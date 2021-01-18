@@ -1,0 +1,74 @@
+#!/usr/bin/bash
+#自定义服务启动、重载、重启、关闭等操作脚本
+#usage:serv 服务名称 [是否守护进程] 操作动作
+#eg:serv wtimer [-d] start 开启定时任务服务
+#author:bing
+filename=$1
+if [ "$2" = "-d" ];then
+    option=$3
+    model="-d"
+else
+    model=""
+    option=$2
+fi
+service_list=('wdsp' 'wtimer' 'wtask' 'wlisten')
+
+helpText(){
+    echo -e "\033[42;37m usage:serv service_name [option] action \033[0m"
+    echo -e "\033[42;37m service_name：\033[0m"
+    echo -e "\033[42;37m wtimer   [定时任务服务，  端口:9515] \033[0m"
+    echo -e "\033[42;37m wdsp     [任务分发服务，  端口:9516] \033[0m"
+    echo -e "\033[42;37m wtask    [异步任务服务，  端口:9517] \033[0m"
+    echo -e "\033[42;37m wlisten  [进程监控服务，  端口:9518] \033[0m"
+    echo -e "\033[42;37m all      [全部服务] \033[0m"
+    echo -e "\033[42;37m option：\033[0m"
+    echo -e "\033[42;37m -d 守护进程方式运行 \033[0m"
+    echo -e "\033[42;37m action： \033[0m"
+    echo -e "\033[42;37m start   [启动服务]   \033[0m"
+    echo -e "\033[42;37m reload  [热重启服务] \033[0m"
+    echo -e "\033[42;37m restart [启动服务]   \033[0m"
+    echo -e "\033[42;37m stop    [关闭服务]   \033[0m"
+}
+
+
+if [ -n "$filename" ];then
+    if [ "$filename" = "--help"  -o "$filename" = "help" ];then
+        helpText
+    fi
+    if [ -z "$option" ];then
+        option="start"
+    fi
+   
+    if [[ "${service_list[@]}"  =~ "$filename" ]]; then
+        entry="./${filename}"
+        cmd="${entry} ${filename} -s ${model} ${option}"
+        $cmd
+    elif [[ ! "${service_list[@]}"  =~ "$filename" ]]; then
+        #全部服务统一操作
+        if [ "$filename" = "all" ];then
+            if [ "$option" = "stop" ];then
+                model=""
+            else
+                model="-d"
+            fi
+            for filename in ${service_list[@]}
+            do
+                entry="./${filename}"
+                if [ "$option" = "restart" ];then
+                        cmd="${entry} ${filename} -s stop"
+                cmd2=" ${entry} ${filename} -s ${model} ${option}"
+                        $cmd
+                        $cmd2
+                else
+                cmd="${entry} ${filename} -s ${model} ${option}"
+                        $cmd
+                fi
+            done
+        else
+            echo "暂不支持开启【$filename】服务"
+        fi
+    fi
+else
+    helpText
+fi
+

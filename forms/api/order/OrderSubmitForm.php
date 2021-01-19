@@ -248,10 +248,12 @@ class OrderSubmitForm extends BaseModel
                 return $this->returnApiResultData();
             }
             try {
+                //获取商品基本信息
                 $data = $this->handleData($type = 2);
             } catch (OrderException $orderException) {
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, CommonLogic::getExceptionMessage($orderException));
             }
+
             if (!$this->getUserAddress() && !$data['all_self_mention']) {
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, "请先选择收货地址");
             }
@@ -264,6 +266,7 @@ class OrderSubmitForm extends BaseModel
                 }
                 /** @var Mall $mall */
                 $mall   = Mall::findOne(['id' => \Yii::$app->mall->id]);
+
                 $status = $mall->getMallSettingOne('mobile_verify');
                 if ($status) {
                     $value   = $data['user_address']['mobile'];
@@ -283,12 +286,14 @@ class OrderSubmitForm extends BaseModel
             $token  = $this->getToken();
 
             $oldOrder = Order::findOne(['token' => $token, 'sign' => $this->sign, 'is_delete' => 0]);
+
             if ($oldOrder)  return $this->returnApiResultData(ApiCode::CODE_FAIL,'重复下单。');
             if (!$data['user_address_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'当前收货地址不允许购买。');
             if (!$data['price_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'订单总价未达到起送要求。');
+            //获取用户的基本信息
             $user = \Yii::$app->user->identity;
-
             $districtArr = new DistrictArr();
+
             $event_data = array();//事件参数
             foreach ($data['list'] as $orderItem) {
                 $order = new Order();
@@ -360,7 +365,7 @@ class OrderSubmitForm extends BaseModel
                 if (!$order->save()) {
                     return $this->returnApiResultData(ApiCode::CODE_FAIL,(new BaseModel())->responseErrorMsg($order));
                 }
-
+//                var_dump($order);exit();
                 if ($orderItem['mch']['id'] > 0) {
                     // $mchOrder = new MchOrder();
                     // $mchOrder->order_id = $order->id;
@@ -434,9 +439,9 @@ class OrderSubmitForm extends BaseModel
                 // $commonOrderForm->commonOrderJob($order->id, CommonOrderDetail::STATUS_NORMAL, CommonOrderDetail::TYPE_MALL_GOODS, $order->mall_id, $order->user_id, $order->total_pay_price);
                 $commonOrderForm->createCommonOrder($order->id, CommonOrderDetail::STATUS_NORMAL, CommonOrderDetail::TYPE_MALL_GOODS, $order->mall_id, $order->user_id, $order->total_pay_price);
             }
+
             $t->commit();
             //遍历触发事件
-
             foreach ($event_data as $event) {
                 \Yii::$app->trigger(Order::EVENT_CREATED, $event);
             }
@@ -461,7 +466,7 @@ class OrderSubmitForm extends BaseModel
      */
     public function handleData($type = 1)
     {
-
+        //获取商品数据
         $listData = $this->getListData($this->form_data["list"]);
 
         foreach ($listData as &$item) {

@@ -92,8 +92,11 @@ class OrderController extends ApiController
     {
         $form = new OrderSubmitForm();
         $form->form_data = $this->requestData;
+        //获取支付类型
         $mallPaymentTypes = OrderLogic::getPaymentTypeConfig();
-        
+//        echo '<pre>';
+//        $form->setSupportPayTypes($mallPaymentTypes)->doSubmitOrder();
+//        exit();
         return $this->asJson($form->setSupportPayTypes($mallPaymentTypes)->doSubmitOrder());
     }
     

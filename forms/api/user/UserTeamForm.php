@@ -57,6 +57,7 @@ class UserTeamForm extends BaseModel
             //团队佣金
             'team_commission' => $this->getUserTeamCommissionTotal($teamAllData),
         ];
+//        var_dump($result);
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '请求成功', $result);
     }
 
@@ -111,6 +112,7 @@ class UserTeamForm extends BaseModel
         $user_id = \Yii::$app->user->id;
         //获取间推或直推数据
         $userStatData = UserLogic::getStatUserPushTotal(["user_id" => $user_id]);
+//        var_dump($userStatData);
         //
         $teamUserIds = self::getMyTeamIds($teamAllData);
         $orderStatData = UserLogic::getUserTeamOrderStatInfo($teamUserIds,["is_pay" => 1]);
@@ -168,10 +170,14 @@ class UserTeamForm extends BaseModel
         if (!$this->validate()) {
             return $this->returnApiResultData();
         }
+//        \Yii::$app->user->identity->id 当前用户id
+        //获取直推和间接推荐
         $query = UserChildren::find()->where(['user_id' => \Yii::$app->user->identity->id, 'is_delete' => 0]);
+        //flag 前端点击tab传递过来
         if ($this->flag == 1) {
             $query->andWhere(['level' => 1]);
         }
+        //flag 前端点击tab传递过来
         if ($this->flag == 2) {
             $query->andWhere(['>', 'level', 1]);
         }
@@ -193,6 +199,7 @@ class UserTeamForm extends BaseModel
             $query = CommonOrder::find()->alias('o')
                 ->andWhere(['o.user_id' => $item['child_id'], 'o.is_delete' => 0]);
             $order_count = $query->count();
+
             $item['order_count'] = $order_count ?? 0;
             $total_price = $query->sum('o.pay_price');
             $total_price = $total_price ?? '0.00';

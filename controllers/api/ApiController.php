@@ -170,6 +170,7 @@ class ApiController extends BaseController
         } else {
             \Yii::$app->user->logout();
         }
+//        var_dump($this);
         return $this;
     }
 
@@ -243,6 +244,7 @@ class ApiController extends BaseController
     protected function getAuthLoginForm()
     {
         $appPlatform = \Yii::$app->appPlatform;
+        var_dump($appPlatform);
         $Class = null;
         if ($appPlatform === APP_PLATFORM_MP_WX) {
             $Class = 'app\\plugins\\wxapp\\models\\LoginForm';

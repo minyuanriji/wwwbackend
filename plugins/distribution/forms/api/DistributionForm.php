@@ -35,9 +35,11 @@ class DistributionForm extends BaseModel
 
     public function getInfo()
     {
+        //获取当前的用户
         $user = User::findOne(\Yii::$app->user->identity->id);
         $common = Common::getCommon(\Yii::$app->mall);
         /** @var Distribution $distributions */
+        //获取直推人
         $returnData = $common->getDistributionInfo($user);
         if (!$returnData["is_distribution"]) {
             $is_apply = DistributionSetting::getValueByKey(DistributionSetting::IS_APPLY, \Yii::$app->mall->id);

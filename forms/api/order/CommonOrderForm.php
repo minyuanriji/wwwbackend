@@ -161,6 +161,7 @@ class CommonOrderForm extends BaseModel
         \Yii::warning("commonOrderForm dataArr=" . var_export($dataArr, true));
         try{
             $class = new CommonOrderJob($dataArr);
+
             \Yii::$app->queue->delay(0)->push($class);
         }catch (\Exception $ex){
             \Yii::error("commonOrderForm commonOrderJob error=" . CommonLogic::getExceptionMessage($ex));

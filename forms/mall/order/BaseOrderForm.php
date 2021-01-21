@@ -669,11 +669,13 @@ abstract class BaseOrderForm extends BaseModel
             return $this->responseErrorInfo();
         }
         try {
+            //获取订单数据ß
             $order = Order::find()->where([
                 'mall_id' => \Yii::$app->mall->id,
                 'id' => $this->order_id,
                 'is_delete' => 0
             ])->with('refund')->one();
+
             /* @var Order $order */
             if (!$order) {
                 throw new \Exception('订单不存在');
@@ -709,6 +711,7 @@ abstract class BaseOrderForm extends BaseModel
 //            \Yii::$app->trigger(Order::EVENT_SALES, new OrderEvent([
 //                'order' => $order
 //            ]));
+
             // 订单过售后
             \Yii::$app->queue->delay(0)->push(new OrderCustomerServiceJob([
                 'orderId' => $order->id

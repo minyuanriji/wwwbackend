@@ -78,6 +78,7 @@ class OrderCustomerServiceJob extends Component implements JobInterface
                 $event = new OrderEvent([
                     'order' => $order
                 ]);
+//                \Yii::$app->redis->set('var1',json_encode($event));
                 \Yii::$app->trigger(Order::EVENT_SALES, $event);
             }
         }catch (\Exception $ex){

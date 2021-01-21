@@ -28,6 +28,7 @@ use app\forms\api\order\OrderSubmitForm;
 use app\logic\OrderLogic;
 use app\models\Express;
 use app\controllers\business\PostageRules;
+use app\forms\mall\order\OrderForm as OrderFormMall;
 class OrderController extends ApiController
 {
 
@@ -232,6 +233,12 @@ class OrderController extends ApiController
         $form = new OrderEditForm();
         $form->attributes = $this->requestData;
         return $form->orderConfirm();
+    }
+    //用户确认收货触发，返回积分
+    public function actionOrderSales(){
+        $form = new OrderFormMall();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->orderSales());
     }
 
     /**

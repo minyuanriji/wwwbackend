@@ -45,6 +45,8 @@ class OrderPaymentDataForm extends BaseModel
         if (!$this->validate()) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL,"",$this);
         }
+
+
 //        if(empty(\Yii::$app->user->identity->mobile)){
 //            return $this->returnApiResultData(ApiCode::CODE_FAIL,"请先绑定手机号");
 //        }

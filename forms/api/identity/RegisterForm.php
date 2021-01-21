@@ -168,12 +168,13 @@ class RegisterForm extends BaseModel
             //     return $this->returnApiResultData(ApiCode::CODE_FAIL,'没有找到该邀请人手机号');
             // }
             // $this->recommend_id = $existParentUser['id'];
-
+            //获取用户,判断是否已经注册过
             $existUser = User::getOneUser(['or',['=', 'username', $this->mobile],['=', 'mobile', $this->mobile]]);
             if(!empty($existUser)){
                 return $this->returnApiResultData(ApiCode::CODE_FAIL,'手机号已被注册');
             }
             $third_parent_id = $second_parent_id = 0;
+
             if(!empty($this->recommend_id)){
                 $recommendUsers = User::findOne($this->recommend_id);
                 if(empty($recommendUsers)){
@@ -182,6 +183,7 @@ class RegisterForm extends BaseModel
                 $second_parent_id = $recommendUsers["parent_id"];
                 $third_parent_id = $recommendUsers["second_parent_id"];
             }
+            //发送验证码
             $smsForm = new SmsForm();
             $smsForm->captcha = $this->captcha;
             $smsForm->mobile = $this->mobile;

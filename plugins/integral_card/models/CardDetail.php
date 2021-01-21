@@ -84,6 +84,9 @@ class CardDetail extends BaseActiveRecord{
             ))
             ->andWhere(array('>','expire_time',time()))
             ->one();
+            var_dump($serialize_no);
+            var_dump($model);
+            exit();
             if(empty($model)) throw new Exception('充值卡不存在或已失效');
 
             $res = IntegralLogic::rechargeIntegral($model->integral_setting,$user_id,0,$model->user_id);

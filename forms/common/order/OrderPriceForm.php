@@ -10,7 +10,7 @@
 
 namespace app\forms\common\order;
 
-use app\core\response\ApiCode;
+use app\core\ApiCode;
 use app\events\OrderEvent;
 use app\models\BaseModel;
 use app\models\Order;
@@ -91,8 +91,7 @@ class OrderPriceForm extends BaseModel
     }
 
     //修改价格
-    public function updatePrice()
-    {
+    public function updatePrice(){
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
@@ -331,3 +330,4 @@ class OrderPriceForm extends BaseModel
         }
     }
 }
+

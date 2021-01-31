@@ -1,0 +1,1 @@
+SELECT * FROM `jxmall_integral` WHERE (`finish_period` <= 1611577761) AND (`status` IN (0, 1)) LIMIT 100

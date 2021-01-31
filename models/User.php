@@ -111,7 +111,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
      */
     public function rules()
     {
-//        'temp_parent_id',
+        // 'temp_parent_id', 
         return [
             [['username', 'password'], 'required'],
             [['mall_id', 'mch_id', 'parent_id', 'second_parent_id', 'third_parent_id', 'is_delete', 'is_blacklist',

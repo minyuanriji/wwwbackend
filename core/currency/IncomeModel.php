@@ -21,7 +21,10 @@ use app\models\ErrorLog;
 use app\models\IncomeLog;
 use app\models\Mall;
 use app\models\User;
+use app\plugins\distribution\models\Distribution;
 use yii\db\Exception;
+
+use app\forms\api\user\UserIncomeForm;
 
 /**
  * @property Mall $mall;
@@ -48,29 +51,14 @@ class IncomeModel extends BaseModel implements BaseCurrency
         if (!is_float($price) && !is_int($price) && !is_double($price)) {
             throw new Exception('金额必须为数字类型');
         }
-        /* @var User $user */
-        $userInfo = $this->user;
-        \Yii::warning("incomeModel add userInfo = ".var_export($userInfo,true));
         $t = \Yii::$app->db->beginTransaction();
-        if($flag == 0){
-            $userInfo->total_income += $price;
-            $userInfo->income_frozen += $price;
-        }else{
-            $userInfo->income_frozen -= $price;
-            $userInfo->income += $price;
-        }
-        if ($userInfo->save()) {
-            try {
-                $this->createLog(1, $price, $desc,$order_detail_id, $flag,$userInfo->total_income,$from);
-                $t->commit();
-                return true;
-            } catch (Exception $e) {
-                $t->rollBack();
-                throw $e;
-            }
-        } else {
+        try {
+            $this->createLog(1, $price, $desc,$order_detail_id, $flag, 0,$from);
+            $t->commit();
+            return true;
+        } catch (Exception $e) {
             $t->rollBack();
-            throw new Exception($this->responseErrorMsg($userInfo), $userInfo->errors, 1);
+            throw $e;
         }
     }
 
@@ -93,27 +81,14 @@ class IncomeModel extends BaseModel implements BaseCurrency
         if ($this->user->income < $price) {
             throw new Exception('用户收益不足');
         }
-        /* @var User $user */
-        $user = $this->user;
         $t = \Yii::$app->db->beginTransaction();
-        $user->income -= $price;
-        $user->income_frozen += $price;
-        // if ($payment['cash_service_fee'] > 0 && $payment['cash_service_fee'] < 100) {
-        //     $balance =  (100 - $payment['cash_service_fee']) * $price / 100;
-        //     $user->balance += $balance;
-        // }
-        if ($user->save()) {
-            try {
-                $this->createLog(2, $price, $desc,$order_detail_id, $flag,$user->income);
-                $t->commit();
-                return true;
-            } catch (Exception $e) {
-                $t->rollBack();
-                throw $e;
-            }
-        } else {
+        try {
+            $this->createLog(2, $price, $desc,$order_detail_id, $flag,0);
+            $t->commit();
+            return true;
+        } catch (Exception $e) {
             $t->rollBack();
-            throw new Exception($this->responseErrorMsg($user), $user->errors, 1);
+            throw $e;
         }
     }
 
@@ -123,7 +98,8 @@ class IncomeModel extends BaseModel implements BaseCurrency
      */
     public function select()
     {
-        return round($this->user->income, 2);
+        $form = new UserIncomeForm();
+        return round($this->getIncomeTotal(), 2);
     }
 
     /**
@@ -141,23 +117,14 @@ class IncomeModel extends BaseModel implements BaseCurrency
         if (!is_float($price) && !is_int($price) && !is_double($price)) {
             throw new Exception('金额必须为数字类型');
         }
-        /* @var User $userInfo */
-        $userInfo = $this->user;
         $t = \Yii::$app->db->beginTransaction();
-        $userInfo->income_frozen -= $price;
-        $userInfo->total_income -= $price;
-        if ($userInfo->save()) {
-            try {
-                $this->createLog(1, $price, $desc,$order_detail_id, $flag,$userInfo->total_income);
-                $t->commit();
-                return true;
-            } catch (Exception $e) {
-                $t->rollBack();
-                throw $e;
-            }
-        } else {
+        try {
+            $this->createLog(1, $price, $desc,$order_detail_id, $flag, 0);
+            $t->commit();
+            return true;
+        } catch (Exception $e) {
             $t->rollBack();
-            throw new Exception($this->responseErrorMsg($userInfo), $userInfo->errors, 1);
+            throw $e;
         }
     }
 
@@ -179,12 +146,15 @@ class IncomeModel extends BaseModel implements BaseCurrency
             \Yii::warning('余额为' . $price . '不记录日志');
             return true;
         }
+
+        $distribution = Distribution::findOne(['user_id' => $this->user->id]);
+
         if($flag == 1 || $flag == 2){
             //查找是否已有冻结记录，有的话更新冻结状态
             $form = IncomeLog::findOne(["mall_id" => $this->user->mall_id,"user_id"=>$this->user->id,
-                                "order_detail_id" => $order_detail_id,"type" => IncomeLog::TYPE_IN,
-                                "from" => $from
-                               ]);
+                "order_detail_id" => $order_detail_id,"type" => IncomeLog::TYPE_IN,
+                "from" => $from
+            ]);
             if(!empty($form)){
                 $form->flag = $flag;
             }else{
@@ -197,7 +167,7 @@ class IncomeModel extends BaseModel implements BaseCurrency
                 $form->desc = $desc;
                 $form->flag = $flag;
                 $form->from = $from;
-                $form->income = $income ==0 ? $this->user->income : $income;
+                $form->income = $distribution->total_price;
             }
         }else{
             //查找是否已有冻结记录，有的话直接返回
@@ -216,8 +186,9 @@ class IncomeModel extends BaseModel implements BaseCurrency
             $form->desc = $desc;
             $form->flag = $flag;
             $form->from = $from;
-            $form->income = $income ==0 ? $this->user->income : $income;
+            $form->income = $distribution->total_price;
         }
+
         if ($form->save()) {
             //触发收益变动事件
             $event             = new IncomeEvent();

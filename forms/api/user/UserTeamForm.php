@@ -57,7 +57,6 @@ class UserTeamForm extends BaseModel
             //团队佣金
             'team_commission' => $this->getUserTeamCommissionTotal($teamAllData),
         ];
-//        var_dump($result);
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '请求成功', $result);
     }
 
@@ -112,9 +111,15 @@ class UserTeamForm extends BaseModel
         $user_id = \Yii::$app->user->id;
         //获取间推或直推数据
         $userStatData = UserLogic::getStatUserPushTotal(["user_id" => $user_id]);
-//        var_dump($userStatData);
         //
-        $teamUserIds = self::getMyTeamIds($teamAllData);
+        //$teamUserIds = self::getMyTeamIds($teamAllData);
+        $child_list = $teamAllData["child_list"];
+        $teamUserIds = [];
+        if (!empty($child_list)) {
+            foreach ($child_list as $value) {
+                $teamUserIds[] = $value["id"];
+            }
+        }
         $orderStatData = UserLogic::getUserTeamOrderStatInfo($teamUserIds,["is_pay" => 1]);
         //var_dump($teamUserIds);exit;
         $returnData = array_merge($userStatData,$orderStatData);
@@ -170,14 +175,10 @@ class UserTeamForm extends BaseModel
         if (!$this->validate()) {
             return $this->returnApiResultData();
         }
-//        \Yii::$app->user->identity->id 当前用户id
-        //获取直推和间接推荐
         $query = UserChildren::find()->where(['user_id' => \Yii::$app->user->identity->id, 'is_delete' => 0]);
-        //flag 前端点击tab传递过来
         if ($this->flag == 1) {
             $query->andWhere(['level' => 1]);
         }
-        //flag 前端点击tab传递过来
         if ($this->flag == 2) {
             $query->andWhere(['>', 'level', 1]);
         }
@@ -187,19 +188,27 @@ class UserTeamForm extends BaseModel
         $list = $query->with(['children' => function ($query) {
             $query->select('id, nickname, avatar_url, junior_at, mobile');
         }])->page($pagination, 10, $this->page)->orderBy(['id'=>SORT_DESC])->asArray()->all();
+        foreach($list as $key => $item){
+            if(empty($item['children'])){
+                unset($list[$key]);
+            }
+        }
 
+        $list = array_values($list);
+        
         foreach ($list as &$item) {
             $query = CommonOrder::find()->alias('o')
                 ->leftJoin(['uc' => UserChildren::tableName()], 'uc.child_id=o.user_id')
-                ->andWhere(['uc.user_id' => $item['child_id'], 'uc.is_delete' => 0]);
+                ->andWhere(['uc.user_id' => $item['child_id'], 'uc.is_delete' => 0])
+                ->andWhere(['o.is_pay' => 1]);
+            
             $team_order_count = $query->count();
             $item['team_order_count'] = $team_order_count ?? 0;
             $team_total_price = $query->sum('o.pay_price');
             $item['team_total_price'] = $team_total_price ?? '0.00';
             $query = CommonOrder::find()->alias('o')
-                ->andWhere(['o.user_id' => $item['child_id'], 'o.is_delete' => 0]);
+                ->andWhere(['o.user_id' => $item['child_id'], 'o.is_delete' => 0, 'o.is_pay' => 1]);
             $order_count = $query->count();
-
             $item['order_count'] = $order_count ?? 0;
             $total_price = $query->sum('o.pay_price');
             $total_price = $total_price ?? '0.00';
@@ -210,7 +219,10 @@ class UserTeamForm extends BaseModel
             $team_user_count = UserChildren::find()->where(['user_id' => $item['child_id'], 'is_delete' => 0])->count();
             $item['team_user_count'] = $team_user_count ?? '0';
             $item['created_at']=date('Y-m-d H:i:s',$item['created_at']);
+            $item['avatar_url'] = !empty($item['avatar_url']) ? $item['avatar_url'] : "http://";
+           
         }
+        
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, ['list' => $list, 'pagination' => $pagination]);
     }
 
@@ -258,7 +270,7 @@ class UserTeamForm extends BaseModel
             ->leftJoin(['u' => User::tableName()], 'u.id=uc.child_id')
             ->leftJoin(['co' => CommonOrder::tableName()], 'co.user_id=u.id and co.is_delete=0')
             ->leftJoin(['o' => Order::tableName()], 'o.id=co.order_id')
-            ->leftJoin(['pl' => PriceLog::tableName()], 'pl.user_id=u.id and pl.order_id=co.order_id') -> orderBy('created_at DESC');
+            ->leftJoin(['pl' => PriceLog::tableName()], 'pl.user_id=\''.\Yii::$app->user->identity->id.'\' and pl.order_id=co.order_id') -> orderBy('created_at DESC');
 
 
         if ($this->status>=0 && $this->status<=2) {
@@ -270,9 +282,13 @@ class UserTeamForm extends BaseModel
             foreach ($list as &$item) {
                 $item['status_text'] = $order->orderStatusText($item);
                 $item['created_at'] = date('Y-m-d H:i:s',$item['created_at']);
+                  if(!empty($item['price'])){
+                    $item['price'] = mb_substr($item['price'],0,strpos($item['price'],'.')) . substr($item['price'],strpos($item['price'],'.'),3);
+                }
             }
         }
-        
+        //print_r(debug_backtrace());
+        //exit;
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, ['list' => $list, 'pagination' => $pagination]);
     }
 }

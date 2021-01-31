@@ -86,20 +86,17 @@ class Common extends BaseModel
         }
         $plugin = new Plugin();
         $sign = $plugin->getName();
-//        var_dump($sign);
         if (!$sign) {
             $this->sign = 'mall';
         } else {
             $this->sign = $sign;
         }
-
         $returnData = [];
         $total_price = 0;
         $level = 0;
         $frozen_price = 0;
         $yesterday_price = 0;
         $distribution = $this->getDistributionUser($user);
-
         $level_name = '普通用户';
         $is_price = '0.00';
         if (!empty($distribution)) {
@@ -107,8 +104,8 @@ class Common extends BaseModel
             $level_name = isset($distribution->distributionLevel) ? $distribution->distributionLevel->name : "普通用户";
             $frozen_price = floatval($distribution->frozen_price);
             $query = PriceLog::find()->where(["mall_id" => \Yii::$app->mall->id, "user_id" => $user->id, 'is_price' => 1, 'sign' => $this->sign]);
-            //统计价格
             $is_price = $query->sum("price");
+
             //昨日收益
             $yesterday = date("Y-m-d", strtotime("-1 day"));
             $begin_time = strtotime($yesterday . " 00:00:00");
@@ -117,9 +114,8 @@ class Common extends BaseModel
             $query->andWhere(['between', "created_at", $begin_time, $end_time]);
             $yesterday_price = $query->sum("price");
         }
-        //查找自己信息，和获取父级信息
         $userParent = UserParent::findOne(['user_id' => $user->id, 'is_delete' => 0, 'level' => 1]);
-        if (!$userParent) { //没有父机走着
+        if (!$userParent) {
             $returnData['parent_name'] = '平台';
             $returnData['parent_avatar_url'] = MallSetting::getValueByKey('logo', \Yii::$app->mall->id);
             $returnData['mobile'] = MallSetting::getValueByKey('contact_tel', \Yii::$app->mall->id);

@@ -66,9 +66,6 @@ class IdentityController extends ApiController
     {
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
-//        echo '<pre>';
-//        var_dump($this->requestData);
-//        exit();
         $result = $wechatForm->authorized();
         return $result;
     }

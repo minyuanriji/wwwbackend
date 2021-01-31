@@ -252,14 +252,11 @@ class Payment extends Component
             }
             /** @var User $user */
             $user = \Yii::$app->user->identity;
-            //查看订单是否存在，是否支付
             $paymentOrderUnion = PaymentOrderUnion::findOne(['id' => $id]);
             if (!$paymentOrderUnion) {
                 throw new PaymentException('待支付订单不存在。');
             }
-            //获取支付方式
             $supportPayTypes = (array)$paymentOrderUnion->decodeSupportPayTypes($paymentOrderUnion->support_pay_types);
-
             if (!empty($supportPayTypes)
                 && is_array($supportPayTypes)
                 && !in_array(static::PAY_TYPE_BALANCE, $supportPayTypes)) {
@@ -280,8 +277,6 @@ class Payment extends Component
                     throw new \Exception('支付密码错误');
                 }
             }
-
-            //获取订单信息
             /** @var \app\models\PaymentOrder[] $paymentOrders */
             $paymentOrders = \app\models\PaymentOrder::find()
                 ->where(['payment_order_union_id' => $paymentOrderUnion->id,])
@@ -296,19 +291,16 @@ class Payment extends Component
             }
             $paymentOrderUnion->is_pay = 1;
             $paymentOrderUnion->pay_type = 3;
-            //修改订单信息表的支付状态
             if (!$paymentOrderUnion->save()) {
                 throw new \Exception($paymentOrderUnion->getFirstErrors());
             }
             foreach ($paymentOrders as $paymentOrder) {
                 $paymentOrder->is_pay = 1;
                 $paymentOrder->pay_type = 3;
-                //修改订单表的支付状态
                 if (!$paymentOrder->save()) {
                     throw new \Exception($paymentOrder->getFirstErrors());
                 }
                 $NotifyClass = $paymentOrder->notify_class;
-
                 /** @var PaymentNotify $notifyObject */
                 $notifyObject = new $NotifyClass();
                 $po = new PaymentOrder([

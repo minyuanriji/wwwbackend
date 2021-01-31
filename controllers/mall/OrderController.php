@@ -407,9 +407,6 @@ class OrderController extends OrderManagerController
         if (\Yii::$app->request->isPost) {
             $form = new OrderForm();
             $form->attributes = \Yii::$app->request->post();
-            var_dump(\Yii::$app->mall->id);
-            var_dump($form->attributes);
-            exit();
             return $this->asJson($form->orderSales());
         }
     }

@@ -46,3 +46,7 @@ tests/_support/_generated
 /web/temp/*
 web/uploads/images/*
 .env
+
+接口说明.md
+短视频.sql
+签到sql.txt

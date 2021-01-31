@@ -45,8 +45,6 @@ class DistributionLogJob extends Component implements JobInterface
     //TODO 还需要加入其他筛选添加 例如是商城商品还是其他商品
     public function execute($queue)
     {
-        return;
-        file_put_contents(__DIR__ . "/debug", date("Y-m-d H:i:s") . "\n", FILE_APPEND);
         \Yii::warning('-------------------------------------------------------------------------------------------------------');
         \Yii::warning('分销记录队列开始执行，common_order_detail_id：'.$this->common_order_detail_id);
         $order = CommonOrderDetail::findOne($this->common_order_detail_id);
@@ -264,8 +262,8 @@ class DistributionLogJob extends Component implements JobInterface
                                 \Yii::warning(json_encode($log->getErrors()));
                             } else {
                                 $user = User::findOne($log->user_id);
-                                //\Yii::$app->currency->setUser($user)->income
-                                //    ->add(floatval($log->price), "分佣记录ID：{$log->id} 的佣金发放", $this->common_order_detail_id);
+                                \Yii::$app->currency->setUser($user)->income
+                                    ->add(floatval($log->price), "分佣记录ID：{$log->id} 的佣金发放", 0);
                                 $distribution->frozen_price += $price;
                                 $order_count = PriceLog::find()->where(['user_id' => $log->user_id, 'is_delete' => 0, 'sign' => $sign])->groupBy('order_id')->count();
                                 $distribution->total_order = $order_count;
@@ -293,7 +291,7 @@ class DistributionLogJob extends Component implements JobInterface
                     //开始佣金到账
                     $user = User::findOne($log->user_id);
                     \Yii::$app->currency->setUser($user)->income
-                        ->add(floatval($log->price), "分佣记录ID：{$log->id} 的佣金发放", $this->common_order_detail_id, 1);
+                        ->add(floatval($log->price), "分佣记录ID：{$log->id} 的佣金发放", 0, 1);
                     $log->is_price = 1;
                     if (!$log->save()) {
                         \Yii::warning('佣金记录发放保存失败：' . SerializeHelper::encode($log->getErrors()));
@@ -328,7 +326,7 @@ class DistributionLogJob extends Component implements JobInterface
                         //保存成功之后要减掉冻结的钱
                         $user = User::findOne($log->user_id);
                         \Yii::$app->currency->setUser($user)->income
-                            ->refund(floatval($log->price), "分佣记录ID：{$log->id} 的冻结佣金扣除", $this->common_order_detail_id, 0);
+                            ->refund(floatval($log->price), "分佣记录ID：{$log->id} 的冻结佣金扣除", 0, 0);
                         $distribution = Distribution::findOne(['user_id' => $log->user_id, 'is_delete' => 0]);
                         if ($distribution) {
                             $distribution->frozen_price -= floatval($log->price);

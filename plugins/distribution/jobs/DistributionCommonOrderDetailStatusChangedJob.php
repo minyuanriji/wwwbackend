@@ -20,9 +20,6 @@ class DistributionCommonOrderDetailStatusChangedJob extends Component implements
     public $order;
 
     public function execute($queue){
-        
-        file_put_contents(__DIR__ . "/debug", $this->common_order_detail_id);
-        
         \Yii::warning('-------------------------------------------------------------------------------------------------------');
         \Yii::warning('分销记录队列开始执行');
 

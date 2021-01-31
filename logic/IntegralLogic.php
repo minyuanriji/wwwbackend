@@ -9,7 +9,7 @@ use app\models\User;
 use app\models\OrderDetail;
 use Exception;
 use Yii;
-use app\controllers\business\OrderCommon;
+
 class IntegralLogic{
     /**
      * 订单取消返还购物券/积分券
@@ -253,14 +253,12 @@ class IntegralLogic{
                         $goods_id = $order_detail->goods_id;
                         $score_setting = Goods::getGooodsScoreSetting($goods_id);
                         $score_setting = json_decode($score_setting,true);
-                        
                         if(empty($score_setting)){
                             $trans->rollBack();
                             return false;
                         }
                         for($i=0;$i<$order_detail['num'];$i++){ //根据该商品购买数量循环发送
                             $res = Integral::addIntegralPlan($user_id,$score_setting,'购买商品赠送积分券','0');
-                            (new OrderCommon()) -> actionOrderSales($user_id,$score_setting);
                         }
                         if($res === false) throw new Exception(Integral::getError());       
                     }elseif(!$is_order_paid){                                       //商品订单不设置支付状态下执行

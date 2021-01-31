@@ -20,9 +20,6 @@ use app\models\Option;
 use app\models\User;
 use app\plugins\distribution\Plugin;
 
-use app\models\PriceLog;
-use app\models\Order;
-
 class UserIncomeForm extends BaseModel
 {
     public $page;
@@ -46,39 +43,6 @@ class UserIncomeForm extends BaseModel
         ];
     }
 
-
-    /**
-     * 计算可提现金额
-     * @return float
-     */
-    public function getIncomeTotal()
-    {
-        $income = PriceLog::find()->alias("pl")
-            ->leftJoin(["o" => Order::tableName()], "o.id=pl.order_id")
-            ->andWhere(["o.is_pay" => 1]) //订单为已支付
-            ->andWhere(["o.mall_id" => \Yii::$app->mall->id])
-            ->andWhere(["pl.user_id" => \Yii::$app->user->id])
-            ->andWhere(["pl.is_price" => 1, "pl.status" => 1])  //已发放，有效记录
-            ->sum("pl.price");
-        return $income ? $income : 0;
-    }
-
-    /**
-     * 计算未结算金额
-     * @return  float
-     */
-    public function getIncomeFrozenTotal()
-    {
-        $incomeFrozen = PriceLog::find()->alias("pl")
-            ->leftJoin(["o" => Order::tableName()], "o.id=pl.order_id")
-            ->andWhere(["o.is_pay" => 1]) //订单为已支付
-            ->andWhere(["o.mall_id" => \Yii::$app->mall->id])
-            ->andWhere(["pl.user_id" => \Yii::$app->user->id])
-            ->andWhere(["pl.is_price" => 0, "pl.status" => 1])  //未发放，有效记录
-            ->sum("pl.price");
-        return $incomeFrozen ? $incomeFrozen : 0;
-    }
-
     /**
      * 用户收益信息
      * @Author: zal
@@ -92,23 +56,17 @@ class UserIncomeForm extends BaseModel
             return null;
         }
         $user_id = \Yii::$app->user->id;
-
         /** @var User $userInfo */
         $userInfo = User::getOneData($user_id);
         $result = [
             //可提现
-            'income' => round($userInfo->income, 2),
-
+            'income' => $userInfo->income,
             //待收益
-            'income_frozen' => round($userInfo->income_frozen, 2),
-
-            'total_income' => round($userInfo->total_income, 2),
-
+            'income_frozen' => $userInfo->income_frozen,
+            'total_income' => $userInfo->total_income,
             'total_cash' => 0,
             'yesterday_income' => $this->getYesterdayIncome()
         ];
-        $result['total_income'] = round($result['income'] + $result['income_frozen'], 2);
-
         $result = array_merge($result, \Yii::$app->plugin->getUserInfo($userInfo));
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '请求成功', $result);
     }

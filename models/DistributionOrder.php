@@ -25,4 +25,3 @@ class DistributionOrder extends BaseActiveRecord{
     }
 
 }
-

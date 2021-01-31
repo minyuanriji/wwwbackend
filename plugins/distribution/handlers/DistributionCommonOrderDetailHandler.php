@@ -13,8 +13,6 @@ namespace app\plugins\distribution\handlers;
 
 use app\handlers\BaseHandler;
 use app\handlers\CommonOrderDetailHandler;
-use app\plugins\distribution\jobs\DistributionCommonOrderDetailCreatedJob;
-use app\plugins\distribution\jobs\DistributionCommonOrderDetailStatusChangedJob;
 use app\plugins\distribution\jobs\DistributionLogJob;
 use app\plugins\distribution\jobs\RebuyLogJob;
 use app\plugins\stock\jobs\StockLogJob;
@@ -34,7 +32,7 @@ class DistributionCommonOrderDetailHandler extends BaseHandler
         // TODO: Implement register() method.
         \Yii::$app->on(CommonOrderDetailHandler::COMMON_ORDER_DETAIL_CREATED, function ($event) {
             $common_order_detail_id = $event->common_order_detail_id;
-            \Yii::$app->queue->delay(3)->push(new DistributionCommonOrderDetailCreatedJob(['common_order_detail_id' => $common_order_detail_id]));
+            \Yii::$app->queue->delay(3)->push(new DistributionLogJob(['common_order_detail_id' => $common_order_detail_id, 'type' => 1]));
             \Yii::$app->queue->delay(3)->push(new RebuyLogJob(['common_order_detail_id' => $common_order_detail_id, 'type' => 1]));
             \Yii::warning('订单创建事件执行次数');
 
@@ -44,7 +42,7 @@ class DistributionCommonOrderDetailHandler extends BaseHandler
         // TODO: Implement register() method.
         \Yii::$app->on(CommonOrderDetailHandler::COMMON_ORDER_DETAIL_STATUS_CHANGED, function ($event) {
             $common_order_detail_id = $event->common_order_detail_id;
-            \Yii::$app->queue->delay(3)->push(new DistributionCommonOrderDetailStatusChangedJob(['common_order_detail_id' => $common_order_detail_id]));
+            \Yii::$app->queue->delay(3)->push(new DistributionLogJob(['common_order_detail_id' => $common_order_detail_id, 'type' => 2]));
             \Yii::$app->queue->delay(3)->push(new RebuyLogJob(['common_order_detail_id' => $common_order_detail_id, 'type' => 2]));
         });
     }

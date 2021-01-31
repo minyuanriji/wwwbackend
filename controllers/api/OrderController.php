@@ -27,8 +27,7 @@ use app\forms\api\order\OrderPayResultForm;
 use app\forms\api\order\OrderSubmitForm;
 use app\logic\OrderLogic;
 use app\models\Express;
-use app\controllers\business\{PostageRules,OrderCommon};
-use app\forms\mall\order\OrderForm as OrderFormMall;
+use app\controllers\business\PostageRules;
 class OrderController extends ApiController
 {
 
@@ -57,14 +56,6 @@ class OrderController extends ApiController
         $result = $form->toSubmitOrder();
         return $this->asJson($result);
     }
-    
-     public function actionGetFlag(){
-        $data = $this->requestData;
-        $result = (new OrderCommon()) -> getOneNavData($data['nav_id']);
-        return $this -> asJson($result);
-
-    }
-    
 
     /**
      * 可用优惠券列表
@@ -238,16 +229,6 @@ class OrderController extends ApiController
         $form = new OrderEditForm();
         $form->attributes = $this->requestData;
         return $form->orderConfirm();
-    }
-    
-
-    
-    
-    //用户确认收货触发，返回积分
-    public function actionOrderSales(){
-        $form = new OrderFormMall();
-        $form->attributes = $this->requestData;
-        return $this->asJson($form->orderSales());
     }
 
     /**

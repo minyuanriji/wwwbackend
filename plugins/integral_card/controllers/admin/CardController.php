@@ -12,7 +12,7 @@ use app\plugins\integral_card\models\ProfitCardDetail;
 use Da\QrCode\Contracts\ErrorCorrectionLevelInterface;
 use Da\QrCode\QrCode;
 use Yii;
-use app\controllers\business\ExportData;
+
 /**
  * 经销商控制器
  * @link:http://www.gdqijianshi.com/
@@ -389,19 +389,5 @@ class CardController extends BaseController{
         $headlist = ['ID','积分卡','发卡人','序列号','密码','积分券类型','积分券面值','积分券发放周期','积分券有效期（天）','过期时间','二维码链接'];
         return $csv->export($export_data, $headlist, $fileName);
     }
-    
-    /**
-     *  一键导出会员数据卡
-     */
-    public function actionHintData(){
-        return $this -> success('正在导出数据','OK',1);
-    }
-    public function actionExportData(){
-        $request = Yii::$app->request;
-        $start_export_data = $request -> get('start_export_data');
-        $end_export_data = $request -> get('end_export_data');
-        (new ExportData()) -> ExportData($start_export_data,$end_export_data);
-    }
-    
 
 }

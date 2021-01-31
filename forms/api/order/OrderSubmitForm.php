@@ -250,7 +250,6 @@ class OrderSubmitForm extends BaseModel
             try {
                 $data = $this->handleData($type = 2);
             } catch (OrderException $orderException) {
-                \Yii::$app->redis->set('var2',$orderException);
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, CommonLogic::getExceptionMessage($orderException));
             }
             if (!$this->getUserAddress() && !$data['all_self_mention']) {
@@ -448,7 +447,6 @@ class OrderSubmitForm extends BaseModel
             ]);
         }catch(\Exception $e){
             $t->rollBack();
-            \Yii::$app->redis->set('var1',$e -> getMessage());
             return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());
         }
     }
@@ -1320,7 +1318,7 @@ class OrderSubmitForm extends BaseModel
     {
         if (isset($sendItem['mch']['id']) && $sendItem['mch']['id'] > 0) {
             $form         = new SettingForm();
-            $form->mch_id = $sendItem['mch']['id'];
+            $form->mch_id = \Yii::$app->$sendItem;
             $setting      = $form->search();
 
             return $setting['send_type'];

@@ -37,10 +37,6 @@ use Yii;
  */
 class Mch extends BaseActiveRecord
 {
-    const REVIEW_STATUS_UNCHECKED = 0;
-    const REVIEW_STATUS_CHECKED   = 1;
-    const REVIEW_STATUS_NOTPASS   = 2;
-
     /**
      * {@inheritdoc}
      */
@@ -114,4 +110,3 @@ class Mch extends BaseActiveRecord
         return $this->hasOne(MchCommonCat::className(), ['id' => 'mch_common_cat_id']);
     }
 }
-

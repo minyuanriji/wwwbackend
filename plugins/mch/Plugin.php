@@ -327,11 +327,12 @@ class Plugin extends \app\plugins\Plugin
 
     public function install()
     {
+        /*
         $sql = <<<EOF
 -- v1.0.4
 ALTER TABLE `zjhj_bd_mch` ALTER column `user_id` SET DEFAULT '0';
 EOF;
-        sql_execute($sql);
+        sql_execute($sql);*/
         return parent::install();
     }
 
@@ -377,3 +378,4 @@ EOF;
         return;
     }
 }
+

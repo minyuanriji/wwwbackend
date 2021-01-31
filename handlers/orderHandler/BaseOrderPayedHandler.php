@@ -87,10 +87,10 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
         // 发放积分
         $this->giveIntegral();
         // 发放积分券
-        //echo '支付后发放积分券'.PHP_EOL;
+        // echo '支付后发放积分券'.PHP_EOL;
         IntegralLogic::shopSendScore($this->order,'paid');
         // 发放购物券
-        //echo '支付后发放购物券'.PHP_EOL;
+        // echo '支付后发放购物券'.PHP_EOL;
         IntegralLogic::shopSendIntegral($this->order,'paid');
         // 消费升级会员等级
         //echo '消费升级会员等级'.PHP_EOL;
@@ -126,7 +126,8 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
                 }
             }
             if ($integral > 0) {
-                \Yii::$app->currency->setUser($this->user)->score->add($integral, '订单购买赠送积分');
+                //                启动订单结束后返回积分支付积分
+                // \Yii::$app->currency->setUser($this->user)->score->add($integral, '订单购买赠送积分');
             }
             return true;
         } catch (Exception $e) {

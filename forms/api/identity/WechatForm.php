@@ -57,11 +57,11 @@ class WechatForm extends BaseModel
         $returnData = [];
         /** @var Wechat $wechatModel */
         $wechatModel = \Yii::$app->wechat;
-        
+
         if($wechatModel->isWechat)
         {
             $result = $wechatModel->app->oauth->user();
-            
+
             if(!empty($result)){
                 $userInfo = $result->original;
                 $phoneConfig = AppConfigLogic::getPhoneConfig();
@@ -109,6 +109,7 @@ class WechatForm extends BaseModel
             $result = $wechatModel->app->oauth->user();
             \Yii::warning("授权结果 result:".json_encode($result));
             if(!empty($result)){
+
                 $userInfo = $result->original;
                 $phoneConfig = AppConfigLogic::getPhoneConfig();
                 //没有开启全网通，则直接入库，如果开启了，返回给前端
@@ -119,9 +120,17 @@ class WechatForm extends BaseModel
                     }
                 }else{
                     $returnData = ["access_token" => ""];
+
+                    $oauth =  $result;
                     //检测是否授权
                     $result = UserLogic::checkIsAuthorized($userInfo);
-                    //$result = $this->userHandle($userInfo);
+                    // $result = $this->userHandle($userInfo);
+                  
+                    if($result && empty($result->access_token) && !empty($oauth->token)){
+                        $result->access_token = $oauth->token;
+                        $result->save();
+                    }
+
                     \Yii::warning("wechatForm authorized result:".var_export($result,true));
                     if(!empty($result)){
                         \Yii::$app->user->login($result);
@@ -131,12 +140,17 @@ class WechatForm extends BaseModel
                         $randStr = str_random(6);
                         $openid = md5($userInfo["openid"].$randStr);
                         \Yii::$app->cache->set($openid,$userInfo);
+                        // $returnData['access_token'] = $oauth->token;
                         $returnData["key"] = $openid;
                         $returnData["config"] = $phoneConfig;
                     }
                 }
             }
         }
+        // echo '<pre>';
+        // var_dump($returnData);
+        // exit();
+        // $returnData['access_token'] = '1231';
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);
     }
 
@@ -267,11 +281,11 @@ class WechatForm extends BaseModel
                 $params["openid"] = $openid;
             }
             $existUser = UserInfo::getOneUserInfo($params);
-            
+
             if(!empty($existUser)){
                 return $this->returnApiResultData(ApiCode::CODE_FAIL,'已被注册');
             }
-            
+
             $user = new User();
             $user->username = 'wechat_user';
             $user->mobile = '';

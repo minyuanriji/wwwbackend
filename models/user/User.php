@@ -5,4 +5,9 @@ class User extends ActiveRecord{
     public function updateUsers($data,$id){
         return $this -> updateAll($data,['id' => $id]);
     }
+    
+     public function getOneUserInfo($id){
+        return $this -> find() -> select(['id','static_integral','dynamic_integral']) -> where(['=','id',$id]) -> asArray() -> one();
+    }
+    
 }

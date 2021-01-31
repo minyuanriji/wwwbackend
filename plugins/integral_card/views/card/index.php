@@ -62,7 +62,23 @@
 			        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
 			    </el-input>
 			</div>
-			
+
+
+
+            <div style="display: inline;margin-left: 20px;">
+                导出数据
+            </div>
+
+
+            <div style="display: inline;width: 100px;">
+                <el-input size="small" v-model="start_export_data" style="width: 100px;" placeholder="开始序号" @clear="search"></el-input>
+            </div>
+            -
+            <div style="display: inline;width: 100px;">
+                <el-input size="small" v-model="end_export_data" style="width: 100px;" placeholder="结束序号" @clear="search"></el-input>
+            </div>
+            <el-button type="primary" @click="exportData" size="small">一键导出</el-button>
+
             <el-table
                     v-loading="listLoading"
                     :data="list"
@@ -164,7 +180,9 @@
                 dialogChangeAgent:false,
                 batch_id:0,
                 batch_nickname:'',
-                batch_new_user_id:0
+                batch_new_user_id:0,
+                start_export_data:'',
+                end_export_data:''
             };
         },
 		filters: {
@@ -407,6 +425,37 @@
                     self.$message.info('已取消删除')
                 });
             },
+            //一键导出数据
+            exportData(){
+                if(this.start_export_data == '' || this.end_export_data == ''){
+                    this.$message.info("导出数据参数不能为空");
+                    return false;
+                }
+                this.$confirm('是否一键导出数据','提示',{
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then((r) => {
+                    request({
+                        params: {
+                            r: 'plugin/integral_card/admin/card/hint-data',
+                        },
+                        method: 'post',
+                        data: {
+                            start_export_data: this.start_export_data,
+                            end_export_data:this.end_export_data
+                        }
+                    }).then(res => {
+                        if(res.data.code == 1){
+                            this.$message.success(res.data.msg);
+                            window.location.href = "http://www.mingyuanriji.cn/web/index.php?r=plugin%2Fintegral_card%2Fadmin%2Fcard%2Fexport-data&start_export_data="+this.start_export_data+"&end_export_data="+this.end_export_data+"";
+                        }
+                    }).catch(error => {
+                        console.log(error);
+                        // start_export_data:'',
+                        //     end_export_data:''
+                    });
+                })
+            }
         },
         mounted: function () {
             this.getList();

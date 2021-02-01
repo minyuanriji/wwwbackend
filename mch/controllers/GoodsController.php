@@ -195,4 +195,16 @@ class GoodsController extends MchController {
             return $this->asJson($res);
         }
     }
+
+    /**
+     * 上下架
+     * @return \yii\web\Response
+     */
+    public function actionSwitchStatus(){
+        $form = new GoodsForm();
+        $form->attributes = \Yii::$app->request->post();
+        $res = $form->switchStatus();
+
+        return $this->asJson($res);
+    }
 }

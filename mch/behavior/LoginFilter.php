@@ -26,7 +26,8 @@ class LoginFilter extends ActionFilter{
         if (is_array($this->onlyActions) && !in_array($action->id, $this->onlyActions)) {
             return parent::beforeAction($action);
         }
-        if (!\Yii::$app->user->isGuest) {
+
+        if (!\Yii::$app->mchAdmin->isGuest) {
             return parent::beforeAction($action);
         }
         if (\Yii::$app->request->isAjax) {

@@ -35,7 +35,7 @@ class BaseController extends Controller
         header("Access-Control-Request-Headers:*");
         header("Access-Control-Allow-Credentials:true");
         header("Access-Control-Request-Method:*");
-        header("Access-Control-Allow-Headers: Content-Type, X-Requested-With, Cache-Control,Authorization");
+        header("Access-Control-Allow-Headers: Origin,  X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, Cache-Control,Authorization");
 
         $this->mall_id = \Yii::$app->getMallId();
         if (!$this->mall_id) {

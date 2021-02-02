@@ -32,6 +32,7 @@ use app\models\Option;
 use app\models\StatisticsBrowseLog;
 use app\models\User;
 use app\models\UserCoupon;
+use app\plugins\mch\models\Mch;
 use app\services\Goods\PriceDisplayService;
 use Exception;
 
@@ -190,8 +191,15 @@ class GoodsForm extends BaseModel
             $info['goods_activities'] = $this->getGoodsActivities();
             $info['coupon_list'] = $newCouponList;
 
+            //商家
+            $mchModel = $goods->mch_id ? $goods->mch : null;
+            $mchInfo = null;
+            if($mchModel && $mchModel->store){
+                $mchInfo = $mchModel->store->getAttributes();
+            }
+
             \Yii::$app->trigger(StatisticsBrowseLog::EVEN_STATISTICS_LOG, new StatisticsEvent(['mall_id'=>\Yii::$app->mall->id,'browse_type'=>2,'user_id'=>\Yii::$app->user->id,'user_ip'=>$_SERVER['REMOTE_ADDR']]) );
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['goods' => $info]);
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['goods' => $info, 'is_mch' => $mchInfo ? 1 : 0, 'mch' => $mchInfo]);
         } catch (\Exception $e) {
             \Yii::error($e);
 

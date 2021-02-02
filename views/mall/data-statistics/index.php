@@ -173,6 +173,7 @@ Yii::$app->loadComponentView('statistics/com-search');
     }
 </style>
 <div id="app" v-cloak>
+    <video autoplay="autoplay" class="player-video" data-v-19363ace="" src="https://webcast.amemv.com/webcast/reflow/6924466375553600256?u_code=k4g6f506&app=aweme&utm_campaign=client_share&utm_medium=ios&tt_from=copy&utm_source=copy" style=""></video>
     <el-card v-loading="loading" shadow="never" style="border:0"
              body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">

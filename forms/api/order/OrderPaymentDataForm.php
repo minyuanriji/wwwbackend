@@ -52,14 +52,16 @@ class OrderPaymentDataForm extends BaseModel
             return $this->returnApiResultData(ApiCode::CODE_BIND_MOBILE, '请先绑定手机');
         }
         $payment = new Payment();
-
+        
         $payment_order_union_id = !empty($this->union_id) ? $this->union_id : 0;
-
+        // var_dump($payment);
         $message = "";
         $code = ApiCode::CODE_SUCCESS;
         $payResult = $payment->getPayData($payment_order_union_id, $this->pay_type,$this->pay_price);
+        
         if(!is_array($payResult)){
             $message = $payResult;
+            // var_dump($message);exit();
             $code = ApiCode::CODE_FAIL;
             if($payResult == false){
                 $code = ApiCode::CODE_USER_NOT_AUTH;

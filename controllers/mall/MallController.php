@@ -127,6 +127,7 @@ class MallController extends BaseController
                 'aes_key' => $info->aes_key,
             ];
         }
+
         $payment = OptionLogic::get(Option::NAME_PAYMENT, $mall_id, Option::GROUP_APP);
         if (!empty($payment) && $payment["wechat_status"] == 1) {
             \Yii::$app->params['wechatPaymentConfig'] = [

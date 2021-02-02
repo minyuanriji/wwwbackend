@@ -110,6 +110,7 @@ class Integral extends BaseActiveRecord
             $model->next_publish_time = time();
             $model->desc = $desc;
             $model->type = $integral_setting['expire'] == -1 ? self::TYPE_ALWAYS : self::TYPE_DYNAMIC;
+            // var_dump($model);exit();
             $res = $model->save();
             if($res === false) throw new Exception($model->getErrorMessage());
             return true;
@@ -135,7 +136,8 @@ class Integral extends BaseActiveRecord
             ->where(array('<=','finish_period',$now))
             ->andWhere(array('in','status',[self::STATUS_WAIT,self::STATUS_DOING]))
             ->limit(100);
-        $plan_list = $query->orderBy("finish_period ASC") ->all();
+        $plan_list = $query->orderBy("finish_period ASC")->all();
+      
 
         if(!empty($plan_list)){
             foreach($plan_list as $plan){
@@ -148,12 +150,7 @@ class Integral extends BaseActiveRecord
                 }else{
                     $before_money = $plan['type'] == self::TYPE_ALWAYS ? $wallet['static_score'] : $wallet['dynamic_score'];
                 }
-                // 按充值日期过期
-//                $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
-
-                // 按每个月的1号 凌晨12点失效
-                $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ '. ($plan['effective_days'] - date('d')) .'days',strtotime(date('Y-m-01')));
-
+                $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',$now);
                 // 测试
                 // $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ 30 minutes',$now);
                 
@@ -169,12 +166,9 @@ class Integral extends BaseActiveRecord
                             $plan->next_publish_time = strtotime('+ 1 week',$now);
                         break;
                         case 'month':
-                            //获取每次充卡开始时间 到 满一个月发放时间
-//                           $plan->next_publish_time = strtotime('+ 1 month',$now);
-                            //每个月1号开始发送积分
-                            $plan->next_publish_time = strtotime(date('Y-m-01',strtotime('+ 1 month')));
+                            $plan->next_publish_time = strtotime('+ 1 month',$now);
                             //测试
-//                             $plan->next_publish_time = strtotime('+ 5 minutes',$now);
+                            // $plan->next_publish_time = strtotime('+ 5 minutes',$now);
                         break;
                     }
                 }
@@ -202,7 +196,6 @@ class Integral extends BaseActiveRecord
                     $transaction->commit();
                 }catch(\Exception $e){
                     $transaction->rollBack();
-                    \Yii::$app->redis -> set('show1',$e->getMessage());
                     self::$error = $e->getMessage();
                     return false;
                 }

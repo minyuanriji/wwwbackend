@@ -95,7 +95,7 @@ class MchEditForm extends MchEditFormBase
             $mch = new Mch();
             $mch->mall_id = \Yii::$app->mall->id;
             $mch->review_status = 1;
-            $mch->review_remark = '后台添加,操作用户:';
+            $mch->review_remark = '后台添加,操作用户:' . \Yii::$app->user->identity->nickname;
             $mch->review_time = mysql_timestamp();
             $mch->form_data = \Yii::$app->serializer->encode([]);
 
@@ -139,4 +139,3 @@ class MchEditForm extends MchEditFormBase
         }
     }
 }
-

@@ -18,7 +18,6 @@ class OrderChangePriceHandlerClass extends BaseOrderHandler
     public function handle()
     {
         \Yii::error('--改价事件触发--');
-        //$this->addDistributionOrder();
+        $this->addDistributionOrder();
     }
 }
-

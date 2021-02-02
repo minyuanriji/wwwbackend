@@ -148,7 +148,7 @@ class Integral extends BaseActiveRecord
                 }else{
                     $before_money = $plan['type'] == self::TYPE_ALWAYS ? $wallet['static_score'] : $wallet['dynamic_score'];
                 }
-                // 按充值日期过期
+                // 按充值日期过期    
 //                $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
 
                 // 按每个月的1号 凌晨12点失效

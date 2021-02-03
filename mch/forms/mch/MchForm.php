@@ -8,8 +8,12 @@ use app\plugins\mch\models\Mch;
 
 class MchForm extends BaseModel{
 
+    public $mch_id;
+
     public function rules(){
-        return [];
+        return [
+            [["mch_id"], "integer"]
+        ];
     }
 
     public function attributeLabels(){
@@ -19,7 +23,7 @@ class MchForm extends BaseModel{
     public function getDetail(){
         try {
             $detail = Mch::find()->where([
-                'id'        => \Yii::$app->mchAdmin->identity->mch_id,
+                'id'        => $this->mch_id ? $this->mch_id : \Yii::$app->mchAdmin->identity->mch_id,
                 'mall_id'   => \Yii::$app->mall->id,
                 'is_delete' => 0,
             ])->with('user.userInfo', 'mchUser', 'store', 'category')->asArray()->one();

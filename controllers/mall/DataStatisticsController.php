@@ -31,8 +31,6 @@ class DataStatisticsController extends StatisticsMangerController
         }
     }
 
-
-
     /**
      * 店铺列表
      * @return \yii\web\Response

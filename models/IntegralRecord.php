@@ -100,6 +100,7 @@ class IntegralRecord extends BaseActiveRecord{
                 }
                 if($log['source_table']=='integral') $wallet->score += $log['money']; 
             }
+
             //绑定积分券所属上级
             $beforeParentId = $wallet['parent_id'];
             if($wallet['parent_id'] == 0 && $parentid > 0){

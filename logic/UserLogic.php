@@ -200,6 +200,15 @@ class UserLogic
 //                }
 //                $params["openid"] = $userData["openid"];
 //            }
+            $where['openid'] = $userData['openid'];
+            $userInfo = UserInfo::getOneUserInfo($where);
+            if(!empty($userData['unionid'])){
+                  if(empty($userInfo['unionid'])){
+                $db = \yii::$app->db; 
+                $db -> createCommand("update jxmall_user_info set unionid = '{$userData['unionid']}' where openid = '{$userData['openid']}'") -> execute();
+                 }
+            }
+
             //如果有unionid，则用unionid同步用户数据
             if(isset($userData["unionid"]) && !empty($userData["unionid"])){
                 $params["unionid"] = $userData["unionid"];

@@ -162,6 +162,7 @@ class Payment extends Component
 
             /** @var User $user */
             $user = \Yii::$app->user->identity;
+            
             switch ($payType) {
                 case static::PAY_TYPE_HUODAO:
                     $data = [
@@ -629,10 +630,10 @@ class Payment extends Component
         /** @var UserInfo $userInfo */
         $userInfo = UserLogic::getPlatformUserInfo();
         $openid = "";
+
         if(!empty($userInfo)){
             $openid = $userInfo->openid;
         }
-
         if(empty($openid)){
             return false;
         }
@@ -663,7 +664,8 @@ class Payment extends Component
             $wechatPay = $wechat->payment;
         }
         $jssdk = $wechatPay->jssdk;
-
+        \Yii::$app->redis -> set('pay123',json_encode($wechat->payment));
+        //   var_dump($wechatPay->jssdk);exit();
         $prepayData = $wechatPay->order->unify([
             'body' => $params["title"],
             'out_trade_no' => $params["order_no"],
@@ -679,6 +681,7 @@ class Payment extends Component
         if(isset($prepayData["err_code_des"])){
             $message = $prepayData["err_code_des"];
         }
+        
         if(($prepayData["return_code"] == "SUCCESS" && $message == "OK") && (isset($prepayData["result_code"]) && $prepayData["result_code"] == "SUCCESS")){
             $prepayId = $prepayData["prepay_id"];
         }

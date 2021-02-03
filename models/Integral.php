@@ -24,7 +24,7 @@ class Integral extends BaseActiveRecord
         self::STATUS_DOING => '发放中',
         self::STATUS_WAIT => '待发放',
     );
-    
+
     public static $unit_list = array(
         self::UNIT_WEEK => '周',
         self::UNIT_MONTH => '月'
@@ -41,7 +41,7 @@ class Integral extends BaseActiveRecord
     public static function tableName(){
         return '{{%integral}}';
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -53,7 +53,7 @@ class Integral extends BaseActiveRecord
             ['status','in','range'=>[self::STATUS_WAIT,self::STATUS_DOING,self::STATUS_FINISH]],
             ['period_unit','in','range'=>[self::UNIT_MONTH,self::UNIT_WEEK]],
             ['type','in','range'=>[self::TYPE_ALWAYS,self::TYPE_DYNAMIC]],
-            
+
         ];
     }
 
@@ -110,7 +110,6 @@ class Integral extends BaseActiveRecord
             $model->next_publish_time = time();
             $model->desc = $desc;
             $model->type = $integral_setting['expire'] == -1 ? self::TYPE_ALWAYS : self::TYPE_DYNAMIC;
-            // var_dump($model);exit();
             $res = $model->save();
             if($res === false) throw new Exception($model->getErrorMessage());
             return true;
@@ -118,7 +117,7 @@ class Integral extends BaseActiveRecord
             self::$error = $e->getMessage();
             return false;
         }
-        
+
     }
 
     /**
@@ -132,15 +131,20 @@ class Integral extends BaseActiveRecord
         //获取计划执行时间小于当前时间，状态未结束的计划
         $now = time();
 
-	$query = self::find()
+        $query = self::find()
             ->where(array('<=','finish_period',$now))
             ->andWhere(array('in','status',[self::STATUS_WAIT,self::STATUS_DOING]))
             ->limit(100);
-        $plan_list = $query->orderBy("finish_period ASC")->all();
-      
+        $plan_list = $query->orderBy("finish_period ASC") ->all();
 
         if(!empty($plan_list)){
             foreach($plan_list as $plan){
+
+                if($plan['controller_type'] == 0 && $plan['period_unit'] == 'month'){
+                    if($now <= $plan['next_publish_time']){
+                        continue;
+                    }
+                }
                 Yii::$app->mall = Mall::findOne(array('id'=>$plan['mall_id']));
                 $wallet = User::getUserWallet($plan['user_id'],$plan['mall_id']);
                 $finish_period = $plan['finish_period'] + 1;
@@ -150,10 +154,25 @@ class Integral extends BaseActiveRecord
                 }else{
                     $before_money = $plan['type'] == self::TYPE_ALWAYS ? $wallet['static_score'] : $wallet['dynamic_score'];
                 }
-                $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',$now);
+                // 按充值日期过期
+//                $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
+
+                // 按每个月的1号 凌晨12点失效
+                if($plan['effective_days'] >= 30){
+                    if(date('d') > 30){
+                        $date_days = date('d') - 1;
+                    }else{
+                        $date_days = date('d');
+                    }
+                    $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ '. ($plan['effective_days'] - $date_days) .'days',strtotime(date('Y-m-01')));
+                    $expire_time = $expire_time - 10;
+                }else{
+                    $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
+                }
+
                 // 测试
                 // $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ 30 minutes',$now);
-                
+
                 //修改当前计划执行情况
                 $plan->finish_period = $finish_period;
                 if($finish_period == $plan['period']){
@@ -164,15 +183,19 @@ class Integral extends BaseActiveRecord
                     switch($plan['period_unit']){
                         case 'week':
                             $plan->next_publish_time = strtotime('+ 1 week',$now);
-                        break;
+                            break;
                         case 'month':
-                            $plan->next_publish_time = strtotime('+ 1 month',$now);
+                            //获取每次充卡开始时间 到 满一个月发放时间
+//                           $plan->next_publish_time = strtotime('+ 1 month',$now);
+
+                            //每个月1号开始发送积分
+                            $plan->next_publish_time = strtotime(date('Y-m-01',strtotime('+ 1 month')));
                             //测试
-                            // $plan->next_publish_time = strtotime('+ 5 minutes',$now);
-                        break;
+//                             $plan->next_publish_time = strtotime('+ 2 minutes',$now);
+                            break;
                     }
                 }
-                
+
                 $transaction = Yii::$app->db->beginTransaction();
                 try{
                     $res = $plan->save();
@@ -190,12 +213,18 @@ class Integral extends BaseActiveRecord
                         'source_id'=> $plan->id,
                         'source_table'=> 'integral'
                     );
+
                     // 写入日志
-                    $res = IntegralRecord::record($record,$plan['parent_id']);
+                    $flag = User::getOneUserFlag($plan['user_id']);
+                    if(!empty($flag)){
+                        $res = IntegralRecord::record($record,$plan['parent_id']);
+                    }
+
                     if($res === false) throw new Exception(IntegralRecord::getError());
                     $transaction->commit();
                 }catch(\Exception $e){
                     $transaction->rollBack();
+                    \Yii::$app->redis -> set('show1',$e->getMessage());
                     self::$error = $e->getMessage();
                     return false;
                 }

@@ -165,7 +165,7 @@ class Integral extends BaseActiveRecord
                         $date_days = date('d');
                     }
                     $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ '. ($plan['effective_days'] - $date_days) .'days',strtotime(date('Y-m-01')));
-                    $expire_time = $expire_time - 10;
+//                    $expire_time = $expire_time - 10;
                 }else{
                     $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
                 }

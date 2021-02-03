@@ -18,6 +18,18 @@ use Curl\Curl;
 class DistrictController extends BaseController
 {
 
+    public function actionTree()
+    {
+        $district = DistrictData::getTerritorial();
+        return $this->asJson([
+            'code' => 0,
+            'msg' => '',
+            'data' => [
+                'district' => $district
+            ]
+        ]);
+    }
+
     public function actionIndex()
     {
         if (\Yii::$app->request->isAjax) {

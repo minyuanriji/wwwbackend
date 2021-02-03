@@ -193,13 +193,13 @@ class GoodsForm extends BaseModel
 
             //商家
             $mchModel = $goods->mch_id ? $goods->mch : null;
-            $mchInfo = null;
+            $mchInfo = [];
             if($mchModel && $mchModel->store){
                 $mchInfo = $mchModel->store->getAttributes();
             }
 
             \Yii::$app->trigger(StatisticsBrowseLog::EVEN_STATISTICS_LOG, new StatisticsEvent(['mall_id'=>\Yii::$app->mall->id,'browse_type'=>2,'user_id'=>\Yii::$app->user->id,'user_ip'=>$_SERVER['REMOTE_ADDR']]) );
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['goods' => $info, 'is_mch' => $mchInfo ? 1 : 0, 'mch' => $mchInfo]);
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['goods' => $info]);
         } catch (\Exception $e) {
             \Yii::error($e);
 

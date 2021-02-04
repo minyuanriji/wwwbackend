@@ -2,13 +2,13 @@
 namespace app\controllers\api;
 class LiveController extends ApiController{
     public function actionGetLive(){
-        $token = \Yii::$app->redis -> get('access_token');
+        $token = \Yii::$app->redis -> get('live_access_token');
         if(empty($token)){
             $token = $this -> actionGetAccessToken();
         }
         $live_list_url='https://api.weixin.qq.com/wxa/business/getliveinfo?access_token='.$token;
         $page                    = 0;  //当前页码
-        $rows                    = 20; //每页记录条数
+        $rows                    = 30; //每页记录条数
         $data = array(
             "start"=>$page,
             "limit"=>$rows
@@ -16,6 +16,11 @@ class LiveController extends ApiController{
         $data = json_encode($data);
         $res=$this->http_request($live_list_url,$data);
         $result = json_decode($res, true);
+        foreach ($result['room_info'] as $key => $val){
+            if($val['live_status'] == 103){
+                unset($result['room_info'][$key]);
+            }
+        }
         return $this -> asJson([
             'data' => $result['room_info'],
             'status' => 1,
@@ -31,8 +36,8 @@ class LiveController extends ApiController{
         $res = $this -> http_request($url);
         $res = json_decode($res,true);
         if($res['access_token']){
-            \Yii::$app->redis -> set('access_token',$res['access_token']);
-            \Yii::$app->redis->expire('access_token',7100);
+            \Yii::$app->redis -> set('live_access_token',$res['access_token']);
+            \Yii::$app->redis->expire('live_access_token',7100);
         }
         return $res['access_token'];
     }

@@ -144,6 +144,29 @@ class OrderDetailForm extends BaseModel
             $detail['goods_num'] = $goodsNum;
             $detail['member_deduction_price_total'] = price_format($memberDeductionPriceCount);
             $orderDetailData["detail"] = $detail;
+
+            //商家数据
+            $orderDetailData['is_mch'] = 0;
+            $orderDetailData['mch'] = [];
+            if(!empty($order['mch']['store'])){
+                $orderDetailData['is_mch'] = 1;
+                $orderDetailData['mch']['mch_id']           = $order['mch']['store']['mch_id'];
+                $orderDetailData['mch']['name']             = $order['mch']['store']['name'];
+                $orderDetailData['mch']['mobile']           = $order['mch']['store']['mobile'];
+                $orderDetailData['mch']['address']          = $order['mch']['store']['address'];
+                $orderDetailData['mch']['province_id']      = $order['mch']['store']['province_id'];
+                $orderDetailData['mch']['city_id']          = $order['mch']['store']['city_id'];
+                $orderDetailData['mch']['district_id']      = $order['mch']['store']['district_id'];
+                $orderDetailData['mch']['longitude']        = $order['mch']['store']['longitude'];
+                $orderDetailData['mch']['latitude']         = $order['mch']['store']['latitude'];
+                $orderDetailData['mch']['score']            = $order['mch']['store']['score'];
+                $orderDetailData['mch']['cover_url']        = $order['mch']['store']['cover_url'];
+                $orderDetailData['mch']['pic_url']          = $order['mch']['store']['pic_url'];
+                $orderDetailData['mch']['business_hours']   = $order['mch']['store']['business_hours'];
+                $orderDetailData['mch']['description']      = $order['mch']['store']['description'];
+                $orderDetailData['mch']['scope']            = $order['mch']['store']['scope'];
+            }
+
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$orderDetailData);
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($e));

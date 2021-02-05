@@ -276,6 +276,7 @@ class UserTeamForm extends BaseModel
         if ($this->status>=0 && $this->status<=2) {
             $query->andWhere(['co.status' => $this->status]);
         }
+        $query->andWhere('pl.price > 0 OR pl.level=1');
         $list = $query->page($pagination, 10, $this->page)->asArray()->all();
         if($list){
             $order = new Order();

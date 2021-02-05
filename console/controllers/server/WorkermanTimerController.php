@@ -123,7 +123,9 @@ class WorkermanTimerController extends WorkermanBaseController
      * @return void
      */
     public function taskRetry($worker){
+
         //获取一把锁
+        
         $lock_tools = new LockTools();
         $lock_name = 'lock:taskRetry';
         if($lock_tools->lock($lock_name)){

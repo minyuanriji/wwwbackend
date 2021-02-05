@@ -26,6 +26,9 @@ class LiveController extends ApiController{
             'status' => 1,
             'msg' => 'OK'
         ]);
+
+
+
     }
 
     /**

@@ -582,4 +582,12 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
         ->where(array('id'=>$user_id,'mall_id'=>Yii::$app->mall->id ?? $mall_id))
         ->one();
     }
+
+    public static function getOneUserFlag($user_id,$mall_id=null){
+        return self::find()
+            ->select('id')
+            ->where(array('id'=>$user_id,'mall_id'=>Yii::$app->mall->id ?? $mall_id)) -> asArray()
+            ->one();
+    }
+
 }

@@ -42,8 +42,8 @@ class WorkermanTimerController extends WorkermanBaseController
     }
 
     public function onWorkerStart($worker){
-        Timer::add(1,array($this,'sendIntegralTimer'),array($worker)); //发放积分定时任务
-        Timer::add(1,array($this,'expireIntegralTimer'),array($worker)); //积分过期定时任务
+        Timer::add(3,array($this,'sendIntegralTimer'),array($worker)); //发放积分定时任务
+        Timer::add(3,array($this,'expireIntegralTimer'),array($worker)); //积分过期定时任务
         Timer::add(1,array($this,'taskRetry'),array($worker));//任务重试定时任务
     }
 

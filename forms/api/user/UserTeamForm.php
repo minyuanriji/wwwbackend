@@ -180,7 +180,8 @@ class UserTeamForm extends BaseModel
             $query->andWhere(['level' => 1]);
         }
         if ($this->flag == 2) {
-            $query->andWhere(['>', 'level', 1]);
+            //$query->andWhere(['>', 'level', 1]);
+            $query->andWhere(['level' => 2]);
         }
         /**
          * @var BasePagination $pagination

@@ -216,7 +216,7 @@ class Integral extends BaseActiveRecord
 
                     // 写入日志
                     $flag = User::getOneUserFlag($plan['user_id']);
-                    if(!empty($flag)){     
+                    if(!empty($flag)){
                         $res = IntegralRecord::record($record,$plan['parent_id']);
                         if($res === false) throw new Exception(IntegralRecord::getError());
                     }

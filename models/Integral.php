@@ -134,7 +134,7 @@ class Integral extends BaseActiveRecord
         $query = self::find()
             ->where(array('<=','finish_period',$now))
             ->andWhere(array('in','status',[self::STATUS_WAIT,self::STATUS_DOING]))
-            ->limit(100);
+            ->limit(250);
         $plan_list = $query->orderBy("finish_period ASC") -> all();
 //        \Yii::$app->redis -> set('var111',count($plan_list));
 //        $expire_time = strtotime('+' . 28 .'days',strtotime(date('Y-m-01')));

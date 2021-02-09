@@ -231,4 +231,5 @@ class Integral extends BaseActiveRecord
         }
         return true;
     }
+
 }

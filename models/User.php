@@ -583,6 +583,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
         ->one();
     }
 
+
     public static function getOneUserFlag($user_id,$mall_id=null){
         return self::find()
             ->select('id')

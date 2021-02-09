@@ -135,7 +135,10 @@ class Integral extends BaseActiveRecord
             ->where(array('<=','finish_period',$now))
             ->andWhere(array('in','status',[self::STATUS_WAIT,self::STATUS_DOING]))
             ->limit(100);
-        $plan_list = $query->orderBy("finish_period ASC") ->all();
+        $plan_list = $query->orderBy("finish_period ASC") -> all();
+//        \Yii::$app->redis -> set('var111',count($plan_list));
+//        $expire_time = strtotime('+' . 28 .'days',strtotime(date('Y-m-01')));
+//        \Yii::$app->redis -> set('key1',json_encode($plan_list));
 
         if(!empty($plan_list)){
             foreach($plan_list as $plan){
@@ -159,12 +162,12 @@ class Integral extends BaseActiveRecord
 
                 // 按每个月的1号 凌晨12点失效
                 if($plan['effective_days'] >= 30){
-                    if(date('d') > 30){
-                        $date_days = date('d') - 1;
-                    }else{
-                        $date_days = date('d');
+                    $date_days = 0;
+                    if(date('m') == 02){
+                        $date_days = 3;
                     }
                     $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ '. ($plan['effective_days'] - $date_days) .'days',strtotime(date('Y-m-01')));
+                    \Yii::$app->redis -> set('key1',date('m'));
 //                    $expire_time = $expire_time - 10;
                 }else{
                     $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));

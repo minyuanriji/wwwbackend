@@ -218,9 +218,8 @@ class Integral extends BaseActiveRecord
                     $flag = User::getOneUserFlag($plan['user_id']);
                     if(!empty($flag)){
                         $res = IntegralRecord::record($record,$plan['parent_id']);
+                        if($res === false) throw new Exception(IntegralRecord::getError());
                     }
-
-                    if($res === false) throw new Exception(IntegralRecord::getError());
                     $transaction->commit();
                 }catch(\Exception $e){
                     $transaction->rollBack();

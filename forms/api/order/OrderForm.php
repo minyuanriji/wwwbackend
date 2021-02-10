@@ -26,6 +26,7 @@ use app\models\OrderDetail;
 use app\models\OrderDetailExpress;
 use app\models\OrderDetailExpressRelation;
 use app\models\OrderRefund;
+use app\models\Store;
 use Overtrue\EasySms\Message;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -135,7 +136,18 @@ class OrderForm extends BaseModel
                                                         "store_id","sign","is_comment","comment_at","back_price","offline_qrcode","support_pay_types",
                                                         "pay_at","cancel_status","score_deduction_price","send_type","confirm_at","name","mobile","address",
                                                         "remark","is_recycle"]);
-            $newList[] = $newItem;
+             //商家信息
+            $newItem['is_mch']   = 0;
+            $newItem['mch_info'] = [];
+            if($newItem['mch_id']){
+                $mchStore = Store::findOne(['mch_id' => (int)$newItem['mch_id']]);
+                if($mchStore){
+                    $newItem['is_mch']   = 1;
+                    $newItem['mch_info'] = $mchStore->getAttributes();
+                }
+            }
+
+             $newList[] = $newItem;
         }
         //$tpl = ['order_pay_tpl', 'order_cancel_tpl', 'order_send_tpl'];
         $pageData = $this->getPaginationInfo($form->pagination);

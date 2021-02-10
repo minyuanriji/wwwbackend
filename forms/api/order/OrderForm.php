@@ -67,7 +67,7 @@ class OrderForm extends BaseModel
         $form->is_comment = 1;
         $form->page = $this->page;
         $form->is_recycle = 0;
-        $form->relations = ['detailExpress.expressRelation.orderDetail','detail.expressRelation','detail.refund', 'detailExpressRelation.orderExpress'];
+        $form->relations = ['mch.store', 'detailExpress.expressRelation.orderDetail','detail.expressRelation','detail.refund', 'detailExpressRelation.orderExpress'];
         $list = $form->search();
 
         $newList = [];

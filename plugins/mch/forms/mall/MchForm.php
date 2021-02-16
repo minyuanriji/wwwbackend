@@ -58,7 +58,8 @@ class MchForm extends BaseModel
     {
         try {
             $detail = Mch::find()->where([
-                'id' => \Yii::$app->user->identity->mch_id ?: $this->id,
+                //'id' => \Yii::$app->user->identity->mch_id ?: $this->id,
+                'id' => $this->id,
                 'mall_id' => \Yii::$app->mall->id,
                 'is_delete' => 0,
             ])->with('user.userInfo', 'mchUser', 'store', 'category')->asArray()->one();
@@ -71,7 +72,9 @@ class MchForm extends BaseModel
             $detail['address'] = $detail['store']['address'];
             $detail['logo'] = $detail['store']['cover_url'];
             $detail['service_mobile'] = $detail['store']['mobile'];
-            $detail['bg_pic_url'] = \Yii::$app->serializer->decode($detail['store']['pic_url']);
+            //$detail['bg_pic_url'] = \Yii::$app->serializer->decode($detail['store']['pic_url']);
+            $bgPicUrls = @json_decode($detail['store']['pic_url'], true);
+            $detail['bg_pic_url'] = is_array($bgPicUrls) ? $bgPicUrls : [];
             $detail['name'] = $detail['store']['name'];
             $detail['description'] = $detail['store']['description'];
             $detail['scope'] = $detail['store']['scope'];

@@ -201,7 +201,7 @@ class MchForm extends BaseModel
     public function route()
     {
         $mallId = base64_encode(\Yii::$app->mall->id);
-        $url = \Yii::$app->urlManager->createAbsoluteUrl('admin/admin/mch-login&mall_id=' . $mallId);
+        $url = \Yii::$app->urlManager->createAbsoluteUrl('mch/admin/login');
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '请求成功',

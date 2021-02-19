@@ -230,7 +230,7 @@ class DistributionCommonOrderDetailCreatedJob extends Component implements JobIn
                         }
                     }
 
-                    if($log->level == $level){
+                    if($log->level == $user_level){
                         $log->price = $price;
                     }
 

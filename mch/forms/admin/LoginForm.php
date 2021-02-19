@@ -43,21 +43,37 @@ class LoginForm extends BaseModel{
             return $this->responseErrorInfo();
         }
         try {
-            $adminModel = MchAdmin::findOne(['username' => $this->username, 'is_delete' => 0]);
-            if (!$adminModel) {
+
+            $user = User::findOne(['username' => $this->username, 'is_delete' => 0]);
+            if(!$user){
                 throw new \Exception('账号不存在');
             }
-            if (!\Yii::$app->getSecurity()->validatePassword($this->password, $adminModel->password)) {
+
+            if (!\Yii::$app->getSecurity()->validatePassword($this->password, $user->password)) {
                 throw new \Exception('密码错误:' . $this->password);
             }
 
-            $mchModel = $adminModel->mch_id ? Mch::findOne($adminModel->mch_id) : null;
+            $mchModel = $user->mch_id ? Mch::findOne($user->mch_id) : null;
+
             if(!$mchModel || $mchModel->is_delete){
                 throw new \Exception('商户不存在');
             }
 
             if($mchModel->review_status != Mch::REVIEW_STATUS_CHECKED){
-                throw new \Exception('商户ID:' . $mchModel->id . '仍在审核中');
+                throw new \Exception('商户正在审核中:' . $mchModel->id);
+            }
+
+            $adminModel = MchAdmin::findOne(['mch_id' => $mchModel->id, 'is_delete' => 0]);
+            if (!$adminModel) {
+                $adminModel = new MchAdmin();
+                $adminModel->username   = $user->username;
+                $adminModel->password   = $user->password;
+                $adminModel->mall_id    = $user->mall_id;
+                $adminModel->mch_id     = $mchModel->id;
+                $adminModel->admin_type = MchAdmin::ADMIN_TYPE_OPERATE;
+                if(!$adminModel->save()){
+                    throw new \Exception('系统异常！');
+                }
             }
 
             $adminModel->mchModel  = $mchModel;

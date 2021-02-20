@@ -70,7 +70,7 @@ class CardController extends ApiBaseController
 
         );
         $params = array(
-            'select'=>'id,card_id,serialize_no,status,integral_setting,created_at',
+            'select'=>'id,card_id,serialize_no,status,integral_setting,updated_at,created_at',
             'with'=>['card'],
             'where' => $where,
             'page'=>$page,
@@ -80,6 +80,7 @@ class CardController extends ApiBaseController
         $data = CardDetail::listPage($params,false,true);
         if(!empty($data)){
             foreach($data['list'] as $key => $card){
+                $data['list'][$key]['created_at'] = !empty($card['updated_at']) ? $card['updated_at'] : $card['created_at'];
                 $data['list'][$key]['integral_setting'] = json_decode($card['integral_setting'],true);
             }
         }

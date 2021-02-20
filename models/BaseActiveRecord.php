@@ -384,7 +384,7 @@ class BaseActiveRecord extends \yii\db\ActiveRecord
             $query->offset(($return['page'] - 1) * $return['page_size']);
             // $return['pagination'] = $pages;
             $return['list'] = $is_array ?  $query->AsArray()->all() : $query->all();
-            if(YII_DEBUG) $return['sql']  = self::$_sql[] = $query->createCommand()->getRawSql();
+            //if(YII_DEBUG) $return['sql']  = self::$_sql[] = $query->createCommand()->getRawSql();
         }catch (\Exception $exc){
             self::$error = $exc->getMessage();
             //$this->errors = $exc->getMessage();

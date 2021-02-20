@@ -44,7 +44,7 @@ class LoginForm extends BaseModel{
         }
         try {
 
-            $user = User::findOne(['username' => $this->username, 'is_delete' => 0]);
+            $user = User::findOne(['mobile' => $this->username, 'is_delete' => 0]);
             if(!$user){
                 throw new \Exception('账号不存在');
             }

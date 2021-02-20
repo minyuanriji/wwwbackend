@@ -101,7 +101,7 @@ class RegisterForm extends BaseModel
             
             $relation = RelationSetting::findOne(['mall_id' => \Yii::$app->mall->id, 'use_relation' => 1, 'is_delete' => 0]);
             if (!$relation) {
-                throw new Exception('未启用关系链');
+                throw new \Exception('未启用关系链');
             }
 
             $user = User::getOneData([
@@ -115,13 +115,13 @@ class RegisterForm extends BaseModel
 
             $recommendUsers = User::getOneUser(['=', 'mobile', $this->parent_mobile]);
             if (!$recommendUsers) {
-                throw new Exception('推荐人手机号不存在');
+                throw new \Exception('推荐人手机号不存在');
             }
             if (!$recommendUsers->is_inviter) {
-                throw new Exception('绑定的手机号没有推广资格');
+                throw new \Exception('绑定的手机号没有推广资格');
             }
-            if ($recommendUsers->parent_id == $user->id) {
-                throw new Exception('自己不能绑定自己');
+            if ($recommendUsers->id == $user->id) {
+                throw new \Exception('自己不能绑定自己');
             }
             $second_parent_id = $recommendUsers["parent_id"];
             $third_parent_id = $recommendUsers["second_parent_id"];

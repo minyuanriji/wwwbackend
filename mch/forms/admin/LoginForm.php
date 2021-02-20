@@ -2,6 +2,7 @@
 namespace app\mch\forms\admin;
 
 use app\mch\models\MchAdmin;
+use app\models\Admin;
 use app\models\BaseModel;
 use app\core\ApiCode;
 use app\models\User;
@@ -44,16 +45,16 @@ class LoginForm extends BaseModel{
         }
         try {
 
-            $user = User::findOne(['mobile' => $this->username, 'is_delete' => 0]);
-            if(!$user){
-                throw new \Exception('账号不存在');
+            $adminModel = Admin::findOne(['username' => $this->username, 'is_delete' => 0]);
+            if(!$adminModel){
+                throw new \Exception('商户账号不存在');
             }
 
-            if (!\Yii::$app->getSecurity()->validatePassword($this->password, $user->password)) {
+            if (!\Yii::$app->getSecurity()->validatePassword($this->password, $adminModel->password)) {
                 throw new \Exception('密码错误:' . $this->password);
             }
 
-            $mchModel = $user->mch_id ? Mch::findOne($user->mch_id) : null;
+            $mchModel = $adminModel->mch_id ? Mch::findOne($adminModel->mch_id) : null;
 
             if(!$mchModel || $mchModel->is_delete){
                 throw new \Exception('商户不存在');
@@ -61,19 +62,6 @@ class LoginForm extends BaseModel{
 
             if($mchModel->review_status != Mch::REVIEW_STATUS_CHECKED){
                 throw new \Exception('商户正在审核中:' . $mchModel->id);
-            }
-
-            $adminModel = MchAdmin::findOne(['mch_id' => $mchModel->id, 'is_delete' => 0]);
-            if (!$adminModel) {
-                $adminModel = new MchAdmin();
-                $adminModel->username   = $user->username;
-                $adminModel->password   = $user->password;
-                $adminModel->mall_id    = $user->mall_id;
-                $adminModel->mch_id     = $mchModel->id;
-                $adminModel->admin_type = MchAdmin::ADMIN_TYPE_OPERATE;
-                if(!$adminModel->save()){
-                    throw new \Exception('系统异常！');
-                }
             }
 
             $adminModel->mchModel  = $mchModel;

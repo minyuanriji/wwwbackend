@@ -3,6 +3,7 @@
 namespace app\plugins\mch\forms\common;
 
 use app\forms\common\version\Compatible;
+use app\models\Admin;
 use app\models\BaseModel;
 use app\models\Store;
 use app\models\User;
@@ -184,6 +185,49 @@ abstract class MchEditFormBase extends BaseModel
         }
     }
 
+    protected function setAdmin()
+    {
+        $admin = Admin::find()->where([
+            'username' => $this->username,
+            'mall_id' => \Yii::$app->mall->id,
+            'is_delete' => 0,
+        ])->one();
+
+        if ($admin && $admin->mch_id != $this->id) {
+            throw new \Exception('商户账号已存在！');
+        }
+
+        if ($this->password) {
+            if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $this->password) > 0) {
+                throw new \Exception('密码不能包含中文字符');
+            }
+        }
+
+        // 商户账号创建
+        $admin = Admin::findOne(['mch_id' => $this->mch->id]);
+        if (!$admin) {
+            if (!$this->password) {
+                throw new \Exception('请填写商户密码');
+            }
+
+            $admin = new Admin();
+            $admin->mch_id          = $this->mch->id;
+            $admin->mall_id         = \Yii::$app->mall->id;
+            $admin->auth_key        = \Yii::$app->security->generateRandomString();
+            $admin->access_token    = \Yii::$app->security->generateRandomString();
+            $admin->admin_type      = Admin::ADMIN_TYPE_OPERATE;
+        }
+
+        if ($this->password) {
+            $admin->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
+        }
+
+        $admin->username = $this->username;
+        if (!$admin->save()) {
+            throw new \Exception($this->responseErrorMsg($admin));
+        }
+    }
+
     protected function setUser()
     {
         /** @var User $user */
@@ -191,10 +235,16 @@ abstract class MchEditFormBase extends BaseModel
             'username' => $this->username,
             'mall_id' => \Yii::$app->mall->id,
             'is_delete' => 0,
-        ])->andWhere(['!=', 'mch_id', 0])->one();
+        ])->one();
         // 商户编辑的时候无需判断
         if ($user && $user->mch_id != $this->id) {
             throw new \Exception('商户账号已存在！');
+        }
+
+        if ($this->password) {
+            if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $this->password) > 0) {
+                throw new \Exception('密码不能包含中文字符');
+            }
         }
 
         // 商户账号创建
@@ -204,17 +254,17 @@ abstract class MchEditFormBase extends BaseModel
                 throw new \Exception('请填写商户密码');
             }
 
-            if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $this->password) > 0) {
-                throw new \Exception('密码不能包含中文字符');
-            }
-
             $user = new User();
-            $user->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
             $user->mch_id = $this->mch->id;
             $user->mall_id = \Yii::$app->mall->id;
             $user->auth_key = \Yii::$app->security->generateRandomString();
             $user->access_token = \Yii::$app->security->generateRandomString();
         }
+
+        if ($this->password) {
+            $user->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
+        }
+
         $user->nickname = $this->mch->realname;
         $user->mobile = $this->mch->mobile;
         $user->username = $this->username;

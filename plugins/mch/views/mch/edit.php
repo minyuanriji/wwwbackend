@@ -62,11 +62,9 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item label="商户账号" prop="username">
-                                <el-input :disabled="isNewEdit ? false : true"
-                                          v-model="ruleForm.username">
-                                </el-input>
+                                <el-input  v-model="ruleForm.username"></el-input>
                             </el-form-item>
-                            <el-form-item v-if="!ruleForm.id" label="商户密码" prop="password">
+                            <el-form-item v-if="!ruleForm.admin_id" label="商户密码" prop="password">
                                 <el-input type="password" v-model="ruleForm.password"></el-input>
                             </el-form-item>
                             <el-form-item label="联系人" prop="realname">

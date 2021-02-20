@@ -42,6 +42,7 @@ class MchEditForm extends MchEditFormBase
             $this->setStore();
             $this->setMallMchSetting();
             $this->setMchSetting();
+            $this->setAdmin();
             $this->setUser();
             $this->sendTemplateMsg();
 

@@ -2,6 +2,7 @@
 
 namespace app\plugins\mch\models;
 
+use app\models\Admin;
 use app\models\BaseActiveRecord;
 use app\models\Store;
 use app\models\User;
@@ -102,6 +103,11 @@ class Mch extends BaseActiveRecord
     public function getMchUser()
     {
         return $this->hasOne(User::className(), ['mch_id' => 'id']);
+    }
+
+    public function getMchAdmin()
+    {
+        return $this->hasOne(Admin::className(), ['mch_id' => 'id']);
     }
 
     public function getStore()

@@ -3,6 +3,7 @@
 namespace app\plugins\mch\forms\mall;
 
 use app\core\ApiCode;
+use app\models\Admin;
 use app\models\ClerkUser;
 use app\models\ClerkUserStoreRelation;
 use app\models\DistrictArr;
@@ -62,7 +63,7 @@ class MchForm extends BaseModel
                 'id' => $this->id,
                 'mall_id' => \Yii::$app->mall->id,
                 'is_delete' => 0,
-            ])->with('user.userInfo', 'mchUser', 'store', 'category')->asArray()->one();
+            ])->with('user.userInfo', 'mchAdmin', 'store', 'category')->asArray()->one();
             if (!$detail) {
                 throw new \Exception('商户不存在');
             }
@@ -92,8 +93,9 @@ class MchForm extends BaseModel
             }
             $detail['cat_name'] = $detail['category']['name'];
             $detail['form_data'] = $detail['form_data'] ? \Yii::$app->serializer->decode($detail['form_data']) : [];
-            $detail['username'] = $detail['mchUser']['username'];
-            $detail['password'] = $detail['mchUser']['password'];
+            $detail['username'] = $detail['mchAdmin']['username'];
+            $detail['password'] = $detail['mchAdmin']['password'];
+            $detail['admin_id'] = $detail['mchAdmin']['id'];
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
@@ -128,6 +130,15 @@ class MchForm extends BaseModel
             $res = $model->save();
             if (!$res) {
                 throw new \Exception($this->responseErrorMsg($model));
+            }
+
+            //删除后台登陆账号
+            $admin = Admin::find()->where(['mch_id' => $model->id])->one();
+            if($admin){
+                $admin->is_delete = 1;
+                if (!$admin->save()) {
+                    throw new \Exception($this->responseErrorMsg($admin));
+                }
             }
 
             /** @var User $user */
@@ -220,19 +231,19 @@ class MchForm extends BaseModel
             if (!$this->password) {
                 throw new \Exception('请填写新密码');
             }
-            $user = User::find()->where([
+            $admin = Admin::find()->where([
                 'mch_id' => $this->id,
                 'mall_id' => \Yii::$app->mall->id,
                 'is_delete' => 0,
             ])->one();
-            if (!$user) {
+            if (!$admin) {
                 throw new \Exception('商户账号不存在');
             }
 
-            $user->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
-            $res = $user->save();
+            $admin->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
+            $res = $admin->save();
             if (!$res) {
-                throw new \Exception($this->responseErrorMsg($user));
+                throw new \Exception($this->responseErrorMsg($admin));
             }
 
             return [

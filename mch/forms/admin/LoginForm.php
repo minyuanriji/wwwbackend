@@ -45,7 +45,7 @@ class LoginForm extends BaseModel{
         }
         try {
 
-            $adminModel = Admin::findOne(['username' => $this->username, 'is_delete' => 0]);
+            $adminModel = MchAdmin::findOne(['username' => $this->username, 'is_delete' => 0]);
             if(!$adminModel){
                 throw new \Exception('商户账号不存在');
             }

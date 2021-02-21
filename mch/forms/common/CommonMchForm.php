@@ -17,12 +17,12 @@ class CommonMchForm extends BaseModel{
     public $id;
     public $is_review_status;
 
-    public $cat;
+    public $cat_id;
     public $keyword;
 
     public function rules(){
         return [
-            [['cat'], 'integer'],
+            [['cat_id'], 'integer'],
             [['keyword'], 'string']
         ];
     }
@@ -45,8 +45,8 @@ class CommonMchForm extends BaseModel{
             ]);
         }
 
-        if($this->cat){
-            $query->andWhere(["mch_common_cat_id" => $this->cat]);
+        if($this->cat_id){
+            $query->andWhere(["mch_common_cat_id" => $this->cat_id]);
         }
 
         $query->select(["id", "mall_id", "status", "is_recommend", "mch_common_cat_id"]);

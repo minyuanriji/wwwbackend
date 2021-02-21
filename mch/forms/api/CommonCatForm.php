@@ -17,7 +17,7 @@ class CommonCatForm extends BaseModel{
             ])->asArray()->orderBy(['sort' => SORT_ASC])->all();
             $list = $list ? $list : [];
             foreach($list as $key => $item){
-                $list[$key]['pic_url'] = "http://";
+                
             }
 
             return [

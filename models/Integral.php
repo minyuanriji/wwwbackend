@@ -142,7 +142,7 @@ class Integral extends BaseActiveRecord
 //        $expire_time = strtotime('+' . 28 .'days',strtotime(date('Y-m-01')));
 //        \Yii::$app->redis -> set('key1',json_encode($plan_list));
 
-        if(!empty($plan_list)){
+        if(!empty($plan_list)){  
             foreach($plan_list as $plan){
                 if($plan['controller_type'] == 0 && $plan['period_unit'] == 'month'){
                     if($now <= $plan['next_publish_time']){

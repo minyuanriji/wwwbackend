@@ -130,19 +130,20 @@ class Integral extends BaseActiveRecord
     public static function sendIntegral(){
         //获取计划执行时间小于当前时间，状态未结束的计划
         $now = time();
-        exit();
         $query = self::find()
             ->where(array('<=','finish_period',$now))
             ->andWhere(array('in','status',[self::STATUS_WAIT,self::STATUS_DOING]))
             ->limit(250);
-        $plan_list = $query->orderBy("finish_period ASC") -> all();
+        $plan_list = $query->orderBy([
+            'finish_period' => 'ASC',
+            'next_publish_time' => 'ASC'
+        ]) -> all();
 //        \Yii::$app->redis -> set('var111',count($plan_list));
 //        $expire_time = strtotime('+' . 28 .'days',strtotime(date('Y-m-01')));
 //        \Yii::$app->redis -> set('key1',json_encode($plan_list));
 
         if(!empty($plan_list)){
             foreach($plan_list as $plan){
-
                 if($plan['controller_type'] == 0 && $plan['period_unit'] == 'month'){
                     if($now <= $plan['next_publish_time']){
                         continue;

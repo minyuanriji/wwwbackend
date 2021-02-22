@@ -5,6 +5,7 @@ namespace app\mch\forms\common;
 use app\forms\common\goods\CommonGoodsStatistic;
 use app\forms\common\order\CommonOrderStatistic;
 use app\models\BaseModel;
+use app\models\DistrictData;
 use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
@@ -29,29 +30,33 @@ class CommonMchForm extends BaseModel{
 
     public function getList(){
 
+        $cityId = \Yii::$app->request->headers->get("x-city-id");
+        $districtData = intval($cityId) > 0 ? DistrictData::getDistrict((int)$cityId) : null;
+
         $query = Mch::find()->where([
-            'mall_id'       => \Yii::$app->mall->id,
-            'is_delete'     => 0,
-            'review_status' => 1,
-        ]);
+            'm.mall_id'       => \Yii::$app->mall->id,
+            'm.is_delete'     => 0,
+            'm.review_status' => 1,
+        ])->alias("m");
+        $query->leftJoin("{{%store}} ss", "ss.mch_id=m.id");
+        $query->leftJoin("{{%user}} u", "u.mch_id=m.id");
 
         if ($this->keyword) {
-            $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
-            $userIds = User::find()->where(['like', 'nickname', $this->keyword])->andWhere(['mall_id' => \Yii::$app->mall->id])->select('id');
-            $query->andWhere([
-                'or',
-                ['id' => $mchIds],
-                ['user_id' => $userIds],
-            ]);
+            $keyword = addslashes($this->keyword);
+            $query->andWhere("(ss.name LIKE '%".$keyword."%' OR u.nickname LIKE '%".$keyword."%')");
+        }
+
+        if($districtData){
+            $query->andWhere(["ss.city_id" => intval($cityId)]);
         }
 
         if($this->cat_id){
-            $query->andWhere(["mch_common_cat_id" => $this->cat_id]);
+            $query->andWhere(["m.mch_common_cat_id" => $this->cat_id]);
         }
 
-        $query->select(["id", "mall_id", "status", "is_recommend", "mch_common_cat_id"]);
+        $query->select(["m.id", "m.mall_id", "m.status", "m.is_recommend", "m.mch_common_cat_id"]);
 
-        $list = $query->orderBy(['sort' => SORT_ASC])
+        $list = $query->orderBy(['m.sort' => SORT_ASC])
             ->with('store', 'category')
             ->page($pagination)->asArray()->all();
 

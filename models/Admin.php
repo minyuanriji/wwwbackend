@@ -65,7 +65,7 @@ class Admin extends BaseActiveRecord implements IdentityInterface
             [['username', 'password', 'admin_type'], 'required'],
             [['admin_type','mall_id','mch_id', 'is_delete', 'mall_num', 'expired_at', 'created_at', 'updated_at'], 'integer'],
             [['password', 'auth_key','access_token'], 'string'],
-            [['username'], 'string', 'max' => 10],
+            [['username'], 'string', 'max' => 15],
         ];
     }
 

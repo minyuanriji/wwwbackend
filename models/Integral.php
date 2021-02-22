@@ -130,7 +130,7 @@ class Integral extends BaseActiveRecord
     public static function sendIntegral(){
         //获取计划执行时间小于当前时间，状态未结束的计划
         $now = time();
-
+        exit();
         $query = self::find()
             ->where(array('<=','finish_period',$now))
             ->andWhere(array('in','status',[self::STATUS_WAIT,self::STATUS_DOING]))

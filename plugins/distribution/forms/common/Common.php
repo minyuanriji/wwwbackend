@@ -120,6 +120,36 @@ class Common extends BaseModel
             $returnData['parent_avatar_url'] = MallSetting::getValueByKey('logo', \Yii::$app->mall->id);
             $returnData['mobile'] = MallSetting::getValueByKey('contact_tel', \Yii::$app->mall->id);
             $returnData['parent_level_name'] = '平台方';
+            $db = \yii::$app->db;
+            $sql = "select id,parent_id from jxmall_user where id = {$user->id}";
+            $result = $db -> createCommand($sql) -> queryOne();
+            if(!empty($result)){
+                $db -> createCommand() -> insert('jxmall_user_parent',[
+                    'id' => null,
+                    'mall_id' => $this->mall->id,
+                    'user_id' => $result['id'],
+                    'parent_id' => $result['parent_id'],
+                    'updated_at' => time(),
+                    'created_at' => time(),
+                    'deleted_at' => 0,
+                    'is_delete' => 0,
+                    'level' => 1
+                ]) -> execute();
+                if(!empty($result['parent_id'])) {
+                    $parent = User::findOne($result['parent_id']);
+                    if ($parent) {
+                        $returnData['parent_name'] = $parent->nickname;
+                        $returnData['avatar_url'] = $parent->avatar_url;
+                        $returnData['mobile'] = $parent->mobile;
+                        $returnData['parent_level_name'] = '普通分销商';
+                        $distributionParent = $this->getDistributionUser($parent);
+                        if ($distributionParent) {
+                            $parent_level_name = isset($distributionParent->distributionLevel) ? $distributionParent->distributionLevel->name : "普通分销商";
+                            $returnData['parent_level_name'] = $parent_level_name;
+                        }
+                    }
+                }
+            }
         } else {
             $parent = User::findOne($userParent->parent_id);
             if ($parent) {

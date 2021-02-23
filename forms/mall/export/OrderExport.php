@@ -164,6 +164,7 @@ class OrderExport extends BaseExport
         } catch (\Exception $exception) {
 
         }
+
         $list = $query->with(['user.userInfo', 'clerk', 'store', 'detail.goods.goodsWarehouse', 'refund', 'paymentOrder.paymentOrderUnion'])
             ->orderBy('o.created_at DESC')
             ->all();

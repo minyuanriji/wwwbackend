@@ -67,7 +67,7 @@ class MchController extends Controller {
     }
 
     private function loadMall(){
-        $mchAdmin = \Yii::$app->mchAdmin->identity;
+        $mchAdmin = \Yii::$app->mchAdmin ? \Yii::$app->mchAdmin->identity : null;
         if(!$mchAdmin) return;
 
         $logoutUrl = \Yii::$app->urlManager->createAbsoluteUrl([

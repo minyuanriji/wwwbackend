@@ -10,13 +10,14 @@ class CommonCatEditForm extends BaseModel
 {
     public $id;
     public $name;
+    public $pic_url;
     public $sort;
     public $status;
 
     public function rules()
     {
         return [
-            [['name', 'sort', 'status'], 'required'],
+            [['name', 'pic_url', 'sort', 'status'], 'required'],
             [['id', 'sort', 'status'], 'integer']
         ];
     }
@@ -40,6 +41,7 @@ class CommonCatEditForm extends BaseModel
                 $model->mall_id = \Yii::$app->mall->id;
             }
             $model->name = $this->name;
+            $model->pic_url = $this->pic_url;
             $model->sort = $this->sort;
             $model->status = $this->status;
             

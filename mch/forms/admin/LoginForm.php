@@ -67,7 +67,7 @@ class LoginForm extends BaseModel{
             $adminModel->mchModel  = $mchModel;
 
             $duration = $this->checked == 'true' ? 86400 : 0;
-            $res = \Yii::$app->user->login($adminModel, $duration);
+            $res = \Yii::$app->mchAdmin->login($adminModel, $duration);
 
             setcookie('__mch_login_route', '/mch/admin/login');
             $route = 'mch/overview/index';

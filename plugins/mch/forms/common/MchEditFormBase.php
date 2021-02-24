@@ -230,52 +230,20 @@ abstract class MchEditFormBase extends BaseModel
 
     protected function setUser()
     {
-        if($this->id){ //编辑模式
-            if(!$this->user_id){
-                throw new \Exception('请设置小程序用户！');
-            }
-            $user = User::findOne($this->user_id);
-            if(!$user){
-                throw new \Exception('小程序用户不存在！');
-            }
-            if($user->mch_id && $user->mch_id != $this->id){
-                throw new \Exception('小程序用户已绑定其它商户！');
-            }
-            $isNewUser = false;
-        }else{
-            $user = new User();
-            $user->mch_id       = $this->mch->id;
-            $user->mall_id      = \Yii::$app->mall->id;
-            $user->auth_key     = \Yii::$app->security->generateRandomString();
-            $user->access_token = \Yii::$app->security->generateRandomString();
-            $user->password     = \Yii::$app->getSecurity()->generatePasswordHash(uniqid());
-            $isNewUser = true;
+        if(!$this->user_id){
+            throw new \Exception('请设置小程序用户！');
+        }
+        $user = User::findOne($this->user_id);
+        if(!$user){
+            throw new \Exception('小程序用户不存在！');
+        }
+        if($user->mch_id && $user->mch_id != $this->id){
+            throw new \Exception('小程序用户已绑定其它商户！');
         }
 
-        $user->mch_id   = $this->mch->id;
-        $user->nickname = $this->mch->realname;
-        $user->mobile   = $this->mch->mobile;
-        $user->username = $this->username;
+        $user->mch_id = $this->mch->id;
         if (!$user->save()) {
             throw new \Exception($this->responseErrorMsg($user));
-        }
-
-        //新用户创建，需要更新商户关联的用户ID
-        if($isNewUser){
-            $this->mch->user_id = $user->id;
-            if(!$this->mch->save()){
-                throw new \Exception($this->responseErrorMsg($user));
-            }
-        }
-
-        $userIdentity = UserIdentity::findOne(['user_id' => $user->id]);
-        if (!$userIdentity) {
-            $userIdentity = new UserIdentity();
-            $userIdentity->user_id = $user->id;
-            $res = $userIdentity->save();
-            if (!$res) {
-                throw new \Exception($this->responseErrorMsg($userIdentity));
-            }
         }
     }
 }

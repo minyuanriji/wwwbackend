@@ -81,6 +81,24 @@ abstract class MchEditFormBase extends BaseModel
     protected function setMch()
     {
         $mch = $this->getMch();
+
+        if(!$this->user_id)
+        {
+            throw new \Exception('请设置小程序用户！');
+        }
+
+        //切换小程序用户
+        //需要把原先所绑定用户的商家ID置0
+        if($mch->user_id && $mch->user_id != $this->user_id)
+        {
+            $user = User::findOne($mch->user_id);
+            if($user)
+            {
+                $user->mch_id = 0;
+                $user->save();
+            }
+        }
+
         $mch->user_id = $this->user_id ?: 0;
         $mch->realname = $this->realname;
         $mch->mobile = $this->mobile;

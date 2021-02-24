@@ -342,7 +342,9 @@
                     form_data: [],
                 },
                 rules: {
-                    username: [
+                    user_id: [
+                        {required: true, message: '小程序用户', trigger: 'change'},
+                    ],username: [
                         {required: true, message: '商户账号', trigger: 'change'},
                     ],
                     password: [

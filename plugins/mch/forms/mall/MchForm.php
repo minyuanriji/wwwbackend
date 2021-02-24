@@ -266,14 +266,6 @@ class MchForm extends BaseModel
             ['or', ['LIKE', 'u.nickname', $keyword], ['u.id' => $keyword]],
             ['u.mall_id' => \Yii::$app->mall->id],
         ]);
-        $userIds = Mch::find()->where([
-            'mall_id' => \Yii::$app->mall->id,
-            'is_delete' => 0,
-        ])->andWhere(['in', 'review_status', [0, 1]])->select('user_id')->asArray()->all();
-        //var_dump($userIds);exit;
-        if ($userIds) {
-            $query->andWhere(['not in', 'u.id', $userIds]);
-        }
         
         $list = $query->InnerJoinwith('userInfo')->orderBy('nickname')->limit(10)->asArray()->all();
         //

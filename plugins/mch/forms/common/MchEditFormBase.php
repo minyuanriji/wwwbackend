@@ -230,47 +230,42 @@ abstract class MchEditFormBase extends BaseModel
 
     protected function setUser()
     {
-        /** @var User $user */
-        $user = User::find()->where([
-            'username' => $this->username,
-            'mall_id' => \Yii::$app->mall->id,
-            'is_delete' => 0,
-        ])->one();
-        // 商户编辑的时候无需判断
-        if ($user && $user->mch_id != $this->id) {
-            throw new \Exception('商户账号已存在！');
-        }
-
-        if ($this->password) {
-            if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $this->password) > 0) {
-                throw new \Exception('密码不能包含中文字符');
+        if($this->id){ //编辑模式
+            if(!$this->user_id){
+                throw new \Exception('请设置小程序用户！');
             }
-        }
-
-        // 商户账号创建
-        $user = User::findOne(['mch_id' => $this->mch->id]);
-        if (!$user) {
-            if (!$this->password) {
-                throw new \Exception('请填写商户密码');
+            $user = User::findOne($this->user_id);
+            if(!$user){
+                throw new \Exception('小程序用户不存在！');
             }
-
+            if($user->mch_id && $user->mch_id != $this->id){
+                throw new \Exception('小程序用户已绑定其它商户！');
+            }
+            $isNewUser = false;
+        }else{
             $user = new User();
-            $user->mch_id = $this->mch->id;
-            $user->mall_id = \Yii::$app->mall->id;
-            $user->auth_key = \Yii::$app->security->generateRandomString();
+            $user->mch_id       = $this->mch->id;
+            $user->mall_id      = \Yii::$app->mall->id;
+            $user->auth_key     = \Yii::$app->security->generateRandomString();
             $user->access_token = \Yii::$app->security->generateRandomString();
+            $user->password     = \Yii::$app->getSecurity()->generatePasswordHash(uniqid());
+            $isNewUser = true;
         }
 
-        if ($this->password) {
-            $user->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
-        }
-
+        $user->mch_id   = $this->mch->id;
         $user->nickname = $this->mch->realname;
-        $user->mobile = $this->mch->mobile;
+        $user->mobile   = $this->mch->mobile;
         $user->username = $this->username;
-        $res = $user->save();
-        if (!$res) {
+        if (!$user->save()) {
             throw new \Exception($this->responseErrorMsg($user));
+        }
+
+        //新用户创建，需要更新商户关联的用户ID
+        if($isNewUser){
+            $this->mch->user_id = $user->id;
+            if(!$this->mch->save()){
+                throw new \Exception($this->responseErrorMsg($user));
+            }
         }
 
         $userIdentity = UserIdentity::findOne(['user_id' => $user->id]);

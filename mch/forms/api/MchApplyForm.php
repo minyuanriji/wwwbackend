@@ -161,6 +161,8 @@ class MchApplyForm extends BaseModel {
         $store->province_id = $this->province_id;
         $store->city_id     = $this->city_id;
         $store->district_id = $this->district_id;
+        $store->longitude   = $this->longitude;
+        $store->latitude    = $this->latitude;
         $store->pic_url     = "http://";
         if (!$store->save()) {
             throw new \Exception($this->responseErrorMsg($store));

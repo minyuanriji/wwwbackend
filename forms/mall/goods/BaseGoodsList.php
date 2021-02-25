@@ -42,6 +42,7 @@ abstract class BaseGoodsList extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
+
         try {
             $search = \Yii::$app->serializer->decode($this->search);
         } catch (\Exception $exception) {
@@ -54,7 +55,6 @@ abstract class BaseGoodsList extends BaseModel
             'g.mall_id' => \Yii::$app->mall->id,
             'g.is_delete' => 0,
         ]);
-
         // 商品名称搜索
         if (isset($search['keyword']) && $search['keyword']) {
             $keyword = trim($search['keyword']);
@@ -100,10 +100,12 @@ abstract class BaseGoodsList extends BaseModel
         }
 
         $query = $this->setQuery($query);
+
         if (\Yii::$app->request->post('flag') == 'EXPORT') {
             return $query;
         }
         $newQuery = clone $query;
+
         $goodsCount = $newQuery->count();
         /**
          * @var BasePagination $pagination

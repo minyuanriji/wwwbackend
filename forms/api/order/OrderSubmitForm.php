@@ -392,7 +392,7 @@ class OrderSubmitForm extends BaseModel
                     $userScoreCard = empty($userScoreInfo) ? 0 : number_format($userScoreInfo['static_score']+$userScoreInfo['dynamic_score']);
                     $userScore = empty($userScoreInfo) ? 0 : $userScoreInfo['score'];
 //                    $userScore >= $userScoreCard
-                    if(!empty($userScore)){ 
+                    if(!empty($userScore)){
                         if (!\Yii::$app->currency->setUser($user)->score->sub($order->use_score, '下单积分抵扣')) {
                             return $this->returnApiResultData(ApiCode::CODE_FAIL,'积分操作失败。');
                         }else{

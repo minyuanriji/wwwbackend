@@ -9,4 +9,8 @@ class Goods extends Common{
         return $this -> find() -> select(['freight_id']) -> where(['id' => $id]) -> asArray() -> one();
     }
 
+    public function getGoodsData($id){
+        return $this -> find() -> where(['id' => $id]) -> asArray() -> one();
+    }
+
 }

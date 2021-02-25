@@ -71,7 +71,8 @@ Yii::$app->loadComponentView('goods/com-batch');
                             </div>
                             <span slot="footer" class="dialog-footer">
                                     <el-button @click="exportDialogVisible = false" size="small">取 消</el-button>
-                                    <el-button @click="exportGoodsData" size="small" type="primary">确定</el-button>
+<!--                                    <el-button @click="exportGoodsData" size="small" type="primary">确定</el-button>-->
+                                <el-button @click="newExportGoodsData" size="small" type="primary">确定</el-button>
                                 </span>
                         </template>
                         <template v-else>
@@ -806,6 +807,11 @@ Yii::$app->loadComponentView('goods/com-batch');
                     action_url: '<?= Yii::$app->urlManager->createUrl('mall/goods/export-goods-list') ?>',
                     goods_count: 0,//商品总数
                 }
+            },
+            newExportGoodsData(){
+                let self = this;
+                window.location.href = 'https://' + document.domain + '/web/index.php?r=mall%2Fgoods%2Fget-goods-data' + '&choose_list=' + self.choose_list;
+                this.exportDialogVisible = false;
             },
             exportGoodsData() {
                 let self = this;

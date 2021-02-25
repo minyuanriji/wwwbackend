@@ -1,12 +1,12 @@
 <?php
 namespace app\controllers\business;
+use app\models\mysql\Goods;
 use yii;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 set_time_limit(0);
 ini_set("memory_limit", "1024M");
 class ExportData{
     public function ExportData($start_id,$end_id){
-
         $Spreadsheet = new Spreadsheet();
         $sheet = $Spreadsheet -> getActiveSheet();
         $sheet -> setCellValue('A1','ID');
@@ -52,6 +52,139 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
         $writer -> save('php://output');
         exit();
     }
+
+    public function getGoodsData($params){
+        $db = \Yii::$app->db;
+        $data = [];
+        if($params != '*'){
+            $params = explode(',',$params);
+        }
+        if($params != '*'){
+            foreach ($params as $key => $val){
+//                $sql = "SELECT * FROM jxmall_goods as g WHERE id = {$val}";
+                $sql = "SELECT id,goods_warehouse_id,status,price,use_attr,attr_groups,goods_stock,virtual_sales,confine_count,pieces,forehead,freight_id,give_score_type,forehead_score,forehead_score_type,accumulative,individual_share,attr_setting_type,share_type,is_default_services,use_score,max_deduct_integral,enable_integral,integral_setting,enable_score,score_setting,cannotrefund FROM jxmall_goods WHERE id = {$val}";
+                $res = $db -> createCommand($sql) -> queryOne();
+                $res['attr_groups'] = json_decode($res['attr_groups'],true);
+                array_push($data,$res);
+            }
+        }else{
+            $total_sql = "SELECT count(id) as total FROM jxmall_goods";
+            $total = $db -> createCommand($total_sql) -> queryOne();
+            $pageSize = 100;
+            $page_total = $total['total'] / $pageSize;
+            for ($i = 0; $i <= ceil($page_total); $i++){
+                $pageNow = $i * $pageSize;
+                $sql = "SELECT id,goods_warehouse_id,status,price,use_attr,attr_groups,goods_stock,virtual_sales,confine_count,pieces,forehead,freight_id,give_score_type,forehead_score,forehead_score_type,accumulative,individual_share,attr_setting_type,share_type,is_default_services,use_score,max_deduct_integral,enable_integral,integral_setting,enable_score,score_setting,cannotrefund FROM jxmall_goods limit {$pageNow},{$pageSize}";
+                $res = $db -> createCommand($sql) -> queryAll();
+                foreach ($res as $key => $val){
+                    $val['attr_groups'] = json_decode($val['attr_groups'],true);
+                    array_push($data,$val);
+                }
+            }
+        }
+        $goods_data = [];
+        foreach ($data as $key => $val){
+            $val['status'] = $val['status'] == 1 ? '上架' : '下架';
+            $val['use_attr'] = $val['use_attr'] == 1 ? '使用' : '不使用';
+            $val['give_score_type'] = $val['give_score_type'] == 1 ? '固定值' : '百分比';
+            $val['forehead_score_type'] = $val['forehead_score_type'] == 1 ? '固定值' : '百分比';
+            $val['individual_share'] = $val['individual_share'] == 1 ? '是' : '否';
+            $val['attr_setting_type'] = $val['attr_setting_type'] == 1 ? '详细设置' : '普通设置';
+            $val['share_type'] = $val['share_type'] == 1 ? '百分比' : '固定金额';
+            $val['is_default_services'] = $val['is_default_services'] == 1 ? '是' : '否';
+            $val['use_score'] = $val['use_score'] == 1 ? '不使用' : '使用';
+            $val['enable_integral'] = $val['enable_integral'] == 1 ? '赠送' : '不赠送';
+            $val['enable_score'] = $val['enable_score'] == 1 ? '赠送' : '不赠送';
+            if(!empty($val['attr_groups'])){
+                $attr_groups_msg = '规格组：';
+                foreach ($val['attr_groups'][0]['attr_list'] as $key2 => $val2){
+                    $attr_groups_msg .= $val2['attr_name'] . '、';
+                }
+                $val['attr_groups'] = $attr_groups_msg;
+            }
+            if(!empty($val['integral_setting'])){
+                $integral_setting_num = '赠送:' . json_decode($val['integral_setting'],true)['integral_num'] . ',' . json_decode($val['integral_setting'],true)['period'] . '月';
+                $val['integral_setting'] = $integral_setting_num;
+            }else{
+                $val['integral_setting'] = '无';
+            }
+            if(!empty($val['score_setting'])){
+                $integral_num = '赠送:' . json_decode($val['score_setting'],true)['integral_num'] . ',' . json_decode($val['score_setting'],true)['period'] . '月';
+                $val['score_setting'] = $integral_num;
+            }else{
+                $val['score_setting'] = '无';
+            }
+
+            if(!empty($val['cannotrefund'])){
+                $cannotrefund = json_decode($val['cannotrefund'],true);
+                $cannotrefund_msg = '';
+                $cannotrefund_msg .= array_search(1,$cannotrefund) === 0 ? '退货：支持，' : '退货：不支持，';
+                $cannotrefund_msg .= array_search(2,$cannotrefund) !== false ? '退货退款：支持，' : '退货退款：不支持，';
+                $cannotrefund_msg .= array_search(3,$cannotrefund) !== false ? '换货：支持。' : '换货：不支持。';
+                $val['cannotrefund'] = $cannotrefund_msg;
+            }else{
+                $val['cannotrefund'] = '暂无数据';
+            }
+            $goods_warehouse_sql = "SELECT `name`,original_price FROM jxmall_goods_warehouse WHERE id = {$val['goods_warehouse_id']}";
+            $goods_warehouse = $db -> createCommand($goods_warehouse_sql) -> queryOne();
+            $val['goods_warehouse_id'] = $goods_warehouse['name'];
+            $val['original_price'] = $goods_warehouse['original_price'];
+            $goods_distribution_sql = "SELECT commission_first,commission_second,`level` FROM jxmall_plugin_distribution_goods_detail WHERE goods_id = {$val['id']} AND `level` BETWEEN 5 AND 7";
+            $goods_distribution = $db -> createCommand($goods_distribution_sql) -> queryAll();
+            $val['level_5'] = '暂无数据';
+            $val['level_6'] = '暂无数据';
+            $val['level_7'] = '暂无数据';
+            if(!empty($goods_distribution)){
+                $val['level_5'] = '一级分销：'. (!empty($goods_distribution[0]['commission_first']) ? $goods_distribution[0]['commission_first'] : '无') . '，二级分销：' . (!empty($goods_distribution[0]['commission_second']) ? $goods_distribution[0]['commission_second'] : '无');
+                $val['level_6'] = '一级分销：'. (!empty($goods_distribution[1]['commission_first']) ? $goods_distribution[1]['commission_first'] : '无') . '，二级分销：' . (!empty($goods_distribution[1]['commission_second']) ? $goods_distribution[1]['commission_second'] : '无');
+                $val['level_7'] = '一级分销：'. (!empty($goods_distribution[2]['commission_first']) ? $goods_distribution[2]['commission_first'] : '无') . '，二级分销：' . (!empty($goods_distribution[2]['commission_second']) ? $goods_distribution[2]['commission_second'] : '无');
+            }
+            array_push($goods_data,$val);
+        }
+        $this -> ExportGoodsData($goods_data);
+    }
+
+    public function ExportGoodsData($arrData){
+        $ascii = 90;
+        $ascii_arr = [];
+        $add_ascii = ['AA','AB','AC','AD','AE'];
+        $title = ['编号', '商品名称', '是否上架', '售价', '使用规格组', '规格组', '商品库存', '已出售量', '购物数量限制', '单品满件包邮', '单口满额包邮', '运费模板ID', '赠送积分类型', '可抵扣积分', '可抵扣积分类型', '允许多件累计折扣', '是否单独分销设置', '分销设置类型', '佣金配比', '默认服务', '使用积分', '购物券可抵扣分', '是否启用购物券赠送', '购物券赠送设置', '是否启用积分券赠送', '积分券赠送设置', '是否支持退换货','原价','合伙人','联合创始人','分公司'
+        ];
+        $widthArr = ['B' => 30,'F' => 120,'Z' => 20,'AA' => 40,'AC' => 40,'AD' => 40,'AE' => 40,'X' => 20,'O' => 20,'V' => 20,'Y' => 20];
+        $num = 0;
+        for ($k = 65; $k <= $ascii; $k++){
+            $ascii_arr[$num] = chr($k);
+            $num++;
+            if($k == 90){
+                for ($j = 0; $j < count($add_ascii); $j++){
+                    $ascii_arr[$num] = $add_ascii[$j];
+                    $num++;
+                }
+            }
+        }
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet -> getActiveSheet();
+//        echo '<pre>';
+        foreach ($ascii_arr as $key => $val){
+            $sheet -> setCellValue($val . 1,$title[$key]);
+        }
+        foreach ($widthArr as $key => $val){
+            $sheet->getColumnDimension($key)->setWidth($val);
+        }
+        $sheet->fromArray($arrData,null,'A2');
+        header('Content-Description: File Transfer');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename=商品信息.xlsx');
+        header('Cache-Control: max-age=0');
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
+        exit();
+    }
+
 }
 
 

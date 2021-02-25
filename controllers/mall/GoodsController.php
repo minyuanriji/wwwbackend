@@ -27,7 +27,7 @@ use app\forms\mall\goods\RecommendSettingForm;
 use app\forms\mall\goods\TaobaoCsvForm;
 use app\forms\mall\goods\TransferForm;
 use app\models\Label;
-
+use app\controllers\business\ExportData;
 class GoodsController extends MallController
 {
 
@@ -529,5 +529,12 @@ class GoodsController extends MallController
             return $this->asJson($res);
         }
     }
+
+    public function actionGetGoodsData(){
+        $goods_id = \Yii::$app->request->get('choose_list');
+        $goods_id = !empty($goods_id) ? $goods_id : '*';
+        $res = (new ExportData()) -> getGoodsData($goods_id);
+    }
+
 
 }

@@ -126,7 +126,8 @@ class MchForm extends BaseModel
                 throw new \Exception('商户不存在');
             }
 
-            $model->is_delete = 1;
+            $model->is_delete   = 1;
+            $model->user_id     = 0;
             $res = $model->save();
             if (!$res) {
                 throw new \Exception($this->responseErrorMsg($model));
@@ -147,6 +148,7 @@ class MchForm extends BaseModel
                 throw new \Exception('商户账号不存在');
             }
             $user->is_delete = 1;
+            $user->mch_id    = 0;
             $res = $user->save();
             if (!$res) {
                 throw new \Exception($this->responseErrorMsg($user));

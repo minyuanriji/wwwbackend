@@ -811,7 +811,7 @@ Yii::$app->loadComponentView('goods/com-batch');
             },
             newExportGoodsData(){
                 let self = this;
-                window.location.href = 'http://' + document.domain + '/web/index.php?r=mall%2Fgoods%2Fget-goods-data' + '&choose_list=' + self.choose_list;
+                window.location.href = 'https://' + document.domain + '/web/index.php?r=mall%2Fgoods%2Fget-goods-data' + '&choose_list=' + self.choose_list;
                 this.exportDialogVisible = false;
             },
             exportGoodsData() {

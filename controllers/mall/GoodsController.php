@@ -439,7 +439,6 @@ class GoodsController extends MallController
         $form = new GoodsForm();
         $form->attributes = \Yii::$app->request->post();
         $res = $form->updateGoodsName();
-
         return $this->asJson($res);
     }
 
@@ -529,6 +528,7 @@ class GoodsController extends MallController
             return $this->asJson($res);
         }
     }
+
 
     public function actionGetGoodsData(){
         $goods_id = \Yii::$app->request->get('choose_list');

@@ -3,6 +3,7 @@ namespace app\controllers\business;
 use app\models\mysql\Goods;
 use yii;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use app\models\mysql\PostageRules;
 set_time_limit(0);
 ini_set("memory_limit", "1024M");
 class ExportData{
@@ -62,7 +63,7 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
         if($params != '*'){
             foreach ($params as $key => $val){
 //                $sql = "SELECT * FROM jxmall_goods as g WHERE id = {$val}";
-                $sql = "SELECT id,goods_warehouse_id,status,price,use_attr,attr_groups,goods_stock,virtual_sales,confine_count,pieces,forehead,freight_id,give_score_type,forehead_score,forehead_score_type,accumulative,individual_share,attr_setting_type,share_type,is_default_services,use_score,max_deduct_integral,enable_integral,integral_setting,enable_score,score_setting,cannotrefund FROM jxmall_goods WHERE id = {$val}";
+                $sql = "SELECT id,goods_warehouse_id,status,price,use_attr,attr_groups,goods_stock,virtual_sales,confine_count,pieces,forehead,freight_id,give_score_type,forehead_score,forehead_score_type,accumulative,individual_share,attr_setting_type,share_type,is_default_services,use_score,max_deduct_integral,enable_integral,integral_setting,enable_score,score_setting,is_order_paid,order_paid,cannotrefund,is_show_sales,use_virtual_sales FROM jxmall_goods WHERE id = {$val}";
                 $res = $db -> createCommand($sql) -> queryOne();
                 $res['attr_groups'] = json_decode($res['attr_groups'],true);
                 array_push($data,$res);
@@ -74,7 +75,7 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
             $page_total = $total['total'] / $pageSize;
             for ($i = 0; $i <= ceil($page_total); $i++){
                 $pageNow = $i * $pageSize;
-                $sql = "SELECT id,goods_warehouse_id,status,price,use_attr,attr_groups,goods_stock,virtual_sales,confine_count,pieces,forehead,freight_id,give_score_type,forehead_score,forehead_score_type,accumulative,individual_share,attr_setting_type,share_type,is_default_services,use_score,max_deduct_integral,enable_integral,integral_setting,enable_score,score_setting,cannotrefund FROM jxmall_goods limit {$pageNow},{$pageSize}";
+                $sql = "SELECT id,goods_warehouse_id,status,price,use_attr,attr_groups,goods_stock,virtual_sales,confine_count,pieces,forehead,freight_id,give_score_type,forehead_score,forehead_score_type,accumulative,individual_share,attr_setting_type,share_type,is_default_services,use_score,max_deduct_integral,enable_integral,integral_setting,enable_score,score_setting,is_order_paid,order_paid,cannotrefund,is_show_sales,use_virtual_sales FROM jxmall_goods limit {$pageNow},{$pageSize}";
                 $res = $db -> createCommand($sql) -> queryAll();
                 foreach ($res as $key => $val){
                     $val['attr_groups'] = json_decode($val['attr_groups'],true);
@@ -95,6 +96,8 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
             $val['use_score'] = $val['use_score'] == 1 ? '不使用' : '使用';
             $val['enable_integral'] = $val['enable_integral'] == 1 ? '赠送' : '不赠送';
             $val['enable_score'] = $val['enable_score'] == 1 ? '赠送' : '不赠送';
+            $val['is_show_sales'] = $val['is_show_sales'] == 1 ? '销量：开启' : '销量：关闭';
+            $val['use_virtual_sales'] = $val['use_virtual_sales'] == 1 ? '虚拟销量：开启' : '虚拟销量：关闭';
             if(!empty($val['attr_groups'])){
                 $attr_groups_msg = '规格组：';
                 foreach ($val['attr_groups'][0]['attr_list'] as $key2 => $val2){
@@ -108,6 +111,14 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
             }else{
                 $val['integral_setting'] = '无';
             }
+
+            if($val['freight_id'] == 0){
+                $PostageRules = (new PostageRules()) -> getExpressPrice();
+            }else{
+                $PostageRules = (new PostageRules()) -> getGoodsExpressPrice($val['freight_id']);
+            }
+            $val['freight_id'] = '运费规则：' . (!empty($PostageRules -> name) ? $PostageRules -> name : '暂无数据');
+
             if(!empty($val['score_setting'])){
                 $integral_num = '赠送:' . json_decode($val['score_setting'],true)['integral_num'] . ',' . json_decode($val['score_setting'],true)['period'] . '月';
                 $val['score_setting'] = $integral_num;
@@ -130,6 +141,16 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
             $val['goods_warehouse_id'] = $goods_warehouse['name'];
             $val['original_price'] = $goods_warehouse['original_price'];
             $goods_distribution_sql = "SELECT commission_first,commission_second,`level` FROM jxmall_plugin_distribution_goods_detail WHERE goods_id = {$val['id']} AND `level` BETWEEN 5 AND 7";
+            if(!empty($val['is_order_paid'])){
+                $val['is_order_paid'] = '订单支付设置：开启';
+                $order_paid = json_decode($val['order_paid'],true);
+                $order_paid_msg = '积分：' . (empty($order_paid['is_score']) ? '关闭，' : '开启，') . '积分劵：' . (empty($order_paid['is_score_card']) ? '关闭，' : '开启，') . '购物券：' . (empty($order_paid['is_integral_card']) ? '关闭。' : '开启。');
+                $val['order_paid'] = $order_paid_msg;
+            }else{
+                $val['order_paid'] = '订单支付参数：无' ;
+                $val['is_order_paid'] = '订单支付设置：关闭';
+            }
+
             $goods_distribution = $db -> createCommand($goods_distribution_sql) -> queryAll();
             $val['level_5'] = '暂无数据';
             $val['level_6'] = '暂无数据';
@@ -141,16 +162,19 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
             }
             array_push($goods_data,$val);
         }
+//        echo '<pre>';
+//        var_dump($goods_data);exit();
+
         $this -> ExportGoodsData($goods_data);
     }
 
     public function ExportGoodsData($arrData){
         $ascii = 90;
         $ascii_arr = [];
-        $add_ascii = ['AA','AB','AC','AD','AE'];
-        $title = ['编号', '商品名称', '是否上架', '售价', '使用规格组', '规格组', '商品库存', '已出售量', '购物数量限制', '单品满件包邮', '单口满额包邮', '运费模板ID', '赠送积分类型', '可抵扣积分', '可抵扣积分类型', '允许多件累计折扣', '是否单独分销设置', '分销设置类型', '佣金配比', '默认服务', '使用积分', '购物券可抵扣分', '是否启用购物券赠送', '购物券赠送设置', '是否启用积分券赠送', '积分券赠送设置', '是否支持退换货','原价','合伙人','联合创始人','分公司'
+        $add_ascii = ['AA','AB','AC','AD','AE','AF','AG','AH','AI'];
+        $title = ['编号', '商品名称', '是否上架', '售价', '使用规格组', '规格组', '商品库存', '已出售量', '购物数量限制', '单品满件包邮', '单口满额包邮', '运费模板ID', '赠送积分类型', '可抵扣积分', '可抵扣积分类型', '允许多件累计折扣', '是否单独分销设置', '分销设置类型', '佣金配比', '默认服务', '使用积分', '购物券可抵扣分', '是否启用购物券赠送', '购物券赠送设置', '是否启用积分券赠送', '积分券赠送设置','订单支付设置','订单支付参数','是否支持退换货','销量是否开启','虚拟销量是否开启','原价', '合伙人','联合创始人','分公司'
         ];
-        $widthArr = ['B' => 30,'F' => 120,'Z' => 20,'AA' => 40,'AC' => 40,'AD' => 40,'AE' => 40,'X' => 20,'O' => 20,'V' => 20,'Y' => 20];
+        $widthArr = ['B' => 30,'F' => 120,'Z' => 20,'AA' => 20,'AB' => 40,'AC' => 40,'AG' => 40,'AH' => 40,'AI' => 40,'X' => 20,'O' => 20,'V' => 20,'Y' => 20,'AD' => 18,'AE' => 18,'L' => 25];
         $num = 0;
         for ($k = 65; $k <= $ascii; $k++){
             $ascii_arr[$num] = chr($k);
@@ -162,6 +186,8 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
                 }
             }
         }
+//        var_dump(count($title));
+//        var_dump(count($ascii_arr));exit();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet -> getActiveSheet();

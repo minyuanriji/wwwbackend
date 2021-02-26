@@ -56,6 +56,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                 <span>商品列表</span>
                 <div style="float: right; margin: -5px 0">
                     <el-button v-if="is_add_goods" type="primary" size="small" @click="edit">添加商品</el-button>
+<!--                    <a href="http://8.129.63.124/web/index.php?r=mall%2Fgoods%2Fexport-goods-list2">导出</a>-->
                     <el-button v-if="isShowExportGoods" type="primary" size="small" @click="exportGoods">商品导出
                     </el-button>
                     <el-dialog
@@ -810,7 +811,7 @@ Yii::$app->loadComponentView('goods/com-batch');
             },
             newExportGoodsData(){
                 let self = this;
-                window.location.href = 'https://' + document.domain + '/web/index.php?r=mall%2Fgoods%2Fget-goods-data' + '&choose_list=' + self.choose_list;
+                window.location.href = 'http://' + document.domain + '/web/index.php?r=mall%2Fgoods%2Fget-goods-data' + '&choose_list=' + self.choose_list;
                 this.exportDialogVisible = false;
             },
             exportGoodsData() {

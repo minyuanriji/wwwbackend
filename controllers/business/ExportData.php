@@ -73,7 +73,7 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
             $page_total = $total['total'] / $pageSize;
             for ($i = 0; $i <= ceil($page_total); $i++){
                 $pageNow = $i * $pageSize;
-                $sql = "SELECT id,goods_warehouse_id,status,price,use_attr,attr_groups,goods_stock,virtual_sales,confine_count,pieces,forehead,freight_id,give_score_type,forehead_score,forehead_score_type,accumulative,individual_share,attr_setting_type,share_type,is_default_services,use_score,max_deduct_integral,enable_integral,integral_setting,enable_score,score_setting,is_order_paid,order_paid,cannotrefund,is_show_sales,use_virtual_sales FROM jxmall_goods limit {$pageNow},{$pageSize}";
+                $sql = "SELECT id,goods_warehouse_id,status,price,use_attr,attr_groups,goods_stock,virtual_sales,confine_count,pieces,forehead,freight_id,give_score_type,forehead_score,forehead_score_type,accumulative,individual_share,attr_setting_type,share_type,is_default_services,use_score,max_deduct_integral,enable_integral,integral_setting,enable_score,score_setting,is_order_paid,order_paid,cannotrefund,is_show_sales,use_virtual_sales FROM jxmall_goods WHERE mch_id = 0 limit {$pageNow},{$pageSize}";
                 $res = $db -> createCommand($sql) -> queryAll();
                 foreach ($res as $key => $val){
                     $val['attr_groups'] = json_decode($val['attr_groups'],true);

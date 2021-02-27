@@ -398,7 +398,7 @@ class OrderSubmitForm extends BaseModel
                         }else{
                             $resx = IntegralDeduct::buyGooodsDeduct($order,0);
                             if($resx === false){
-                                return $this->returnApiResultData(ApiCode::CODE_FAIL,'积分券扣除失败。');
+                                return $this->returnApiResultData(ApiCode::CODE_FAIL,'积分券扣除失败。xxx');
                             }
                         }
                     }

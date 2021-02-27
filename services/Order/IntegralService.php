@@ -106,7 +106,15 @@ class IntegralService
             if (($this->getUserRemainingintegral() == 0) or $this->total_goods_price == 0) {
                 continue;
             }
-            $value['max_deduct_integral']                       = min($value['max_deduct_integral'], $this->user_remaining_integral, $this->item['total_goods_price'], $value['total_price']);
+
+            //如果是多商户商品，最大抵扣卷额度为商品总价
+            if(!empty($this->item['mch']['id'])){
+                $value['max_deduct_integral'] = max($this->item['total_goods_price'], $value['total_price']);
+                $value['max_deduct_integral'] = min($value['max_deduct_integral'], $this->user_remaining_integral);
+            }else{
+                $value['max_deduct_integral'] = min($value['max_deduct_integral'], $this->user_remaining_integral, $this->item['total_goods_price'], $value['total_price']);
+            }
+
             $value['max_deduct_integral']                       = intval($value['max_deduct_integral']);
             $this->item['same_goods_list'][$key]['total_price'] -= $value['max_deduct_integral'];
             $this->user_use_integral                            += $this->getIntegral($value['max_deduct_integral']);

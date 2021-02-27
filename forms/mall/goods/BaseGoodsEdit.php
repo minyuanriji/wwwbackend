@@ -13,6 +13,7 @@ namespace app\forms\mall\goods;
 
 use app\events\GoodsEvent;
 use app\forms\common\goods\CommonGoods;
+use app\forms\common\mch\MchSettingForm;
 use app\helpers\SerializeHelper;
 use app\models\BaseModel;
 use app\models\Goods;

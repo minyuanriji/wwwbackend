@@ -101,12 +101,12 @@ class Menus
                         'name' => '类目设置',
                         'route' => 'mch/cat/index',
                         'action' => []
-                    ],
+                    ]/*,
                     [
                         'name' => '运费规则',
                         'route' => 'mch/postage-rules/index',
                         'action' => []
-                    ]
+                    ]*/
                 ],
             ],
             [

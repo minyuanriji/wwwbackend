@@ -359,7 +359,7 @@ echo $this->render('../components/goods/com-goods-agent');
                                         <el-button @click="app_share.dialog = true;app_share.type = 'pic_bg'" type="text">查看图例
                                         </el-button>
                                     </el-form-item>
-                                    <el-form-item v-if="!is_mch && is_goods == 1" label="上架状态" prop="status">
+                                    <el-form-item label="上架状态" prop="status">
                                         <el-switch @change="statusChange" :active-value="1" :inactive-value="0" v-model="ruleForm.status">
                                         </el-switch>
                                     </el-form-item>
@@ -578,7 +578,7 @@ echo $this->render('../components/goods/com-goods-agent');
                                         </el-checkbox>
                                     </el-form-item>
 
-                                    <el-form-item prop="freight_id">
+                                    <el-form-item v-show="false" prop="freight_id">
                                         <template slot='label'>
                                             <span>运费设置</span>
                                             <el-tooltip effect="dark" content="选择第一项（默认运费）将会根据运费管理的（默认运费）变化而变化" placement="top">
@@ -635,7 +635,7 @@ echo $this->render('../components/goods/com-goods-agent');
                                         </div>
                                     </el-form-item>
 
-                                    <el-form-item label="" prop="pieces">
+                                    <el-form-item v-show="false" label="" prop="pieces">
                                         <template slot='label'>
                                             <span>单品满件包邮</span>
                                             <el-tooltip effect="dark" content="如果设置0或空，则不支持满件包邮" placement="top">
@@ -647,7 +647,7 @@ echo $this->render('../components/goods/com-goods-agent');
                                         </el-input>
                                     </el-form-item>
 
-                                    <el-form-item prop="forehead">
+                                    <el-form-item v-show="false" prop="forehead">
                                         <template slot='label'>
                                             <span>单品满额包邮</span>
                                             <el-tooltip effect="dark" content="如果设置0或空，则不支持满额包邮" placement="top">

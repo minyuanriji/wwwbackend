@@ -199,7 +199,7 @@ class GoodsForm extends BaseModel
             }
 
             \Yii::$app->trigger(StatisticsBrowseLog::EVEN_STATISTICS_LOG, new StatisticsEvent(['mall_id'=>\Yii::$app->mall->id,'browse_type'=>2,'user_id'=>\Yii::$app->user->id,'user_ip'=>$_SERVER['REMOTE_ADDR']]) );
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['goods' => $info]);
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['goods' => $info, 'is_mch' => !empty($mchInfo) ? 1 : 0, 'mch' => $mchInfo]);
         } catch (\Exception $e) {
             \Yii::error($e);
 

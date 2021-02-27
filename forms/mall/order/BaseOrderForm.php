@@ -700,15 +700,15 @@ abstract class BaseOrderForm extends BaseModel
                     }
                 }
             }
-//            $order->is_sale = 1;
-//            $order->status = Order::STATUS_COMPLETE;
-//            $order->complete_at = time();
-//            if (!$order->save()) {
-//                throw new \Exception($this->responseErrorMsg($order));
-//            }
-//            \Yii::$app->trigger(Order::EVENT_SALES, new OrderEvent([
-//                'order' => $order
-//            ]));
+            $order->is_sale = 1;
+            $order->status = Order::STATUS_COMPLETE;
+            $order->complete_at = time();
+            if (!$order->save()) {
+                throw new \Exception($this->responseErrorMsg($order));
+            }
+            \Yii::$app->trigger(Order::EVENT_SALES, new OrderEvent([
+                'order' => $order
+            ]));
             // 订单过售后
             \Yii::$app->queue->delay(0)->push(new OrderCustomerServiceJob([
                 'orderId' => $order->id

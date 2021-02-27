@@ -165,13 +165,13 @@ class Integral extends BaseActiveRecord
                 if($plan['effective_days'] >= 30){
                     $date_days = 0;
                     if(date('m') == 02){
-                        $date_days = 3;
+                        $date_days = 2;
                     }
-                    $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ '. ($plan['effective_days'] - $date_days) .'days',strtotime(date('Y-m-01')));
+                    $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ '. ($plan['effective_days'] - $date_days) .'days',strtotime(date('Y-m-01'))) - 1;
                     \Yii::$app->redis -> set('key1',date('m'));
 //                    $expire_time = $expire_time - 10;
                 }else{
-                    $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
+                    $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01'))) - 1;
                 }
 
                 // 测试

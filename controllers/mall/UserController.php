@@ -30,6 +30,7 @@ class UserController extends UserManagerController
      */
     public function actionIndex()
     {
+        echo strtotime('+'. 28 .'days',strtotime(date('Y-m-01'))) - 1;
         if (\Yii::$app->request->isAjax) {
             $form = new UserForm();
             $form->attributes = \Yii::$app->request->get();

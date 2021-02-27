@@ -5,6 +5,7 @@ use app\logic\IntegralLogic;
 use app\models\BaseActiveRecord;
 use app\models\Mall;
 use app\models\User;
+use app\models\user\User as UserModel;
 use Exception;
 use Yii;
 
@@ -98,6 +99,10 @@ class CardDetail extends BaseActiveRecord{
             $card->use_num += 1;
             $res = $card->save();
             if($res === false) throw new Exception($card->getErrorMessage());
+            $level = (new UserModel()) -> getOneUserInfo($user_id);
+            if($level['level'] < 4){
+                (new UserModel()) -> updateUsers(['level' => 4],$user_id);
+            }
             return $model;
         }catch(Exception $e){
             self::$error = $e->getMessage();

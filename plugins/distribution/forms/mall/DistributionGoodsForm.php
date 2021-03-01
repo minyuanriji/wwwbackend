@@ -67,51 +67,54 @@ class DistributionGoodsForm extends BaseModel
      */
     public function setDistributionGoodsSetting()
     {
-        if ($this->goods_type == DistributionGoodsDetail::TYPE_MALL_GOODS) {
-            $goods = Goods::findOne(['id' => $this->goods_id, 'is_delete' => 0]);
-            if (!$goods) {
-                return ['code' => ApiCode::CODE_FAIL, 'msg' => '商品不存在,请先保存商品！'];
-            }
-            $distributionGoods = DistributionGoods::findOne(['goods_id' => $this->goods_id, 'goods_type' => DistributionGoods::TYPE_MALL_GOODS]);
-            if (!$distributionGoods) {
-                $distributionGoods = new DistributionGoods();
-                $distributionGoods->goods_id = $this->goods_id;
-                $distributionGoods->goods_type = DistributionGoods::TYPE_MALL_GOODS;
-                $distributionGoods->mall_id = \Yii::$app->mall->id;
-            }
-            $distributionGoods->share_type = $this->share_type;
-            $distributionGoods->attr_setting_type = $this->attr_setting_type;
-            $distributionGoods->is_alone = $this->is_alone;
-            $res = $distributionGoods->save();
-            if (!$res) {
-                return $this->responseErrorMsg($distributionGoods);
-            }
-            if ($this->attr_setting_type == 0) {
-                $res = $this->setGoodsDistribution(0, $this->distribution_level_list, $distributionGoods->id);
-                if (!$res) {
-                    return ['code' => ApiCode::CODE_FAIL, 'msg' => '发生出错误'];
+            if ($this->goods_type == DistributionGoodsDetail::TYPE_MALL_GOODS) {
+                $goods = Goods::findOne(['id' => $this->goods_id, 'is_delete' => 0]);
+                if (!$goods) {
+                    return ['code' => ApiCode::CODE_FAIL, 'msg' => '商品不存在,请先保存商品！'];
                 }
-            } else {
-                foreach ($this->attr as $key => $attrLevelItem) {
-                    if ($this->attr_setting_type == 1) {
-                        $attr_id = "";
-                        foreach ($attrLevelItem['attr_list'] as $item) {
-                            $attr_id .= $item["attr_id"].":";
-                        }
-                        $attr_id = substr($attr_id,0,strlen($attr_id)-1);
-                        $goods_attr = GoodsAttr::findOne(['goods_id' => $this->goods_id, 'sign_id' => $attr_id, 'is_delete' => 0]);
-                        if ($goods_attr) {
-                            $res = $this->setGoodsDistribution($goods_attr->id, $attrLevelItem['distribution_level_list'], $distributionGoods->id);
-                            if (!$res) {
-                                return ['code' => ApiCode::CODE_FAIL, 'msg' => '发生出错误'];
+                $distributionGoods = DistributionGoods::findOne(['goods_id' => $this->goods_id, 'goods_type' => DistributionGoods::TYPE_MALL_GOODS]);
+                if (!$distributionGoods) {
+                    $distributionGoods = new DistributionGoods();
+                    $distributionGoods->goods_id = $this->goods_id;
+                    $distributionGoods->goods_type = DistributionGoods::TYPE_MALL_GOODS;
+                    $distributionGoods->mall_id = \Yii::$app->mall->id;
+                }
+                $distributionGoods->share_type = $this->share_type;
+                $distributionGoods->attr_setting_type = $this->attr_setting_type;
+                if($this->is_alone === null){
+                    $this->is_alone = empty($distributionGoods->is_alone) ? 1 : 0;
+                }
+                $distributionGoods->is_alone = $this->is_alone;
+                $res = $distributionGoods->save();
+
+                if (!$res) {
+                    return $this->responseErrorMsg($distributionGoods);
+                }
+                if ($this->attr_setting_type == 0) {
+                    $res = $this->setGoodsDistribution(0, $this->distribution_level_list, $distributionGoods->id);
+                    if (!$res) {
+                        return ['code' => ApiCode::CODE_FAIL, 'msg' => '发生出错误'];
+                    }
+                } else {
+                    foreach ($this->attr as $key => $attrLevelItem) {
+                        if ($this->attr_setting_type == 1) {
+                            $attr_id = "";
+                            foreach ($attrLevelItem['attr_list'] as $item) {
+                                $attr_id .= $item["attr_id"].":";
+                            }
+                            $attr_id = substr($attr_id,0,strlen($attr_id)-1);
+                            $goods_attr = GoodsAttr::findOne(['goods_id' => $this->goods_id, 'sign_id' => $attr_id, 'is_delete' => 0]);
+                            if ($goods_attr) {
+                                $res = $this->setGoodsDistribution($goods_attr->id, $attrLevelItem['distribution_level_list'], $distributionGoods->id);
+                                if (!$res) {
+                                    return ['code' => ApiCode::CODE_FAIL, 'msg' => '发生出错误'];
+                                }
                             }
                         }
                     }
                 }
+                return ['code' => ApiCode::CODE_SUCCESS, 'msg' => '保存成功'];
             }
-
-            return ['code' => ApiCode::CODE_SUCCESS, 'msg' => '保存成功'];
-        }
     }
 
     /**

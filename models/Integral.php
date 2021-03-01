@@ -138,10 +138,6 @@ class Integral extends BaseActiveRecord
             'finish_period' => 'ASC',
             'next_publish_time' => 'ASC'
         ]) -> all();
-//        \Yii::$app->redis -> set('var111',count($plan_list));
-//        $expire_time = strtotime('+' . 28 .'days',strtotime(date('Y-m-01')));
-//        \Yii::$app->redis -> set('key1',json_encode($plan_list));
-
         if(!empty($plan_list)){
             foreach($plan_list as $plan){
                 if($plan['controller_type'] == 0 && $plan['period_unit'] == 'month'){
@@ -168,7 +164,7 @@ class Integral extends BaseActiveRecord
                         $date_days = 2;
                     }
                     $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ '. ($plan['effective_days'] - $date_days) .'days',strtotime(date('Y-m-01'))) - 1;
-                    \Yii::$app->redis -> set('key1',date('m'));
+//                    \Yii::$app->redis -> set('key1',date('m'));
 //                    $expire_time = $expire_time - 10;
                 }else{
                     $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01'))) - 1;

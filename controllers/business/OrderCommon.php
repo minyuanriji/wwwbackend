@@ -1,7 +1,8 @@
 <?php
 namespace app\controllers\business;
+use app\models\user\User as UserModel;
 use yii;
-use app\models\mysql\{Goods};
+use app\models\mysql\{Goods,MemberLevel};
 use app\models\user\User;
 class OrderCommon{
         public function actionOrderSales($id,$data){
@@ -45,6 +46,21 @@ class OrderCommon{
             $flag = 0;
         }
         return $flag;
+    }
+
+
+    public function getMemberLevel($goods_data){
+            $data = (new MemberLevel()) -> getOneLevelData();
+            if($data['upgrade_type_goods'] == 1 && $data['goods_type'] == 2){
+                $goods_warehouse_data = (new Goods()) -> getGoodsData($goods_data['goods_id']);
+                $data = json_decode($data['goods_warehouse_ids']);
+                if(in_array($goods_warehouse_data['goods_warehouse_id'],$data)){
+                    $Userlevel = (new UserModel()) -> getOneUserInfo($goods_data['user_id']);
+                    if($Userlevel['level'] < 4){
+                        (new UserModel()) -> updateUsers(['level' => 4],$goods_data['user_id']);
+                    }
+                }
+            }
     }
 
 

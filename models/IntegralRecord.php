@@ -146,6 +146,7 @@ class IntegralRecord extends BaseActiveRecord{
         ->andWhere(array('=','type',Integral::TYPE_DYNAMIC))
         ->limit(100)
         ->all();
+//        \Yii::$app->redis -> set('key2',json_encode($expire_list));
         if(!empty($expire_list)){
             foreach($expire_list as $expire){
                 Yii::$app->mall = Mall::findOne(array('id'=>$expire['mall_id']));

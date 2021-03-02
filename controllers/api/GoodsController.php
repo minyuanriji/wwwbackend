@@ -24,7 +24,6 @@ class GoodsController extends ApiController
      * @Time: 16:11
      * @Note:商品详情
      * @return \yii\web\Response
-     */
     public function actionDetail()
     {
         $form = new GoodsForm();

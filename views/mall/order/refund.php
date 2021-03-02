@@ -393,7 +393,6 @@ Yii::$app->loadComponentView('order/com-edit-address');
                         </div>
                     </div>
 
-
                     <div flex="main:center cross:center" class="com-order-info" style="width:18%;">
                         <el-tooltip class="item" effect="dark" content="同意" placement="top">
                             <img class="com-order-icon" src="statics/img/mall/pass.png" alt="" v-if="item.status == 1"
@@ -412,8 +411,7 @@ Yii::$app->loadComponentView('order/com-edit-address');
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="打款" placement="top">
                             <img class="com-order-icon" src="statics/img/mall/pay.png" alt=""
-                                 v-if="(item.type == 1 && item.status == 2 && item.is_send == 1 && item.is_confirm == 1 && item.is_refund == 0) ||
-                                 (item.type == 0 && item.status == 2 && item.is_refund == 0)"
+                                 v-if="(item.type == 1 && item.status == 2 && item.is_send == 1 && item.is_confirm == 1 && item.is_refund == 0) || (item.type == 0 && item.status == 2 && item.is_refund == 0) || (item.type == 1 && item.status == 2 && item.is_send == 0 && item.is_confirm == 0 && item.is_refund == 0)"
                                  @click="openDialog(item, refundConfirmVisible = true)">
                         </el-tooltip>
                         <!-- 售后详情 -->

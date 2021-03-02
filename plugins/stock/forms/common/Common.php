@@ -145,7 +145,6 @@ class Common extends BaseModel
             $returnData['parent_avatar_url'] = MallSetting::getValueByKey('logo', \Yii::$app->mall->id);
             $returnData['mobile'] = MallSetting::getValueByKey('contact_tel', \Yii::$app->mall->id);
             $returnData['parent_level_name'] = '平台方';
-
         }
         $user_parent = UserParent::find()
             ->alias('uc')

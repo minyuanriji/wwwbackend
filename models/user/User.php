@@ -7,7 +7,7 @@ class User extends ActiveRecord{
     }
     
      public function getOneUserInfo($id){
-        return $this -> find() -> select(['id','static_integral','dynamic_integral','level']) -> where(['=','id',$id]) -> asArray() -> one();
+        return $this -> find() -> select(['id','static_integral','dynamic_integral','level','parent_id']) -> where(['=','id',$id]) -> asArray() -> one();
     }
     
 }

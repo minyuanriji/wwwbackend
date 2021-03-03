@@ -120,6 +120,7 @@ class Common extends BaseModel
             $returnData['user_id'] = $user->id;
         }
         $returnData["is_agent"] = 0;
+
         if (!empty($agent)) {
             $stock_level = StockLevel::findOne(['level' => $agent->level, 'mall_id' => $agent->mall_id, 'is_delete' => 0, 'is_use' => 1]);
             $total_price = $agent->total_price;

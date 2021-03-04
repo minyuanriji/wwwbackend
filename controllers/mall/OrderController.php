@@ -358,7 +358,6 @@ class OrderController extends OrderManagerController
         if (\Yii::$app->request->isPost) {
             $form = new OrderRefundForm();
             $form->attributes = \Yii::$app->request->post();
-            
             return $this->asJson($form->save());
         }
     }

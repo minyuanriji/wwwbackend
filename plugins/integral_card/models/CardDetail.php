@@ -6,7 +6,7 @@ use app\models\BaseActiveRecord;
 use app\models\Mall;
 use app\models\User;
 use app\models\user\User as UserModel;
-use app\models\mysql\{UserParent};
+use app\models\mysql\{UserParent,UserChildren};
 use Exception;
 use Yii;
 
@@ -115,6 +115,17 @@ class CardDetail extends BaseActiveRecord{
                     $parent_data -> is_delete = 0;
                     $parent_data -> level = 1;
                     $parent_data -> save();
+                    $UserChildren = new UserChildren();
+                    $UserChildren -> id = null;
+                    $UserChildren -> mall_id = \Yii::$app->mall->id;
+                    $UserChildren -> user_id = $model -> user_id;
+                    $UserChildren -> child_id = $user_id;
+                    $UserChildren -> level = 1;
+                    $UserChildren -> created_at = time();
+                    $UserChildren -> updated_at = time();
+                    $UserChildren -> deleted_at = 0;
+                    $UserChildren -> is_delete = 0;
+                    $UserChildren -> save();
                 }
             }
             if($level['level'] < 4){

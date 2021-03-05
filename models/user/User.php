@@ -9,5 +9,9 @@ class User extends ActiveRecord{
      public function getOneUserInfo($id){
         return $this -> find() -> select(['id','static_integral','dynamic_integral','level','parent_id']) -> where(['=','id',$id]) -> asArray() -> one();
     }
+
+    public function getOneUserMobile($id){
+        return $this -> find() -> select(['mobile']) -> where(['id' => $id]) -> asArray() -> one();
+    }
     
 }

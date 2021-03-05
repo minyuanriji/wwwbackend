@@ -57,7 +57,6 @@ class GrafikaOption extends ApiGrafika
         $this->poster_file_name = sha1(serialize($keys)) . '.jpg';
 
         $file_url = \Yii::$app->request->hostInfo . \Yii::$app->request->baseUrl . '/temp/' . $this->poster_file_name;
-
         if (YII_ENV != ('dev' or 'test')) {
             $file_url = str_replace('http://', 'https://', $file_url);
         }

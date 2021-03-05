@@ -19,6 +19,8 @@ use app\forms\api\user\UserEditForm;
 use app\forms\api\user\UserForm;
 use app\forms\api\user\UserRechargeForm;
 use app\forms\common\attachment\CommonAttachment;
+use app\controllers\business\{Qrcode,Poster};
+use app\models\user\User;
 
 class UserController extends ApiController
 {
@@ -214,6 +216,130 @@ class UserController extends ApiController
         $form = new PosterForm();
         $shareForm = $form->share();
         $shareForm->sign = "share/";
-        return $shareForm->get();
+        return $shareForm->get('pages/index/index');
+    }
+
+    /**
+     * 分享领取海报领取红包
+     * @return array
+     */
+    public function actionLinkPoster(){
+        $mobile = (new User()) -> getOneUserMobile(\Yii::$app->user->identity ->id);
+        if(!empty($mobile)){
+            $mobile = $mobile['mobile'];
+        }else{
+            $mobile = '';
+        }
+        $code = \Yii::$app->request->hostInfo . '/h5/#/pages/public/login?mobile='. $mobile;
+        $qrCodeData = QRcode::pngData($code,13);
+        $config = array(
+            'bg_url' => __DIR__ . '/bg/063bd7ebf5f752309d3cf3867209b8db.jpg',//背景图片路径
+            'text' => array(
+//                array(
+//                    'text' => '初夏',//文本内容
+//                    'left' => 312, //左侧字体开始的位置
+//                    'top' => 676, //字体的下边框
+//                    'fontSize' => 16, //字号
+//                    'fontColor' => '255,0,0', //字体颜色
+//                    'angle' => 0,
+//                ),
+//                array(
+//                    'text' => '你不运动，地球也会动',
+//                    'left' => 310,
+//                    'top' => 720,
+//                    'width' => 400,
+//                    'fontSize' => 16, //字号
+//                    'fontColor' => '0,0,80', //字体颜色
+//                    'angle' => 0,
+//                ),
+//                array(
+//                    'text' => '好嗨哟~',
+//                    'left' => 507,
+//                    'top' => 760,
+//                    'width' => 400,
+//                    'fontSize' => 25, //字号
+//                    'fontColor' => '0,175,80', //字体颜色
+//                    'angle' => -50,
+//                ),
+                array(
+                    'text' => '扫码领红包',
+                    'left' => 200,
+                    'top' => 190,
+                    'width' => 400,
+                    'fontSize' => 30, //字号
+                    'fontColor' => '0,0,80', //字体颜色
+                    'angle' => 0,
+                ),
+            ),
+            'image' => array(
+//                array(
+//                    'name' => 'jobs', //图片名称，用于出错时定位
+//                    'url' => './img/02.jpg',
+//                    'stream' => 0, //图片资源是否是字符串图像流
+//                    'left' => 202,
+//                    'top' => 639,
+//                    'right' => 0,
+//                    'bottom' => 0,
+//                    'width' => 100,
+//                    'height' => 100,
+//                    'radius' => 50,
+//                    'opacity' => 100
+//                ),
+//                array(
+//                    'name' => '水印', //图片名称，用于出错时定位
+//                    'url' => './img/03.png',
+//                    'stream' => 0,
+//                    'left' => 507,
+//                    'top' => 590,
+//                    'right' => 0,
+//                    'bottom' => 0,
+//                    'width' => 108,
+//                    'height' => 108,
+//                    'radius' => 0,
+//                    'opacity' => 100
+//                ),
+                array(
+                    'name' => '二维码', //图片名称，用于出错时定位
+                    'url' => '',
+                    'stream' => $qrCodeData,
+                    'left' => 200,
+                    'top' => 230,
+                    'right' => 0,
+                    'bottom' => 0,
+                    'width' => 184,
+                    'height' => 184,
+                    'radius' => 0,
+                    'opacity' => 100
+                ),
+//                array(
+//                    'name' => '苹果', //图片名称，用于出错时定位
+//                    'url' => './img/01.jpg',
+//                    'stream' => 0,
+//                    'left' => 335,
+//                    'top' => 910,
+//                    'right' => 0,
+//                    'bottom' => 0,
+//                    'width' => 50,
+//                    'height' => 50,
+//                    'radius' => 0,
+//                    'opacity' => 100
+//                ),
+            )
+        );
+        Poster::setConfig($config);
+//设置保存路径
+        $Img = '/web/poster/images/' .time() . uniqid() . '.jpg';
+        $filename = \Yii::$app->basePath .$Img;
+        $res = Poster::make($filename);
+        if($res){
+            $data = [
+                'status' => 1,
+                'img' => \Yii::$app->request->hostInfo . $Img,
+                'msg' => 'OK'
+            ];
+            return $this->asJson($data);
+        }
+//是否要清理缓存资源
+        Poster::clear();
     }
 }

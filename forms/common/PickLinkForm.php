@@ -532,6 +532,14 @@ class PickLinkForm extends BaseModel
                 'icon' => $iconUrlPrefix . 'icon-summary.png',
                 'value' => '/plugins/extensions/poster',
                 'ignore' => [PickLinkForm::IGNORE_NAVIGATE],
+            ],
+            [
+                'type' => 'base',
+                'name' => '新人福利',
+                'open_type' => '',
+                'icon' => $iconUrlPrefix . 'icon-index.png',
+                'value' => '/pages/link/index',
+
             ]
         ];
 

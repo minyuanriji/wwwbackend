@@ -65,7 +65,6 @@ class RegisterForm extends BaseModel
      * @throws \Exception
      */
     public function parentInfo(){
-        // var_dump($this->recommend_id);exit;
          if (!$this->recommend_id) {
              return $this->returnApiResultData();
         }

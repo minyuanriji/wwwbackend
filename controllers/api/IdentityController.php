@@ -35,6 +35,9 @@ class IdentityController extends ApiController
         $form->attributes = $this->requestData;
         $form->mall_id = \Yii::$app->mall->id;
         $res = $form->login();
+//        if(!empty($form->attributes -> moblie)){
+//            (new RegisterForm()) -> bindParent($form->attributes -> moblie);
+//        }
         return $this->asJson($res);
     }
 
@@ -98,7 +101,6 @@ class IdentityController extends ApiController
         $form = new RegisterForm();
         $form->attributes = $this->requestData;
         $form->mall_id = \Yii::$app->mall->id;
-        
         $res = $form->parentInfo();
         return $this->asJson($res);
     }

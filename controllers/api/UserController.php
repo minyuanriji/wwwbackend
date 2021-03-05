@@ -233,7 +233,7 @@ class UserController extends ApiController
         $code = \Yii::$app->request->hostInfo . '/h5/#/pages/public/login?mobile='. $mobile;
         $qrCodeData = QRcode::pngData($code,13);
         $config = array(
-            'bg_url' => __DIR__ . '/bg/063bd7ebf5f752309d3cf3867209b8db.jpg',//背景图片路径
+            'bg_url' => \Yii::$app->basePath . '/web/statics' . '/bg/063bd7ebf5f752309d3cf3867209b8db.jpg',//背景图片路径
             'text' => array(
 //                array(
 //                    'text' => '初夏',//文本内容
@@ -331,6 +331,7 @@ class UserController extends ApiController
         $Img = '/web/poster/images/' .time() . uniqid() . '.jpg';
         $filename = \Yii::$app->basePath .$Img;
         $res = Poster::make($filename);
+//        var_dump(Poster::getErrMessage());exit();
         if($res){
             $data = [
                 'status' => 1,

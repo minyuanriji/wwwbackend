@@ -11,7 +11,7 @@ class poster {
     private static $imageDefault = array();
 
     public static function init() {
-        self::$fontPath = dirname(__FILE__) . '/fonts/';
+        self::$fontPath = \Yii::$app->basePath . '/web/statics/font/';
         self::$imageDefault = array(
             'name' => '', //图片名称，用于出错时定位
             'url' => '', //图片路径

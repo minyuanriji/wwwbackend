@@ -233,7 +233,7 @@ class UserController extends ApiController
         $code = \Yii::$app->request->hostInfo . '/h5/#/pages/public/login?mobile='. $mobile;
         $qrCodeData = QRcode::pngData($code,13);
         $config = array(
-            'bg_url' => \Yii::$app->basePath . '/web/statics' . '/bg/063bd7ebf5f752309d3cf3867209b8dc.jpg',//背景图片路径
+            'bg_url' => \Yii::$app->basePath . '/web/statics' . '/bg/063bd7ebf5f752309d3cf3867209b8dq.jpg',//背景图片路径
             'text' => array(
 //                array(
 //                    'text' => '初夏',//文本内容

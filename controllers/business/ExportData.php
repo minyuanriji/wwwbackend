@@ -208,7 +208,7 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
         header('Content-Description: File Transfer');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
-        header('Pragma: public');
+        header('Pragma: poster');
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename=商品信息.xlsx');
         header('Cache-Control: max-age=0');

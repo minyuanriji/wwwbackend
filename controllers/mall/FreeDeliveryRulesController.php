@@ -67,7 +67,7 @@ class FreeDeliveryRulesController extends MallController
         return $this->render('edit');
     }
 
-//    public function actionDestoy()
+//    poster function actionDestoy()
 //    {
 //        if (\Yii::$app->request->isAjax) {
 //            $id = \Yii::$app->request->get('id');

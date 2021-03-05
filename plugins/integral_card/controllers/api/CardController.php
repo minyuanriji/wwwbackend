@@ -22,7 +22,7 @@ use Yii;
 class CardController extends ApiBaseController
 {
     public $pageSize = 10;
-    //public $page;
+    //poster $page;
 
     public function behaviors()
     {

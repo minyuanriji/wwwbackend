@@ -115,27 +115,29 @@ class UserLogic
                     }
                     $Parent = (new UserParentModel()) -> getUserParentData($user -> attributes['id']);
                     if(empty($Parent)){
-                    $parent_data = new UserParentModel();
-                    $parent_data -> mall_id = \Yii::$app->mall->id;
-                    $parent_data -> user_id = $user -> attributes['id'];
-                    $parent_data -> parent_id = $parent_id;
-                    $parent_data -> updated_at = time();
-                    $parent_data -> created_at = time();
-                    $parent_data -> deleted_at = time();
-                    $parent_data -> is_delete = 0;
-                    $parent_data -> level = 1;
-                    $parent_data -> save();
-                    $UserChildren = new UserChildrenModel();
-                    $UserChildren -> id = null;
-                    $UserChildren -> mall_id = \Yii::$app->mall->id;
-                    $UserChildren -> user_id = $parent_id;
-                    $UserChildren -> child_id = $user -> attributes['id'];
-                    $UserChildren -> level = 1;
-                    $UserChildren -> created_at = time();
-                    $UserChildren -> updated_at = time();
-                    $UserChildren -> deleted_at = 0;
-                    $UserChildren -> is_delete = 0;
-                    $UserChildren -> save();
+                        if(!empty($parent_id)){
+                            $parent_data = new UserParentModel();
+                            $parent_data -> mall_id = \Yii::$app->mall->id;
+                            $parent_data -> user_id = $user -> attributes['id'];
+                            $parent_data -> parent_id = $parent_id;
+                            $parent_data -> updated_at = time();
+                            $parent_data -> created_at = time();
+                            $parent_data -> deleted_at = time();
+                            $parent_data -> is_delete = 0;
+                            $parent_data -> level = 1;
+                            $parent_data -> save();
+                            $UserChildren = new UserChildrenModel();
+                            $UserChildren -> id = null;
+                            $UserChildren -> mall_id = \Yii::$app->mall->id;
+                            $UserChildren -> user_id = $parent_id;
+                            $UserChildren -> child_id = $user -> attributes['id'];
+                            $UserChildren -> level = 1;
+                            $UserChildren -> created_at = time();
+                            $UserChildren -> updated_at = time();
+                            $UserChildren -> deleted_at = 0;
+                            $UserChildren -> is_delete = 0;
+                            $UserChildren -> save();
+                        }
                     }
                 }
             }

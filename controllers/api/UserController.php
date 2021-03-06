@@ -19,7 +19,7 @@ use app\forms\api\user\UserEditForm;
 use app\forms\api\user\UserForm;
 use app\forms\api\user\UserRechargeForm;
 use app\forms\common\attachment\CommonAttachment;
-use app\controllers\business\{Qrcode,Poster};
+use app\controllers\business\{Qrcode,Poster,NewUserIntegral};
 use app\models\user\User;
 
 class UserController extends ApiController
@@ -224,12 +224,6 @@ class UserController extends ApiController
      * @return array
      */
     public function actionLinkPoster(){
-//        $mobile = (new User()) -> getOneUserMobile(\Yii::$app->user->identity ->id);
-//        if(!empty($mobile)){
-//            $mobile = $mobile['mobile'];
-//        }else{
-//            $mobile = '';
-//        }
         $code = \Yii::$app->request->hostInfo . '/h55/#/pages/public/login?user_id='. \Yii::$app->user->identity ->id;
         $qrCodeData = QRcode::pngData($code,13);
         $config = array(
@@ -328,19 +322,41 @@ class UserController extends ApiController
         );
         Poster::setConfig($config);
 //设置保存路径
-        $Img = '/web/poster/images/' .time() . uniqid() . '.jpg';
+        $Img = '/web/statics/poster/images/' .time() . uniqid() . '.jpg';
         $filename = \Yii::$app->basePath .$Img;
         $res = Poster::make($filename);
-//        var_dump(Poster::getErrMessage());exit();
         if($res){
             $data = [
                 'status' => 1,
                 'img' => \Yii::$app->request->hostInfo . $Img,
                 'msg' => 'OK'
             ];
+            //是否要清理缓存资源
+            Poster::clear();
             return $this->asJson($data);
         }
-//是否要清理缓存资源
+        //是否要清理缓存资源
         Poster::clear();
     }
+
+    /**
+     * 新人获取红包福利
+     */
+    public function actionGetIntegral(){
+        $data = $this->requestData;
+        $result = (new NewUserIntegral()) -> SendUserIntegral($data['user_id']);
+        if($result == 1){
+            $msg = '积分发放成功';
+        }else if($result == 2){
+            $msg = '您不是新用户，不能领取';
+        }else{
+            $msg = '系统出错';
+        }
+        return $this -> asJson([
+            'status' => 1,
+            'msg' => $msg
+        ]);
+
+    }
+
 }

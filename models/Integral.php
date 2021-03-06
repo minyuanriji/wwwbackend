@@ -159,11 +159,9 @@ class Integral extends BaseActiveRecord
 
                 // 按每个月的1号 凌晨12点失效
                 if($plan['effective_days'] >= 30){
-                    $date_days = 0;
-                    if(date('m') == 02){
-                        $date_days = 2;
-                    }
-                    $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ '. ($plan['effective_days'] - $date_days) .'days',strtotime(date('Y-m-01'))) - 1;
+                    $date = date('Y-m-d',time());
+                    $day = date("t",strtotime($date));
+                    $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'. $day .'days',strtotime(date('Y-m-01'))) - 1;
 //                    \Yii::$app->redis -> set('key1',date('m'));
 //                    $expire_time = $expire_time - 10;
                 }else{

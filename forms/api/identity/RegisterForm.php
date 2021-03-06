@@ -89,8 +89,11 @@ class RegisterForm extends BaseModel
      * @return array
      * @throws \Exception
      */
-    public function bindParent()
+    public function bindParent($mobile='')
     {
+        if(!empty($mobile)){
+            $this->parent_mobile = $mobile;
+        }
         if(!$this->parent_mobile){
             return $this->returnApiResultData(ApiCode::CODE_FAIL,'请输入推荐人手机号');
         }

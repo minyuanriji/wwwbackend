@@ -224,13 +224,13 @@ class UserController extends ApiController
      * @return array
      */
     public function actionLinkPoster(){
-        $mobile = (new User()) -> getOneUserMobile(\Yii::$app->user->identity ->id);
-        if(!empty($mobile)){
-            $mobile = $mobile['mobile'];
-        }else{
-            $mobile = '';
-        }
-        $code = \Yii::$app->request->hostInfo . '/h55/#/pages/public/login?mobile='. $mobile;
+//        $mobile = (new User()) -> getOneUserMobile(\Yii::$app->user->identity ->id);
+//        if(!empty($mobile)){
+//            $mobile = $mobile['mobile'];
+//        }else{
+//            $mobile = '';
+//        }
+        $code = \Yii::$app->request->hostInfo . '/h55/#/pages/public/login?user_id='. \Yii::$app->user->identity ->id;
         $qrCodeData = QRcode::pngData($code,13);
         $config = array(
             'bg_url' => \Yii::$app->basePath . '/web/statics' . '/bg/063bd7ebf5f752309d3cf3867209b8dq.jpg',//背景图片路径

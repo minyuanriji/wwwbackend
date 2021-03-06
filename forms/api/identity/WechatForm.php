@@ -64,6 +64,7 @@ class WechatForm extends BaseModel
 
             if(!empty($result)){
                 $userInfo = $result->original;
+
                 $phoneConfig = AppConfigLogic::getPhoneConfig();
                 //没有开启全网通，则直接入库，如果开启了，返回给前端
                 if(empty($phoneConfig["all_network_enable"])){
@@ -109,7 +110,6 @@ class WechatForm extends BaseModel
             $result = $wechatModel->app->oauth->user();
             \Yii::warning("授权结果 result:".json_encode($result));
             if(!empty($result)){
-
                 $userInfo = $result->original;
                 $phoneConfig = AppConfigLogic::getPhoneConfig();
                 //没有开启全网通，则直接入库，如果开启了，返回给前端
@@ -147,10 +147,6 @@ class WechatForm extends BaseModel
                 }
             }
         }
-        // echo '<pre>';
-        // var_dump($returnData);
-        // exit();
-        // $returnData['access_token'] = '1231';
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);
     }
 

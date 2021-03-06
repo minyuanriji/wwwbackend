@@ -35,9 +35,6 @@ class IdentityController extends ApiController
         $form->attributes = $this->requestData;
         $form->mall_id = \Yii::$app->mall->id;
         $res = $form->login();
-//        if(!empty($form->attributes -> moblie)){
-//            (new RegisterForm()) -> bindParent($form->attributes -> moblie);
-//        }
         return $this->asJson($res);
     }
 
@@ -70,6 +67,9 @@ class IdentityController extends ApiController
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
         $result = $wechatForm->authorized();
+        //        if(!empty($form->attributes -> moblie)){
+//            (new RegisterForm()) -> bindParent($form->attributes -> moblie);
+//        }
         return $result;
     }
 
@@ -157,7 +157,7 @@ class IdentityController extends ApiController
     public function actionBind(){
         $smsForm = new UserBindForm();
         $smsForm->attributes = $this->requestData;
-        return $smsForm->bind();
+        return $smsForm->bind($this->requestData['user_id']);
     }
 
     /**

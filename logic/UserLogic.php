@@ -21,6 +21,7 @@ use app\models\UserInfo;
 use app\models\UserParent;
 use yii\base\Exception;
 use function EasyWeChat\Kernel\Support\get_client_ip;
+use app\models\mysql\{UserParent as UserParentModel,UserChildren as UserChildrenModel};
 
 class UserLogic
 {
@@ -76,7 +77,7 @@ class UserLogic
      * @return bool
      * @throws \yii\base\Exception
      */
-    public static function userRegister($userData,$user = []){
+    public static function userRegister($userData,$user = [],$parent_id=0){
         $userData = self::loadUserFields($userData);
         $transaction = \Yii::$app->db->beginTransaction();
         try{
@@ -102,12 +103,39 @@ class UserLogic
                     $user->last_login_at = time();
                     $user->login_ip = get_client_ip();
                     $user->parent_id = isset($userData["parent_id"]) ? $userData["parent_id"] : 0;
+                    if(!empty($parent_id)){
+                        $user->parent_id = $parent_id;
+                    }
                     $user->second_parent_id = isset($userData["second_parent_id"]) ? $userData["second_parent_id"] : 0;
                     $user->third_parent_id = isset($userData["third_parent_id"]) ? $userData["third_parent_id"] : 0;
                     $user->source = isset($userData["source"]) ? $userData["source"] : \Yii::$app->source;
                     if ($user->save() === false) {
                         \Yii::error("userRegister ".var_export($user->getErrors(),true));
                         throw new Exception("用户新增失败");
+                    }
+                    $Parent = (new UserParentModel()) -> getUserParentData($user -> attributes['id']);
+                    if(empty($Parent)){
+                    $parent_data = new UserParentModel();
+                    $parent_data -> mall_id = \Yii::$app->mall->id;
+                    $parent_data -> user_id = $user -> attributes['id'];
+                    $parent_data -> parent_id = $parent_id;
+                    $parent_data -> updated_at = time();
+                    $parent_data -> created_at = time();
+                    $parent_data -> deleted_at = time();
+                    $parent_data -> is_delete = 0;
+                    $parent_data -> level = 1;
+                    $parent_data -> save();
+                    $UserChildren = new UserChildrenModel();
+                    $UserChildren -> id = null;
+                    $UserChildren -> mall_id = \Yii::$app->mall->id;
+                    $UserChildren -> user_id = $parent_id;
+                    $UserChildren -> child_id = $user -> attributes['id'];
+                    $UserChildren -> level = 1;
+                    $UserChildren -> created_at = time();
+                    $UserChildren -> updated_at = time();
+                    $UserChildren -> deleted_at = 0;
+                    $UserChildren -> is_delete = 0;
+                    $UserChildren -> save();
                     }
                 }
             }

@@ -157,7 +157,8 @@ class IdentityController extends ApiController
     public function actionBind(){
         $smsForm = new UserBindForm();
         $smsForm->attributes = $this->requestData;
-        return $smsForm->bind($this->requestData['user_id']);
+        $user_id = !empty($this->requestData['user_id']) ? $this->requestData['user_id'] : 0;
+        return $smsForm->bind($user_id);
     }
 
     /**

@@ -246,6 +246,14 @@ echo $this->render('/components/goods/com-batch');
                         </template>
                     </el-table-column>
                     <el-table-column prop="virtual_sales" width="110" label="虚拟销量" sortable="false"></el-table-column>
+                    <el-table-column label="到店消费商品" width="110">
+                        <template slot-scope="scope">
+                            <div flex="main:center">
+                                <el-tag size="small" type="normal" v-if="scope.row.is_on_site_consumption == 1">是</el-tag>
+                                <div v-else><font color="gray">否</font></div>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="状态" width="100">
                         <template slot-scope="scope">
                             <template>

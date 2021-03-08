@@ -37,6 +37,7 @@ abstract class BaseGoodsEdit extends BaseModel
     public $id;
     public $goods_warehouse_id;
     public $status;
+    public $is_on_site_consumption;
     public $price;
     public $use_attr;
     public $attr;
@@ -135,6 +136,7 @@ abstract class BaseGoodsEdit extends BaseModel
                 'is_default_services'], 'default', 'value' => 1],
             [['price', 'forehead_score'], 'number', 'min' => 0],
             [['price'], 'number', 'max' => 9999999],
+            [['is_on_site_consumption'], 'number'],
             [['fulfil_price','full_relief_price'],'default','value'=>0]
         ];
     }
@@ -352,6 +354,7 @@ abstract class BaseGoodsEdit extends BaseModel
         $goods->app_share_title = $this->app_share_title;
         $goods->app_share_pic = $this->app_share_pic;
         $goods->status = $this->status;
+        $goods->is_on_site_consumption = $this->is_on_site_consumption;
         $goods->sort = $this->sort;
         $goods->confine_count = $this->confine_count;
         $goods->confine_order_count = $this->confine_order_count;

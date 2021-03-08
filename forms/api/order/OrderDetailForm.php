@@ -125,6 +125,10 @@ class OrderDetailForm extends BaseModel
                     $refundOrderGoodsTotal++;
                 }
                 $orderGoodsTotal++;
+                $item['is_on_site_consumption'] = 0;
+                if(!empty($item['orderGoodsConsumeVerification'])){
+                    $item['is_on_site_consumption'] = 1;
+                }
                 $detail["order_goods_list"][] = $item;
             }
             $express_no	= $express_code = $express = $mobile = "";

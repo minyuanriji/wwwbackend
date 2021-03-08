@@ -88,7 +88,7 @@ class OrderDetailCommon extends BaseModel
                     $this->$method();
                 }
             }
-            $order = $this->query->with(["detailExpress", "mch.store"])->asArray($this->is_array)->one();
+            $order = $this->query->with(["detailExpress", "detail.orderGoodsConsumeVerification", "mch.store"])->asArray($this->is_array)->one();
 
             return $order;
         } catch (\Exception $e) {

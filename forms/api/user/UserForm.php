@@ -23,6 +23,7 @@ use app\models\ScoreLog;
 use app\models\User;
 use app\models\UserCard;
 use app\models\UserCoupon;
+use app\plugins\mch\models\Mch;
 
 class UserForm extends BaseModel
 {
@@ -86,6 +87,20 @@ class UserForm extends BaseModel
             ->leftJoin(['g' => Goods::tableName()], 'g.id = f.goods_id')
             ->andWhere(['g.status' => 1, 'g.is_delete' => 0])->count();
 
+        //是否商户身份
+        $isMch = 0;
+        $mchStore = $mchCategory = [];
+        $mchInfo = Mch::find()->where([
+            'user_id'       => $user->id,
+            'review_status' => Mch::REVIEW_STATUS_CHECKED,
+            'is_delete'     => 0
+        ])->with(["store", "category"])->asArray()->one();
+        if($mchInfo){
+            $isMch       = 1;
+            $mchStore    = $mchInfo['store'];
+            $mchCategory = $mchInfo['category'];
+        }
+
         $result = [
             'user_id' => $user->id,
             'username' => $user->username,
@@ -118,6 +133,9 @@ class UserForm extends BaseModel
             'coupon' => $couponCount,
           /*  'card' => $cardCount,*/
             'is_vip_card_user' => 0,
+            'is_mch' => $isMch,
+            'mch_store' => $mchStore,
+            'mch_category' => $mchCategory
         ];
         $pluginUserInfo = \Yii::$app->plugin->getUserInfo($user);
         if(isset($pluginUserInfo["score"])){

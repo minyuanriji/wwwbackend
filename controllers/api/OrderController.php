@@ -102,7 +102,7 @@ class OrderController extends ApiController
         $form = new OrderSubmitForm();
         $form->form_data = $this->requestData;
         $mallPaymentTypes = OrderLogic::getPaymentTypeConfig();
-        
+
         return $this->asJson($form->setSupportPayTypes($mallPaymentTypes)->doSubmitOrder());
     }
     
@@ -399,5 +399,13 @@ class OrderController extends ApiController
         } else {
             return $result;
         }
+    }
+
+    /**
+     * 到店核销码
+     * @return \yii\web\Response
+     */
+    public function actionConsumeVerificationInfo(){
+
     }
 }

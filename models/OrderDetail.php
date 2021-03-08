@@ -285,4 +285,8 @@ class OrderDetail extends BaseActiveRecord
         }
         return $returnData;
     }
+
+    public function getOrderGoodsConsumeVerification(){
+        return $this->hasOne(OrderGoodsConsumeVerification::className(), ['order_detail_id' => 'id']);
+    }
 }

@@ -41,6 +41,7 @@ use app\models\MemberLevel;
 use app\models\Option;
 use app\models\Order;
 use app\models\OrderDetail;
+use app\models\OrderGoodsConsumeVerification;
 use app\models\PostageRules;
 use app\models\Store;
 use app\models\User;
@@ -253,40 +254,47 @@ class OrderSubmitForm extends BaseModel
                 \Yii::$app->redis->set('var2',$orderException);
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, CommonLogic::getExceptionMessage($orderException));
             }
-            if (!$this->getUserAddress() && !$data['all_self_mention']) {
-                return $this->returnApiResultData(ApiCode::CODE_FAIL, "请先选择收货地址");
-            }
-            if ($data['all_self_mention']) {
-                if (!$data['user_address']['name']) {
-                    return $this->returnApiResultData(ApiCode::CODE_FAIL, "请填写联系人");
+
+            //需要设置收货地址的情况
+            //全部是到店消费商品，就不需要设置收货地址
+            if($data['is_need_address']){
+                if (!$this->getUserAddress() && !$data['all_self_mention']) {
+                    return $this->returnApiResultData(ApiCode::CODE_FAIL, "请先选择收货地址");
                 }
-                if (!$data['user_address']['mobile']) {
-                    return $this->returnApiResultData(ApiCode::CODE_FAIL, "请填写手机号");
-                }
-                /** @var Mall $mall */
-                $mall   = Mall::findOne(['id' => \Yii::$app->mall->id]);
-                $status = $mall->getMallSettingOne('mobile_verify');
-                if ($status) {
-                    $value   = $data['user_address']['mobile'];
-                    $pattern = (new PhoneNumberValidator())->pattern;
-                    if ($value && !preg_match($pattern, $value)) {
-                        return $this->returnApiResultData(ApiCode::CODE_FAIL, "手机格式不正确");
+                if ($data['all_self_mention']) {
+                    if (!$data['user_address']['name']) {
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, "请填写联系人");
+                    }
+                    if (!$data['user_address']['mobile']) {
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, "请填写手机号");
+                    }
+                    /** @var Mall $mall */
+                    $mall   = Mall::findOne(['id' => \Yii::$app->mall->id]);
+                    $status = $mall->getMallSettingOne('mobile_verify');
+                    if ($status) {
+                        $value   = $data['user_address']['mobile'];
+                        $pattern = (new PhoneNumberValidator())->pattern;
+                        if ($value && !preg_match($pattern, $value)) {
+                            return $this->returnApiResultData(ApiCode::CODE_FAIL, "手机格式不正确");
+                        }
                     }
                 }
-            }
 
-            foreach ($data['list'] as $cityItem) {
-                if (isset($cityItem['city']) && isset($cityItem['city']['error'])) {
-                    return $this->returnApiResultData(ApiCode::CODE_FAIL, $cityItem['city']['error']);
+                foreach ($data['list'] as $cityItem) {
+                    if (isset($cityItem['city']) && isset($cityItem['city']['error'])) {
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, $cityItem['city']['error']);
+                    }
                 }
+
+                if (!$data['user_address_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'当前收货地址不允许购买。');
+                if (!$data['price_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'订单总价未达到起送要求。');
+
             }
 
             $token  = $this->getToken();
 
             $oldOrder = Order::findOne(['token' => $token, 'sign' => $this->sign, 'is_delete' => 0]);
             if ($oldOrder)  return $this->returnApiResultData(ApiCode::CODE_FAIL,'重复下单。');
-            if (!$data['user_address_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'当前收货地址不允许购买。');
-            if (!$data['price_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'订单总价未达到起送要求。');
             $user = \Yii::$app->user->identity;
 
             $districtArr = new DistrictArr();
@@ -554,6 +562,7 @@ class OrderSubmitForm extends BaseModel
             $item['total_price'] = $this->setTotalPrice($totalPrice);
 
             $item = $this->setGoodsForm($item);
+
         }
 
         $total_price        = 0;
@@ -675,7 +684,21 @@ class OrderSubmitForm extends BaseModel
         if (!OrderCommon::checkIsBindMobile()) {
             $is_auth_phone = 0;
         }
+
+        //判断如果所有商品都是到店消费商品，配送地址可以不需要设置
+        $is_need_address = false;
+        foreach ($listData as &$item) {
+            foreach($item['goods_list'] as $goodsItem){
+                //只要有一个商品不是到店消费类型，就需要设置地址
+                if(!$goodsItem['is_on_site_consumption']){
+                    $is_need_address = true;
+                    break;
+                }
+            }
+        }
+
         return [
+            'is_need_address'     => $is_need_address ? 1 : 0,
             'list'                => $listData,
             'total_price'         => price_format($total_price),
             'user_coupon'         => $userCouponList,
@@ -800,36 +823,36 @@ class OrderSubmitForm extends BaseModel
         }
         $attrList = $goods->signToAttr($goodsAttr->sign_id);
         $itemData = [
-            'id'                   => $goods->id,
-            'name'                 => $goods->goodsWarehouse->name,
-            'num'                  => $goodsItem['num'],
-            'forehead_score'       => $goods->forehead_score,
-            'forehead_score_type'  => $goods->forehead_score_type,
-            'accumulative'         => $goods->accumulative,
-            'pieces'               => $goods->pieces,
-            'forehead'             => $goods->forehead,
-            'freight_id'           => $goods->freight_id,
-            'unit_price'           => price_format($goodsAttr->original_price),
-            'total_original_price' => price_format($goodsAttr->original_price * $goodsItem['num']),
-            'total_price'          => price_format($goodsAttr->price * $goodsItem['num']),
-            'member_discount'      => price_format(0),
-            'cover_pic'            => $goods->goodsWarehouse->cover_pic,
-            'is_level_alone'       => $goods->is_level_alone,
-            'is_level'             => $goods->is_level,
-            'goods_warehouse_id'   => $goods->goods_warehouse_id,
-            'sign'                 => $goods->sign,
-            'confine_order_count'  => $goods->confine_order_count,
-            'form_id'              => $goods->form_id,
-            'goods_attr'           => $goodsAttr,
-            'attr_list'            => $attrList,
-            'discounts'            => $goodsAttr->discount,
-            'user_coupon_id'       => isset($goodsItem["user_coupon_id"]) ? $goodsItem["user_coupon_id"] : 0,
-            'fulfil_price'         => $goods->fulfil_price,
-            'full_relief_price'    => $goods->full_relief_price,
-            'max_deduct_integral'  => $goods->max_deduct_integral
+            'id'                     => $goods->id,
+            'name'                   => $goods->goodsWarehouse->name,
+            'num'                    => $goodsItem['num'],
+            'forehead_score'         => $goods->forehead_score,
+            'forehead_score_type'    => $goods->forehead_score_type,
+            'accumulative'           => $goods->accumulative,
+            'pieces'                 => $goods->pieces,
+            'forehead'               => $goods->forehead,
+            'freight_id'             => $goods->freight_id,
+            'unit_price'             => price_format($goodsAttr->original_price),
+            'total_original_price'   => price_format($goodsAttr->original_price * $goodsItem['num']),
+            'total_price'            => price_format($goodsAttr->price * $goodsItem['num']),
+            'member_discount'        => price_format(0),
+            'cover_pic'              => $goods->goodsWarehouse->cover_pic,
+            'is_level_alone'         => $goods->is_level_alone,
+            'is_level'               => $goods->is_level,
+            'goods_warehouse_id'     => $goods->goods_warehouse_id,
+            'sign'                   => $goods->sign,
+            'confine_order_count'    => $goods->confine_order_count,
+            'form_id'                => $goods->form_id,
+            'goods_attr'             => $goodsAttr,
+            'attr_list'              => $attrList,
+            'discounts'              => $goodsAttr->discount,
+            'user_coupon_id'         => isset($goodsItem["user_coupon_id"]) ? $goodsItem["user_coupon_id"] : 0,
+            'fulfil_price'           => $goods->fulfil_price,
+            'full_relief_price'      => $goods->full_relief_price,
+            'max_deduct_integral'    => $goods->max_deduct_integral,
             // 规格自定义货币 例如：步数宝的步数币
             //'custom_currency' => $this->getCustomCurrency($goods, $goodsAttr),
-
+            'is_on_site_consumption' => $goods->is_on_site_consumption //到店消费类型
         ];
         return $itemData;
     }
@@ -2343,6 +2366,23 @@ class OrderSubmitForm extends BaseModel
                 throw new \Exception('优惠券状态更新失败。');
             }
         }
+
+        //到店消费商品，生成核销码
+        if($goodsItem['is_on_site_consumption']){
+            $orderGoodsVerification = new OrderGoodsConsumeVerification();
+            $orderGoodsVerification->mall_id           = $order->mall_id;
+            $orderGoodsVerification->mch_id            = $order->mch_id;
+            $orderGoodsVerification->order_id          = $order->id;
+            $orderGoodsVerification->order_detail_id   = $orderDetail->id;
+            $orderGoodsVerification->goods_id          = $goodsItem['id'];
+            $orderGoodsVerification->user_id           = $order->user_id;
+            $orderGoodsVerification->verification_code = "OGC" . date("ymdhis") . rand(1000, 9999);
+            $orderGoodsVerification->is_used           = OrderGoodsConsumeVerification::STATUS_UNUSED;
+            if (!$orderGoodsVerification->save()) {
+                throw new \Exception((new BaseModel())->responseErrorMsg($orderGoodsVerification));
+            }
+        }
+
     }
 
     /**

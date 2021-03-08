@@ -77,7 +77,7 @@ use Yii;
  * @property string $order_paid 订单支付后参数设置
  * @property int $is_order_sales 订单完结后设置
  * @property string $order_sales 订单完结后参数设置
- * 
+ * @property string $is_on_site_consumption 是否到店消费类商品
  * 
  */
 class Goods extends BaseActiveRecord
@@ -116,7 +116,7 @@ class Goods extends BaseActiveRecord
             [['price', 'forehead', 'payment_amount', 'forehead_score', 'confine_order_count','full_relief_price','fulfil_price','max_deduct_integral','enable_integral','enable_score', 'is_order_paid','is_order_sales'], 'number'],
             [['attr_groups', 'area_limit'], 'string'],
             [['area_limit'], 'default', 'value' => ''],
-            [['created_at', 'updated_at', 'deleted_at','labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund'], 'safe'],
+            [['created_at', 'updated_at', 'deleted_at','labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund', 'is_on_site_consumption'], 'safe'],
             [['sign', 'app_share_pic'], 'string', 'max' => 255],
             [['app_share_title'], 'string', 'max' => 65],
 	    [['full_relief_price','fulfil_price'], 'default', 'value' => 0],

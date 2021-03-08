@@ -12,6 +12,7 @@ namespace app\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
 use app\core\ApiCode;
+use app\forms\api\order\ConsumeVerificationInfoForm;
 use app\forms\api\order\OrderCommentForm;
 use app\forms\api\order\OrderClerkForm;
 use app\forms\api\order\OrderDetailForm;
@@ -402,10 +403,13 @@ class OrderController extends ApiController
     }
 
     /**
-     * 到店核销码
+     * 到店消费核销码
      * @return \yii\web\Response
      */
-    public function actionConsumeVerificationInfo(){
+    public function actionConsumeVerificationQrcode(){
+        $form = new ConsumeVerificationInfoForm();
+        $form->attributes = $this->requestData;
 
+        return $this->asJson($form->qrCode());
     }
 }

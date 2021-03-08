@@ -167,7 +167,8 @@ class IdentityController extends ApiController
     public function actionMiniLogin(){
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
-        $result = $wechatForm->miniAuthorized();
+        $parent_user_id = !empty($this->requestData['parent_user_id']) ? $this->requestData['parent_user_id'] : 0;
+        $result = $wechatForm->miniAuthorized($parent_user_id);
         return $result;
     }
 

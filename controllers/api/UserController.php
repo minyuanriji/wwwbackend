@@ -356,7 +356,7 @@ class UserController extends ApiController
             $data = [
                 'status' => 1,
                 'img' => \Yii::$app->request->hostInfo . $Img,
-                'msg' => 'OK'
+                'msg' => '正在生成分享海报！'
             ];
             //是否要清理缓存资源
             Poster::clear();

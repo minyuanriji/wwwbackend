@@ -593,8 +593,10 @@ abstract class BaseGoodsEdit extends BaseModel
         // 将会员价格式调整为 key|value 即 会员等级|会员价
         $memberPrices = $this->member_price;
         $newMemberPrice = [];
-        foreach ($memberPrices as $key => $memberPrice) {
-            $newMemberPrice[$key] = $memberPrice;
+        if($memberPrices){
+            foreach ($memberPrices as $key => $memberPrice) {
+                $newMemberPrice[$key] = $memberPrice;
+            }
         }
         $newAttrs[0]['member_price'] = $newMemberPrice;
         $this->newAttrs = $newAttrs;

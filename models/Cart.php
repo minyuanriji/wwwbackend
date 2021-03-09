@@ -113,7 +113,7 @@ class Cart extends BaseActiveRecord
         $list = $query->with(['goods.goodsWarehouse'])
                       ->with(['attrs.memberPrice' => function ($query) {
                             $query->where(['is_delete' => 0]);
-                }])->select(['c.id', 'c.mch_id', 'c.goods_id','c.attr_id','c.num'])->orderBy(['c.id' => SORT_DESC])->all();
+                }])->select(['c.id', 'c.mch_id', 'c.goods_id','c.attr_id','c.num', 'c.is_on_site_consumption'])->orderBy(['c.id' => SORT_DESC])->all();
         return $list;
     }
 

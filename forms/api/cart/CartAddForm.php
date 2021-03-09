@@ -92,6 +92,7 @@ class CartAddForm extends BaseModel
                 $cart->num = 0;
                 $cart->mch_id = $goods->mch_id;
                 $cart->attr_info = \Yii::$app->serializer->encode(ArrayHelper::toArray($attr));
+                $cart->is_on_site_consumption = $goods->is_on_site_consumption;
             }
             $cart->num += $this->num;
             if ($cart->save()) {

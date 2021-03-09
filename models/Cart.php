@@ -23,6 +23,7 @@ use Yii;
  * @property Store $store
  * @property Goods $goods
  * @property $attrs
+ * @property int $is_on_site_consumption 是否到店消费类商品
  */
 class Cart extends BaseActiveRecord
 {
@@ -49,7 +50,7 @@ class Cart extends BaseActiveRecord
     {
         return [
             [['mall_id', 'user_id', 'goods_id', 'attr_id', 'created_at', 'deleted_at', 'updated_at'], 'required'],
-            [['mall_id', 'user_id', 'goods_id', 'num', 'mch_id', 'is_delete', 'attr_id'], 'integer'],
+            [['mall_id', 'user_id', 'goods_id', 'num', 'mch_id', 'is_delete', 'attr_id', 'is_on_site_consumption'], 'integer'],
             [['created_at', 'deleted_at', 'updated_at', 'sign', 'attr_info'], 'safe'],
         ];
     }

@@ -739,9 +739,10 @@ class OrderSubmitForm extends BaseModel
     protected function getListData($formDataList)
     {
         foreach ($formDataList as $i => $formDataItem) {
-            $mchItem    = [
+            $goodsList = $this->getGoodsListData($formDataItem['goods_list']);
+            $mchItem = [
                 'mch'        => $this->getMchInfo(isset($formDataItem['mch_id']) ? $formDataItem['mch_id'] : 0),
-                'goods_list' => $this->getGoodsListData($formDataItem['goods_list']),
+                'goods_list' => $goodsList,
                 'form_data'  => $formDataItem,
             ];
             $listData[] = $mchItem;

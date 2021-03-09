@@ -42,7 +42,7 @@ class NewUserIntegral {
                 $IntegralRecord -> mall_id = \Yii::$app->mall->id;
                 $IntegralRecord -> user_id = $user_id;
                 $IntegralRecord -> money = 300;
-                $IntegralRecord -> desc = '用户充值积分券 发放进度(1/12)';
+                $IntegralRecord -> desc = '新用户赠送积分 发放进度(1/12)';
                 $IntegralRecord -> before_money = $user_data -> score;
                 $IntegralRecord -> type = 2;
                 $IntegralRecord -> expire_time = strtotime('+'. $day .'days',strtotime(date('Y-m-01'))) - 1;
@@ -53,7 +53,7 @@ class NewUserIntegral {
                 $IntegralRecord -> updated_at = time();
                 $IntegralRecord -> save();
 
-                (new userMode()) -> updateUsers(['dynamic_integral' => ($user_data -> dynamic_integral + 300),'score' => ($user_data -> score + 300)],$user_data -> id);
+                (new userMode()) -> updateUsers(['dynamic_score' => ($user_data -> dynamic_integral + 300),'score' => ($user_data -> score + 300)],$user_data -> id);
                 $transaction -> commit();
                 return 1;
             }

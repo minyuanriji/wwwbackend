@@ -56,7 +56,6 @@ class ConsumeVerificationInfoForm extends BaseModel{
         }
 
         try {
-
             $verificationLog = OrderGoodsConsumeVerification::findOne([
                 "id"        => $this->id,
                 "is_used"   => 0,
@@ -77,7 +76,9 @@ class ConsumeVerificationInfoForm extends BaseModel{
                 $res = $qrCode->getQrCode(['id' => $this->id], 100, $this->route);
             }else{
                 $dir = 'clerk/' . \Yii::$app->mall->id."_".$this->id. '.jpg';
-                $res = CommonLogic::createQrcode([], $this, $this->route, $dir);
+                $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
+                $file = CommonLogic::createQrcode([], $this, $this->route, $dir);
+                $res = CommonLogic::uploadImgToCloudStorage($file, $dir, $imgUrl);
             }
 
             return [

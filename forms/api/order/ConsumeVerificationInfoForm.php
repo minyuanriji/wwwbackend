@@ -3,6 +3,7 @@ namespace app\forms\api\order;
 
 use app\core\ApiCode;
 use app\forms\common\QrCodeCommon;
+use app\helpers\ArrayHelper;
 use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\Order;
@@ -21,28 +22,6 @@ class ConsumeVerificationInfoForm extends BaseModel{
             [['route'], 'string'],
             [['id'], 'required'],
         ];
-    }
-
-    public function checkVerificationLog($verificationLog){
-
-        $order = $verificationLog->order;
-        if(!$order || $order->is_delete){
-            throw new \Exception('订单不存在');
-        }
-
-        if($order->is_pay != Order::IS_PAY_YES){
-            throw new \Exception('订单未付款');
-        }
-
-        $orderDetail = $verificationLog->orderDetail;
-        if(!$orderDetail || $orderDetail->is_delete){
-            throw new \Exception('订单详情不存在');
-        }
-
-        if($orderDetail->is_refund && $orderDetail->refund_status != OrderDetail::REFUND_STATUS_SALES_END_REJECT){
-            throw new \Exception('订单详情状态异常');
-        }
-
     }
 
     /**
@@ -65,7 +44,23 @@ class ConsumeVerificationInfoForm extends BaseModel{
                 throw new \Exception('记录不存在或无效');
             }
 
-            $this->checkVerificationLog($verificationLog);
+            $order = $verificationLog->order;
+            if(!$order || $order->is_delete){
+                throw new \Exception('订单不存在');
+            }
+
+            if($order->is_pay != Order::IS_PAY_YES){
+                throw new \Exception('订单未付款');
+            }
+
+            $orderDetail = $verificationLog->orderDetail;
+            if(!$orderDetail || $orderDetail->is_delete){
+                throw new \Exception('订单详情不存在');
+            }
+
+            if($orderDetail->is_refund && $orderDetail->refund_status != OrderDetail::REFUND_STATUS_SALES_END_REJECT){
+                throw new \Exception('订单详情状态异常');
+            }
 
             if(empty($this->route)){
                 throw new \Exception('路由地址不能为空');
@@ -86,8 +81,9 @@ class ConsumeVerificationInfoForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
                 'data' => [
-                    'url'  => $codeUrl,
-                    'code' => $verificationLog->verification_code
+                    'url'    => $codeUrl,
+                    'code'   => $verificationLog->verification_code,
+                    'detail' => ArrayHelper::toArray($orderDetail)
                 ]
             ];
         } catch (\Exception $e) {

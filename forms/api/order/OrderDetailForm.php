@@ -172,10 +172,10 @@ class OrderDetailForm extends BaseModel
             }
 
             //如果有一个不是到店消费商品，就需要设置地址
-            $orderDetailData['is_need_address'] = false;
-            foreach ($order['detail']['order_goods_list'] as $goodsItem) {
+            $orderDetailData['is_need_address'] = 0;
+            foreach ($orderDetailData['detail']['order_goods_list'] as $goodsItem) {
                 if(!$goodsItem['is_on_site_consumption']){
-                    $orderDetailData['is_need_address'] = true;
+                    $orderDetailData['is_need_address'] = 1;
                     break;
                 }
             }

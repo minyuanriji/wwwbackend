@@ -4,6 +4,7 @@ namespace app\forms\api\order;
 
 use app\core\ApiCode;
 use app\forms\common\QrCodeCommon;
+use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\Order;
 use app\models\OrderDetail;
@@ -69,7 +70,8 @@ class ConsumeVerificationInfoForm extends BaseModel{
             $qrCode = new QrCodeCommon();
             $res = $qrCode->getQrCode(['id' => $this->id], 100, 'pages/order/clerk/clerk');
 
-            print_r($res);exit;
+            print_r($res);
+            exit;
 
         } catch (\Exception $e) {
             return [

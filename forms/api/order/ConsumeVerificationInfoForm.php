@@ -1,23 +1,22 @@
 <?php
 namespace app\forms\api\order;
 
-
 use app\core\ApiCode;
 use app\forms\common\QrCodeCommon;
-use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\Order;
 use app\models\OrderDetail;
 use app\models\OrderGoodsConsumeVerification;
-use app\models\User;
 
 class ConsumeVerificationInfoForm extends BaseModel{
 
     public $id;
+    public $route;
 
     public function rules(){
         return [
             [['id'], 'integer'],
+            [['route'], 'string'],
             [['id'], 'required'],
         ];
     }
@@ -65,14 +64,20 @@ class ConsumeVerificationInfoForm extends BaseModel{
                 throw new \Exception('记录不存在或无效');
             }
 
-            //$this->checkVerificationLog($verificationLog);
+            $this->checkVerificationLog($verificationLog);
 
             $qrCode = new QrCodeCommon();
-            $res = $qrCode->getQrCode(['id' => $this->id], 100, 'pages/order/clerk/clerk');
 
-            print_r($res);
-            exit;
-
+            if(empty($this->route)){
+                throw new \Exception('路由地址不能为空');
+            }
+            $res = $qrCode->getQrCode(['id' => $this->id], 100, $this->route);
+            
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '请求成功',
+                'data' => $res
+            ];
         } catch (\Exception $e) {
             return [
                 'code' => ApiCode::CODE_FAIL,

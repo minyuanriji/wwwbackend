@@ -171,6 +171,15 @@ class OrderDetailForm extends BaseModel
                 $orderDetailData['mch']['scope']            = $order['mch']['store']['scope'];
             }
 
+            //如果有一个不是到店消费商品，就需要设置地址
+            $orderDetailData['is_need_address'] = false;
+            foreach ($order['detail']['order_goods_list'] as $goodsItem) {
+                if(!$goodsItem['is_on_site_consumption']){
+                    $orderDetailData['is_need_address'] = true;
+                    break;
+                }
+            }
+
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$orderDetailData);
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($e));

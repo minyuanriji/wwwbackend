@@ -3,10 +3,12 @@ namespace app\forms\api\order;
 
 use app\core\ApiCode;
 use app\forms\common\QrCodeCommon;
+use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\Order;
 use app\models\OrderDetail;
 use app\models\OrderGoodsConsumeVerification;
+use app\models\User;
 
 class ConsumeVerificationInfoForm extends BaseModel{
 
@@ -66,13 +68,18 @@ class ConsumeVerificationInfoForm extends BaseModel{
 
             $this->checkVerificationLog($verificationLog);
 
-            $qrCode = new QrCodeCommon();
-
             if(empty($this->route)){
                 throw new \Exception('路由地址不能为空');
             }
-            $res = $qrCode->getQrCode(['id' => $this->id], 100, $this->route);
-            
+
+            if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
+                $qrCode = new QrCodeCommon();
+                $res = $qrCode->getQrCode(['id' => $this->id], 100, $this->route);
+            }else{
+                $dir = 'clerk/' . \Yii::$app->mall->id."_".$this->id. '.jpg';
+                $res = CommonLogic::createQrcode([], $this, $this->route, $dir);
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',

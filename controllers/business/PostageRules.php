@@ -20,6 +20,6 @@ class PostageRules{
         }catch (\Exception $e){
             $price = [];
         }
-        return $price;
+        return ['price' => $price];
     }
 }

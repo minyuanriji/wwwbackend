@@ -13,5 +13,10 @@ class User extends ActiveRecord{
     public function getOneUserMobile($id){
         return $this -> find() -> select(['mobile']) -> where(['id' => $id]) -> asArray() -> one();
     }
-    
+
+    public function getOneUserParent($token){
+        return $this -> find() -> select('id,parent_id') -> where(['access_token' => $token]) -> asArray() -> one();
+    }
+
+
 }

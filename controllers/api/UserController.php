@@ -219,13 +219,41 @@ class UserController extends ApiController
         return $shareForm->get('pages/index/index');
     }
 
+    public function actionLinkPoster2(){
+        $access_token = (new SetToken()) -> getToken();
+        //1.4 拼接扫码跳转的小程序url地址
+        $path= '/pages/user/index?user_id='. \Yii::$app->user->identity ->id;
+        $width=430;
+        //1.5 拼接地址+二维码大小
+        $post_data='{"path":"'.$path.'","width":'.$width.'}';
+        //1.6 拼接获取二维码的地址带上access_token
+        $url="https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=".$access_token;
+        //1.7 发送 POST请求换取二维码
+        $Img = '/web/statics/poster/images/' .time() . uniqid() . '.jpg';
+        $filename = \Yii::$app->basePath .$Img;
+        $result= (new SetToken()) -> httpRequest($url,$post_data,'POST');
+        file_put_contents($filename, $result);
+//        $data='image/png;base64,'.base64_encode($result);
+//        var_dump($data);
+//        echo '<img src="data:'.$data.'">';
+        $data = $this -> actionLinkPoster($filename);
+        return $this -> asJson($data);
+    }
+
     /**
      * 分享领取海报领取红包
      * @return array
      */
-    public function actionLinkPoster(){
-        $code = \Yii::$app->request->hostInfo . '/h55/#/pages/public/login?user_id='. \Yii::$app->user->identity ->id;
-        $qrCodeData = QRcode::pngData($code,13);
+    public function actionLinkPoster($flag = ''){
+        $qrCodeData = '';
+        $WeChatCode = '';
+        if(empty($flag)){
+            //$code = \Yii::$app->request->hostInfo . '/h5/#/pages/public/login?user_id='. \Yii::$app->user->identity ->id;
+            $code = 'https://www.mingyuanriji.cn' . '/h55/#/pages/public/login?user_id='. \Yii::$app->user->identity ->id;
+            $qrCodeData = QRcode::pngData($code,13);
+        }else{
+            $WeChatCode = $flag;
+        }
         $config = array(
             'bg_url' => \Yii::$app->basePath . '/web/statics' . '/bg/063bd7ebf5f752309d3cf3867209b8dq.jpg',//背景图片路径
             'text' => array(
@@ -294,7 +322,7 @@ class UserController extends ApiController
 //                ),
                 array(
                     'name' => '二维码', //图片名称，用于出错时定位
-                    'url' => '',
+                    'url' => $WeChatCode,
                     'stream' => $qrCodeData,
                     'left' => 200,
                     'top' => 230,
@@ -333,7 +361,10 @@ class UserController extends ApiController
             ];
             //是否要清理缓存资源
             Poster::clear();
-            return $this->asJson($data);
+            if(empty($flag)){
+                return $this->asJson($data);
+            }
+            return $data;
         }
         //是否要清理缓存资源
         Poster::clear();

@@ -23,11 +23,12 @@ use app\models\BaseModel;
 use app\models\ErrorLog;
 use app\models\Mall;
 use app\models\User;
+use app\models\user\User as UserMode;
 use app\models\UserInfo;
 use jianyan\easywechat\Wechat;
 use function EasyWeChat\Kernel\Support\str_random;
 use function EasyWeChat\Kernel\Support\get_client_ip;
-
+use app\models\mysql\{UserParent,UserChildren};
 class WechatForm extends BaseModel
 {
     public $code;
@@ -156,7 +157,7 @@ class WechatForm extends BaseModel
      * @throws \EasyWeChat\Kernel\Exceptions\DecryptException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      */
-    public function miniAuthorized(){
+    public function miniAuthorized($parent_user_id = ''){
         try{
             /** @var Wechat $wechatModel */
             $wechatModel = \Yii::$app->wechat;
@@ -205,6 +206,40 @@ class WechatForm extends BaseModel
             $openid = md5($data["openid"].$randStr);
             \Yii::$app->cache->set($openid,$data);
             $returnData["key"] = $openid;
+            if(!empty($parent_user_id)){
+                $transaction = \Yii::$app->db->beginTransaction();
+                try{
+                    $user_data = (new UserMode()) -> getOneUserParent($returnData['access_token']);
+                    (new UserMode()) -> updateUsers(['parent_id' => $parent_user_id],$user_data['id']);
+                    if(empty($user_data['parent_id'])){
+                        $parent_data = new UserParent();
+                        $parent_data -> mall_id = \Yii::$app->mall->id;
+                        $parent_data -> user_id = $user_data['id'];
+                        $parent_data -> parent_id = $parent_user_id;
+                        $parent_data -> updated_at = time();
+                        $parent_data -> created_at = time();
+                        $parent_data -> deleted_at = time();
+                        $parent_data -> is_delete = 0;
+                        $parent_data -> level = 1;
+                        $parent_data -> save();
+                        $UserChildren = new UserChildren();
+                        $UserChildren -> id = null;
+                        $UserChildren -> mall_id = \Yii::$app->mall->id;
+                        $UserChildren -> user_id = $parent_user_id;
+                        $UserChildren -> child_id = $user_data['id'];
+                        $UserChildren -> level = 1;
+                        $UserChildren -> created_at = time();
+                        $UserChildren -> updated_at = time();
+                        $UserChildren -> deleted_at = 0;
+                        $UserChildren -> is_delete = 0;
+                        $UserChildren -> save();
+                    }
+                    $transaction -> commit();
+                }catch (\Exception $e){
+//                    var_dump($e -> getMessage());
+                }
+            }
+
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);
         }catch (\Exception $ex){
 

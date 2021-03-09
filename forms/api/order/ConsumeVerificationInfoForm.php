@@ -77,13 +77,16 @@ class ConsumeVerificationInfoForm extends BaseModel{
                 $codeUrl = CommonLogic::uploadImgToCloudStorage($file, $dir, $imgUrl);
             }
 
+            $detail = ArrayHelper::toArray($orderDetail);
+            $detail['goods_info'] = json_decode($detail['goods_info'], true);
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
                 'data' => [
                     'url'    => $codeUrl,
                     'code'   => $verificationLog->verification_code,
-                    'detail' => ArrayHelper::toArray($orderDetail)
+                    'detail' => $detail
                 ]
             ];
         } catch (\Exception $e) {

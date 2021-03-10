@@ -89,7 +89,7 @@ class UserForm extends BaseModel
 
         //是否商户身份
         $isMch = 0;
-        $mchStore = $mchCategory = [];
+        $mchStore = $mchCategory = $mchStat = [];
         $mchInfo = Mch::find()->where([
             'user_id'       => $user->id,
             'review_status' => Mch::REVIEW_STATUS_CHECKED,
@@ -99,6 +99,11 @@ class UserForm extends BaseModel
             $isMch       = 1;
             $mchStore    = $mchInfo['store'];
             $mchCategory = $mchInfo['category'];
+            $mchStat     = [
+                'account_money' => $mchInfo['account_money'],
+                'order_num'     => 0,
+                'goods_num'     => 0
+            ];
         }
 
         $result = [

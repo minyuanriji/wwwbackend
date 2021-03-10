@@ -697,6 +697,7 @@ class OrderSubmitForm extends BaseModel
             }
         }
 
+
         return [
             'is_need_address'     => $is_need_address ? 1 : 0,
             'list'                => $listData,

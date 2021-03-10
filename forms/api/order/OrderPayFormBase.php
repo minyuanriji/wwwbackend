@@ -40,6 +40,7 @@ abstract class OrderPayFormBase extends BaseModel
             if (count($supportPayTypes) < 1) {
                 $supportPayTypes = OrderLogic::getPaymentTypeConfig();
             }
+
             $paymentOrder = new PaymentOrder([
                 'title' => $this->getOrderTitle($order),
                 'amount' => (float)$order->total_pay_price,
@@ -49,13 +50,9 @@ abstract class OrderPayFormBase extends BaseModel
             ]);
             $paymentOrders[] = $paymentOrder;
         }
-        /** @var \app\models\PaymentOrder $paymentOrderData */
-        $paymentOrderData = \app\models\PaymentOrder::getOneData(["order_no"=>$order->order_no]);
-        if(empty($paymentOrderData)){
-            $id = \Yii::$app->payment->createOrder($paymentOrders);
-        }else{
-            $id = $paymentOrderData->payment_order_union_id;
-        }
+
+        $id = \Yii::$app->payment->createOrder($paymentOrders);
+
         return ["id" => $id];
     }
 

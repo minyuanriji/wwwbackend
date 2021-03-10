@@ -76,6 +76,15 @@ class Payment extends Component
         sort($orderNos);
         $orderNos[] = $amount;
         $unionOrderNo = 'JX' . mb_substr(md5(json_encode($orderNos)), 2);
+
+        //如果已经创建过记录了，就不再重复创建了
+        $paymentOrderUnion = PaymentOrderUnion::find()->where([
+            'order_no' => $unionOrderNo
+        ])->one();
+        if($paymentOrderUnion){
+            return $paymentOrderUnion->id;
+        }
+
         $title = mb_substr($title, 0, 32);
         $paymentOrderUnion = new PaymentOrderUnion();
         $paymentOrderUnion->mall_id = \Yii::$app->mall->id;

@@ -19,7 +19,16 @@ class CheckoutOrderController extends ApiController{
         $form->attributes = $this->requestData;
 
         return $this->asJson($form->create());
-
     }
 
+    /**
+     * 结账单支付
+     * @return \yii\web\Response
+     * @throws \app\core\exceptions\ClassNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
+     */
+    public function actionToPay(){
+
+    }
 }

@@ -68,21 +68,31 @@ abstract class OrderPayFormBase extends BaseModel
      * @param User $userData
      * @return array
      */
-    public function loadOrderPayData($order,$userData = []){
+    public function loadOrderPayData($order, $userData = []){
         $supportPayTypes = OrderLogic::getPaymentTypeConfig();
         $balance = $userData["balance"];
+        if(is_array($order)){
+            $amount = 0;
+            foreach($order as $item){
+                $amount += (float)$item->total_pay_price;
+            }
+            $orderNo = $order[0]->same_order_no;
+        }else{
+            $amount = (float)$order->total_pay_price;
+            $orderNo = $order->order_no;
+        }
         $data = [
                 //'title' => $this->getOrderTitle($order),
                 'balance' => $balance,
-                'amount' => (float)$order->total_pay_price,
-                'orderNo' => $order->order_no,
+                'amount'  => $amount,
+                'orderNo' => $orderNo,
                 //'notifyClass' => OrderPayNotify::class,
                 'supportPayTypes' => $supportPayTypes,
         ];
         $paymentConfigs = AppConfigLogic::getPaymentConfig();
         $data["pay_password_status"] = isset($paymentConfigs["pay_password_status"]) ? $paymentConfigs["pay_password_status"] : 0;
         $isPayPassword = empty($userData["transaction_password"]) ? 0 : 1;
-        $returnData = $this->getReturnData([$order]);
+        $returnData = $this->getReturnData(is_array($order) ? $order : [$order]);
         $data["is_pay_password"] = $isPayPassword;
         $data["union_id"] = $returnData["id"];
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"",$data);

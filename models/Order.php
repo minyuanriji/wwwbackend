@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property int $user_id
  * @property int $mch_id 多商户id，0表示商城订单
  * @property string $order_no 订单号
+ * @property string $same_order_no 批次订单号
  * @property string $total_price 订单总金额(含运费)
  * @property string $total_pay_price 实际支付总费用(含运费）
  * @property string $express_original_price 运费(后台修改前)
@@ -253,7 +254,7 @@ class Order extends BaseActiveRecord
             [['order_form', 'support_pay_types'], 'string'],
             [['pay_at', 'send_at', 'confirm_at', 'cancel_at', 'created_at', 'updated_at', 'deleted_at',
                 'comment_at', 'auto_cancel_at', 'auto_confirm_at', 'auto_sales_at','complete_at'], 'safe'],
-            [['order_no', 'mobile', 'address', 'remark', 'words', 'seller_remark', 'express_no', 'offline_qrcode',
+            [['order_no', 'same_order_no', 'mobile', 'address', 'remark', 'words', 'seller_remark', 'express_no', 'offline_qrcode',
                 'sign', 'location', 'city_name', 'city_info'], 'string', 'max' => 255],
             [['name', 'customer_name', 'express'], 'string', 'max' => 65],
             [['token'], 'string', 'max' => 32],

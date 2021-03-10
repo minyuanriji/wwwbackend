@@ -299,12 +299,15 @@ class OrderSubmitForm extends BaseModel
 
             $districtArr = new DistrictArr();
             $event_data = array();//事件参数
+
+            $sameOrderNo = Order::getOrderNo('SS');
             foreach ($data['list'] as $orderItem) {
                 $order = new Order();
                 $order->mall_id = \Yii::$app->mall->id;
                 $order->user_id = $user->getId();
                 $order->mch_id = $orderItem['mch']['id'];
-                $order->order_no = Order::getOrderNo('S');;
+                $order->order_no = Order::getOrderNo('S');
+                $order->same_order_no = $sameOrderNo;
                 $order->total_price = $orderItem['total_price'];
                 $order->total_pay_price = $orderItem['total_price'];
                 $order->express_original_price = $orderItem['express_price'];

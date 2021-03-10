@@ -6,6 +6,9 @@ class PostageRules{
     public function getExpressPrice($data){
         try {
             $freight = (new Goods()) -> getGoodsFreightId($data['order_id']);
+            if($freight['mch_id'] > 0){
+                return ['price' => 0];
+            }
             if($freight['freight_id'] == 0){
                 $result = (new PostageRulesModel()) -> getExpressPrice();
             }else{

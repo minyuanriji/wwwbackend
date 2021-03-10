@@ -5,3 +5,4 @@ class Order extends Common{
         return $this -> find() -> where(['id' => $id]) -> select('id,total_price,use_score,integral_deduction_price') -> asArray() -> one();
     }
 }
+

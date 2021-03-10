@@ -83,6 +83,7 @@ class OrderRefundForm extends BaseModel
             }
             //从申请售后跳转需要显示的相关数据
             if($from == 1){
+
                 $data_arr = (new OrderModel()) -> getOneOrderData($detail['order_id']);
                 //订单为未发货，售后退运费,订单为已发货, 售后不退运费
                 $realityPrice = price_format($detail['total_price']);

@@ -21,6 +21,7 @@ use app\models\Order;
 use app\models\OrderDetail;
 use app\models\OrderRefund;
 use yii\helpers\ArrayHelper;
+use app\models\mysql\Order as OrderModel;
 
 class OrderRefundForm extends BaseModel
 {
@@ -80,14 +81,17 @@ class OrderRefundForm extends BaseModel
                     }
                 }
             }
-            
             //从申请售后跳转需要显示的相关数据
             if($from == 1){
+                $data_arr = (new OrderModel()) -> getOneOrderData($detail['order_id']);
                 //订单为未发货，售后退运费,订单为已发货, 售后不退运费
                 $realityPrice = price_format($detail['total_price']);
                 //目前没有预售价，暂时设置为0
                 $advance_price = 0;
                 $data["refund_price"] = price_format($realityPrice + $advance_price);
+                $data["refund_total_price"] = $data_arr['total_price'];
+                $data["use_score"] = $data_arr['use_score'];
+                $data["integral_deduction_price"] = $data_arr['integral_deduction_price'];
                 $data["order_detail_id"] = $this->order_detail_id;
                 $data["goods_info"] = $goodsInfo;
                 $data["type_list"] = $cannotrefund_str;// OrderRefund::$refund_type_array;

@@ -412,4 +412,15 @@ class OrderController extends ApiController
 
         return $this->asJson($form->qrCode());
     }
+
+    /**
+     * 到店消费核销码信息
+     * @return \yii\web\Response
+     */
+    public function actionConsumeVerificationInfo(){
+        $form = new ConsumeVerificationInfoForm();
+        $form->attributes = $this->requestData;
+
+        return $this->asJson($form->info());
+    }
 }

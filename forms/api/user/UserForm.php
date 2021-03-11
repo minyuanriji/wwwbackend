@@ -40,6 +40,37 @@ class UserForm extends BaseModel
     }
 
     /**
+     * 获取关联商户信息
+     * @return array
+     */
+    private function getMchInfo(){
+        $returnData = [
+            'is_mch'    => 0,
+            'store'     => null,
+            'category'  => null,
+            'stat'      => null
+        ];
+        $mchInfo = Mch::find()->where([
+            'user_id'       => \Yii::$app->user->id,
+            'review_status' => Mch::REVIEW_STATUS_CHECKED,
+            'is_delete'     => 0
+        ])->with(["store", "category"])->asArray()->one();
+        if($mchInfo){
+            $returnData['is_mch']   = 1;
+            $returnData['store']    = $mchInfo['store'];
+            $returnData['category'] = $mchInfo['category'];
+            $returnData['stat']     = [
+                'account_money' => (float)$mchInfo['account_money'],
+                'order_num'     => 0,
+                'goods_num'     => 0
+            ];
+            //
+        }
+
+        return $returnData;
+    }
+
+    /**
      * 用户信息
      * @Author: zal
      * @Date: 2020-04-28
@@ -87,24 +118,8 @@ class UserForm extends BaseModel
             ->leftJoin(['g' => Goods::tableName()], 'g.id = f.goods_id')
             ->andWhere(['g.status' => 1, 'g.is_delete' => 0])->count();
 
-        //是否商户身份
-        $isMch = 0;
-        $mchStore = $mchCategory = $mchStat = [];
-        $mchInfo = Mch::find()->where([
-            'user_id'       => $user->id,
-            'review_status' => Mch::REVIEW_STATUS_CHECKED,
-            'is_delete'     => 0
-        ])->with(["store", "category"])->asArray()->one();
-        if($mchInfo){
-            $isMch       = 1;
-            $mchStore    = $mchInfo['store'];
-            $mchCategory = $mchInfo['category'];
-            $mchStat     = [
-                'account_money' => $mchInfo['account_money'],
-                'order_num'     => 0,
-                'goods_num'     => 0
-            ];
-        }
+        //商户信息
+        $mchInfo = $this->getMchInfo();
 
         $result = [
             'user_id' => $user->id,
@@ -138,10 +153,10 @@ class UserForm extends BaseModel
             'coupon' => $couponCount,
           /*  'card' => $cardCount,*/
             'is_vip_card_user' => 0,
-            'is_mch' => $isMch,
-            'mch_store' => $mchStore,
-            'mch_category' => $mchCategory
+            'is_mch' => $mchInfo['is_mch'],
+            'mch_info' => $mchInfo
         ];
+
         $pluginUserInfo = \Yii::$app->plugin->getUserInfo($user);
         if(isset($pluginUserInfo["score"])){
             unset($pluginUserInfo["score"]);

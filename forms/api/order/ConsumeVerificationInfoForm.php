@@ -26,6 +26,26 @@ class ConsumeVerificationInfoForm extends BaseModel{
     }
 
     /**
+     * 获取到店消费核销信息
+     * @return array
+     */
+    public function info(){
+
+        list($verificationLog, $order, $orderDetail) = $this->getData();
+
+        if($verificationLog->user_id != \Yii::$app->user->id){
+            throw new \Exception('无权限操作');
+        }
+
+        $returnData = ArrayHelper::toArray($verificationLog);
+
+        $orderDetail = ArrayHelper::toArray($orderDetail);
+        $returnData['goods_info'] = json_decode($orderDetail['goods_info'], true);
+
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"", $returnData);
+    }
+
+    /**
      * 确认使用核销二维码
      * @return array
      */
@@ -37,6 +57,10 @@ class ConsumeVerificationInfoForm extends BaseModel{
             }
 
             list($verificationLog, $order, $orderDetail) = $this->getData();
+
+            if($verificationLog->is_used){
+                throw new \Exception('订单信息已失效');
+            }
 
             //获取当前登录的账号关联商户信息
             $mch = Mch::findOne([
@@ -85,10 +109,6 @@ class ConsumeVerificationInfoForm extends BaseModel{
      * @return array
      */
     public function qrCode(){
-
-        if (!$this->validate()) {
-            return $this->responseErrorInfo();
-        }
 
         try {
             if (empty($this->id)) {
@@ -141,7 +161,6 @@ class ConsumeVerificationInfoForm extends BaseModel{
 
     private function getData(){
         $where = [
-            "is_used"   => 0,
             "is_delete" => 0
         ];
         if(empty($this->id)){

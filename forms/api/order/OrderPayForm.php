@@ -56,10 +56,10 @@ class OrderPayForm extends OrderPayFormBase
             ]);
         }else{
             /** @var Order[] $orders */
-            $orders = Order::findAll([
+            $orders = Order::getOneData([
                 'token' => $this->token,
                 'is_delete' => 0,
-                'user_id' => \Yii::$app->user->id
+                'user_id' => \Yii::$app->user->id,
             ]);
         }
         if (empty($orders)) {

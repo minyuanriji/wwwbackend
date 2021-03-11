@@ -19,6 +19,7 @@ use app\models\Favorite;
 use app\models\Goods;
 use app\models\GoodsCollect;
 use app\models\MemberLevel;
+use app\models\Order;
 use app\models\ScoreLog;
 use app\models\User;
 use app\models\UserCard;
@@ -64,7 +65,20 @@ class UserForm extends BaseModel
                 'order_num'     => 0,
                 'goods_num'     => 0
             ];
-            //
+
+            //商户订单数量
+            $returnData['stat']['order_num'] = (int)Order::find()->where([
+                'is_delete'  => 0,
+                'is_recycle' => 0,
+                'mch_id'     => $mchInfo['id']
+            ])->count();
+
+            //商户商品数量
+            $returnData['stat']['goods_num'] = (int)Goods::find()->where([
+                'is_delete'  => 0,
+                'is_recycle' => 0,
+                'mch_id'     => $mchInfo['id']
+            ])->count();
         }
 
         return $returnData;

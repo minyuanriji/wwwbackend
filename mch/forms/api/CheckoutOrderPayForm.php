@@ -8,6 +8,7 @@ use app\forms\api\order\OrderPayNotify;
 use app\helpers\ArrayHelper;
 use app\logic\AppConfigLogic;
 use app\logic\OrderLogic;
+use app\mch\payment\CheckoutOrderPayNotify;
 use app\models\BaseModel;
 use app\models\User;
 use app\plugins\mch\models\MchCheckoutOrder;
@@ -66,11 +67,11 @@ class CheckoutOrderPayForm extends BaseModel {
                     'title'             => "Checkout for mch id:" . $mch->id,
                     'amount'            => (float)$payPrice,
                     'orderNo'           => $checkoutOrder->order_no,
-                    'notifyClass'       => OrderPayNotify::class,
+                    'notifyClass'       => CheckoutOrderPayNotify::class,
                     'supportPayTypes'   => $supportPayTypes,
                 ]);
 
-                $id = \Yii::$app->payment->createOrder([$paymentOrder]);
+                $union_id = \Yii::$app->payment->createOrder([$paymentOrder]);
             }
 
             $userModel = new User();

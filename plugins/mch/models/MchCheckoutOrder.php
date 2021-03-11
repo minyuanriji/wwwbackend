@@ -65,4 +65,9 @@ class MchCheckoutOrder extends BaseActiveRecord
             'is_delete' => 'Delete At'
         ];
     }
+
+    public function getMch(){
+        return $this->hasOne(Mch::className(), ['id' => 'mch_id']);
+    }
+
 }

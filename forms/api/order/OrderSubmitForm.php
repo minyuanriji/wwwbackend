@@ -61,6 +61,7 @@ use app\models\IntegralDeduct;
 use yii\helpers\ArrayHelper;
 use app\services\Order\SameGoodsService;
 use app\services\wechat\WechatTemplateService;
+use app\controllers\business\PostageRules as PostageRulesBus;
 
 class OrderSubmitForm extends BaseModel
 {
@@ -485,6 +486,7 @@ class OrderSubmitForm extends BaseModel
 
             $formDataItem            = $item['form_data'];
             $item['express_price']   = price_format(0);
+
             $item['remark']          = isset($formDataItem['remark'])
                 ? $formDataItem['remark'] : null;
             $item['order_form_data'] = isset($formDataItem['order_form'])
@@ -522,6 +524,7 @@ class OrderSubmitForm extends BaseModel
             $item = $CouponService->getUsableUserCouponId();
             //优惠卷计算
             $item = $this->setCouponDiscountData($item, $formDataItem, $type);
+
             //优惠卷结束
 
             //是否使用积分减免
@@ -557,7 +560,6 @@ class OrderSubmitForm extends BaseModel
             $item = $this->setDeliveryData($item, $formDataItem);
 
             $item                = $this->setExpressData($item);
-
             $totalPrice          = price_format($item['total_goods_price'] + $item['express_price']);
             $item['total_price'] = $this->setTotalPrice($totalPrice);
 
@@ -1512,6 +1514,7 @@ class OrderSubmitForm extends BaseModel
             foreach ($expressItem['goods_list'] as $goodsItem) { // 按商品ID小计件数和金额，看是否达到包邮条件
                 $num += $goodsItem['num'];
             }
+
             try {
                 $commonDelivery = DeliveryCommon::getInstance();
                 $cityConfig     = $commonDelivery->getConfig();
@@ -1534,6 +1537,7 @@ class OrderSubmitForm extends BaseModel
             $expressItem['total_price']   = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
             return $expressItem;
         }
+
 
         $groupGoodsTotalList = []; // 按商品id小计的商品金额和数量
         foreach ($expressItem['goods_list'] as $goodsItem) { // 按商品ID小计件数和金额，看是否达到包邮条件
@@ -1604,15 +1608,21 @@ class OrderSubmitForm extends BaseModel
 
         $postageRuleGroups = []; // 商品按匹配到的运费规则进行分组
         $noPostageRuleHit  = true; // 没有比配到运费规则
+        $str_id = '';
         foreach ($noZeroGoodsList as $goodsItem) {
-            if ($goodsItem['freight_id'] && $goodsItem['freight_id'] != -1) {
+            $str_id .=  $goodsItem['id'] . ',';
+            //判断是否使用到快递模板
+            if ($goodsItem['freight_id'] != -1) {
+                //获取快递规则
                 $postageRule = PostageRules::findOne([
                     'mall_id'   => \Yii::$app->mall->id,
                     'id'        => $goodsItem['freight_id'],
                     'is_delete' => 0,
                     'mch_id'    => $expressItem['mch']['id'],
                 ]);
+
                 if (!$postageRule) {
+                    //获取默认规则
                     $postageRule = PostageRules::findOne([
                         'mall_id'   => \Yii::$app->mall->id,
                         'status'    => 1,
@@ -1654,7 +1664,6 @@ class OrderSubmitForm extends BaseModel
             if (!$rule) {
                 continue;
             }
-
             $noPostageRuleHit = false;
             if (!isset($postageRuleGroups['rule:' . $postageRule->id])) {
                 $postageRuleGroups['rule:' . $postageRule->id] = [
@@ -1675,6 +1684,7 @@ class OrderSubmitForm extends BaseModel
             $postageRule = $group['postage_rule'];
             $rule        = $group['rule'];
             $goodsList   = $group['goods_list'];
+
             $firstPrice  = $rule['firstPrice'];
             $secondPrice = 0;
             if ($postageRule->type == 1) { // 按重量计费
@@ -1696,6 +1706,7 @@ class OrderSubmitForm extends BaseModel
                 foreach ($goodsList as $goods) {
                     $totalNum += $goods['num'];
                 }
+
                 if ($rule['second'] > 0) {
                     $secondPrice = ceil(($totalNum - $rule['first']) / $rule['second']) // 向上取整
                         * $rule['secondPrice'];
@@ -1709,8 +1720,14 @@ class OrderSubmitForm extends BaseModel
             $firstPriceList[] = $firstPrice;
             $totalSecondPrice += $secondPrice;
         }
-
-        $expressItem['express_price'] = price_format(max($firstPriceList) + $totalSecondPrice);
+        $goods_data = [
+            'order_id' => $str_id,
+            'data' => $address -> province
+        ];
+        $express_price = (new PostageRulesBus()) -> getExpressPrice($goods_data);
+        $express_price = array_sum($express_price);
+//        $expressItem['express_price'] = price_format(max($firstPriceList) + $totalSecondPrice);
+        $expressItem['express_price'] = $express_price;
         $expressItem['total_price']   = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
         return $expressItem;
     }

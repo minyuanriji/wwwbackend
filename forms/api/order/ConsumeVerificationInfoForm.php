@@ -110,7 +110,7 @@ class ConsumeVerificationInfoForm extends BaseModel{
                 $res = $qrCode->getQrCode(['code' => $verificationLog->verification_code], 100, $this->route);
                 $codeUrl = $res['file_path'];
             }else{
-                $dir = 'clerk/' . \Yii::$app->mall->id."_".$this->id. '.jpg';
+                $dir = 'clerk/' . \Yii::$app->mall->id."_".$this->id. '_' . time() . '.jpg';
                 $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
                 $file = CommonLogic::createQrcode(['code' => $verificationLog->verification_code], $this, $this->route, $dir);
                 $codeUrl = CommonLogic::uploadImgToCloudStorage($file, $dir, $imgUrl);

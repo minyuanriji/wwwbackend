@@ -5,6 +5,7 @@ namespace app\mch\forms\api;
 use app\core\ApiCode;
 use app\core\payment\PaymentOrder;
 use app\forms\api\order\OrderPayNotify;
+use app\helpers\ArrayHelper;
 use app\logic\AppConfigLogic;
 use app\logic\OrderLogic;
 use app\models\BaseModel;
@@ -55,7 +56,7 @@ class CheckoutOrderPayForm extends BaseModel {
             $checkoutOrder->updated_at               = time();
             $checkoutOrder->integral_deduction_price = $integralDeductionPrice;
             if(!$checkoutOrder->save()){
-
+                throw new \Exception($this->responseErrorMsg($checkoutOrder));
             }
 
             $supportPayTypes = OrderLogic::getPaymentTypeConfig();
@@ -86,6 +87,9 @@ class CheckoutOrderPayForm extends BaseModel {
             $isPayPassword = empty($userData["transaction_password"]) ? 0 : 1;
             $data["is_pay_password"]     = $isPayPassword;
             $data["union_id"]            = $union_id;
+            $data['detail']              = ArrayHelper::toArray($checkoutOrder);
+
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"", $data);
 
         }catch(\Exception $e){
             \Yii::$app->redis->set('var1',$e -> getMessage());

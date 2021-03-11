@@ -2,6 +2,7 @@
 namespace app\mch\controllers\api;
 
 use app\controllers\api\ApiController;
+use app\mch\forms\api\CheckoutOrderInfoForm;
 use app\mch\forms\api\CheckoutOrderPayForm;
 use app\mch\forms\api\CheckoutOrderSubmitForm;
 use Yii;
@@ -34,5 +35,19 @@ class CheckoutOrderController extends ApiController{
         $form->attributes = $this->requestData;
 
         return $this->asJson($form->pay());
+    }
+
+    /**
+     * 结账单信息
+     * @return \yii\web\Response
+     * @throws \app\core\exceptions\ClassNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
+     */
+    public function actionInfo(){
+        $form = new CheckoutOrderInfoForm();
+        $form->attributes = $this->requestData;
+
+        return $this->asJson($form->info());
     }
 }

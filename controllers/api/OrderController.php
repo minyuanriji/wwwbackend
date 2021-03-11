@@ -403,7 +403,7 @@ class OrderController extends ApiController
     }
 
     /**
-     * 到店消费核销码
+     * 到店消费核销码二维码
      * @return \yii\web\Response
      */
     public function actionConsumeVerificationQrcode(){

@@ -13,13 +13,16 @@ class LiveController extends ApiController{
         $data = json_encode($data);
         $res=$this->http_request($live_list_url,$data);
         $result = json_decode($res, true);
+        $data = [];
         foreach ($result['room_info'] as $key => $val){
             if($val['live_status'] == 103){
                 unset($result['room_info'][$key]);
+            }else{
+                array_push($data,$val);
             }
         }
         return $this -> asJson([
-            'data' => $result['room_info'],
+            'data' => $data,
             'status' => 1,
             'msg' => 'OK'
         ]);

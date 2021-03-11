@@ -75,9 +75,8 @@ class UserForm extends BaseModel
 
             //商户商品数量
             $returnData['stat']['goods_num'] = (int)Goods::find()->where([
-                'is_delete'  => 0,
-                'is_recycle' => 0,
-                'mch_id'     => $mchInfo['id']
+                'is_delete' => 0,
+                'mch_id'    => $mchInfo['id']
             ])->count();
         }
 

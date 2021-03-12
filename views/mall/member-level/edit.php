@@ -160,7 +160,7 @@ Yii::$app->loadComponentView('com-rich-text')
                             </el-form-item>
                             <el-form-item prop="goods_warehouse_ids" v-if="ruleForm.upgrade_type_goods==1">
                                 <template v-if="ruleForm.goods_type==2">
-                                    <div style="color: #ff4544;">最多可添加20个商品</div>
+                                    <div style="color: #ff4544;">最多可添加150个商品</div>
                                     <div style="max-height: 300px;overflow-y: auto">
                                         <el-table :data="ruleForm.goods_list" :show-header="false" border>
                                             <el-table-column label="">
@@ -348,8 +348,8 @@ Yii::$app->loadComponentView('com-rich-text')
             goodsSelect(param) {
                 for (let j in param) {
                     let item = param[j];
-                    if (this.ruleForm.goods_warehouse_ids.length >= 20) {
-                        this.$message.error('指定商品不能大于20个');
+                    if (this.ruleForm.goods_warehouse_ids.length >= 150) {
+                        this.$message.error('指定商品不能大于150个');
                         return;
                     }
                     let flag = true;

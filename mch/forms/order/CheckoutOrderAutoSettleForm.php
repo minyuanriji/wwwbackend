@@ -4,71 +4,107 @@
  */
 namespace app\mch\forms\order;
 
-
-use app\helpers\SerializeHelper;
+use app\core\ApiCode;
 use app\models\BaseModel;
-use app\models\Cash;
-use app\models\CashLog;
-use app\models\IncomeLog;
+use app\plugins\mch\forms\mall\CashEditForm;
+use app\plugins\mch\models\MchAccountLog;
+use app\plugins\mch\models\MchCash;
 
 class CheckoutOrderAutoSettleForm extends BaseModel{
 
-    public $user_id; //商家关联的用户ID
+    public $price;                   //金额
+    public $mch_id;                  //商家ID
 
-    public $name;           //收款人
-    public $bank_name;      //银行
-    public $bank_account;   //银行卡号
-    public $wechat_qrcode;  //微信收款码
+    public $order_id;
 
-    public $content = "商家结账单结算";
 
     public function rules(){
         return [
-            [['user_id'], 'required'],
-            [['user_id'], 'integer'],
-            [['content'], 'string']
+            [['mch_id', 'price', 'order_id'], 'required'],
+            [['mch_id', 'order_id'], 'integer'],
+            [['price'], 'number'],
+            [[], 'string']
         ];
     }
 
     public function save(){
 
+        if(!$this->validate()){
+            throw new \Exception($this->responseErrorMsg());
+        }
+
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+            $cashId = $this->setCashLog();
+
+            //自动打款
+            $cashEditForm = new CashEditForm([
+                "id"            => $cashId,
+                "transfer_type" => 1
+            ]);
+            $res = $cashEditForm->transfer();
+            if($res['code'] != ApiCode::CODE_SUCCESS){
+                throw new \Exception($res['msg']);
+            }
+            print_r($res);
+            exit;
+            //$t->commit();
+        }catch (\Exception $e){
+            $t->rollBack();
+            throw new \Exception($e->getMessage());
+        }
+
+
     }
 
-
+    /**
+     * 设置提现记录
+     * @param $payment
+     * @return array
+     */
     private function setCashLog(){
 
-        $extra = SerializeHelper::encode([
-            'name'          => $this->name,
-            'mobile'        => $this->mobile,
-            'bank_name'     => $this->bank_name,
-            'bank_account'  => $this->bank_account,
-            'wechat_qrcode' => $this->wechat_qrcode
-        ]);
+        $mchCash = new MchCash();
+        $mchCash->mall_id         = \Yii::$app->mall->id;
+        $mchCash->mch_id          = $this->mch_id;
+        $mchCash->money           = $this->price;
+        $mchCash->order_no        = $this->getCashOrder();
+        $mchCash->status          = 1; //同意打款
+        $mchCash->transfer_status = 0;
+        $mchCash->type            = "auto"; //微信自动打款
+        $mchCash->virtual_type    = 0;
+        $mchCash->type_data       = "{}";
+        $mchCash->created_at      = time();
+        $mchCash->updated_at      = time();
+        $mchCash->content         = "结账单打款(".$this->order_id.")";
 
-        $content = SerializeHelper::encode(['user_content' => $this->content]);
-        $cash = new Cash();
-        $cash->mall_id = \Yii::$app->mall->id;
-        $cash->user_id = $this->user_id;
-        $cash->price = $this->price;
-        $cash->fact_price = $this->price;
-        if ($payment['cash_service_fee'] > 0 && $payment['cash_service_fee'] < 100) {
-            $cash->fact_price = (100 - $payment['cash_service_fee']) * $this->price / 100;
+        if (!$mchCash->save()) {
+            throw new \Exception($this->responseErrorMsg($mchCash));
         }
-        $cash->order_no = $this->getCashOrder();
-        $cash->service_fee_rate = $payment['cash_service_fee'];
-        $cash->content = $content;
-        $cash->type = $this->type;
-        $cash->extra = $extra;
-        if (!$cash->save()) {
-            return $this->returnApiResultData();
+
+        $accountLog = new MchAccountLog();
+        $accountLog->mall_id    = \Yii::$app->mall->id;
+        $accountLog->mch_id     = $this->mch_id;
+        $accountLog->money      = $this->price;
+        $accountLog->desc       = "结账单打款(".$this->order_id.")";
+        $accountLog->type       = 2; //支出
+        $accountLog->created_at = date("Y-m-d H:i:s");
+        if (!$accountLog->save()) {
+            throw new \Exception($this->responseErrorMsg($accountLog));
         }
-        \Yii::$app->currency->setUser($user)->income->sub(floatval($cash->price), "由用户（{$user->id}）申请提现（{$cash->order_no}）", 0, IncomeLog::FLAG_CASH);
-        $log = new CashLog();
-        $log->price = $this->price;
-        $log->type = 2;
-        $log->desc = '提现申请';
-        $log->user_id = $user->id;
-        $log->mall_id = $user->mall_id;
-        $log->save();
+
+        return $mchCash->id;
+    }
+
+    private function getCashOrder(){
+        $order_no = null;
+        while (true) {
+            $order_no = 'MTX' . date('YmdHis') . rand(10000, 99999);
+            $exist = MchCash::find()->where(['mall_id' => \Yii::$app->mall->id, 'order_no' => $order_no])->exists();
+            if (!$exist) {
+                break;
+            }
+        }
+        return $order_no;
     }
 }

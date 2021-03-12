@@ -6,9 +6,11 @@ class PostageRules{
     public function getExpressPrice($data){
         try {
             $dataArr = explode(',', $data['order_id']);
+            $dataArr = array_filter($dataArr);
             $data_price = [];
             foreach ($dataArr as $key => $val) {
                 $freight = (new Goods())->getGoodsFreightId($val);
+
                 if ($freight['mch_id'] > 0) {
                     $price = 0;
                 } else {

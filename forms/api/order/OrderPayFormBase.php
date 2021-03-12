@@ -40,7 +40,6 @@ abstract class OrderPayFormBase extends BaseModel
             if (count($supportPayTypes) < 1) {
                 $supportPayTypes = OrderLogic::getPaymentTypeConfig();
             }
-
             $paymentOrder = new PaymentOrder([
                 'title' => $this->getOrderTitle($order),
                 'amount' => (float)$order->total_pay_price,
@@ -50,9 +49,13 @@ abstract class OrderPayFormBase extends BaseModel
             ]);
             $paymentOrders[] = $paymentOrder;
         }
-
-        $id = \Yii::$app->payment->createOrder($paymentOrders);
-
+        /** @var \app\models\PaymentOrder $paymentOrderData */
+        $paymentOrderData = \app\models\PaymentOrder::getOneData(["order_no"=>$order->order_no]);
+        if(empty($paymentOrderData)){
+            $id = \Yii::$app->payment->createOrder($paymentOrders);
+        }else{
+            $id = $paymentOrderData->payment_order_union_id;
+        }
         return ["id" => $id];
     }
 
@@ -65,31 +68,21 @@ abstract class OrderPayFormBase extends BaseModel
      * @param User $userData
      * @return array
      */
-    public function loadOrderPayData($order, $userData = []){
+    public function loadOrderPayData($order,$userData = []){
         $supportPayTypes = OrderLogic::getPaymentTypeConfig();
         $balance = $userData["balance"];
-        if(is_array($order)){
-            $amount = 0;
-            foreach($order as $item){
-                $amount += (float)$item->total_pay_price;
-            }
-            $orderNo = $order[0]->same_order_no;
-        }else{
-            $amount = (float)$order->total_pay_price;
-            $orderNo = $order->order_no;
-        }
         $data = [
                 //'title' => $this->getOrderTitle($order),
                 'balance' => $balance,
-                'amount'  => $amount,
-                'orderNo' => $orderNo,
+                'amount' => (float)$order->total_pay_price,
+                'orderNo' => $order->order_no,
                 //'notifyClass' => OrderPayNotify::class,
                 'supportPayTypes' => $supportPayTypes,
         ];
         $paymentConfigs = AppConfigLogic::getPaymentConfig();
         $data["pay_password_status"] = isset($paymentConfigs["pay_password_status"]) ? $paymentConfigs["pay_password_status"] : 0;
         $isPayPassword = empty($userData["transaction_password"]) ? 0 : 1;
-        $returnData = $this->getReturnData(is_array($order) ? $order : [$order]);
+        $returnData = $this->getReturnData([$order]);
         $data["is_pay_password"] = $isPayPassword;
         $data["union_id"] = $returnData["id"];
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"",$data);

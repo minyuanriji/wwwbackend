@@ -36,20 +36,22 @@ class CheckoutOrderPaidHandler {
                 }
 
                 //购物券抵扣
-                $deductIntegralForm = new CheckoutOrderDeductIntegralForm([
-                    "user_id"         => $checkoutOrder->pay_user_id,
-                    "deduction_price" => $checkoutOrder->integral_deduction_price,
-                    "source_id"       => $checkoutOrder->id,
-                    "desc"            => "商家结账单(" . $checkoutOrder->id . ")付款",
-                    "source_table"    => "plugin_mch_checkout_order"
-                ]);
-                if(!$deductIntegralForm->save()){
-                    throw new \Exception(CheckoutOrderDeductIntegralForm::$errorMsg);
+                if($checkoutOrder->integral_deduction_price > 0){
+                    $deductIntegralForm = new CheckoutOrderDeductIntegralForm([
+                        "user_id"         => $checkoutOrder->pay_user_id,
+                        "deduction_price" => $checkoutOrder->integral_deduction_price,
+                        "source_id"       => $checkoutOrder->id,
+                        "desc"            => "商家结账单(" . $checkoutOrder->id . ")付款",
+                        "source_table"    => "plugin_mch_checkout_order"
+                    ]);
+                    if(!$deductIntegralForm->save()){
+                        throw new \Exception(CheckoutOrderDeductIntegralForm::$errorMsg);
+                    }
                 }
 
                 //商家结算
-                $settleForm = new CheckoutOrderAutoSettleForm();
-                $settleForm->save();
+                //$settleForm = new CheckoutOrderAutoSettleForm();
+                //$settleForm->save();
 
                 $t->commit();
             }catch (\Exception $e){

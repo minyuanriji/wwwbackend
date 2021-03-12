@@ -139,7 +139,7 @@ class CashEditForm extends BaseModel
                     if (!$wechatPaySetting['wechat_status']) {
                         throw new \Exception('系统未开启微信支付！');
                     }
-                    
+
                     $res = $payment->transfer->toBalance([
                         'partner_trade_no'  => $wechatPaySetting['wechat_mch_id'].'x'.$mchCash->id, // 商户订单号，需保持唯一性(只能是字母或者数字，不能包含有符号)
                         'openid'            => $userInfo->openid,
@@ -151,7 +151,8 @@ class CashEditForm extends BaseModel
                     if ($res['result_code'] == 'FAIL') {
                         throw new \Exception($res['err_code_des']);
                     }
-
+                    print_r($res);
+                    exit;
                     /*$data['transferType'] = $mchCash->mch->user->userInfo->platform;
                     $model = new PaymentTransfer($data);
                     \Yii::$app->payment->transfer($model);*/

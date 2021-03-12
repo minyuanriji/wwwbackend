@@ -67,9 +67,6 @@ class IdentityController extends ApiController
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
         $result = $wechatForm->authorized();
-        //        if(!empty($form->attributes -> moblie)){
-//            (new RegisterForm()) -> bindParent($form->attributes -> moblie);
-//        }
         return $result;
     }
 

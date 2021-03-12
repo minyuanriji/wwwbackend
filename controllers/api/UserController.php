@@ -208,6 +208,20 @@ class UserController extends ApiController
     }
 
     /**
+     * 清空分享海报图片
+     */
+    public function delCodeImg(){
+        $path = \Yii::$app->basePath . '/web/temp/';
+        $path_wj = opendir($path);
+        while (false !== ($file_name = readdir($path_wj))){
+            if(!is_dir($path . $file_name)){
+                unlink($path . $file_name);
+            }
+        }
+        closedir($path_wj);
+    }
+
+    /**
      * 商品海报
      * @return \yii\web\R1esponse
      * @throws \Exception

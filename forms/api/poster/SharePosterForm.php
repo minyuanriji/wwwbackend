@@ -23,6 +23,7 @@ class SharePosterForm extends GrafikaOption implements BasePoster
         if ($cache) {
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',['pic_url' => $cache . '?v=' . time()]);
         }
+
         if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
             $file = $this->qrcode($option, [
                 ['pid' => \Yii::$app->user->id,'source'=>User::SOURCE_SHARE_POSTER,'mall_id'=>\Yii::$app->mall->id],

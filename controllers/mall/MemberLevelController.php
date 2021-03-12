@@ -17,7 +17,6 @@ use app\forms\mall\member\MemberLevelForm;
 
 class MemberLevelController extends UserManagerController
 {
-
     public function actionIndex()
     {
         if (\Yii::$app->request->isAjax) {
@@ -50,7 +49,6 @@ class MemberLevelController extends UserManagerController
                 $form = new MemberLevelEditForm();
                 $form->attributes = \Yii::$app->request->post('form');
                 $res = $form->save();
-
                 return $this->asJson($res);
             } else {
                 $form = new MemberLevelForm();

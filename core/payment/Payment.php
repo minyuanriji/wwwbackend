@@ -142,7 +142,8 @@ class Payment extends Component
                 if (!$orderInfo) {
                     throw new PaymentException('待支付订单不存在。');
                 }
-                if(!isset($orderInfo->paymentOrder[0]->order)){
+
+                /*if(!isset($orderInfo->paymentOrder[0]->order)){
                     $order = Order::getOneData(["order_no"=> $orderInfo->paymentOrder[0]->order_no]);
                 }else{
                     $order = $orderInfo->paymentOrder[0]->order;
@@ -150,7 +151,7 @@ class Payment extends Component
 
                 if($order->status > Order::STATUS_WAIT_PAY){
                     throw new PaymentException('该订单已经支付或已取消！');
-                }
+                }*/
 
                 $supportPayTypes = (array)$orderInfo->decodeSupportPayTypes($orderInfo->support_pay_types);
                 if (!empty($supportPayTypes)

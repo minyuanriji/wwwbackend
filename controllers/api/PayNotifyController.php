@@ -25,6 +25,37 @@ class PayNotifyController extends BaseController
         $this->enableCsrfValidation = false;
     }
 
+    public function actionTest(){
+        try{
+            $app = \Yii::$app->wechat;
+            $paymentOrderUnion = PaymentOrderUnion::findOne([
+                'order_no' => "JXa90f8fb4a2c0d33c37756088d9351d",
+            ]);
+            $paymentOrders = PaymentOrder::findAll(['payment_order_union_id' => $paymentOrderUnion->id]);
+            foreach ($paymentOrders as $paymentOrder) {
+                $Class = $paymentOrder->notify_class;
+                $notify = new $Class();
+                try {
+                    $po = new \app\core\payment\PaymentOrder([
+                        'orderNo' => $paymentOrder->order_no,
+                        'amount' => (float)$paymentOrder->amount,
+                        'title' => $paymentOrder->title,
+                        'notifyClass' => $paymentOrder->notify_class,
+                        'payType' => \app\core\payment\PaymentOrder::PAY_TYPE_WECHAT
+                    ]);
+                    $notify->notify($po);
+                } catch (\Exception $e) {
+                    throw new \Exception("支付订单更新失败 ".$e->getMessage());
+                }
+            }
+        }catch (\Exception $e){
+            echo $e->getMessage();
+        }
+
+        echo "SUCCESS";
+
+    }
+
     /**
      * 微信支付回调
      * @return bool|\Symfony\Component\HttpFoundation\Response

@@ -4,10 +4,10 @@ namespace app\mch\forms\api;
 
 use app\core\ApiCode;
 use app\core\payment\PaymentOrder;
-use app\forms\api\order\OrderPayNotify;
 use app\helpers\ArrayHelper;
 use app\logic\AppConfigLogic;
 use app\logic\OrderLogic;
+use app\mch\events\CheckoutOrderPaidEvent;
 use app\mch\payment\CheckoutOrderPayNotify;
 use app\models\BaseModel;
 use app\models\User;
@@ -52,17 +52,23 @@ class CheckoutOrderPayForm extends BaseModel {
             $payPrice = max(0, $checkoutOrder->order_price - $integralDeductionPrice);
 
             //更新结账单
-            $checkoutOrder->is_pay                   = $payPrice <= 0 ? 1 : 0;
             $checkoutOrder->pay_user_id              = \Yii::$app->user->id;
             $checkoutOrder->updated_at               = time();
             $checkoutOrder->integral_deduction_price = $integralDeductionPrice;
             if(!$checkoutOrder->save()){
-                throw new \Exception($this->responseErrorMsg($checkoutOrder));
+                throw new \Exception('结账单更新失败');
             }
 
             $supportPayTypes = OrderLogic::getPaymentTypeConfig();
             $union_id = 0;
-            if($payPrice > 0){ //如果仍有待需要支付的金额
+
+            if($payPrice <= 0){ //通过抵扣卷支付成功
+                $event = new CheckoutOrderPaidEvent();
+                $event->checkoutOrder = $checkoutOrder;
+                $event->amount        = 0;
+                $event->sender        = $this;
+                \Yii::$app->trigger(MchCheckoutOrder::EVENT_PAYED, $event);
+            }else{
                 $paymentOrder = new PaymentOrder([
                     'title'             => "Checkout for mch id:" . $mch->id,
                     'amount'            => (float)$payPrice,

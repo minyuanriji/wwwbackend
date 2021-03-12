@@ -88,7 +88,7 @@ class CheckoutOrderAutoSettleForm extends BaseModel{
         $accountLog->money      = $this->price;
         $accountLog->desc       = "结账单打款(".$this->order_id.")";
         $accountLog->type       = 2; //支出
-        $accountLog->created_at = date("Y-m-d H:i:s");
+        $accountLog->created_at = time();
         if (!$accountLog->save()) {
             throw new \Exception($this->responseErrorMsg($accountLog));
         }

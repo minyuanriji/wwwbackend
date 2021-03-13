@@ -227,6 +227,12 @@ class UserLogic
                 "platform"  => $platform
             ];
 
+            if(!empty($userData["unionid"]) && !empty($userData["openid"])){
+                UserInfo::updateAll([
+                    "unionid" => $userData["unionid"]
+                ], "openid='".$userData["openid"]."' AND unionid=''");
+            }
+
             //如果有unionid，则用unionid同步用户数据
             if(isset($userData["unionid"]) && !empty($userData["unionid"])){
                 $params["unionid"] = $userData["unionid"];

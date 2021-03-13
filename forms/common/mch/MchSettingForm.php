@@ -94,6 +94,7 @@ class MchSettingForm extends BaseModel
 //    ]
         return [
             'cash_type' => [],
+            'cash_service_fee'  => 0,
             'desc' => '',//入驻协议
             'is_service' => 1,//是否开启客服图标
             'form_data' => [],

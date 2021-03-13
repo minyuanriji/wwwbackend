@@ -25,11 +25,11 @@ class PayNotifyController extends BaseController
         $this->enableCsrfValidation = false;
     }
 
-    public function actionTest(){
+    /*public function actionTest(){
         try{
             $app = \Yii::$app->wechat;
             $paymentOrderUnion = PaymentOrderUnion::findOne([
-                'order_no' => "JXa90f8fb4a2c0d33c37756088d9351d",
+                'order_no' => "JX9ccb652a8a38f90242d2d7c07acff2",
             ]);
             $paymentOrders = PaymentOrder::findAll(['payment_order_union_id' => $paymentOrderUnion->id]);
             foreach ($paymentOrders as $paymentOrder) {
@@ -54,7 +54,7 @@ class PayNotifyController extends BaseController
 
         echo "SUCCESS";
 
-    }
+    }*/
 
     /**
      * 微信支付回调

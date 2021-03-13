@@ -1609,8 +1609,10 @@ class OrderSubmitForm extends BaseModel
         $postageRuleGroups = []; // 商品按匹配到的运费规则进行分组
         $noPostageRuleHit  = true; // 没有比配到运费规则
         $str_id = '';
+        $str_num = '';
         foreach ($noZeroGoodsList as $goodsItem) {
             $str_id .=  $goodsItem['id'] . ',';
+            $str_num .= $goodsItem['num'] . ',';
             //判断是否使用到快递模板
             if ($goodsItem['freight_id'] != -1) {
                 //获取快递规则
@@ -1720,13 +1722,22 @@ class OrderSubmitForm extends BaseModel
             $firstPriceList[] = $firstPrice;
             $totalSecondPrice += $secondPrice;
         }
+        $str_id_arr = array_filter(explode(',',$str_id));
+        $str_num_arr = array_filter(explode(',',$str_num));
+        $order_data = [];
+        foreach ($str_id_arr as $key => $val){
+            $order_data[] = [
+                'id' => $val,
+                'num' => $str_num_arr[$key]
+            ];
+        }
         $goods_data = [
-            'order_id' => $str_id,
+            'order_id' => $order_data,
             'data' => $address -> province
         ];
-        $express_price = (new PostageRulesBus()) -> getExpressPrice($goods_data);
+        $express_price = (new PostageRulesBus()) -> getExpressPrice($goods_data,1);
         $express_price = array_sum($express_price);
-//        $expressItem['express_price'] = price_format(max($firstPriceList) + $totalSecondPrice);
+        $expressItem['express_price'] = price_format(max($firstPriceList) + $totalSecondPrice);
         $expressItem['express_price'] = $express_price;
         $expressItem['total_price']   = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
         return $expressItem;

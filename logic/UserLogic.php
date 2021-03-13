@@ -66,7 +66,7 @@ class UserLogic
     }
 
     public static function getRecommendIds($id){
-       $users = User::findOne($id);
+        $users = User::findOne($id);
 
     }
 
@@ -85,10 +85,10 @@ class UserLogic
             if(empty($user)){
                 //检测用户unionid是否存在，存在获取对应的用户数据
                 if(isset($userData["unionid"]) && !empty($userData["unionid"])){
-                   $userInfos = self::checkUserUnionidIsExist($userData["unionid"]);
-                   if(isset($userInfos->user) && !empty($userInfos->user)){
-                      $user = $userInfos->user;
-                   }
+                    $userInfos = self::checkUserUnionidIsExist($userData["unionid"]);
+                    if(isset($userInfos->user) && !empty($userInfos->user)){
+                        $user = $userInfos->user;
+                    }
                 }
                 if(empty($user)){
                     $user = new User();
@@ -182,7 +182,11 @@ class UserLogic
      * @return array|bool|UserInfo|null
      */
     public static function checkUserUnionidIsExist($unionId){
-        $result = UserInfo::getOneUserInfo(["unionid" => $unionId,'is_delete' => 0,'user' => 1]);
+        $query = UserInfo::find()->where([
+            "unionid"   => $unionId,
+            'is_delete' => 0
+        ])->with(["user"]);
+        $result = $query->one();
         if(!empty($result)){
             return $result;
         }
@@ -221,29 +225,23 @@ class UserLogic
         $returnData = [];
         try{
             $platform = isset($userData["platform"]) ? $userData["platform"] : \Yii::$app->appPlatform;
-            $params = ["mall_id"=>\Yii::$app->mall->id,"is_delete" => User::IS_DELETE_NO,"platform" => $platform];
-//            if($platform == User::PLATFORM_WECHAT){
-//                $params["openid"] = $userData["openid"];
-//            }else{
-//                if(isset($userData["unionid"]) && !empty($userData["unionid"])){
-//                    $params["unionid"] = $userData["unionid"];
-//                }
-//                $params["openid"] = $userData["openid"];
-//            }
-            $where['openid'] = $userData['openid'];
-            $userInfo = UserInfo::getOneUserInfo($where);
-            if(!empty($userData['unionid'])){
-                  if(empty($userInfo['unionid'])){
-                $db = \yii::$app->db; 
-                $db -> createCommand("update jxmall_user_info set unionid = '{$userData['unionid']}' where openid = '{$userData['openid']}'") -> execute();
-                 }
+            $params = [
+                "mall_id"   => \Yii::$app->mall->id,
+                "is_delete" => User::IS_DELETE_NO,
+                "platform"  => $platform
+            ];
+
+            if(!empty($userData["unionid"]) && !empty($userData["openid"])){
+                UserInfo::updateAll([
+                    "unionid" => $userData["unionid"]
+                ], "openid='".$userData["openid"]."' AND unionid=''");
             }
 
             //如果有unionid，则用unionid同步用户数据
             if(isset($userData["unionid"]) && !empty($userData["unionid"])){
                 $params["unionid"] = $userData["unionid"];
             }else{
-                $params["openid"] = $userData["openid"];
+                $params["openid"]  = $userData["openid"];
             }
             \Yii::warning("checkIsAuthorized params:".var_export($params,true));
             /** @var UserInfo $userInfo */

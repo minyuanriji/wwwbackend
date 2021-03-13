@@ -112,7 +112,6 @@ class QrCodeCommon extends BaseModel
 
     private function wechat($scene, $width = 430, $page = null)
     {
-
         /** @var Wechat $wechat */
         $wechat = \Yii::$app->wechat;
         $accessTokenArray = $wechat->miniProgram->access_token->getToken();

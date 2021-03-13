@@ -121,7 +121,7 @@ class CashEditForm extends BaseModel
                 if ($mchCash->type == 'auto') {
                     $data = [
                         'orderNo' => $mchCash->order_no,
-                        'amount' => floatval($mchCash->money),
+                        'amount' => floatval($mchCash->fact_price),
                         'user' => $mchCash->mch->user,
                         'title' => '商户提现,自动打款',
                     ];
@@ -145,14 +145,13 @@ class CashEditForm extends BaseModel
                         'openid'            => $userInfo->openid,
                         'check_name'        => 'NO_CHECK', // NO_CHECK：不校验真实姓名, FORCE_CHECK：强校验真实姓名
                         're_user_name'      => '', // 如果 check_name 设置为FORCE_CHECK，则必填用户真实姓名
-                        'amount'            => $mchCash->money * 100, // 企业付款金额，单位为分
+                        'amount'            => $mchCash->fact_price * 100, // 企业付款金额，单位为分
                         'desc'              => '收益提现', // 企业付款操作说明信息。必填
                     ]);
                     if ($res['result_code'] == 'FAIL') {
                         throw new \Exception($res['err_code_des']);
                     }
-                    print_r($res);
-                    exit;
+
                     /*$data['transferType'] = $mchCash->mch->user->userInfo->platform;
                     $model = new PaymentTransfer($data);
                     \Yii::$app->payment->transfer($model);*/
@@ -160,11 +159,12 @@ class CashEditForm extends BaseModel
 
                 } elseif ($mchCash->type == 'balance') {
                     \Yii::$app->currency->setUser($mchCash->mch->user)->balance->add(
-                        round($mchCash->money, 2),
+                        round($mchCash->fact_price, 2),
                         '商户提现到余额',
                         \Yii::$app->serializer->encode($mchCash)
                     );
                 } elseif ($mchCash->type == 'wx' || $mchCash->type == 'alipay' || $mchCash->type == 'bank') {
+                    throw new \Exception('未定义的提现方式');
                 } else {
                     throw new \Exception('提现异常');
                 }
@@ -177,6 +177,18 @@ class CashEditForm extends BaseModel
                 if (!$res) {
                     throw new \Exception($this->responseErrorMsg($mchCash));
                 }
+
+                $accountLog = new MchAccountLog();
+                $accountLog->mall_id    = $mchCash->mall_id;
+                $accountLog->mch_id     = $mchCash->mch_id;
+                $accountLog->money      = $mchCash->fact_price;
+                $accountLog->desc       = $mchCash->content;
+                $accountLog->type       = 2; //支出
+                $accountLog->created_at = time();
+                if (!$accountLog->save()) {
+                    throw new \Exception($this->responseErrorMsg($accountLog));
+                }
+
             } else {
                 $mch = Mch::findOne($mchCash->mch_id);
                 if (!$mch) {
@@ -197,23 +209,6 @@ class CashEditForm extends BaseModel
                 if (!$res) {
                     throw new \Exception($this->responseErrorMsg($mchCash));
                 }
-            }
-
-            $model = new MchAccountLog();
-            if ($this->transfer_type == 1) {
-                $model->desc = '提现申请已打款';
-                $model->type = 1;
-            } else {
-                $model->desc = '提现申请拒绝打款';
-                $model->type = 2;
-            }
-
-            $model->mall_id = \Yii::$app->mall->id;
-            $model->mch_id = $mchCash->mch_id;
-            $model->money = $mchCash->money;
-            $res = $model->save();
-            if (!$res) {
-                throw new \Exception($this->responseErrorMsg($model));
             }
 
             $transaction->commit();

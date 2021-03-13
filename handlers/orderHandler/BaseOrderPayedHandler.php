@@ -20,6 +20,7 @@ use app\forms\common\template\tplmsg\Tplmsg;
 use app\logic\AppConfigLogic;
 use app\logic\IntegralLogic;
 
+use app\mch\forms\order\GoodsOrderAutoSettleForm;
 use app\models\CommonOrder;
 use app\models\CouponAutoSend;
 use app\models\OrderPayResult;
@@ -95,6 +96,9 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
         // 消费升级会员等级
         //echo '消费升级会员等级'.PHP_EOL;
         //$this->upLevel();
+
+        //多商户订单结算
+        GoodsOrderAutoSettleForm::settle($this->order);
     }
 
     /**

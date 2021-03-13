@@ -15,7 +15,6 @@ class AccountLogController extends MchMApiController {
         $form = new MchAccountLogListForm();
         $form->attributes = $this->requestData;
         $form->mch_id = $this->mch_id;
-
         return $form->getList();
     }
 }

@@ -182,7 +182,11 @@ class UserLogic
      * @return array|bool|UserInfo|null
      */
     public static function checkUserUnionidIsExist($unionId){
-        $result = UserInfo::getOneUserInfo(["unionid" => $unionId,'is_delete' => 0,'user' => 1]);
+        $query = UserInfo::find()->where([
+            "unionid"   => $unionId,
+            'is_delete' => 0
+        ])->with(["user"]);
+        $result = $query->one();
         if(!empty($result)){
             return $result;
         }

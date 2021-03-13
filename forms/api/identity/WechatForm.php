@@ -28,7 +28,7 @@ use app\models\UserInfo;
 use jianyan\easywechat\Wechat;
 use function EasyWeChat\Kernel\Support\str_random;
 use function EasyWeChat\Kernel\Support\get_client_ip;
-use app\models\mysql\{UserParent,UserChildren};
+use app\models\mysql\{UserParent,UserChildren,QrcodeParameter};
 class WechatForm extends BaseModel
 {
     public $code;
@@ -157,8 +157,13 @@ class WechatForm extends BaseModel
      * @throws \EasyWeChat\Kernel\Exceptions\DecryptException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      */
-    public function miniAuthorized($parent_user_id = ''){
+    public function miniAuthorized($parent_user_id = '',$parent_source = ''){
         try{
+            if(!empty($parent_source)){
+                $source_data = (new QrcodeParameter()) -> getParentData($parent_source);
+                $source_data = json_decode($source_data['data'],true);
+                $parent_user_id = $source_data['pid'];
+            }
             /** @var Wechat $wechatModel */
             $wechatModel = \Yii::$app->wechat;
             //微信小程序授权登录
@@ -236,10 +241,8 @@ class WechatForm extends BaseModel
                     }
                     $transaction -> commit();
                 }catch (\Exception $e){
-//                    var_dump($e -> getMessage());
                 }
             }
-
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);
         }catch (\Exception $ex){
 

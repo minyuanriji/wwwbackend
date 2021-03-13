@@ -281,7 +281,6 @@ class QrCodeCommon extends BaseModel
         $model->path = $page;
         $model->data = \Yii::$app->serializer->encode($data);
         $res = $model->save();
-
         if (!$res) {
             throw new \Exception($this->responseErrorMsg($model));
         }

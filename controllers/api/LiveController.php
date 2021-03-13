@@ -2,7 +2,14 @@
 namespace app\controllers\api;
 class LiveController extends ApiController{
     public function actionGetLive(){
-        $token = (new SetToken()) -> getToken();
+        $wechat = \Yii::$app->wechat;
+        $accessTokenArray = $wechat->miniProgram->access_token->getToken();
+        if(empty($accessTokenArray['access_token'])){
+            $token = (new SetToken()) -> getToken();
+        }else{
+            $token = $accessTokenArray['access_token'];
+        }
+
         $live_list_url='https://api.weixin.qq.com/wxa/business/getliveinfo?access_token='.$token;
         $page                    = 0;  //当前页码
         $rows                    = 30; //每页记录条数

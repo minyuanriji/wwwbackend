@@ -546,7 +546,7 @@ class OrderSubmitForm extends BaseModel
             $item         = $ScoreService->countScore();
 
             //计算购物券总额
-            $user_integral   = User::getCanUseIntegral(\Yii::$app->user->id);
+            $user_integral   = isset($IntegralService) ? $IntegralService->getRemainingIntegral() : User::getCanUseIntegral(\Yii::$app->user->id);
             $IntegralService = new IntegralService($item, $user_integral, $type, $use_integral, $this->enableIntegral);
             $item            = $IntegralService->countIntegral();
 
@@ -825,6 +825,12 @@ class OrderSubmitForm extends BaseModel
             throw new OrderException($exception->getFile() . ";line:" . $exception->getLine() . ";message:" . $exception->getMessage() . '无法查询商品`' . $goods->name . '`的规格信息。');
         }
         $attrList = $goods->signToAttr($goodsAttr->sign_id);
+
+        //如果是多商户商品，可全额抵扣
+        if($goods->mch_id){
+            $goods->max_deduct_integral = $goodsAttr->price;
+        }
+
         $itemData = [
             'id'                     => $goods->id,
             'name'                   => $goods->goodsWarehouse->name,
@@ -855,7 +861,8 @@ class OrderSubmitForm extends BaseModel
             'max_deduct_integral'    => $goods->max_deduct_integral,
             // 规格自定义货币 例如：步数宝的步数币
             //'custom_currency' => $this->getCustomCurrency($goods, $goodsAttr),
-            'is_on_site_consumption' => $goods->is_on_site_consumption //到店消费类型
+            'is_on_site_consumption' => $goods->is_on_site_consumption, //到店消费类型
+            'integral_fee_rate'      => $goods->integral_fee_rate
         ];
         return $itemData;
     }

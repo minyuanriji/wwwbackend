@@ -50,7 +50,7 @@ class MchAutoSettleForm extends BaseModel{
                 throw new \Exception("商户不存在");
             }
 
-            $mchCash = $this->setCashLog();
+            $mchCash = $this->setCashLog($mch);
 
             //自动打款
             $cashEditForm = new CashEditForm([
@@ -85,12 +85,9 @@ class MchAutoSettleForm extends BaseModel{
      * @param $payment
      * @return array
      */
-    private function setCashLog(){
+    private function setCashLog(Mch $mch){
 
-        $settingForm = new SettingForm();
-        $mchSetting = $settingForm->getSetting();
-
-        $serviceFeeRate = max(0, min(100, (int)$mchSetting['data']['setting']->cash_service_fee));
+        $serviceFeeRate = max(0, min(100, (int)$mch->transfer_rate));
         $serviceFee = ($serviceFeeRate/100) * floatval($this->price);
 
         $mchCash = new MchCash();
@@ -106,7 +103,7 @@ class MchAutoSettleForm extends BaseModel{
         $mchCash->created_at       = time();
         $mchCash->updated_at       = time();
         $mchCash->content          = $this->desc . "提现到微信";
-        $mchCash->service_fee_rate = $mchSetting['data']['setting']->cash_service_fee;
+        $mchCash->service_fee_rate = $serviceFeeRate;
         $mchCash->fact_price       = $mchCash->money - $serviceFee;
 
         if (!$mchCash->save()) {

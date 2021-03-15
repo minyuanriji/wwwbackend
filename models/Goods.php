@@ -78,6 +78,7 @@ use Yii;
  * @property int $is_order_sales 订单完结后设置
  * @property string $order_sales 订单完结后参数设置
  * @property string $is_on_site_consumption 是否到店消费类商品
+ * @property int $integral_fee_rate 使用抵扣券支付，需要额外收取的抵扣券比例
  * 
  */
 class Goods extends BaseActiveRecord
@@ -119,8 +120,9 @@ class Goods extends BaseActiveRecord
             [['created_at', 'updated_at', 'deleted_at','labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund', 'is_on_site_consumption'], 'safe'],
             [['sign', 'app_share_pic'], 'string', 'max' => 255],
             [['app_share_title'], 'string', 'max' => 65],
-	    [['full_relief_price','fulfil_price'], 'default', 'value' => 0],
-	    [['integral_setting','score_setting','order_paid','order_sales'],'default','value'=>''],
+	        [['full_relief_price','fulfil_price'], 'default', 'value' => 0],
+	        [['integral_setting','score_setting','order_paid','order_sales'],'default','value'=>''],
+            [['integral_fee_rate'], 'integer']
         ];
     }
 

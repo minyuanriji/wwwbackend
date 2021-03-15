@@ -70,6 +70,7 @@ abstract class BaseGoodsEdit extends BaseModel
     public $fulfil_price = 0;
     public $full_relief_price = 0;
     public $max_deduct_integral = 0;
+    public $integral_fee_rate = 0;
     public $price_display;
     public $enable_integral;
     public $integral_setting;
@@ -137,7 +138,8 @@ abstract class BaseGoodsEdit extends BaseModel
             [['price', 'forehead_score'], 'number', 'min' => 0],
             [['price'], 'number', 'max' => 9999999],
             [['is_on_site_consumption'], 'number'],
-            [['fulfil_price','full_relief_price'],'default','value'=>0]
+            [['fulfil_price','full_relief_price'],'default','value'=>0],
+            [['integral_fee_rate'], 'integer', 'min' => 0, 'max' => 100]
         ];
     }
 
@@ -391,6 +393,7 @@ abstract class BaseGoodsEdit extends BaseModel
         $goods->fulfil_price = $this->fulfil_price;
         $goods->full_relief_price = $this->full_relief_price;
         $goods->max_deduct_integral = $this->max_deduct_integral;
+        $goods->integral_fee_rate = $this->integral_fee_rate;
         $goods->enable_integral = $this->enable_integral;
         $goods->enable_score = $this->enable_score;
         $goods->is_order_paid = $this->is_order_paid;

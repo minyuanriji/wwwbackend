@@ -100,16 +100,24 @@
                                         inactive-value="0">
                                 </el-switch>
                             </el-form-item>
-                            <el-form-item label="手续费(千分之)" prop="transfer_rate">
-                                <label slot="label">手续费(千分之)
+                            <el-form-item label="提现手续费" prop="transfer_rate">
+                                <label slot="label">服务费
                                     <el-tooltip class="item" effect="dark"
-                                                content="商户每笔订单交易金额扣除的手续费，请填写0~1000范围的整数"
+                                                content="0表示不设置服务费"
                                                 placement="top">
                                         <i class="el-icon-info"></i>
                                     </el-tooltip>
                                 </label>
-                                <el-input min="0" max="1000" type="number"
-                                          v-model.number="ruleForm.transfer_rate"></el-input>
+                                <el-input type="number" v-model.number="ruleForm.transfer_rate">
+                                    <template slot="append">%</template>
+                                </el-input>
+                                <div>
+                                    <span class="text-danger">服务费额外从提现中扣除</span><br>
+                                    例如：<span style="color: #F56C6C;font-size: 12px">10%</span>的提现服务费：<br>
+                                    提现<span style="color: #F56C6C;font-size: 12px">100</span>元，扣除服务费<span
+                                            style="color: #F56C6C;font-size: 12px">10</span>元，
+                                    实际到手<span style="color: #F56C6C;font-size: 12px">90</span>元
+                                </div>
                             </el-form-item>
                             <el-form-item label="排序" prop="sort">
                                 <label slot="label">排序

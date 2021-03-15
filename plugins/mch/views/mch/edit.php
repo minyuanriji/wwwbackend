@@ -119,6 +119,25 @@
                                     实际到手<span style="color: #F56C6C;font-size: 12px">90</span>元
                                 </div>
                             </el-form-item>
+                            <el-form-item label="抵扣券额外扣取比例" prop="transfer_rate">
+                                <label slot="label">抵扣券额外扣取比例
+                                    <el-tooltip class="item" effect="dark"
+                                                content="0表示不设置"
+                                                placement="top">
+                                        <i class="el-icon-info"></i>
+                                    </el-tooltip>
+                                </label>
+                                <el-input type="number" v-model.number="ruleForm.integral_fee_rate">
+                                    <template slot="append">%</template>
+                                </el-input>
+                                <div>
+                                    <span class="text-danger">使用抵扣券支付需额外支付的抵扣券数额</span><br>
+                                    例如：设置<span style="color: #F56C6C;font-size: 12px">10%</span><br>
+                                    使用抵扣券抵扣<span style="color: #F56C6C;font-size: 12px">100</span>元时，需要额外收取<span
+                                            style="color: #F56C6C;font-size: 12px">10</span>的抵扣券，
+                                    最终需要<span style="color: #F56C6C;font-size: 12px">110</span>的抵扣券
+                                </div>
+                            </el-form-item>
                             <el-form-item label="排序" prop="sort">
                                 <label slot="label">排序
                                     <el-tooltip class="item" effect="dark"
@@ -348,6 +367,7 @@
                     service_mobile: '',
                     district: [],
                     form_data: [],
+                    integral_fee_rate:0
                 },
                 rules: {
                     user_id: [

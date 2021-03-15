@@ -105,11 +105,14 @@ class IntegralService
             return $this->item;
         }
 
+        static $mchList = [];
+
         foreach ($this->item['same_goods_list'] as $key => $value) {
             //当用户剩余购物券等于,跳过
             if (($this->getUserRemainingintegral() == 0) or $this->total_goods_price == 0) {
                 continue;
             }
+
 
             $max_deduct_integral = (int)min($value['max_deduct_integral'], $this->user_remaining_integral, $this->item['total_goods_price'], $value['total_price']);
             $integral_fee_rate = $value['integral_fee_rate']/100;

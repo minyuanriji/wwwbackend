@@ -40,9 +40,10 @@ class MchApplyForm extends BaseModel {
             [['user_id', 'mobile', 'realname', 'pic_id_card_front', 'pic_id_card_back',
               'pic_business_license', 'cat_id', 'name', 'province_id', 'address',
               'city_id', 'district_id', 'longitude', 'latitude'], 'required'],
-            [['user_id', 'cat_id', 'province_id', 'city_id', 'district_id'], 'integer'],
+            [['user_id', 'cat_id'], 'integer'],
             [['mobile', 'pic_id_card_front', 'address', 'pic_id_card_back', 'pic_business_license'], 'string', 'max' => 255],
             [['realname', 'name', 'longitude', 'latitude'], 'string', 'max' => 65],
+            [['province_id', 'city_id', 'district_id'], 'safe']
         ]);
     }
 

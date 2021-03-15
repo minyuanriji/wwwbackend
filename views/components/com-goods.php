@@ -874,13 +874,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 								</el-col>
                             </el-row>
 
-
-
-
-                            
-
-
-
                         </el-card>
 
                         <!-- 商品详情 -->
@@ -1773,6 +1766,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         self.info.enable_integral == 1 ? postData['integral_setting'] = self.integral_setting : '';
                         // 0.4 购物券优惠
                         postData['max_deduct_integral'] = self.info.max_deduct_integral;
+                        postData['integral_fee_rate'] = self.info.integral_fee_rate;
 
                         // 0.5 是否开启订单支付后
                         postData['is_order_paid'] = self.info.is_order_paid;
@@ -1908,6 +1902,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             // delete infoObj.integral_setting;
                         }
                         self.info.max_deduct_integral = infoObj.max_deduct_integral
+                        self.info.integral_fee_rate = infoObj.integral_fee_rate;
                         console.log(infoObj);
                         // 0.4 判断是否开启订单支付后设置
                         self.info.is_order_paid = infoObj.is_order_paid * 1;

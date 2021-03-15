@@ -214,19 +214,19 @@ class MchApplyForm extends BaseModel {
 
         $districtData = array_combine(array_column($districtData, 'id'), $districtData) ;
         if(!isset($districtData[$this->province_id])){
-            throw new \Exception('省份信息选择有误！');
+            //throw new \Exception('省份信息选择有误！');
         }
 
         $districtData = $districtData[$this->province_id]['list'];
         $districtData = array_combine(array_column($districtData, 'id'), $districtData) ;
         if(!isset($districtData[$this->city_id])){
-            throw new \Exception('城市信息选择有误！');
+            //throw new \Exception('城市信息选择有误！');
         }
 
         $districtData = $districtData[$this->city_id]['list'];
         $districtData = array_combine(array_column($districtData, 'id'), $districtData) ;
         if($this->district_id && !isset($districtData[$this->district_id])){
-            throw new \Exception('区信息选择有误！');
+            //throw new \Exception('区信息选择有误！');
         }
 
     }

@@ -67,9 +67,6 @@ class IdentityController extends ApiController
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
         $result = $wechatForm->authorized();
-        //        if(!empty($form->attributes -> moblie)){
-//            (new RegisterForm()) -> bindParent($form->attributes -> moblie);
-//        }
         return $result;
     }
 
@@ -168,7 +165,8 @@ class IdentityController extends ApiController
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
         $parent_user_id = !empty($this->requestData['parent_user_id']) ? $this->requestData['parent_user_id'] : 0;
-        $result = $wechatForm->miniAuthorized($parent_user_id);
+        $parent_source = $this->requestData['parent_source'];
+        $result = $wechatForm->miniAuthorized($parent_user_id,$parent_source);
         return $result;
     }
 

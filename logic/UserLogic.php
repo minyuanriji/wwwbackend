@@ -66,7 +66,7 @@ class UserLogic
     }
 
     public static function getRecommendIds($id){
-       $users = User::findOne($id);
+        $users = User::findOne($id);
 
     }
 
@@ -85,10 +85,10 @@ class UserLogic
             if(empty($user)){
                 //检测用户unionid是否存在，存在获取对应的用户数据
                 if(isset($userData["unionid"]) && !empty($userData["unionid"])){
-                   $userInfos = self::checkUserUnionidIsExist($userData["unionid"]);
-                   if(isset($userInfos->user) && !empty($userInfos->user)){
-                      $user = $userInfos->user;
-                   }
+                    $userInfos = self::checkUserUnionidIsExist($userData["unionid"]);
+                    if(isset($userInfos->user) && !empty($userInfos->user)){
+                        $user = $userInfos->user;
+                    }
                 }
                 if(empty($user)){
                     $user = new User();

@@ -60,7 +60,7 @@ class Mch extends BaseActiveRecord
             [['mall_id', 'user_id', 'status', 'is_recommend', 'review_status', 'mch_common_cat_id', 'transfer_rate',
                 'sort', 'is_delete'], 'integer'],
             [['review_time', 'created_at', 'updated_at', 'deleted_at', 'form_data'], 'safe'],
-            [['account_money'], 'number'],
+            [['account_money', 'integral_fee_rate'], 'number'],
             [['review_remark', 'mobile'], 'string', 'max' => 255],
             [['realname', 'wechat'], 'string', 'max' => 65],
         ];

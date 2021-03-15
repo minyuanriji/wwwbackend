@@ -16,14 +16,18 @@ class IntegralService
 {
     public $item;
     private $enable_integral;
-    private $user_integral; //用户购物券
+
     private $user_use_integral = 0; //用户已使用购物券
-    private $user_remaining_integral; //用户剩余购物券
     private $integral_status = 1; //后台购物券开启状态
     private $integral_price = 1; //多少购物券抵扣一元;购物券比例
     private $use_integral; //用户是否使用购物券
     private $type; //订单预览还是订单提交
     private $total_goods_price;//订单的商品总价
+
+    private $user_integral; //用户购物券
+    private $user_remaining_integral; //用户剩余购物券
+
+    private $integral_service_fee = 0; //抵扣券总服务费
 
     /**
      * IntegralService constructor.
@@ -107,18 +111,23 @@ class IntegralService
                 continue;
             }
 
-            //如果是多商户商品，最大抵扣卷额度为商品总价
-            if(!empty($this->item['mch']['id'])){
-                $value['max_deduct_integral'] = max($this->item['total_goods_price'], $value['total_price']);
-                $value['max_deduct_integral'] = min($value['max_deduct_integral'], $this->user_remaining_integral);
-            }else{
-                $value['max_deduct_integral'] = min($value['max_deduct_integral'], $this->user_remaining_integral, $this->item['total_goods_price'], $value['total_price']);
+            $max_deduct_integral = (int)min($value['max_deduct_integral'], $this->user_remaining_integral, $this->item['total_goods_price'], $value['total_price']);
+            $integral_fee_rate = $value['integral_fee_rate']/100;
+
+            //如果最大抵扣券加上抵扣券服务费大于用户剩余的抵扣券
+            //---就重新计算最大抵扣券值
+            if(($max_deduct_integral + intval($max_deduct_integral * $integral_fee_rate)) > $this->user_remaining_integral){
+                $max_deduct_integral = $this->user_remaining_integral/(1+$integral_fee_rate);
             }
 
-            $value['max_deduct_integral']                       = intval($value['max_deduct_integral']);
+            $value['integral_service_fee'] = intval($max_deduct_integral * $integral_fee_rate);
+            $value['max_deduct_integral']  = $max_deduct_integral;
+
+            $this->integral_service_fee += $value['integral_service_fee'];
+
             $this->item['same_goods_list'][$key]['total_price'] -= $value['max_deduct_integral'];
-            $this->user_use_integral                            += $this->getIntegral($value['max_deduct_integral']);
-            $this->user_remaining_integral                      -= $this->getIntegral($value['max_deduct_integral']);
+            $this->user_use_integral                            += $this->getIntegral($value['max_deduct_integral'])+$value['integral_service_fee'];
+            $this->user_remaining_integral                      -= ($this->getIntegral($value['max_deduct_integral'])+$value['integral_service_fee']);
 
             //当前商品可抵扣购物券，和可抵扣金额
             $this->item['same_goods_list'][$key]['deduction_price'] = $value['max_deduct_integral'];
@@ -153,6 +162,9 @@ class IntegralService
         $this->user_remaining_integral = $this->user_integral;
     }
 
+    public function getRemainingIntegral(){
+        return $this->user_remaining_integral;
+    }
 
     public function getItemintegral()
     {
@@ -165,6 +177,7 @@ class IntegralService
             'user_integral'            => $this->user_integral,
             //剩余购物券金额
             'user_remaining_integral'  => $this->user_remaining_integral,
+            'service_fee'              => $this->integral_service_fee
         ];
     }
 }

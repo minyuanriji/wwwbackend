@@ -852,9 +852,24 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 									        <template slot="prepend">最多抵扣</template>
 									        <template slot="append">元</template>
 									    </el-input>
+
 									</el-form-item>
-									
-									
+
+                                    <el-form-item >
+                                        <template slot='label'>
+                                            <span>购物券抵扣服务费比例</span>
+                                            <el-tooltip effect="dark" content="使用抵扣券抵扣支付时，需要额外收取的抵扣券"
+                                                        placement="top">
+                                                <i class="el-icon-info"></i>
+                                            </el-tooltip>
+                                        </template>
+                                        <el-input type="number" min="0" max="100"
+                                                  oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
+                                                  placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
+                                            <template slot="append">元</template>
+                                        </el-input>
+
+                                    </el-form-item>
 								
 								</el-col>
                             </el-row>
@@ -1421,6 +1436,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     // 这里是是否开启购物券赠送
                     enable_integral: "0", //是否开启赠送购物券
                     max_deduct_integral: 0, //购物券抵扣金额
+                    integral_fee_rate: 0,
                     is_order_paid:"0",
                     is_order_sales:"0",
                     

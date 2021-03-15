@@ -22,8 +22,8 @@ use Yii;
  * @property string $updated_at
  * @property Store $store
  * @property Goods $goods
- * @property $attrs
  * @property int $is_on_site_consumption 是否到店消费类商品
+ * @property $attrs
  */
 class Cart extends BaseActiveRecord
 {

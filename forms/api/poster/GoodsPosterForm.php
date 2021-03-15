@@ -78,12 +78,11 @@ class GoodsPosterForm extends GrafikaOption implements BasePoster
             isset($option['head']) && $option['head']['file_path'] = self::head($this);
         }else{
             $path = "/h5/#/pages/goods/detail?mall_id=".\Yii::$app->mall->id."&proId=".$this->goods_id."&pid=".$user_id."&source=".User::SOURCE_SHARE_GOODS;;
-            $dir = 'goods/' . $this->goods_id . '.jpg';
+            $dir = 'goods/' . $this->goods_id . time() . uniqid() . '.jpg';
             $file = CommonLogic::createQrcode($option,$this,$path,$dir);
             isset($option['qr_code']) && $option['qr_code']['file_path'] = $file;
             isset($option['head']) && $option['head']['file_path'] = self::head($this,"goods/");
         }
-
         $editor = $this->getPoster($option);
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',['pic_url' => $editor->qrcode_url . '?v=' . time()]);
     }

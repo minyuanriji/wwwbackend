@@ -22,6 +22,13 @@ use Yii;
  */
 class MchCheckoutOrder extends BaseActiveRecord
 {
+<<<<<<< HEAD
+=======
+
+    /** @var string 结账单支付 */
+    const EVENT_PAYED = 'checkoutOrderPayed';
+
+>>>>>>> 3e6bcd95c340635d2b5e49428acc3a563617fd7c
     /**
      * {@inheritdoc}
      */
@@ -65,4 +72,12 @@ class MchCheckoutOrder extends BaseActiveRecord
             'is_delete' => 'Delete At'
         ];
     }
+<<<<<<< HEAD
+=======
+
+    public function getMch(){
+        return $this->hasOne(Mch::className(), ['id' => 'mch_id']);
+    }
+
+>>>>>>> 3e6bcd95c340635d2b5e49428acc3a563617fd7c
 }

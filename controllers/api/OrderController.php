@@ -403,7 +403,7 @@ class OrderController extends ApiController
     }
 
     /**
-     * 到店消费核销码
+     * 到店消费核销码二维码
      * @return \yii\web\Response
      */
     public function actionConsumeVerificationQrcode(){
@@ -411,5 +411,16 @@ class OrderController extends ApiController
         $form->attributes = $this->requestData;
 
         return $this->asJson($form->qrCode());
+    }
+
+    /**
+     * 到店消费核销码信息
+     * @return \yii\web\Response
+     */
+    public function actionConsumeVerificationInfo(){
+        $form = new ConsumeVerificationInfoForm();
+        $form->attributes = $this->requestData;
+
+        return $this->asJson($form->info());
     }
 }

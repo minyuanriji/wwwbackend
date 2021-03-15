@@ -68,7 +68,6 @@ class WorkermanTimerController extends WorkermanBaseController
      * @return void
      */
     public function sendIntegralTimer($worker){
-	file_put_contents(__DIR__ . "/DEBUG", 1);
         //获取一把锁
         $lock_tools = new LockTools();
         $lock_name = 'lock:sendIntegralTimer';

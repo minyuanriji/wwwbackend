@@ -19,6 +19,7 @@ use app\models\Favorite;
 use app\models\Goods;
 use app\models\GoodsCollect;
 use app\models\MemberLevel;
+use app\models\Order;
 use app\models\ScoreLog;
 use app\models\User;
 use app\models\UserCard;
@@ -37,6 +38,49 @@ class UserForm extends BaseModel
             ['page', 'default', 'value' => 1],
             ['limit', 'default', 'value' => 20],
         ];
+    }
+
+    /**
+     * 获取关联商户信息
+     * @return array
+     */
+    private function getMchInfo(){
+        $returnData = [
+            'is_mch'    => 0,
+            'store'     => null,
+            'category'  => null,
+            'stat'      => null
+        ];
+        $mchInfo = Mch::find()->where([
+            'user_id'       => \Yii::$app->user->id,
+            'review_status' => Mch::REVIEW_STATUS_CHECKED,
+            'is_delete'     => 0
+        ])->with(["store", "category"])->asArray()->one();
+        if($mchInfo){
+            $returnData['is_mch']   = 1;
+            $returnData['store']    = $mchInfo['store'];
+            $returnData['category'] = $mchInfo['category'];
+            $returnData['stat']     = [
+                'account_money' => (float)$mchInfo['account_money'],
+                'order_num'     => 0,
+                'goods_num'     => 0
+            ];
+
+            //商户订单数量
+            $returnData['stat']['order_num'] = (int)Order::find()->where([
+                'is_delete'  => 0,
+                'is_recycle' => 0,
+                'mch_id'     => $mchInfo['id']
+            ])->count();
+
+            //商户商品数量
+            $returnData['stat']['goods_num'] = (int)Goods::find()->where([
+                'is_delete' => 0,
+                'mch_id'    => $mchInfo['id']
+            ])->count();
+        }
+
+        return $returnData;
     }
 
     /**
@@ -87,19 +131,8 @@ class UserForm extends BaseModel
             ->leftJoin(['g' => Goods::tableName()], 'g.id = f.goods_id')
             ->andWhere(['g.status' => 1, 'g.is_delete' => 0])->count();
 
-        //是否商户身份
-        $isMch = 0;
-        $mchStore = $mchCategory = [];
-        $mchInfo = Mch::find()->where([
-            'user_id'       => $user->id,
-            'review_status' => Mch::REVIEW_STATUS_CHECKED,
-            'is_delete'     => 0
-        ])->with(["store", "category"])->asArray()->one();
-        if($mchInfo){
-            $isMch       = 1;
-            $mchStore    = $mchInfo['store'];
-            $mchCategory = $mchInfo['category'];
-        }
+        //商户信息
+        $mchInfo = $this->getMchInfo();
 
         $result = [
             'user_id' => $user->id,
@@ -133,10 +166,10 @@ class UserForm extends BaseModel
             'coupon' => $couponCount,
           /*  'card' => $cardCount,*/
             'is_vip_card_user' => 0,
-            'is_mch' => $isMch,
-            'mch_store' => $mchStore,
-            'mch_category' => $mchCategory
+            'is_mch' => $mchInfo['is_mch'],
+            'mch_info' => $mchInfo
         ];
+
         $pluginUserInfo = \Yii::$app->plugin->getUserInfo($user);
         if(isset($pluginUserInfo["score"])){
             unset($pluginUserInfo["score"]);

@@ -26,6 +26,26 @@ class ConsumeVerificationInfoForm extends BaseModel{
     }
 
     /**
+     * 获取到店消费核销信息
+     * @return array
+     */
+    public function info(){
+
+        list($verificationLog, $order, $orderDetail) = $this->getData();
+
+        if($verificationLog->user_id != \Yii::$app->user->id){
+            throw new \Exception('无权限操作');
+        }
+
+        $returnData = ArrayHelper::toArray($verificationLog);
+
+        $orderDetail = ArrayHelper::toArray($orderDetail);
+        $returnData['goods_info'] = json_decode($orderDetail['goods_info'], true);
+
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"", $returnData);
+    }
+
+    /**
      * 确认使用核销二维码
      * @return array
      */
@@ -37,6 +57,10 @@ class ConsumeVerificationInfoForm extends BaseModel{
             }
 
             list($verificationLog, $order, $orderDetail) = $this->getData();
+
+            if($verificationLog->is_used){
+                throw new \Exception('订单信息已失效');
+            }
 
             //获取当前登录的账号关联商户信息
             $mch = Mch::findOne([
@@ -86,10 +110,6 @@ class ConsumeVerificationInfoForm extends BaseModel{
      */
     public function qrCode(){
 
-        if (!$this->validate()) {
-            return $this->responseErrorInfo();
-        }
-
         try {
             if (empty($this->id)) {
                 throw new \Exception('ID不能为空');
@@ -107,12 +127,12 @@ class ConsumeVerificationInfoForm extends BaseModel{
 
             if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
                 $qrCode = new QrCodeCommon();
-                $res = $qrCode->getQrCode(['id' => $this->id], 100, $this->route);
+                $res = $qrCode->getQrCode([], 100, $this->route . "?code=" . $verificationLog->verification_code);
                 $codeUrl = $res['file_path'];
             }else{
-                $dir = 'clerk/' . \Yii::$app->mall->id."_".$this->id. '.jpg';
+                $dir = 'clerk/' . \Yii::$app->mall->id . "/" . $this->id . '.jpg';
                 $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
-                $file = CommonLogic::createQrcode(['id' => $this->id], $this, $this->route, $dir);
+                $file = CommonLogic::createQrcode([], $this, $this->route . "?code=" . $verificationLog->verification_code, $dir);
                 $codeUrl = CommonLogic::uploadImgToCloudStorage($file, $dir, $imgUrl);
             }
 
@@ -141,7 +161,6 @@ class ConsumeVerificationInfoForm extends BaseModel{
 
     private function getData(){
         $where = [
-            "is_used"   => 0,
             "is_delete" => 0
         ];
         if(empty($this->id)){

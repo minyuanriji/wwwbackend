@@ -38,8 +38,7 @@ class MchApplyForm extends BaseModel {
     public function rules(){
         return array_merge(parent::rules(), [
             [['user_id', 'mobile', 'realname', 'pic_id_card_front', 'pic_id_card_back',
-              'pic_business_license', 'cat_id', 'name', 'province_id', 'address',
-              'city_id', 'district_id', 'longitude', 'latitude'], 'required'],
+              'pic_business_license', 'cat_id', 'name', 'address', 'longitude', 'latitude'], 'required'],
             [['user_id', 'cat_id'], 'integer'],
             [['mobile', 'pic_id_card_front', 'address', 'pic_id_card_back', 'pic_business_license'], 'string', 'max' => 255],
             [['realname', 'name', 'longitude', 'latitude'], 'string', 'max' => 65],
@@ -75,7 +74,7 @@ class MchApplyForm extends BaseModel {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
 
-            $this->checkDistrict();
+            //$this->checkDistrict();
 
             $mchModel = Mch::find()->where([
                 'user_id'   => $this->user_id,
@@ -214,19 +213,19 @@ class MchApplyForm extends BaseModel {
 
         $districtData = array_combine(array_column($districtData, 'id'), $districtData) ;
         if(!isset($districtData[$this->province_id])){
-            //throw new \Exception('省份信息选择有误！');
+            throw new \Exception('省份信息选择有误！');
         }
 
         $districtData = $districtData[$this->province_id]['list'];
         $districtData = array_combine(array_column($districtData, 'id'), $districtData) ;
         if(!isset($districtData[$this->city_id])){
-            //throw new \Exception('城市信息选择有误！');
+            throw new \Exception('城市信息选择有误！');
         }
 
         $districtData = $districtData[$this->city_id]['list'];
         $districtData = array_combine(array_column($districtData, 'id'), $districtData) ;
         if($this->district_id && !isset($districtData[$this->district_id])){
-            //throw new \Exception('区信息选择有误！');
+            throw new \Exception('区信息选择有误！');
         }
 
     }

@@ -76,9 +76,8 @@ class CheckoutOrderSubmitForm extends BaseModel {
             if (!$order->save()) {
                 return $this->returnApiResultData(ApiCode::CODE_FAIL,(new BaseModel())->responseErrorMsg($order));
             }
-
+            $qrCode = new QrCodeCommon();
             if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
-                $qrCode = new QrCodeCommon();
                 $res = $qrCode->getQrCode(['id' => $order->id], 100, $this->route);
                 $codeUrl = $res['file_path'];
             }else{
@@ -87,11 +86,6 @@ class CheckoutOrderSubmitForm extends BaseModel {
                 $file = CommonLogic::createQrcode(['id' => $order->id], $this, $this->route, $dir);
                 $res = $qrCode->getQrCode([], 100, $this->route . "?id=" . $order->id);
                 $codeUrl = $res['file_path'];
-            }else{
-                $dir = "checkout-order/" . $mchModel->id . "/" . $order->mch_id . "/" . $order->id . time(). '.jpg';
-                $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
-                $file = CommonLogic::createQrcode([], $this, $this->route . "?id=" . $order->id, $dir);
-                $codeUrl = CommonLogic::uploadImgToCloudStorage($file, $dir, $imgUrl);
             }
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, "", [

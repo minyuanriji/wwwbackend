@@ -191,7 +191,7 @@ class SmsForm extends BaseModel
      */
     public function checkCode(){
         //测试验证码
-         return true;
+//         return true;
         $result = Sms::checkValidateCode($this->mobile, $this->captcha);
         if (!$result) {
             return false;

@@ -2,11 +2,9 @@
 namespace app\mch\controllers\api;
 
 use app\controllers\api\ApiController;
-<<<<<<< HEAD
-=======
+
 use app\mch\forms\api\CheckoutOrderInfoForm;
 use app\mch\forms\api\CheckoutOrderPayForm;
->>>>>>> 3e6bcd95c340635d2b5e49428acc3a563617fd7c
 use app\mch\forms\api\CheckoutOrderSubmitForm;
 use Yii;
 
@@ -34,9 +32,6 @@ class CheckoutOrderController extends ApiController{
      * @throws \yii\db\Exception
      */
     public function actionToPay(){
-<<<<<<< HEAD
-
-=======
         $form = new CheckoutOrderPayForm();
         $form->attributes = $this->requestData;
 
@@ -55,6 +50,5 @@ class CheckoutOrderController extends ApiController{
         $form->attributes = $this->requestData;
 
         return $this->asJson($form->info());
->>>>>>> 3e6bcd95c340635d2b5e49428acc3a563617fd7c
     }
 }

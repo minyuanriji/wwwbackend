@@ -230,7 +230,7 @@ class Sms
      */
     public static function updateCodeStatus($mobile, $code)
     {
-        //测试验证码
+        //测试验证码1
 //         return true;
         $ValidateCode = ValidateCode::find()->where([
             'target' => $mobile,

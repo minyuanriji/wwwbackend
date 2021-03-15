@@ -35,7 +35,7 @@ class CheckoutOrderController extends ApiController{
     }
 
     /**
-     * 结账单信息a
+     * 结账单信息1
      * @return \yii\web\Response
      * @throws \app\core\exceptions\ClassNotFoundException
      * @throws \yii\base\Exception

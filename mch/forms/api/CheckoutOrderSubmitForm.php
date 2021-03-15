@@ -50,7 +50,7 @@ class CheckoutOrderSubmitForm extends BaseModel {
             }
 
             //判断是否有未支付的订单
-            //有就复用订单
+            //有就复用订单1
             $order = MchCheckoutOrder::find()->where([
                 'is_pay'  => 0,
                 'mall_id' => $mchModel->mall_id,

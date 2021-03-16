@@ -109,6 +109,7 @@ class WechatForm extends BaseModel
         if($wechatModel->isWechat)
         {
             $result = $wechatModel->app->oauth->user();
+            var_dump($result);
             \Yii::warning("授权结果 result:".json_encode($result));
             if(!empty($result)){
                 $userInfo = $result->original;

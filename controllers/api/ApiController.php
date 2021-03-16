@@ -147,7 +147,7 @@ class ApiController extends BaseController
         $cache = \Yii::$app->getCache();
         $cacheData = $cache->get($cacheKey);
 
-        if(true || empty($cacheData)){
+        if(empty($cacheData)){
             $url = "https://apis.map.qq.com/ws/geocoder/v1/?location=".$cityData['latitude'].",".$cityData['longitude']."&key={$key}&get_poi=1";
 
             $hostInfo = \Yii::$app->getRequest()->getHostInfo();

@@ -34,6 +34,7 @@ abstract class MchEditFormBase extends BaseModel
     public $province_id;
     public $city_id;
     public $district_id;
+    public $integral_fee_rate;
 
     /**
      * @var Mch
@@ -46,7 +47,7 @@ abstract class MchEditFormBase extends BaseModel
         return [
             [['mch_common_cat_id', 'address', 'username', 'mobile', 'service_mobile', 'realname', 'name'], 'required'],
             [['user_id', 'mch_common_cat_id', 'transfer_rate', 'sort', 'id', 'status', 'is_recommend',
-                'province_id', 'city_id', 'district_id'], 'integer'],
+                'province_id', 'city_id', 'district_id', 'integral_fee_rate'], 'integer'],
             [['mobile', 'logo', 'service_mobile', 'password'], 'string', 'max' => 255],
             [['realname', 'wechat', 'name', 'username', 'password'], 'string', 'max' => 65],
             [['bg_pic_url'], 'safe']
@@ -105,6 +106,7 @@ abstract class MchEditFormBase extends BaseModel
         $mch->mch_common_cat_id = $this->mch_common_cat_id;
         $mch->wechat = $this->wechat ?: '';
         $mch->transfer_rate = $this->transfer_rate ?: 0;
+        $mch->integral_fee_rate = $this->integral_fee_rate ? : 0;
         $mch->sort = $this->sort ?: 100;
         $mch->status = $this->status ?: 0;
         $mch->is_recommend = $this->is_recommend ?: 0;

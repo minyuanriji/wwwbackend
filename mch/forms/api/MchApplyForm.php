@@ -38,11 +38,11 @@ class MchApplyForm extends BaseModel {
     public function rules(){
         return array_merge(parent::rules(), [
             [['user_id', 'mobile', 'realname', 'pic_id_card_front', 'pic_id_card_back',
-              'pic_business_license', 'cat_id', 'name', 'province_id', 'address',
-              'city_id', 'district_id', 'longitude', 'latitude'], 'required'],
-            [['user_id', 'cat_id', 'province_id', 'city_id', 'district_id'], 'integer'],
+              'pic_business_license', 'cat_id', 'name', 'address', 'longitude', 'latitude'], 'required'],
+            [['user_id', 'cat_id'], 'integer'],
             [['mobile', 'pic_id_card_front', 'address', 'pic_id_card_back', 'pic_business_license'], 'string', 'max' => 255],
             [['realname', 'name', 'longitude', 'latitude'], 'string', 'max' => 65],
+            [['province_id', 'city_id', 'district_id'], 'safe']
         ]);
     }
 
@@ -74,7 +74,7 @@ class MchApplyForm extends BaseModel {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
 
-            $this->checkDistrict();
+            //$this->checkDistrict();
 
             $mchModel = Mch::find()->where([
                 'user_id'   => $this->user_id,
@@ -158,9 +158,12 @@ class MchApplyForm extends BaseModel {
         $store->name        = $this->name;
         $store->address     = $this->address;
         $store->mobile      = $this->mobile;
-        $store->province_id = $this->province_id;
+        /*$store->province_id = $this->province_id;
         $store->city_id     = $this->city_id;
-        $store->district_id = $this->district_id;
+        $store->district_id = $this->district_id;*/
+        $store->province_id = 0;
+        $store->city_id     = 0;
+        $store->district_id = 0;
         $store->longitude   = $this->longitude;
         $store->latitude    = $this->latitude;
         $store->pic_url     = "http://";

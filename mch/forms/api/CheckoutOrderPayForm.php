@@ -10,7 +10,9 @@ use app\logic\OrderLogic;
 use app\mch\events\CheckoutOrderPaidEvent;
 use app\mch\payment\CheckoutOrderPayNotify;
 use app\models\BaseModel;
+use app\models\Order;
 use app\models\User;
+use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
 
 class CheckoutOrderPayForm extends BaseModel {
@@ -18,43 +20,112 @@ class CheckoutOrderPayForm extends BaseModel {
     public $id;
     public $use_integral;
     public $use_score;
+    public $order_price;
 
     public function rules(){
         return [
-            [['id', 'use_integral'], 'required'],
-            [['use_integral'], 'number']
+            [['id'], 'integer'],
+            [['use_integral', 'order_price'], 'number', 'min' => 0]
         ];
     }
 
+    public function attributeLabels(){
+        return [
+            'id'           => '商户ID',
+            'use_integral' => '使用抵扣券',
+            'order_price'  => '付款金额'
+        ];
+    }
+
+    /**
+     * 生成结账单
+     * @return object
+     */
+    public function create(){
+
+        try {
+            //获取商户信息
+            $mchModel = Mch::findOne([
+                'id'            => $this->id,
+                'review_status' => Mch::REVIEW_STATUS_CHECKED,
+                'is_delete'     => 0
+            ]);
+            if(!$mchModel){
+                throw new \Exception('商户信息不存在');
+            }
+
+            //获取未支付的
+            $checkoutOrder = MchCheckoutOrder::find()->where([
+                'is_pay'      => 0,
+                'mall_id'     => \Yii::$app->mall->id,
+                'mch_id'      => $mchModel->id,
+                'pay_user_id' => \Yii::$app->user->id
+            ])->one();
+
+            if(!$checkoutOrder){
+                $checkoutOrder = new MchCheckoutOrder();
+                $checkoutOrder->mall_id     = \Yii::$app->mall->id;
+                $checkoutOrder->mch_id      = $mchModel->id;
+                $checkoutOrder->order_no    = Order::getOrderNo('MS');
+                $checkoutOrder->pay_user_id = \Yii::$app->user->id;
+            }
+
+            $checkoutOrder->order_price              = $this->order_price;
+            $checkoutOrder->pay_price                = 0;
+            $checkoutOrder->is_pay                   = 0;
+            $checkoutOrder->pay_at                   = 0;
+            $checkoutOrder->score_deduction_price    = 0;
+            $checkoutOrder->integral_deduction_price = 0;
+            $checkoutOrder->created_at               = time();
+            $checkoutOrder->updated_at               = time();
+            $checkoutOrder->is_delete                = 0;
+            if (!$checkoutOrder->save()) {
+                return $this->returnApiResultData(ApiCode::CODE_FAIL,(new BaseModel())->responseErrorMsg($checkoutOrder));
+            }
+
+            $detail = ArrayHelper::toArray($checkoutOrder);
+            $detail['format_date'] = date("Y-m-d H:i:s", $detail['updated_at']);
+
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"", $detail);
+
+        }catch (\Exception $e){
+            \Yii::$app->redis->set('var1',$e -> getMessage());
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());
+        }
+    }
 
     public function pay(){
 
-        if (!$this->validate()) {
-            return $this->returnApiResultData();
-        }
-
-        $checkoutOrder = MchCheckoutOrder::findOne($this->id);
         try {
 
+            $checkoutOrder = MchCheckoutOrder::findOne($this->id);
             if(!$checkoutOrder){
-                throw new \Exception('结账单不存在');
+                throw new \Exception('无法获取到结账单');
             }
-
             if($checkoutOrder->is_pay){
-                throw new \Exception('账单已支付');
+                throw new \Exception('结账单已支付成功');
             }
 
             $mch = $checkoutOrder->mch;
+            if(!$mch){
+                throw new \Exception('无法获取到商家信息');
+            }
 
             //购物卷抵扣
+            $integralFeeRate = $mch->integral_fee_rate;
             $userIntegral = User::getCanUseIntegral(\Yii::$app->user->id);
             $integralDeductionPrice = min($userIntegral, min($checkoutOrder->order_price, $this->use_integral));
+            if(($integralDeductionPrice + intval($integralDeductionPrice * ($integralFeeRate/100))) > $userIntegral){
+                $integralDeductionPrice = $userIntegral/(1+($integralFeeRate/100));
+            }
+            $integralServiceFee = intval($integralDeductionPrice * ($integralFeeRate/100));
+
             $payPrice = max(0, $checkoutOrder->order_price - $integralDeductionPrice);
 
-            //更新结账单
-            $checkoutOrder->pay_user_id              = \Yii::$app->user->id;
             $checkoutOrder->updated_at               = time();
-            $checkoutOrder->integral_deduction_price = $integralDeductionPrice;
+            $checkoutOrder->integral_deduction_price = (int)$integralDeductionPrice + $integralServiceFee;
+            $checkoutOrder->integral_fee_rate        = $integralFeeRate;
+
             if(!$checkoutOrder->save()){
                 throw new \Exception('结账单更新失败');
             }

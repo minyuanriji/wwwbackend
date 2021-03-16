@@ -195,6 +195,7 @@ class ApiController extends BaseController
             }
         }
 
+        return $this;
     }
 
     /**

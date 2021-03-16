@@ -150,8 +150,8 @@ class ApiController extends BaseController
         if(true || empty($cacheData)){
             $url = "https://apis.map.qq.com/ws/geocoder/v1/?location=".$cityData['latitude'].",".$cityData['longitude']."&key={$key}&get_poi=1";
 
-            //$hostInfo = \Yii::$app->getRequest()->getHostInfo();
-            $hostInfo = "http://dev.mingyuanriji.cn";
+            $hostInfo = \Yii::$app->getRequest()->getHostInfo();
+            //$hostInfo = "http://dev.mingyuanriji.cn";
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);

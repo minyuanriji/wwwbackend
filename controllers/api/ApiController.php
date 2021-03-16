@@ -23,6 +23,7 @@ use app\handlers\RelationHandler;
 use app\helpers\ArrayHelper;
 use app\logic\CommonLogic;
 use app\logic\RelationLogic;
+use app\models\DistrictData;
 use app\models\Formid;
 use app\models\Mall;
 use app\models\RelationSetting;
@@ -73,7 +74,7 @@ class ApiController extends BaseController
         \Yii::$app->user->enableAutoLogin = false;
         $this->enableCsrfValidation = false;
         $headers = \Yii::$app->request->headers;
-        $this->getParamsData()->setMall($headers)->login($headers)->saveFormIdList($headers)->bindParent($headers)->checkInviter();
+        $this->getParamsData()->setMall($headers)->setCity($headers)->login($headers)->saveFormIdList($headers)->bindParent($headers)->checkInviter();
     }
 
     /**
@@ -105,6 +106,98 @@ class ApiController extends BaseController
         return $this;
     }
 
+    /**
+     * 设置城市信息
+     * @return $this
+     */
+    private function setCity($headers)
+    {
+        $cityData = [
+            'city_id'       => 0,
+            'province_id'   => 0,
+            'district_id'   => 0,
+            'province'      => '',
+            'city'          => '',
+            'district'      => '',
+            'longitude'     => '23.140281',
+            'latitude'      => '113.265953',
+            'address'       => '',
+            'pois'          => []
+        ];
+
+        $cache = Yii::$app->getCache();
+
+        
+
+        $key = \Yii::$app->params['qqMapApiKey'];
+
+        $longitude = !empty($headers['x-longitude']) ? $headers['x-longitude'] : null;
+        $latitude = !empty($headers['x-latitude']) ? $headers['x-latitude'] : null;
+
+        $pattern = "/^\d+\.\d+$/";
+        if(preg_match($pattern, $latitude) && preg_match($pattern, $longitude)){
+            $cityData['longitude'] = $longitude;
+            $cityData['latitude']  = $latitude;
+        }
+
+        $url = "https://apis.map.qq.com/ws/geocoder/v1/?location=".$cityData['latitude'].",".$cityData['longitude']."&key={$key}&get_poi=1";
+
+        //$hostInfo = \Yii::$app->getRequest()->getHostInfo();
+        $hostInfo = "http://dev.mingyuanriji.cn";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_REFERER, $hostInfo);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        $result = @curl_exec($ch);
+        @curl_close($ch);
+
+        $data = !empty($result) ? json_decode($result, true) : null;
+        if(isset($data['status']) && $data['status'] == 0){
+            $cityData['province'] = $data['result']['address_component']['province'];
+            $cityData['city'] = $data['result']['address_component']['city'];
+            $cityData['district'] = $data['result']['address_component']['district'];
+            $cityData['street'] = $data['result']['address_component']['street_number'];
+
+            $districtList = DistrictData::getArr();
+
+            //获取省份ID
+            foreach($districtList as $district){
+                if($district['level'] == "province" && $district['name'] == $cityData['province']) {
+                    $cityData['province_id'] = $district['id'];
+                    break;
+                }
+            }
+
+            //获取城市ID
+            foreach($districtList as $district){
+                if($district['parent_id'] == $cityData['province_id'] && $district['name'] == $cityData['city']) {
+                    $cityData['city_id'] = $district['id'];
+                    break;
+                }
+            }
+
+            //获取区域ID
+            foreach($districtList as $district){
+                if($district['parent_id'] == $cityData['city_id'] && $district['name'] == $cityData['district']) {
+                    $cityData['district_id'] = $district['id'];
+                    break;
+                }
+            }
+
+            foreach($data['result']['pois'] as $item){
+                $cityData['result']['pois'][] = [
+                    'address'  => $item['address'],
+                    'location' => $item['location']
+                ];
+            }
+        }
+        print_r($cityData);
+        exit;
+
+    }
 
     /**
      * 设置商城

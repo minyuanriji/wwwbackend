@@ -95,7 +95,7 @@ class WechatForm extends BaseModel
 
     /**
      * 微信授权
-     * @Author: zal
+     * @Author: zal   2
      * @Date: 2020-04-27
      * @Time: 10:33
      * @return array

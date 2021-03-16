@@ -143,7 +143,7 @@ class GoodsListForm extends BaseModel
     }
 
     /**
-     * @param $cat_id  查找的值
+     * @param $cat_id  查找的值  2
      * @param $data 数组
      * @return bool
      */

@@ -321,9 +321,9 @@ class OrderSubmitForm extends BaseModel
                 //购物券抵扣
                 $order->integral_deduction_price = $orderItem['integral']['use'] ? $orderItem['integral']['integral_deduction_price'] : 0;
 
-                $order->name = $data['user_address']['name'];
-                $order->mobile = $data['user_address']['mobile'];
-                if ($orderItem['delivery']['send_type'] !== 'offline') {
+                $order->name = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
+                $order->mobile = !empty($data['user_address']['mobile']) ? $data['user_address']['mobile'] : "";
+                if ($data['is_need_address'] && $orderItem['delivery']['send_type'] !== 'offline') {
                     $order->address = $data['user_address']['province']
                         . ' '
                         . $data['user_address']['city']
@@ -335,7 +335,7 @@ class OrderSubmitForm extends BaseModel
                     $order->address_id=$data['user_address']['id'];
                 }
 
-                $order->province_id = $districtArr->getId($data['user_address']['province']);
+                $order->province_id = $data['is_need_address'] ? $districtArr->getId($data['user_address']['province']) : 0;
                 $order->remark = empty($orderItem['remark']) ? "" : $orderItem['remark'];
                 $order->order_form = $order->encodeOrderForm($orderItem['order_form_data']);
                 $order->distance = isset($orderItem['form_data']['distance']) ? $orderItem['form_data']['distance'] : 0;//同城距离
@@ -347,19 +347,24 @@ class OrderSubmitForm extends BaseModel
                 $order->is_confirm = Order::IS_COMMENT_NO;
                 $order->is_sale = 0;
                 $order->support_pay_types = $order->encodeSupportPayTypes($this->supportPayTypes);
-                if ($orderItem['delivery']['send_type'] === 'offline') {
-                    if (empty($orderItem['store'])) return $this->returnApiResultData(ApiCode::CODE_FAIL,'请选择自提门店。');
-                    $order->store_id = $orderItem['store']['id'];
-                    $order->send_type = Order::SEND_TYPE_SELF;
-                } elseif ($orderItem['delivery']['send_type'] === 'city') {
-                    $order->distance = $orderItem['distance'];
-                    $order->location = $data['user_address']['longitude'] . ',' . $data['user_address']['latitude'];
-                    $order->send_type = Order::SEND_TYPE_CITY;
-                    $order->store_id = 0;
-                } else {
-                    $order->send_type = Order::SEND_TYPE_EXPRESS;
-                    $order->store_id = 0;
+
+                if($data['is_need_address']){
+                    if ($orderItem['delivery']['send_type'] === 'offline') {
+                        if (empty($orderItem['store']))
+                            return $this->returnApiResultData(ApiCode::CODE_FAIL,'请选择自提门店。');
+                        $order->store_id = $orderItem['store']['id'];
+                        $order->send_type = Order::SEND_TYPE_SELF;
+                    } elseif ($orderItem['delivery']['send_type'] === 'city') {
+                        $order->distance = $orderItem['distance'];
+                        $order->location = $data['user_address']['longitude'] . ',' . $data['user_address']['latitude'];
+                        $order->send_type = Order::SEND_TYPE_CITY;
+                        $order->store_id = 0;
+                    } else {
+                        $order->send_type = Order::SEND_TYPE_EXPRESS;
+                        $order->store_id = 0;
+                    }
                 }
+
                 $order->sign = $this->sign !== null ? $this->sign : '';
                 $order->token = $token;
                 $order->status = $this->status;

@@ -194,8 +194,6 @@ class ApiController extends BaseController
                 ];
             }
         }
-        print_r($cityData);
-        exit;
 
     }
 

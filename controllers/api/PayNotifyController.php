@@ -29,7 +29,7 @@ class PayNotifyController extends BaseController
         try{
             $app = \Yii::$app->wechat;
             $paymentOrderUnion = PaymentOrderUnion::findOne([
-                'order_no' => "JX9ccb652a8a38f90242d2d7c07acff2",
+                'order_no' => "JX14512fb1b2c71af318916c3bf083cf",
             ]);
             $paymentOrders = PaymentOrder::findAll(['payment_order_union_id' => $paymentOrderUnion->id]);
             foreach ($paymentOrders as $paymentOrder) {

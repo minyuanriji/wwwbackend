@@ -763,6 +763,7 @@ class OrderSubmitForm extends BaseModel
             return [
                 'id'   => 0,
                 'name' => \Yii::$app->mall->name,
+                'integral_fee_rate' => 0
             ];
         } else {
             $mch = Mch::findOne($id);
@@ -770,6 +771,7 @@ class OrderSubmitForm extends BaseModel
             return [
                 'id'   => $id,
                 'name' => $mch ? $mch->store->name : '未知商户',
+                'integral_fee_rate' => $mch ? $mch->integral_fee_rate : 0
             ];
         }
     }
@@ -2369,6 +2371,7 @@ class OrderSubmitForm extends BaseModel
         
         //购物券抵扣
         $orderDetail->integral_price       = $goodsItem['integral_price'];
+        $orderDetail->integral_fee_rate    = $goodsItem['integral_fee_rate'];
 
         //满减金额
         $orderDetail->full_relief_price = $goodsItem['actual_full_relief_price'];

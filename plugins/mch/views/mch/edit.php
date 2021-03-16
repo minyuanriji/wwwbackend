@@ -120,7 +120,7 @@
                                 </div>
                             </el-form-item>
                             <el-form-item label="抵扣券额外扣取比例" prop="transfer_rate">
-                                <label slot="label">抵扣券额外扣取比例
+                                <label slot="label">抵扣券扣取比例
                                     <el-tooltip class="item" effect="dark"
                                                 content="0表示不设置"
                                                 placement="top">

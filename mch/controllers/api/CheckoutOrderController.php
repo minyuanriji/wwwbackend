@@ -3,11 +3,22 @@ namespace app\mch\controllers\api;
 
 use app\controllers\api\ApiController;
 
+use app\controllers\api\filters\LoginFilter;
 use app\mch\forms\api\CheckoutOrderInfoForm;
 use app\mch\forms\api\CheckoutOrderPayForm;
 use app\mch\forms\api\CheckoutOrderQrcodeForm;
 use Yii;
+
 class CheckoutOrderController extends ApiController{
+
+    public function behaviors(){
+        return array_merge(parent::behaviors(), [
+            'login' => [
+                'class' => LoginFilter::class,
+            ]
+        ]);
+    }
+
     /**
      * 生成结账单
      * @return \yii\web\Response

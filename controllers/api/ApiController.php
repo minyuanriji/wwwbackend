@@ -213,7 +213,7 @@ class ApiController extends BaseController
             $cityData = $cacheData;
         }
 
-        if(!empty($selCityId)){
+        if(!empty($selCityId) && $selCityId > 0){
             $district = DistrictData::getDistrict($selCityId);
             if($district){
                 $cityData['sel_city'] = $district->name;

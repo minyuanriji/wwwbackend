@@ -131,7 +131,6 @@ class CommonLogic
             $qrCode = (new QrCode($url, ErrorCorrectionLevelInterface::HIGH))
                 ->useEncoding('UTF-8')->setLogoWidth(60)->setSize(300)->setMargin(5);
             $qrCode->writeFile($file);
-
         }
 //        if ($option['qr_code']['type'] == 1) {
 //            $file = CommonFunction::avatar($file, $model->temp_path, $option['qr_code']['size'], $option['qr_code']['size']);

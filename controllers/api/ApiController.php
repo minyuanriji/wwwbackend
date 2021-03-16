@@ -122,6 +122,7 @@ class ApiController extends BaseController
     private function setCity($headers)
     {
         $cityData = [
+            'sel_city'      => '',
             'city_id'       => 0,
             'province_id'   => 0,
             'district_id'   => 0,
@@ -138,6 +139,7 @@ class ApiController extends BaseController
 
         $longitude = !empty($headers['x-longitude']) ? $headers['x-longitude'] : null;
         $latitude = !empty($headers['x-latitude']) ? $headers['x-latitude'] : null;
+        $selCityId = !empty($headers['x-city-id']) ? $headers['x-city-id'] : null;
 
         $pattern = "/^\d+\.\d+$/";
         if(preg_match($pattern, $latitude) && preg_match($pattern, $longitude)){
@@ -149,7 +151,9 @@ class ApiController extends BaseController
         $cache = \Yii::$app->getCache();
         $cacheData = $cache->get($cacheKey);
 
-        if(empty($cacheData)){
+        $districtList = DistrictData::getArr();
+
+        if(true || empty($cacheData)){
             $url = "https://apis.map.qq.com/ws/geocoder/v1/?location=".$cityData['latitude'].",".$cityData['longitude']."&key={$key}&get_poi=1";
 
             $hostInfo = \Yii::$app->getRequest()->getHostInfo();
@@ -171,7 +175,6 @@ class ApiController extends BaseController
                 $cityData['district'] = $data['result']['address_component']['district'];
                 $cityData['street'] = $data['result']['address_component']['street_number'];
 
-                $districtList = DistrictData::getArr();
 
                 //获取省份ID
                 foreach($districtList as $district){
@@ -208,6 +211,15 @@ class ApiController extends BaseController
             $cache->set($cacheKey, $cityData, 600);
         }else{
             $cityData = $cacheData;
+        }
+
+        if(!empty($selCityId)){
+            $district = DistrictData::getDistrict($selCityId);
+            if($district){
+                $cityData['sel_city'] = $district->name;
+            }
+        }else{
+            $cityData['sel_city'] = $cityData['city'];
         }
 
         static::$cityData = $cityData;

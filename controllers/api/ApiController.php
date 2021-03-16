@@ -125,7 +125,7 @@ class ApiController extends BaseController
             'pois'          => []
         ];
 
-        $cache = Yii::$app->getCache();
+        $cache = \Yii::$app->getCache();
 
         
 

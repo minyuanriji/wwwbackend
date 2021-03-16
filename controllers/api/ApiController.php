@@ -48,7 +48,9 @@ class ApiController extends BaseController
 
     public function asJson($data)
     {
-        $data['city_data'] = static::$cityData;
+        if(is_array($data)){
+            $data['city_data'] = static::$cityData;
+        }
         return parent::asJson($data);
     }
 

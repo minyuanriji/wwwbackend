@@ -10,6 +10,7 @@
 
 namespace app\models;
 
+use app\controllers\api\ApiController;
 use app\core\ApiCode;
 
 class BaseModel extends \yii\base\Model
@@ -88,6 +89,9 @@ class BaseModel extends \yii\base\Model
         if($code == 999){
             $this->result = $this->responseErrorInfo($data);
         }
+
+        $this->result['city_data'] = ApiController::$cityData;
+
         return $this->result;
     }
 

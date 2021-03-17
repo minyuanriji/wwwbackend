@@ -14,9 +14,10 @@ class ShareController extends MchMApiController {
      */
     public function actionPoster(){
         $shareForm = new MchSharePosterForm([
-            'name' => $this->mchData['store']['name']
+            'name'   => $this->mchData['store']['name']
         ]);
         $shareForm->attributes = $this->requestData;
+        $shareForm->mch_id = $this->mch_id;
         return $shareForm->getSharePoster();
     }
 

@@ -8,11 +8,13 @@ class MchSharePosterForm extends SharePosterForm {
 
     public $route;
     public $name;
+    public $mch_id;
 
     public function rules(){
         return [
             [['route'], 'required'],
-            [['route', 'name'], 'string']
+            [['route', 'name'], 'string'],
+            [['mch_id'], 'integer']
         ];
     }
 
@@ -31,7 +33,7 @@ class MchSharePosterForm extends SharePosterForm {
     }
 
     protected function h5Path(){
-        $path = "/h5/#/" . $this->route . "?mall_id=" . \Yii::$app->mall->id."&pid=" . \Yii::$app->user->id . "&source=".User::SOURCE_SHARE_POSTER;
+        $path = "/h5/#/" . $this->route . "?mall_id=" . \Yii::$app->mall->id."&pid=" . \Yii::$app->user->id . "&source=".User::SOURCE_SHARE_POSTER . "&mch_id=" . $this->mch_id;
         return $path;
     }
 

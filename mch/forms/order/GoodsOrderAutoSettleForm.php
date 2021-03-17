@@ -11,7 +11,7 @@ class GoodsOrderAutoSettleForm extends MchAutoSettleForm {
      */
     public static function settle(Order $order){
         $settleForm = new GoodsOrderAutoSettleForm([
-            "price"  => $order->total_price+$order->integral_deduction_price,
+            "price"  => $order->total_goods_original_price,
             "mch_id" => $order->mch_id,
             "desc"   => "商品订单（".$order->id."）结算"
         ]);

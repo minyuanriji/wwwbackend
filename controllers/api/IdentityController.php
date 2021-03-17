@@ -55,7 +55,7 @@ class IdentityController extends ApiController
     }
 
     /**
-     * 授权登录
+     * 授权登录2
      * @Author: zal
      * @Date: 2020-04-27
      * @Time: 10:33

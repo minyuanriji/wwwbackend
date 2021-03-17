@@ -95,7 +95,7 @@ class WechatForm extends BaseModel
 
     /**
      * 微信授权
-     * @Author: zal
+     * @Author: zal   2
      * @Date: 2020-04-27
      * @Time: 10:33
      * @return array
@@ -109,6 +109,7 @@ class WechatForm extends BaseModel
         if($wechatModel->isWechat)
         {
             $result = $wechatModel->app->oauth->user();
+            var_dump($result);
             \Yii::warning("授权结果 result:".json_encode($result));
             if(!empty($result)){
                 $userInfo = $result->original;

@@ -21,6 +21,8 @@ use app\models\GoodsCats;
 use app\models\GoodsWarehouse;
 use app\logic\OptionLogic;
 use app\models\Option;
+use app\models\mysql\GoodsCatRelation as GoodsCatRelationModel;
+use function Webmozart\Assert\Tests\StaticAnalysis\false;
 
 class GoodsListForm extends BaseModel
 {
@@ -92,7 +94,8 @@ class GoodsListForm extends BaseModel
             $list = $query->orderBy(['g.sort' => SORT_ASC, 'g.id' => SORT_DESC])
                 ->groupBy('g.goods_warehouse_id')
                 ->page($pagination, $this->limit, $this->page)
-                ->all();
+                -> all();
+
             $newList = [];
             /* @var Goods[] $list */
             foreach ($list as $item) {
@@ -109,6 +112,22 @@ class GoodsListForm extends BaseModel
                 }
                 $newList[] = $detail;
             }
+
+            $GoodsCatRelation = new GoodsCatRelationModel();
+            foreach ($newList as $key => $val){
+                if($val['is_delete'] !== 1){
+                    $GoodsCat = $GoodsCatRelation -> getGoodsCatId($val['goods_warehouse_id']);
+                    if(!$this -> deep_in_array($this -> cat_id,$GoodsCat)){
+                        unset($newList[$key]);
+                    }
+                }else{
+                    unset($newList[$key]);
+                }
+
+            }
+            $newList = array_merge($newList);
+
+
             return $this->returnApiResultData(
                 ApiCode::CODE_SUCCESS,
                 '',
@@ -122,4 +141,21 @@ class GoodsListForm extends BaseModel
 
         }
     }
+
+    /**
+     * @param $cat_id  查找的值  2
+     * @param $data 数组
+     * @return bool
+     */
+    public function deep_in_array($cat_id,$data){
+        foreach ($data as $key => $val){
+            if(array_search($cat_id,$val)){
+                return true;
+            }else{
+                continue;
+            }
+        }
+        return false;
+    }
+
 }

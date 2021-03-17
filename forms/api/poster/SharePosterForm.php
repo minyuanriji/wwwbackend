@@ -19,11 +19,11 @@ class SharePosterForm extends GrafikaOption implements BasePoster
         $option = $options["share"];
         $option = $this->optionDiff($option, $default);
         if(empty($option['name']['text'])){
-            //isset($option['name']) && $option['name']['text'] = \Yii::$app->user->identity->nickname;
+            isset($option['name']) && $option['name']['text'] = \Yii::$app->user->identity->nickname;
         }
         $cache = $this->getCache($option);
         if ($cache) {
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',['pic_url' => $cache . '?v=' . time()]);
+            //return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',['pic_url' => $cache . '?v=' . time()]);
         }
         if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
             $file = $this->qrcode($option, [

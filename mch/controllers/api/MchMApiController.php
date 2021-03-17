@@ -10,6 +10,7 @@ use app\plugins\mch\models\Mch;
 class MchMApiController extends ApiController{
 
     protected $mch_id;
+    protected $mchModel;
 
     public function behaviors(){
         return array_merge(parent::behaviors(), [
@@ -34,7 +35,8 @@ class MchMApiController extends ApiController{
                 ];
                 return false;
             }
-            $this->mch_id = $mchModel->id;
+            $this->mch_id   = $mchModel->id;
+            $this->mchModel = $mchModel;
         }
 
         return $beforeAction;

@@ -38,7 +38,7 @@ class MchSharePosterForm extends SharePosterForm {
     }
 
     protected function h5Dir(){
-        $dir = 'mch-share/' . md5(strtolower($this->route)) . "_" . \Yii::$app->mall->id."_".\Yii::$app->user->id. '.jpg';
+        $dir = 'mch-share/' . md5(strtolower($this->route)) . time() . "_" . \Yii::$app->mall->id."_".\Yii::$app->user->id. '.jpg';
         return $dir;
     }
 }

@@ -2,6 +2,7 @@
 namespace app\mch\forms\api;
 
 use app\forms\api\poster\SharePosterForm;
+use app\models\User;
 
 class MchSharePosterForm extends SharePosterForm {
 
@@ -27,5 +28,10 @@ class MchSharePosterForm extends SharePosterForm {
 
     public function getSharePoster(){
         return parent::get($this->route);
+    }
+
+    public function h5Path(){
+        $path = "/h5/#/" . $this->route . "?mall_id=" . \Yii::$app->mall->id."&pid=" . \Yii::$app->user->id . "&source=".User::SOURCE_SHARE_POSTER;
+        return $path;
     }
 }

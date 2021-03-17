@@ -23,7 +23,7 @@ class SharePosterForm extends GrafikaOption implements BasePoster
         }
         $cache = $this->getCache($option);
         if ($cache) {
-            //return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',['pic_url' => $cache . '?v=' . time()]);
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',['pic_url' => $cache . '?v=' . time()]);
         }
         if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
             $file = $this->qrcode($option, [
@@ -34,7 +34,8 @@ class SharePosterForm extends GrafikaOption implements BasePoster
             isset($option['qr_code']) && $option['qr_code']['file_path'] = $file;
             isset($option['head']) && $option['head']['file_path'] = self::head($this);
         }else{
-            $path = "/h5/#/?mall_id=".\Yii::$app->mall->id."&pid=".\Yii::$app->user->id."&source=".User::SOURCE_SHARE_POSTER;
+            $path = $this->h5Path();
+            $path = empty($path) ? "/h5/#/?mall_id=".\Yii::$app->mall->id."&pid=".\Yii::$app->user->id."&source=".User::SOURCE_SHARE_POSTER : $path;
             $dir = 'share/' . \Yii::$app->mall->id."_".\Yii::$app->user->id. '.jpg';
             $file = CommonLogic::createQrcode($option,$this,$path,$dir);
 
@@ -44,5 +45,9 @@ class SharePosterForm extends GrafikaOption implements BasePoster
 
         $editor = $this->getPoster($option);
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',['pic_url' => $editor->qrcode_url . '?v=' . time()]);
+    }
+
+    protected function h5Path(){
+        return null;
     }
 }

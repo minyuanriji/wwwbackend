@@ -2,6 +2,7 @@
 
 namespace app\mch\forms\common;
 
+use app\controllers\api\ApiController;
 use app\forms\common\goods\CommonGoodsStatistic;
 use app\forms\common\order\CommonOrderStatistic;
 use app\models\BaseModel;
@@ -33,11 +34,16 @@ class CommonMchForm extends BaseModel{
         $cityId = \Yii::$app->request->headers->get("x-city-id");
         $districtData = intval($cityId) > 0 ? DistrictData::getDistrict((int)$cityId) : null;
 
+        $longitude = ApiController::$cityData['longitude'];
+        $latitude = ApiController::$cityData['latitude'];
+
+
         $query = Mch::find()->where([
             'm.mall_id'       => \Yii::$app->mall->id,
             'm.is_delete'     => 0,
-            'm.review_status' => 1,
+            'm.review_status' => Mch::REVIEW_STATUS_CHECKED,
         ])->alias("m");
+
         $query->leftJoin("{{%store}} ss", "ss.mch_id=m.id");
         $query->leftJoin("{{%user}} u", "u.mch_id=m.id");
 
@@ -54,12 +60,26 @@ class CommonMchForm extends BaseModel{
             $query->andWhere(["m.mch_common_cat_id" => $this->cat_id]);
         }
 
-        $query->select(["m.id", "m.mall_id", "m.status", "m.is_recommend", "m.mch_common_cat_id"]);
+        $selects = ["m.id", "m.mall_id", "m.status", "m.is_recommend", "m.mch_common_cat_id"];
+        $selects[] = "ST_Distance_sphere(point(longitude, latitude), point({$longitude}, {$latitude})) as distance_mi";
 
-        $list = $query->orderBy(['m.sort' => SORT_ASC])
+        $query->select($selects);
+
+        $list = $query->orderBy("distance_mi ASC")
             ->with('store', 'category')
             ->page($pagination)->asArray()->all();
-
+        if($list){
+            foreach($list as &$item){
+                $item['distance_format'] = "0m";
+                if(empty($item['distance_mi']))
+                    continue;
+                if($item['distance_mi'] < 1000){
+                    $item['distance_format'] = intval($item['distance_mi']) . "m";
+                }else if($item['distance_mi'] >= 1000){
+                    $item['distance_format'] = round(($item['distance_mi']/1000), 1) . "km";
+                }
+            }
+        }
         return [
             'list' => $list,
             'pagination' => $pagination

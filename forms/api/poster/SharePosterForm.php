@@ -19,7 +19,7 @@ class SharePosterForm extends GrafikaOption implements BasePoster
         $option = $options["share"];
         $option = $this->optionDiff($option, $default);
         if(empty($option['name']['text'])){
-            isset($option['name']) && $option['name']['text'] = \Yii::$app->user->identity->nickname;
+            //isset($option['name']) && $option['name']['text'] = \Yii::$app->user->identity->nickname;
         }
         $cache = $this->getCache($option);
         if ($cache) {
@@ -36,7 +36,8 @@ class SharePosterForm extends GrafikaOption implements BasePoster
         }else{
             $path = $this->h5Path();
             $path = empty($path) ? "/h5/#/?mall_id=".\Yii::$app->mall->id."&pid=".\Yii::$app->user->id."&source=".User::SOURCE_SHARE_POSTER : $path;
-            $dir = 'share/' . \Yii::$app->mall->id."_".\Yii::$app->user->id. '.jpg';
+            $dir = $this->h5Dir();
+            $dir = empty($dir) ? 'share/' . \Yii::$app->mall->id."_".\Yii::$app->user->id. '.jpg' : $dir;
             $file = CommonLogic::createQrcode($option,$this,$path,$dir);
 
             isset($option['qr_code']) && $option['qr_code']['file_path'] = $file;
@@ -48,6 +49,10 @@ class SharePosterForm extends GrafikaOption implements BasePoster
     }
 
     protected function h5Path(){
+        return null;
+    }
+
+    protected function h5Dir(){
         return null;
     }
 }

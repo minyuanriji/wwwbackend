@@ -18,6 +18,10 @@ class MchSharePosterForm extends SharePosterForm {
     protected function optionDiff($option, $default): array{
         $option = parent::optionDiff($option, $default);
         $option['name']['text'] = $this->name;
+        $option['qr_code']['size'] = 200;
+        $option['qr_code']['top'] -= 50;
+        $option['name']['top']    -= 50;
+        $option['head']['top']    -= 50;
         return $option;
     }
 

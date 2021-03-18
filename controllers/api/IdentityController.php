@@ -54,8 +54,6 @@ class IdentityController extends ApiController
         return $result;
     }
 
-    
-
     /**
      * 授权登录2
      * @Author: zal

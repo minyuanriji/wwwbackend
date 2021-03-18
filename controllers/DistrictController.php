@@ -11,6 +11,7 @@
 namespace app\controllers;
 
 
+use app\forms\api\user\UserAddressForm;
 use app\models\DistrictData;
 use app\models\Town;
 use Curl\Curl;
@@ -28,6 +29,12 @@ class DistrictController extends BaseController
                 'district' => $district
             ]
         ]);
+    }
+
+    public function actionCommon()
+    {
+        $form = new UserAddressForm();
+        return $this->asJson($form->autoAddressInfo());
     }
 
     public function actionIndex()

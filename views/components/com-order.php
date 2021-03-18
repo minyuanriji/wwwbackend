@@ -457,7 +457,6 @@ Yii::$app->loadComponentView('order/com-city');
                                 <el-tag size="small" type="warning" v-if="item.is_pay == 1 && item.is_send == 0">已付款
                                 </el-tag>
                                 <el-tag size="small" type="success"
-                                        v-if="item.is_send == 0 && item.is_pay == 1 && item.detailExpress && item.detailExpress.length > 0">
                                     部分发货
                                 </el-tag>
                                 <el-tag size="small" type="success"
@@ -1318,6 +1317,7 @@ Yii::$app->loadComponentView('order/com-city');
                     this.loading = false;
                     if (e.data.code === 0) {
                         this.list = e.data.data.list;
+                        console.log(this.list);
                         this.export_list = e.data.data.export_list;
                         this.pagination = e.data.data.pagination;
                         this.plugins = e.data.data.plugins;

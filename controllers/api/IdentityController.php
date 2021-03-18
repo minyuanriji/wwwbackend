@@ -19,6 +19,7 @@ use app\forms\api\user\UserBindForm;
 use app\helpers\ArrayHelper;
 use app\models\ErrorLog;
 use yii;
+use app\controllers\business\GetAttentionWeChat;
 
 class IdentityController extends ApiController
 {
@@ -52,6 +53,12 @@ class IdentityController extends ApiController
         $wechatForm->attributes = $this->requestData;
         $result = $wechatForm->wxAuthorized();
         return $result;
+    }
+
+    public function actionSubscribeStatus(){
+        $data = $this->requestData;
+        $result = (new GetAttentionWeChat()) -> getUserAttentionWeChatInfo($data['user_id']);
+        return $this -> asJson($result);
     }
 
     /**

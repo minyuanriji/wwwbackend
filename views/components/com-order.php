@@ -500,9 +500,10 @@ Yii::$app->loadComponentView('order/com-city');
                         <!-- 订单信息 -->
                         <div class="goods-item" :style="{width: orderTitle[0].width}">
                             <div class="goods" v-for="goods in item.detail">
-                               <img :src="goods.goods_info && goods.goods_info.goods_attr && goods.goods_info.goods_attr.pic_url ? goods.goods_info.goods_attr.pic_url : goods.goods_info.goods_attr.cover_pic"
+                                <img :src="goods.goods_info && goods.goods_info.goods_attr && goods.goods_info.goods_attr.pic_url ? goods.goods_info.goods_attr.pic_url : goods.goods_info.goods_attr.cover_pic"
                                      class="goods-image">
-                                <span v-if="goods.refund_status == '11' || goods.refund_status == '10' || goods.refund_status == '12'" class="com-order-refund-status">售后中</span>
+                                <span v-if="goods.refund_status == '11' || goods.refund_status == '10' || goods.refund_status == '12'"
+                                      class="com-order-refund-status">售后中</span>
 
                                 <span v-else-if="goods.refund_status == '20'" class="com-order-refund-status">已退款</span>
 
@@ -659,7 +660,7 @@ Yii::$app->loadComponentView('order/com-city');
                                          v-if="item.send_type == 1 && (item.is_pay == 1 || item.pay_type == 2) && item.clerk == null && item.is_send == 0 && item.is_clerk_show && item.is_recycle == 0 && isShowClerk && item.is_recycle == 0 && item.status != 0 && item.cancel_status != 1"
                                          src="statics/img/mall/order/clerk.png" alt="">
                                 </el-tooltip>
-								
+
                                 <template v-if="">
                                     <slot name="orderSend" :order="item"></slot>
                                     <!-- 发货 -->
@@ -668,21 +669,21 @@ Yii::$app->loadComponentView('order/com-city');
                                              v-if="item.is_send_show"
                                              src="statics/img/mall/order/send.png" alt="">
                                     </el-tooltip>
-                                    <!-- 同城配送发货 选择配送员 -->	<!-- 到店自提也可发货 -->
-                                   <!-- <el-tooltip class="item" effect="dark" content="发货" placement="top">
-                                        <img class="com-order-icon" @click="openCity(item,'send')"
-                                             v-if="item.send_type == 2 && item.is_send == 0 && item.cancel_status != 1 && (item.is_pay == 1 || item.pay_type == 2) && item.is_send_show == 1 && isShowSend && item.is_recycle == 0 && item.status != 0"
-                                             src="statics/img/mall/order/send.png" alt="">
-                                    </el-tooltip>
-                                    
-                                    <el-tooltip class="item" effect="dark" content="发货" placement="top">
-                                        <img class="com-order-icon" @click="storeOrderSend(item)"
-                                             v-if="item.send_type == 1 && (item.is_pay == 1 || item.pay_type == 2) && item.is_send == 0 && item.cancel_status != 1 && item.is_send_show == 1 && isShowSend && item.is_recycle == 0 && item.status != 0"
-                                             src="statics/img/mall/order/send.png" alt="">
-                                    </el-tooltip> -->
+                                    <!-- 同城配送发货 选择配送员 -->    <!-- 到店自提也可发货 -->
+                                    <!-- <el-tooltip class="item" effect="dark" content="发货" placement="top">
+                                         <img class="com-order-icon" @click="openCity(item,'send')"
+                                              v-if="item.send_type == 2 && item.is_send == 0 && item.cancel_status != 1 && (item.is_pay == 1 || item.pay_type == 2) && item.is_send_show == 1 && isShowSend && item.is_recycle == 0 && item.status != 0"
+                                              src="statics/img/mall/order/send.png" alt="">
+                                     </el-tooltip>
+
+                                     <el-tooltip class="item" effect="dark" content="发货" placement="top">
+                                         <img class="com-order-icon" @click="storeOrderSend(item)"
+                                              v-if="item.send_type == 1 && (item.is_pay == 1 || item.pay_type == 2) && item.is_send == 0 && item.cancel_status != 1 && item.is_send_show == 1 && isShowSend && item.is_recycle == 0 && item.status != 0"
+                                              src="statics/img/mall/order/send.png" alt="">
+                                     </el-tooltip> -->
                                 </template>
                                 <!-- 打印小票 -->
-								
+
                                 <el-tooltip class="item" effect="dark" content="打印小票" placement="top">
                                     <img class="com-order-icon"
                                          v-if="item.is_recycle == 0 && isShowPrint"
@@ -820,7 +821,7 @@ Yii::$app->loadComponentView('order/com-city');
                     </div>
                     <div flex="dir:left" style="margin-top: 10px;">
                         <span class="label">配送商品:</span>
-                       <img v-for="(goods, index) in expressSingle.goods_list"
+                        <img v-for="(goods, index) in expressSingle.goods_list"
                              :key="index"
                              class="goods-pic"
                              :src="goods.cover_pic">
@@ -1061,6 +1062,9 @@ Yii::$app->loadComponentView('order/com-city');
             if (getQuery('clerk_id') > 0) {
                 this.search.clerk_id = getQuery('clerk_id');
             }
+            if(localStorage.getItem('order_page')){
+                this.search.page = localStorage.getItem('order_page');
+            }
             this.getList();
         },
         methods: {
@@ -1071,10 +1075,13 @@ Yii::$app->loadComponentView('order/com-city');
             },
             // 进入商品详情
             toDetail(id) {
-                this.$navigate({
-                    r: this.orderDetailUrl,
-                    order_id: id
-                })
+                var path = window.location.origin + window.location.pathname + '?r=mall%2Forder%2Fdetail&order_id=' + id;
+                window.open(path,'_blank');
+                // return;
+                // this.$navigate({
+                //     r: this.orderDetailUrl,
+                //     order_id: id
+                // })
             },
             // 确认收货
             confirm(id) {
@@ -1327,6 +1334,7 @@ Yii::$app->loadComponentView('order/com-city');
             // 分页
             pageChange(page) {
                 this.search.page = page;
+                localStorage.setItem('order_page',page);
                 this.getList();
             },
             openDialog(order) {

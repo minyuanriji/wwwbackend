@@ -1,6 +1,17 @@
 <?php
 
 $mchId = Yii::$app->admin->identity->mch_id;
+$path_goods = 'mall/goods/index';
+$path_order = 'mall/order/index';
+if(\Yii::$app->requestedRoute !== $path_goods){
+ echo '<script>
+localStorage.removeItem(\'goods_page\');
+</script>';
+}else if(\Yii::$app->requestedRoute !== $path_order){
+    echo '<script>
+    localStorage.removeItem(\'order_page\');
+</script>';
+}
 ?>
 <style>
     .mall-header {

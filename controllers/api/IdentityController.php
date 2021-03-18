@@ -54,13 +54,7 @@ class IdentityController extends ApiController
         return $result;
     }
 
-    public function actionCsGo(){
-        $token = '43_xpWmX9oClBhpTZVKlyBvjT_jZ0XcZaMHNMjOec31mGy-FSZyKzL2lq8RE_-NOJ2nZ6lHyaIhfjGGZ7Z8ZiNOz4ygYERy266vSnuZbbFKpgXLS6CWDM4qUkvHzgdOaPuF48In6I1UfkPHAQ2vVRTfAJAZVX';
-        $subscribe_msg = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=$token&openid=ohQHU552Uyczs8eAlz9BV5jGh5y4";
-        $subscribe = json_decode(file_get_contents($subscribe_msg));
-//        $gzxx = $subscribe->subscribe;
-        var_dump($subscribe);
-    }
+  
 
     /**
      * 授权登录2
@@ -72,9 +66,6 @@ class IdentityController extends ApiController
      */
     public function actionAuthLogin()
     {
-        $wechat = \Yii::$app->wechat;
-        $accessTokenArray = $wechat->miniProgram->access_token->getToken();
-        var_dump($accessTokenArray);exit();
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
         $result = $wechatForm->authorized();

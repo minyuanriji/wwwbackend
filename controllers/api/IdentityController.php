@@ -71,6 +71,9 @@ class IdentityController extends ApiController
      */
     public function actionAuthLogin()
     {
+        var_dump(\Yii::$app->wechat->app);
+        var_dump(\Yii::$app->wechat->payment);
+        var_dump(\Yii::$app->wechat->miniProgram -> access_token->getToken());
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
         $result = $wechatForm->authorized();

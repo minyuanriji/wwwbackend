@@ -141,7 +141,7 @@ class CashEditForm extends BaseModel
                     }
 
                     $transferData = [
-                        'partner_trade_no'  => $wechatPaySetting['wechat_mch_id'].'x'.$mchCash->id, // 商户订单号，需保持唯一性(只能是字母或者数字，不能包含有符号)
+                        'partner_trade_no'  => $mchCash->order_no, // 商户订单号，需保持唯一性(只能是字母或者数字，不能包含有符号)
                         'openid'            => $userInfo->openid,
                         'check_name'        => 'NO_CHECK', // NO_CHECK：不校验真实姓名, FORCE_CHECK：强校验真实姓名
                         're_user_name'      => '', // 如果 check_name 设置为FORCE_CHECK，则必填用户真实姓名

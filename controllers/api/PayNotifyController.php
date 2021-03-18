@@ -26,6 +26,7 @@ class PayNotifyController extends BaseController
     }
 
     /*public function actionTest(){
+
         try{
             $app = \Yii::$app->wechat;
             $paymentOrderUnion = PaymentOrderUnion::findOne([

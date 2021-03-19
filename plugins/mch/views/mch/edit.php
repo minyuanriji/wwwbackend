@@ -47,240 +47,243 @@
         </div>
         <div class="form-body">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="160px" size="small">
-                <el-row>
-                    <el-card shadow="never" style="margin-bottom: 20px">
-                        <div slot="header">
-                            <span>基本信息</span>
-                        </div>
-                        <el-col :span="12">
-                            <el-form-item label="小程序用户" prop="user_id">
-                                <el-input style="display: none;" v-model="ruleForm.user_id"></el-input>
-                                <el-input disabled v-model="nickname">
-                                    <template slot="append">
-                                        <el-button @click="getUsers" type="primary">选择</el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item label="商户账号" prop="username">
-                                <el-input  v-model="ruleForm.username"></el-input>
-                            </el-form-item>
-                            <el-form-item v-if="!ruleForm.admin_id" label="商户密码" prop="password">
-                                <el-input type="password" v-model="ruleForm.password"></el-input>
-                            </el-form-item>
-                            <el-form-item label="联系人" prop="realname">
-                                <el-input v-model="ruleForm.realname"></el-input>
-                            </el-form-item>
-                            <el-form-item label="联系电话" prop="mobile">
-                                <el-input v-model="ruleForm.mobile"></el-input>
-                            </el-form-item>
-                            <el-form-item label="微信号" prop="wechat">
-                                <el-input v-model="ruleForm.wechat"></el-input>
-                            </el-form-item>
-                            <el-form-item label="所售类目" prop="mch_common_cat_id">
-                                <el-select v-model="ruleForm.mch_common_cat_id" placeholder="请选择">
-                                    <el-option
-                                            v-for="item in commonCats"
-                                            :key="item.id"
-                                            :label="item.name"
-                                            :value="item.id">
-                                    </el-option>
-                                </el-select>
-                            </el-form-item>
-                            <el-form-item label="是否开业" prop="status">
-                                <el-switch
-                                        v-model="ruleForm.status"
-                                        active-value="1"
-                                        inactive-value="0">
-                                </el-switch>
-                            </el-form-item>
-                            <el-form-item label="好店推荐" prop="is_recommend">
-                                <el-switch
-                                        v-model="ruleForm.is_recommend"
-                                        active-value="1"
-                                        inactive-value="0">
-                                </el-switch>
-                            </el-form-item>
-                            <el-form-item label="提现手续费" prop="transfer_rate">
-                                <label slot="label">服务费
-                                    <el-tooltip class="item" effect="dark"
-                                                content="0表示不设置服务费"
-                                                placement="top">
-                                        <i class="el-icon-info"></i>
-                                    </el-tooltip>
-                                </label>
-                                <el-input type="number" v-model.number="ruleForm.transfer_rate">
-                                    <template slot="append">%</template>
-                                </el-input>
-                                <div>
-                                    <span class="text-danger">服务费额外从提现中扣除</span><br>
-                                    例如：<span style="color: #F56C6C;font-size: 12px">10%</span>的提现服务费：<br>
-                                    提现<span style="color: #F56C6C;font-size: 12px">100</span>元，扣除服务费<span
-                                            style="color: #F56C6C;font-size: 12px">10</span>元，
-                                    实际到手<span style="color: #F56C6C;font-size: 12px">90</span>元
+
+                <el-tabs >
+                    <el-tab-pane label="基本信息" name="first">
+                        <el-row>
+                            <el-card shadow="never" style="margin-bottom: 20px">
+                                <div slot="header">
+                                    <span>基本信息</span>
                                 </div>
-                            </el-form-item>
-                            <el-form-item label="抵扣券额外扣取比例" prop="transfer_rate">
-                                <label slot="label">抵扣券扣取比例
-                                    <el-tooltip class="item" effect="dark"
-                                                content="0表示不设置"
-                                                placement="top">
-                                        <i class="el-icon-info"></i>
-                                    </el-tooltip>
-                                </label>
-                                <el-input type="number" v-model.number="ruleForm.integral_fee_rate">
-                                    <template slot="append">%</template>
-                                </el-input>
-                                <div>
-                                    <span class="text-danger">使用抵扣券支付需额外支付的抵扣券数额</span><br>
-                                    例如：设置<span style="color: #F56C6C;font-size: 12px">10%</span><br>
-                                    使用抵扣券抵扣<span style="color: #F56C6C;font-size: 12px">100</span>元时，需要额外收取<span
-                                            style="color: #F56C6C;font-size: 12px">10</span>的抵扣券，
-                                    最终需要<span style="color: #F56C6C;font-size: 12px">110</span>的抵扣券
+                                <el-col :span="12">
+                                    <el-form-item label="小程序用户" prop="user_id">
+                                        <el-input style="display: none;" v-model="ruleForm.user_id"></el-input>
+                                        <el-input disabled v-model="nickname">
+                                            <template slot="append">
+                                                <el-button @click="getUsers" type="primary">选择</el-button>
+                                            </template>
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item label="商户账号" prop="username">
+                                        <el-input  v-model="ruleForm.username"></el-input>
+                                    </el-form-item>
+                                    <el-form-item v-if="!ruleForm.admin_id" label="商户密码" prop="password">
+                                        <el-input type="password" v-model="ruleForm.password"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="联系人" prop="realname">
+                                        <el-input v-model="ruleForm.realname"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="联系电话" prop="mobile">
+                                        <el-input v-model="ruleForm.mobile"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="微信号" prop="wechat">
+                                        <el-input v-model="ruleForm.wechat"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="所售类目" prop="mch_common_cat_id">
+                                        <el-select v-model="ruleForm.mch_common_cat_id" placeholder="请选择">
+                                            <el-option
+                                                    v-for="item in commonCats"
+                                                    :key="item.id"
+                                                    :label="item.name"
+                                                    :value="item.id">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                    <el-form-item label="是否开业" prop="status">
+                                        <el-switch
+                                                v-model="ruleForm.status"
+                                                active-value="1"
+                                                inactive-value="0">
+                                        </el-switch>
+                                    </el-form-item>
+                                    <el-form-item label="好店推荐" prop="is_recommend">
+                                        <el-switch
+                                                v-model="ruleForm.is_recommend"
+                                                active-value="1"
+                                                inactive-value="0">
+                                        </el-switch>
+                                    </el-form-item>
+                                    <el-form-item label="提现手续费" prop="transfer_rate">
+                                        <label slot="label">服务费
+                                            <el-tooltip class="item" effect="dark"
+                                                        content="0表示不设置服务费"
+                                                        placement="top">
+                                                <i class="el-icon-info"></i>
+                                            </el-tooltip>
+                                        </label>
+                                        <el-input type="number" v-model.number="ruleForm.transfer_rate">
+                                            <template slot="append">%</template>
+                                        </el-input>
+                                        <div>
+                                            <span class="text-danger">服务费额外从提现中扣除</span><br>
+                                            例如：<span style="color: #F56C6C;font-size: 12px">10%</span>的提现服务费：<br>
+                                            提现<span style="color: #F56C6C;font-size: 12px">100</span>元，扣除服务费<span
+                                                    style="color: #F56C6C;font-size: 12px">10</span>元，
+                                            实际到手<span style="color: #F56C6C;font-size: 12px">90</span>元
+                                        </div>
+                                    </el-form-item>
+                                    <el-form-item label="抵扣券额外扣取比例" prop="transfer_rate">
+                                        <label slot="label">抵扣券扣取比例
+                                            <el-tooltip class="item" effect="dark"
+                                                        content="0表示不设置"
+                                                        placement="top">
+                                                <i class="el-icon-info"></i>
+                                            </el-tooltip>
+                                        </label>
+                                        <el-input type="number" v-model.number="ruleForm.integral_fee_rate">
+                                            <template slot="append">%</template>
+                                        </el-input>
+                                        <div>
+                                            <span class="text-danger">使用抵扣券支付需额外支付的抵扣券数额</span><br>
+                                            例如：设置<span style="color: #F56C6C;font-size: 12px">10%</span><br>
+                                            使用抵扣券抵扣<span style="color: #F56C6C;font-size: 12px">100</span>元时，需要额外收取<span
+                                                    style="color: #F56C6C;font-size: 12px">10</span>的抵扣券，
+                                            最终需要<span style="color: #F56C6C;font-size: 12px">110</span>的抵扣券
+                                        </div>
+                                    </el-form-item>
+                                    <el-form-item label="排序" prop="sort">
+                                        <label slot="label">排序
+                                            <el-tooltip class="item" effect="dark"
+                                                        content="升序，数字越小排的越靠前"
+                                                        placement="top">
+                                                <i class="el-icon-info"></i>
+                                            </el-tooltip>
+                                        </label>
+                                        <el-input type="number" v-model.number="ruleForm.sort"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                            </el-card>
+                            <el-card shadow="never" style="margin-bottom: 20px">
+                                <div slot="header">
+                                    <span>商户信息</span>
                                 </div>
-                            </el-form-item>
-                            <el-form-item label="排序" prop="sort">
-                                <label slot="label">排序
-                                    <el-tooltip class="item" effect="dark"
-                                                content="升序，数字越小排的越靠前"
-                                                placement="top">
-                                        <i class="el-icon-info"></i>
-                                    </el-tooltip>
-                                </label>
-                                <el-input type="number" v-model.number="ruleForm.sort"></el-input>
-                            </el-form-item>
-                        </el-col>
-                    </el-card>
-                    <el-card shadow="never" style="margin-bottom: 20px">
-                        <div slot="header">
-                            <span>商户信息</span>
-                        </div>
-                        <el-col :span="12">
-                            <el-form-item label="店铺名称" prop="name">
-                                <el-input v-model="ruleForm.name"></el-input>
-                            </el-form-item>
-                            <el-form-item label="店铺Logo" prop="logo">
-                                <com-attachment :multiple="false" :max="1" v-model="ruleForm.logo">
-                                    <el-tooltip class="item"
-                                                effect="dark"
-                                                content="建议尺寸:240 * 240"
-                                                placement="top">
-                                        <el-button size="mini">选择文件</el-button>
-                                    </el-tooltip>
-                                </com-attachment>
-                                <com-image mode="aspectFill" width='80px' height='80px' :src="ruleForm.logo">
-                                </com-image>
-                            </el-form-item>
-                            <el-form-item label="店铺背景图" prop="bg_pic_url">
-                                <com-attachment :multiple="false" :max="1" @selected="picUrl">
-                                    <el-tooltip class="item"
-                                                effect="dark"
-                                                content="建议尺寸:750 * 200"
-                                                placement="top">
-                                        <el-button size="mini">选择文件</el-button>
-                                    </el-tooltip>
-                                </com-attachment>
-                                <com-image mode="aspectFill" width='80px' height='80px'
-                                           :src="ruleForm.bg_pic_url && ruleForm.bg_pic_url.length ? ruleForm.bg_pic_url[0].pic_url : ''">
-                                </com-image>
-                            </el-form-item>
-                            <el-form-item label="省市区" prop="district">
-                                <el-cascader
-                                        :options="district"
-                                        :props="props"
-                                        v-model="ruleForm.district">
-                                </el-cascader>
-                            </el-form-item>
-                            <el-form-item label="店铺地址" prop="address">
-                                <el-input v-model="ruleForm.address"></el-input>
-                            </el-form-item>
-                            <el-form-item label="客服电话" prop="service_mobile">
-                                <el-input v-model="ruleForm.service_mobile"></el-input>
-                            </el-form-item>
-                        </el-col>
-                    </el-card>
-
-                    <el-card v-if="is_audit == 1 && ruleForm.form_data.length > 0" shadow="never"
-                             style="margin-bottom: 20px">
-                        <div slot="header">
-                            <span>自定义审核资料</span>
-                        </div>
-                        <el-col :span="12">
-                            <template v-for="item in ruleForm.form_data">
-                                <el-form-item v-if="item.key == 'text'" :label="item.label">
-                                    <el-input disabled v-model="item.value" type="text"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="item.key == 'textarea'" :label="item.label">
-                                    <el-input disabled v-model="item.value" type="textarea"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="item.key == 'date'" :label="item.label">
-                                    <el-input disabled v-model="item.value" type="text"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="item.key == 'time'" :label="item.label">
-                                    <el-input disabled v-model="item.value" type="text"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="item.key == 'radio'" :label="item.label">
-                                    <el-radio disabled v-model="item.value" :label="item.value">{{item.value}}
-                                    </el-radio>
-                                </el-form-item>
-                                <el-form-item v-if="item.key == 'checkbox'" :label="item.label">
-                                    <el-checkbox disabled v-for="cItem in item.value" :checked='true'>{{cItem}}
-                                    </el-checkbox>
-                                </el-form-item>
-                                <el-form-item v-if="item.key == 'img_upload'" :label="item.label">
-                                    <template v-if="item.img_type == 2 || Array.isArray(item.value)">
-                                        <div flex="dir:left">
-                                            <div v-for="imgItem in item.value" @click="dialogImgShow(imgItem)">
-                                                <com-image style="margin-right: 10px;"
-                                                           mode="aspectFill"
-                                                           width="100px"
-                                                           height='100px'
-                                                           :src="imgItem">
-                                                </com-image>
-                                            </div>
-                                        </div>
+                                <el-col :span="12">
+                                    <el-form-item label="店铺名称" prop="name">
+                                        <el-input v-model="ruleForm.name"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="店铺Logo" prop="logo">
+                                        <com-attachment :multiple="false" :max="1" v-model="ruleForm.logo">
+                                            <el-tooltip class="item"
+                                                        effect="dark"
+                                                        content="建议尺寸:240 * 240"
+                                                        placement="top">
+                                                <el-button size="mini">选择文件</el-button>
+                                            </el-tooltip>
+                                        </com-attachment>
+                                        <com-image mode="aspectFill" width='80px' height='80px' :src="ruleForm.logo">
+                                        </com-image>
+                                    </el-form-item>
+                                    <el-form-item label="店铺背景图" prop="bg_pic_url">
+                                        <com-attachment :multiple="false" :max="1" @selected="picUrl">
+                                            <el-tooltip class="item"
+                                                        effect="dark"
+                                                        content="建议尺寸:750 * 200"
+                                                        placement="top">
+                                                <el-button size="mini">选择文件</el-button>
+                                            </el-tooltip>
+                                        </com-attachment>
+                                        <com-image mode="aspectFill" width='80px' height='80px'
+                                                   :src="ruleForm.bg_pic_url && ruleForm.bg_pic_url.length ? ruleForm.bg_pic_url[0].pic_url : ''">
+                                        </com-image>
+                                    </el-form-item>
+                                    <el-form-item label="省市区" prop="district">
+                                        <el-cascader
+                                                :options="district"
+                                                :props="props"
+                                                v-model="ruleForm.district">
+                                        </el-cascader>
+                                    </el-form-item>
+                                    <el-form-item label="店铺地址" prop="address">
+                                        <el-input v-model="ruleForm.address"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="客服电话" prop="service_mobile">
+                                        <el-input v-model="ruleForm.service_mobile"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                            </el-card>
+                            <el-card v-if="is_audit == 1 && ruleForm.form_data.length > 0" shadow="never"
+                                     style="margin-bottom: 20px">
+                                <div slot="header">
+                                    <span>自定义审核资料</span>
+                                </div>
+                                <el-col :span="12">
+                                    <template v-for="item in ruleForm.form_data">
+                                        <el-form-item v-if="item.key == 'text'" :label="item.label">
+                                            <el-input disabled v-model="item.value" type="text"></el-input>
+                                        </el-form-item>
+                                        <el-form-item v-if="item.key == 'textarea'" :label="item.label">
+                                            <el-input disabled v-model="item.value" type="textarea"></el-input>
+                                        </el-form-item>
+                                        <el-form-item v-if="item.key == 'date'" :label="item.label">
+                                            <el-input disabled v-model="item.value" type="text"></el-input>
+                                        </el-form-item>
+                                        <el-form-item v-if="item.key == 'time'" :label="item.label">
+                                            <el-input disabled v-model="item.value" type="text"></el-input>
+                                        </el-form-item>
+                                        <el-form-item v-if="item.key == 'radio'" :label="item.label">
+                                            <el-radio disabled v-model="item.value" :label="item.value">{{item.value}}
+                                            </el-radio>
+                                        </el-form-item>
+                                        <el-form-item v-if="item.key == 'checkbox'" :label="item.label">
+                                            <el-checkbox disabled v-for="cItem in item.value" :checked='true'>{{cItem}}
+                                            </el-checkbox>
+                                        </el-form-item>
+                                        <el-form-item v-if="item.key == 'img_upload'" :label="item.label">
+                                            <template v-if="item.img_type == 2 || Array.isArray(item.value)">
+                                                <div flex="dir:left">
+                                                    <div v-for="imgItem in item.value" @click="dialogImgShow(imgItem)">
+                                                        <com-image style="margin-right: 10px;"
+                                                                   mode="aspectFill"
+                                                                   width="100px"
+                                                                   height='100px'
+                                                                   :src="imgItem">
+                                                        </com-image>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            <template v-else>
+                                                <div @click="dialogImgShow(item.value)">
+                                                    <com-image mode="aspectFill"
+                                                               width="100px"
+                                                               height='100px'
+                                                               :src="item.value">
+                                                    </com-image>
+                                                </div>
+                                            </template>
+                                        </el-form-item>
                                     </template>
-                                    <template v-else>
-                                        <div @click="dialogImgShow(item.value)">
-                                            <com-image mode="aspectFill"
-                                                       width="100px"
-                                                       height='100px'
-                                                       :src="item.value">
-                                            </com-image>
-                                        </div>
+                                </el-col>
+                            </el-card>
+                            <el-card v-if="is_audit == 1" shadow="never">
+                                <div slot="header">
+                                    <span>审核信息</span>
+                                </div>
+                                <el-col :span="12">
+                                    <template v-if="is_audit == 1 && is_review == 0">
+                                        <el-form-item label="审核状态" prop="review_status">
+                                            <el-tag v-if="ruleForm.review_status == 0" type="info">待审核</el-tag>
+                                            <el-tag v-if="ruleForm.review_status == 1" type="success">审核通过</el-tag>
+                                            <el-tag v-if="ruleForm.review_status == 2" type="danger">审核不通过</el-tag>
+                                        </el-form-item>
+                                        <el-form-item label="审核结果" prop="review_remark">
+                                            {{ruleForm.review_remark}}
+                                        </el-form-item>
                                     </template>
-                                </el-form-item>
-                            </template>
-                        </el-col>
-                    </el-card>
+                                    <template v-if="is_review == 1">
+                                        <el-form-item label="审核状态" prop="review_status">
+                                            <el-radio v-model="ruleForm.review_status" label="1">审核通过</el-radio>
+                                            <el-radio v-model="ruleForm.review_status" label="2">审核不通过</el-radio>
+                                        </el-form-item>
+                                        <el-form-item label="审核结果">
+                                            <el-input v-model="ruleForm.review_remark" type="textarea" :row="5"></el-input>
+                                        </el-form-item>
+                                    </template>
+                                </el-col>
+                            </el-card>
+                        </el-row>
+                    </el-tab-pane>
+                </el-tabs>
 
-                    <el-card v-if="is_audit == 1" shadow="never">
-                        <div slot="header">
-                            <span>审核信息</span>
-                        </div>
-                        <el-col :span="12">
-                            <template v-if="is_audit == 1 && is_review == 0">
-                                <el-form-item label="审核状态" prop="review_status">
-                                    <el-tag v-if="ruleForm.review_status == 0" type="info">待审核</el-tag>
-                                    <el-tag v-if="ruleForm.review_status == 1" type="success">审核通过</el-tag>
-                                    <el-tag v-if="ruleForm.review_status == 2" type="danger">审核不通过</el-tag>
-                                </el-form-item>
-                                <el-form-item label="审核结果" prop="review_remark">
-                                    {{ruleForm.review_remark}}
-                                </el-form-item>
-                            </template>
-                            <template v-if="is_review == 1">
-                                <el-form-item label="审核状态" prop="review_status">
-                                    <el-radio v-model="ruleForm.review_status" label="1">审核通过</el-radio>
-                                    <el-radio v-model="ruleForm.review_status" label="2">审核不通过</el-radio>
-                                </el-form-item>
-                                <el-form-item label="审核结果">
-                                    <el-input v-model="ruleForm.review_remark" type="textarea" :row="5"></el-input>
-                                </el-form-item>
-                            </template>
-                        </el-col>
-                    </el-card>
-
-                </el-row>
             </el-form>
         </div>
         <el-button class="button-item" :loading="btnLoading" type="primary" @click="store('ruleForm')" size="small">保存

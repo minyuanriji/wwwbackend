@@ -66,12 +66,11 @@ class GoodsListForm extends BaseModel
                 ->with(['goodsWarehouse', 'attr'])
                 ->where(['g.is_delete' => 0, 'g.status' => 1, 'g.mall_id' => \Yii::$app->mall->id,])
                 ->leftJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
-
             if ($this->keyword) {
                 $query->keyword($this->keyword, [
                     'or',
-                    ['like', 'gw.name', $this->keyword],
-                    ['like', 'g.labels', $this->keyword]]);
+                    ['like', 'gw.name', str_replace(' ','',$this->keyword)],
+                    ['like', 'g.labels', str_replace(' ','',$this->keyword)]]);
             }
             if ($this->label) {
                 $query->keyword($this->label, [
@@ -113,19 +112,21 @@ class GoodsListForm extends BaseModel
                 $newList[] = $detail;
             }
 
-            $GoodsCatRelation = new GoodsCatRelationModel();
-            foreach ($newList as $key => $val){
-                if($val['is_delete'] !== 1){
-                    $GoodsCat = $GoodsCatRelation -> getGoodsCatId($val['goods_warehouse_id']);
-                    if(!$this -> deep_in_array($this -> cat_id,$GoodsCat)){
+            if(!empty($this -> cat_id)){
+                $GoodsCatRelation = new GoodsCatRelationModel();
+                foreach ($newList as $key => $val){
+                    if($val['is_delete'] !== 1){
+                        $GoodsCat = $GoodsCatRelation -> getGoodsCatId($val['goods_warehouse_id']);
+                        if(!$this -> deep_in_array($this -> cat_id,$GoodsCat)){
+                            unset($newList[$key]);
+                        }
+                    }else{
                         unset($newList[$key]);
                     }
-                }else{
-                    unset($newList[$key]);
                 }
-
+                $newList = array_merge($newList);
             }
-            $newList = array_merge($newList);
+
 
 
             return $this->returnApiResultData(

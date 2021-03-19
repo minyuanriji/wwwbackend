@@ -207,6 +207,12 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                 </template>
                                             </el-input>
                                         </el-form-item>
+                                        <el-form-item>
+                                            <template slot="label">
+                                                <span>品牌名称</span>
+                                            </template>
+                                            <el-input v-model="ruleForm.goods_brand" type="text" placeholder="请输入品牌名称"></el-input>
+                                        </el-form-item>
                                         <el-form-item prop="number">
                                             <template slot="label">
                                                 <span>商城商品编码</span>
@@ -503,11 +509,11 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                             <el-input :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_no">
                                             </el-input>
                                         </el-form-item>
-                                        <el-form-item label="商品重量">
-                                            <el-input oninput="this.value = this.value.replace(/[^0-9]/g, '');" :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_weight">
-                                                <template slot="append">克</template>
-                                            </el-input>
-                                        </el-form-item>
+<!--                                        <el-form-item label="商品重量">-->
+<!--                                            <el-input oninput="this.value = this.value.replace(/[^0-9]/g, '');" :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_weight">-->
+<!--                                                <template slot="append">克</template>-->
+<!--                                            </el-input>-->
+<!--                                        </el-form-item>-->
                                     </template>
                                     <template v-else-if="is_price == 1">
                                         <el-form-item label="售价" prop="price">
@@ -1188,7 +1194,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 individual_share: 0,
                 is_level: 1,
                 is_level_alone: 0,
-
+                goods_brand:'',
                 pieces: 0,
                 share_type: 0,
                 attr_setting_type: 0,

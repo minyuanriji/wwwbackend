@@ -108,9 +108,6 @@ class WechatForm extends BaseModel
         $wechatModel = \Yii::$app->wechat;
         if($wechatModel->isWechat)
         {
-//            var_dump(\Yii::$app-> wechat -> getWechat() -> getAccessToken());
-            var_dump($wechatModel -> getApp() -> access_token);
-//            $accessTokenArray = $wechat->miniProgram->access_token->getToken();
             $result = $wechatModel->app->oauth->user();
             \Yii::warning("授权结果 result:".json_encode($result));
             if(!empty($result)){

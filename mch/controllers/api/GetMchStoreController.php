@@ -14,7 +14,7 @@ class GetMchStoreController extends ApiController {
      */
     public function actionIndex(){
 
-        $mchId = (int)\Yii::$app->getRequest()->post("mch_id", 0);
+        $mchId = (int)$this->requestData['mch_id'];
 
         try {
             $mchModel = Mch::find()->where([

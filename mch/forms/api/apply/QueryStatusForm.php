@@ -29,6 +29,7 @@ class QueryStatusForm extends EfpsReviewInfoForm{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'status' => $status,
+                    'remark' => $mch->review_remark,
                     'detail' => ArrayHelper::toArray($relatEfps)
                 ]
             ];

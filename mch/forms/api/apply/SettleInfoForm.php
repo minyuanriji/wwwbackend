@@ -4,6 +4,7 @@ namespace app\mch\forms\api\apply;
 use app\core\ApiCode;
 use app\mch\forms\mch\EfpsReviewInfoForm;
 use app\models\MchRelatEfps;
+use app\plugins\mch\models\Mch;
 
 class SettleInfoForm extends EfpsReviewInfoForm{
 
@@ -17,6 +18,9 @@ class SettleInfoForm extends EfpsReviewInfoForm{
                 MchRelatEfps::updateAll([
                     "status" => 1
                 ], ["mch_id" => $this->mch_id]);
+                Mch::updateAll([
+                    "review_status" => Mch::REVIEW_STATUS_UNCHECKED
+                ], ["id" => $this->mch_id]);
             }
 
             return $res;

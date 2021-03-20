@@ -329,7 +329,6 @@ class Efps extends Component{
             $stageParams = [];
 
             $paperParams = [
-                'acqSpId'                    => $params['acqSpId'],
                 'merchantType'               => $params['merchantType'],
                 'businessLicenseCode'        => isset($params['businessLicenseCode']) ? $params['businessLicenseCode'] : "",
                 'businessLicenseName'        => isset($params['businessLicenseName']) ? $params['businessLicenseName'] : "",

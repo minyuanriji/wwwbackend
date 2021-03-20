@@ -65,6 +65,7 @@ class EfpsReviewInfoForm extends BaseModel {
     public $updated_at;
     public $deleted_at;
     public $is_delete;
+    public $status;
 
     public function rules(){
         return array_merge(parent::rules(), [

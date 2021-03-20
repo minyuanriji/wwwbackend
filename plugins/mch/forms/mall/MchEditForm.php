@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\forms\common\template\TemplateSend;
 use app\forms\common\template\tplmsg\AudiResultTemplate;
 use app\mch\forms\mch\EfpsReviewInfoForm;
+use app\models\MchRelatEfps;
 use app\models\Model;
 use app\models\Store;
 use app\models\User;
@@ -43,6 +44,7 @@ class MchEditForm extends MchEditFormBase
             $this->checkData();
             $this->setMch();
             $this->setReviewInfo();
+            $this->setReviewStatus();
             $this->setStore();
             $this->setMallMchSetting();
             $this->setMchSetting();
@@ -67,6 +69,10 @@ class MchEditForm extends MchEditFormBase
         }
     }
 
+    /**
+     * 设置审核信息
+     * @throws \Exception
+     */
     protected function setReviewInfo(){
         $form = new EfpsReviewInfoForm();
         $form->attributes = $this->review_info;
@@ -74,6 +80,30 @@ class MchEditForm extends MchEditFormBase
         $res = $form->save();
         if($res['code'] != ApiCode::CODE_SUCCESS){
             throw new \Exception($res['msg']);
+        }
+    }
+
+    protected function setReviewStatus(){
+        if($this->mch->review_status == $this->review_status)
+            return;
+        if($this->review_status == Mch::REVIEW_STATUS_NOTPASS){ //审核不通过
+            MchRelatEfps::updateAll(['status' => 3], ["mch_id" => $this->mch->id]);
+            Mch::updateAll([
+                "review_status" => Mch::REVIEW_STATUS_NOTPASS,
+                "review_remark" => $this->review_remark
+            ], ["id" => $this->mch->id]);
+        }elseif($this->review_status == Mch::REVIEW_STATUS_CHECKED){ //审核通过
+            $reviewData = MchRelatEfps::find()->where(["mch_id" => $this->mch->id])->asArray()->one();
+            if(!$reviewData){
+                throw new \Exception("无法获取审核信息");
+            }
+
+            $params = [
+                //'merchantName' => $reviewData[''],
+            ];
+
+            Yii::$app->efps->merchantApply();
+            exit;
         }
     }
 

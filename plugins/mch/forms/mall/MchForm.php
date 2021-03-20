@@ -106,13 +106,14 @@ class MchForm extends BaseModel
             }
 
             $reviewData = ArrayHelper::toArray($relatEfps);
-            $reviewData['acceptOrder'] = $reviewData['acceptOrder'] ? "1" : "0";
-            $reviewData['openAccount'] = $reviewData['openAccount'] ? "1" : "0";
-            $reviewData['paper_merchantType'] = (string)$reviewData['paper_merchantType'];
-            $reviewData['paper_isCc'] = $reviewData['paper_isCc'] ? "1" : "0";
-            $reviewData['paper_settleAccountType'] = (string)$reviewData['paper_settleAccountType'];
-            $reviewData['paper_settleTarget'] = (string)$reviewData['paper_settleTarget'];
-
+            if(!empty($reviewData)){
+                $reviewData['acceptOrder'] = $reviewData['acceptOrder'] ? "1" : "0";
+                $reviewData['openAccount'] = $reviewData['openAccount'] ? "1" : "0";
+                $reviewData['paper_merchantType'] = (string)$reviewData['paper_merchantType'];
+                $reviewData['paper_isCc'] = $reviewData['paper_isCc'] ? "1" : "0";
+                $reviewData['paper_settleAccountType'] = (string)$reviewData['paper_settleAccountType'];
+                $reviewData['paper_settleTarget'] = (string)$reviewData['paper_settleTarget'];
+            }
             $reviewData['paper_mcc_obj'] = ["type" => "", "code" => ""];
             if(!empty($reviewData['paper_mcc'])){
                 $mcc = EfpsMerchantMcc::findOne(['code' => $reviewData['paper_mcc']]);

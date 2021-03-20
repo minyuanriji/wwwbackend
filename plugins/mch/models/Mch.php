@@ -4,6 +4,7 @@ namespace app\plugins\mch\models;
 
 use app\models\Admin;
 use app\models\BaseActiveRecord;
+use app\models\MchRelatEfps;
 use app\models\Store;
 use app\models\User;
 use Yii;
@@ -118,6 +119,11 @@ class Mch extends BaseActiveRecord
     public function getCategory()
     {
         return $this->hasOne(MchCommonCat::className(), ['id' => 'mch_common_cat_id']);
+    }
+
+    public function getRelatEfps()
+    {
+        return $this->hasOne(MchRelatEfps::className(), ['mch_id' => 'id']);
     }
 }
 

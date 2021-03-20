@@ -5,6 +5,7 @@ namespace app\plugins\mch\forms\mall;
 use app\core\ApiCode;
 use app\forms\common\template\TemplateSend;
 use app\forms\common\template\tplmsg\AudiResultTemplate;
+use app\mch\forms\mch\EfpsReviewInfoForm;
 use app\models\Model;
 use app\models\Store;
 use app\models\User;
@@ -20,12 +21,14 @@ class MchEditForm extends MchEditFormBase
     public $is_review;
     public $review_status;
     public $review_remark;
+    public $review_info;
 
     public function rules()
     {
         return array_merge(parent::rules(), [
             [['review_remark'], 'string'],
-            [['review_status', 'is_review'], 'integer']
+            [['review_status', 'is_review'], 'integer'],
+            [['review_info'], 'safe']
         ]);
     }
 
@@ -39,6 +42,7 @@ class MchEditForm extends MchEditFormBase
         try {
             $this->checkData();
             $this->setMch();
+            $this->setReviewInfo();
             $this->setStore();
             $this->setMallMchSetting();
             $this->setMchSetting();
@@ -63,6 +67,16 @@ class MchEditForm extends MchEditFormBase
         }
     }
 
+    protected function setReviewInfo(){
+        $form = new EfpsReviewInfoForm();
+        $form->attributes = $this->review_info;
+        $form->mch_id     = $this->mch->id;
+        $res = $form->save();
+        if($res['code'] != ApiCode::CODE_SUCCESS){
+            throw new \Exception($res['msg']);
+        }
+    }
+
     /**
      * @param Mch $mch
      * @return bool
@@ -70,7 +84,7 @@ class MchEditForm extends MchEditFormBase
      */
     protected function extraMchInfo($mch)
     {
-        if ($this->is_review) {
+        /*if ($this->is_review) {
             if (!$this->review_status) {
                 throw new \Exception('请选择审核状态');
             }
@@ -81,7 +95,7 @@ class MchEditForm extends MchEditFormBase
                 $mch->review_remark = $this->review_remark;
                 $mch->review_time = mysql_timestamp();
             }
-        }
+        }*/
         return true;
     }
 

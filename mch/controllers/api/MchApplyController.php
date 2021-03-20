@@ -16,6 +16,7 @@ class MchApplyController extends ApiController{
         ]);
     }
 
+
     public function actionIndex(){
         $form = new MchApplyForm();
         $form->attributes = \Yii::$app->request->post();

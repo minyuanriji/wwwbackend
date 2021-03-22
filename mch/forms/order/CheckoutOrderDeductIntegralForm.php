@@ -99,7 +99,7 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
                         $deduct['money'] = $canDeductMoney * -1;
                         $deduct['desc']  = $this->desc . '扣除动态购物券('.$integral['id'].')抵扣：'.$canDeductMoney;
 
-                        static::deduct($deduct);
+                        static::deduct($deduct, $user);
 
                         $integral->status = 3;
                         if(!$integral->save()){
@@ -157,7 +157,8 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
             }
 
             //更新用户动态抵扣券数
-            $wallet->dynamic_integral += $log['money'];
+            $wallet->dynamic_integral -= $log['money'];
+
             if(!$wallet->save(false)){
                 throw new \Exception($wallet->getErrorMessage());
             }

@@ -50,6 +50,7 @@ use Yii;
  * @property int $confine_order_count
  * @property int $is_area_limit 是否单独区域购买
  * @property string $area_limit
+ * @property string $goods_brand
  * @property GoodsDistribution[] $share
  * @property GoodsAttr[] $attr
  * @property GoodsCards[] $cards

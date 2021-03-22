@@ -100,7 +100,7 @@ class UserIncomeForm extends BaseModel
             'income' => round($userInfo->income, 2),
 
             //待收益
-            'income_frozen' => round($userInfo->income_frozen, 2),
+            'income_frozen' => round(str_replace('-','',$userInfo -> income_frozen), 2),
 
             'total_income' => round($userInfo->total_income, 2),
 

@@ -243,7 +243,7 @@ class UserController extends ApiController
         //1.6 拼接获取二维码的地址带上access_token
         $url="https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=".$access_token;
         //1.7 发送 POST请求换取二维码
-        $Img = '/web/statics/poster/images/' .time() . uniqid() . '.jpg';
+        $Img = '/runtime/image/poster/images/' .time() . uniqid() . '.jpg';
         $filename = \Yii::$app->basePath .$Img;
         $result= (new SetToken()) -> httpRequest($url,$post_data,'POST');
         file_put_contents($filename, $result);
@@ -363,7 +363,7 @@ class UserController extends ApiController
         );
         Poster::setConfig($config);
 //设置保存路径
-        $Img = '/web/statics/poster/images/' .time() . uniqid() . '.jpg';
+        $Img = '/runtime/image/poster/images/' .time() . uniqid() . '.jpg';
         $filename = \Yii::$app->basePath .$Img;
         $res = Poster::make($filename);
         if($res){

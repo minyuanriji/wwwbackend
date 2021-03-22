@@ -330,6 +330,8 @@ class OrderSubmitForm extends BaseModel
                         . ' '
                         . $data['user_address']['district']
                         . ' '
+                        . $data['user_address']['town']
+                        . ' '
                         . $data['user_address']['detail'];
 
                     $order->address_id=$data['user_address']['id'];

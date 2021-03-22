@@ -71,6 +71,7 @@ class GoodsForm extends BaseModel
             $common->mch_id = $this->mch_id;
             /* @var Goods[] $goodsList */
             $goodsList = $common->search();
+
             $newList = [];
             foreach ($goodsList as $goods) {
                 $newItem = $common->getDiyBack($goods);

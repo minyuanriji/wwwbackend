@@ -102,6 +102,7 @@ abstract class BaseGoodsEdit extends BaseModel
     public $mch_id;
     protected $newAttrs;
     protected $sign;
+    public $expressName;
 
 
     /** @var  Mch */

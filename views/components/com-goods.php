@@ -601,16 +601,31 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         <el-dialog title="选择运费" :visible.sync="freight.dialog" width="30%">
                                             <el-card shadow="never" flex="dir:left" style="flex-wrap: wrap" v-loading="freight.loading">
                                                 <el-radio-group v-model="freight.checked">
-                                                    <el-radio style="padding: 10px;" v-for="item in freight.list" :label="item" :key="item.id">{{item.name}}
+                                                    <el-radio @change="open_show(item.id)" style="padding: 10px;" v-for="item in freight.list" :label="item" :key="item.id">{{item.name}}
                                                     </el-radio>
                                                 </el-radio-group>
                                             </el-card>
+                                            <el-button type="primary" style="margin-top: 20px;" @click="open_option" v-if="ExpressFlag">{{CustomExpressText}}</el-button>
                                             <div slot="footer" class="dialog-footer">
                                                 <el-button @click="freightCancel">取 消</el-button>
                                                 <el-button type="primary" @click="freightConfirm">确 定</el-button>
                                             </div>
                                         </el-dialog>
                                     </el-form-item>
+
+                                    <el-drawer
+                                            title="追加快递费"
+                                            :visible.sync="drawer"
+                                            size="25%" style="overflow: scroll">
+                                        <div>
+                                            <el-form ref="form" label-width="120px">
+                                            <el-form-item v-for="(el,i) in ExpressDataList" :label="el.name">
+                                                <el-input v-model="ExpressForm[i]" :name="el.name" value="" size="small" style="width: 200px"></el-input>
+                                            </el-form-item>
+                                            </el-form>
+                                        </div>
+                                    </el-drawer>
+
                                     <el-form-item prop="freight_id" v-if="is_form == 1">
                                         <template slot='label'>
                                             <span>自定义表单</span>
@@ -859,19 +874,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 									        <template slot="append">元</template>
 									    </el-input>
 									</el-form-item>
-									
-									
-								
 								</el-col>
                             </el-row>
-
-
-
-
-                            
-
-
-
                         </el-card>
 
                         <!-- 商品详情 -->
@@ -1339,7 +1343,14 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 mchCats: [], //用于前端已选的分类展示 多商户
                 cards: [], // 优惠券
                 attrGroups: [], //规格组
-
+                CustomExpress:'',
+                ExpressFlag:false,
+                CustomExpressText:'开启自定义',
+                ExpressForm:[],
+                ExpressName:[],
+                ExpressDataList:[],
+                drawer: false,
+                innerDrawer: false,
                 attrGroupName: '',
                 attrName: [],
                 // 批量设置
@@ -1499,7 +1510,36 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             }
         },
         methods: {
+            open_show(id){
+                this.ExpressFlag = true;
+                this.CustomExpress = id;
+            },
+            open_option(){
+                this.drawer = true;
+                request({
+                    params: {
+                        r: 'mall/postage-rules/express-list',
+                        'id': this.CustomExpress
+                    },
+                }).then(e => {
+                    this.ExpressDataList = e.data.data.list;
 
+                    e.data.data.list.forEach((el,i) => {
+                        var val = el.name;
+                        this.ExpressForm[i] = '';
+                        this.ExpressName[i] = el.name;
+                    })
+                }).catch(e => {
+
+                });
+            },
+            handleClose(done) {
+                this.$confirm('还有未保存的工作哦确定关闭吗？')
+                    .then(_ => {
+                        done();
+                    })
+                    .catch(_ => {});
+            },
             // 如果是效时有效、购物券
             isPermanentChange() {
                 if (this.isPermanent) {
@@ -1785,6 +1825,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             data: {
                                 form: JSON.stringify(postData),
                                 attrGroups: JSON.stringify(self.attrGroups),
+                                expressName:JSON.stringify(this.ExpressName),
                             }
                         }).then(e => {
                             self.btnLoading = false;
@@ -2251,6 +2292,12 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             freightConfirm() {
                 this.ruleForm.freight = JSON.parse(JSON.stringify(this.freight.checked));
                 this.ruleForm.freight_id = this.ruleForm.freight.id;
+                this.ExpressFlag = false;
+                this.ExpressForm.forEach((el,i) => {
+                    var value = this.ExpressName[i] + ',' + (el ? el : 0);
+                    this.ExpressName[i] = value;
+                })
+                console.log(this.ExpressName);
                 this.freightCancel();
             },
             freightDelete() {
@@ -2296,3 +2343,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
         }
     });
 </script>
+<style>
+    .el-drawer__body {
+        overflow: auto;
+    }
+</style>

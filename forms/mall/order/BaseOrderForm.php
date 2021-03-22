@@ -140,6 +140,9 @@ abstract class BaseOrderForm extends BaseModel
         $query->andWhere($this->getExtraWhere());
         //过滤拼团订单
         $query->andWhere(['!=', 'o.sign', 'group_buy']);
+        if($this -> status == '-1'){
+            $query->andWhere(['!=', 'o.is_recycle', '1']);
+        }
 
         $list = $query->page($pagination)
             ->orderBy($this->order_by . 'o.created_at DESC')
@@ -191,7 +194,6 @@ abstract class BaseOrderForm extends BaseModel
             foreach ($item['detail'] as $key => &$detail) {
                 $goods_info = \Yii::$app->serializer->decode($detail['goods_info']);
                 $item['detail'][$key]['attr_list'] = $goods_info['attr_list'];
-
                 //有问题的代码,xuyaoxiang
 //                $refund_status = 0;
 //                if ($detail['refund']) {

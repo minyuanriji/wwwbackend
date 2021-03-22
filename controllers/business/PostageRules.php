@@ -3,6 +3,12 @@ namespace app\controllers\business;
 use app\models\mysql\PostageRules as PostageRulesModel;
 use app\models\mysql\Goods;
 class PostageRules{
+    /**
+     * 获取快递价格
+     * @param $data
+     * @param int $flag
+     * @return array
+     */
     public function getExpressPrice($data,$flag = 0){
         try {
             if($flag == 0){
@@ -44,4 +50,39 @@ class PostageRules{
         }
         return $data_price;
     }
+
+    /**
+     * 获取快递信息
+     * @param $id
+     * @return mixed|null
+     */
+    public function getExpressData($id){
+        if ($id == 0) {
+            $result = (new PostageRulesModel())->getExpressPrice();
+        } else {
+            $result = (new PostageRulesModel())->getGoodsExpressPrice($id);
+        }
+        $data = json_decode($result -> toArray()['detail'],true);
+        $data_arr = [];
+        foreach ($data as $key => $val){
+            $data_arr[] = $val['list'];
+        }
+        $result = array_reduce($data_arr, 'array_merge', []);
+        return $result;
+    }
+
+    public function CustomPostage($data){
+        $data_arr = [];
+        foreach ($data as $key => $val){
+            $postage = explode(',',$val);
+            $data_arr[] = [
+                'name' => $postage[0],
+                'price' => $postage[1],
+            ];
+        }
+        var_dump(json_encode($data_arr));
+    }
+
+
+
 }

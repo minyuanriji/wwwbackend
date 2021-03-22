@@ -115,7 +115,7 @@ class GoodsListForm extends BaseModel
             if(!empty($this -> cat_id)){
                 $GoodsCatRelation = new GoodsCatRelationModel();
                 foreach ($newList as $key => $val){
-                    if($val['is_delete'] !== 1){
+                    if($val['is_delete'] !== 1 && $val['status'] !== 0){
                         $GoodsCat = $GoodsCatRelation -> getGoodsCatId($val['goods_warehouse_id']);
                         if(!$this -> deep_in_array($this -> cat_id,$GoodsCat)){
                             unset($newList[$key]);

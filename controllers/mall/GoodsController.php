@@ -27,7 +27,7 @@ use app\forms\mall\goods\RecommendSettingForm;
 use app\forms\mall\goods\TaobaoCsvForm;
 use app\forms\mall\goods\TransferForm;
 use app\models\Label;
-use app\controllers\business\ExportData;
+use app\controllers\business\{ExportData};
 class GoodsController extends MallController
 {
 
@@ -90,7 +90,8 @@ class GoodsController extends MallController
                 $form->attributes = $data_form;
 
                 $form->attrGroups = json_decode($data['attrGroups'], true);
-
+                $form -> expressName = json_decode($data['expressName'],true);
+                
                 $res = $form->save();
                 return $this->asJson($res);
             } else {
@@ -104,6 +105,8 @@ class GoodsController extends MallController
             return $this->render('edit');
         }
     }
+
+
 
 
     /**

@@ -52,9 +52,8 @@ class UserForm extends BaseModel
             'stat'      => null
         ];
         $mchInfo = Mch::find()->where([
-            'user_id'       => \Yii::$app->user->id,
-            'review_status' => Mch::REVIEW_STATUS_CHECKED,
-            'is_delete'     => 0
+            'user_id'   => \Yii::$app->user->id,
+            'is_delete' => 0
         ])->with(["store", "category"])->asArray()->one();
         if($mchInfo){
             $returnData['is_mch']   = 1;

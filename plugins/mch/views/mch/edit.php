@@ -246,14 +246,18 @@
                                 <el-form-item label="商户注册名称" prop="merchantName">
                                     <div>{{ruleForm.name}}</div>
                                 </el-form-item>
-                                <el-form-item label="是否收单" prop="acceptOrder">
+                                <el-form-item label="进件商户" prop="register_type">
+                                    <el-radio v-model="review.register_type" label="separate_account">分账商户</el-radio>
+                                    <el-radio v-model="review.register_type" label="common">标准商户</el-radio>
+                                </el-form-item>
+                                <el-form-item v-if="review.register_type != 'separate_account'" label="是否收单" prop="acceptOrder">
                                     <el-switch
                                             v-model="review.acceptOrder"
                                             active-value="1"
                                             inactive-value="0">
                                     </el-switch>
                                 </el-form-item>
-                                <el-form-item label="是否开户" prop="openAccount">
+                                <el-form-item v-if="review.register_type != 'separate_account'" label="是否开户" prop="openAccount">
                                     <el-switch
                                             v-model="review.openAccount"
                                             active-value="1"
@@ -280,7 +284,7 @@
                                     </el-form-item>
                                 </template>
                             </el-tab-pane>
-                            <el-tab-pane label="营业执照">
+                            <el-tab-pane v-if="review.register_type != 'separate_account'" label="营业执照">
                                 <el-form-item label="商户类型" prop="paper_merchantType">
                                     <el-radio v-model="review.paper_merchantType" label="1">个体</el-radio>
                                     <el-radio v-model="review.paper_merchantType" label="2">企业</el-radio>
@@ -464,7 +468,7 @@
                                     <el-input v-model="review.paper_email"></el-input>
                                 </el-form-item>
                             </el-tab-pane>
-                            <el-tab-pane label="对公账户">
+                            <el-tab-pane v-if="review.register_type != 'separate_account'" label="对公账户">
                                 <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1 && review.paper_merchantType==2" label="账户名" prop="paper_licenceAccount">
                                     <el-input v-model="review.paper_licenceAccount"></el-input>
                                 </el-form-item>
@@ -492,10 +496,10 @@
                             </el-tab-pane>
                             <el-tab-pane label="结算账号">
                                 <el-form-item v-if="review.openAccount==1 || review.paper_merchantType==1 || review.paper_merchantType==2" label="结算账户类型" prop="paper_settleAccountType">
-                                    <el-radio v-model="review.paper_settleAccountType" label="1">对公账户</el-radio>
+                                    <el-radio v-if="review.register_type != 'separate_account'" v-model="review.paper_settleAccountType" label="1">对公账户</el-radio>
                                     <el-radio v-model="review.paper_settleAccountType" label="2">法人账户</el-radio>
-                                    <el-radio v-model="review.paper_settleAccountType" label="3">授权对公</el-radio>
-                                    <el-radio v-model="review.paper_settleAccountType" label="4">授权对私</el-radio>
+                                    <el-radio v-if="review.register_type != 'separate_account'" v-model="review.paper_settleAccountType" label="3">授权对公</el-radio>
+                                    <el-radio v-if="review.register_type != 'separate_account'" v-model="review.paper_settleAccountType" label="4">授权对私</el-radio>
                                 </el-form-item>
                                 <el-form-item v-if="review.openAccount==1 || review.paper_merchantType==1 || review.paper_merchantType==2" label="结算账户号" prop="paper_settleAccountNo">
                                     <el-input v-model="review.paper_settleAccountNo"></el-input>
@@ -536,7 +540,7 @@
 
                             </el-tab-pane>
                             <el-tab-pane label="业务信息">
-                                <el-form-item label="业务代码" prop="paper_businessCode">
+                                <el-form-item v-if="review.register_type != 'separate_account'" label="业务代码" prop="paper_businessCode">
                                     <el-input v-model="review.paper_businessCode"></el-input>
                                 </el-form-item>
 
@@ -715,6 +719,7 @@
                     acqMerId: '',
                     acceptOrder: '0',
                     openAccount: '0',
+                    register_type: 'separate_account',
                     paper_merchantType: 0,
                     paper_businessLicenseCode: '',
                     paper_businessLicenseName: '',
@@ -811,6 +816,17 @@
                 paperMerchantMccValue: [],
                 paperMerchantMccOptions: []
             };
+        },
+        watch: {
+            'review.register_type'(val, oldVal){
+                if(val == "separate_account"){ //分账商户
+                    this.review.acceptOrder = '0';
+                    this.review.openAccount = '1';
+                    this.review.paper_merchantType = '3';
+                    this.review.paper_settleAccountType = '2';
+                    this.review.paper_businessCode = 'WITHDRAW_TO_SETTMENT_DEBIT';
+                }
+            }
         },
         methods: {
             getDetail() {

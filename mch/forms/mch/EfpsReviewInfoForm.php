@@ -70,7 +70,7 @@ class EfpsReviewInfoForm extends BaseModel {
     public function rules(){
         return array_merge(parent::rules(), [
             [["mch_id"], "required"],
-            [["mch_id", "status", "paper_settleAccount", "created_at", "updated_at", "deleted_at", "is_delete",
+            [["mch_id", "status", "created_at", "updated_at", "deleted_at", "is_delete",
               "openAccount", "acceptOrder", "paper_isCc", "paper_province",
               "paper_city", "paper_mcc", "paper_merchantType", "paper_lawyerCertType",
               "paper_settleAccountType", "paper_stage_feeRate", "paper_stage_feePer"], "integer"],
@@ -86,7 +86,7 @@ class EfpsReviewInfoForm extends BaseModel {
               "paper_serviceTel", "paper_email", "paper_licenceAccount",
               "paper_licenceAccountNo", "paper_licenceOpenBank",
               "paper_licenceOpenSubBank", "paper_openingLicenseAccountPhoto",
-              "paper_settleAccountNo", "paper_settleTarget",
+              "paper_settleAccountNo", "paper_settleAccount", "paper_settleTarget",
               "paper_settleAttachment", "paper_openBank", "paper_openSubBank",
               "paper_openBankCode", "paper_businessCode", "paper_settleCycle",
               "paper_stage_amountFrom"], 'safe']
@@ -96,7 +96,10 @@ class EfpsReviewInfoForm extends BaseModel {
     public function save(){
 
         if (!$this->validate()) {
-            return $this->responseErrorMsg();
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $this->responseErrorMsg()
+            ];
         }
 
         try {

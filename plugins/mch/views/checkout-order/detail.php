@@ -52,7 +52,9 @@
                         id: getQuery('id'),
                     },
                 }).then(e => {
-
+                    if (e.data.code == 0) {
+                        this.order = e.data.data.detail;
+                    }
                 }).catch(e => {
 
                 });

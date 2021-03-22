@@ -5,6 +5,7 @@ namespace app\plugins\mch\forms\mall;
 
 
 use app\core\ApiCode;
+use app\core\payment\PaymentNotify;
 use app\models\BaseModel;
 use app\models\PaymentOrder;
 use app\plugins\mch\controllers\mall\CheckoutOrderDetailForm;
@@ -31,13 +32,47 @@ class CheckoutOrderQueryReloadForm extends BaseModel{
                 ]);
                 if($paymentOrder){
                     $paymentOrderUnion = $paymentOrder->paymentOrderUnion;
-                    if($paymentOrderUnion && $paymentOrderUnion->pay_type == 1){
+                    if($paymentOrderUnion /*&& $paymentOrderUnion->pay_type == 1*/){
                         $app = \Yii::$app->wechat;
-                        //$paymentOrderUnion->order_no
-                        $orderNo = "JX541403f8d18214058d8da812174e02";
+                        $orderNo = $paymentOrderUnion->order_no;
                         $res = $app->payment->order->queryByOutTradeNumber($orderNo);
-                        print_r($res);
-                        exit;
+                        if(isset($res['trade_state']) && $res['trade_state'] =="SUCCESS"){
+                            $paymentOrderUnion->is_pay = 1;
+                            $paymentOrderUnion->pay_type = 1;
+                            if (!$paymentOrderUnion->save()) {
+                                \Yii::error("pay_notify ".$paymentOrderUnion->getFirstErrors());
+                                throw new \Exception($paymentOrderUnion->getFirstErrors());
+                            }
+                            foreach ([$paymentOrder] as $paymentOrder) {
+                                $Class = $paymentOrder->notify_class;
+                                if (!class_exists($Class)) {
+                                    continue;
+                                }
+                                $paymentOrder->is_pay = 1;
+                                $paymentOrder->pay_type = 1;
+                                if (!$paymentOrder->save()) {
+                                    throw new \Exception($paymentOrder->getFirstErrors());
+                                }
+                                /** @var PaymentNotify $notify */
+                                $notify = new $Class();
+                                try {
+                                    $po = new \app\core\payment\PaymentOrder([
+                                        'orderNo' => $paymentOrder->order_no,
+                                        'amount' => (float)$paymentOrder->amount,
+                                        'title' => $paymentOrder->title,
+                                        'notifyClass' => $paymentOrder->notify_class,
+                                        'payType' => \app\core\payment\PaymentOrder::PAY_TYPE_WECHAT
+                                    ]);
+                                    $notify->notify($po);
+
+                                    $detail = $form->getDetail();
+
+                                } catch (\Exception $e) {
+                                   throw new \Exception("支付订单更新失败 ".$e->getMessage());
+                                }
+                            }
+
+                        }
                     }
                 }
             }

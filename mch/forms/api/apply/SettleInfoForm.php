@@ -59,10 +59,6 @@ class SettleInfoForm extends EfpsReviewInfoForm{
             throw new \Exception("请设置开户银行");
         }
 
-        if(empty($this->paper_openSubBank)){ //开户支行
-            throw new \Exception("请设置开户支行");
-        }
-
         if($settleAccountType ==  MchRelatEfps::SETTLEACCOUNTTYPE_ENT){
             if(empty($this->paper_openSubBank)){ //开户支行
                 throw new \Exception("请设置开户支行");

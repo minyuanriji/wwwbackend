@@ -529,6 +529,9 @@ Yii::$app->loadComponentView('order/com-edit-address');
             };
         },
         created() {
+            // if(localStorage.getItem('refund_page')){
+            //     this.search.page = localStorage.getItem('refund_page');
+            // }
             this.getList();
         },
         methods: {
@@ -553,7 +556,6 @@ Yii::$app->loadComponentView('order/com-edit-address');
                 Object.keys(this.search).map((key) => {
                     params[key] = this.search[key]
                 });
-
                 request({
                     params: params,
                 }).then(e => {
@@ -575,7 +577,10 @@ Yii::$app->loadComponentView('order/com-edit-address');
             },
             // 分页
             pageChange(page) {
+                console.log(this.pagination);
                 this.search.page = page;
+                // localStorage.setItem('current_page',this.pagination.current_page);
+                // localStorage.setItem('refund_page',page);
                 this.getList();
             },
             // 新的
@@ -586,10 +591,13 @@ Yii::$app->loadComponentView('order/com-edit-address');
             },
             // 进入商品详情
             toDetail(id) {
-                this.$navigate({
-                    r: 'mall/order/detail',
-                    order_id: id
-                })
+                var path = window.location.origin + window.location.pathname + '?r=mall%2Forder%2Fdetail&order_id=' + id;
+                window.open(path,'_blank');
+                // return;
+                // this.$navigate({
+                //     r: 'mall/order/detail',
+                //     order_id: id
+                // })
             },
             toRefundDetail(id) {
                 this.$navigate({

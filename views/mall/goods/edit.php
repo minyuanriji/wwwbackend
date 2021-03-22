@@ -4,7 +4,6 @@
  * copyright: Copyright (c) 2020 广东七件事集团
  * author: zal
  */
-
 Yii::$app->loadComponentView('com-goods');
 $mchId = Yii::$app->admin->identity->mch_id;
 ?>

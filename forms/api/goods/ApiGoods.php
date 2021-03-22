@@ -108,6 +108,7 @@ class ApiGoods extends BaseModel
             'use_attr'=>$this->goods->use_attr,
             'sales' => $this->getSales($isSales, $this->goods->unit),
             'is_delete' => $this->goods -> is_delete,
+            'status' => $this->goods -> status,
             'attr_groups' => $attrGroups,
             'attr' => $this->setAttr($this->goods->attr),
             'goods_stock' => $goodsStock,

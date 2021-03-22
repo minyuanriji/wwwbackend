@@ -500,6 +500,10 @@ Yii::$app->loadComponentView('goods/com-batch');
             if (getQuery('page') > 1) {
                 this.page = getQuery('page');
             }
+            if(localStorage.getItem('goods_page')){
+                this.page = localStorage.getItem('goods_page');
+                this.getList();
+            }
 
             // 搜索条件从缓存中获取
             let search = this.getCookie('search');
@@ -559,6 +563,7 @@ Yii::$app->loadComponentView('goods/com-batch');
             pagination(currentPage) {
                 let self = this;
                 self.page = currentPage;
+                localStorage.setItem('goods_page',self.page);
                 self.getList();
             },
             getList() {
@@ -586,12 +591,14 @@ Yii::$app->loadComponentView('goods/com-batch');
             },
             edit(row) {
                 if (row.id) {
-                    navigateTo({
-                        r: this.edit_goods_url,
-                        id: row.id,
-                        mch_id: row.mch_id,
-                        page: this.page,
-                    });
+                    var path = window.location.origin + window.location.pathname + '?r=mall%2Fgoods%2Fedit&id=' + row.id + '&mch_id=' + row.mch_id + '&page=' + this.page;
+                    window.open(path,'_blank');
+                    // navigateTo({
+                    //     r: this.edit_goods_url,
+                    //     id: row.id,
+                    //     mch_id: row.mch_id,
+                    //     page: this.page,
+                    // });
                     this.saveSearch();
                 } else {
                     navigateTo({

@@ -414,7 +414,6 @@ Yii::$app->loadComponentView('order/com-edit-template');
                 this.click_img = url;
                 this.dialogImg = true;
             },
-
             pagination(currentPage) {
                 this.page = currentPage;
                 this.search();
@@ -424,10 +423,9 @@ Yii::$app->loadComponentView('order/com-edit-template');
                 this.getTemplateList();
             },
             change() {
-                this.page = 1;
-                this.search();
+                // this.page = 1;
+                // this.search();
             },
-
             search() {
                 this.listLoading = true;
                 request({

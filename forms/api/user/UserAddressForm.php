@@ -140,7 +140,6 @@ class UserAddressForm extends BaseModel
                 $inPointList[] = $list[$i];
             }
         }
-
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'data' => [

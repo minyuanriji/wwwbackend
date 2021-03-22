@@ -192,6 +192,7 @@ $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
         },
         created() {
             this.loadPicCaptcha();
+            localStorage.removeItem('goods_page');
         },
         methods: {
             login(formName) {

@@ -21,6 +21,7 @@ use app\models\GoodsCatRelation;
 use app\models\GoodsWarehouse;
 use app\models\MallGoods;
 use app\plugins\mch\models\MchGoods;
+use app\controllers\business\PostageRules;
 
 
 /**
@@ -109,8 +110,10 @@ class GoodsEditForm extends BaseGoodsEdit
             $this->setGoodsCat();
             $this->setGoodsService();
             $this->setListener();
-
             $transaction->commit();
+//            echo '<pre>';
+//            (new PostageRules()) -> CustomPostage($this -> expressName);
+//            exit();
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '保存成功',

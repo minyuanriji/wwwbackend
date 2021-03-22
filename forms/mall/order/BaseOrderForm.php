@@ -32,6 +32,7 @@ use app\models\User;
 use app\plugins\advance\models\AdvanceOrder;
 use yii\db\Query;
 use app\services\mall\order\OrderSendService;
+use app\models\mysql\UserAddress;
 
 abstract class BaseOrderForm extends BaseModel
 {
@@ -139,6 +140,9 @@ abstract class BaseOrderForm extends BaseModel
         $query->andWhere($this->getExtraWhere());
         //过滤拼团订单
         $query->andWhere(['!=', 'o.sign', 'group_buy']);
+        if($this -> status == '-1'){
+            $query->andWhere(['!=', 'o.is_recycle', '1']);
+        }
 
         $list = $query->page($pagination)
             ->orderBy($this->order_by . 'o.created_at DESC')
@@ -154,7 +158,10 @@ abstract class BaseOrderForm extends BaseModel
             ->all();
 
         $order = new Order();
+        $address = new UserAddress();
         foreach ($list as &$item) {
+            $user_address = $address -> getUserAddress($item['user_id'],$item['address_id']);
+            $item['address'] = $user_address['province'] . ' ' . $user_address['city'] . ' ' . $user_address['district'] . ' ' . $user_address['town'] . ' ' . $user_address['detail'];
             $item['platform'] = $item['user']['platform'];
             //插件名称
             if ($item['sign'] == '' && $item['mch_id'] == 0) {
@@ -187,7 +194,6 @@ abstract class BaseOrderForm extends BaseModel
             foreach ($item['detail'] as $key => &$detail) {
                 $goods_info = \Yii::$app->serializer->decode($detail['goods_info']);
                 $item['detail'][$key]['attr_list'] = $goods_info['attr_list'];
-
                 //有问题的代码,xuyaoxiang
 //                $refund_status = 0;
 //                if ($detail['refund']) {

@@ -110,6 +110,9 @@ class Efps extends Component{
             if(!empty($resText)){
                 $resObj = @json_decode($resText);
                 if(is_object($resObj)){
+                    if(isset($resObj->returnCode)){
+                        throw new \Exception($resObj->returnMsg);
+                    }
                     if($resObj->respCode != "0000"){
                         $errorText = isset($resObj->respMsg) ? $resObj->respMsg : "未知错误";
                         throw new \Exception($errorText);

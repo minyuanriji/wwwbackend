@@ -237,8 +237,8 @@
                     </el-tab-pane>
                     <el-tab-pane label="审核信息" name="review_info">
 
-                        <el-tabs type="border-card">
-                            <el-tab-pane label="审核状态">
+                        <el-tabs v-model="review_status_activeName" type="border-card">
+                            <el-tab-pane label="审核状态" name="tab_review_status">
                                 <el-form-item label="商户编号" prop="acqMerId">
                                     <div v-if="review.acqMerId != ''">{{review.acqMerId}}</div>
                                     <div style="color:#cc3311" v-else>未申请</div>
@@ -283,8 +283,8 @@
                                         <el-input v-model="ruleForm.review_remark" type="textarea" :row="5"></el-input>
                                     </el-form-item>
                                 </template>
-                            </el-tab-pane>
-                            <el-tab-pane v-if="review.register_type != 'separate_account'" label="营业执照">
+                            </el-tab-pane name="review_info">
+                            <el-tab-pane v-if="review.register_type != 'separate_account'" label="营业执照" name="tab_review_license">
                                 <el-form-item label="商户类型" prop="paper_merchantType">
                                     <el-radio v-model="review.paper_merchantType" label="1">个体</el-radio>
                                     <el-radio v-model="review.paper_merchantType" label="2">企业</el-radio>
@@ -361,7 +361,7 @@
                                 </el-form-item>
 
                             </el-tab-pane>
-                            <el-tab-pane label="位置及环境">
+                            <el-tab-pane label="位置及环境" name="tab_review_place">
                                 <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1" label="经营地址" prop="paper_businessAddress">
                                     <el-input v-model="review.paper_businessAddress"></el-input>
                                 </el-form-item>
@@ -406,16 +406,16 @@
                                 </el-form-item>
 
                             </el-tab-pane>
-                            <el-tab-pane label="法人资料">
+                            <el-tab-pane label="法人资料"  name="tab_review_lawyer">
                                 <el-form-item label="证件类型" prop="paper_lawyerCertType">
                                     <el-select v-model="review.paper_lawyerCertType" placeholder="请选择">
-                                            <el-option
-                                                    v-for="item in lawyerCertTypes"
-                                                    :key="item.value"
-                                                    :label="item.label"
-                                                    :value="item.value">
-                                            </el-option>
-                                        </el-select>
+                                        <el-option
+                                                v-for="item in lawyerCertTypes"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value">
+                                        </el-option>
+                                    </el-select>
                                 </el-form-item>
                                 <el-form-item label="证件号码" prop="paper_lawyerCertNo">
                                     <el-input v-model="review.paper_lawyerCertNo"></el-input>
@@ -454,7 +454,7 @@
                                 </el-form-item>
 
                             </el-tab-pane>
-                            <el-tab-pane label="联系人">
+                            <el-tab-pane label="联系人" name="tab_review_contact">
                                 <el-form-item v-if="review.acceptOrder==1" label="联系人姓名" prop="paper_contactPerson">
                                     <el-input v-model="review.paper_contactPerson"></el-input>
                                 </el-form-item>
@@ -468,7 +468,7 @@
                                     <el-input v-model="review.paper_email"></el-input>
                                 </el-form-item>
                             </el-tab-pane>
-                            <el-tab-pane v-if="review.register_type != 'separate_account'" label="对公账户">
+                            <el-tab-pane v-if="review.register_type != 'separate_account'" label="对公账户" name="tab_review_account">
                                 <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1 && review.paper_merchantType==2" label="账户名" prop="paper_licenceAccount">
                                     <el-input v-model="review.paper_licenceAccount"></el-input>
                                 </el-form-item>
@@ -494,7 +494,7 @@
                                 </el-form-item>
 
                             </el-tab-pane>
-                            <el-tab-pane label="结算账号">
+                            <el-tab-pane label="结算账号" name="tab_review_settle">
                                 <el-form-item v-if="review.openAccount==1 || review.paper_merchantType==1 || review.paper_merchantType==2" label="结算账户类型" prop="paper_settleAccountType">
                                     <el-radio v-if="review.register_type != 'separate_account'" v-model="review.paper_settleAccountType" label="1">对公账户</el-radio>
                                     <el-radio v-model="review.paper_settleAccountType" label="2">法人账户</el-radio>
@@ -539,7 +539,7 @@
 
 
                             </el-tab-pane>
-                            <el-tab-pane label="业务信息">
+                            <el-tab-pane label="业务信息" name="tab_review_business">
                                 <el-form-item v-if="review.register_type != 'separate_account'" label="业务代码" prop="paper_businessCode">
                                     <el-input v-model="review.paper_businessCode"></el-input>
                                 </el-form-item>
@@ -809,6 +809,7 @@
                 dialogImg: false,
                 click_img: '',
                 activeName: 'basic',
+                review_status_activeName: 'tab_review_status',
 
                 paperProvinceCityValue:[],
                 paperProvinceCityOptions: [],

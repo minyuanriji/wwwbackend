@@ -115,15 +115,15 @@ class CheckoutOrderPayForm extends BaseModel {
             $integralFeeRate = $mch->integral_fee_rate;
             $userIntegral = User::getCanUseIntegral(\Yii::$app->user->id);
             $integralDeductionPrice = min($userIntegral, min($checkoutOrder->order_price, $this->use_integral));
-            if(($integralDeductionPrice + intval($integralDeductionPrice * ($integralFeeRate/100))) > $userIntegral){
+            if(($integralDeductionPrice + $integralDeductionPrice * ($integralFeeRate/100)) > $userIntegral){
                 $integralDeductionPrice = $userIntegral/(1+($integralFeeRate/100));
             }
-            $integralServiceFee = intval($integralDeductionPrice * ($integralFeeRate/100));
+            $integralServiceFee = $integralDeductionPrice * ($integralFeeRate/100);
 
             $payPrice = max(0, $checkoutOrder->order_price - $integralDeductionPrice);
 
             $checkoutOrder->updated_at               = time();
-            $checkoutOrder->integral_deduction_price = (int)$integralDeductionPrice + $integralServiceFee;
+            $checkoutOrder->integral_deduction_price = round($integralDeductionPrice + $integralServiceFee, 2);
             $checkoutOrder->integral_fee_rate        = $integralFeeRate;
 
             if(!$checkoutOrder->save()){

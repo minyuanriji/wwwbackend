@@ -232,7 +232,7 @@ class UserForm extends BaseModel
                 "open_type" => "pages/personalCentre/personalCentre"
             ];
         }
-        
+
         $res = [
             'config' => [
                     'title_bar' => [

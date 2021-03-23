@@ -4,6 +4,7 @@ namespace app\mch\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
+use app\core\ApiCode;
 use app\mch\forms\api\MchApplyForm;
 
 class MchApplyController extends ApiController{
@@ -16,6 +17,15 @@ class MchApplyController extends ApiController{
         ]);
     }
 
+    public function actionSetting(){
+        $agreement = @file_get_contents(\Yii::getAlias("@runtime/agreement"));
+        $this->asJson([
+            'code' => ApiCode::CODE_SUCCESS,
+            'data' => [
+                'agreement' => $agreement ? $agreement : ""
+            ]
+        ]);
+    }
 
     public function actionIndex(){
         $form = new MchApplyForm();

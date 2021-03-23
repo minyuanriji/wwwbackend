@@ -95,6 +95,17 @@ class Plugin extends \app\plugins\Plugin
                     ],
                 ]
             ],
+            [
+                'name' => '账单记录',
+                'route' => 'plugin/mch/mall/checkout-order/index',
+                'icon' => 'el-icon-star-on',
+                'action' => [
+                    [
+                        'name' => '账单详情',
+                        'route' => 'plugin/mch/mall/checkout-order/detail',
+                    ],
+                ]
+            ],
             $this->getStatisticsMenus(false)
         ];
     }

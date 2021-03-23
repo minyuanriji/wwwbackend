@@ -2,6 +2,8 @@
 namespace app\plugins\mch\models;
 
 use app\models\BaseActiveRecord;
+use app\models\Store;
+use app\models\User;
 use Yii;
 
 /**
@@ -71,5 +73,13 @@ class MchCheckoutOrder extends BaseActiveRecord
     }
     public function getMch(){
         return $this->hasOne(Mch::className(), ['id' => 'mch_id']);
+    }
+
+    public function getMchStore(){
+        return $this->hasOne(Store::className(), ['mch_id' => 'mch_id']);
+    }
+
+    public function getPayUser(){
+        return $this->hasOne(User::className(), ['id' => 'pay_user_id']);
     }
 }

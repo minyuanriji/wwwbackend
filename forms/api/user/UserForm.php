@@ -218,7 +218,7 @@ class UserForm extends BaseModel
                 $userCenter['order_bar'][$i]['num'] = $orderInfoCount[$i] ?: '';
             }
         }
-
+        print_r($userCenter);exit;
         $res = [
             'config' => [
                     'title_bar' => [

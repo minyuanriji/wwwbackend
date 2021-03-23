@@ -5,6 +5,9 @@ namespace app\component\efps;
 use app\component\efps\lib\InterfaceEfps;
 use app\component\efps\lib\MerchantApply;
 use app\component\efps\lib\MerchantQuery;
+use app\component\efps\lib\pay\UnifiedPayment;
+use app\component\efps\lib\pay\WxJSAPIPayment;
+use app\component\efps\lib\wechat\BindAppId;
 use yii\base\Component;
 
 class Efps extends Component{
@@ -36,6 +39,33 @@ class Efps extends Component{
 
     public $notify_url;
     public $return_url;
+
+    /**
+     * 收银台支付接口
+     * 统一下单
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
+    public function payUnifiedPayment($params){
+        $params['clientIp'] = \Yii::$app->getRequest()->getUserIP();
+        return $this->request((new UnifiedPayment())->build($params));
+    }
+
+    public function wechatBindAppId($params){
+        return $this->request((new BindAppId())->build($params));
+    }
+
+    /**
+     * 微信公众号/小程序支付接口
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
+    public function payWxJSAPIPayment($params){
+        $params['clientIp'] = \Yii::$app->getRequest()->getUserIP();
+        return $this->request((new WxJSAPIPayment())->build($params));
+    }
 
     /**
      * 商户信息进件
@@ -74,7 +104,6 @@ class Efps extends Component{
     public function request(InterfaceEfps $api){
         try {
             $params = $api->getParam();
-            $params['acqSpId'] = $this->main_config['acq_sp_id'];
 
             $jsonStr = json_encode($params, JSON_UNESCAPED_UNICODE);
             $sign = $this->sign($jsonStr);
@@ -106,7 +135,7 @@ class Efps extends Component{
             $errno = curl_errno($ch);
 
             @curl_close($ch);
-
+            print_r($resText);exit;
             if(!empty($resText)){
                 $resObj = @json_decode($resText);
                 if(is_object($resObj)){

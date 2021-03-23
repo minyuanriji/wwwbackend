@@ -24,6 +24,30 @@ class BaseController extends \yii\web\Controller
     public $pageSize = 10;
     public function init()
     {
+        /*$res = \Yii::$app->efps->payWxJSAPIPayment([
+            "outTradeNo" => "Test000000000013",
+            "customerCode" => "562326003594814",
+            "appId" => "wxd7ac6d41d564256c",
+            "openId" => "ohQHU5yzLhuF-IIRKrEqxbVaT-NI",
+            "payAmount" => 100,
+            "payMethod" => 1,
+            "notifyUrl" => "http://",
+            "orderInfo" => [
+                "Id" => "1234567",
+                "businessType" => "100001",
+                "goodsList" => [
+                    [
+                        "goodsId"   => "12345",
+                        "name"      => "test11111",
+                        "price"     => 150,
+                        "number"    => "1",
+                        "amount"    => 100
+                    ]
+                ]
+            ]
+        ]);
+        print_r($res);
+        exit;*/
         //\Yii::$app->validateCloudFile();
         parent::init();
     }

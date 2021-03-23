@@ -3,13 +3,7 @@ namespace app\component\efps\lib;
 
 use app\models\MchRelatEfps;
 
-class MerchantApply implements InterfaceEfps {
-
-    public $params;
-
-    public function getParam(){
-        return $this->params;
-    }
+class MerchantApply extends ParamsBuilder implements InterfaceEfps {
 
     public function build($params){
         try {

@@ -32,14 +32,21 @@ class CheckoutOrderInfoForm extends BaseModel {
         $storeModel = $mchModel->store;
 
         //用户可使用抵扣卷
+        $integralFeeRate = $mchModel->integral_fee_rate;
         $userIntegral = User::getCanUseIntegral(\Yii::$app->user->id);
         $integralMaxDeduction = min($checkoutOrder->order_price, $userIntegral);
+        if(($integralMaxDeduction + $integralMaxDeduction * ($integralFeeRate/100)) > $userIntegral){
+            $integralMaxDeduction = $userIntegral/(1+($integralFeeRate/100));
+        }
+        $integralServiceFee = $integralMaxDeduction * ($integralFeeRate/100);
+
 
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"", [
             'order_info'             => ArrayHelper::toArray($checkoutOrder),
             'mch_info'               => ArrayHelper::toArray($storeModel),
             'user_integral_num'      => (float)$userIntegral,
-            'integral_max_deduction' => (float)$integralMaxDeduction
+            'integral_max_deduction' => round((float)$integralMaxDeduction, 2),
+            'integral_service_fee'   => round((float)$integralServiceFee, 2)
         ]);
     }
 }

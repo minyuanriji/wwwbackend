@@ -4,13 +4,7 @@
 namespace app\component\efps\lib;
 
 
-class MerchantQuery implements InterfaceEfps{
-
-    public $params;
-
-    public function getParam(){
-        return $this->params;
-    }
+class MerchantQuery extends ParamsBuilder implements InterfaceEfps{
 
     public function getApi(){
         return "/api/cust/SP/Merchant/query";

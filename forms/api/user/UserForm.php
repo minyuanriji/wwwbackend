@@ -218,7 +218,21 @@ class UserForm extends BaseModel
                 $userCenter['order_bar'][$i]['num'] = $orderInfoCount[$i] ?: '';
             }
         }
-        print_r($userCenter);exit;
+
+        //TODO
+        $isMch = Mch::find()->where([
+            'user_id'   => \Yii::$app->user->id,
+            'is_delete' => 0
+        ])->exists();
+        if($isMch){
+            $userCenter['menus'][] = [
+                "icon_url"  => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                "name"      => "商户",
+                "link_url"  => "navigate",
+                "open_type" => "pages/personalCentre/personalCentre"
+            ];
+        }
+        
         $res = [
             'config' => [
                     'title_bar' => [

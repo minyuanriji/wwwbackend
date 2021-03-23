@@ -103,13 +103,23 @@
     <el-card class="box-card" shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <div>
-                <span>结账单记录</span>
+                <span>账单记录</span>
                 <div style="float: right;margin-top: -5px"> </div>
             </div>
         </div>
 
         <div class="table-body">
             <el-form @submit.native.prevent="searchList" size="small" :inline="true" :model="search">
+                <el-form-item>
+                    <el-select v-model="search.pay_status" placeholder="请选择" style="width:110px;">
+                        <el-option
+                                v-for="item in pay_options"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item>
                     <div class="input-item">
                         <el-input  @keyup.enter.native="searchList" size="small" placeholder="请输入店铺名/单号搜索" v-model="search.keyword" clearable
@@ -176,11 +186,17 @@
 
                 search: {
                     keyword: '',
+                    pay_status: '0'
                 },
                 btnLoading: false,
                 mch_id: 0,
                 id: null,
                 sort: 0,
+                pay_options: [
+                    {label: "全部",   value: "0"},
+                    {label: "已支付", value: "paid"},
+                    {label: "未支付", value: "unpaid"}
+                ]
             };
         },
         methods: {
@@ -196,7 +212,8 @@
                     params: {
                         r: 'plugin/mch/mall/checkout-order/index',
                         page: self.page,
-                        keyword: self.search.keyword
+                        keyword: self.search.keyword,
+                        pay_status: self.search.pay_status
                     },
                     method: 'get',
                 }).then(e => {

@@ -8,31 +8,15 @@ use app\core\ApiCode;
 use app\plugins\mch\models\MchCheckoutOrder;
 use app\plugins\sign_in\forms\BaseModel;
 
-class CheckoutOrderForm extends BaseModel{
+class CheckoutOrderSearchForm extends BaseModel{
 
-    public $mch_id;
-    public $order_no;
-    public $order_price;
-    public $pay_price;
-    public $is_pay;
-    public $pay_user_id;
-    public $pay_at;
-    public $score_deduction_price;
-    public $integral_deduction_price;
-    public $created_at;
-    public $updated_at;
-    public $integral_fee_rate;
+    public $keyword;
+    public $pay_status;
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules(){
-        return [
-            [['mall_id', 'mch_id', 'order_no', 'order_price', 'created_at', 'updated_at'], 'required'],
-            [['is_pay', 'mch_id', 'mall_id', 'pay_user_id', 'pay_at', 'created_at', 'updated_at', 'is_delete'], 'integer'],
-            [['order_price', 'pay_price', 'score_deduction_price', 'integral_deduction_price', 'integral_fee_rate'], 'number'],
-            [['order_no'], 'string']
-        ];
+        return array_merge(parent::rules(), [
+            [["keyword", "pay_status"], "string"]
+        ]);
     }
 
     /**
@@ -42,6 +26,19 @@ class CheckoutOrderForm extends BaseModel{
     public function search(){
 
         $query = MchCheckoutOrder::find();
+
+        if(!empty($this->keyword)){
+            $query->andWhere(["LIKE", "order_no", $this->keyword]);
+        }
+
+        if(!empty($this->pay_status)){
+            if($this->pay_status == "paid"){ //已支付
+                $query->andWhere(["is_pay" => 1]);
+            }
+            if($this->pay_status == "unpaid"){ //未支付
+                $query->andWhere(["is_pay" => 0]);
+            }
+        }
 
         $rows = $query->page($pagination)
                       ->with(["mchStore", "payUser"])

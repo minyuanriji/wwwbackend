@@ -6,7 +6,7 @@
                 <div style="float: right;margin-top: -5px"> </div>
             </div>
         </div>
-        <div>
+        <div class="form-body">
             <div>订单号：{{order.order_no}}</div>
             <div>店铺名称：{{order.mchStore.name}}</div>
             <span>支付状态：

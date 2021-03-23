@@ -1,5 +1,5 @@
 <?php
-namespace app\plugins\mch\controllers\mall;
+namespace app\plugins\mch\forms\mall;
 
 use app\core\ApiCode;
 use app\plugins\mch\models\MchCheckoutOrder;

@@ -2,7 +2,8 @@
 namespace app\plugins\mch\controllers\mall;
 
 use app\plugins\Controller;
-use app\plugins\mch\forms\mall\CheckoutOrderForm;
+use app\plugins\mch\forms\mall\CheckoutOrderDetailForm;
+use app\plugins\mch\forms\mall\CheckoutOrderSearchForm;
 use app\plugins\mch\forms\mall\CheckoutOrderQueryReloadForm;
 
 class CheckoutOrderController extends Controller{
@@ -10,7 +11,8 @@ class CheckoutOrderController extends Controller{
     public function actionIndex(){
 
         if (\Yii::$app->request->isAjax) {
-            $form = new CheckoutOrderForm();
+            $form = new CheckoutOrderSearchForm();
+            $form->attributes = \Yii::$app->getRequest()->get();
             return $this->asJson($form->search());
         } else {
             if (\Yii::$app->request->post('flag') === 'EXPORT') {

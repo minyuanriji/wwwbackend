@@ -96,12 +96,12 @@ class Plugin extends \app\plugins\Plugin
                 ]
             ],
             [
-                'name' => '结账单记录',
+                'name' => '账单记录',
                 'route' => 'plugin/mch/mall/checkout-order/index',
                 'icon' => 'el-icon-star-on',
                 'action' => [
                     [
-                        'name' => '结账单记录详情',
+                        'name' => '账单详情',
                         'route' => 'plugin/mch/mall/checkout-order/detail',
                     ],
                 ]

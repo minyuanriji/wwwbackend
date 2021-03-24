@@ -24,13 +24,10 @@ class BaseController extends \yii\web\Controller
     public $pageSize = 10;
     public function init()
     {
-        /*$res = \Yii::$app->efps->payWxJSAPIPayment([
-            "outTradeNo" => "Test000000000013",
+        /*$res = \Yii::$app->efps->payAliJSAPIPayment([
+            "outTradeNo" => "Test0000000221313",
             "customerCode" => "562326003594814",
-            "appId" => "wxd7ac6d41d564256c",
-            "openId" => "ohQHU5yzLhuF-IIRKrEqxbVaT-NI",
             "payAmount" => 100,
-            "payMethod" => 1,
             "notifyUrl" => "http://",
             "orderInfo" => [
                 "Id" => "1234567",

@@ -5,6 +5,7 @@ namespace app\component\efps;
 use app\component\efps\lib\InterfaceEfps;
 use app\component\efps\lib\MerchantApply;
 use app\component\efps\lib\MerchantQuery;
+use app\component\efps\lib\pay\AliJSAPIPayment;
 use app\component\efps\lib\pay\UnifiedPayment;
 use app\component\efps\lib\pay\WxJSAPIPayment;
 use app\component\efps\lib\wechat\BindAppId;
@@ -40,6 +41,10 @@ class Efps extends Component{
     public $notify_url;
     public $return_url;
 
+    public function getCustomerCode(){
+        return $this->main_config['acq_sp_id'];
+    }
+
     /**
      * 收银台支付接口
      * 统一下单
@@ -52,6 +57,12 @@ class Efps extends Component{
         return $this->request((new UnifiedPayment())->build($params));
     }
 
+    /**
+     * 绑定微信APPID
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
     public function wechatBindAppId($params){
         return $this->request((new BindAppId())->build($params));
     }
@@ -65,6 +76,16 @@ class Efps extends Component{
     public function payWxJSAPIPayment($params){
         $params['clientIp'] = \Yii::$app->getRequest()->getUserIP();
         return $this->request((new WxJSAPIPayment())->build($params));
+    }
+
+    /**
+     * 支付宝主扫支付
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
+    public function payAliJSAPIPayment($params){
+        return $this->request((new AliJSAPIPayment())->build($params));
     }
 
     /**
@@ -135,14 +156,15 @@ class Efps extends Component{
             $errno = curl_errno($ch);
 
             @curl_close($ch);
-            print_r($resText);exit;
+
             if(!empty($resText)){
                 $resObj = @json_decode($resText);
                 if(is_object($resObj)){
-                    if(isset($resObj->returnCode)){
-                        throw new \Exception($resObj->returnMsg);
+                    if(isset($resObj->returnCode) && $resObj->returnCode != "0000"){
+                        $errorText = isset($resObj->returnMsg) ? $resObj->returnMsg : "未知错误";
+                        throw new \Exception($errorText);
                     }
-                    if($resObj->respCode != "0000"){
+                    if(isset($resObj->respCode) && $resObj->respCode != "0000"){
                         $errorText = isset($resObj->respMsg) ? $resObj->respMsg : "未知错误";
                         throw new \Exception($errorText);
                     }

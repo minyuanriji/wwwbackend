@@ -71,6 +71,11 @@ abstract class OrderPayFormBase extends BaseModel
     public function loadOrderPayData($order,$userData = []){
         $supportPayTypes = OrderLogic::getPaymentTypeConfig();
         $balance = $userData["balance"];
+
+        if(in_array("wechat", $supportPayTypes) && \Yii::$app->appPlatform == "h5"){
+            $supportPayTypes = array_diff($supportPayTypes, ["wechat"]);
+        }
+
         $data = [
                 //'title' => $this->getOrderTitle($order),
                 'balance' => $balance,

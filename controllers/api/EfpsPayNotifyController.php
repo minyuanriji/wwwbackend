@@ -17,7 +17,14 @@ class EfpsPayNotifyController extends Controller{
      * @return array
      */
     public function actionAliJsApiPayment(){
-        @file_put_contents(\Yii::getAlias("@runtime/efps_notify_data"), json_encode($_REQUEST));
+        ob_start();
+        print_r($_GET);
+        print($_POST);
+        print_r($_REQUEST);
+        echo file_get_contents("php://input");
+        $content = ob_get_contents();
+        ob_end_clean();
+        @file_put_contents(\Yii::getAlias("@runtime/efps_notify_data"), $content);
     }
 
 }

@@ -9,6 +9,9 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\PaymentEfpsOrder;
 use app\models\PaymentOrderUnion;
+use app\models\Store;
+use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchCheckoutOrder;
 
 class EfpsPayForm extends BaseModel{
 
@@ -70,20 +73,40 @@ class EfpsPayForm extends BaseModel{
                     "goodsList"    => []
                 ];
                 foreach($paymentOrders as $paymentOrder){
-                    $order = $paymentOrder->order;
-                    if(!$order){
-                        throw new \Exception("订单不存在");
-                    }
-                    $orderDetails = $order->detail;
-                    foreach($orderDetails as $detail){
-                        $goodsInfo = json_decode($detail->goods_info, true);
+                    if(substr($paymentOrder->order_no, 0, 2) == "MS"){ //商家结账单
+                        $checkoutOrder = MchCheckoutOrder::findOne([
+                            "order_no" => $paymentOrder->order_no
+                        ]);
+                        if(!$checkoutOrder){
+                            throw new \Exception("订单不存在");
+                        }
+                        $mchStore = $checkoutOrder->mchStore;
+                        if(!$mchStore){
+                            throw new \Exception("无法获取店铺信息");
+                        }
                         $orderInfo['goodsList'][] = [
-                            "goodsId"   => (string)$detail->goods_id,
-                            "name"      => $goodsInfo['goods_attr']['name'],
-                            "price"     => $goodsInfo['goods_attr']['original_price'] * 100,
-                            "number"    => (string)$detail->num,
-                            "amount"    => (string)$detail->total_price * 100
+                            "goodsId" => (string)$mchStore->mch_id,
+                            "name"    => $mchStore->name,
+                            "price"   => $checkoutOrder->order_price * 100,
+                            "number"  => "1",
+                            "amount"  => (string)$checkoutOrder->order_price * 100
                         ];
+                    }else{
+                        $order = $paymentOrder->order;
+                        if(!$order){
+                            throw new \Exception("订单不存在");
+                        }
+                        $orderDetails = $order->detail;
+                        foreach($orderDetails as $detail){
+                            $goodsInfo = json_decode($detail->goods_info, true);
+                            $orderInfo['goodsList'][] = [
+                                "goodsId" => (string)$detail->goods_id,
+                                "name"    => $goodsInfo['goods_attr']['name'],
+                                "price"   => $goodsInfo['goods_attr']['original_price'] * 100,
+                                "number"  => (string)$detail->num,
+                                "amount"  => (string)$detail->total_price * 100
+                            ];
+                        }
                     }
                 }
                 $paymentEfpsOrder->orderInfo = json_encode($orderInfo);

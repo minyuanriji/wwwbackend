@@ -1,6 +1,6 @@
 <?php
 
-$_GET['r'] = 'api/efps-pay/notify';
+$_GET['r'] = 'api/efps-pay-notify/ali-js-api-payment';
 
 error_reporting(E_ALL);
 

@@ -108,7 +108,7 @@ class EfpsPayForm extends BaseModel{
                 $paymentEfpsOrder->orderInfo = json_encode($orderInfo);
             }
 
-            $notifyUrl = \Yii::$app->getRequest()->getHostName() . static::$notifyUri;
+            $notifyUrl = \Yii::$app->getRequest()->getHostInfo() . static::$notifyUri;
 
             $paymentEfpsOrder->customerCode           = \Yii::$app->efps->getCustomerCode();
             $paymentEfpsOrder->payAmount              = $paymentOrderUnion->amount * 100;

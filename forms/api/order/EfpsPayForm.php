@@ -17,7 +17,7 @@ class EfpsPayForm extends BaseModel{
 
     public $union_id;
 
-    public static $notifyUri = "/pay-notify/efps.php";
+    public static $notifyUri = "/web/pay-notify/efps.php";
 
     public function rules(){
         return [

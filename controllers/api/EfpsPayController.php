@@ -33,6 +33,6 @@ class EfpsPayController extends ApiController{
      * @return array
      */
     public function actionNotify(){
-        @file_put_contents(\Yii::getAlias("@runtime/efps_notify_data"), json_encode($_REQUEST));
+        @file_put_contents(\Yii::getAlias("@runtime/efps_notify_data"), @file_get_contents("php://input"));
     }
 }

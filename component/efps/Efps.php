@@ -6,6 +6,7 @@ use app\component\efps\lib\InterfaceEfps;
 use app\component\efps\lib\MerchantApply;
 use app\component\efps\lib\MerchantQuery;
 use app\component\efps\lib\pay\AliJSAPIPayment;
+use app\component\efps\lib\pay\PaymentQuery;
 use app\component\efps\lib\pay\UnifiedPayment;
 use app\component\efps\lib\pay\WxJSAPIPayment;
 use app\component\efps\lib\wechat\BindAppId;
@@ -55,6 +56,16 @@ class Efps extends Component{
     public function payUnifiedPayment($params){
         $params['clientIp'] = \Yii::$app->getRequest()->getUserIP();
         return $this->request((new UnifiedPayment())->build($params));
+    }
+
+    /**
+     * 支付结果查询
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
+    public function payQuery($params){
+        return $this->request((new PaymentQuery())->build($params));
     }
 
     /**

@@ -17,14 +17,22 @@ class EfpsPayNotifyController extends Controller{
      * @return array
      */
     public function actionAliJsApiPayment(){
+
         ob_start();
-        print_r($_GET);
-        print($_POST);
-        print_r($_REQUEST);
-        echo file_get_contents("php://input");
-        $content = ob_get_contents();
+        $content = \Yii::$app->getRequest()->getHeaders();
+        print_r($content);
         ob_end_clean();
-        @file_put_contents(\Yii::getAlias("@runtime/efps_notify_data"), $content);
+        file_put_contents(\Yii::getAlias("@runtime/test_efps_header"), $content);
+        file_put_contents(\Yii::getAlias("@runtime/test_efps_body"), file_get_contents("php://input"));
+        exit;
+
+       /* $res = \Yii::$app->efps->payQuery([
+            "customerCode" => \Yii::$app->efps->getCustomerCode(),
+            "outTradeNo" => "2021032418463192039"
+        ]);
+        print_r($res);
+        exit;*/
+
     }
 
 }

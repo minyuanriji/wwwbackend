@@ -63,10 +63,6 @@ class EfpsPayForm extends BaseModel{
                 $paymentEfpsOrder = new PaymentEfpsOrder();
                 $paymentEfpsOrder->payment_order_union_id = $paymentOrderUnion->id;
                 $paymentEfpsOrder->payAPI                 = "IF-QRcode-01";
-                $paymentEfpsOrder->customerCode           = \Yii::$app->efps->getCustomerCode();
-                $paymentEfpsOrder->payAmount              = $paymentOrderUnion->amount * 100;
-                $paymentEfpsOrder->payCurrency            = "CNY";
-                $paymentEfpsOrder->payMethod              = "7";
                 $orderInfo = [
                     'Id'           => $paymentOrderUnion->id,
                     "businessType" => "100001",
@@ -114,10 +110,14 @@ class EfpsPayForm extends BaseModel{
 
             $notifyUrl = \Yii::$app->getRequest()->getHostName() . static::$notifyUri;
 
-            $paymentEfpsOrder->outTradeNo           = date("YmdHis") . rand(10000, 99999);
-            $paymentEfpsOrder->transactionStartTime = date("YmdHis");
-            $paymentEfpsOrder->nonceStr             = md5(uniqid());
-            $paymentEfpsOrder->notifyUrl            = $notifyUrl;
+            $paymentEfpsOrder->customerCode           = \Yii::$app->efps->getCustomerCode();
+            $paymentEfpsOrder->payAmount              = $paymentOrderUnion->amount * 100;
+            $paymentEfpsOrder->payCurrency            = "CNY";
+            $paymentEfpsOrder->payMethod              = "7";
+            $paymentEfpsOrder->outTradeNo             = date("YmdHis") . rand(10000, 99999);
+            $paymentEfpsOrder->transactionStartTime   = date("YmdHis");
+            $paymentEfpsOrder->nonceStr               = md5(uniqid());
+            $paymentEfpsOrder->notifyUrl              = $notifyUrl;
 
             if(!$paymentEfpsOrder->save()){
                 throw new \Exception($this->responseErrorMsg($paymentEfpsOrder));

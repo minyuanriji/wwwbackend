@@ -19,7 +19,7 @@ class EfpsPayNotifyController extends Controller{
     public function actionAliJsApiPayment(){
 
         ob_start();
-        $content = \Yii::$app->getRequest()->getHeaders();
+        $content = \Yii::$app->request->headers;
         print_r($content);
         ob_end_clean();
         file_put_contents(\Yii::getAlias("@runtime/test_efps_header"), $content);

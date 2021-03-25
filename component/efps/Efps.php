@@ -159,7 +159,7 @@ class Efps extends Component{
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);  // 跳过检查
             //curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_VERBOSE, true);
+            curl_setopt($ch, CURLOPT_VERBOSE, false);
 
 
             $resText = curl_exec($ch);

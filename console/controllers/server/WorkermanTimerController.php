@@ -5,6 +5,7 @@
  
 namespace app\console\controllers\server;
 
+use app\component\jobs\EfpsPayQueryJob;
 use app\component\lib\LockTools;
 use app\console\controllers\WorkermanBaseController;
 use app\models\Task;
@@ -42,6 +43,7 @@ class WorkermanTimerController extends WorkermanBaseController
     }
 
     public function onWorkerStart($worker){
+        Timer::add(5,array($this,'payQueryLoopTimer'),array($worker)); //支付状态检查轮询
         Timer::add(3,array($this,'sendIntegralTimer'),array($worker)); //发放积分定时任务
         Timer::add(3,array($this,'expireIntegralTimer'),array($worker)); //积分过期定时任务
         Timer::add(1,array($this,'taskRetry'),array($worker));//任务重试定时任务
@@ -60,6 +62,14 @@ class WorkermanTimerController extends WorkermanBaseController
         $connection->close();
     }
 
+    /**
+     * 支付状态检查轮询
+     * @return void
+     */
+    public function payQueryLoopTimer($worker){
+        //\Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob());
+    }
+
      /**
      * 执行发放积分计划
      * @Author bing
@@ -68,6 +78,7 @@ class WorkermanTimerController extends WorkermanBaseController
      * @return void
      */
     public function sendIntegralTimer($worker){
+
         //获取一把锁
         $lock_tools = new LockTools();
         $lock_name = 'lock:sendIntegralTimer';

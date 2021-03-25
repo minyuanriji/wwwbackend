@@ -23,7 +23,8 @@ class CheckoutOrderPaidHandler {
 
         \Yii::$app->setMallId($mall->id);
         \Yii::$app->setMall($mall);
-
+        echo 'here';
+        exit;
         if(!$checkoutOrder->is_pay){
 
             $t = \Yii::$app->db->beginTransaction();

@@ -119,7 +119,8 @@ class EfpsPayForm extends BaseModel{
             $paymentEfpsOrder->nonceStr               = md5(uniqid());
             $paymentEfpsOrder->notifyUrl              = $notifyUrl;
             $paymentEfpsOrder->update_at              = time();
-            
+            $paymentEfpsOrder->is_pay                 = 0;
+
             if(!$paymentEfpsOrder->save()){
                 throw new \Exception($this->responseErrorMsg($paymentEfpsOrder));
             }

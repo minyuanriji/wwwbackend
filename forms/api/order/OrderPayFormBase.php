@@ -74,6 +74,9 @@ abstract class OrderPayFormBase extends BaseModel
 
         if(in_array("wechat", $supportPayTypes) && \Yii::$app->appPlatform == "h5"){
             $supportPayTypes = array_diff($supportPayTypes, ["wechat"]);
+            if(!in_array("alipay", $supportPayTypes)){
+                $supportPayTypes[] = "alipay";
+            }
         }
 
         $data = [

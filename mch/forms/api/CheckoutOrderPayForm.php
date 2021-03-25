@@ -131,6 +131,13 @@ class CheckoutOrderPayForm extends BaseModel {
             }
 
             $supportPayTypes = OrderLogic::getPaymentTypeConfig();
+            if(in_array("wechat", $supportPayTypes) && \Yii::$app->appPlatform == "h5"){
+                $supportPayTypes = array_diff($supportPayTypes, ["wechat"]);
+                if(!in_array("alipay", $supportPayTypes)){
+                    $supportPayTypes[] = "alipay";
+                }
+            }
+
             $union_id = 0;
 
             if($payPrice <= 0){ //通过抵扣卷支付成功

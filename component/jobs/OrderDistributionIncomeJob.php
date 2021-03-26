@@ -142,7 +142,13 @@ class OrderDistributionIncomeJob extends Component implements JobInterface{
 
                 if(!$distribution) continue;
 
-                $log = PriceLog::findOne(['common_order_detail_id' => $this->common_order_detail_id, 'is_delete' => 0, 'user_id' => $distribution->user_id, 'sign' => "distribution"]);
+                $log = PriceLog::findOne([
+                    'common_order_detail_id' => $this->common_order_detail_id,
+                    'is_delete'              => 0,
+                    'user_id'                => $distribution->user_id,
+                    'sign'                   => "distribution",
+                    'level'                  => $user_level
+                ]);
 
                 $price = 0;
                 if (!$log) {
@@ -233,9 +239,7 @@ class OrderDistributionIncomeJob extends Component implements JobInterface{
                     }
                 }
 
-                if($log->level == $user_level){
-                    $log->price = $price;
-                }
+                $log->price = $price;
 
                 $distributionUser = $distribution->user;
 

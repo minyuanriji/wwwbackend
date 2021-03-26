@@ -142,11 +142,13 @@ class OrderDistributionIncomeJob extends Component implements JobInterface{
 
                 if(!$distribution) continue;
 
+                $sign = "distribution";
+
                 $log = PriceLog::findOne([
                     'common_order_detail_id' => $this->common_order_detail_id,
                     'is_delete'              => 0,
                     'user_id'                => $distribution->user_id,
-                    'sign'                   => "distribution",
+                    'sign'                   => $sign,
                     'level'                  => $user_level
                 ]);
 
@@ -161,7 +163,7 @@ class OrderDistributionIncomeJob extends Component implements JobInterface{
                     $log->child_id               = $commonOrderDetail->user_id;
                     $log->level                  = $user_level;
                     $log->order_id               = $commonOrderDetail->order_id;
-                    $log->sign                   = "distribution";
+                    $log->sign                   = $sign;
                 }
 
                 if ($is_alone) { //独立分销机制

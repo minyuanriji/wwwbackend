@@ -11,6 +11,7 @@
 namespace app\controllers\admin;
 
 
+use app\component\jobs\OrderDistributionIncomeJob;
 use app\controllers\admin\behaviors\PermissionsBehavior;
 use app\controllers\admin\behaviors\RoleUserBehavior;
 use app\controllers\behavior\AdminPermissionsBehavior;

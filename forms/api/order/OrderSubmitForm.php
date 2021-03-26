@@ -2383,7 +2383,6 @@ class OrderSubmitForm extends BaseModel
 
         $orderDetailId                      = $orderDetail->save();
         if (!$orderDetailId) {
-
             throw new \Exception((new BaseModel())->responseErrorMsg($orderDetail));
         }
 

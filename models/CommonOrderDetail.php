@@ -60,6 +60,7 @@ class CommonOrderDetail extends BaseActiveRecord
             [['mall_id', 'order_id', 'goods_id', 'num', 'user_id', 'is_delete', 'created_at', 'updated_at', 'deleted_at', 'common_order_id', 'attr_id', 'status', 'order_detail_id'], 'integer'],
             [['order_no', 'goods_type'], 'string'],
             [['price', 'profit'], 'number'],
+            [['process_priority_level'], 'safe']
         ];
     }
 
@@ -146,6 +147,11 @@ class CommonOrderDetail extends BaseActiveRecord
     public function getGoodsAttr()
     {
         return $this->hasOne(GoodsAttr::className(), ['id' => 'attr_id']);
+    }
+
+    public function getOrder()
+    {
+        return $this->hasOne(Order::className(), ["id" => "order_id"]);
     }
 
     public function getOrderDetail()

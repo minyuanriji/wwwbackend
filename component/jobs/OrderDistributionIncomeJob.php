@@ -2,8 +2,6 @@
 namespace app\component\jobs;
 
 
-use app\core\currency\IncomeModel;
-use app\helpers\SerializeHelper;
 use app\models\CommonOrderDetail;
 use app\models\IncomeLog;
 use app\models\Mall;
@@ -23,7 +21,7 @@ class OrderDistributionIncomeJob extends Component implements JobInterface{
 
     public $common_order_detail_id;
 
-    private $is_debug = true;
+    private $is_debug = false;
 
 
     public function execute($queue){
@@ -142,7 +140,13 @@ class OrderDistributionIncomeJob extends Component implements JobInterface{
 
                 if(!$distribution) continue;
 
-                $log = PriceLog::findOne(['common_order_detail_id' => $this->common_order_detail_id, 'is_delete' => 0, 'user_id' => $distribution->user_id, 'sign' => "distribution"]);
+                $log = PriceLog::findOne([
+                    'common_order_detail_id' => $this->common_order_detail_id,
+                    'is_delete' => 0,
+                    'user_id' => $distribution->user_id,
+                    'sign' => "distribution",
+                    'level' => $user_level
+                ]);
 
                 $price = 0;
                 if (!$log) {
@@ -363,10 +367,6 @@ class OrderDistributionIncomeJob extends Component implements JobInterface{
         if(!$incomeLog->save()){
             throw new \Exception("收入记录生成失败！");
         }
-
-    }
-
-    private function income(User $user, $order_detail_id, $price){
 
     }
 

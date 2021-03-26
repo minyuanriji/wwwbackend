@@ -2,6 +2,7 @@
 namespace app\mch\forms\order;
 
 use app\core\ApiCode;
+use app\mch\forms\mch\MchAccountModifyForm;
 use app\models\BaseModel;
 use app\plugins\mch\forms\mall\CashEditForm;
 use app\plugins\mch\forms\mall\SettingForm;
@@ -58,14 +59,17 @@ class MchAutoSettleForm extends BaseModel{
                 "transfer_type" => 1
             ]);
             $res = $cashEditForm->transfer();
+
             if($res['code'] != ApiCode::CODE_SUCCESS){
-                //打款失败，试试转到余额
-                $mchCash->type = "balance";
-                $mchCash->content .= "。提现失败，自动转入余额";
+                //打款失败，返还到帐户
+                $mchCash->status = 2;
+                $mchCash->transfer_status = 2;
+                $mchCash->content .= "。自动打款失败";
                 if(!$mchCash->save()){
                     throw new \Exception($mchCash->responseErrorMsg());
                 }
-                $res = $cashEditForm->transfer();
+
+                $res = MchAccountModifyForm::modify($mch, $mchCash->money, $this->desc, true);
                 if($res['code'] != ApiCode::CODE_SUCCESS){
                     throw new \Exception($res['msg']);
                 }

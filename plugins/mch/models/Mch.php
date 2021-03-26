@@ -125,5 +125,6 @@ class Mch extends BaseActiveRecord
     {
         return $this->hasOne(MchRelatEfps::className(), ['mch_id' => 'id']);
     }
+
 }
 

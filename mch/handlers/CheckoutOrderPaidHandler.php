@@ -23,8 +23,7 @@ class CheckoutOrderPaidHandler {
 
         \Yii::$app->setMallId($mall->id);
         \Yii::$app->setMall($mall);
-        echo 'here';
-        exit;
+
         if(!$checkoutOrder->is_pay){
 
             $t = \Yii::$app->db->beginTransaction();
@@ -57,6 +56,7 @@ class CheckoutOrderPaidHandler {
                     "mch_id"   => $checkoutOrder->mch_id,
                     "price"    => $checkoutOrder->order_price
                 ]);
+
                 if(!$settleForm->save()){
                     throw new \Exception(CheckoutOrderAutoSettleForm::$errorMsg);
                 }

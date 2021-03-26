@@ -11,6 +11,7 @@
 namespace app\controllers\admin;
 
 
+use app\component\jobs\EfpsPayQueryJob;
 use app\component\jobs\OrderDistributionIncomeJob;
 use app\controllers\admin\behaviors\PermissionsBehavior;
 use app\controllers\admin\behaviors\RoleUserBehavior;
@@ -25,11 +26,18 @@ class BaseController extends \yii\web\Controller
     public $pageSize = 10;
     public function init()
     {
-        /*$res = \Yii::$app->efps->payAliJSAPIPayment([
-            "outTradeNo" => "Test0000000221313",
+        /*\Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob([
+            "outTradeNo" => "2021032418463192039"
+        ]));
+        exit;*/
+        /*$res = \Yii::$app->efps->payWxJSAPIPayment([
+            "outTradeNo" => "Test0000001222313",
             "customerCode" => "562326003594814",
             "payAmount" => 100,
             "notifyUrl" => "http://",
+            "appId" => "wxd7ac6d41d564256c",
+            "openId" => "ohQHU50qQNj63aHpP-j72DVWlmnk",
+            "payMethod" => 1,
             "orderInfo" => [
                 "Id" => "1234567",
                 "businessType" => "100001",

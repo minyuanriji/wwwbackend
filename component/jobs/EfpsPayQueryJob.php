@@ -9,7 +9,6 @@ use app\models\PaymentEfpsOrder;
 use app\models\PaymentOrder;
 use app\models\PaymentOrderUnion;
 use yii\base\Component;
-use yii\db\Transaction;
 use yii\queue\JobInterface;
 
 class EfpsPayQueryJob extends Component implements JobInterface{
@@ -46,7 +45,6 @@ class EfpsPayQueryJob extends Component implements JobInterface{
             if(!$efpsOrder->save()){
                 throw new \Exception($efpsOrder->getFirstErrors());
             }
-            exit;
 
             if($efpsOrder->is_pay){ //支付成功
                 $paymentOrderUnion = PaymentOrderUnion::findOne($efpsOrder->payment_order_union_id);
@@ -96,7 +94,6 @@ class EfpsPayQueryJob extends Component implements JobInterface{
                     }
                 }
             }
-            echo '\ncommit\n';
             $t->commit();
         }catch (\Exception $e) {
             $t->rollBack();

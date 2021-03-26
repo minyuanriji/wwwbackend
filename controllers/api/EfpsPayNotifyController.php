@@ -18,10 +18,7 @@ class EfpsPayNotifyController extends Controller{
      * @return array
      */
     public function actionAliJsApiPayment(){
-
-        \Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob([
-            "outTradeNo" => "2021032418463192039"
-        ]));
+        \Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob());
 
         /*ob_start();
         $content = \Yii::$app->request->headers;

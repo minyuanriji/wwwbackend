@@ -10,7 +10,6 @@ use app\component\jobs\EfpsPayQueryJob;
 use app\component\jobs\OrderDistributionIncomeJob;
 use app\component\lib\LockTools;
 use app\console\controllers\WorkermanBaseController;
-use app\models\CommonOrderDetail;
 use app\models\Task;
 use app\models\Integral;
 use app\models\IntegralRecord;
@@ -46,8 +45,8 @@ class WorkermanTimerController extends WorkermanBaseController
     }
 
     public function onWorkerStart($worker){
-        Timer::add(5,array($this,'payQueryLoopTimer'),array($worker)); //支付状态检查轮询
-        Timer::add(5,array($this,'OrderDistributionIncomeTimer'),array($worker)); //分佣
+        Timer::add(10,array($this,'payQueryLoopTimer'),array($worker)); //支付状态检查轮询
+        Timer::add(10,array($this,'OrderDistributionIncomeTimer'),array($worker)); //分佣
         Timer::add(3,array($this,'sendIntegralTimer'),array($worker)); //发放积分定时任务
         Timer::add(3,array($this,'expireIntegralTimer'),array($worker)); //积分过期定时任务
         Timer::add(1,array($this,'taskRetry'),array($worker));//任务重试定时任务
@@ -78,7 +77,7 @@ class WorkermanTimerController extends WorkermanBaseController
 	 * @return void
      */
     public function OrderDistributionIncomeTimer($worker){
-        \Yii::$app->queue->delay(10)->push(new OrderDistributionIncomeJob());
+        \Yii::$app->queue->delay(0)->push(new OrderDistributionIncomeJob());
     }
 
      /**

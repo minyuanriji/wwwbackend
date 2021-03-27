@@ -10,6 +10,8 @@ use app\models\BaseModel;
 use app\models\PaymentEfpsOrder;
 use app\models\PaymentOrderUnion;
 use app\models\Store;
+use app\models\User;
+use app\models\UserInfo;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
 
@@ -27,7 +29,7 @@ class EfpsPayForm extends BaseModel{
     }
 
     public function wechatPay(){
-
+        return $this->callPay("IF-WeChat-01");
     }
 
     /**
@@ -35,10 +37,14 @@ class EfpsPayForm extends BaseModel{
      * @return array
      */
     public function aliPay(){
+        return $this->callPay("IF-QRcode-01");
+    }
+
+
+    public function callPay($payAPI){
         if (!$this->validate()) {
             return $this->returnApiResultData();
         }
-
         try {
             $paymentOrderUnion = PaymentOrderUnion::findOne($this->union_id);
 
@@ -57,12 +63,12 @@ class EfpsPayForm extends BaseModel{
 
             $paymentEfpsOrder = PaymentEfpsOrder::findOne([
                 "payment_order_union_id" => $paymentOrderUnion->id,
-                "payAPI"                 => "IF-QRcode-01"
+                "payAPI"                 => $payAPI
             ]);
             if(!$paymentEfpsOrder){
                 $paymentEfpsOrder = new PaymentEfpsOrder();
                 $paymentEfpsOrder->payment_order_union_id = $paymentOrderUnion->id;
-                $paymentEfpsOrder->payAPI                 = "IF-QRcode-01";
+                $paymentEfpsOrder->payAPI                 = $payAPI;
                 $orderInfo = [
                     'Id'           => $paymentOrderUnion->id,
                     "businessType" => "100001",
@@ -113,7 +119,6 @@ class EfpsPayForm extends BaseModel{
             $paymentEfpsOrder->customerCode           = \Yii::$app->efps->getCustomerCode();
             $paymentEfpsOrder->payAmount              = $paymentOrderUnion->amount * 100;
             $paymentEfpsOrder->payCurrency            = "CNY";
-            $paymentEfpsOrder->payMethod              = "7";
             $paymentEfpsOrder->outTradeNo             = date("YmdHis") . rand(10000, 99999);
             $paymentEfpsOrder->transactionStartTime   = date("YmdHis");
             $paymentEfpsOrder->nonceStr               = md5(uniqid());
@@ -121,23 +126,54 @@ class EfpsPayForm extends BaseModel{
             $paymentEfpsOrder->update_at              = time();
             $paymentEfpsOrder->is_pay                 = 0;
 
+            if($payAPI == "IF-WeChat-01"){ //微信公众号/小程序支付
+
+                $userInfo = UserInfo::findOne([
+                    "user_id"  => \Yii::$app->user->id,
+                    "platform" => User::PLATFORM_WECHAT
+                ]);
+                if(!$userInfo || empty($userInfo->openid)){
+                    throw new \Exception("用户需要授权获取openid");
+                }
+
+                if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){ //小程序
+                    $paymentEfpsOrder->payMethod = "1";
+                }else{ //公众号
+                    $paymentEfpsOrder->payMethod = "35";
+                }
+                $paymentEfpsOrder->appId = \Yii::$app->params['wechatConfig']['app_id'];
+                $paymentEfpsOrder->openId = $userInfo->openid;
+            }else{ //支付宝主扫支付
+                $paymentEfpsOrder->payMethod = "7";
+            }
+
             if(!$paymentEfpsOrder->save()){
                 throw new \Exception($this->responseErrorMsg($paymentEfpsOrder));
             }
-            $res = \Yii::$app->efps->payAliJSAPIPayment([
+
+            $data = [
                 "outTradeNo"   => $paymentEfpsOrder->outTradeNo,
                 "customerCode" => $paymentEfpsOrder->customerCode,
                 "payAmount"    => $paymentEfpsOrder->payAmount,
                 "notifyUrl"    => $paymentEfpsOrder->notifyUrl,
                 "orderInfo"    => json_decode($paymentEfpsOrder->orderInfo, true)
-            ]);
+            ];
+
+            if($payAPI == "IF-WeChat-01") { //微信公众号/小程序支付
+                $res = \Yii::$app->efps->payWxJSAPIPayment(array_merge($data, [
+                    "appId"  => $paymentEfpsOrder->appId,
+                    "openId" => $paymentEfpsOrder->openId
+                ]));
+            }else{ //支付宝主扫支付
+                $res = \Yii::$app->efps->payAliJSAPIPayment($data);
+            }
             if($res['code'] != Efps::CODE_SUCCESS){
                 throw new \Exception($res['msg']);
             }
             return [
                 'code'  => ApiCode::CODE_SUCCESS,
                 'msg'   => '请求成功',
-                'data'  => $res['data']
+                'data'  => $payAPI == "IF-WeChat-01" ? $res['data']['wxJsapiParam'] : $res['data']
             ];
         }catch (\Exception $e){
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());

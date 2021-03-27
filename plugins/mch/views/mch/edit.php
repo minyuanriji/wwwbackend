@@ -264,17 +264,7 @@
                                             inactive-value="0">
                                     </el-switch>
                                 </el-form-item>
-                                <template v-if="is_audit == 1 && is_review == 0">
-                                    <el-form-item label="审核状态" prop="review_status">
-                                        <el-tag v-if="ruleForm.review_status == 0" type="info">待审核</el-tag>
-                                        <el-tag v-if="ruleForm.review_status == 1" type="success">审核通过</el-tag>
-                                        <el-tag v-if="ruleForm.review_status == 2" type="danger">审核不通过</el-tag>
-                                    </el-form-item>
-                                    <el-form-item label="审核结果" prop="review_remark">
-                                        {{ruleForm.review_remark}}
-                                    </el-form-item>
-                                </template>
-                                <template v-if="is_review == 1">
+                                <template>
                                     <el-form-item label="审核状态" prop="review_status">
                                         <el-radio v-model="ruleForm.review_status" label="1">审核通过</el-radio>
                                         <el-radio v-model="ruleForm.review_status" label="2">审核不通过</el-radio>

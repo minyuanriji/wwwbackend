@@ -117,6 +117,7 @@ class Efps extends Component{
      * @throws \Exception
      */
     public function merchantApply($params){
+        $params['acqSpId'] = $this->getCustomerCode();
         return $this->request((new MerchantApply())->build($params));
     }
 
@@ -127,6 +128,7 @@ class Efps extends Component{
      * @throws \Exception
      */
     public function merchantQuery($params){
+        $params['acqSpId'] = $this->getCustomerCode();
         return $this->request((new MerchantQuery())->build($params));
     }
 
@@ -171,7 +173,6 @@ class Efps extends Component{
             //curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_VERBOSE, false);
-
 
             $resText = curl_exec($ch);
             $error = curl_error($ch);

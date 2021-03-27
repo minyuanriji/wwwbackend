@@ -30,7 +30,7 @@ class BaseController extends \yii\web\Controller
             "outTradeNo" => "2021032418463192039"
         ]));
         exit;*/
-        $res = \Yii::$app->efps->payWxJSAPIPayment([
+        /*$res = \Yii::$app->efps->payWxJSAPIPayment([
             "outTradeNo" => "Test0001012322313",
             "customerCode" => "562326003594814",
             "payAmount" => 100,
@@ -53,7 +53,7 @@ class BaseController extends \yii\web\Controller
             ]
         ]);
         print_r($res);
-        exit;
+        exit;*/
         //\Yii::$app->validateCloudFile();
         parent::init();
     }

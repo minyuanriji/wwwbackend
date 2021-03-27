@@ -7,6 +7,7 @@ use app\component\efps\lib\MerchantApply;
 use app\component\efps\lib\MerchantQuery;
 use app\component\efps\lib\pay\AliJSAPIPayment;
 use app\component\efps\lib\pay\PaymentQuery;
+use app\component\efps\lib\pay\SplitOrder;
 use app\component\efps\lib\pay\UnifiedPayment;
 use app\component\efps\lib\pay\WxJSAPIPayment;
 use app\component\efps\lib\wechat\BindAppId;
@@ -44,6 +45,16 @@ class Efps extends Component{
 
     public function getCustomerCode(){
         return $this->main_config['acq_sp_id'];
+    }
+
+    /**
+     * 交易分账接口
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
+    public function splitOrder($params){
+        return $this->request((new SplitOrder())->build($params));
     }
 
     /**

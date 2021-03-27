@@ -22,9 +22,6 @@ class MchApplyForm extends BaseModel {
 
     public $mobile;                 //手机号
     public $realname;               //申请人真实姓名
-    public $pic_id_card_front;      //身份证正面图片
-    public $pic_id_card_back;       //身份证背面图片
-    public $pic_business_license;   //营业执照图片
 
     public $cat_id;                 //店铺类型
     public $name;                   //店铺名称
@@ -37,12 +34,7 @@ class MchApplyForm extends BaseModel {
 
     public function rules(){
         return array_merge(parent::rules(), [
-            [['user_id', 'mobile', 'realname', 'pic_id_card_front', 'pic_id_card_back',
-              'pic_business_license', 'cat_id', 'name', 'address', 'longitude', 'latitude'], 'required'],
-            [['user_id', 'cat_id'], 'integer'],
-            [['mobile', 'pic_id_card_front', 'address', 'pic_id_card_back', 'pic_business_license'], 'string', 'max' => 255],
-            [['realname', 'name', 'longitude', 'latitude'], 'string', 'max' => 65],
-            [['province_id', 'city_id', 'district_id'], 'safe']
+            [['user_id', 'mobile', 'realname', 'cat_id', 'name', 'address', 'longitude', 'latitude', 'province_id', 'city_id', 'district_id'], 'safe']
         ]);
     }
 

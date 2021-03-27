@@ -11,8 +11,6 @@
 namespace app\controllers\admin;
 
 
-use app\component\jobs\EfpsPayQueryJob;
-use app\component\jobs\OrderDistributionIncomeJob;
 use app\controllers\admin\behaviors\PermissionsBehavior;
 use app\controllers\admin\behaviors\RoleUserBehavior;
 use app\controllers\behavior\AdminPermissionsBehavior;
@@ -26,6 +24,19 @@ class BaseController extends \yii\web\Controller
     public $pageSize = 10;
     public function init()
     {
+        /*$res = \Yii::$app->efps->splitOrder([
+            "customerCode" => \Yii::$app->efps->getCustomerCode(),
+            "outTradeNo" => "2021032714032270225",
+            "notifyUrl" => "http://",
+            "splitInfoList" => [
+                "customerCode" => "562075003109308",
+                "amount" => 1000,
+                "isProcedureCustomer" => "0"
+            ]
+        ]);
+        print_r($res);
+        exit;*/
+
         /*\Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob([
             "outTradeNo" => "2021032418463192039"
         ]));

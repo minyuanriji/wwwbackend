@@ -29,6 +29,7 @@ use app\models\OrderRefund;
 
 use app\models\User;
 use app\models\UserCard;
+use forms\efps\distribute\GoodsOrder;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
 
 /**
@@ -97,8 +98,11 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
         //echo '消费升级会员等级'.PHP_EOL;
         //$this->upLevel();
 
+        //分账
+        GoodsOrder::distribute($this->order);
+
         //多商户订单结算
-        GoodsOrderAutoSettleForm::settle($this->order);
+        //GoodsOrderAutoSettleForm::settle($this->order);
     }
 
     /**

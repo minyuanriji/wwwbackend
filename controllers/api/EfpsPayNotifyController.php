@@ -19,19 +19,6 @@ class EfpsPayNotifyController extends Controller{
      */
     public function actionAliJsApiPayment(){
         \Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob());
-
-        /*ob_start();
-        $content = \Yii::$app->request->headers;
-        print_r($content);
-        ob_end_clean();
-        file_put_contents(\Yii::getAlias("@runtime/test_efps_header"), $content);
-        file_put_contents(\Yii::getAlias("@runtime/test_efps_body"), file_get_contents("php://input"));
-        exit;*/
-
-       /*
-        print_r($res);
-        exit;*/
-
     }
 
 }

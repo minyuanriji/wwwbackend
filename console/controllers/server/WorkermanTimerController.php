@@ -70,7 +70,7 @@ class WorkermanTimerController extends WorkermanBaseController
      * @return void
      */
     public function payQueryLoopTimer($worker){
-        //\Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob());
+        \Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob());
 	}
 	
     /* 分佣计划

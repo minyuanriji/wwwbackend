@@ -7,6 +7,7 @@ use app\mch\forms\order\CheckoutOrderDeductIntegralForm;
 use app\mch\forms\order\CheckoutOrderAutoSettleForm;
 use app\models\Mall;
 use app\plugins\mch\models\Mch;
+use forms\efps\distribute\CheckoutOrder;
 
 class CheckoutOrderPaidHandler {
 
@@ -50,8 +51,11 @@ class CheckoutOrderPaidHandler {
                     }
                 }
 
+                //分账业务
+                CheckoutOrder::distribute($checkoutOrder);
+
                 //商家结算
-                $settleForm = new CheckoutOrderAutoSettleForm([
+                /*$settleForm = new CheckoutOrderAutoSettleForm([
                     "order_id" => $checkoutOrder->id,
                     "mch_id"   => $checkoutOrder->mch_id,
                     "price"    => $checkoutOrder->order_price
@@ -59,7 +63,7 @@ class CheckoutOrderPaidHandler {
 
                 if(!$settleForm->save()){
                     throw new \Exception(CheckoutOrderAutoSettleForm::$errorMsg);
-                }
+                }*/
 
                 $t->commit();
             }catch (\Exception $e){

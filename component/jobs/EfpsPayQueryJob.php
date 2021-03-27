@@ -61,8 +61,14 @@ class EfpsPayQueryJob extends Component implements JobInterface{
                     \Yii::$app->setMall($mall);
 
                     $paymentOrders = PaymentOrder::findAll(['payment_order_union_id' => $paymentOrderUnion->id]);
-                    $paymentOrderUnion->is_pay   = 1;
-                    $paymentOrderUnion->pay_type = 4;
+
+                    if($efpsOrder->payAPI == "IF-QRcode-01"){ //支付宝
+                        $paymentOrderUnion->pay_type = 4;
+                    }else{
+                        $paymentOrderUnion->pay_type = 1;
+                    }
+                    $paymentOrderUnion->is_pay = 1;
+
                     if (!$paymentOrderUnion->save()) {
                         throw new \Exception($paymentOrderUnion->getFirstErrors());
                     }
@@ -72,8 +78,12 @@ class EfpsPayQueryJob extends Component implements JobInterface{
                         if (!class_exists($Class)) {
                             continue;
                         }
+                        if($efpsOrder->payAPI == "IF-QRcode-01"){ //支付宝
+                            $paymentOrder->pay_type = 4;
+                        }else{
+                            $paymentOrder->pay_type = 1;
+                        }
                         $paymentOrder->is_pay   = 1;
-                        $paymentOrder->pay_type = 4;
                         if (!$paymentOrder->save()) {
                             throw new \Exception($paymentOrder->getFirstErrors());
                         }

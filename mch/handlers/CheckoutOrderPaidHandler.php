@@ -6,7 +6,6 @@ use app\mch\events\CheckoutOrderPaidEvent;
 use app\mch\forms\order\CheckoutOrderDeductIntegralForm;
 use app\mch\forms\order\CheckoutOrderAutoSettleForm;
 use app\models\Mall;
-use app\plugins\mch\models\Mch;
 
 class CheckoutOrderPaidHandler {
 
@@ -59,7 +58,6 @@ class CheckoutOrderPaidHandler {
                 if(!$settleForm->save()){
                     throw new \Exception(CheckoutOrderAutoSettleForm::$errorMsg);
                 }
-
                 $t->commit();
             }catch (\Exception $e){
                 $t->rollBack();
@@ -67,6 +65,5 @@ class CheckoutOrderPaidHandler {
             }
         }
     }
-
 
 }

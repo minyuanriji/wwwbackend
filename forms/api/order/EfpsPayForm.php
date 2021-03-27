@@ -48,7 +48,7 @@ class EfpsPayForm extends BaseModel{
             }
 
             if($paymentOrderUnion->is_pay == 1){
-                //throw new \Exception('请勿重复支付');
+                throw new \Exception('请勿重复支付');
             }
 
             $supportPayTypes = (array)$paymentOrderUnion->decodeSupportPayTypes($paymentOrderUnion->support_pay_types);

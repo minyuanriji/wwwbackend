@@ -15,6 +15,16 @@ class EfpsPayController extends ApiController{
     }
 
     /**
+     * 余额支付
+     * @return array
+     */
+    public function actionBalance(){
+        $form = new EfpsPayForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->balancePay());
+    }
+
+    /**
      * 微信支付
      * @return array
      */

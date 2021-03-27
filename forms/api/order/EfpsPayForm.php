@@ -6,13 +6,15 @@ namespace app\forms\api\order;
 
 use app\component\efps\Efps;
 use app\core\ApiCode;
+use app\core\payment\PaymentException;
+use app\core\payment\PaymentNotify;
+use app\core\payment\PaymentOrder;
+use app\logic\AppConfigLogic;
 use app\models\BaseModel;
 use app\models\PaymentEfpsOrder;
 use app\models\PaymentOrderUnion;
-use app\models\Store;
 use app\models\User;
 use app\models\UserInfo;
-use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
 
 class EfpsPayForm extends BaseModel{
@@ -28,6 +30,108 @@ class EfpsPayForm extends BaseModel{
         ];
     }
 
+    /**
+     * 余额支付
+     * @return array
+     */
+    public function balancePay(){
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+            if (\Yii::$app->user->isGuest) {
+                throw new \Exception('用户未登录。');
+            }
+
+            $user = \Yii::$app->user->identity;
+            $paymentOrderUnion = PaymentOrderUnion::findOne(['id' => $this->union_id]);
+            if (!$paymentOrderUnion) {
+                throw new \Exception('待支付订单不存在。');
+            }
+
+            if($paymentOrderUnion->is_pay == 1){
+                //throw new \Exception('请勿重复支付');
+            }
+
+            $supportPayTypes = (array)$paymentOrderUnion->decodeSupportPayTypes($paymentOrderUnion->support_pay_types);
+            if (!empty($supportPayTypes) && is_array($supportPayTypes) && !in_array("balance", $supportPayTypes)) {
+                if ($paymentOrderUnion->amount != 0) { // 订单金额为0时可以使用余额支付
+                    throw new \Exception('暂不支持余额支付。');
+                }
+            }
+
+            $paymentConfigs = AppConfigLogic::getPaymentConfig();
+            $pay_password_status = isset($paymentConfigs["pay_password_status"]) ? $paymentConfigs["pay_password_status"] : 0;
+            if($pay_password_status == 1){
+                if(empty($user->transaction_password)){
+                    throw new \Exception('您未设置支付密码');
+                }
+                if(empty($transaction_password)){
+                    throw new \Exception('请输入交易密码');
+                }
+                if (!\Yii::$app->getSecurity()->validatePassword(trim($transaction_password), $user->transaction_password)) {
+                    throw new \Exception('支付密码错误');
+                }
+            }
+
+            $paymentOrders = \app\models\PaymentOrder::find()
+                ->where(['payment_order_union_id' => $paymentOrderUnion->id,])
+                ->all();
+            $totalAmount = 0;
+            foreach ($paymentOrders as $paymentOrder) {
+                $totalAmount += $paymentOrder->amount;
+            }
+            $balanceAmount = \Yii::$app->currency->setUser($user)->balance->select();
+            if ($balanceAmount < $totalAmount) {
+                throw new \Exception('账户余额不足。');
+            }
+            $paymentOrderUnion->is_pay   = 1;
+            $paymentOrderUnion->pay_type = 3;
+            if (!$paymentOrderUnion->save()) {
+                throw new \Exception($paymentOrderUnion->getFirstErrors());
+            }
+
+            foreach ($paymentOrders as $paymentOrder) {
+
+                $paymentOrder->is_pay   = 1;
+                $paymentOrder->pay_type = 3;
+                if (!$paymentOrder->save()) {
+                    throw new \Exception($paymentOrder->getFirstErrors());
+                }
+                $NotifyClass = $paymentOrder->notify_class;
+                $notifyObject = new $NotifyClass();
+                $po = new PaymentOrder([
+                    'orderNo'     => $paymentOrder->order_no,
+                    'amount'      => (float)$paymentOrder->amount,
+                    'title'       => $paymentOrder->title,
+                    'notifyClass' => $paymentOrder->notify_class,
+                    'payType'     => "balance",
+                ]);
+                if ($po->amount > 0) {
+                    if (!\Yii::$app->currency->setUser($user)->balance->sub($po->amount, '账户余额支付：' . $po->amount . '元')) {
+                        throw new \Exception('余额操作失败。');
+                    }
+                }
+                try {
+                    $notifyObject->notify($po);
+                } catch (\Exception $e) {
+                    return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
+                }
+            }
+            $t->commit();
+
+            return [
+                'code'  => ApiCode::CODE_SUCCESS,
+                'msg'   => '支付成功'
+            ];
+        }catch (\Exception $e){
+            $t->rollBack();
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
+        }
+    }
+
+    /**
+     * 微信支付
+     * @return array
+     */
     public function wechatPay(){
         return $this->callPay("IF-WeChat-01");
     }

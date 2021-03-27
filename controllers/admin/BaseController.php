@@ -36,35 +36,6 @@ class BaseController extends \yii\web\Controller
         ]);
         print_r($res);
         exit;*/
-
-        /*\Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob([
-            "outTradeNo" => "2021032418463192039"
-        ]));
-        exit;*/
-        /*$res = \Yii::$app->efps->payWxJSAPIPayment([
-            "outTradeNo" => "Test0001012322313",
-            "customerCode" => "562326003594814",
-            "payAmount" => 100,
-            "notifyUrl" => "http://",
-            "appId" => "wxd7ac6d41d564256c",
-            "openId" => "ohQHU50qQNj63aHpP-j72DVWlmnk",
-            "payMethod" => 1,
-            "orderInfo" => [
-                "Id" => "1234567",
-                "businessType" => "100001",
-                "goodsList" => [
-                    [
-                        "goodsId"   => "12345",
-                        "name"      => "test11111",
-                        "price"     => 150,
-                        "number"    => "1",
-                        "amount"    => 100
-                    ]
-                ]
-            ]
-        ]);
-        print_r($res);
-        exit;*/
         //\Yii::$app->validateCloudFile();
         parent::init();
     }

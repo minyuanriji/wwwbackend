@@ -18,7 +18,14 @@ class EfpsPayNotifyController extends Controller{
      * @return array
      */
     public function actionAliJsApiPayment(){
-        \Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob());
+        $notifyData = (array)@json_decode(@file_get_contents("php://input"), true);
+        $outTradeNo = !empty($notifyData['outTradeNo']) ? $notifyData['outTradeNo'] : null;
+        if(!empty($outTradeNo)){
+            $job = new EfpsPayQueryJob([
+                "outTradeNo" => $outTradeNo
+            ]);
+            $job->execute(null);
+        }
     }
 
 }

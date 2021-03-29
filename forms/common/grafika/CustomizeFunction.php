@@ -39,7 +39,7 @@ trait CustomizeFunction
     public static function head(GrafikaOption $model): string
     {
         $user = User::findOne(['id' => \Yii::$app->user->id]);
-        if(!preg_match($user->avatar_url, "/^http/i")){
+        if(!preg_match("/^http/i", $user->avatar_url){
             $user->avatar_url = $model->default_avatar_url;
         }
         $avatar = CommonFunction::avatar(CommonFunction::saveTempImage($user->avatar_url, $model->default_avatar_url), $model->temp_path, 0, 0);

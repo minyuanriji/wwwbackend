@@ -2,7 +2,7 @@
 namespace app\models;
 
 
-class MchRelatEfps extends BaseActiveRecord {
+class EfpsMchReviewInfo extends BaseActiveRecord {
 
     const MERCHANTTYPE_IND          = 1; //个体
     const MERCHANTTYPE_ENT          = 2; //企业
@@ -18,7 +18,7 @@ class MchRelatEfps extends BaseActiveRecord {
      * {@inheritdoc}
      */
     public static function tableName(){
-        return '{{%plugin_mch_relat_efps}}';
+        return '{{%efps_mch_review_info}}';
     }
 
     public function rules(){

@@ -9,8 +9,10 @@ use app\component\efps\lib\pay\AliJSAPIPayment;
 use app\component\efps\lib\pay\PaymentQuery;
 use app\component\efps\lib\pay\SplitOrder;
 use app\component\efps\lib\pay\UnifiedPayment;
+use app\component\efps\lib\pay\WithdrawalToCard;
 use app\component\efps\lib\pay\WxJSAPIPayment;
 use app\component\efps\lib\wechat\BindAppId;
+use app\component\efps\tools\Rsa;
 use yii\base\Component;
 
 class Efps extends Component{
@@ -45,6 +47,25 @@ class Efps extends Component{
 
     public function getCustomerCode(){
         return $this->main_config['acq_sp_id'];
+    }
+
+    /**
+     * 商户单笔提现
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
+    public function withdrawalToCard($params){
+        if(!empty($params['bankUserName'])){
+            $params['bankUserName'] = $this->encriptByPublic($params['bankUserName']);
+            $params['bankCardNo'] = $this->encriptByPublic($params['bankCardNo']);
+        }
+        return $this->request((new WithdrawalToCard())->build($params));
+    }
+
+    private function encriptByPublic($str){
+        openssl_public_encrypt($str, $encrypt, file_get_contents($this->main_config['efpsPublicKeyFilePath']));
+        return base64_encode($encrypt);
     }
 
     /**

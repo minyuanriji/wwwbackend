@@ -6,7 +6,7 @@ use app\component\efps\Efps;
 use app\core\ApiCode;
 use app\forms\common\template\tplmsg\AudiResultTemplate;
 use app\mch\forms\mch\EfpsReviewInfoForm;
-use app\models\MchRelatEfps;
+use app\models\EfpsMchReviewInfo;
 use app\models\Model;
 use app\models\User;
 use app\plugins\mch\forms\common\MchEditFormBase;
@@ -85,14 +85,14 @@ class MchEditForm extends MchEditFormBase
 
     protected function setReviewStatus(){
         if($this->review_status == Mch::REVIEW_STATUS_NOTPASS){ //审核不通过
-            MchRelatEfps::updateAll(['status' => 3], ["mch_id" => $this->mch->id]);
+            EfpsMchReviewInfo::updateAll(['status' => 3], ["mch_id" => $this->mch->id]);
             Mch::updateAll([
                 "review_status" => Mch::REVIEW_STATUS_NOTPASS,
                 "review_remark" => $this->review_remark
             ], ["id" => $this->mch->id]);
         }elseif($this->review_status == Mch::REVIEW_STATUS_CHECKED){ //审核通过
 
-            $reviewData = MchRelatEfps::find()->where(["mch_id" => $this->mch->id])->asArray()->one();
+            $reviewData = EfpsMchReviewInfo::find()->where(["mch_id" => $this->mch->id])->asArray()->one();
 
             if(!$reviewData){
                 throw new \Exception("无法获取审核信息");
@@ -110,7 +110,7 @@ class MchEditForm extends MchEditFormBase
                 }
             }
 
-            MchRelatEfps::updateAll(['status' => 2], ["mch_id" => $this->mch->id]);
+            EfpsMchReviewInfo::updateAll(['status' => 2], ["mch_id" => $this->mch->id]);
             Mch::updateAll(["review_status" => Mch::REVIEW_STATUS_CHECKED], [
                 "id" => $this->mch->id
             ]);
@@ -120,7 +120,7 @@ class MchEditForm extends MchEditFormBase
                 if($res['code'] != Efps::CODE_SUCCESS){
                     throw new \Exception($res['msg']);
                 }
-                MchRelatEfps::updateAll(["acqMerId" => $res['data']['acqMerId']], [
+                EfpsMchReviewInfo::updateAll(["acqMerId" => $res['data']['acqMerId']], [
                     "mch_id" => $this->mch->id
                 ]);
                 $acqMerId = $res['data']['acqMerId'];
@@ -136,7 +136,7 @@ class MchEditForm extends MchEditFormBase
 
             //审核通过
             if($res['data']['accountStatus'] == 1 && $res['data']['auditStatus'] == 2){
-                MchRelatEfps::updateAll(['status' => 2], ["mch_id" => $this->mch->id]);
+                EfpsMchReviewInfo::updateAll(['status' => 2], ["mch_id" => $this->mch->id]);
                 Mch::updateAll(["review_status" => Mch::REVIEW_STATUS_CHECKED], [
                     "id" => $this->mch->id
                 ]);

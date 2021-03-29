@@ -4,10 +4,10 @@
 namespace app\models;
 
 
-class PaymentEfpsOrder extends BaseActiveRecord {
+class EfpsPaymentOrder extends BaseActiveRecord {
 
     public static function tableName(){
-        return '{{%payment_efps_order}}';
+        return '{{%efps_payment_order}}';
     }
 
     public function rules(){

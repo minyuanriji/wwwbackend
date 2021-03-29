@@ -3,7 +3,7 @@ namespace app\mch\forms\api\apply;
 
 use app\core\ApiCode;
 use app\mch\forms\mch\EfpsReviewInfoForm;
-use app\models\MchRelatEfps;
+use app\models\EfpsMchReviewInfo;
 use app\plugins\mch\models\Mch;
 
 class SettleInfoForm extends EfpsReviewInfoForm{
@@ -15,7 +15,7 @@ class SettleInfoForm extends EfpsReviewInfoForm{
 
             $res = parent::save();
             if($res['code'] == ApiCode::CODE_SUCCESS){
-                MchRelatEfps::updateAll([
+                EfpsMchReviewInfo::updateAll([
                     "status" => 1
                 ], ["mch_id" => $this->mch_id]);
                 Mch::updateAll([
@@ -38,10 +38,10 @@ class SettleInfoForm extends EfpsReviewInfoForm{
     private function checkData(){
         $settleAccountType = (int)$this->paper_settleAccountType;
         if(!in_array($settleAccountType, [
-            MchRelatEfps::SETTLEACCOUNTTYPE_ENT,
-            MchRelatEfps::SETTLEACCOUNTTYPE_PER,
-            MchRelatEfps::SETTLEACCOUNTTYPE_AU_ENT,
-            MchRelatEfps::SETTLEACCOUNTTYPE_AU_PER])){
+            EfpsMchReviewInfo::SETTLEACCOUNTTYPE_ENT,
+            EfpsMchReviewInfo::SETTLEACCOUNTTYPE_PER,
+            EfpsMchReviewInfo::SETTLEACCOUNTTYPE_AU_ENT,
+            EfpsMchReviewInfo::SETTLEACCOUNTTYPE_AU_PER])){
             throw new \Exception("请设置结算账户类型");
         }
 
@@ -59,7 +59,7 @@ class SettleInfoForm extends EfpsReviewInfoForm{
             throw new \Exception("请设置开户银行");
         }
 
-        if($settleAccountType ==  MchRelatEfps::SETTLEACCOUNTTYPE_ENT){
+        if($settleAccountType ==  EfpsMchReviewInfo::SETTLEACCOUNTTYPE_ENT){
             if(empty($this->paper_openSubBank)){ //开户支行
                 throw new \Exception("请设置开户支行");
             }
@@ -68,8 +68,8 @@ class SettleInfoForm extends EfpsReviewInfoForm{
             }
         }
 
-        if(in_array($settleAccountType, [MchRelatEfps::SETTLEACCOUNTTYPE_AU_ENT,
-                MchRelatEfps::SETTLEACCOUNTTYPE_AU_PER]) && empty($this->paper_settleAttachment)){
+        if(in_array($settleAccountType, [EfpsMchReviewInfo::SETTLEACCOUNTTYPE_AU_ENT,
+                EfpsMchReviewInfo::SETTLEACCOUNTTYPE_AU_PER]) && empty($this->paper_settleAttachment)){
             throw new \Exception("请设置结算账户附件");
         }
 

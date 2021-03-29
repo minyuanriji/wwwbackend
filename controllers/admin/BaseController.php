@@ -24,18 +24,17 @@ class BaseController extends \yii\web\Controller
     public $pageSize = 10;
     public function init()
     {
-        /*$res = \Yii::$app->efps->splitOrder([
-            "customerCode" => \Yii::$app->efps->getCustomerCode(),
-            "outTradeNo" => "2021032714032270225",
-            "notifyUrl" => "http://",
-            "splitInfoList" => [
-                "customerCode" => "562075003109308",
-                "amount" => 1000,
-                "isProcedureCustomer" => "0"
-            ]
+        /*$res = \Yii::$app->efps->withdrawalToCard([
+            "customerCode"    => \Yii::$app->efps->getCustomerCode(),
+            "outTradeNo"      => date("YmdHis") . rand(1000, 9999),
+            "notifyUrl"       => "http://",
+            "amount"          => 100,
+            "bankUserName"    => "杨桢",
+            "bankCardNo"      => "6216610100014295485",
+            "bankName"        => "中国银行",
+            "bankAccountType" => "2"
         ]);
-        print_r($res);
-        exit;*/
+        print_r($res);exit;*/
         //\Yii::$app->validateCloudFile();
         parent::init();
     }

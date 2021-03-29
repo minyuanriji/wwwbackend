@@ -4,7 +4,7 @@ namespace app\mch\forms\api\apply;
 use app\core\ApiCode;
 use app\helpers\ArrayHelper;
 use app\mch\forms\mch\EfpsReviewInfoForm;
-use app\models\MchRelatEfps;
+use app\models\EfpsMchReviewInfo;
 use app\plugins\mch\models\Mch;
 
 class QueryStatusForm extends EfpsReviewInfoForm{
@@ -20,7 +20,7 @@ class QueryStatusForm extends EfpsReviewInfoForm{
             }
 
             $status = 0;
-            $relatEfps = MchRelatEfps::findOne(["mch_id" => $this->mch_id]);
+            $relatEfps = EfpsMchReviewInfo::findOne(["mch_id" => $this->mch_id]);
             if($relatEfps){
                 $status = $relatEfps['status'];
             }

@@ -5,7 +5,7 @@ namespace app\component\jobs;
 use app\component\efps\Efps;
 use app\core\payment\PaymentNotify;
 use app\models\Mall;
-use app\models\PaymentEfpsOrder;
+use app\models\EfpsPaymentOrder;
 use app\models\PaymentOrder;
 use app\models\PaymentOrderUnion;
 use yii\base\Component;
@@ -19,11 +19,11 @@ class EfpsPayQueryJob extends Component implements JobInterface{
         $t = \Yii::$app->getDb()->beginTransaction();
         try {
             if(empty($this->outTradeNo)){
-                $efpsOrder = PaymentEfpsOrder::find()->where([
+                $efpsOrder = EfpsPaymentOrder::find()->where([
                     "is_pay" => 0
                 ])->orderBy("update_at ASC")->one();
             }else{
-                $efpsOrder = PaymentEfpsOrder::find()->where([
+                $efpsOrder = EfpsPaymentOrder::find()->where([
                     "is_pay"     => 0,
                     "outTradeNo" => $this->outTradeNo
                 ])->one();

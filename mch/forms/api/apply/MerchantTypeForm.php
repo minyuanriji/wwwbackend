@@ -3,7 +3,7 @@ namespace app\mch\forms\api\apply;
 
 use app\core\ApiCode;
 use app\mch\forms\mch\EfpsReviewInfoForm;
-use app\models\MchRelatEfps;
+use app\models\EfpsMchReviewInfo;
 
 class MerchantTypeForm extends EfpsReviewInfoForm{
 
@@ -26,13 +26,13 @@ class MerchantTypeForm extends EfpsReviewInfoForm{
 
     private function checkData(){
 
-        if(empty($this->paper_merchantType) || !in_array($this->paper_merchantType, [ MchRelatEfps::MERCHANTTYPE_IND, MchRelatEfps::MERCHANTTYPE_ENT, MchRelatEfps::MERCHANTTYPE_PER])){
+        if(empty($this->paper_merchantType) || !in_array($this->paper_merchantType, [ EfpsMchReviewInfo::MERCHANTTYPE_IND, EfpsMchReviewInfo::MERCHANTTYPE_ENT, EfpsMchReviewInfo::MERCHANTTYPE_PER])){
             throw new \Exception("请设置商户类型");
         }
 
         $this->paper_isCc = 1;
 
-        if($this->paper_merchantType != MchRelatEfps::MERCHANTTYPE_PER){
+        if($this->paper_merchantType != EfpsMchReviewInfo::MERCHANTTYPE_PER){
             if(empty($this->paper_businessLicenseCode)){ //营业执照号
                 throw new \Exception("请设置营业执照号");
             }

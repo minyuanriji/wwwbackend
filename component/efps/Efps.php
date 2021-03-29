@@ -9,8 +9,10 @@ use app\component\efps\lib\pay\AliJSAPIPayment;
 use app\component\efps\lib\pay\PaymentQuery;
 use app\component\efps\lib\pay\SplitOrder;
 use app\component\efps\lib\pay\UnifiedPayment;
+use app\component\efps\lib\pay\WithdrawalToCard;
 use app\component\efps\lib\pay\WxJSAPIPayment;
 use app\component\efps\lib\wechat\BindAppId;
+use app\component\efps\tools\Rsa;
 use yii\base\Component;
 
 class Efps extends Component{
@@ -45,6 +47,25 @@ class Efps extends Component{
 
     public function getCustomerCode(){
         return $this->main_config['acq_sp_id'];
+    }
+
+    /**
+     * 商户单笔提现
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
+    public function withdrawalToCard($params){
+        if(!empty($params['bankUserName'])){
+            $params['bankUserName'] = $this->encriptByPublic($params['bankUserName']);
+            $params['bankCardNo'] = $this->encriptByPublic($params['bankCardNo']);
+        }
+        return $this->request((new WithdrawalToCard())->build($params));
+    }
+
+    private function encriptByPublic($str){
+        openssl_public_encrypt($str, $encrypt, file_get_contents($this->main_config['efpsPublicKeyFilePath']));
+        return base64_encode($encrypt);
     }
 
     /**
@@ -117,8 +138,9 @@ class Efps extends Component{
      * @throws \Exception
      */
     public function merchantApply($params){
-        $params['acqSpId'] = $this->getCustomerCode();
-        return $this->request((new MerchantApply())->build($params));
+        return $this->request((new MerchantApply())->build($params), [
+            "acqSpId" => $this->getCustomerCode()
+        ]);
     }
 
     /**
@@ -128,8 +150,9 @@ class Efps extends Component{
      * @throws \Exception
      */
     public function merchantQuery($params){
-        $params['acqSpId'] = $this->getCustomerCode();
-        return $this->request((new MerchantQuery())->build($params));
+        return $this->request((new MerchantQuery())->build($params), [
+            "acqSpId" => $this->getCustomerCode()
+        ]);
     }
 
     public function sign($data) {
@@ -146,9 +169,9 @@ class Efps extends Component{
         return $sign;
     }
 
-    public function request(InterfaceEfps $api){
+    public function request(InterfaceEfps $api, $extraParams = []){
         try {
-            $params = $api->getParam();
+            $params = array_merge($api->getParam(), $extraParams);
 
             $jsonStr = json_encode($params, JSON_UNESCAPED_UNICODE);
             $sign = $this->sign($jsonStr);
@@ -175,6 +198,7 @@ class Efps extends Component{
             curl_setopt($ch, CURLOPT_VERBOSE, false);
 
             $resText = curl_exec($ch);
+
             $error = curl_error($ch);
             $errno = curl_errno($ch);
 

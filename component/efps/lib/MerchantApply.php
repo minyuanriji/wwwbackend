@@ -1,7 +1,7 @@
 <?php
 namespace app\component\efps\lib;
 
-use app\models\MchRelatEfps;
+use app\models\EfpsMchReviewInfo;
 
 class MerchantApply extends ParamsBuilder implements InterfaceEfps {
 
@@ -396,8 +396,8 @@ class MerchantApply extends ParamsBuilder implements InterfaceEfps {
                 "settleAccount"     => isset($params['settleAccount']) ? $params['settleAccount'] : "",
                 "settleAccountNo"   => isset($params['settleAccountNo']) ? $params['settleAccountNo'] : "",
                 "settleTarget"      => isset($params['settleTarget']) ? $params['settleTarget'] : "",
-                "settleAccountType" => MchRelatEfps::SETTLEACCOUNTTYPE_PER,
-                "merchantType"      => MchRelatEfps::MERCHANTTYPE_PER,
+                "settleAccountType" => EfpsMchReviewInfo::SETTLEACCOUNTTYPE_PER,
+                "merchantType"      => EfpsMchReviewInfo::MERCHANTTYPE_PER,
             ], JSON_UNESCAPED_UNICODE)
         ];
         return $params;

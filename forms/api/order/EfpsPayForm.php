@@ -6,12 +6,10 @@ namespace app\forms\api\order;
 
 use app\component\efps\Efps;
 use app\core\ApiCode;
-use app\core\payment\PaymentException;
-use app\core\payment\PaymentNotify;
 use app\core\payment\PaymentOrder;
 use app\logic\AppConfigLogic;
 use app\models\BaseModel;
-use app\models\PaymentEfpsOrder;
+use app\models\EfpsPaymentOrder;
 use app\models\PaymentOrderUnion;
 use app\models\User;
 use app\models\UserInfo;
@@ -165,14 +163,14 @@ class EfpsPayForm extends BaseModel{
                 throw new \Exception("支付订单记录不存在");
             }
 
-            $paymentEfpsOrder = PaymentEfpsOrder::findOne([
+            $efpsPaymentOrder = EfpsPaymentOrder::findOne([
                 "payment_order_union_id" => $paymentOrderUnion->id,
                 "payAPI"                 => $payAPI
             ]);
-            if(!$paymentEfpsOrder){
-                $paymentEfpsOrder = new PaymentEfpsOrder();
-                $paymentEfpsOrder->payment_order_union_id = $paymentOrderUnion->id;
-                $paymentEfpsOrder->payAPI                 = $payAPI;
+            if(!$efpsPaymentOrder){
+                $efpsPaymentOrder = new EfpsPaymentOrder();
+                $efpsPaymentOrder->payment_order_union_id = $paymentOrderUnion->id;
+                $efpsPaymentOrder->payAPI                 = $payAPI;
                 $orderInfo = [
                     'Id'           => $paymentOrderUnion->id,
                     "businessType" => "100001",
@@ -215,20 +213,20 @@ class EfpsPayForm extends BaseModel{
                         }
                     }
                 }
-                $paymentEfpsOrder->orderInfo = json_encode($orderInfo);
+                $efpsPaymentOrder->orderInfo = json_encode($orderInfo);
             }
 
             $notifyUrl = \Yii::$app->getRequest()->getHostInfo() . static::$notifyUri;
 
-            $paymentEfpsOrder->customerCode           = \Yii::$app->efps->getCustomerCode();
-            $paymentEfpsOrder->payAmount              = $paymentOrderUnion->amount * 100;
-            $paymentEfpsOrder->payCurrency            = "CNY";
-            $paymentEfpsOrder->outTradeNo             = date("YmdHis") . rand(10000, 99999);
-            $paymentEfpsOrder->transactionStartTime   = date("YmdHis");
-            $paymentEfpsOrder->nonceStr               = md5(uniqid());
-            $paymentEfpsOrder->notifyUrl              = $notifyUrl;
-            $paymentEfpsOrder->update_at              = time();
-            $paymentEfpsOrder->is_pay                 = 0;
+            $efpsPaymentOrder->customerCode           = \Yii::$app->efps->getCustomerCode();
+            $efpsPaymentOrder->payAmount              = $paymentOrderUnion->amount * 100;
+            $efpsPaymentOrder->payCurrency            = "CNY";
+            $efpsPaymentOrder->outTradeNo             = date("YmdHis") . rand(10000, 99999);
+            $efpsPaymentOrder->transactionStartTime   = date("YmdHis");
+            $efpsPaymentOrder->nonceStr               = md5(uniqid());
+            $efpsPaymentOrder->notifyUrl              = $notifyUrl;
+            $efpsPaymentOrder->update_at              = time();
+            $efpsPaymentOrder->is_pay                 = 0;
 
             if($payAPI == "IF-WeChat-01"){ //微信公众号/小程序支付
 
@@ -241,32 +239,32 @@ class EfpsPayForm extends BaseModel{
                 }
 
                 if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){ //小程序
-                    $paymentEfpsOrder->payMethod = "1";
+                    $efpsPaymentOrder->payMethod = "1";
                 }else{ //公众号
-                    $paymentEfpsOrder->payMethod = "35";
+                    $efpsPaymentOrder->payMethod = "35";
                 }
-                $paymentEfpsOrder->appId = \Yii::$app->params['wechatConfig']['app_id'];
-                $paymentEfpsOrder->openId = $userInfo->openid;
+                $efpsPaymentOrder->appId = \Yii::$app->params['wechatConfig']['app_id'];
+                $efpsPaymentOrder->openId = $userInfo->openid;
             }else{ //支付宝主扫支付
-                $paymentEfpsOrder->payMethod = "7";
+                $efpsPaymentOrder->payMethod = "7";
             }
 
-            if(!$paymentEfpsOrder->save()){
-                throw new \Exception($this->responseErrorMsg($paymentEfpsOrder));
+            if(!$efpsPaymentOrder->save()){
+                throw new \Exception($this->responseErrorMsg($efpsPaymentOrder));
             }
 
             $data = [
-                "outTradeNo"   => $paymentEfpsOrder->outTradeNo,
-                "customerCode" => $paymentEfpsOrder->customerCode,
-                "payAmount"    => $paymentEfpsOrder->payAmount,
-                "notifyUrl"    => $paymentEfpsOrder->notifyUrl,
-                "orderInfo"    => json_decode($paymentEfpsOrder->orderInfo, true)
+                "outTradeNo"   => $efpsPaymentOrder->outTradeNo,
+                "customerCode" => $efpsPaymentOrder->customerCode,
+                "payAmount"    => $efpsPaymentOrder->payAmount,
+                "notifyUrl"    => $efpsPaymentOrder->notifyUrl,
+                "orderInfo"    => json_decode($efpsPaymentOrder->orderInfo, true)
             ];
 
             if($payAPI == "IF-WeChat-01") { //微信公众号/小程序支付
                 $res = \Yii::$app->efps->payWxJSAPIPayment(array_merge($data, [
-                    "appId"  => $paymentEfpsOrder->appId,
-                    "openId" => $paymentEfpsOrder->openId
+                    "appId"  => $efpsPaymentOrder->appId,
+                    "openId" => $efpsPaymentOrder->openId
                 ]));
             }else{ //支付宝主扫支付
                 $res = \Yii::$app->efps->payAliJSAPIPayment($data);

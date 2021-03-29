@@ -3,7 +3,7 @@ namespace app\mch\forms\mch;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
-use app\models\MchRelatEfps;
+use app\models\EfpsMchReviewInfo;
 
 class EfpsReviewInfoForm extends BaseModel {
 
@@ -103,9 +103,9 @@ class EfpsReviewInfoForm extends BaseModel {
         }
 
         try {
-            $model = MchRelatEfps::findOne(["mch_id" => $this->mch_id]);
+            $model = EfpsMchReviewInfo::findOne(["mch_id" => $this->mch_id]);
             if(!$model){
-                $model = new MchRelatEfps();
+                $model = new EfpsMchReviewInfo();
                 $model->mch_id     = $this->mch_id;
                 $model->created_at = time();
                 $model->updated_at = time();

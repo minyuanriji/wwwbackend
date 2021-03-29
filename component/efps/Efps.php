@@ -117,8 +117,9 @@ class Efps extends Component{
      * @throws \Exception
      */
     public function merchantApply($params){
-        $params['acqSpId'] = $this->getCustomerCode();
-        return $this->request((new MerchantApply())->build($params));
+        return $this->request((new MerchantApply())->build($params), [
+            "acqSpId" => $this->getCustomerCode()
+        ]);
     }
 
     /**
@@ -128,8 +129,9 @@ class Efps extends Component{
      * @throws \Exception
      */
     public function merchantQuery($params){
-        $params['acqSpId'] = $this->getCustomerCode();
-        return $this->request((new MerchantQuery())->build($params));
+        return $this->request((new MerchantQuery())->build($params), [
+            "acqSpId" => $this->getCustomerCode()
+        ]);
     }
 
     public function sign($data) {
@@ -146,9 +148,9 @@ class Efps extends Component{
         return $sign;
     }
 
-    public function request(InterfaceEfps $api){
+    public function request(InterfaceEfps $api, $extraParams = []){
         try {
-            $params = $api->getParam();
+            $params = array_merge($api->getParam(), $extraParams);
 
             $jsonStr = json_encode($params, JSON_UNESCAPED_UNICODE);
             $sign = $this->sign($jsonStr);
@@ -175,6 +177,7 @@ class Efps extends Component{
             curl_setopt($ch, CURLOPT_VERBOSE, false);
 
             $resText = curl_exec($ch);
+
             $error = curl_error($ch);
             $errno = curl_errno($ch);
 

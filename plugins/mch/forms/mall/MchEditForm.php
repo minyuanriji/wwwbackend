@@ -110,7 +110,12 @@ class MchEditForm extends MchEditFormBase
                 }
             }
 
-            if(empty($reviewData['acqMerId'])){
+            MchRelatEfps::updateAll(['status' => 2], ["mch_id" => $this->mch->id]);
+            Mch::updateAll(["review_status" => Mch::REVIEW_STATUS_CHECKED], [
+                "id" => $this->mch->id
+            ]);
+
+            /*if(empty($reviewData['acqMerId'])){
                 $res = \Yii::$app->efps->merchantApply($params);
                 if($res['code'] != Efps::CODE_SUCCESS){
                     throw new \Exception($res['msg']);
@@ -135,7 +140,7 @@ class MchEditForm extends MchEditFormBase
                 Mch::updateAll(["review_status" => Mch::REVIEW_STATUS_CHECKED], [
                     "id" => $this->mch->id
                 ]);
-            }
+            }*/
         }
     }
 

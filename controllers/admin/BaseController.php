@@ -24,7 +24,7 @@ class BaseController extends \yii\web\Controller
     public $pageSize = 10;
     public function init()
     {
-        $res = \Yii::$app->efps->withdrawalToCard([
+        /*$res = \Yii::$app->efps->withdrawalToCard([
             "customerCode"    => \Yii::$app->efps->getCustomerCode(),
             "outTradeNo"      => date("YmdHis") . rand(1000, 9999),
             "notifyUrl"       => "http://",
@@ -34,7 +34,7 @@ class BaseController extends \yii\web\Controller
             "bankName"        => "中国银行",
             "bankAccountType" => "2"
         ]);
-        print_r($res);exit;
+        print_r($res);exit;*/
         //\Yii::$app->validateCloudFile();
         parent::init();
     }

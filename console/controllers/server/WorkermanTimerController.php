@@ -5,8 +5,8 @@
  
 namespace app\console\controllers\server;
 
-
 use app\component\jobs\EfpsPayQueryJob;
+use app\component\jobs\CheckoutOrderDistributionIncomeJob;
 use app\component\jobs\OrderDistributionIncomeJob;
 use app\component\lib\LockTools;
 use app\console\controllers\WorkermanBaseController;
@@ -78,6 +78,7 @@ class WorkermanTimerController extends WorkermanBaseController
      */
     public function OrderDistributionIncomeTimer($worker){
         \Yii::$app->queue->delay(0)->push(new OrderDistributionIncomeJob());
+        \Yii::$app->queue->delay(0)->push(new CheckoutOrderDistributionIncomeJob());
     }
 
      /**

@@ -87,7 +87,7 @@ class EfpsDistributeForm extends BaseModel{
     /**
      * 结账订单
      * @param CheckoutOrder $checkoutOrder
-     */
+     */ 
     public static function checkoutOrder(CheckoutOrder $checkoutOrder){
         return (new EfpsDistributeForm([
             "order_sn"   => $checkoutOrder->order_no,

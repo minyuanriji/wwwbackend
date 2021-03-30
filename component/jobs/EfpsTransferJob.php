@@ -2,10 +2,10 @@
 namespace app\component\jobs;
 
 use app\component\efps\Efps;
-use app\models\EfpsMchReviewInfo;
+use app\core\ApiCode;
+use app\mch\forms\mch\MchAccountModifyForm;
 use app\models\EfpsTransferOrder;
-use app\models\Order;
-use app\plugins\mch\models\MchCheckoutOrder;
+use app\plugins\mch\models\MchCash;
 use yii\base\Component;
 use yii\queue\JobInterface;
 
@@ -13,49 +13,38 @@ class EfpsTransferJob extends Component implements JobInterface{
 
     public function execute($queue){
 
-        //待提交
-        $transferOrder = EfpsTransferOrder::find()->andWhere("status IN (0,1)")->orderBy("updated_at ASC")->limit(1)->one();
-        if(!$transferOrder) return;
+        $mchCash = MchCash::find()->where([
+            "type"            => "efps_bank",
+            "status"          => 1,
+            "transfer_status" => 0
+        ])->orderBy("updated_at ASC")->one();
+        if(!$mchCash) return;
+
+        $mchCash->updated_at = time();
+        $mchCash->save();
 
         $t = \Yii::$app->getDb()->beginTransaction();
         try {
-            if($transferOrder->order_type == "mch_checkout_order"){ //结账订单
-                $checkoutOrder = MchCheckoutOrder::findOne([
-                    "order_no" => $transferOrder->order_sn
+            $transferOrder = EfpsTransferOrder::findOne(["outTradeNo" => $mchCash->order_no]);
+            if(!$transferOrder){
+                $typeData = (array)@json_decode($mchCash->type_data, true);
+                $transferOrder = new EfpsTransferOrder([
+                    "status"          => 0,
+                    "outTradeNo"      => $mchCash->order_no,
+                    "customerCode"    => \Yii::$app->efps->getCustomerCode(),
+                    "notifyUrl"       => "http://",
+                    "amount"          => $mchCash->money,
+                    "bankUserName"    => !empty($typeData['bankUserName']) ? $typeData['bankUserName'] : "",
+                    "bankCardNo"      => !empty($typeData['bankCardNo']) ? $typeData['bankCardNo'] : "",
+                    "bankName"        => !empty($typeData['bankName']) ? $typeData['bankName'] : "",
+                    "bankAccountType" => !empty($typeData['bankAccountType']) ? $typeData['bankAccountType'] : "",
+                    "created_at"      => time(),
+                    "updated_at"      => time()
                 ]);
-                if(!$checkoutOrder || !$checkoutOrder->is_pay){
-                    throw new \Exception("订单[MchCheckoutOrder:". ($checkoutOrder ? $checkoutOrder->id : 0) ."]未支付");
-                }
-
-                $mchReviewInfo = EfpsMchReviewInfo::findOne([
-                    "mch_id" => $checkoutOrder->mch_id
-                ]);
-            }elseif($transferOrder->order_type == "goods_order"){ //商品订单
-                $order = Order::findOne(["order_no" => $transferOrder->order_sn]);
-                if(!$order || !$order->is_pay){
-                    throw new \Exception("订单[Order:" . ($order ? $order->id : 0) . "]未支付");
-                }
-
-                $mchReviewInfo = EfpsMchReviewInfo::findOne([
-                    "mch_id" => $order->mch_id
-                ]);
-            }else{
-                throw new \Exception("未知订单类型");
             }
 
-            if(empty($mchReviewInfo) || $mchReviewInfo->status != 2){
-                throw new \Exception("商家未审核通过");
-            }
-
-            if($transferOrder->status == 0){ //待提交状态
-                $transferOrder->bankUserName    = $mchReviewInfo->paper_settleAccount;
-                $transferOrder->bankCardNo      = $mchReviewInfo->paper_settleAccountNo;
-                $transferOrder->bankName        = $mchReviewInfo->paper_openBank;
-                $transferOrder->bankAccountType = 2; //对私
-                $transferOrder->outTradeNo      = date("YmdHis") . rand(1000, 9999);
-                $transferOrder->status          = 1; //切换提交状态
-                $transferOrder->updated_at      = time();
-
+            if($transferOrder->status == 0){ //待提交
+                $transferOrder->status = 1;
                 if(!$transferOrder->save()){
                     throw new \Exception(json_encode($transferOrder->getErrors()));
                 }
@@ -74,7 +63,7 @@ class EfpsTransferJob extends Component implements JobInterface{
                 if($res['code'] != Efps::CODE_SUCCESS){
                     throw new \Exception($res['msg']);
                 }
-            }else{ //已提交查询操作
+            }elseif($transferOrder->status == 1){ //已提交
                 $res = \Yii::$app->efps->withdrawalToCardQuery([
                     "customerCode" => \Yii::$app->efps->getCustomerCode(),
                     "outTradeNo"   => $transferOrder->outTradeNo
@@ -93,16 +82,31 @@ class EfpsTransferJob extends Component implements JobInterface{
                 if(!$transferOrder->save()){
                     throw new \Exception(json_encode($transferOrder->getErrors()));
                 }
+            }elseif($transferOrder->status == 2) { //成功
+                $mchCash->transfer_status = 1;
+                $mchCash->save();
+            }else{ //失败
+                $mchCash->transfer_status = 2;
+                if(!$mchCash->save()){
+                    throw new \Exception(json_encode($mchCash->getErrors()));
+                }
+
+                //退还余额
+                $form = new MchAccountModifyForm([
+                    'mall_id' => $mchCash->mall_id,
+                    'mch_id'  => $mchCash->mch_id,
+                    'type'    => 1,
+                    'money'   => $mchCash->money,
+                    'desc'    => "提现失败，返还帐户"
+                ]);
+                $res = $form->save();
+                if($res['code'] != ApiCode::CODE_SUCCESS){
+                    throw new \Exception($res['msg']);
+                }
             }
             $t->commit();
         }catch (\Exception $e){
             $t->rollBack();
-            $transferOrder->remark = $e->getMessage();
-            $transferOrder->fail_retry_count += 1;
-            if($transferOrder->fail_retry_count > 3){ //错误次数太多 转账失败
-                $transferOrder->status = 3;
-            }
-            $transferOrder->save();
         }
     }
 }

@@ -61,7 +61,12 @@ class EfpsTransferJob extends Component implements JobInterface{
                 ]);
 
                 if($res['code'] != Efps::CODE_SUCCESS){
-                    throw new \Exception($res['msg']);
+                    if($res['data']['returnCode'] == "09109"){ //重复请求
+                        $transferOrder->status = 1;
+                        $transferOrder->save();
+                    }else{
+                        throw new \Exception($res['msg']);
+                    }
                 }
             }elseif($transferOrder->status == 1){ //已提交
                 $res = \Yii::$app->efps->withdrawalToCardQuery([

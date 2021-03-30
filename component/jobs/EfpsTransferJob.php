@@ -119,5 +119,7 @@ class EfpsTransferJob extends Component implements JobInterface{
         }catch (\Exception $e){
             $t->rollBack();
         }
+
+        $lock_tools->unlock($lock_name);
     }
 }

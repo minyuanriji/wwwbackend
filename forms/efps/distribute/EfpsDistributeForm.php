@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\EfpsTransferOrder;
 use app\models\Order;
+use app\plugins\mch\models\MchCheckoutOrder;
 
 class EfpsDistributeForm extends BaseModel{
 
@@ -88,7 +89,7 @@ class EfpsDistributeForm extends BaseModel{
      * 结账订单
      * @param CheckoutOrder $checkoutOrder
      */
-    public static function checkoutOrder(CheckoutOrder $checkoutOrder){
+    public static function checkoutOrder(MchCheckoutOrder $checkoutOrder){
         return (new EfpsDistributeForm([
             "order_sn"   => $checkoutOrder->order_no,
             "order_type" => "mch_checkout_order",

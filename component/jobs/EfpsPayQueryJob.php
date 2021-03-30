@@ -107,7 +107,6 @@ class EfpsPayQueryJob extends Component implements JobInterface{
             $t->commit();
         }catch (\Exception $e) {
             $t->rollBack();
-            echo $e->getMessage();
             \Yii::error("查询出现异常 File=".$e->getFile().";Line:".$e->getLine().";message:".$e->getMessage());
         }
     }

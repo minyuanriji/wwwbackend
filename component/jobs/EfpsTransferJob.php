@@ -2,6 +2,7 @@
 namespace app\component\jobs;
 
 use app\component\efps\Efps;
+use app\component\lib\LockTools;
 use app\core\ApiCode;
 use app\mch\forms\mch\MchAccountModifyForm;
 use app\models\EfpsTransferOrder;
@@ -12,6 +13,11 @@ use yii\queue\JobInterface;
 class EfpsTransferJob extends Component implements JobInterface{
 
     public function execute($queue){
+        $lock_tools = new LockTools();
+        $lock_name = 'lock:EfpsTransferJob';
+
+        if(!$lock_tools->lock($lock_name))
+            return;
 
         $mchCash = MchCash::find()->where([
             "type"            => "efps_bank",

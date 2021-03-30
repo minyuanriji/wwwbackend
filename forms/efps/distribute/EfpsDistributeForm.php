@@ -79,7 +79,7 @@ class EfpsDistributeForm extends BaseModel{
 
             //计算要打给商家的钱
             $serviceFeeRate = max(0, min(100, (int)$mch->transfer_rate));
-            $serviceFee = ($serviceFeeRate/100) * floatval($this->price);
+            $serviceFee = ($serviceFeeRate/100) * floatval($amount);
             $amount = $amount - $serviceFee;
 
             //修改商家帐户

@@ -4,10 +4,8 @@ namespace app\mch\handlers;
 
 use app\mch\events\CheckoutOrderPaidEvent;
 use app\mch\forms\order\CheckoutOrderDeductIntegralForm;
-use app\mch\forms\order\CheckoutOrderAutoSettleForm;
 use app\models\Mall;
-use app\plugins\mch\models\Mch;
-use forms\efps\distribute\CheckoutOrder;
+use forms\efps\distribute\EfpsDistributeForm;
 
 class CheckoutOrderPaidHandler {
 
@@ -52,7 +50,7 @@ class CheckoutOrderPaidHandler {
                 }
 
                 //分账业务
-                CheckoutOrder::distribute($checkoutOrder);
+                EfpsDistributeForm::checkoutOrder($checkoutOrder);
 
                 //商家结算
                 /*$settleForm = new CheckoutOrderAutoSettleForm([

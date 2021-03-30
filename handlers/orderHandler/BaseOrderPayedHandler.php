@@ -20,7 +20,6 @@ use app\forms\common\template\tplmsg\Tplmsg;
 use app\logic\AppConfigLogic;
 use app\logic\IntegralLogic;
 
-use app\mch\forms\order\GoodsOrderAutoSettleForm;
 use app\models\CommonOrder;
 use app\models\CouponAutoSend;
 use app\models\OrderPayResult;
@@ -29,7 +28,7 @@ use app\models\OrderRefund;
 
 use app\models\User;
 use app\models\UserCard;
-use forms\efps\distribute\GoodsOrder;
+use forms\efps\distribute\EfpsDistributeForm;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
 
 /**
@@ -99,7 +98,7 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
         //$this->upLevel();
 
         //分账
-        GoodsOrder::distribute($this->order);
+        EfpsDistributeForm::goodsOrder($this->order);
 
         //多商户订单结算
         //GoodsOrderAutoSettleForm::settle($this->order);

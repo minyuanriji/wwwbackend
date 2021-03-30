@@ -10,6 +10,7 @@ use app\component\efps\lib\pay\PaymentQuery;
 use app\component\efps\lib\pay\SplitOrder;
 use app\component\efps\lib\pay\UnifiedPayment;
 use app\component\efps\lib\pay\WithdrawalToCard;
+use app\component\efps\lib\pay\WithdrawalToCardQuery;
 use app\component\efps\lib\pay\WxJSAPIPayment;
 use app\component\efps\lib\wechat\BindAppId;
 use app\component\efps\tools\Rsa;
@@ -61,6 +62,16 @@ class Efps extends Component{
             $params['bankCardNo'] = $this->encriptByPublic($params['bankCardNo']);
         }
         return $this->request((new WithdrawalToCard())->build($params));
+    }
+
+    /**
+     * 商户单笔提现查询
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
+    public function withdrawalToCardQuery($params){
+        return $this->request((new WithdrawalToCardQuery())->build($params));
     }
 
     private function encriptByPublic($str){
@@ -174,6 +185,7 @@ class Efps extends Component{
             $params = array_merge($api->getParam(), $extraParams);
 
             $jsonStr = json_encode($params, JSON_UNESCAPED_UNICODE);
+
             $sign = $this->sign($jsonStr);
 
             $headers = array(

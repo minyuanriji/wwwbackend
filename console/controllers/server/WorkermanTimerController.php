@@ -7,6 +7,7 @@ namespace app\console\controllers\server;
 
 use app\component\jobs\EfpsPayQueryJob;
 use app\component\jobs\CheckoutOrderDistributionIncomeJob;
+use app\component\jobs\EfpsTransferJob;
 use app\component\jobs\OrderDistributionIncomeJob;
 use app\component\lib\LockTools;
 use app\console\controllers\WorkermanBaseController;
@@ -45,11 +46,10 @@ class WorkermanTimerController extends WorkermanBaseController
     }
 
     public function onWorkerStart($worker){
-        Timer::add(10,array($this,'payQueryLoopTimer'),array($worker)); //支付状态检查轮询
-        Timer::add(10,array($this,'OrderDistributionIncomeTimer'),array($worker)); //分佣
-        Timer::add(3,array($this,'sendIntegralTimer'),array($worker)); //发放积分定时任务
-        Timer::add(3,array($this,'expireIntegralTimer'),array($worker)); //积分过期定时任务
-        Timer::add(1,array($this,'taskRetry'),array($worker));//任务重试定时任务
+        Timer::add(10,array($this,'commonQueueLoopTimer'),array($worker));
+        Timer::add(3, array($this,'sendIntegralTimer'),array($worker)); //发放积分定时任务
+        Timer::add(3, array($this,'expireIntegralTimer'),array($worker)); //积分过期定时任务
+        Timer::add(1, array($this,'taskRetry'),array($worker));//任务重试定时任务
     }
 
     //有客户端连接
@@ -66,20 +66,18 @@ class WorkermanTimerController extends WorkermanBaseController
     }
 
     /**
-     * 支付状态检查轮询
+     * 统一队列轮询
      * @return void
      */
-    public function payQueryLoopTimer($worker){
+    public function commonQueueLoopTimer($worker){
+        //支付状态
         \Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob());
-	}
-	
-    /* 分佣计划
-	 * @return void
-     */
-    public function OrderDistributionIncomeTimer($worker){
+        //分佣计划
         \Yii::$app->queue->delay(0)->push(new OrderDistributionIncomeJob());
         \Yii::$app->queue->delay(0)->push(new CheckoutOrderDistributionIncomeJob());
-    }
+        //交易分账
+        \Yii::$app->queue->delay(0)->push(new EfpsTransferJob());
+	}
 
      /**
      * 执行发放积分计划

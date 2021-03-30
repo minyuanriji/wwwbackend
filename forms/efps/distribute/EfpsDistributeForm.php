@@ -91,7 +91,7 @@ class EfpsDistributeForm extends BaseModel{
             $t->commit();
 
             //设置一个提现队列
-            MchAccountWithdraw::efpsBank($mch, $amount, $desc . "提现");
+            $res = MchAccountWithdraw::efpsBank($mch, $amount, $desc . "提现");
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

@@ -50,7 +50,7 @@ class MchAccountWithdraw extends BaseModel{
                 "mall_id"         => $mch->mall_id,
                 "mch_id"          => $mch->id,
                 "money"           => $this->money,
-                "fact_price"      => $this->fact_price,
+                "fact_price"      => $this->money,
                 "order_no"        => "MC" . date("YmdHis") . rand(1000, 9999),
                 "status"          => 0,
                 "transfer_status" => 0,

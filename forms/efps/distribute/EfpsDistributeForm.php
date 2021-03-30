@@ -1,12 +1,12 @@
 <?php
-namespace forms\efps\distribute;
+namespace app\forms\efps\distribute;
 
 
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\EfpsTransferOrder;
 use app\models\Order;
- 
+
 class EfpsDistributeForm extends BaseModel{
 
     public $order_sn;

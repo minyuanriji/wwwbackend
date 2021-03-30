@@ -53,8 +53,6 @@ class SettleInfoForm extends EfpsReviewInfoForm{
             throw new \Exception("请设置结算账户名");
         }
 
-        $this->paper_settleAccount = 1;
-
         if(empty($this->paper_openBank)){ //开户银行
             throw new \Exception("请设置开户银行");
         }

@@ -125,6 +125,7 @@ class CheckoutOrderPayForm extends BaseModel {
             $checkoutOrder->updated_at               = time();
             $checkoutOrder->integral_deduction_price = round($integralDeductionPrice + $integralServiceFee, 2);
             $checkoutOrder->integral_fee_rate        = $integralFeeRate;
+            $checkoutOrder->pay_user_id              = \Yii::$app->user->id;
 
             if(!$checkoutOrder->save()){
                 throw new \Exception('结账单更新失败');

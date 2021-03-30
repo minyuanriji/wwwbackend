@@ -5,7 +5,7 @@ namespace app\mch\handlers;
 use app\mch\events\CheckoutOrderPaidEvent;
 use app\mch\forms\order\CheckoutOrderDeductIntegralForm;
 use app\models\Mall;
-use forms\efps\distribute\EfpsDistributeForm;
+use app\forms\efps\distribute\EfpsDistributeForm;
 
 class CheckoutOrderPaidHandler {
 

@@ -28,7 +28,7 @@ use app\models\OrderRefund;
 
 use app\models\User;
 use app\models\UserCard;
-use forms\efps\distribute\EfpsDistributeForm;
+use app\forms\efps\distribute\EfpsDistributeForm;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
 
 /**

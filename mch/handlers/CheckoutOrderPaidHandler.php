@@ -2,6 +2,7 @@
 namespace app\mch\handlers;
 
 
+use app\core\ApiCode;
 use app\mch\events\CheckoutOrderPaidEvent;
 use app\mch\forms\order\CheckoutOrderDeductIntegralForm;
 use app\models\Mall;
@@ -50,7 +51,10 @@ class CheckoutOrderPaidHandler {
                 }
 
                 //分账业务
-                EfpsDistributeForm::checkoutOrder($checkoutOrder);
+                $res = EfpsDistributeForm::checkoutOrder($checkoutOrder);
+                if($res['code'] != ApiCode::CODE_SUCCESS){
+                    throw new \Exception($res['msg']);
+                }
 
                 //商家结算
                 /*$settleForm = new CheckoutOrderAutoSettleForm([

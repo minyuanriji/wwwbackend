@@ -6,7 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\EfpsTransferOrder;
 use app\models\Order;
-
+ 
 class EfpsDistributeForm extends BaseModel{
 
     public $order_sn;
@@ -87,7 +87,7 @@ class EfpsDistributeForm extends BaseModel{
     /**
      * 结账订单
      * @param CheckoutOrder $checkoutOrder
-     */ 
+     */
     public static function checkoutOrder(CheckoutOrder $checkoutOrder){
         return (new EfpsDistributeForm([
             "order_sn"   => $checkoutOrder->order_no,

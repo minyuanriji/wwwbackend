@@ -55,7 +55,7 @@ class MchAccountWithdraw extends BaseModel{
                 "status"          => 0,
                 "transfer_status" => 0,
                 "type"            => $this->type,
-                "virtual_type"    => $this->type,
+                "virtual_type"    => 0,
                 "created_at"      => time(),
                 "updated_at"      => time(),
                 "content"         => $this->content

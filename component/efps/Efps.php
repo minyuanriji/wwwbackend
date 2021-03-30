@@ -232,7 +232,7 @@ class Efps extends Component{
                 }
             }
         }catch (\Exception $e){
-            return ["code" => self::CODE_FALI, "msg" => $e->getMessage()];
+            return ["code" => self::CODE_FALI, "msg" => $e->getMessage(), "data" => @json_decode(!empty($resText) ? $resText : "{}", true)];
         }
 
         return ["code" => self::CODE_SUCCESS, "data" => json_decode($resText, true)];

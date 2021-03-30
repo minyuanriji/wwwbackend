@@ -1,11 +1,12 @@
 <?php
 namespace app\forms\efps\distribute;
 
-
 use app\core\ApiCode;
+use app\mch\forms\mch\MchAccountModifyForm;
+use app\mch\forms\mch\MchAccountWithdraw;
 use app\models\BaseModel;
-use app\models\EfpsTransferOrder;
 use app\models\Order;
+use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
 
 class EfpsDistributeForm extends BaseModel{
@@ -13,17 +14,9 @@ class EfpsDistributeForm extends BaseModel{
     public $order_sn;
     public $order_type;
 
-    public $notifyUrl       = "http://";
-    public $amount          = 0;
-    public $bankUserName    = "";
-    public $bankCardNo      = "";
-    public $bankName        = "";
-    public $bankAccountType = "";
-
     public function rules(){
         return [
-            [['order_sn', 'order_type'], 'required'],
-            [['notifyUrl', 'amount', 'bankUserName', 'bankCardNo', 'bankName', 'bankAccountType'], 'safe']
+            [['order_sn', 'order_type'], 'required']
         ];
     }
 
@@ -31,40 +24,82 @@ class EfpsDistributeForm extends BaseModel{
         if(!$this->validate()){
             return $this->responseErrorInfo();
         }
+
+        $t = \Yii::$app->getDb()->beginTransaction();
         try {
 
-            $model = EfpsTransferOrder::findOne([
-                "order_sn"   => $this->order_sn,
-                "order_type" => $this->order_type
-            ]);
-            if(!$model){
-                $model = new EfpsTransferOrder([
-                    "order_sn"     => $this->order_sn,
-                    "order_type"   => $this->order_type,
-                    "amount"       => $this->amount,
-                    "created_at"   => time(),
-                    "outTradeNo"   => date("YmdHis") . rand(1000, 9999),
-                    "customerCode" => \Yii::$app->efps->getCustomerCode(),
-                    "status"       => 0
+            $mch    = null;
+            $amount = 0;
+            $desc   = "";
+            if($this->order_type == "goods_order"){ //商品订单
+                $order = Order::findOne([
+                    "order_no"  => $this->order_sn,
+                    "is_pay"    => 1,
+                    "is_delete" => 0
                 ]);
+                if(!$order){
+                    throw new \Exception("订单不存在");
+                }
+                if($order->mch_id){
+                    $mch = Mch::findOne([
+                        "id"            => $order->mch_id,
+                        "review_status" => 1,
+                        "is_delete"     => 0
+                    ]);
+                }
+                $amount = $order->total_goods_original_price;
+                $desc   = "来自商品订单[".$this->order_sn."]的收入";
+            }elseif($this->order_type == "mch_checkout_order"){ //结账订单
+                $checkoutOrder = MchCheckoutOrder::findOne([
+                    "order_no"  => $this->order_sn,
+                    "is_pay"    => 1,
+                    "is_delete" => 0
+                ]);
+                if(!$checkoutOrder){
+                    throw new \Exception("结账订单不存在");
+                }
+                if($checkoutOrder->mch_id){
+                    $mch = Mch::findOne([
+                        "id"            => $checkoutOrder->mch_id,
+                        "review_status" => 1,
+                        "is_delete"     => 0
+                    ]);
+                }
+                $amount = $checkoutOrder->order_price;
+                $desc   = "来自结账订单[".$this->order_sn."]的收入";
             }
 
-            $model->notifyUrl       = $this->notifyUrl;
-            $model->bankUserName    = $this->bankUserName;
-            $model->bankCardNo      = $this->bankCardNo;
-            $model->bankName        = $this->bankName;
-            $model->bankAccountType = $this->bankAccountType;
-            $model->updated_at      = time();
-
-            if(!$model->save()){
-                throw new \Exception($this->responseErrorMsg($model));
+            if(!$mch){
+                throw new \Exception("商户不存在");
             }
+
+            if($amount <= 0){
+                throw new \Exception("金额不能小于0");
+            }
+
+            //计算要打给商家的钱
+            $serviceFeeRate = max(0, min(100, (int)$mch->transfer_rate));
+            $serviceFee = ($serviceFeeRate/100) * floatval($this->price);
+            $amount = $amount - $serviceFee;
+
+            //修改商家帐户
+            $res = MchAccountModifyForm::modify($mch, $amount, $desc, true);
+            if($res['code'] != ApiCode::CODE_SUCCESS){
+                throw new \Exception($res['msg']);
+            }
+
+            $t->commit();
+
+            //设置一个提现队列
+            MchAccountWithdraw::efpsBank($mch, $amount, $desc . "提现");
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '保存成功'
             ];
         }catch (\Exception $e){
+            $t->rollBack();
+
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => $e->getMessage()
@@ -80,8 +115,7 @@ class EfpsDistributeForm extends BaseModel{
     public static function goodsOrder(Order $order){
         return (new EfpsDistributeForm([
             "order_sn"   => $order->order_no,
-            "order_type" => "goods_order",
-            "amount"     => $order->total_goods_original_price
+            "order_type" => "goods_order"
         ]))->save();
     }
 
@@ -92,8 +126,7 @@ class EfpsDistributeForm extends BaseModel{
     public static function checkoutOrder(MchCheckoutOrder $checkoutOrder){
         return (new EfpsDistributeForm([
             "order_sn"   => $checkoutOrder->order_no,
-            "order_type" => "mch_checkout_order",
-            "amount"     => $checkoutOrder->order_price
+            "order_type" => "mch_checkout_order"
         ]))->save();
     }
 }

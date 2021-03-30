@@ -56,17 +56,6 @@ class CheckoutOrderPaidHandler {
                     throw new \Exception($res['msg']);
                 }
 
-                //商家结算
-                /*$settleForm = new CheckoutOrderAutoSettleForm([
-                    "order_id" => $checkoutOrder->id,
-                    "mch_id"   => $checkoutOrder->mch_id,
-                    "price"    => $checkoutOrder->order_price
-                ]);
-
-                if(!$settleForm->save()){
-                    throw new \Exception(CheckoutOrderAutoSettleForm::$errorMsg);
-                }*/
-
                 $t->commit();
             }catch (\Exception $e){
                 $t->rollBack();

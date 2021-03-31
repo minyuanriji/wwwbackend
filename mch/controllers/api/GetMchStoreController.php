@@ -44,7 +44,10 @@ class GetMchStoreController extends ApiController {
             $store['address']        = $mchStoreModel->address;
             $store['logo']           = $mchStoreModel->cover_url;
             $store['service_mobile'] = $mchStoreModel->mobile;
-            $store['bg_pic_url']     = \Yii::$app->serializer->decode($mchStoreModel->pic_url);
+            $store['pic_urls']       = (array)@json_decode($mchStoreModel->pic_url, true);
+            if(isset($store['pic_urls'][0]) && empty($store['pic_urls'][0])){
+                unset($store['pic_urls'][0]);
+            }
             $store['name']           = $mchStoreModel->name;
             $store['description']    = $mchStoreModel->description;
             $store['scope']          = $mchStoreModel->scope;
@@ -66,8 +69,8 @@ class GetMchStoreController extends ApiController {
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
                 'data' => [
-                    'store'    => $store,
-                    'category' => $category
+                    'store'      => $store,
+                    'category'   => $category
                 ]
             ]);
         } catch (\Exception $e) {

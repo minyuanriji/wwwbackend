@@ -45,11 +45,11 @@ abstract class MchEditFormBase extends BaseModel
     public function rules()
     {
         return [
-            [['mch_common_cat_id', 'address', 'username', 'mobile', 'service_mobile', 'realname', 'name'], 'required'],
+            [['mch_common_cat_id',  'mobile', 'service_mobile', 'realname', 'name'], 'required'],
             [['user_id', 'mch_common_cat_id', 'transfer_rate', 'sort', 'id', 'status', 'is_recommend',
                 'province_id', 'city_id', 'district_id', 'integral_fee_rate'], 'integer'],
-            [['mobile', 'logo', 'service_mobile', 'password'], 'string', 'max' => 255],
-            [['realname', 'wechat', 'name', 'username', 'password'], 'string', 'max' => 65],
+            [['mobile', 'address', 'logo', 'service_mobile', 'password'], 'string', 'max' => 255],
+            [['username', 'realname', 'wechat', 'name', 'username', 'password'], 'string', 'max' => 65],
             [['bg_pic_url'], 'safe']
         ];
     }
@@ -207,6 +207,10 @@ abstract class MchEditFormBase extends BaseModel
 
     protected function setAdmin()
     {
+        if(empty($this->username)){
+            $this->username = uniqid();
+        }
+
         $admin = Admin::find()->where([
             'username' => $this->username,
             'mall_id' => \Yii::$app->mall->id,
@@ -227,7 +231,7 @@ abstract class MchEditFormBase extends BaseModel
         $admin = Admin::findOne(['mch_id' => $this->mch->id]);
         if (!$admin) {
             if (!$this->password) {
-                throw new \Exception('请填写商户密码');
+                $this->password = uniqid();
             }
 
             $admin = new Admin();

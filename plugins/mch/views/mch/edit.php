@@ -57,12 +57,6 @@
                                 </template>
                             </el-input>
                         </el-form-item>
-                        <el-form-item label="商户账号" prop="username">
-                            <el-input  v-model="ruleForm.username"></el-input>
-                        </el-form-item>
-                        <el-form-item v-if="!ruleForm.admin_id" label="商户密码" prop="password">
-                            <el-input type="password" v-model="ruleForm.password"></el-input>
-                        </el-form-item>
                         <el-form-item label="联系人" prop="realname">
                             <el-input v-model="ruleForm.realname"></el-input>
                         </el-form-item>
@@ -144,6 +138,14 @@
                             </label>
                             <el-input type="number" v-model.number="ruleForm.sort"></el-input>
                         </el-form-item>
+
+                        <el-form-item label="商户账号" prop="username">
+                            <el-input  v-model="ruleForm.username"></el-input>
+                        </el-form-item>
+                        <el-form-item v-if="!ruleForm.admin_id" label="商户密码" prop="password">
+                            <el-input type="password" v-model="ruleForm.password"></el-input>
+                        </el-form-item>
+
                     </el-tab-pane>
                     <el-tab-pane label="店铺信息" name="store">
                         <el-form-item label="店铺名称" prop="name">
@@ -239,13 +241,6 @@
 
                         <el-tabs v-model="review_status_activeName" type="border-card">
                             <el-tab-pane label="审核状态" name="tab_review_status">
-                                <el-form-item label="商户编号" prop="acqMerId">
-                                    <div v-if="review.acqMerId != ''">{{review.acqMerId}}</div>
-                                    <div style="color:#cc3311" v-else>未申请</div>
-                                </el-form-item>
-                                <el-form-item label="商户注册名称" prop="merchantName">
-                                    <div>{{ruleForm.name}}</div>
-                                </el-form-item>
                                 <el-form-item label="进件商户" prop="register_type">
                                     <el-radio v-model="review.register_type" label="separate_account">分账商户</el-radio>
                                     <el-radio v-model="review.register_type" label="common">标准商户</el-radio>
@@ -656,11 +651,6 @@
                 rules: {
                     user_id: [
                         {required: true, message: '小程序用户', trigger: 'change'},
-                    ],username: [
-                        {required: true, message: '商户账号', trigger: 'change'},
-                    ],
-                    password: [
-                        {required: true, message: '商户密码', trigger: 'change'},
                     ],
                     realname: [
                         {required: true, message: '联系人', trigger: 'change'},
@@ -668,29 +658,11 @@
                     mobile: [
                         {required: true, message: '联系人电话', trigger: 'change'},
                     ],
-                    name: [
-                        {required: true, message: '店铺名称', trigger: 'change'},
-                    ],
-                    logo: [
-                        {required: true, message: '店铺Logo', trigger: 'change'},
-                    ],
-                    bg_pic_url: [
-                        {required: true, message: '店铺背景图', trigger: 'change'},
-                    ],
-                    address: [
-                        {required: true, message: '店铺详细地址', trigger: 'change'},
-                    ],
-                    district: [
-                        {required: true, message: '店铺省市区', trigger: 'change'},
-                    ],
                     transfer_rate: [
                         {required: true, message: '店铺手续费', trigger: 'change'},
                     ],
                     sort: [
                         {required: true, message: '店铺排序', trigger: 'change'},
-                    ],
-                    service_mobile: [
-                        {required: true, message: '客服电话', trigger: 'change'},
                     ],
                     mch_common_cat_id: [
                         {required: true, message: '所售类目', trigger: 'change'},
@@ -700,9 +672,6 @@
                     ],
                     status: [
                         {required: true, message: '是否开业', trigger: 'change'},
-                    ],
-                    review_status: [
-                        {required: true, message: '审核状态', trigger: 'change'},
                     ],
                 },
                 review: {
@@ -810,6 +779,11 @@
         },
         watch: {
             'review.register_type'(val, oldVal){
+                this.registerTypeBindding(val);
+            }
+        },
+        methods: {
+            registerTypeBindding(val){
                 if(val == "separate_account"){ //分账商户
                     this.review.acceptOrder = '0';
                     this.review.openAccount = '1';
@@ -817,9 +791,8 @@
                     this.review.paper_settleAccountType = '2';
                     this.review.paper_businessCode = 'WITHDRAW_TO_SETTMENT_DEBIT';
                 }
-            }
-        },
-        methods: {
+            },
+
             getDetail() {
                 this.cardLoading = true;
                 request({
@@ -833,6 +806,8 @@
                         this.review = e.data.data.review;
                         this.ruleForm = e.data.data.detail;
                         this.nickname = this.ruleForm.user.nickname;
+
+                        this.registerTypeBindding(this.review.register_type);
 
                         this.paperProvinceCityValue = [];
                         this.paperProvinceCityValue.push(this.review.paper_province);

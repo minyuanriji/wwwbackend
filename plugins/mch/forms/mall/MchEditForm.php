@@ -32,7 +32,7 @@ class MchEditForm extends MchEditFormBase
     public function save()
     {
         if (!$this->validate()) {
-            return $this->responseErrorMsg();
+            return $this->responseErrorInfo();
         }
 
         $transaction = \Yii::$app->db->beginTransaction();

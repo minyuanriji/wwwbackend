@@ -103,6 +103,13 @@ class MchForm extends BaseModel
             $relatEfps = EfpsMchReviewInfo::findOne(["mch_id" => $this->id]);
             if(!$relatEfps){
                 $relatEfps = new EfpsMchReviewInfo();
+                $relatEfps->mch_id        = $this->id;
+                $relatEfps->register_type = "separate_account";
+                $relatEfps->created_at    = time();
+                $relatEfps->updated_at    = time();
+                if(!$relatEfps->save()){
+                    throw new \Exception($this->responseErrorMsg($relatEfps));
+                }
             }
 
             $reviewData = ArrayHelper::toArray($relatEfps);

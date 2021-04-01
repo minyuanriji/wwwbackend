@@ -157,7 +157,7 @@ class RegisterForm extends BaseModel
     public function register()
     {
         if (!$this->validate()) {
-            return $this->returnApiResultData();
+            return $this->responseErrorInfo();
         }
         $trans = \Yii::$app->db->beginTransaction();
         try {

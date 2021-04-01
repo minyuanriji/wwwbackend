@@ -369,6 +369,8 @@ class IntegralLogic{
                     if(empty($scoreSetting)){
                         continue;
                     }
+                    if($scoreSetting['expire'] == -1 && !$order->is_confirm) //永久有效只有确认收货才送
+                        continue;
                     for($i=0; $i < $orderDetail['num']; $i++){ //根据该商品购买数量循环发送
                         $res = Integral::addIntegralPlan($order->user_id, $scoreSetting,'购买商品赠送积分券','0');
                         if(!$res){
@@ -376,10 +378,12 @@ class IntegralLogic{
                         }
                     }
                 }else{ //赠送积分
-                    if ($orderDetail->goods->give_score_type == 1) {
-                        $integral += ($orderDetail->goods->give_score * $orderDetail->num);
-                    } else {
-                        $integral += (intval($orderDetail->goods->give_score * $orderDetail->total_price / 100));
+                    if($order->is_confirm){
+                        if ($orderDetail->goods->give_score_type == 1) {
+                            $integral += ($orderDetail->goods->give_score * $orderDetail->num);
+                        } else {
+                            $integral += (intval($orderDetail->goods->give_score * $orderDetail->total_price / 100));
+                        }
                     }
                 }
             }

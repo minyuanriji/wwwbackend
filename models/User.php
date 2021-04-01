@@ -585,7 +585,8 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
         $dynamicScore = (int)IntegralRecord::find()->where([
             "controller_type" => 0,
             "type"            => 2,
-            "status"          => 1
+            "status"          => 1,
+            "user_id"         => $user_id
         ])->andWhere("expire_time > '".time()."'")->sum("money");
         if($wallet->dynamic_score != $dynamicScore){
             $wallet->dynamic_score = $dynamicScore;

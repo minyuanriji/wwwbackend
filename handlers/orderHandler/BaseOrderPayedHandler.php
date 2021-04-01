@@ -85,6 +85,10 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
 
     protected function action()
     {
+
+        //赠送积分
+        IntegralLogic::sendScore($this->order);
+
         // 发放积分
        //$this->giveIntegral();
         // 发放积分券

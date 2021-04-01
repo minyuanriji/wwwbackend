@@ -106,7 +106,7 @@ class OrderCommon extends BaseModel
                 throw new \Exception($this->responseErrorMsg($order));
             }
 
-            //确认收货赠送积分
+            //赠送积分
             IntegralLogic::sendScore($order);
 
             $t->commit();

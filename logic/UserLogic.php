@@ -77,7 +77,7 @@ class UserLogic
      * @return bool
      * @throws \yii\base\Exception
      */
-    public static function userRegister($userData,$user = [],$parent_id=0){
+    public static function userRegister($userData, $user = [],$parent_id=0){
         $userData = self::loadUserFields($userData);
         $transaction = \Yii::$app->db->beginTransaction();
         try{
@@ -92,23 +92,28 @@ class UserLogic
                 }
                 if(empty($user)){
                     $user = new User();
-                    $user->username = isset($userData["username"]) ? $userData["username"] : "wechat_user";
-                    $user->mobile = isset($userData["mobile"]) ? $userData["mobile"] : "";
-                    $user->mall_id = \Yii::$app->mall->id;
-                    $user->access_token = \Yii::$app->security->generateRandomString();
-                    $user->auth_key = \Yii::$app->security->generateRandomString();
-                    $user->nickname = isset($userData["nickname"]) ? $userData["nickname"] : "";
-                    $user->password = isset($userData["password"]) ? \Yii::$app->getSecurity()->generatePasswordHash($userData["password"]) : "";
-                    $user->avatar_url = isset($userData["avatar_url"]) ? $userData["avatar_url"] : "";
-                    $user->last_login_at = time();
-                    $user->login_ip = get_client_ip();
-                    $user->parent_id = isset($userData["parent_id"]) ? $userData["parent_id"] : 0;
-                    if(!empty($parent_id)){
-                        $user->parent_id = $parent_id;
-                    }
+                    $user->username         = isset($userData["username"]) ? $userData["username"] : "wechat_user";
+                    $user->mobile           = isset($userData["mobile"]) ? $userData["mobile"] : "";
+                    $user->mall_id          = \Yii::$app->mall->id;
+                    $user->access_token     = \Yii::$app->security->generateRandomString();
+                    $user->auth_key         = \Yii::$app->security->generateRandomString();
+                    $user->nickname         = isset($userData["nickname"]) ? $userData["nickname"] : "";
+                    $user->password         = isset($userData["password"]) ? \Yii::$app->getSecurity()->generatePasswordHash($userData["password"]) : "";
+                    $user->avatar_url       = isset($userData["avatar_url"]) ? $userData["avatar_url"] : "";
+                    $user->last_login_at    = time();
+                    $user->login_ip         = get_client_ip();
+                    $user->source           = isset($userData["source"]) ? $userData["source"] : \Yii::$app->source;
+                    $user->parent_id        = isset($userData["parent_id"]) ? $userData["parent_id"] : 0;
                     $user->second_parent_id = isset($userData["second_parent_id"]) ? $userData["second_parent_id"] : 0;
-                    $user->third_parent_id = isset($userData["third_parent_id"]) ? $userData["third_parent_id"] : 0;
-                    $user->source = isset($userData["source"]) ? $userData["source"] : \Yii::$app->source;
+                    $user->third_parent_id  = isset($userData["third_parent_id"]) ? $userData["third_parent_id"] : 0;
+                    if(!empty($parent_id)){
+                        $parent = UserInfo::findOne(["id" => $parent_id, "is_delete" => 0]);
+                        if($parent){
+                            $user->parent_id        = $parent->id;
+                            $user->second_parent_id = $parent->parent_id;
+                            $user->third_parent_id  = $parent->second_parent_id;
+                        }
+                    }
                     if ($user->save() === false) {
                         \Yii::error("userRegister ".var_export($user->getErrors(),true));
                         throw new Exception("用户新增失败");
@@ -142,13 +147,13 @@ class UserLogic
                 }
             }
             $userInfoModel = new UserInfo();
-            $userInfoModel->mall_id = \Yii::$app->mall->id;
-            $userInfoModel->mch_id = 0;
-            $userInfoModel->user_id = $user->id;
-            $userInfoModel->unionid = isset($userData["unionid"]) ? $userData["unionid"] : "";
-            $userInfoModel->openid = isset($userData["openid"]) ? $userData["openid"] : "";
+            $userInfoModel->mall_id       = \Yii::$app->mall->id;
+            $userInfoModel->mch_id        = 0;
+            $userInfoModel->user_id       = $user->id;
+            $userInfoModel->unionid       = isset($userData["unionid"]) ? $userData["unionid"] : "";
+            $userInfoModel->openid        = isset($userData["openid"]) ? $userData["openid"] : "";
             $userInfoModel->platform_data = isset($userData["platform_data"]) ? $userData["platform_data"] : "";
-            $userInfoModel->platform = $appPlatform;
+            $userInfoModel->platform      = $appPlatform;
             if ($userInfoModel->save() === false) {
                 \Yii::error("userRegister ".var_export($userInfoModel->getErrors(),true));
                 throw new Exception("用户信息新增失败");

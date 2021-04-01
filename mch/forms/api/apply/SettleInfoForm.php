@@ -62,13 +62,13 @@ class SettleInfoForm extends EfpsReviewInfoForm{
                 throw new \Exception("请设置开户支行");
             }
             if(empty($this->paper_openBankCode)){ //开户行联行号
-                throw new \Exception("请设置开户行联行号");
+                //throw new \Exception("请设置开户行联行号");
             }
         }
 
         if(in_array($settleAccountType, [EfpsMchReviewInfo::SETTLEACCOUNTTYPE_AU_ENT,
                 EfpsMchReviewInfo::SETTLEACCOUNTTYPE_AU_PER]) && empty($this->paper_settleAttachment)){
-            throw new \Exception("请设置结算账户附件");
+            //throw new \Exception("请设置结算账户附件");
         }
 
 

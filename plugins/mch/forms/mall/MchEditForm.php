@@ -69,8 +69,6 @@ class MchEditForm extends MchEditFormBase
      * @throws \Exception
      */
     protected function setReviewInfo(){
-        if($this->mch->review_status  == Mch::REVIEW_STATUS_CHECKED)
-            return;
 
         $form = new EfpsReviewInfoForm();
         $form->attributes   = $this->review_info;

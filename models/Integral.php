@@ -95,23 +95,23 @@ class Integral extends BaseActiveRecord
      * @return void
      */
     public static function addIntegralPlan($user_id,$integral_setting,$desc='',$ctype=0,$parentid=0){
-        $wallet = User::getOneUser($user_id,Yii::$app->mall->id);
         try{
             $model = new self();
             $model->loadDefaultValues();
-            $model->controller_type = $ctype;
-            $model->user_id = $user_id;
-            $model->mall_id = Yii::$app->mall->id;
-            $model->parent_id = $parentid;
-            $model->integral_num = $integral_setting['integral_num'];
-            $model->period = $integral_setting['period'];
-            $model->period_unit = $integral_setting['period_unit'];
-            $model->effective_days = $integral_setting['expire'] == -1 ? 0 : $integral_setting['expire'];
+            $model->controller_type   = $ctype;
+            $model->user_id           = $user_id;
+            $model->mall_id           = Yii::$app->mall->id;
+            $model->parent_id         = $parentid;
+            $model->integral_num      = $integral_setting['integral_num'];
+            $model->period            = $integral_setting['period'];
+            $model->period_unit       = $integral_setting['period_unit'];
+            $model->effective_days    = $integral_setting['expire'] == -1 ? 0 : $integral_setting['expire'];
             $model->next_publish_time = time();
-            $model->desc = $desc;
-            $model->type = $integral_setting['expire'] == -1 ? self::TYPE_ALWAYS : self::TYPE_DYNAMIC;
-            $res = $model->save();
-            if($res === false) throw new Exception($model->getErrorMessage());
+            $model->desc              = $desc;
+            $model->type              = $integral_setting['expire'] == -1 ? self::TYPE_ALWAYS : self::TYPE_DYNAMIC;
+            if(!$model->save()){
+                throw new Exception($model->getErrorMessage());
+            }
             return true;
         }catch(Exception $e){
             self::$error = $e->getMessage();
@@ -141,12 +141,12 @@ class Integral extends BaseActiveRecord
         if(!empty($plan_list)){
             foreach($plan_list as $plan){
                 if($plan['controller_type'] == 0 && $plan['period_unit'] == 'month'){
-                    if($now <= $plan['next_publish_time']){
+                    if($now < $plan['next_publish_time']){
                         continue;
                     }
                 }
                 Yii::$app->mall = Mall::findOne(array('id'=>$plan['mall_id']));
-                $wallet = User::getUserWallet($plan['user_id'],$plan['mall_id']);
+                $wallet = User::getUserWallet($plan['user_id'], $plan['mall_id']);
                 $finish_period = $plan['finish_period'] + 1;
                 $desc = $plan['desc'] .' 发放进度('.$finish_period.'/'.$plan['period'].')';
                 if($plan['controller_type'] == 1){
@@ -196,29 +196,34 @@ class Integral extends BaseActiveRecord
 
                 $transaction = Yii::$app->db->beginTransaction();
                 try{
-                    $res = $plan->save();
-                    if($res === false) throw new Exception($plan->getErrorMessage());
+                    if(!$plan->save()) {
+                        throw new Exception($plan->getErrorMessage());
+                    }
+
                     $record = array(
-                        'controller_type'=> $plan['controller_type'],
-                        'mall_id'=> $plan['mall_id'],
-                        'user_id'=> $plan['user_id'],
-                        'money'=> $plan['integral_num'],
-                        'desc'=> $desc,
-                        'before_money'=> $before_money,
-                        'type'=> $plan['type'],
-                        'expire_time'=> $expire_time,
-                        'status'=> 1,
-                        'source_id'=> $plan->id,
-                        'source_table'=> 'integral'
+                        'controller_type' => $plan['controller_type'],
+                        'mall_id'         => $plan['mall_id'],
+                        'user_id'         => $plan['user_id'],
+                        'money'           => $plan['integral_num'],
+                        'desc'            => $desc,
+                        'before_money'    => $before_money,
+                        'type'            => $plan['type'],
+                        'expire_time'     => $expire_time,
+                        'status'          => 1,
+                        'source_id'       => $plan->id,
+                        'source_table'    => 'integral'
                     );
 
                     // 写入日志
                     $flag = User::getOneUserFlag($plan['user_id']);
                     if(!empty($flag)){
-                        $res = IntegralRecord::record($record,$plan['parent_id']);
-                        if($res === false) throw new Exception(IntegralRecord::getError());
+                        if(!IntegralRecord::record($record,$plan['parent_id'])){
+                            throw new Exception(IntegralRecord::getError());
+                        }
                     }
+
                     $transaction->commit();
+
                 }catch(\Exception $e){
                     $transaction->rollBack();
                     \Yii::$app->redis -> set('show1',$e->getMessage());

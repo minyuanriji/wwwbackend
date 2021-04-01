@@ -86,10 +86,10 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
     protected function action()
     {
         // 发放积分
-        $this->giveIntegral();
+       //$this->giveIntegral();
         // 发放积分券
         // echo '支付后发放积分券'.PHP_EOL;
-        IntegralLogic::shopSendScore($this->order,'paid');
+        //IntegralLogic::shopSendScore($this->order,'paid');
         // 发放购物券
         // echo '支付后发放购物券'.PHP_EOL;
         IntegralLogic::shopSendIntegral($this->order,'paid');

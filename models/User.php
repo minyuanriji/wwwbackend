@@ -577,10 +577,21 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
      * @return object|array|boolean
      */
     public static function getUserWallet($user_id,$mall_id=null){
-        return self::find()
-        ->select('id,mall_id,parent_id,second_parent_id,third_parent_id,is_inviter,static_integral,dynamic_integral,score,static_score,dynamic_score')
-        ->where(array('id'=>$user_id,'mall_id'=>Yii::$app->mall->id ?? $mall_id))
-        ->one();
+        $wallet = self::find()->select('id,mall_id,parent_id,second_parent_id,third_parent_id,is_inviter,static_integral,dynamic_integral,score,static_score,dynamic_score')
+                    ->where(array('id'=>$user_id,'mall_id'=>Yii::$app->mall->id ?? $mall_id))
+                    ->one();
+
+        //计算用户动态积分
+        $dynamicScore = (int)IntegralRecord::find()->where([
+            "controller_type" => 0,
+            "type"            => 2,
+            "status"          => 1
+        ])->andWhere("expire_time > '".time()."'")->sum("money");
+        if($wallet->dynamic_score != $dynamicScore){
+            $wallet->dynamic_score = $dynamicScore;
+            $wallet->save();
+        }
+        return $wallet;
     }
 
 

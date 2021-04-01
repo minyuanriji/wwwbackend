@@ -46,7 +46,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
         $score =  round($score, 2);
         $t = \Yii::$app->db->beginTransaction();
         $this->user->score += $score;
-        $this->user->dynamic_score += $score;
+        $this->user->static_score += $score;
         $this->user->total_score += $score;
         if ($this->user->save()) {
             try {
@@ -82,6 +82,8 @@ class ScoreModel extends BaseModel implements BaseCurrency
         $score =  round($score, 2);
         $t = \Yii::$app->db->beginTransaction();
         $this->user->score -= $score;
+        $this->user->static_score -= $score;
+        $this->user->total_score -= $score;
         if ($this->user->save()) {
             try {
                 $this->createLog(2, $score, $desc, $customDesc);
@@ -130,6 +132,8 @@ class ScoreModel extends BaseModel implements BaseCurrency
         $score =  round($score, 2);
         $t = \Yii::$app->db->beginTransaction();
         $this->user->score += $score;
+        $this->user->static_score += $score;
+        $this->user->total_score += $score;
         if ($this->user->save()) {
             try {
                 $this->createLog(1, $score, $desc, $customDesc);

@@ -13,6 +13,7 @@ namespace app\component\jobs;
 use app\events\CommonOrderEvent;
 use app\events\OrderEvent;
 use app\forms\api\order\CommonOrderForm;
+use app\logic\IntegralLogic;
 use app\models\CommonOrder;
 use app\models\CommonOrderDetail;
 use app\models\Mall;

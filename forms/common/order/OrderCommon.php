@@ -19,6 +19,7 @@ use app\forms\common\mptemplate\MpTplMsgSend;
 use app\forms\common\SmsCommon;
 use app\handlers\orderHandler\OrderHandler;
 use app\logic\AppConfigLogic;
+use app\logic\IntegralLogic;
 use app\models\BaseModel;
 use app\forms\OrderConfig;
 use app\models\Order;
@@ -104,6 +105,10 @@ class OrderCommon extends BaseModel
             if (!$res) {
                 throw new \Exception($this->responseErrorMsg($order));
             }
+
+            //确认收货赠送积分
+            IntegralLogic::sendScore($order);
+
             $t->commit();
             if ($order->pay_type == 2) {
                 // 货到付款的订单 确认收货需要触发支付完成事件

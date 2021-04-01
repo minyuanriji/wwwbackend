@@ -5,6 +5,7 @@ use app\models\Goods;
 use app\models\Integral;
 use app\models\IntegralDeduct;
 use app\models\IntegralRecord;
+use app\models\Order;
 use app\models\User;
 use app\models\OrderDetail;
 use Exception;
@@ -339,4 +340,60 @@ class IntegralLogic{
         }
     }
 
+    /**
+     * 购物赠送积分
+     * @Author bing
+     * @DateTime 2020-10-09 17:44:13
+     * @copyright: Copyright (c) 2020 广东七件事集团
+     * @return void
+     */
+    public static function sendScore(Order $order){
+        $trans = Yii::$app->db->beginTransaction();
+        try{
+            if(!$order){
+                throw new \Exception("订单不存在");
+            }
+            $orderDetails = $order->detail;
+            $integral = 0;
+            foreach($orderDetails as $orderDetail){
+
+                if (!in_array($orderDetail->refund_status, OrderDetail::ALLOW_ADD_SCORE_REFUND_STATUS)) {
+                    continue;
+                }
+
+                $goods = $orderDetail->goods;
+                if(!$goods) continue;
+
+                if($goods->enable_score){ //赠送积分卷
+                    $scoreSetting = @json_decode($goods->score_setting,true);
+                    if(empty($scoreSetting)){
+                        continue;
+                    }
+                    for($i=0; $i < $orderDetail['num']; $i++){ //根据该商品购买数量循环发送
+                        $res = Integral::addIntegralPlan($order->user_id, $scoreSetting,'购买商品赠送积分券','0');
+                        if(!$res){
+                            throw new \Exception(Integral::getError());
+                        }
+                    }
+                }else{ //赠送积分
+                    if ($orderDetail->goods->give_score_type == 1) {
+                        $integral += ($orderDetail->goods->give_score * $orderDetail->num);
+                    } else {
+                        $integral += (intval($orderDetail->goods->give_score * $orderDetail->total_price / 100));
+                    }
+                }
+            }
+
+            if ($integral > 0) {
+                \Yii::$app->currency->setUser($order->user)->score->add($integral, '订单购买赠送积分');
+            }
+
+            $trans->commit();
+            return true;
+        }catch(Exception $e){
+            $trans->rollBack();
+            Yii::error('用户购物发放积分失败'.PHP_EOL. $e->getFile().'('.$e->getLine().')'.PHP_EOL."message:".$e->getMessage());
+            return false;
+        }
+    }
 }

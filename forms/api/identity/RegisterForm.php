@@ -164,12 +164,15 @@ class RegisterForm extends BaseModel
 //            if($this->password !== $this->confirm_password){
 //                return $this->returnApiResultData(ApiCode::CODE_FAIL,'两次密码不一致');
 //            }
-            // 粗糙版 上级绑定
-            // $existParentUser = User::getOneUser(['=', 'mobile', $this->parent_mobile]);
-            // if(empty($existParentUser)){
-            //     return $this->returnApiResultData(ApiCode::CODE_FAIL,'没有找到该邀请人手机号');
-            // }
-            // $this->recommend_id = $existParentUser['id'];
+
+            //上级绑定
+            if(empty($this->recommend_id) && !empty($this->parent_mobile)){
+                $existParentUser = User::getOneUser(['=', 'mobile', $this->parent_mobile]);
+                if(empty($existParentUser)){
+                    return $this->returnApiResultData(ApiCode::CODE_FAIL,'没有找到该邀请人手机号');
+                }
+                $this->recommend_id = $existParentUser['id'];
+            }
 
             $existUser = User::getOneUser(['or',['=', 'username', $this->mobile],['=', 'mobile', $this->mobile]]);
             if(!empty($existUser)){
@@ -182,8 +185,9 @@ class RegisterForm extends BaseModel
                     return $this->returnApiResultData(ApiCode::CODE_FAIL,'推荐人不存在');
                 }
                 $second_parent_id = $recommendUsers["parent_id"];
-                $third_parent_id = $recommendUsers["second_parent_id"];
+                $third_parent_id  = $recommendUsers["second_parent_id"];
             }
+
             $smsForm = new SmsForm();
             $smsForm->captcha = $this->captcha;
             $smsForm->mobile = $this->mobile;
@@ -197,7 +201,6 @@ class RegisterForm extends BaseModel
             $user->access_token = \Yii::$app->security->generateRandomString();
             $user->auth_key = \Yii::$app->security->generateRandomString();
             $user->nickname = "";
-            $this->password = 'myrj2021';//"jx888888";
             $user->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
             $user->avatar_url = "";
             $user->last_login_at = time();

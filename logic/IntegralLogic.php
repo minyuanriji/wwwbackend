@@ -357,7 +357,9 @@ class IntegralLogic{
             $integral = 0;
             foreach($orderDetails as $orderDetail){
 
-                if (!in_array($orderDetail->refund_status, OrderDetail::ALLOW_ADD_SCORE_REFUND_STATUS)) {
+                $isScoreSend = $orderDetail->is_score_send;
+
+                if ($orderDetail->is_score_send || !in_array($orderDetail->refund_status, OrderDetail::ALLOW_ADD_SCORE_REFUND_STATUS)) {
                     continue;
                 }
 
@@ -371,12 +373,16 @@ class IntegralLogic{
                     }
                     if($scoreSetting['expire'] == -1 && !$order->is_confirm) //永久有效只有确认收货才送
                         continue;
+
                     for($i=0; $i < $orderDetail['num']; $i++){ //根据该商品购买数量循环发送
                         $res = Integral::addIntegralPlan($order->user_id, $scoreSetting,'购买商品赠送积分券','0');
                         if(!$res){
                             throw new \Exception(Integral::getError());
                         }
                     }
+
+                    $isScoreSend = 1;
+
                 }else{ //赠送积分
                     if($order->is_confirm){
                         if ($orderDetail->goods->give_score_type == 1) {
@@ -384,6 +390,14 @@ class IntegralLogic{
                         } else {
                             $integral += (intval($orderDetail->goods->give_score * $orderDetail->total_price / 100));
                         }
+                        $isScoreSend = 1;
+                    }
+                }
+
+                if($isScoreSend){
+                    $orderDetail->is_score_send = 1;
+                    if(!$orderDetail->save()){
+                        throw new \Exception("积分赠送状态更新失败");
                     }
                 }
             }
@@ -391,6 +405,8 @@ class IntegralLogic{
             if ($integral > 0) {
                 \Yii::$app->currency->setUser($order->user)->score->add($integral, '订单购买赠送积分');
             }
+
+
 
             $trans->commit();
             return true;

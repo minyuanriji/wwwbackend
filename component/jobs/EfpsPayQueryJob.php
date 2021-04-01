@@ -43,7 +43,7 @@ class EfpsPayQueryJob extends Component implements JobInterface{
 
             $efpsOrder->update_at = time();
             if(!$efpsOrder->save()){
-                throw new \Exception($efpsOrder->getFirstErrors());
+                throw new \Exception(json_encode($efpsOrder->getFirstErrors()));
             }
 
             if($efpsOrder->is_pay){ //支付成功

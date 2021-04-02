@@ -587,7 +587,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
             "type"            => 2,
             "status"          => 1,
             "user_id"         => $user_id
-        ])->andWhere("expire_time > '".time()."'")->sum("money");
+        ])->andWhere("(expire_time > '".time()."' OR type=1)")->sum("money");
         $deductSum = (float)IntegralDeduct::find()->where([
             "controller_type" => 0,
             "user_id"         => $user_id,
@@ -595,9 +595,9 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
         ])->sum("money");
         $dynamicScore = $recordSum + $deductSum;
         if($wallet->dynamic_score != $dynamicScore){
-            $wallet->score         = $dynamicScore + $wallet->static_score;
+            $wallet->score         = min(0, $dynamicScore + $wallet->static_score);
             $wallet->total_score   = $wallet->score;
-            $wallet->dynamic_score = $dynamicScore;
+            $wallet->dynamic_score = min(0, $dynamicScore);
             $wallet->save();
         }
         return $wallet;

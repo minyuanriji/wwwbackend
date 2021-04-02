@@ -37,8 +37,15 @@ class MchAccountWithdraw extends BaseModel{
                 throw new \Exception("商户不存在");
             }
 
+            $factPrice = $this->money;
+            $this->money += 0.5;
+
             if($mch->account_money < $this->money){
                 throw new \Exception("商户帐户余额不足");
+            }
+
+            if($factPrice <= 0){
+                throw new \Exception("提现金额必须大于0");
             }
 
             $res = MchAccountModifyForm::modify($mch, $this->money, $this->content, false);
@@ -50,7 +57,7 @@ class MchAccountWithdraw extends BaseModel{
                 "mall_id"         => $mch->mall_id,
                 "mch_id"          => $mch->id,
                 "money"           => $this->money,
-                "fact_price"      => $this->money,
+                "fact_price"      => $factPrice,
                 "order_no"        => "MC" . date("YmdHis") . rand(1000, 9999),
                 "status"          => 0,
                 "transfer_status" => 0,
@@ -58,7 +65,7 @@ class MchAccountWithdraw extends BaseModel{
                 "virtual_type"    => 0,
                 "created_at"      => time(),
                 "updated_at"      => time(),
-                "content"         => $this->content
+                "content"         => $this->content,
             ]);
 
             $typeData = [];
@@ -91,7 +98,10 @@ class MchAccountWithdraw extends BaseModel{
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg'  => "操作成功"
+                'msg'  => "操作成功",
+                'data' => [
+                    'account_money' => ($mch->account_money - $this->money)
+                ]
             ];
         }catch (\Exception $e){
             $t->rollBack();

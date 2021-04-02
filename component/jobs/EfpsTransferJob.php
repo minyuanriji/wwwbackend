@@ -39,7 +39,7 @@ class EfpsTransferJob extends Component implements JobInterface{
                     "outTradeNo"      => $mchCash->order_no,
                     "customerCode"    => \Yii::$app->efps->getCustomerCode(),
                     "notifyUrl"       => "http://",
-                    "amount"          => $mchCash->money,
+                    "amount"          => $mchCash->fact_price,
                     "bankUserName"    => !empty($typeData['bankUserName']) ? $typeData['bankUserName'] : "",
                     "bankCardNo"      => !empty($typeData['bankCardNo']) ? $typeData['bankCardNo'] : "",
                     "bankName"        => !empty($typeData['bankName']) ? $typeData['bankName'] : "",

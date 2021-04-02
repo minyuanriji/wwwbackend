@@ -79,7 +79,7 @@ class ServerController extends WorkermanBaseController{
                             'code'=>'wlisten',
                             'title'=> '监控服务',
                             'port' => '9518',
-                            'status' => $this->getSelfServerStatus(9518)
+                            'status' => $this->getSelfServerStatus(9519)
                         );
                         $data['info'] = array(
                             'connections_cout'=>$connections_count

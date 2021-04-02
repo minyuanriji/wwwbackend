@@ -593,7 +593,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
             "mall_id"         => \Yii::$app->mall->id
         ])->sum("money");
         $dynamicScore = $recordSum + $deductSum;
-        if($wallet->dynamic_score != $dynamicScore){
+        if($wallet->dynamic_score < 0 || $wallet->dynamic_score != $dynamicScore){
             $wallet->score         = min(0, $dynamicScore + $wallet->static_score);
             $wallet->total_score   = $wallet->score;
             $wallet->dynamic_score = min(0, $dynamicScore);

@@ -96,7 +96,7 @@ class OptionLogic extends BaseLogic
             $model = Option::findOne([
                 'name' => $name,
                 'mall_id' => $mall_id,
-                'mch_id' => $mch_id,
+                //'mch_id' => $mch_id,
                 'group' => $group
             ]);
 

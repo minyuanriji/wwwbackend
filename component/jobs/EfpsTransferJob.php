@@ -13,13 +13,13 @@ use yii\queue\JobInterface;
 class EfpsTransferJob extends Component implements JobInterface{
 
     public function execute($queue){
-        $lock_tools = new LockTools();
-        $lock_name = 'lock:EfpsTransferJob';
+        //$lock_tools = new LockTools();
+        //$lock_name = 'lock:EfpsTransferJob';
 
-        if(!$lock_tools->lock($lock_name)){
-            echo "LOCK";
-            return;
-        }
+        //if(!$lock_tools->lock($lock_name)){
+        //    echo "LOCK";
+        //    return;
+        //}
 
         $mchCash = MchCash::find()->where([
             "type"            => "efps_bank",
@@ -31,6 +31,7 @@ class EfpsTransferJob extends Component implements JobInterface{
         $mchCash->updated_at = time();
         $mchCash->save();
 
+        $exceptionForceCommit = false;
         $t = \Yii::$app->getDb()->beginTransaction();
         try {
             $transferOrder = EfpsTransferOrder::findOne(["outTradeNo" => $mchCash->order_no]);
@@ -69,6 +70,8 @@ class EfpsTransferJob extends Component implements JobInterface{
                 ]);
 
                 if($res['code'] != Efps::CODE_SUCCESS){
+                    $exceptionForceCommit = true;
+                    $transferOrder->remark = $res['msg'];
                     if($res['data']['returnCode'] == "09109"){ //重复请求
                         $transferOrder->status = 1;
                         $transferOrder->save();
@@ -119,9 +122,13 @@ class EfpsTransferJob extends Component implements JobInterface{
             }
             $t->commit();
         }catch (\Exception $e){
-            $t->rollBack();
+            if($exceptionForceCommit){
+                $t->commit();
+            }else{
+                $t->rollBack();
+            }
         }
 
-        $lock_tools->unlock($lock_name);
+        //$lock_tools->unlock($lock_name);
     }
 }

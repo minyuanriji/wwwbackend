@@ -70,13 +70,15 @@ class WorkermanTimerController extends WorkermanBaseController
      * @return void
      */
     public function commonQueueLoopTimer($worker){
+        //\Yii::$app->getCache()->flush();
+        //交易分账
+        \Yii::$app->queue->delay(0)->push(new EfpsTransferJob());
         //支付状态
         \Yii::$app->queue->delay(0)->push(new EfpsPayQueryJob());
         //分佣计划
         \Yii::$app->queue->delay(0)->push(new OrderDistributionIncomeJob());
         \Yii::$app->queue->delay(0)->push(new CheckoutOrderDistributionIncomeJob());
-        //交易分账
-        \Yii::$app->queue->delay(0)->push(new EfpsTransferJob());
+
 	}
 
      /**

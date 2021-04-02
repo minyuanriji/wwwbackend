@@ -3,10 +3,25 @@ namespace app\mch\controllers\api;
 
 
 use app\mch\forms\api\account\InfoForm;
+use app\mch\forms\api\account\SetSettleInfo;
 use app\mch\forms\api\account\SetWithdrawPwd;
 use app\mch\forms\api\account\WithdrawForm;
 
 class AccountController extends MchMApiController {
+
+    /**
+     * 设置结算信息
+     * @return \yii\web\Response
+     * @throws \app\core\exceptions\ClassNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
+     */
+    public function actionSetSettleInfo(){
+        $form = new SetSettleInfo();
+        $form->attributes = $this->requestData;
+        $form->mch_id = $this->mch_id;
+        return $form->save();
+    }
 
     /**
      * 设置提现密码

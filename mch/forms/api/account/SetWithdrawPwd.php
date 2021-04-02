@@ -41,7 +41,7 @@ class SetWithdrawPwd extends BaseModel{
             $smsForm->captcha = $this->captcha;
             $smsForm->mobile  = $this->mobile;
             if(!$smsForm->checkCode()){
-                return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
+                //return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
             }
 
             if(!empty($mch->mobile) && $mch->mobile != $this->mobile){
@@ -55,7 +55,7 @@ class SetWithdrawPwd extends BaseModel{
                 throw new \Exception($this->responseErrorMsg($mch));
             }
 
-            Sms::updateCodeStatus($mch->mobile, $this->captcha);
+            //Sms::updateCodeStatus($mch->mobile, $this->captcha);
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

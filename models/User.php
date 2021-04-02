@@ -592,14 +592,21 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
             "user_id"         => $user_id,
             "mall_id"         => \Yii::$app->mall->id
         ])->sum("money");
-        $dynamicScore = $recordSum + $deductSum;
-        if($wallet->dynamic_score < 0 || $wallet->dynamic_score != $dynamicScore){
-            User::updateAll([
-                "score"         => max(0, $dynamicScore + $wallet->static_score),
-                "total_score"   => max(0, $dynamicScore + $wallet->static_score),
-                "dynamic_score" => max(0, $dynamicScore)
-            ], ["id" => $user_id]);
-        }
+
+        $dynamicScore = max(0, $recordSum + $deductSum);
+        $score        = max(0, $dynamicScore + $wallet->static_score);
+        $totalScore   = $score;
+
+        User::updateAll([
+            "score"         => $score,
+            "total_score"   => $totalScore,
+            "dynamic_score" => $dynamicScore
+        ], ["id" => $user_id]);
+
+        $wallet['dynamic_score'] = $dynamicScore;
+        $wallet['score']         = $score;
+        $wallet['total_score']   = $totalScore;
+
         return $wallet;
     }
 

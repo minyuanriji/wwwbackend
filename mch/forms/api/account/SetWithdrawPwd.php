@@ -12,11 +12,12 @@ class SetWithdrawPwd extends BaseModel{
 
     public $mch_id;
     public $withdraw_pwd;
+    public $mobile;
     public $captcha;
 
     public function rules(){
         return array_merge(parent::rules(), [
-            [['mch_id', 'withdraw_pwd', 'captcha'], 'required'],
+            [['mch_id', 'mobile', 'withdraw_pwd', 'captcha'], 'required'],
             [['withdraw_pwd'], 'string', 'min' => 6, 'max' => 6]
         ]);
     }
@@ -38,12 +39,18 @@ class SetWithdrawPwd extends BaseModel{
             //检测手机验证码是否正确
             $smsForm = new SmsForm();
             $smsForm->captcha = $this->captcha;
-            $smsForm->mobile  = $mch->mobile;
+            $smsForm->mobile  = $this->mobile;
             if(!$smsForm->checkCode()){
                 return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
             }
 
+            if(!empty($mch->mobile) && $mch->mobile != $this->mobile){
+                throw new \Exception("商户绑定的手机号码不正确");
+            }
+
+            $mch->mobile       = $this->mobile;
             $mch->withdraw_pwd = \Yii::$app->getSecurity()->generatePasswordHash($this->withdraw_pwd);
+
             if(!$mch->save()){
                 throw new \Exception($this->responseErrorMsg($mch));
             }

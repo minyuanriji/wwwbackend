@@ -5,6 +5,7 @@ use app\core\ApiCode;
 use app\mch\forms\mch\MchAccountModifyForm;
 use app\mch\forms\mch\MchAccountWithdraw;
 use app\models\BaseModel;
+use app\models\EfpsMchReviewInfo;
 use app\models\Order;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
@@ -90,8 +91,12 @@ class EfpsDistributeForm extends BaseModel{
 
             $t->commit();
 
-            //设置一个提现队列
-            $res = MchAccountWithdraw::efpsBank($mch, $amount, "系统自动提现操作");
+            $reviewInfo = EfpsMchReviewInfo::findOne([
+                'mch_id' => $mch->id
+            ]);
+            if($reviewInfo && $reviewInfo['paper_settleTarget'] == 1){ //自动提现 TODO
+                $res = MchAccountWithdraw::efpsBank($mch, $amount - 0.5, "系统自动提现操作");
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

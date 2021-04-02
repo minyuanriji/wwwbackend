@@ -584,7 +584,6 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
         //统计用户动态积分
         $recordSum = (float)IntegralRecord::find()->where([
             "controller_type" => 0,
-            "type"            => 2,
             "status"          => 1,
             "user_id"         => $user_id
         ])->andWhere("(expire_time > '".time()."' OR type=1)")->sum("money");

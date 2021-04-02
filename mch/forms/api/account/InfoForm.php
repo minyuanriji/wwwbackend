@@ -62,6 +62,7 @@ class InfoForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg'  => "操作成功",
                 'data' => [
+                    'mobile'        => $mch->mobile,
                     'account_money' => (float)$mch->account_money,
                     'is_pwd_set'    => !empty($mch->withdraw_pwd) ? 1 : 0,
                     'efps_bank'     => $efpsBankData

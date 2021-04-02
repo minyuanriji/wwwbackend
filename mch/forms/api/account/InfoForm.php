@@ -63,6 +63,7 @@ class InfoForm extends BaseModel{
                 'msg'  => "操作成功",
                 'data' => [
                     'mobile'        => $mch->mobile,
+                    'withdraw_fee'  => 0.5,
                     'account_money' => (float)$mch->account_money,
                     'is_pwd_set'    => !empty($mch->withdraw_pwd) ? 1 : 0,
                     'efps_bank'     => $efpsBankData

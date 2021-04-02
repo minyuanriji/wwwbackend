@@ -76,14 +76,15 @@ class ScoreModel extends BaseModel implements BaseCurrency
         if (!is_numeric($score)) {
             throw new Exception('积分必须是数值类型');
         }
-        if ($this->user->score < $score) {
+
+        if ($this->user->static_score < $score) {
             throw new Exception('用户积分不足');
         }
         $score =  round($score, 2);
         $t = \Yii::$app->db->beginTransaction();
-        $this->user->score -= $score;
+        $this->user->score        -= $score;
         $this->user->static_score -= $score;
-        $this->user->total_score -= $score;
+        $this->user->total_score  -= $score;
         if ($this->user->save()) {
             try {
                 $this->createLog(2, $score, $desc, $customDesc);

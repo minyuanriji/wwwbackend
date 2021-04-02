@@ -404,19 +404,9 @@ class OrderSubmitForm extends BaseModel
 
                 // 扣除积分
                 if ($order->score_deduction_price) {
-                    $userScoreInfo = User::getUserWallet(\Yii::$app->user->id);
-                    $userScoreCard = empty($userScoreInfo) ? 0 : number_format($userScoreInfo['static_score']+$userScoreInfo['dynamic_score']);
-                    $userScore = empty($userScoreInfo) ? 0 : $userScoreInfo['score'];
-//                    $userScore >= $userScoreCard
-                    if(!empty($userScore)){
-                        if (!\Yii::$app->currency->setUser($user)->score->sub($order->use_score, '下单积分抵扣')) {
-                            return $this->returnApiResultData(ApiCode::CODE_FAIL,'积分操作失败。');
-                        }else{
-                            $resx = IntegralDeduct::buyGooodsDeduct($order,0);
-                            if($resx === false){
-                                return $this->returnApiResultData(ApiCode::CODE_FAIL,'积分券扣除失败。');
-                            }
-                        }
+                    $res = IntegralDeduct::buyGooodsScoreDeduct($order);
+                    if($res === false){
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'积分券扣除失败。');
                     }
                 }
                 
@@ -424,7 +414,9 @@ class OrderSubmitForm extends BaseModel
                 // 扣除购物券
                 if ($order->integral_deduction_price) {
                     $res = IntegralDeduct::buyGooodsDeduct($order,1);
-                    if($res === false) return $this->returnApiResultData(ApiCode::CODE_FAIL,'购物券扣除失败。');
+                    if($res === false){
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'购物券扣除失败。');
+                    }
                 }
                 //开放额外的订单处理接口
                 $this->extraOrder($order, $orderItem);

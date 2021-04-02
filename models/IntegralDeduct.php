@@ -1,9 +1,6 @@
 <?php
 namespace app\models;
 
-use app\models\Mall;
-use app\models\User;
-use app\plugins\agent\models\Agent;
 use Exception;
 use Yii;
 
@@ -108,6 +105,87 @@ class IntegralDeduct extends BaseActiveRecord{
         ->sum('money');
     }
 
+    /**
+     * 购物积分券抵扣
+     * @DateTime 2020-10-08 14:14:26
+     * @copyright: Copyright (c) 2020 广东七件事集团
+     * @return boolean
+     */
+    public static function buyGooodsScoreDeduct(Order $order){
+        try{
+            $wallet = User::getUserWallet($order->user_id, $order->mall_id);
+
+            //查询用户可用积分券按过期时间升序排列
+            $can_use_integrals = IntegralRecord::getIntegralAscExpireTime($order->user_id, 0);
+
+            //要抵扣的数值
+            $integral_deduction_price = $order->score_deduction_price;
+            if($integral_deduction_price > 0){
+                if($wallet['dynamic_score'] > 0){
+                    //有动态积分优先扣减
+                    $deduct = array(
+                        'controller_type' => 0,
+                        'mall_id'         => $order['mall_id'],
+                        'user_id'         => $order['user_id'],
+                        'source_id'       => $order->id,
+                        'source_table'    => 'order',
+                    );
+
+                    $before_money = $wallet['dynamic_score'];
+
+                    //动态积分足够扣减
+                    foreach($can_use_integrals as $integral){
+                        $deduct['record_id']    = $integral['id'];
+                        $deduct['before_money'] = $before_money;
+                        $can_deduct_money = !empty($integral['deduct']) ? $integral['money'] + array_sum(array_column($integral['deduct'], 'money')) : $integral['money'];
+
+                        if(intval(bcmul($can_deduct_money,100) >= intval(bcmul($integral_deduction_price,100)))){
+                            //当前券的面值足够抵扣掉订单，则从此券中扣除
+                            $deduct['money'] = $integral_deduction_price * -1;
+                            $deduct['desc']  = '订单('.$order->id.')创建扣除动态积分券('.$integral['id'].')抵扣：'.$integral_deduction_price;
+                            if(!self::deduct($deduct,0)){
+                                throw new Exception(self::getError());
+                            }
+
+                            if(intval(bcmul($can_deduct_money,100) == intval(bcmul($integral_deduction_price,100)))){
+                                $integral->status = 3;
+                                if(!$integral->save()){
+                                    throw new Exception($integral->getErrorMessage());
+                                }
+                            }
+
+                            $before_money -= $integral_deduction_price;
+                            $integral_deduction_price = 0;
+                            break;
+                        }else{
+                            //当前券的面值不足够抵扣掉订单使用的券，则扣除当前全部面值
+                            $integral_deduction_price -= $can_deduct_money;
+                            $deduct['money'] = $can_deduct_money * -1;
+                            $deduct['desc']  = '订单('.$order->id.')创建扣除动态积分券('.$integral['id'].')抵扣：'. $can_deduct_money;
+                            $before_money -= $integral_deduction_price;
+                            if(!self::deduct($deduct, 0)){
+                                throw new Exception(self::getError());
+                            }
+                            $integral->status = 3;
+                            if(!$integral->save()){
+                                throw new Exception($integral->getErrorMessage());
+                            }
+                        }
+                    }
+
+                    //使用永久积分补足不够的
+                    if($integral_deduction_price > 0){
+                        self::_deductStaticScore($wallet, $integral_deduction_price, $order, 0);
+                    }
+                }else{
+                    self::_deductStaticScore($wallet, $integral_deduction_price, $order,0);
+                }
+            }
+        }catch (\Exception $e){
+            self::$error = $e->getMessage();
+            return false;
+        }
+    }
 
     /**
      * 购物购物券、积分券抵扣
@@ -303,30 +381,29 @@ class IntegralDeduct extends BaseActiveRecord{
      * @param [type] $order
      * @return void
      */
-    private static function _deductStaticScore($wallet,$integral_deduction_price,$order,$ctype){
+    private static function _deductStaticScore($wallet, $integral_deduction_price, $order, $ctype){
         
-        // 使用永久积分抵扣
-        /* $diff_integral = ($wallet['score'] - $wallet['dynamic_score']) - $integral_deduction_price;
-        if($diff_integral < 0) throw new Exception('永久积分券不足'); */
         if($integral_deduction_price >= $wallet['static_score'] ){
             $kouchu = $wallet['static_score'] * -1;
         }else{
             $kouchu = $integral_deduction_price * -1;
         }
         $record = array(
-            'controller_type'=> $ctype,
-            'mall_id'=> $order['mall_id'],
-            'user_id'=> $order['user_id'],
-            'money'=> $kouchu,
-            'desc'=> '订单('.$order->id.')创建,扣除购物券'.$kouchu,
-            'before_money'=> $wallet['static_score'],
-            'type'=> Integral::TYPE_ALWAYS,
-            'source_id'=>	$order->id,
-            'source_table'=> 'order',
+            'controller_type' => $ctype,
+            'mall_id'         => $order['mall_id'],
+            'user_id'         => $order['user_id'],
+            'money'           => $kouchu,
+            'desc'            => '订单('.$order->id.')创建,扣除积分' . $kouchu,
+            'before_money'    => $wallet['static_score'],
+            'type'            => Integral::TYPE_ALWAYS,
+            'source_id'       => $order->id,
+            'source_table'    => 'order',
         );
+
         // 写入日志
-        $res = IntegralRecord::record($record);
-        if($res === false) throw new Exception(IntegralRecord::getError());
+        if(!IntegralRecord::record($record)){
+            throw new Exception(IntegralRecord::getError());
+        }
     }
 
     /**

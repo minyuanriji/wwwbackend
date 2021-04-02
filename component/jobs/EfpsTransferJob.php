@@ -16,8 +16,10 @@ class EfpsTransferJob extends Component implements JobInterface{
         $lock_tools = new LockTools();
         $lock_name = 'lock:EfpsTransferJob';
 
-        if(!$lock_tools->lock($lock_name))
+        if(!$lock_tools->lock($lock_name)){
+            echo "LOCK";
             return;
+        }
 
         $mchCash = MchCash::find()->where([
             "type"            => "efps_bank",

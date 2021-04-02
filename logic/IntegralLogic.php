@@ -188,7 +188,7 @@ class IntegralLogic{
      * @copyright: Copyright (c) 2020 广东七件事集团
      * @return void
      */
-    public static function shopSendIntegral($order,$type='sales'){
+    public static function shopSendIntegral($order, $type = 'sales'){
         $trans = Yii::$app->db->beginTransaction();
         try{
             if(!empty($order)){
@@ -202,28 +202,24 @@ class IntegralLogic{
                         $goods_id = $order_detail->goods_id;
                         $integral_setting = Goods::getGooodsIntegralSetting($goods_id);
                         $integral_setting = json_decode($integral_setting,true);
-                        if(empty($integral_setting)){
-                            $trans->rollBack();
-                            return false;
-                        }
+
+                        if(empty($integral_setting)) continue;
+
                         for($i=0;$i<$order_detail['num'];$i++){ //根据该商品购买数量循环发送
-                            $res = Integral::addIntegralPlan($user_id,$integral_setting,'购买商品赠送购物券','1');
+                            Integral::addIntegralPlan($user_id, $integral_setting,'购买商品赠送购物券','1');
                         }
-                        if($res === false) throw new Exception(Integral::getError());     
-                    }elseif(!$is_order_paid){                  //商品订单不设置支付状态下执行
+
+                    }elseif(!$is_order_paid){ //商品订单不设置支付状态下执行
                         $goods_id = $order_detail->goods_id;
                         $integral_setting = Goods::getGooodsIntegralSetting($goods_id);
                         $integral_setting = json_decode($integral_setting,true);
-                        if(empty($integral_setting)){
-                            $trans->rollBack();
-                            return false;
-                        }
+
+                        if(empty($integral_setting)) continue;
+
                         for($i=0;$i<$order_detail['num'];$i++){ //根据该商品购买数量循环发送
-                            $res = Integral::addIntegralPlan($user_id,$integral_setting,'购买商品赠送购物券','1');
+                            Integral::addIntegralPlan($user_id, $integral_setting,'购买商品赠送购物券','1');
                         }
-                        if($res === false) throw new Exception(Integral::getError());     
                     }
-                               
                 }
             }
             $trans->commit();

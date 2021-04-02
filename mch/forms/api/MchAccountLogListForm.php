@@ -36,7 +36,7 @@ class MchAccountLogListForm extends BaseModel{
 
         return [
             'code' => ApiCode::CODE_SUCCESS,
-            'msg' => "请求成功",
+            'msg'  => "请求成功",
             'data' => [
                 'list' => $list,
                 'pagination' => $pagination

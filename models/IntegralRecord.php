@@ -224,7 +224,7 @@ class IntegralRecord extends BaseActiveRecord{
             'type' => Integral::TYPE_DYNAMIC,
             'status' => 1,
             'user_id' => $user_id
-        ))->with(['deduct'])
+        ))->with(['deduct'])->andWhere("expire_time>'".time()."'")
         ->orderBy('expire_time ASC')->all();
     }
 

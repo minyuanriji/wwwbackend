@@ -37,7 +37,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
      * @return bool
      * @throws Exception
      */
-    public function add($score, $desc, $customDesc = '')
+    public function add($score, $desc, $customDesc = '', $source_type = null)
     {
         $this->mall = \Yii::$app->mall;
         if (!is_numeric($score)) {
@@ -49,7 +49,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
         $this->user->total_score  += $score;
         if ($this->user->save()) {
             try {
-                $this->createLog(1, $score, $desc, $customDesc);
+                $this->createLog(1, $score, $desc, $customDesc, $source_type);
                 $t->commit();
                 return true;
             } catch (Exception $e) {
@@ -155,7 +155,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
      * @return bool
      * @throws \Exception
      */
-    private function createLog($type, $score, $desc, $customDesc = '')
+    private function createLog($type, $score, $desc, $customDesc = '', $source_type = null)
     {
         if ($score == 0) {
             \Yii::warning('积分为' . $score . '不记录日志');
@@ -174,6 +174,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
         $form->desc          = $desc;
         $form->custom_desc   = $customDesc;
         $form->current_score = $this->user->total_score;
+        $form->source_type   = !empty($source_type) ? $source_type : "normal";
         if ($form->save()) {
 //            $templateSend = new AccountChange([
 //                'remark' => '用户积分变动说明',

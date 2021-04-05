@@ -14,6 +14,7 @@ use app\controllers\api\filters\LoginFilter;
 use app\forms\api\identity\ForgetPasswordForm;
 use app\forms\api\identity\SmsForm;
 use app\forms\api\poster\PosterForm;
+use app\forms\api\user\GiveScoreForm;
 use app\forms\api\user\UserAddressForm;
 use app\forms\api\user\UserEditForm;
 use app\forms\api\user\UserForm;
@@ -387,20 +388,12 @@ class UserController extends ApiController
      * 新人获取红包福利
      */
     public function actionGetIntegral(){
-        $data = $this->requestData;
-        $result = (new NewUserIntegral()) -> SendUserIntegral($data['user_id']);
-        if($result == 1){
-            $msg = '积分发放成功';
-        }else if($result == 2){
-            $msg = '您不是新用户，不能领取';
-        }else{
-            $msg = '系统出错';
-        }
-        return $this -> asJson([
-            'status' => 1,
-            'msg' => $msg
-        ]);
-
+        $form = new GiveScoreForm();
+        $form->attributes = $this->requestData;
+        $form->user_id = \Yii::$app->user->id;
+        $form->number  = 300;
+        $form->desc    = "新人领取300积分";
+        return $form->execute();
     }
 
 }

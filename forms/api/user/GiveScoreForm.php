@@ -31,6 +31,10 @@ class GiveScoreForm extends BaseModel{
                 throw new \Exception("用户不存在");
             }
             \Yii::$app->currency->setUser($user)->score->add((int)$this->number, $this->desc, json_encode([]));
+            return [
+                'code'  => ApiCode::CODE_SUCCESS,
+                'msg'   => '支付成功'
+            ];
         }catch (\Exception $e){
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }

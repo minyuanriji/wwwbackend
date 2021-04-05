@@ -92,10 +92,11 @@
                                    v-text="scope.row.balance"></el-button>
                     </template>
                 </el-table-column>
-                <el-table-column prop="score" label="积分">
+                <el-table-column prop="score" label="动态积分"></el-table-column>
+                <el-table-column prop="static_score" label="静态积分">
                     <template slot-scope="scope">
                         <el-button type="text" @click="$navigate({r: 'mall/user/score-log', user_id:scope.row.user_id})"
-                                   v-text="scope.row.score"></el-button>
+                                   v-text="scope.row.static_score"></el-button>
                     </template>
                 </el-table-column>
 

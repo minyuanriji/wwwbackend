@@ -186,7 +186,7 @@ class ScoreService
         /** @var User $user */
         $user = \Yii::$app->user->identity;
 
-        $this->user_score           = \Yii::$app->currency->setUser($user)->score->select();
+        $this->user_score           = $user->total_score;
         $this->user_remaining_score = $this->user_score;
     }
 

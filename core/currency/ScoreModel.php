@@ -45,9 +45,8 @@ class ScoreModel extends BaseModel implements BaseCurrency
         }
         $score =  round($score, 2);
         $t = \Yii::$app->db->beginTransaction();
-        $this->user->score += $score;
         $this->user->static_score += $score;
-        $this->user->total_score += $score;
+        $this->user->total_score  += $score;
         if ($this->user->save()) {
             try {
                 $this->createLog(1, $score, $desc, $customDesc);
@@ -82,7 +81,6 @@ class ScoreModel extends BaseModel implements BaseCurrency
         }
         $score =  round($score, 2);
         $t = \Yii::$app->db->beginTransaction();
-        $this->user->score        -= $score;
         $this->user->static_score -= $score;
         $this->user->total_score  -= $score;
         if ($this->user->save()) {
@@ -105,7 +103,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
      */
     public function select()
     {
-        return intval($this->user->score);
+        return intval($this->user->static_score);
     }
 
     /**
@@ -132,9 +130,8 @@ class ScoreModel extends BaseModel implements BaseCurrency
 
         $score =  round($score, 2);
         $t = \Yii::$app->db->beginTransaction();
-        $this->user->score += $score;
         $this->user->static_score += $score;
-        $this->user->total_score += $score;
+        $this->user->total_score  += $score;
         if ($this->user->save()) {
             try {
                 $this->createLog(1, $score, $desc, $customDesc);
@@ -170,13 +167,13 @@ class ScoreModel extends BaseModel implements BaseCurrency
 
         $score =  round($score, 2);
         $form = new ScoreLog();
-        $form->user_id = $this->user->id;
-        $form->mall_id = $this->user->mall_id;
-        $form->type = $type;
-        $form->score = $score;
-        $form->desc = $desc;
-        $form->custom_desc = $customDesc;
-        $form->current_score = $this->user->score;
+        $form->user_id       = $this->user->id;
+        $form->mall_id       = $this->user->mall_id;
+        $form->type          = $type;
+        $form->score         = $score;
+        $form->desc          = $desc;
+        $form->custom_desc   = $customDesc;
+        $form->current_score = $this->user->total_score;
         if ($form->save()) {
 //            $templateSend = new AccountChange([
 //                'remark' => '用户积分变动说明',
@@ -186,7 +183,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
 //            ]);
 //            $templateSend->send();
             //触发积分变动事件
-            $event              = new ScoreEvent();
+            $event            = new ScoreEvent();
             $event->score_log = $form;
             \Yii::$app->trigger(ScoreLog::EVENT_SCORE_CHANGE, $event);
             return true;
@@ -200,15 +197,14 @@ class ScoreModel extends BaseModel implements BaseCurrency
         $list = ScoreLog::find()->where([
             'mall_id' => $this->mall->id,
             'user_id' => $this->user->id,
-            'type' => $this->type,
-        ])
-            ->page($pagination)
-            ->orderBy('created_at DESC')
-            ->asArray()
-            ->all();
+            'type'    => $this->type,
+        ])->page($pagination)
+          ->orderBy('created_at DESC')
+          ->asArray()
+          ->all();
 
         return [
-            'list' => $list,
+            'list'       => $list,
             'pagination' => $pagination
         ];
     }

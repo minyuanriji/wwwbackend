@@ -77,8 +77,10 @@ class IntegralDeduct extends BaseActiveRecord{
                 $wallet->dynamic_integral += $log['money'];
             }else{
                 //修改经销商的积分卡券动态金额
-                $wallet->dynamic_score += $log['money'];
-                //$wallet->score += $log['money']; 
+                $wallet->score         += $log['money'];
+                $wallet->dynamic_score = $wallet->score;
+                $wallet->total_score   = $wallet->dynamic_score + $wallet->static_score;
+
             }
             $res = $wallet->save(false);
             if($res === false) throw new Exception($wallet->getErrorMessage());
@@ -121,7 +123,7 @@ class IntegralDeduct extends BaseActiveRecord{
             //要抵扣的数值
             $integral_deduction_price = $order->score_deduction_price;
             if($integral_deduction_price > 0){
-                if($wallet['dynamic_score'] > 0){
+                if($wallet['score'] > 0){
                     //有动态积分优先扣减
                     $deduct = array(
                         'controller_type' => 0,
@@ -131,7 +133,7 @@ class IntegralDeduct extends BaseActiveRecord{
                         'source_table'    => 'order',
                     );
 
-                    $before_money = $wallet['dynamic_score'];
+                    $before_money = $wallet['score'];
 
                     //动态积分足够扣减
                     foreach($can_use_integrals as $integral){

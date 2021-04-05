@@ -577,36 +577,13 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
      * @return object|array|boolean
      */
     public static function getUserWallet($user_id, $mall_id = null){
-        $wallet = self::find()->select('id,mall_id,parent_id,second_parent_id,third_parent_id,is_inviter,static_integral,dynamic_integral,score,static_score,dynamic_score')
-                    ->where(array('id'=>$user_id,'mall_id'=>Yii::$app->mall->id ?? $mall_id))
-                    ->one();
-
-        //统计用户动态积分
-        $recordSum = (float)IntegralRecord::find()->where([
-            "controller_type" => 0,
-            "status"          => 1,
-            "user_id"         => $user_id
-        ])->andWhere("(expire_time > '".time()."' OR type=1)")->sum("money");
-        $deductSum = (float)IntegralDeduct::find()->where([
-            "controller_type" => 0,
-            "user_id"         => $user_id,
-            "mall_id"         => \Yii::$app->mall->id
-        ])->sum("money");
-
-        $dynamicScore = max(0, $recordSum + $deductSum);
-        $score        = max(0, $dynamicScore + $wallet->static_score);
-        $totalScore   = $score;
-
-        User::updateAll([
-            "score"         => $score,
-            "total_score"   => $totalScore,
-            "dynamic_score" => $dynamicScore
-        ], ["id" => $user_id]);
-
-        $wallet['dynamic_score'] = $dynamicScore;
-        $wallet['score']         = $score;
-        $wallet['total_score']   = $totalScore;
-
+        $selects = 'id,mall_id,parent_id,second_parent_id,third_parent_id,is_inviter,static_integral,dynamic_integral,score,static_score,dynamic_score';
+        $wallet = self::find()->select($selects)
+                    ->where([
+                        'id'      =>$user_id,
+                        'mall_id' => Yii::$app->mall->id ?? $mall_id
+                    ])->one();
+        $wallet['dynamic_integral'] = $wallet['score'];
         return $wallet;
     }
 

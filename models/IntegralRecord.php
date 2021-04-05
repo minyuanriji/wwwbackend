@@ -79,7 +79,7 @@ class IntegralRecord extends BaseActiveRecord{
             $model->attributes = $log;
             $res = $model->save();
             if($res === false) throw new Exception($model->getErrorMessage());
-            $wallet = User::getUserWallet($log['user_id']);
+            $wallet = User::findOne($log['user_id']);
             if($log['controller_type'] == 1){
                 switch($log['type']){
                     case Integral::TYPE_ALWAYS:
@@ -95,10 +95,11 @@ class IntegralRecord extends BaseActiveRecord{
                         $wallet->static_score += $log['money'];
                     break;
                     case Integral::TYPE_DYNAMIC:
-                        $wallet->dynamic_score += $log['money'];
+                        $wallet->score         += $log['money'];
                     break;
                 }
-                if($log['source_table']=='integral') $wallet->score += $log['money']; 
+                $wallet->dynamic_score = $wallet->score;
+                $wallet->total_score   = $wallet->static_score + $wallet->score;
             }
 
             //绑定积分券所属上级

@@ -364,11 +364,11 @@ class IntegralLogic{
 
                 if($goods->enable_score){ //赠送积分卷
                     $scoreSetting = @json_decode($goods->score_setting,true);
-                    if(empty($scoreSetting)){
+
+                    //永久有效只有确认收货才送
+                    if(empty($scoreSetting) || ($scoreSetting['expire'] == -1 && !$order->is_confirm)){
                         continue;
                     }
-                    if($scoreSetting['expire'] == -1 && !$order->is_confirm) //永久有效只有确认收货才送
-                        continue;
 
                     for($i=0; $i < $orderDetail['num']; $i++){ //根据该商品购买数量循环发送
                         $res = Integral::addIntegralPlan($order->user_id, $scoreSetting,'购买商品赠送积分券','0');

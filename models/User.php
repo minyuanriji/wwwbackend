@@ -587,6 +587,27 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
         return $wallet;
     }
 
+    /**
+     * 更新用户钱包
+     * @return boolean
+     */
+    public static function updateUserWallet(User $user){
+
+        //查询用户可用积分券按过期时间升序排列
+        $can_use_integrals = IntegralRecord::getIntegralAscExpireTime($user->id, 0);
+        $dynamicScores = 0;
+
+        foreach($can_use_integrals as $integral){
+            $dynamicScores += !empty($integral['deduct']) ? $integral['money'] + array_sum(array_column($integral['deduct'], 'money')) : $integral['money'];
+        }
+
+        $user->score         = $dynamicScores;
+        $user->dynamic_score = $user->score;
+        $user->total_score   = $user->dynamic_score + $user->static_score;
+
+        return $user->save();
+    }
+
 
     public static function getOneUserFlag($user_id,$mall_id=null){
         return self::find()

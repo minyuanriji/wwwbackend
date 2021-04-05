@@ -187,15 +187,10 @@ class ScoreService
         /** @var User $user */
         $user = \Yii::$app->user->identity;
 
-        //查询用户可用积分券按过期时间升序排列
-        $can_use_integrals = IntegralRecord::getIntegralAscExpireTime($user->id, 0);
-        $dynamicScores = 0;
+        //先更新用户钱包
+        User::updateUserWallet($user);
 
-        foreach($can_use_integrals as $integral){
-            $dynamicScores += !empty($integral['deduct']) ? $integral['money'] + array_sum(array_column($integral['deduct'], 'money')) : $integral['money'];
-        }
-
-        $this->user_score           = (int)$dynamicScores + $user->static_score;
+        $this->user_score           = $user->total_score;
         $this->user_remaining_score = $this->user_score;
     }
 

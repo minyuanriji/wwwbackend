@@ -94,8 +94,14 @@ class UserForm extends BaseModel
         if (\Yii::$app->user->isGuest) {
             return null;
         }
+
+
         /** @var User $user */
         $user = \Yii::$app->user->identity;
+
+        //先更新用户钱包
+        User::updateUserWallet($user);
+
 
         $parentName = '系统';
         if ($user->parent_id != 0) {
@@ -139,6 +145,7 @@ class UserForm extends BaseModel
             "source_type" => "new_user"
         ])->exists() ? 1 : 0;
 
+
         $result = [
             'user_id' => $user->id,
             'username' => $user->username,
@@ -146,19 +153,17 @@ class UserForm extends BaseModel
             'mobile' => $user->mobile,
             'avatar' => $user->avatar_url,
             'score' => intval($user->score),
+            'total_score' => $user->total_score,
+            'static_score' => intval($user->static_score),
+            'dynamic_score' => intval($user->dynamic_score),
             'birthday' => $user->birthday > 0 ? date("Y-m-d",$user->birthday) : 0,
             'balance' => $user->balance,
-            'total_score' => $user->total_score,
             'total_balance' => $user->total_balance,
             'income' => $user->income,
             'income_frozen' => $user->income_frozen,
             'total_income' => $user->total_income,
-            'total_income' => $user->total_income,
-            'total_income' => $user->total_income,
             'static_integral' => $user->static_integral ?? 0,
             'dynamic_integral' => $user->dynamic_integral ?? 0,
-            'static_score' => intval($user->static_score),
-            'dynamic_score' => intval($user->dynamic_score),
             'favorite' => $favoriteCount ?? '0',
             //'footprint' => FootprintGoodsLog::find()->where(['user_id' => $user->id, 'is_delete' => 0])->count() ?? '0',
             'identity' => [

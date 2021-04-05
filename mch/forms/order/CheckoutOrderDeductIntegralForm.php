@@ -113,7 +113,7 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
             if($integralDeductionPrice > 0){
                 $diffIntegral = $user->static_integral - $integralDeductionPrice;
                 if($diffIntegral < 0){
-                    throw new Exception('永久购物券不足');
+                    throw new \Exception('永久购物券不足');
                 }
                 $record = array(
                     'controller_type' => 1,

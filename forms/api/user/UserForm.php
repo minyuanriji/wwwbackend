@@ -133,6 +133,12 @@ class UserForm extends BaseModel
         //商户信息
         $mchInfo = $this->getMchInfo();
 
+        //判断是否新人
+        $newUserIsGetScore = ScoreLog::find()->where([
+            "user_id"     => $user->id,
+            "source_type" => "new_user"
+        ])->exists() ? 1 : 0;
+
         $result = [
             'user_id' => $user->id,
             'username' => $user->username,
@@ -166,7 +172,8 @@ class UserForm extends BaseModel
           /*  'card' => $cardCount,*/
             'is_vip_card_user' => 0,
             'is_mch' => $mchInfo['is_mch'],
-            'mch_info' => $mchInfo
+            'mch_info' => $mchInfo,
+            'new_user_is_get_score' => $newUserIsGetScore
         ];
 
         $pluginUserInfo = \Yii::$app->plugin->getUserInfo($user);

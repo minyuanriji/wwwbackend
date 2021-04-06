@@ -91,9 +91,9 @@ class WorkermanTimerController extends WorkermanBaseController
     public function sendIntegralTimer($worker){
 
         //获取一把锁
-        $lock_tools = new LockTools();
-        $lock_name = 'lock:sendIntegralTimer';
-        if($lock_tools->lock($lock_name)){
+        //$lock_tools = new LockTools();
+        //$lock_name = 'lock:sendIntegralTimer';
+        //if($lock_tools->lock($lock_name)){
             try{
                 $res = Integral::sendIntegral();
                 if($res === false) throw new Exception(Integral::getError());
@@ -104,7 +104,7 @@ class WorkermanTimerController extends WorkermanBaseController
                 $lock_tools->unlock($lock_name);
                 Yii::getLogger()->flush(true);
             }
-        }
+        //}
     }
     
     /**

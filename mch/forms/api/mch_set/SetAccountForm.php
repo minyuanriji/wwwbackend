@@ -34,10 +34,7 @@ class SetAccountForm extends BaseModel{
                 if($len < 3 || $len > 15){
                     throw new \Exception("请控制账号长度在3~15个字符之间");
                 }
-                $exists = Admin::find()->where(["username" => $this->username])->exists();
-                if($exists){
-                    throw new \Exception("账号“".$this->username."”已被使用");
-                }
+
                 if(!$adminModel){
                     $adminModel = new Admin([
                         "mall_id"      => $this->mall_id,
@@ -49,6 +46,11 @@ class SetAccountForm extends BaseModel{
                         "updated_at"   => time()
                     ]);
                 }
+            }
+
+            $exists = Admin::find()->where(["username" => $this->username])->exists();
+            if($exists){
+                throw new \Exception("账号“".$this->username."”已被使用");
             }
 
             $adminModel->username = $this->username;

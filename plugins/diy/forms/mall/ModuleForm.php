@@ -51,7 +51,7 @@ class ModuleForm extends BaseModel
 
         $extra = [];
         $common = CommonTemplate::getCommon();
-        foreach ($common->allComponents() as $key => $allComponent) {
+        foreach ($common->allComponentsa() as $key => $allComponent) {
             foreach ($allComponent['list'] as $key2 => $item) {
                 if ((isset($item['single']) && $item['single']) || $item['id'] === 'module') {
                     array_push($extra, $item['id']);

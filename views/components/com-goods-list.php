@@ -56,6 +56,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                 <span>商品列表</span>
                 <div style="float: right; margin: -5px 0">
                     <el-button v-if="is_add_goods" type="primary" size="small" @click="edit">添加商品</el-button>
+<!--                    <a href="http://8.129.63.124/web/index.php?r=mall%2Fgoods%2Fexport-goods-list2">导出</a>-->
                     <el-button v-if="isShowExportGoods" type="primary" size="small" @click="exportGoods">商品导出
                     </el-button>
                     <el-dialog
@@ -71,7 +72,8 @@ Yii::$app->loadComponentView('goods/com-batch');
                             </div>
                             <span slot="footer" class="dialog-footer">
                                     <el-button @click="exportDialogVisible = false" size="small">取 消</el-button>
-                                    <el-button @click="exportGoodsData" size="small" type="primary">确定</el-button>
+<!--                                    <el-button @click="exportGoodsData" size="small" type="primary">确定</el-button>-->
+                                <el-button @click="newExportGoodsData" size="small" type="primary">确定</el-button>
                                 </span>
                         </template>
                         <template v-else>
@@ -498,6 +500,10 @@ Yii::$app->loadComponentView('goods/com-batch');
             if (getQuery('page') > 1) {
                 this.page = getQuery('page');
             }
+            if(localStorage.getItem('goods_page')){
+                this.page = localStorage.getItem('goods_page');
+                this.getList();
+            }
 
             // 搜索条件从缓存中获取
             let search = this.getCookie('search');
@@ -557,6 +563,7 @@ Yii::$app->loadComponentView('goods/com-batch');
             pagination(currentPage) {
                 let self = this;
                 self.page = currentPage;
+                localStorage.setItem('goods_page',self.page);
                 self.getList();
             },
             getList() {
@@ -584,12 +591,14 @@ Yii::$app->loadComponentView('goods/com-batch');
             },
             edit(row) {
                 if (row.id) {
-                    navigateTo({
-                        r: this.edit_goods_url,
-                        id: row.id,
-                        mch_id: row.mch_id,
-                        page: this.page,
-                    });
+                    var path = window.location.origin + window.location.pathname + '?r=mall%2Fgoods%2Fedit&id=' + row.id + '&mch_id=' + row.mch_id + '&page=' + this.page;
+                    window.open(path,'_blank');
+                    // navigateTo({
+                    //     r: this.edit_goods_url,
+                    //     id: row.id,
+                    //     mch_id: row.mch_id,
+                    //     page: this.page,
+                    // });
                     this.saveSearch();
                 } else {
                     navigateTo({
@@ -806,6 +815,11 @@ Yii::$app->loadComponentView('goods/com-batch');
                     action_url: '<?= Yii::$app->urlManager->createUrl('mall/goods/export-goods-list') ?>',
                     goods_count: 0,//商品总数
                 }
+            },
+            newExportGoodsData(){
+                let self = this;
+                window.location.href = 'https://' + document.domain + '/web/index.php?r=mall%2Fgoods%2Fget-goods-data' + '&choose_list=' + self.choose_list;
+                this.exportDialogVisible = false;
             },
             exportGoodsData() {
                 let self = this;

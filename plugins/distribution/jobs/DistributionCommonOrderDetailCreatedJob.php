@@ -202,6 +202,7 @@ class DistributionCommonOrderDetailCreatedJob extends Component implements JobIn
                         $third_price = $third_price1;
                         $price_type = DistributionSetting::getValueByKey(DistributionSetting::PRICE_TYPE);
                     }
+
                     //公共的部分
                     if ($price_type == 2) {
                         //固定金额
@@ -215,6 +216,7 @@ class DistributionCommonOrderDetailCreatedJob extends Component implements JobIn
                             $price = $third_price * $this->order->num;
                         }
                     }
+
                     if ($price_type == 1) {
                         //百分比金额
                         if ($user_level == 1) { //一级
@@ -228,7 +230,9 @@ class DistributionCommonOrderDetailCreatedJob extends Component implements JobIn
                         }
                     }
 
-                    $log->price = $price;
+                    if($log->level == $user_level){
+                        $log->price = $price;
+                    }
 
                     if (!$log->save()) {
                         \Yii::warning(json_encode($log->getErrors()));

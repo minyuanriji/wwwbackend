@@ -37,7 +37,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
      * @return bool
      * @throws Exception
      */
-    public function add($score, $desc, $customDesc = '')
+    public function add($score, $desc, $customDesc = '', $source_type = null)
     {
         $this->mall = \Yii::$app->mall;
         if (!is_numeric($score)) {
@@ -45,11 +45,11 @@ class ScoreModel extends BaseModel implements BaseCurrency
         }
         $score =  round($score, 2);
         $t = \Yii::$app->db->beginTransaction();
-        $this->user->score += $score;
-        $this->user->total_score += $score;
+        $this->user->static_score += $score;
+        $this->user->total_score  += $score;
         if ($this->user->save()) {
             try {
-                $this->createLog(1, $score, $desc, $customDesc);
+                $this->createLog(1, $score, $desc, $customDesc, $source_type);
                 $t->commit();
                 return true;
             } catch (Exception $e) {
@@ -75,12 +75,14 @@ class ScoreModel extends BaseModel implements BaseCurrency
         if (!is_numeric($score)) {
             throw new Exception('积分必须是数值类型');
         }
-        if ($this->user->score < $score) {
+
+        if ($this->user->static_score < $score) {
             throw new Exception('用户积分不足');
         }
         $score =  round($score, 2);
         $t = \Yii::$app->db->beginTransaction();
-        $this->user->score -= $score;
+        $this->user->static_score -= $score;
+        $this->user->total_score  -= $score;
         if ($this->user->save()) {
             try {
                 $this->createLog(2, $score, $desc, $customDesc);
@@ -101,7 +103,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
      */
     public function select()
     {
-        return intval($this->user->score);
+        return intval($this->user->static_score);
     }
 
     /**
@@ -128,7 +130,8 @@ class ScoreModel extends BaseModel implements BaseCurrency
 
         $score =  round($score, 2);
         $t = \Yii::$app->db->beginTransaction();
-        $this->user->score += $score;
+        $this->user->static_score += $score;
+        $this->user->total_score  += $score;
         if ($this->user->save()) {
             try {
                 $this->createLog(1, $score, $desc, $customDesc);
@@ -152,7 +155,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
      * @return bool
      * @throws \Exception
      */
-    private function createLog($type, $score, $desc, $customDesc = '')
+    private function createLog($type, $score, $desc, $customDesc = '', $source_type = null)
     {
         if ($score == 0) {
             \Yii::warning('积分为' . $score . '不记录日志');
@@ -164,13 +167,14 @@ class ScoreModel extends BaseModel implements BaseCurrency
 
         $score =  round($score, 2);
         $form = new ScoreLog();
-        $form->user_id = $this->user->id;
-        $form->mall_id = $this->user->mall_id;
-        $form->type = $type;
-        $form->score = $score;
-        $form->desc = $desc;
-        $form->custom_desc = $customDesc;
-        $form->current_score = $this->user->score;
+        $form->user_id       = $this->user->id;
+        $form->mall_id       = $this->user->mall_id;
+        $form->type          = $type;
+        $form->score         = $score;
+        $form->desc          = $desc;
+        $form->custom_desc   = $customDesc;
+        $form->current_score = $this->user->total_score;
+        $form->source_type   = !empty($source_type) ? $source_type : "normal";
         if ($form->save()) {
 //            $templateSend = new AccountChange([
 //                'remark' => '用户积分变动说明',
@@ -180,7 +184,7 @@ class ScoreModel extends BaseModel implements BaseCurrency
 //            ]);
 //            $templateSend->send();
             //触发积分变动事件
-            $event              = new ScoreEvent();
+            $event            = new ScoreEvent();
             $event->score_log = $form;
             \Yii::$app->trigger(ScoreLog::EVENT_SCORE_CHANGE, $event);
             return true;
@@ -194,15 +198,14 @@ class ScoreModel extends BaseModel implements BaseCurrency
         $list = ScoreLog::find()->where([
             'mall_id' => $this->mall->id,
             'user_id' => $this->user->id,
-            'type' => $this->type,
-        ])
-            ->page($pagination)
-            ->orderBy('created_at DESC')
-            ->asArray()
-            ->all();
+            'type'    => $this->type,
+        ])->page($pagination)
+          ->orderBy('created_at DESC')
+          ->asArray()
+          ->all();
 
         return [
-            'list' => $list,
+            'list'       => $list,
             'pagination' => $pagination
         ];
     }

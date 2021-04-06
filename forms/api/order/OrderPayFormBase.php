@@ -12,7 +12,6 @@
 namespace app\forms\api\order;
 
 use app\core\ApiCode;
-use app\core\payment\Payment;
 use app\core\payment\PaymentOrder;
 use app\logic\AppConfigLogic;
 use app\logic\OrderLogic;
@@ -20,7 +19,7 @@ use app\models\BaseModel;
 use app\models\Order;
 use app\models\OrderDetail;
 use app\models\User;
-use Codeception\Template\Api;
+use app\notify_class\goods\OrderPayNotify;
 
 abstract class OrderPayFormBase extends BaseModel
 {
@@ -71,6 +70,14 @@ abstract class OrderPayFormBase extends BaseModel
     public function loadOrderPayData($order,$userData = []){
         $supportPayTypes = OrderLogic::getPaymentTypeConfig();
         $balance = $userData["balance"];
+
+        if(in_array("wechat", $supportPayTypes) && \Yii::$app->appPlatform == "h5"){
+            $supportPayTypes = array_diff($supportPayTypes, ["wechat"]);
+            if(!in_array("alipay", $supportPayTypes)){
+                $supportPayTypes[] = "alipay";
+            }
+        }
+
         $data = [
                 //'title' => $this->getOrderTitle($order),
                 'balance' => $balance,

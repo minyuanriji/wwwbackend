@@ -58,6 +58,11 @@ class Plugin extends \app\plugins\Plugin
                 ]
             ],
             [
+                'name' => '商家分佣',
+                'route' => 'plugin/mch/mall/distribution/list',
+                'icon' => 'el-icon-star-on',
+            ],
+            [
                 'name' => '入驻审核',
                 'route' => 'plugin/mch/mall/mch/review',
                 'icon' => 'el-icon-star-on',
@@ -92,6 +97,17 @@ class Plugin extends \app\plugins\Plugin
                     [
                         'name' => '订单详情',
                         'route' => 'plugin/mch/mall/order/detail',
+                    ],
+                ]
+            ],
+            [
+                'name' => '账单记录',
+                'route' => 'plugin/mch/mall/checkout-order/index',
+                'icon' => 'el-icon-star-on',
+                'action' => [
+                    [
+                        'name' => '账单详情',
+                        'route' => 'plugin/mch/mall/checkout-order/detail',
                     ],
                 ]
             ],

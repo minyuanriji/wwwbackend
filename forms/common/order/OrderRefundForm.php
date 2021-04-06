@@ -29,6 +29,7 @@ use app\services\mall\order\OrderSendService;
 use app\services\mall\order\OrderToSatusWaitReceive;
 use yii\db\Exception;
 use app\services\wechat\WechatTemplateService;
+use app\controllers\business\OrderCommon;
 
 class OrderRefundForm extends BaseModel
 {
@@ -250,9 +251,9 @@ class OrderRefundForm extends BaseModel
             //微信通知
             $this->sendWechatTempAgree($orderRefund, $orderRefund->refund_price, $remark);
             //退积分
+            (new OrderCommon()) -> returnIntegral($orderRefund->detail,$orderRefund -> order_no);
             $this->returnScore($orderRefund->detail);
             $transaction->commit();
-
             //更新订单售后状态,不能写在事务里
             $OrderSaleStatusService = new OrderSaleStatusService();
             $OrderSaleStatusService->updateOrderSaleStatus($orderRefund->order);

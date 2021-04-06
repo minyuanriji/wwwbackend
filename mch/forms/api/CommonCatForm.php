@@ -11,13 +11,13 @@ class CommonCatForm extends BaseModel{
     public function getAll(){
 
         try {
-            $list = MchCommonCat::find()->select(["id", "mall_id", "name"])->where([
+            $list = MchCommonCat::find()->select(["id", "mall_id", "name", "pic_url"])->where([
                 'mall_id'   => \Yii::$app->mall->id,
                 'is_delete' => 0
             ])->asArray()->orderBy(['sort' => SORT_ASC])->all();
             $list = $list ? $list : [];
             foreach($list as $key => $item){
-                $list[$key]['pic_url'] = "http://";
+
             }
 
             return [

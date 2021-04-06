@@ -112,11 +112,10 @@ class QrCodeCommon extends BaseModel
 
     private function wechat($scene, $width = 430, $page = null)
     {
-
         /** @var Wechat $wechat */
         $wechat = \Yii::$app->wechat;
         $accessTokenArray = $wechat->miniProgram->access_token->getToken();
-        //$this->accessToken = \Yii::$app->wechat->getAccessToken();
+//        $this->accessToken = \Yii::$app->wechat->getAccessToken();
         if (!isset($accessTokenArray["access_token"])) {
             throw new \Exception('微信配置有误');
         }
@@ -281,7 +280,6 @@ class QrCodeCommon extends BaseModel
         $model->path = $page;
         $model->data = \Yii::$app->serializer->encode($data);
         $res = $model->save();
-
         if (!$res) {
             throw new \Exception($this->responseErrorMsg($model));
         }

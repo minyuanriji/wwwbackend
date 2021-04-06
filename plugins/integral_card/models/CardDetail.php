@@ -5,6 +5,8 @@ use app\logic\IntegralLogic;
 use app\models\BaseActiveRecord;
 use app\models\Mall;
 use app\models\User;
+use app\models\user\User as UserModel;
+use app\models\mysql\{UserParent,UserChildren};
 use Exception;
 use Yii;
 
@@ -98,6 +100,37 @@ class CardDetail extends BaseActiveRecord{
             $card->use_num += 1;
             $res = $card->save();
             if($res === false) throw new Exception($card->getErrorMessage());
+            $level = (new UserModel()) -> getOneUserInfo($user_id);
+            $Parent = (new UserParent()) -> getUserParentData($user_id);
+            if(empty($level['parent_id'])){
+                (new UserModel()) -> updateUsers(['parent_id' => $model -> user_id],$user_id);
+                if(empty($Parent)){
+                    $parent_data = new UserParent();
+                    $parent_data -> mall_id = \Yii::$app->mall->id;
+                    $parent_data -> user_id = $user_id;
+                    $parent_data -> parent_id = $model -> user_id;
+                    $parent_data -> updated_at = time();
+                    $parent_data -> created_at = time();
+                    $parent_data -> deleted_at = time();
+                    $parent_data -> is_delete = 0;
+                    $parent_data -> level = 1;
+                    $parent_data -> save();
+                    $UserChildren = new UserChildren();
+                    $UserChildren -> id = null;
+                    $UserChildren -> mall_id = \Yii::$app->mall->id;
+                    $UserChildren -> user_id = $model -> user_id;
+                    $UserChildren -> child_id = $user_id;
+                    $UserChildren -> level = 1;
+                    $UserChildren -> created_at = time();
+                    $UserChildren -> updated_at = time();
+                    $UserChildren -> deleted_at = 0;
+                    $UserChildren -> is_delete = 0;
+                    $UserChildren -> save();
+                }
+            }
+            if($level['level'] < 4){
+                (new UserModel()) -> updateUsers(['level' => 4],$user_id);
+            }
             return $model;
         }catch(Exception $e){
             self::$error = $e->getMessage();

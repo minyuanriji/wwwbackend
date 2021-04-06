@@ -55,7 +55,7 @@ class AttrGoodsService
                     $temp['score_price'] = 0;
                 }
 
-                //购物券
+                //红包券
                 if (!isset($temp['integral_price'])) {
                     $temp['integral_price'] = 0;
                 }
@@ -114,7 +114,7 @@ class AttrGoodsService
     /**
      * same_goods_list中的优惠券数据转换成goods_list的优惠券数据,优惠卷信息以单规格商品总价最高的记录入库,排第一的为总价最高的规格总价
      */
-    /*public function getUsableUserCouponId()
+    /*poster function getUsableUserCouponId()
     {
         foreach ($this->item['same_goods_list'] as $key => $value) {
             foreach ($value['goods_list'] as $k => $goods) {

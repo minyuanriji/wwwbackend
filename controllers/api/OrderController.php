@@ -12,6 +12,7 @@ namespace app\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
 use app\core\ApiCode;
+use app\forms\api\order\ConsumeVerificationInfoForm;
 use app\forms\api\order\OrderCommentForm;
 use app\forms\api\order\OrderClerkForm;
 use app\forms\api\order\OrderDetailForm;
@@ -102,7 +103,7 @@ class OrderController extends ApiController
         $form = new OrderSubmitForm();
         $form->form_data = $this->requestData;
         $mallPaymentTypes = OrderLogic::getPaymentTypeConfig();
-        
+
         return $this->asJson($form->setSupportPayTypes($mallPaymentTypes)->doSubmitOrder());
     }
     
@@ -399,5 +400,27 @@ class OrderController extends ApiController
         } else {
             return $result;
         }
+    }
+
+    /**
+     * 到店消费核销码二维码
+     * @return \yii\web\Response
+     */
+    public function actionConsumeVerificationQrcode(){
+        $form = new ConsumeVerificationInfoForm();
+        $form->attributes = $this->requestData;
+
+        return $this->asJson($form->qrCode());
+    }
+
+    /**
+     * 到店消费核销码信息
+     * @return \yii\web\Response
+     */
+    public function actionConsumeVerificationInfo(){
+        $form = new ConsumeVerificationInfoForm();
+        $form->attributes = $this->requestData;
+
+        return $this->asJson($form->info());
     }
 }

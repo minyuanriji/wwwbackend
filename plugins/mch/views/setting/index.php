@@ -50,6 +50,25 @@
                                         </el-checkbox>
                                     </el-checkbox-group>
                                 </el-form-item>
+                                <el-form-item label="提现手续费" prop="cash_service_fee" required>
+                                    <label slot="label">服务费
+                                        <el-tooltip class="item" effect="dark"
+                                                    content="0表示不设置服务费"
+                                                    placement="top">
+                                            <i class="el-icon-info"></i>
+                                        </el-tooltip>
+                                    </label>
+                                    <el-input type="number" v-model.number="ruleForm.cash_service_fee">
+                                        <template slot="append">%</template>
+                                    </el-input>
+                                    <div>
+                                        <span class="text-danger">服务费额外从提现中扣除</span><br>
+                                        例如：<span style="color: #F56C6C;font-size: 12px">10%</span>的提现服务费：<br>
+                                        提现<span style="color: #F56C6C;font-size: 12px">100</span>元，扣除服务费<span
+                                                style="color: #F56C6C;font-size: 12px">10</span>元，
+                                        实际到手<span style="color: #F56C6C;font-size: 12px">90</span>元
+                                    </div>
+                                </el-form-item>
                                 <el-form-item label="入驻协议" prop="desc">
                                     <el-input
                                             type="textarea"

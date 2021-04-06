@@ -180,7 +180,8 @@ class UserTeamForm extends BaseModel
             $query->andWhere(['level' => 1]);
         }
         if ($this->flag == 2) {
-            $query->andWhere(['>', 'level', 1]);
+            //$query->andWhere(['>', 'level', 1]);
+            $query->andWhere(['level' => 2]);
         }
         /**
          * @var BasePagination $pagination
@@ -271,13 +272,12 @@ class UserTeamForm extends BaseModel
             ->leftJoin(['co' => CommonOrder::tableName()], 'co.user_id=u.id and co.is_delete=0')
             ->leftJoin(['o' => Order::tableName()], 'o.id=co.order_id')
             ->leftJoin(['pl' => PriceLog::tableName()], 'pl.user_id=\''.\Yii::$app->user->identity->id.'\' and pl.order_id=co.order_id') -> orderBy('created_at DESC');
-
-
         if ($this->status>=0 && $this->status<=2) {
             $query->andWhere(['co.status' => $this->status]);
         }
         $query->andWhere('pl.price > 0 OR pl.level=1');
         $list = $query->page($pagination, 10, $this->page)->asArray()->all();
+
         if($list){
             $order = new Order();
             foreach ($list as &$item) {

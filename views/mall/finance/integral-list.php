@@ -14,10 +14,10 @@
 	<el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
 	    <div slot="header">
 	        <div>
-				<el-button :type="pageName=='plan' ? 'primary' : '' "  @click="toOtherPage('mall/finance/integral-plan')">购物券发放计划</el-button>
-				<el-button :type="pageName=='detail' ? 'primary' : '' " @click="toOtherPage('mall/finance/integral-list')">购物券发放明细</el-button>
-				<el-button :type="pageName=='detail' ? 'primary' : '' " @click=" $navigate('mall/finance/integral-list')">购物券发放明细</el-button>
-				<el-button :type="pageName=='dynamic' ? 'primary' : '' ">限时购物券</el-button>
+				<el-button :type="pageName=='plan' ? 'primary' : '' "  @click="toOtherPage('mall/finance/integral-plan')">红包券发放计划</el-button>
+				<el-button :type="pageName=='detail' ? 'primary' : '' " @click="toOtherPage('mall/finance/integral-list')">红包券发放明细</el-button>
+				<el-button :type="pageName=='detail' ? 'primary' : '' " @click=" $navigate('mall/finance/integral-list')">红包券发放明细</el-button>
+				<el-button :type="pageName=='dynamic' ? 'primary' : '' ">限时红包券</el-button>
 	        </div>
 	    </div>
 	</el-card>
@@ -25,7 +25,7 @@
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <div>
-                <span>购物券发放计划</span>
+                <span>红包券发放计划</span>
             </div>
         </div>
 		
@@ -50,8 +50,8 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="integral_num" label="购物券数量"></el-table-column>
-                <el-table-column  label="购物券类型">
+                <el-table-column prop="integral_num" label="红包券数量"></el-table-column>
+                <el-table-column  label="红包券类型">
                     <template slot-scope="scope">
                             <div size="small">{{getTypeName(scope.row.type)}}</div>
                         </template>

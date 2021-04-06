@@ -50,6 +50,7 @@ use Yii;
  * @property int $confine_order_count
  * @property int $is_area_limit 是否单独区域购买
  * @property string $area_limit
+ * @property string $goods_brand
  * @property GoodsDistribution[] $share
  * @property GoodsAttr[] $attr
  * @property GoodsCards[] $cards
@@ -77,7 +78,8 @@ use Yii;
  * @property string $order_paid 订单支付后参数设置
  * @property int $is_order_sales 订单完结后设置
  * @property string $order_sales 订单完结后参数设置
- * 
+ * @property string $is_on_site_consumption 是否到店消费类商品
+ * @property int $integral_fee_rate 使用红包券支付，需要额外收取的红包券比例
  * 
  */
 class Goods extends BaseActiveRecord
@@ -116,11 +118,12 @@ class Goods extends BaseActiveRecord
             [['price', 'forehead', 'payment_amount', 'forehead_score', 'confine_order_count','full_relief_price','fulfil_price','max_deduct_integral','enable_integral','enable_score', 'is_order_paid','is_order_sales'], 'number'],
             [['attr_groups', 'area_limit'], 'string'],
             [['area_limit'], 'default', 'value' => ''],
-            [['created_at', 'updated_at', 'deleted_at','labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund'], 'safe'],
+            [['created_at', 'updated_at', 'deleted_at','labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund', 'is_on_site_consumption'], 'safe'],
             [['sign', 'app_share_pic'], 'string', 'max' => 255],
             [['app_share_title'], 'string', 'max' => 65],
-	    [['full_relief_price','fulfil_price'], 'default', 'value' => 0],
-	    [['integral_setting','score_setting','order_paid','order_sales'],'default','value'=>''],
+	        [['full_relief_price','fulfil_price'], 'default', 'value' => 0],
+	        [['integral_setting','score_setting','order_paid','order_sales'],'default','value'=>''],
+            [['integral_fee_rate'], 'integer']
         ];
     }
 
@@ -175,9 +178,9 @@ class Goods extends BaseActiveRecord
             'full_relief_price' => '单品满额减免金额',
             'fulfil_price' => '单品满额金额',
             'price_display'=>'自定义商品价格显示字样',
-            'max_deduct_integral'=>'最大抵扣购物券',
-            'enable_integral' =>'是否启用购物券赠送',
-            'integral_setting'=>'购物券赠送设置',
+            'max_deduct_integral'=>'最大抵扣红包券',
+            'enable_integral' =>'是否启用红包券赠送',
+            'integral_setting'=>'红包券赠送设置',
             'enable_score' =>'是否启用积分券赠送',
             'score_setting'=>'积分券赠送设置',
             'is_order_paid'=>'订单支付后设置',
@@ -398,7 +401,7 @@ class Goods extends BaseActiveRecord
     }
 
     /**
-     * 获取商品购物券设置
+     * 获取商品红包券设置
      * @Author bing
      * @DateTime 2020-10-15 12:54:18
      * @copyright: Copyright (c) 2020 广东七件事集团

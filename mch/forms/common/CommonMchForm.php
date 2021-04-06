@@ -2,9 +2,11 @@
 
 namespace app\mch\forms\common;
 
+use app\controllers\api\ApiController;
 use app\forms\common\goods\CommonGoodsStatistic;
 use app\forms\common\order\CommonOrderStatistic;
 use app\models\BaseModel;
+use app\models\DistrictData;
 use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
@@ -17,44 +19,67 @@ class CommonMchForm extends BaseModel{
     public $id;
     public $is_review_status;
 
-    public $cat;
+    public $cat_id;
     public $keyword;
 
     public function rules(){
         return [
-            [['cat'], 'integer'],
+            [['cat_id'], 'integer'],
             [['keyword'], 'string']
         ];
     }
 
     public function getList(){
 
+        $cityId = \Yii::$app->request->headers->get("x-city-id");
+        $districtData = intval($cityId) > 0 ? DistrictData::getDistrict((int)$cityId) : null;
+
+        $longitude = ApiController::$cityData['longitude'];
+        $latitude = ApiController::$cityData['latitude'];
+
+
         $query = Mch::find()->where([
-            'mall_id'       => \Yii::$app->mall->id,
-            'is_delete'     => 0,
-            'review_status' => 1,
-        ]);
+            'm.mall_id'       => \Yii::$app->mall->id,
+            'm.is_delete'     => 0,
+            'm.review_status' => Mch::REVIEW_STATUS_CHECKED,
+        ])->alias("m");
+
+        $query->leftJoin("{{%store}} ss", "ss.mch_id=m.id");
+        $query->leftJoin("{{%user}} u", "u.mch_id=m.id");
 
         if ($this->keyword) {
-            $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
-            $userIds = User::find()->where(['like', 'nickname', $this->keyword])->andWhere(['mall_id' => \Yii::$app->mall->id])->select('id');
-            $query->andWhere([
-                'or',
-                ['id' => $mchIds],
-                ['user_id' => $userIds],
-            ]);
+            $keyword = addslashes($this->keyword);
+            $query->andWhere("(ss.name LIKE '%".$keyword."%' OR u.nickname LIKE '%".$keyword."%')");
         }
 
-        if($this->cat){
-            $query->andWhere(["mch_common_cat_id" => $this->cat]);
+        if($districtData){
+            $query->andWhere(["ss.city_id" => intval($cityId)]);
         }
 
-        $query->select(["id", "mall_id", "status", "is_recommend", "mch_common_cat_id"]);
+        if($this->cat_id){
+            $query->andWhere(["m.mch_common_cat_id" => $this->cat_id]);
+        }
 
-        $list = $query->orderBy(['sort' => SORT_ASC])
+        $selects = ["m.id", "m.mall_id", "m.status", "m.is_recommend", "m.mch_common_cat_id"];
+        $selects[] = "ST_Distance_sphere(point(longitude, latitude), point({$longitude}, {$latitude})) as distance_mi";
+
+        $query->select($selects);
+
+        $list = $query->orderBy("distance_mi ASC")
             ->with('store', 'category')
             ->page($pagination)->asArray()->all();
-
+        if($list){
+            foreach($list as &$item){
+                $item['distance_format'] = "0m";
+                if(empty($item['distance_mi']))
+                    continue;
+                if($item['distance_mi'] < 1000){
+                    $item['distance_format'] = intval($item['distance_mi']) . "m";
+                }else if($item['distance_mi'] >= 1000){
+                    $item['distance_format'] = round(($item['distance_mi']/1000), 1) . "km";
+                }
+            }
+        }
         return [
             'list' => $list,
             'pagination' => $pagination

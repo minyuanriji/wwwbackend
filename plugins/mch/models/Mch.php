@@ -2,7 +2,9 @@
 
 namespace app\plugins\mch\models;
 
+use app\models\Admin;
 use app\models\BaseActiveRecord;
+use app\models\EfpsMchReviewInfo;
 use app\models\Store;
 use app\models\User;
 use Yii;
@@ -57,9 +59,9 @@ class Mch extends BaseActiveRecord
         return [
             [['mall_id', 'user_id', 'mch_common_cat_id', 'created_at', 'updated_at', 'deleted_at'], 'required'],
             [['mall_id', 'user_id', 'status', 'is_recommend', 'review_status', 'mch_common_cat_id', 'transfer_rate',
-                'sort', 'is_delete'], 'integer'],
-            [['review_time', 'created_at', 'updated_at', 'deleted_at', 'form_data'], 'safe'],
-            [['account_money'], 'number'],
+                'sort', 'is_delete', 'distribution_detail_set', 'distribution_share_type'], 'integer'],
+            [['review_time', 'created_at', 'updated_at', 'deleted_at', 'form_data', 'withdraw_pwd'], 'safe'],
+            [['account_money', 'integral_fee_rate'], 'number'],
             [['review_remark', 'mobile'], 'string', 'max' => 255],
             [['realname', 'wechat'], 'string', 'max' => 65],
         ];
@@ -104,6 +106,11 @@ class Mch extends BaseActiveRecord
         return $this->hasOne(User::className(), ['mch_id' => 'id']);
     }
 
+    public function getMchAdmin()
+    {
+        return $this->hasOne(Admin::className(), ['mch_id' => 'id']);
+    }
+
     public function getStore()
     {
         return $this->hasOne(Store::className(), ['mch_id' => 'id']);
@@ -113,5 +120,11 @@ class Mch extends BaseActiveRecord
     {
         return $this->hasOne(MchCommonCat::className(), ['id' => 'mch_common_cat_id']);
     }
+
+    public function getRelatEfps()
+    {
+        return $this->hasOne(EfpsMchReviewInfo::className(), ['mch_id' => 'id']);
+    }
+
 }
 

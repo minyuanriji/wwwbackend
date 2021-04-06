@@ -12,6 +12,7 @@ namespace app\services\Order;
 
 use app\helpers\ArrayHelper;
 use app\logic\AppConfigLogic;
+use app\models\IntegralRecord;
 use app\models\User;
 
 class ScoreService
@@ -186,7 +187,10 @@ class ScoreService
         /** @var User $user */
         $user = \Yii::$app->user->identity;
 
-        $this->user_score           = \Yii::$app->currency->setUser($user)->score->select();
+        //先更新用户钱包
+        User::updateUserWallet($user);
+
+        $this->user_score           = $user->total_score;
         $this->user_remaining_score = $this->user_score;
     }
 

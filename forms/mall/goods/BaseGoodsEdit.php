@@ -13,6 +13,7 @@ namespace app\forms\mall\goods;
 
 use app\events\GoodsEvent;
 use app\forms\common\goods\CommonGoods;
+use app\forms\common\mch\MchSettingForm;
 use app\helpers\SerializeHelper;
 use app\models\BaseModel;
 use app\models\Goods;
@@ -36,6 +37,7 @@ abstract class BaseGoodsEdit extends BaseModel
     public $id;
     public $goods_warehouse_id;
     public $status;
+    public $is_on_site_consumption;
     public $price;
     public $use_attr;
     public $attr;
@@ -68,6 +70,7 @@ abstract class BaseGoodsEdit extends BaseModel
     public $fulfil_price = 0;
     public $full_relief_price = 0;
     public $max_deduct_integral = 0;
+    public $integral_fee_rate = 0;
     public $price_display;
     public $enable_integral;
     public $integral_setting;
@@ -78,6 +81,7 @@ abstract class BaseGoodsEdit extends BaseModel
     public $is_order_sales;
     public $order_sales;
     public $cannotrefund;
+    public $goods_brand;
 
     //分销
     public $individual_share;
@@ -99,6 +103,7 @@ abstract class BaseGoodsEdit extends BaseModel
     public $mch_id;
     protected $newAttrs;
     protected $sign;
+    public $expressName;
 
 
     /** @var  Mch */
@@ -128,13 +133,15 @@ abstract class BaseGoodsEdit extends BaseModel
                 'attr_setting_type', 'goods_weight', 'is_area_limit', 'form_id'], 'default', 'value' => 0],
             [['app_share_title', 'app_share_pic', 'attr_default_name'], 'default', 'value' => ''],
             [['sort'], 'default', 'value' => 100],
-            [['area_limit'], 'trim'],
+            [['area_limit','goods_brand'], 'trim'],
             [['confine_count', 'confine_order_count'], 'default', 'value' => -1],
             [['forehead_score_type', 'give_score_type', 'is_level',
                 'is_default_services'], 'default', 'value' => 1],
             [['price', 'forehead_score'], 'number', 'min' => 0],
             [['price'], 'number', 'max' => 9999999],
-            [['fulfil_price','full_relief_price'],'default','value'=>0]
+            [['is_on_site_consumption'], 'number'],
+            [['fulfil_price','full_relief_price'],'default','value'=>0],
+            [['integral_fee_rate'], 'integer', 'min' => 0, 'max' => 100]
         ];
     }
 
@@ -157,9 +164,9 @@ abstract class BaseGoodsEdit extends BaseModel
             'give_score' => '积分赠送',
             'labels' => '标签',
             'price_display'=>'自定义价格显示',
-            'max_deduct_integral'=>'最多购物券抵扣',
-            'enable_integral' => '是否启用购物券赠送',
-            'integral_setting' => '	购物券赠送设置',
+            'max_deduct_integral'=>'最多红包券抵扣',
+            'enable_integral' => '是否启用红包券赠送',
+            'integral_setting' => '	红包券赠送设置',
             'enable_score' => '是否启用积分券赠送',
             'score_setting' => ' 积分券赠送设置',
             'is_order_paid' => ' 订单支付后设置',
@@ -351,6 +358,7 @@ abstract class BaseGoodsEdit extends BaseModel
         $goods->app_share_title = $this->app_share_title;
         $goods->app_share_pic = $this->app_share_pic;
         $goods->status = $this->status;
+        $goods->is_on_site_consumption = $this->is_on_site_consumption;
         $goods->sort = $this->sort;
         $goods->confine_count = $this->confine_count;
         $goods->confine_order_count = $this->confine_order_count;
@@ -369,6 +377,7 @@ abstract class BaseGoodsEdit extends BaseModel
         $goods->use_virtual_sales = $this->use_virtual_sales;
         $goods->is_area_limit = $this->is_area_limit;
         $goods->area_limit = \Yii::$app->serializer->encode($this->area_limit);
+        $goods ->goods_brand = $this -> goods_brand;
         if($this->labels!=[]){
             $goods->labels = SerializeHelper::encode($this->labels);
         }
@@ -387,6 +396,7 @@ abstract class BaseGoodsEdit extends BaseModel
         $goods->fulfil_price = $this->fulfil_price;
         $goods->full_relief_price = $this->full_relief_price;
         $goods->max_deduct_integral = $this->max_deduct_integral;
+        $goods->integral_fee_rate = $this->integral_fee_rate;
         $goods->enable_integral = $this->enable_integral;
         $goods->enable_score = $this->enable_score;
         $goods->is_order_paid = $this->is_order_paid;
@@ -589,8 +599,10 @@ abstract class BaseGoodsEdit extends BaseModel
         // 将会员价格式调整为 key|value 即 会员等级|会员价
         $memberPrices = $this->member_price;
         $newMemberPrice = [];
-        foreach ($memberPrices as $key => $memberPrice) {
-            $newMemberPrice[$key] = $memberPrice;
+        if($memberPrices){
+            foreach ($memberPrices as $key => $memberPrice) {
+                $newMemberPrice[$key] = $memberPrice;
+            }
         }
         $newAttrs[0]['member_price'] = $newMemberPrice;
         $this->newAttrs = $newAttrs;

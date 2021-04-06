@@ -240,17 +240,19 @@ class GoodsEditForm extends BaseGoodsEdit {
             $mchGoods->goods_id = $this->goods->id;
         }
 
-        // 多商户开启商品上架审核,每次编辑都需下架
+        // 多商户开启商品上架审核
         $form = new MchSettingForm();
         $setting = $form->search();
         if ($setting['is_goods_audit'] == 1) {
-            $this->goods->status = 0;
+            $this->goods->status = Goods::STATUS_OFF;
             $res = $this->goods->save();
             if (!$res) {
                 throw new \Exception($this->goods);
             }
             $mchGoods->status = 0;
             $mchGoods->remark = '';
+        }else if($this->goods->status == 1){ //上架
+            $mchGoods->status = 2;
         }
 
         $mchGoods->sort = $this->sort;

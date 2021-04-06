@@ -3,10 +3,14 @@
 namespace app\plugins\mch\forms\mall;
 
 use app\core\ApiCode;
+use app\helpers\ArrayHelper;
+use app\models\Admin;
 use app\models\ClerkUser;
 use app\models\ClerkUserStoreRelation;
 use app\models\DistrictArr;
 use app\models\BaseModel;
+use app\models\EfpsMerchantMcc;
+use app\models\EfpsMchReviewInfo;
 use app\models\Order;
 use app\models\User;
 use app\plugins\mch\forms\common\CommonMchForm;
@@ -58,10 +62,11 @@ class MchForm extends BaseModel
     {
         try {
             $detail = Mch::find()->where([
-                'id' => \Yii::$app->user->identity->mch_id ?: $this->id,
+                //'id' => \Yii::$app->user->identity->mch_id ?: $this->id,
+                'id' => $this->id,
                 'mall_id' => \Yii::$app->mall->id,
                 'is_delete' => 0,
-            ])->with('user.userInfo', 'mchUser', 'store', 'category')->asArray()->one();
+            ])->with('user.userInfo', 'mchAdmin', 'store', 'category')->asArray()->one();
             if (!$detail) {
                 throw new \Exception('商户不存在');
             }
@@ -71,7 +76,9 @@ class MchForm extends BaseModel
             $detail['address'] = $detail['store']['address'];
             $detail['logo'] = $detail['store']['cover_url'];
             $detail['service_mobile'] = $detail['store']['mobile'];
-            $detail['bg_pic_url'] = \Yii::$app->serializer->decode($detail['store']['pic_url']);
+            //$detail['bg_pic_url'] = \Yii::$app->serializer->decode($detail['store']['pic_url']);
+            $bgPicUrls = @json_decode($detail['store']['pic_url'], true);
+            $detail['bg_pic_url'] = is_array($bgPicUrls) ? $bgPicUrls : [];
             $detail['name'] = $detail['store']['name'];
             $detail['description'] = $detail['store']['description'];
             $detail['scope'] = $detail['store']['scope'];
@@ -89,14 +96,48 @@ class MchForm extends BaseModel
             }
             $detail['cat_name'] = $detail['category']['name'];
             $detail['form_data'] = $detail['form_data'] ? \Yii::$app->serializer->decode($detail['form_data']) : [];
-            $detail['username'] = $detail['mchUser']['username'];
-            $detail['password'] = $detail['mchUser']['password'];
+            $detail['username'] = $detail['mchAdmin']['username'];
+            $detail['password'] = $detail['mchAdmin']['password'];
+            $detail['admin_id'] = $detail['mchAdmin']['id'];
+
+            $relatEfps = EfpsMchReviewInfo::findOne(["mch_id" => $this->id]);
+            if(!$relatEfps){
+                $relatEfps = new EfpsMchReviewInfo();
+                $relatEfps->mch_id        = $this->id;
+                $relatEfps->register_type = "separate_account";
+                $relatEfps->created_at    = time();
+                $relatEfps->updated_at    = time();
+                if(!$relatEfps->save()){
+                    throw new \Exception($this->responseErrorMsg($relatEfps));
+                }
+            }
+
+            $reviewData = ArrayHelper::toArray($relatEfps);
+            if(!empty($reviewData)){
+                $reviewData['acceptOrder'] = $reviewData['acceptOrder'] ? "1" : "0";
+                $reviewData['openAccount'] = $reviewData['openAccount'] ? "1" : "0";
+                $reviewData['paper_merchantType'] = (string)$reviewData['paper_merchantType'];
+                $reviewData['paper_isCc'] = $reviewData['paper_isCc'] ? "1" : "0";
+                $reviewData['paper_settleAccountType'] = (string)$reviewData['paper_settleAccountType'];
+                $reviewData['paper_settleTarget'] = (string)$reviewData['paper_settleTarget'];
+            }
+            $reviewData['paper_mcc_obj'] = ["type" => "", "code" => ""];
+            if(!empty($reviewData['paper_mcc'])){
+                $mcc = EfpsMerchantMcc::findOne(['code' => $reviewData['paper_mcc']]);
+                if($mcc){
+                    $reviewData['paper_mcc_obj'] = [
+                        "type" => $mcc->type,
+                        "code" => (string)$mcc->code
+                    ];
+                }
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
                 'data' => [
                     'detail' => $detail,
+                    'review' => $reviewData
                 ]
             ];
         } catch (\Exception $e) {
@@ -121,10 +162,20 @@ class MchForm extends BaseModel
                 throw new \Exception('商户不存在');
             }
 
-            $model->is_delete = 1;
+            $model->is_delete   = 1;
+            $model->user_id     = 0;
             $res = $model->save();
             if (!$res) {
                 throw new \Exception($this->responseErrorMsg($model));
+            }
+
+            //删除后台登陆账号
+            $admin = Admin::find()->where(['mch_id' => $model->id])->one();
+            if($admin){
+                $admin->is_delete = 1;
+                if (!$admin->save()) {
+                    throw new \Exception($this->responseErrorMsg($admin));
+                }
             }
 
             /** @var User $user */
@@ -133,6 +184,7 @@ class MchForm extends BaseModel
                 throw new \Exception('商户账号不存在');
             }
             $user->is_delete = 1;
+            $user->mch_id    = 0;
             $res = $user->save();
             if (!$res) {
                 throw new \Exception($this->responseErrorMsg($user));
@@ -201,7 +253,7 @@ class MchForm extends BaseModel
     public function route()
     {
         $mallId = base64_encode(\Yii::$app->mall->id);
-        $url = \Yii::$app->urlManager->createAbsoluteUrl('admin/admin/mch-login&mall_id=' . $mallId);
+        $url = \Yii::$app->urlManager->createAbsoluteUrl('mch/admin/login');
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '请求成功',
@@ -217,19 +269,19 @@ class MchForm extends BaseModel
             if (!$this->password) {
                 throw new \Exception('请填写新密码');
             }
-            $user = User::find()->where([
+            $admin = Admin::find()->where([
                 'mch_id' => $this->id,
                 'mall_id' => \Yii::$app->mall->id,
                 'is_delete' => 0,
             ])->one();
-            if (!$user) {
+            if (!$admin) {
                 throw new \Exception('商户账号不存在');
             }
 
-            $user->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
-            $res = $user->save();
+            $admin->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
+            $res = $admin->save();
             if (!$res) {
-                throw new \Exception($this->responseErrorMsg($user));
+                throw new \Exception($this->responseErrorMsg($admin));
             }
 
             return [
@@ -252,14 +304,6 @@ class MchForm extends BaseModel
             ['or', ['LIKE', 'u.nickname', $keyword], ['u.id' => $keyword]],
             ['u.mall_id' => \Yii::$app->mall->id],
         ]);
-        $userIds = Mch::find()->where([
-            'mall_id' => \Yii::$app->mall->id,
-            'is_delete' => 0,
-        ])->andWhere(['in', 'review_status', [0, 1]])->select('user_id')->asArray()->all();
-        //var_dump($userIds);exit;
-        if ($userIds) {
-            $query->andWhere(['not in', 'u.id', $userIds]);
-        }
         
         $list = $query->InnerJoinwith('userInfo')->orderBy('nickname')->limit(10)->asArray()->all();
         //

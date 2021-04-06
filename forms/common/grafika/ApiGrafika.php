@@ -78,6 +78,7 @@ class ApiGrafika extends BaseGrafika
     {
         $this->model->save($image, $this->temp_path . $this->poster_file_name, 'jpeg', 85);
         $this->qrcode_url = str_replace('http://', 'https://', \Yii::$app->request->hostInfo . \Yii::$app->request->baseUrl . '/temp/' . $this->poster_file_name);
+
     }
 
     //强制

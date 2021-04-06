@@ -65,7 +65,6 @@ class RegisterForm extends BaseModel
      * @throws \Exception
      */
     public function parentInfo(){
-        // var_dump($this->recommend_id);exit;
          if (!$this->recommend_id) {
              return $this->returnApiResultData();
         }
@@ -90,8 +89,11 @@ class RegisterForm extends BaseModel
      * @return array
      * @throws \Exception
      */
-    public function bindParent()
+    public function bindParent($mobile='')
     {
+        if(!empty($mobile)){
+            $this->parent_mobile = $mobile;
+        }
         if(!$this->parent_mobile){
             return $this->returnApiResultData(ApiCode::CODE_FAIL,'请输入推荐人手机号');
         }
@@ -101,7 +103,7 @@ class RegisterForm extends BaseModel
             
             $relation = RelationSetting::findOne(['mall_id' => \Yii::$app->mall->id, 'use_relation' => 1, 'is_delete' => 0]);
             if (!$relation) {
-                throw new Exception('未启用关系链');
+                throw new \Exception('未启用关系链');
             }
 
             $user = User::getOneData([
@@ -115,13 +117,13 @@ class RegisterForm extends BaseModel
 
             $recommendUsers = User::getOneUser(['=', 'mobile', $this->parent_mobile]);
             if (!$recommendUsers) {
-                throw new Exception('推荐人手机号不存在');
+                throw new \Exception('推荐人手机号不存在');
             }
             if (!$recommendUsers->is_inviter) {
-                throw new Exception('绑定的手机号没有推广资格');
+                throw new \Exception('绑定的手机号没有推广资格');
             }
-            if ($recommendUsers->parent_id == $user->id) {
-                throw new Exception('自己不能绑定自己');
+            if ($recommendUsers->id == $user->id) {
+                throw new \Exception('自己不能绑定自己');
             }
             $second_parent_id = $recommendUsers["parent_id"];
             $third_parent_id = $recommendUsers["second_parent_id"];
@@ -155,19 +157,22 @@ class RegisterForm extends BaseModel
     public function register()
     {
         if (!$this->validate()) {
-            return $this->returnApiResultData();
+            return $this->responseErrorInfo();
         }
         $trans = \Yii::$app->db->beginTransaction();
         try {
 //            if($this->password !== $this->confirm_password){
 //                return $this->returnApiResultData(ApiCode::CODE_FAIL,'两次密码不一致');
 //            }
-            // 粗糙版 上级绑定
-            // $existParentUser = User::getOneUser(['=', 'mobile', $this->parent_mobile]);
-            // if(empty($existParentUser)){
-            //     return $this->returnApiResultData(ApiCode::CODE_FAIL,'没有找到该邀请人手机号');
-            // }
-            // $this->recommend_id = $existParentUser['id'];
+
+            //上级绑定
+            if(empty($this->recommend_id) && !empty($this->parent_mobile)){
+                $existParentUser = User::getOneUser(['=', 'mobile', $this->parent_mobile]);
+                if(empty($existParentUser)){
+                    return $this->returnApiResultData(ApiCode::CODE_FAIL,'没有找到该邀请人手机号');
+                }
+                $this->recommend_id = $existParentUser['id'];
+            }
 
             $existUser = User::getOneUser(['or',['=', 'username', $this->mobile],['=', 'mobile', $this->mobile]]);
             if(!empty($existUser)){
@@ -180,8 +185,9 @@ class RegisterForm extends BaseModel
                     return $this->returnApiResultData(ApiCode::CODE_FAIL,'推荐人不存在');
                 }
                 $second_parent_id = $recommendUsers["parent_id"];
-                $third_parent_id = $recommendUsers["second_parent_id"];
+                $third_parent_id  = $recommendUsers["second_parent_id"];
             }
+
             $smsForm = new SmsForm();
             $smsForm->captcha = $this->captcha;
             $smsForm->mobile = $this->mobile;
@@ -195,7 +201,6 @@ class RegisterForm extends BaseModel
             $user->access_token = \Yii::$app->security->generateRandomString();
             $user->auth_key = \Yii::$app->security->generateRandomString();
             $user->nickname = "";
-            $this->password = 'myrj2021';//"jx888888";
             $user->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
             $user->avatar_url = "";
             $user->last_login_at = time();

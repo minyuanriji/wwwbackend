@@ -25,6 +25,38 @@ class PayNotifyController extends BaseController
         $this->enableCsrfValidation = false;
     }
 
+    /*public function actionTest(){
+
+        try{
+            $app = \Yii::$app->wechat;
+            $paymentOrderUnion = PaymentOrderUnion::findOne([
+                'order_no' => "JX14512fb1b2c71af318916c3bf083cf",
+            ]);
+            $paymentOrders = PaymentOrder::findAll(['payment_order_union_id' => $paymentOrderUnion->id]);
+            foreach ($paymentOrders as $paymentOrder) {
+                $Class = $paymentOrder->notify_class;
+                $notify = new $Class();
+                try {
+                    $po = new \app\core\payment\PaymentOrder([
+                        'orderNo' => $paymentOrder->order_no,
+                        'amount' => (float)$paymentOrder->amount,
+                        'title' => $paymentOrder->title,
+                        'notifyClass' => $paymentOrder->notify_class,
+                        'payType' => \app\core\payment\PaymentOrder::PAY_TYPE_WECHAT
+                    ]);
+                    $notify->notify($po);
+                } catch (\Exception $e) {
+                    throw new \Exception("支付订单更新失败 ".$e->getMessage());
+                }
+            }
+        }catch (\Exception $e){
+            echo $e->getMessage();
+        }
+
+        echo "SUCCESS";
+
+    }*/
+
     /**
      * 微信支付回调
      * @return bool|\Symfony\Component\HttpFoundation\Response
@@ -149,7 +181,7 @@ class PayNotifyController extends BaseController
 
         if ($passed) {
             $paymentOrders = PaymentOrder::findAll(['payment_order_union_id' => $paymentOrderUnion->id]);
-            $paymentOrderUnion->is_pay = 1;
+            $paymentOrderUnion->is_pay   = 1;
             $paymentOrderUnion->pay_type = 4;
             if (!$paymentOrderUnion->save()) {
                 throw new \Exception($paymentOrderUnion->getFirstErrors());
@@ -159,7 +191,7 @@ class PayNotifyController extends BaseController
                 if (!class_exists($Class)) {
                     continue;
                 }
-                $paymentOrder->is_pay = 1;
+                $paymentOrder->is_pay   = 1;
                 $paymentOrder->pay_type = 4;
                 if (!$paymentOrder->save()) {
                     throw new \Exception($paymentOrder->getFirstErrors());
@@ -168,11 +200,11 @@ class PayNotifyController extends BaseController
                 $notify = new $Class();
                 try {
                     $po = new \app\core\payment\PaymentOrder([
-                        'orderNo' => $paymentOrder->order_no,
-                        'amount' => (float)$paymentOrder->amount,
-                        'title' => $paymentOrder->title,
+                        'orderNo'     => $paymentOrder->order_no,
+                        'amount'      => (float)$paymentOrder->amount,
+                        'title'       => $paymentOrder->title,
                         'notifyClass' => $paymentOrder->notify_class,
-                        'payType' => \app\core\payment\PaymentOrder::PAY_TYPE_ALIPAY
+                        'payType'     => \app\core\payment\PaymentOrder::PAY_TYPE_ALIPAY
                     ]);
                     $notify->notify($po);
                 } catch (\Exception $e) {

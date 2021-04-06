@@ -125,6 +125,10 @@ class OrderDetailForm extends BaseModel
                     $refundOrderGoodsTotal++;
                 }
                 $orderGoodsTotal++;
+                $item['is_on_site_consumption'] = 0;
+                if(!empty($item['orderGoodsConsumeVerification'])){
+                    $item['is_on_site_consumption'] = 1;
+                }
                 $detail["order_goods_list"][] = $item;
             }
             $express_no	= $express_code = $express = $mobile = "";
@@ -165,6 +169,15 @@ class OrderDetailForm extends BaseModel
                 $orderDetailData['mch']['business_hours']   = $order['mch']['store']['business_hours'];
                 $orderDetailData['mch']['description']      = $order['mch']['store']['description'];
                 $orderDetailData['mch']['scope']            = $order['mch']['store']['scope'];
+            }
+
+            //如果有一个不是到店消费商品，就需要设置地址
+            $orderDetailData['is_need_address'] = 0;
+            foreach ($orderDetailData['detail']['order_goods_list'] as $goodsItem) {
+                if(!$goodsItem['is_on_site_consumption']){
+                    $orderDetailData['is_need_address'] = 1;
+                    break;
+                }
             }
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$orderDetailData);

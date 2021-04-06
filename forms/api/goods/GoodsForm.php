@@ -108,7 +108,7 @@ class GoodsForm extends BaseModel
 
             $info['max_deduct_integral'] = $goods->max_deduct_integral;
 
-            //可抵购物券大于0才显示购物券会员价
+            //可抵红包券大于0才显示红包券会员价
             $PriceDisplayService=new PriceDisplayService(\Yii::$app->mall->id);
             if ($goods->max_deduct_integral > 0) {
                 $info['price_display'] = $PriceDisplayService->getGoodsPriceDisplay($goods->price_display);
@@ -199,7 +199,7 @@ class GoodsForm extends BaseModel
             }
 
             \Yii::$app->trigger(StatisticsBrowseLog::EVEN_STATISTICS_LOG, new StatisticsEvent(['mall_id'=>\Yii::$app->mall->id,'browse_type'=>2,'user_id'=>\Yii::$app->user->id,'user_ip'=>$_SERVER['REMOTE_ADDR']]) );
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['goods' => $info]);
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['goods' => $info, 'is_mch' => !empty($mchInfo) ? 1 : 0, 'mch' => $mchInfo]);
         } catch (\Exception $e) {
             \Yii::error($e);
 

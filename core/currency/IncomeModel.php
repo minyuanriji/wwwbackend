@@ -147,8 +147,6 @@ class IncomeModel extends BaseModel implements BaseCurrency
             return true;
         }
 
-        $distribution = Distribution::findOne(['user_id' => $this->user->id]);
-
         if($flag == 1 || $flag == 2){
             //查找是否已有冻结记录，有的话更新冻结状态
             $form = IncomeLog::findOne(["mall_id" => $this->user->mall_id,"user_id"=>$this->user->id,
@@ -167,7 +165,7 @@ class IncomeModel extends BaseModel implements BaseCurrency
                 $form->desc = $desc;
                 $form->flag = $flag;
                 $form->from = $from;
-                $form->income = $distribution->total_price;
+                $form->income = $this->user->total_income;
             }
         }else{
             //查找是否已有冻结记录，有的话直接返回
@@ -186,7 +184,7 @@ class IncomeModel extends BaseModel implements BaseCurrency
             $form->desc = $desc;
             $form->flag = $flag;
             $form->from = $from;
-            $form->income = $distribution->total_price;
+            $form->income = $this->user->total_income;
         }
 
         if ($form->save()) {

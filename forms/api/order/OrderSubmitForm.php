@@ -41,6 +41,7 @@ use app\models\MemberLevel;
 use app\models\Option;
 use app\models\Order;
 use app\models\OrderDetail;
+use app\models\OrderGoodsConsumeVerification;
 use app\models\PostageRules;
 use app\models\Store;
 use app\models\User;
@@ -60,6 +61,7 @@ use app\models\IntegralDeduct;
 use yii\helpers\ArrayHelper;
 use app\services\Order\SameGoodsService;
 use app\services\wechat\WechatTemplateService;
+use app\controllers\business\PostageRules as PostageRulesBus;
 
 class OrderSubmitForm extends BaseModel
 {
@@ -89,7 +91,7 @@ class OrderSubmitForm extends BaseModel
     protected $enableScore = true;
 
     /**
-     * 是否开启购物券
+     * 是否开启红包券
      * @var bool
      */
     protected $enableIntegral= true;
@@ -253,40 +255,47 @@ class OrderSubmitForm extends BaseModel
                 \Yii::$app->redis->set('var2',$orderException);
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, CommonLogic::getExceptionMessage($orderException));
             }
-            if (!$this->getUserAddress() && !$data['all_self_mention']) {
-                return $this->returnApiResultData(ApiCode::CODE_FAIL, "请先选择收货地址");
-            }
-            if ($data['all_self_mention']) {
-                if (!$data['user_address']['name']) {
-                    return $this->returnApiResultData(ApiCode::CODE_FAIL, "请填写联系人");
+
+            //需要设置收货地址的情况
+            //全部是到店消费商品，就不需要设置收货地址
+            if($data['is_need_address']){
+                if (!$this->getUserAddress() && !$data['all_self_mention']) {
+                    return $this->returnApiResultData(ApiCode::CODE_FAIL, "请先选择收货地址");
                 }
-                if (!$data['user_address']['mobile']) {
-                    return $this->returnApiResultData(ApiCode::CODE_FAIL, "请填写手机号");
-                }
-                /** @var Mall $mall */
-                $mall   = Mall::findOne(['id' => \Yii::$app->mall->id]);
-                $status = $mall->getMallSettingOne('mobile_verify');
-                if ($status) {
-                    $value   = $data['user_address']['mobile'];
-                    $pattern = (new PhoneNumberValidator())->pattern;
-                    if ($value && !preg_match($pattern, $value)) {
-                        return $this->returnApiResultData(ApiCode::CODE_FAIL, "手机格式不正确");
+                if ($data['all_self_mention']) {
+                    if (!$data['user_address']['name']) {
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, "请填写联系人");
+                    }
+                    if (!$data['user_address']['mobile']) {
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, "请填写手机号");
+                    }
+                    /** @var Mall $mall */
+                    $mall   = Mall::findOne(['id' => \Yii::$app->mall->id]);
+                    $status = $mall->getMallSettingOne('mobile_verify');
+                    if ($status) {
+                        $value   = $data['user_address']['mobile'];
+                        $pattern = (new PhoneNumberValidator())->pattern;
+                        if ($value && !preg_match($pattern, $value)) {
+                            return $this->returnApiResultData(ApiCode::CODE_FAIL, "手机格式不正确");
+                        }
                     }
                 }
-            }
 
-            foreach ($data['list'] as $cityItem) {
-                if (isset($cityItem['city']) && isset($cityItem['city']['error'])) {
-                    return $this->returnApiResultData(ApiCode::CODE_FAIL, $cityItem['city']['error']);
+                foreach ($data['list'] as $cityItem) {
+                    if (isset($cityItem['city']) && isset($cityItem['city']['error'])) {
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, $cityItem['city']['error']);
+                    }
                 }
+
+                if (!$data['user_address_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'当前收货地址不允许购买。');
+                if (!$data['price_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'订单总价未达到起送要求。');
+
             }
 
             $token  = $this->getToken();
 
             $oldOrder = Order::findOne(['token' => $token, 'sign' => $this->sign, 'is_delete' => 0]);
             if ($oldOrder)  return $this->returnApiResultData(ApiCode::CODE_FAIL,'重复下单。');
-            if (!$data['user_address_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'当前收货地址不允许购买。');
-            if (!$data['price_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'订单总价未达到起送要求。');
             $user = \Yii::$app->user->identity;
 
             $districtArr = new DistrictArr();
@@ -309,24 +318,26 @@ class OrderSubmitForm extends BaseModel
                 $order->use_score = $orderItem['score']['use'] ? $orderItem['score']['use_num'] : 0;
                 //积分抵扣
                 $order->score_deduction_price = $orderItem['score']['use'] ? $orderItem['score']['deduction_price'] : 0;
-                //购物券抵扣
+                //红包券抵扣
                 $order->integral_deduction_price = $orderItem['integral']['use'] ? $orderItem['integral']['integral_deduction_price'] : 0;
 
-                $order->name = $data['user_address']['name'];
-                $order->mobile = $data['user_address']['mobile'];
-                if ($orderItem['delivery']['send_type'] !== 'offline') {
+                $order->name = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
+                $order->mobile = !empty($data['user_address']['mobile']) ? $data['user_address']['mobile'] : "";
+                if ($data['is_need_address'] && $orderItem['delivery']['send_type'] !== 'offline') {
                     $order->address = $data['user_address']['province']
                         . ' '
                         . $data['user_address']['city']
                         . ' '
                         . $data['user_address']['district']
                         . ' '
+                        . $data['user_address']['town']
+                        . ' '
                         . $data['user_address']['detail'];
 
                     $order->address_id=$data['user_address']['id'];
                 }
 
-                $order->province_id = $districtArr->getId($data['user_address']['province']);
+                $order->province_id = $data['is_need_address'] ? $districtArr->getId($data['user_address']['province']) : 0;
                 $order->remark = empty($orderItem['remark']) ? "" : $orderItem['remark'];
                 $order->order_form = $order->encodeOrderForm($orderItem['order_form_data']);
                 $order->distance = isset($orderItem['form_data']['distance']) ? $orderItem['form_data']['distance'] : 0;//同城距离
@@ -338,19 +349,24 @@ class OrderSubmitForm extends BaseModel
                 $order->is_confirm = Order::IS_COMMENT_NO;
                 $order->is_sale = 0;
                 $order->support_pay_types = $order->encodeSupportPayTypes($this->supportPayTypes);
-                if ($orderItem['delivery']['send_type'] === 'offline') {
-                    if (empty($orderItem['store'])) return $this->returnApiResultData(ApiCode::CODE_FAIL,'请选择自提门店。');
-                    $order->store_id = $orderItem['store']['id'];
-                    $order->send_type = Order::SEND_TYPE_SELF;
-                } elseif ($orderItem['delivery']['send_type'] === 'city') {
-                    $order->distance = $orderItem['distance'];
-                    $order->location = $data['user_address']['longitude'] . ',' . $data['user_address']['latitude'];
-                    $order->send_type = Order::SEND_TYPE_CITY;
-                    $order->store_id = 0;
-                } else {
-                    $order->send_type = Order::SEND_TYPE_EXPRESS;
-                    $order->store_id = 0;
+
+                if($data['is_need_address']){
+                    if ($orderItem['delivery']['send_type'] === 'offline') {
+                        if (empty($orderItem['store']))
+                            return $this->returnApiResultData(ApiCode::CODE_FAIL,'请选择自提门店。');
+                        $order->store_id = $orderItem['store']['id'];
+                        $order->send_type = Order::SEND_TYPE_SELF;
+                    } elseif ($orderItem['delivery']['send_type'] === 'city') {
+                        $order->distance = $orderItem['distance'];
+                        $order->location = $data['user_address']['longitude'] . ',' . $data['user_address']['latitude'];
+                        $order->send_type = Order::SEND_TYPE_CITY;
+                        $order->store_id = 0;
+                    } else {
+                        $order->send_type = Order::SEND_TYPE_EXPRESS;
+                        $order->store_id = 0;
+                    }
                 }
+
                 $order->sign = $this->sign !== null ? $this->sign : '';
                 $order->token = $token;
                 $order->status = $this->status;
@@ -388,26 +404,19 @@ class OrderSubmitForm extends BaseModel
 
                 // 扣除积分
                 if ($order->score_deduction_price) {
-                    $userScoreInfo = User::getUserWallet(\Yii::$app->user->id);
-                    $userScoreCard = empty($userScoreInfo) ? 0 : number_format($userScoreInfo['static_score']+$userScoreInfo['dynamic_score']);
-                    $userScore = empty($userScoreInfo) ? 0 : $userScoreInfo['score'];
-                    if($userScore >= $userScoreCard){
-                        if (!\Yii::$app->currency->setUser($user)->score->sub($order->use_score, '下单积分抵扣')) {
-                            return $this->returnApiResultData(ApiCode::CODE_FAIL,'积分操作失败。');
-                        }else{
-                            $resx = IntegralDeduct::buyGooodsDeduct($order,0);
-                            if($resx === false){
-                                return $this->returnApiResultData(ApiCode::CODE_FAIL,'积分券扣除失败。xxx');
-                            }
-                        }
+                    $res = IntegralDeduct::buyGooodsScoreDeduct($order);
+                    if($res === false){
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'积分券扣除失败。');
                     }
                 }
                 
 
-                // 扣除购物券
+                // 扣除红包券
                 if ($order->integral_deduction_price) {
                     $res = IntegralDeduct::buyGooodsDeduct($order,1);
-                    if($res === false) return $this->returnApiResultData(ApiCode::CODE_FAIL,'购物券扣除失败。');
+                    if($res === false){
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'红包券扣除失败。');
+                    }
                 }
                 //开放额外的订单处理接口
                 $this->extraOrder($order, $orderItem);
@@ -476,6 +485,7 @@ class OrderSubmitForm extends BaseModel
 
             $formDataItem            = $item['form_data'];
             $item['express_price']   = price_format(0);
+
             $item['remark']          = isset($formDataItem['remark'])
                 ? $formDataItem['remark'] : null;
             $item['order_form_data'] = isset($formDataItem['order_form'])
@@ -513,6 +523,7 @@ class OrderSubmitForm extends BaseModel
             $item = $CouponService->getUsableUserCouponId();
             //优惠卷计算
             $item = $this->setCouponDiscountData($item, $formDataItem, $type);
+
             //优惠卷结束
 
             //是否使用积分减免
@@ -522,7 +533,7 @@ class OrderSubmitForm extends BaseModel
                 $use_score = false;
             }
 
-            //是否使用购物券
+            //是否使用红包券
             if (isset($this->form_data['use_integral']) && $this->form_data['use_integral'] == 1) {
                 $use_integral = true;
             } else {
@@ -533,8 +544,8 @@ class OrderSubmitForm extends BaseModel
             $ScoreService = new ScoreService($item, $type, $use_score, $this->enableScore);
             $item         = $ScoreService->countScore();
 
-            //计算购物券总额
-            $user_integral   = User::getCanUseIntegral(\Yii::$app->user->id);
+            //计算红包券总额
+            $user_integral   = isset($IntegralService) ? $IntegralService->getRemainingIntegral() : User::getCanUseIntegral(\Yii::$app->user->id);
             $IntegralService = new IntegralService($item, $user_integral, $type, $use_integral, $this->enableIntegral);
             $item            = $IntegralService->countIntegral();
 
@@ -548,11 +559,11 @@ class OrderSubmitForm extends BaseModel
             $item = $this->setDeliveryData($item, $formDataItem);
 
             $item                = $this->setExpressData($item);
-
             $totalPrice          = price_format($item['total_goods_price'] + $item['express_price']);
             $item['total_price'] = $this->setTotalPrice($totalPrice);
 
             $item = $this->setGoodsForm($item);
+
         }
 
         $total_price        = 0;
@@ -663,7 +674,7 @@ class OrderSubmitForm extends BaseModel
         } else {
             $score_enable = false;
         }
-        //购物券开关
+        //红包券开关
         if ($this->enableIntegral) {
             $integral_enable = isset($optionCache->integral_status)?$optionCache->integral_status:false;
         } else {
@@ -674,7 +685,21 @@ class OrderSubmitForm extends BaseModel
         if (!OrderCommon::checkIsBindMobile()) {
             $is_auth_phone = 0;
         }
+
+        //判断如果所有商品都是到店消费商品，配送地址可以不需要设置
+        $is_need_address = false;
+        foreach ($listData as &$item) {
+            foreach($item['goods_list'] as $goodsItem){
+                //只要有一个商品不是到店消费类型，就需要设置地址
+                if(!$goodsItem['is_on_site_consumption']){
+                    $is_need_address = true;
+                    break;
+                }
+            }
+        }
+
         return [
+            'is_need_address'     => $is_need_address ? 1 : 0,
             'list'                => $listData,
             'total_price'         => price_format($total_price),
             'user_coupon'         => $userCouponList,
@@ -687,7 +712,7 @@ class OrderSubmitForm extends BaseModel
             'all_self_mention'    => $allSelfMention,
             'hasCity'             => $hasCity,
             'score_enable'        => $score_enable,
-            'integral_enable'     => $integral_enable, //购物券
+            'integral_enable'     => $integral_enable, //红包券
             'form_data'           => [
                 'sign'             => isset($this->form_data['sign'])?$this->form_data['sign']:null,
                 'related_id'       => isset($this->form_data['related_id'])?$this->form_data['related_id']:null,
@@ -715,9 +740,10 @@ class OrderSubmitForm extends BaseModel
     protected function getListData($formDataList)
     {
         foreach ($formDataList as $i => $formDataItem) {
-            $mchItem    = [
+            $goodsList = $this->getGoodsListData($formDataItem['goods_list']);
+            $mchItem = [
                 'mch'        => $this->getMchInfo(isset($formDataItem['mch_id']) ? $formDataItem['mch_id'] : 0),
-                'goods_list' => $this->getGoodsListData($formDataItem['goods_list']),
+                'goods_list' => $goodsList,
                 'form_data'  => $formDataItem,
             ];
             $listData[] = $mchItem;
@@ -736,6 +762,7 @@ class OrderSubmitForm extends BaseModel
             return [
                 'id'   => 0,
                 'name' => \Yii::$app->mall->name,
+                'integral_fee_rate' => 0
             ];
         } else {
             $mch = Mch::findOne($id);
@@ -743,6 +770,7 @@ class OrderSubmitForm extends BaseModel
             return [
                 'id'   => $id,
                 'name' => $mch ? $mch->store->name : '未知商户',
+                'integral_fee_rate' => $mch ? $mch->integral_fee_rate : 0
             ];
         }
     }
@@ -798,37 +826,44 @@ class OrderSubmitForm extends BaseModel
             throw new OrderException($exception->getFile() . ";line:" . $exception->getLine() . ";message:" . $exception->getMessage() . '无法查询商品`' . $goods->name . '`的规格信息。');
         }
         $attrList = $goods->signToAttr($goodsAttr->sign_id);
+
+        //如果是多商户商品，可全额抵扣
+        if($goods->mch_id){
+            $goods->max_deduct_integral = $goodsAttr->price;
+        }
+
         $itemData = [
-            'id'                   => $goods->id,
-            'name'                 => $goods->goodsWarehouse->name,
-            'num'                  => $goodsItem['num'],
-            'forehead_score'       => $goods->forehead_score,
-            'forehead_score_type'  => $goods->forehead_score_type,
-            'accumulative'         => $goods->accumulative,
-            'pieces'               => $goods->pieces,
-            'forehead'             => $goods->forehead,
-            'freight_id'           => $goods->freight_id,
-            'unit_price'           => price_format($goodsAttr->original_price),
-            'total_original_price' => price_format($goodsAttr->original_price * $goodsItem['num']),
-            'total_price'          => price_format($goodsAttr->price * $goodsItem['num']),
-            'member_discount'      => price_format(0),
-            'cover_pic'            => $goods->goodsWarehouse->cover_pic,
-            'is_level_alone'       => $goods->is_level_alone,
-            'is_level'             => $goods->is_level,
-            'goods_warehouse_id'   => $goods->goods_warehouse_id,
-            'sign'                 => $goods->sign,
-            'confine_order_count'  => $goods->confine_order_count,
-            'form_id'              => $goods->form_id,
-            'goods_attr'           => $goodsAttr,
-            'attr_list'            => $attrList,
-            'discounts'            => $goodsAttr->discount,
-            'user_coupon_id'       => isset($goodsItem["user_coupon_id"]) ? $goodsItem["user_coupon_id"] : 0,
-            'fulfil_price'         => $goods->fulfil_price,
-            'full_relief_price'    => $goods->full_relief_price,
-            'max_deduct_integral'  => $goods->max_deduct_integral
+            'id'                     => $goods->id,
+            'name'                   => $goods->goodsWarehouse->name,
+            'num'                    => $goodsItem['num'],
+            'forehead_score'         => $goods->forehead_score,
+            'forehead_score_type'    => $goods->forehead_score_type,
+            'accumulative'           => $goods->accumulative,
+            'pieces'                 => $goods->pieces,
+            'forehead'               => $goods->forehead,
+            'freight_id'             => $goods->freight_id,
+            'unit_price'             => price_format($goodsAttr->original_price),
+            'total_original_price'   => price_format($goodsAttr->original_price * $goodsItem['num']),
+            'total_price'            => price_format($goodsAttr->price * $goodsItem['num']),
+            'member_discount'        => price_format(0),
+            'cover_pic'              => $goods->goodsWarehouse->cover_pic,
+            'is_level_alone'         => $goods->is_level_alone,
+            'is_level'               => $goods->is_level,
+            'goods_warehouse_id'     => $goods->goods_warehouse_id,
+            'sign'                   => $goods->sign,
+            'confine_order_count'    => $goods->confine_order_count,
+            'form_id'                => $goods->form_id,
+            'goods_attr'             => $goodsAttr,
+            'attr_list'              => $attrList,
+            'discounts'              => $goodsAttr->discount,
+            'user_coupon_id'         => isset($goodsItem["user_coupon_id"]) ? $goodsItem["user_coupon_id"] : 0,
+            'fulfil_price'           => $goods->fulfil_price,
+            'full_relief_price'      => $goods->full_relief_price,
+            'max_deduct_integral'    => $goods->max_deduct_integral,
             // 规格自定义货币 例如：步数宝的步数币
             //'custom_currency' => $this->getCustomCurrency($goods, $goodsAttr),
-
+            'is_on_site_consumption' => $goods->is_on_site_consumption, //到店消费类型
+            'integral_fee_rate'      => $goods->integral_fee_rate
         ];
         return $itemData;
     }
@@ -1487,6 +1522,7 @@ class OrderSubmitForm extends BaseModel
             foreach ($expressItem['goods_list'] as $goodsItem) { // 按商品ID小计件数和金额，看是否达到包邮条件
                 $num += $goodsItem['num'];
             }
+
             try {
                 $commonDelivery = DeliveryCommon::getInstance();
                 $cityConfig     = $commonDelivery->getConfig();
@@ -1509,6 +1545,7 @@ class OrderSubmitForm extends BaseModel
             $expressItem['total_price']   = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
             return $expressItem;
         }
+
 
         $groupGoodsTotalList = []; // 按商品id小计的商品金额和数量
         foreach ($expressItem['goods_list'] as $goodsItem) { // 按商品ID小计件数和金额，看是否达到包邮条件
@@ -1579,15 +1616,23 @@ class OrderSubmitForm extends BaseModel
 
         $postageRuleGroups = []; // 商品按匹配到的运费规则进行分组
         $noPostageRuleHit  = true; // 没有比配到运费规则
+        $str_id = '';
+        $str_num = '';
         foreach ($noZeroGoodsList as $goodsItem) {
-            if ($goodsItem['freight_id'] && $goodsItem['freight_id'] != -1) {
+            $str_id .=  $goodsItem['id'] . ',';
+            $str_num .= $goodsItem['num'] . ',';
+            //判断是否使用到快递模板
+            if ($goodsItem['freight_id'] != -1) {
+                //获取快递规则
                 $postageRule = PostageRules::findOne([
                     'mall_id'   => \Yii::$app->mall->id,
                     'id'        => $goodsItem['freight_id'],
                     'is_delete' => 0,
                     'mch_id'    => $expressItem['mch']['id'],
                 ]);
+
                 if (!$postageRule) {
+                    //获取默认规则
                     $postageRule = PostageRules::findOne([
                         'mall_id'   => \Yii::$app->mall->id,
                         'status'    => 1,
@@ -1629,7 +1674,6 @@ class OrderSubmitForm extends BaseModel
             if (!$rule) {
                 continue;
             }
-
             $noPostageRuleHit = false;
             if (!isset($postageRuleGroups['rule:' . $postageRule->id])) {
                 $postageRuleGroups['rule:' . $postageRule->id] = [
@@ -1650,6 +1694,7 @@ class OrderSubmitForm extends BaseModel
             $postageRule = $group['postage_rule'];
             $rule        = $group['rule'];
             $goodsList   = $group['goods_list'];
+
             $firstPrice  = $rule['firstPrice'];
             $secondPrice = 0;
             if ($postageRule->type == 1) { // 按重量计费
@@ -1671,6 +1716,7 @@ class OrderSubmitForm extends BaseModel
                 foreach ($goodsList as $goods) {
                     $totalNum += $goods['num'];
                 }
+
                 if ($rule['second'] > 0) {
                     $secondPrice = ceil(($totalNum - $rule['first']) / $rule['second']) // 向上取整
                         * $rule['secondPrice'];
@@ -1684,8 +1730,23 @@ class OrderSubmitForm extends BaseModel
             $firstPriceList[] = $firstPrice;
             $totalSecondPrice += $secondPrice;
         }
-
+        $str_id_arr = array_filter(explode(',',$str_id));
+        $str_num_arr = array_filter(explode(',',$str_num));
+        $order_data = [];
+        foreach ($str_id_arr as $key => $val){
+            $order_data[] = [
+                'id' => $val,
+                'num' => $str_num_arr[$key]
+            ];
+        }
+        $goods_data = [
+            'order_id' => $order_data,
+            'data' => $address -> province
+        ];
+        $express_price = (new PostageRulesBus()) -> getExpressPrice($goods_data,1);
+        $express_price = array_sum($express_price);
         $expressItem['express_price'] = price_format(max($firstPriceList) + $totalSecondPrice);
+        $expressItem['express_price'] = $express_price;
         $expressItem['total_price']   = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
         return $expressItem;
     }
@@ -2307,15 +2368,15 @@ class OrderSubmitForm extends BaseModel
         $orderDetail->use_score       = $goodsItem['use_score'];
         $orderDetail->score_price       = $goodsItem['score_price'];
         
-        //购物券抵扣
+        //红包券抵扣
         $orderDetail->integral_price       = $goodsItem['integral_price'];
+        $orderDetail->integral_fee_rate    = $goodsItem['integral_fee_rate'];
 
         //满减金额
         $orderDetail->full_relief_price = $goodsItem['actual_full_relief_price'];
 
         $orderDetailId                      = $orderDetail->save();
         if (!$orderDetailId) {
-
             throw new \Exception((new BaseModel())->responseErrorMsg($orderDetail));
         }
 
@@ -2342,6 +2403,23 @@ class OrderSubmitForm extends BaseModel
                 throw new \Exception('优惠券状态更新失败。');
             }
         }
+
+        //到店消费商品，生成核销码
+        if($goodsItem['is_on_site_consumption']){
+            $orderGoodsVerification = new OrderGoodsConsumeVerification();
+            $orderGoodsVerification->mall_id           = $order->mall_id;
+            $orderGoodsVerification->mch_id            = $order->mch_id;
+            $orderGoodsVerification->order_id          = $order->id;
+            $orderGoodsVerification->order_detail_id   = $orderDetail->id;
+            $orderGoodsVerification->goods_id          = $goodsItem['id'];
+            $orderGoodsVerification->user_id           = $order->user_id;
+            $orderGoodsVerification->verification_code = "OGC" . date("ymdhis") . rand(1000, 9999);
+            $orderGoodsVerification->is_used           = OrderGoodsConsumeVerification::STATUS_UNUSED;
+            if (!$orderGoodsVerification->save()) {
+                throw new \Exception((new BaseModel())->responseErrorMsg($orderGoodsVerification));
+            }
+        }
+
     }
 
     /**

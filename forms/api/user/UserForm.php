@@ -19,10 +19,12 @@ use app\models\Favorite;
 use app\models\Goods;
 use app\models\GoodsCollect;
 use app\models\MemberLevel;
+use app\models\Order;
 use app\models\ScoreLog;
 use app\models\User;
 use app\models\UserCard;
 use app\models\UserCoupon;
+use app\plugins\mch\models\Mch;
 
 class UserForm extends BaseModel
 {
@@ -39,6 +41,48 @@ class UserForm extends BaseModel
     }
 
     /**
+     * 获取关联商户信息
+     * @return array
+     */
+    private function getMchInfo(){
+        $returnData = [
+            'is_mch'    => 0,
+            'store'     => null,
+            'category'  => null,
+            'stat'      => null
+        ];
+        $mchInfo = Mch::find()->where([
+            'user_id'   => \Yii::$app->user->id,
+            'is_delete' => 0
+        ])->with(["store", "category"])->asArray()->one();
+        if($mchInfo){
+            $returnData['is_mch']   = 1;
+            $returnData['store']    = $mchInfo['store'];
+            $returnData['category'] = $mchInfo['category'];
+            $returnData['stat']     = [
+                'account_money' => (float)$mchInfo['account_money'],
+                'order_num'     => 0,
+                'goods_num'     => 0
+            ];
+
+            //商户订单数量
+            $returnData['stat']['order_num'] = (int)Order::find()->where([
+                'is_delete'  => 0,
+                'is_recycle' => 0,
+                'mch_id'     => $mchInfo['id']
+            ])->count();
+
+            //商户商品数量
+            $returnData['stat']['goods_num'] = (int)Goods::find()->where([
+                'is_delete' => 0,
+                'mch_id'    => $mchInfo['id']
+            ])->count();
+        }
+
+        return $returnData;
+    }
+
+    /**
      * 用户信息
      * @Author: zal
      * @Date: 2020-04-28
@@ -50,8 +94,14 @@ class UserForm extends BaseModel
         if (\Yii::$app->user->isGuest) {
             return null;
         }
+
+
         /** @var User $user */
         $user = \Yii::$app->user->identity;
+
+        //先更新用户钱包
+        User::updateUserWallet($user);
+
 
         $parentName = '系统';
         if ($user->parent_id != 0) {
@@ -86,6 +136,16 @@ class UserForm extends BaseModel
             ->leftJoin(['g' => Goods::tableName()], 'g.id = f.goods_id')
             ->andWhere(['g.status' => 1, 'g.is_delete' => 0])->count();
 
+        //商户信息
+        $mchInfo = $this->getMchInfo();
+
+        //判断是否新人
+        $newUserIsGetScore = ScoreLog::find()->where([
+            "user_id"     => $user->id,
+            "source_type" => "new_user"
+        ])->exists() ? 1 : 0;
+
+
         $result = [
             'user_id' => $user->id,
             'username' => $user->username,
@@ -93,19 +153,17 @@ class UserForm extends BaseModel
             'mobile' => $user->mobile,
             'avatar' => $user->avatar_url,
             'score' => intval($user->score),
+            'total_score' => $user->total_score,
+            'static_score' => intval($user->static_score),
+            'dynamic_score' => intval($user->dynamic_score),
             'birthday' => $user->birthday > 0 ? date("Y-m-d",$user->birthday) : 0,
             'balance' => $user->balance,
-            'total_score' => $user->total_score,
             'total_balance' => $user->total_balance,
             'income' => $user->income,
             'income_frozen' => $user->income_frozen,
             'total_income' => $user->total_income,
-            'total_income' => $user->total_income,
-            'total_income' => $user->total_income,
             'static_integral' => $user->static_integral ?? 0,
             'dynamic_integral' => $user->dynamic_integral ?? 0,
-            'static_score' => intval($user->static_score),
-            'dynamic_score' => intval($user->dynamic_score),
             'favorite' => $favoriteCount ?? '0',
             //'footprint' => FootprintGoodsLog::find()->where(['user_id' => $user->id, 'is_delete' => 0])->count() ?? '0',
             'identity' => [
@@ -118,7 +176,11 @@ class UserForm extends BaseModel
             'coupon' => $couponCount,
           /*  'card' => $cardCount,*/
             'is_vip_card_user' => 0,
+            'is_mch' => $mchInfo['is_mch'],
+            'mch_info' => $mchInfo,
+            'new_user_is_get_score' => $newUserIsGetScore
         ];
+
         $pluginUserInfo = \Yii::$app->plugin->getUserInfo($user);
         if(isset($pluginUserInfo["score"])){
             unset($pluginUserInfo["score"]);
@@ -167,6 +229,20 @@ class UserForm extends BaseModel
                 $userCenter['order_bar'][$i]['text'] = $orderInfoCount[$i] ?: '';
                 $userCenter['order_bar'][$i]['num'] = $orderInfoCount[$i] ?: '';
             }
+        }
+
+        //TODO
+        $isMch = Mch::find()->where([
+            'user_id'   => \Yii::$app->user->id,
+            'is_delete' => 0
+        ])->exists();
+        if($isMch){
+            $userCenter['menus'][] = [
+                "icon_url"  => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                "name"      => "商户",
+                "link_url"  => "/pages/personalCentre/personalCentre",
+                "open_type" => "navigate"
+            ];
         }
 
         $res = [

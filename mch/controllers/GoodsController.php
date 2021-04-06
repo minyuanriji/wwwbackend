@@ -131,7 +131,6 @@ class GoodsController extends MchController {
         $form = new GoodsForm();
         $form->attributes = \Yii::$app->request->post();
         $res = $form->batchUpdateStatus();
-
         return $this->asJson($res);
     }
 
@@ -143,7 +142,6 @@ class GoodsController extends MchController {
         $form = new GoodsForm();
         $form->attributes = \Yii::$app->request->post();
         $res = $form->batchUpdateFreight();
-
         return $this->asJson($res);
     }
 

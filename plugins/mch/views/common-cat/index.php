@@ -196,6 +196,16 @@
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="ruleForm.name" placeholder="请输入名称"></el-input>
                 </el-form-item>
+                <el-form-item label="分类图标" prop="pic_url">
+                    <com-attachment :multiple="false" :max="1" v-model="ruleForm.pic_url">
+                        <el-tooltip effect="dark" content="建议尺寸200*200" placement="top">
+                            <el-button style="margin-bottom: 10px;" size="mini">选择文件</el-button>
+                        </el-tooltip>
+                    </com-attachment>
+                    <com-gallery :url="ruleForm.pic_url" :show-delete="true" @deleted="ruleForm.pic_url = ''"
+                                 width="80px" height="80px">
+                    </com-gallery>
+                </el-form-item>
                 <el-form-item label="排序" prop="sort">
                     <el-input type="number" v-model="ruleForm.sort" placeholder="请输入排序"></el-input>
                 </el-form-item>

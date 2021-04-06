@@ -95,23 +95,23 @@ class Integral extends BaseActiveRecord
      * @return void
      */
     public static function addIntegralPlan($user_id,$integral_setting,$desc='',$ctype=0,$parentid=0){
-        $wallet = User::getOneUser($user_id,Yii::$app->mall->id);
         try{
             $model = new self();
             $model->loadDefaultValues();
-            $model->controller_type = $ctype;
-            $model->user_id = $user_id;
-            $model->mall_id = Yii::$app->mall->id;
-            $model->parent_id = $parentid;
-            $model->integral_num = $integral_setting['integral_num'];
-            $model->period = $integral_setting['period'];
-            $model->period_unit = $integral_setting['period_unit'];
-            $model->effective_days = $integral_setting['expire'] == -1 ? 0 : $integral_setting['expire'];
+            $model->controller_type   = $ctype;
+            $model->user_id           = $user_id;
+            $model->mall_id           = Yii::$app->mall->id;
+            $model->parent_id         = $parentid;
+            $model->integral_num      = $integral_setting['integral_num'];
+            $model->period            = $integral_setting['period'];
+            $model->period_unit       = $integral_setting['period_unit'];
+            $model->effective_days    = $integral_setting['expire'] == -1 ? 0 : $integral_setting['expire'];
             $model->next_publish_time = time();
-            $model->desc = $desc;
-            $model->type = $integral_setting['expire'] == -1 ? self::TYPE_ALWAYS : self::TYPE_DYNAMIC;
-            $res = $model->save();
-            if($res === false) throw new Exception($model->getErrorMessage());
+            $model->desc              = $desc;
+            $model->type              = $integral_setting['expire'] == -1 ? self::TYPE_ALWAYS : self::TYPE_DYNAMIC;
+            if(!$model->save()){
+                throw new Exception($model->getErrorMessage());
+            }
             return true;
         }catch(Exception $e){
             self::$error = $e->getMessage();
@@ -121,115 +121,118 @@ class Integral extends BaseActiveRecord
     }
 
     /**
-     * 派发购物券
+     * 派发红包券
      * @Author bing
      * @DateTime 2020-10-07 18:44:27
      * @copyright: Copyright (c) 2020 广东七件事集团
      * @return void
      */
     public static function sendIntegral(){
-        //获取计划执行时间小于当前时间，状态未结束的计划
-        $now = time();
 
-        $query = self::find()
-            ->where(array('<=','finish_period',$now))
-            ->andWhere(array('in','status',[self::STATUS_WAIT,self::STATUS_DOING]))
-            ->limit(100);
-        $plan_list = $query->orderBy("finish_period ASC") ->all();
-
-        if(!empty($plan_list)){
-            foreach($plan_list as $plan){
-
-                if($plan['controller_type'] == 0 && $plan['period_unit'] == 'month'){
-                    if($now <= $plan['next_publish_time']){
-                        continue;
+        $transaction = Yii::$app->db->beginTransaction();
+        try{
+            //获取计划执行时间小于当前时间，状态未结束的计划
+            $now = time();
+            $query = self::find()
+                ->where(array('<=','finish_period',$now))
+                ->andWhere(array('in','status',[self::STATUS_WAIT,self::STATUS_DOING]))
+                ->limit(250);
+            $plan_list = $query->orderBy([
+                'finish_period' => 'ASC',
+                'next_publish_time' => 'ASC'
+            ]) -> all();
+            if(!empty($plan_list)){
+                foreach($plan_list as $plan){
+                    if($plan['controller_type'] == 0 && $plan['period_unit'] == 'month'){
+                        if($now < $plan['next_publish_time']){
+                            continue;
+                        }
                     }
-                }
-                Yii::$app->mall = Mall::findOne(array('id'=>$plan['mall_id']));
-                $wallet = User::getUserWallet($plan['user_id'],$plan['mall_id']);
-                $finish_period = $plan['finish_period'] + 1;
-                $desc = $plan['desc'] .' 发放进度('.$finish_period.'/'.$plan['period'].')';
-                if($plan['controller_type'] == 1){
-                    $before_money = $plan['type'] == self::TYPE_ALWAYS ? $wallet['static_integral'] : $wallet['dynamic_integral'];
-                }else{
-                    $before_money = $plan['type'] == self::TYPE_ALWAYS ? $wallet['static_score'] : $wallet['dynamic_score'];
-                }
-                // 按充值日期过期
-//                $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
-
-                // 按每个月的1号 凌晨12点失效
-                if($plan['effective_days'] >= 30){
-                    if(date('d') > 30){
-                        $date_days = date('d') - 1;
+                    Yii::$app->mall = Mall::findOne(array('id'=>$plan['mall_id']));
+                    $wallet = User::getUserWallet($plan['user_id'], $plan['mall_id']);
+                    $finish_period = $plan['finish_period'] + 1;
+                    $desc = $plan['desc'] .' 发放进度('.$finish_period.'/'.$plan['period'].')';
+                    if($plan['controller_type'] == 1){
+                        $before_money = $plan['type'] == self::TYPE_ALWAYS ? $wallet['static_integral'] : $wallet['dynamic_integral'];
                     }else{
-                        $date_days = date('d');
+                        $before_money = $plan['type'] == self::TYPE_ALWAYS ? $wallet['static_score'] : $wallet['dynamic_score'];
                     }
-                    $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ '. ($plan['effective_days'] - $date_days) .'days',strtotime(date('Y-m-01')));
-//                    $expire_time = $expire_time - 10;
-                }else{
-                    $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
-                }
+                    // 按充值日期过期
+    //                $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
 
-                // 测试
-                // $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ 30 minutes',$now);
-
-                //修改当前计划执行情况
-                $plan->finish_period = $finish_period;
-                if($finish_period == $plan['period']){
-                    $plan->status = self::STATUS_FINISH;
-                }else{
-                    $plan->status =  self::STATUS_DOING;
-                    //计算下期的发放时间
-                    switch($plan['period_unit']){
-                        case 'week':
-                            $plan->next_publish_time = strtotime('+ 1 week',$now);
-                            break;
-                        case 'month':
-                            //获取每次充卡开始时间 到 满一个月发放时间
-//                           $plan->next_publish_time = strtotime('+ 1 month',$now);
-
-                            //每个月1号开始发送积分
-                            $plan->next_publish_time = strtotime(date('Y-m-01',strtotime('+ 1 month')));
-                            //测试
-//                             $plan->next_publish_time = strtotime('+ 2 minutes',$now);
-                            break;
+                    // 按每个月的1号 凌晨12点失效
+                    if($plan['effective_days'] >= 30){
+                        $date = date('Y-m-d',time());
+                        $day = date("t",strtotime($date));
+                        $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'. $day .'days',strtotime(date('Y-m-01'))) - 1;
+    //                    \Yii::$app->redis -> set('key1',date('m'));
+    //                    $expire_time = $expire_time - 10;
+                    }else{
+                        $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01'))) - 1;
                     }
-                }
 
-                $transaction = Yii::$app->db->beginTransaction();
-                try{
-                    $res = $plan->save();
-                    if($res === false) throw new Exception($plan->getErrorMessage());
+                    // 测试
+                    // $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+ 30 minutes',$now);
+
+                    //修改当前计划执行情况
+                    $plan->finish_period = $finish_period;
+                    if($finish_period == $plan['period']){
+                        $plan->status = self::STATUS_FINISH;
+                    }else{
+                        $plan->status =  self::STATUS_DOING;
+                        //计算下期的发放时间
+                        switch($plan['period_unit']){
+                            case 'week':
+                                $plan->next_publish_time = strtotime('+ 1 week',$now);
+                                break;
+                            case 'month':
+                                //获取每次充卡开始时间 到 满一个月发放时间
+    //                           $plan->next_publish_time = strtotime('+ 1 month',$now);
+
+                                //每个月1号开始发送积分
+                                $plan->next_publish_time = strtotime(date('Y-m-01',strtotime('+ 1 month')));
+                                //测试
+    //                             $plan->next_publish_time = strtotime('+ 2 minutes',$now);
+                                break;
+                        }
+                    }
+
+                    if(!$plan->save()) {
+                        throw new Exception($plan->getErrorMessage());
+                    }
+
                     $record = array(
-                        'controller_type'=> $plan['controller_type'],
-                        'mall_id'=> $plan['mall_id'],
-                        'user_id'=> $plan['user_id'],
-                        'money'=> $plan['integral_num'],
-                        'desc'=> $desc,
-                        'before_money'=> $before_money,
-                        'type'=> $plan['type'],
-                        'expire_time'=> $expire_time,
-                        'status'=> 1,
-                        'source_id'=> $plan->id,
-                        'source_table'=> 'integral'
+                        'controller_type' => $plan['controller_type'],
+                        'mall_id'         => $plan['mall_id'],
+                        'user_id'         => $plan['user_id'],
+                        'money'           => $plan['integral_num'],
+                        'desc'            => $desc,
+                        'before_money'    => $before_money,
+                        'type'            => $plan['type'],
+                        'expire_time'     => $expire_time,
+                        'status'          => 1,
+                        'source_id'       => $plan->id,
+                        'source_table'    => 'integral'
                     );
 
                     // 写入日志
                     $flag = User::getOneUserFlag($plan['user_id']);
                     if(!empty($flag)){
-                        $res = IntegralRecord::record($record,$plan['parent_id']);
+                        if(!IntegralRecord::record($record,$plan['parent_id'])){
+                            throw new Exception(IntegralRecord::getError());
+                        }
                     }
 
-                    if($res === false) throw new Exception(IntegralRecord::getError());
                     $transaction->commit();
-                }catch(\Exception $e){
-                    $transaction->rollBack();
-                    \Yii::$app->redis -> set('show1',$e->getMessage());
-                    self::$error = $e->getMessage();
-                    return false;
                 }
             }
+        }catch(\Exception $e){
+            $transaction->rollBack();
+            \Yii::$app->redis -> set('show1',$e->getMessage());
+            self::$error = $e->getMessage();
+            return false;
         }
         return true;
     }
+
 }

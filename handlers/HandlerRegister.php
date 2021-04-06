@@ -11,6 +11,7 @@
 namespace app\handlers;
 
 
+use app\mch\handlers\MchModuleHandler;
 use app\models\RelationSetting;
 use yii\base\BaseObject;
 use app\handlers\currency\BalanceChangeHandler;
@@ -61,6 +62,7 @@ class HandlerRegister extends BaseObject
             IncomeChangeHandler::class,
             StatisticsHandler::class,
             MemberUpgradeHandler::class,
+            MchModuleHandler::class
         ];
     }
 

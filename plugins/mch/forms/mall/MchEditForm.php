@@ -2,17 +2,15 @@
 
 namespace app\plugins\mch\forms\mall;
 
+use app\component\efps\Efps;
 use app\core\ApiCode;
-use app\forms\common\template\TemplateSend;
 use app\forms\common\template\tplmsg\AudiResultTemplate;
+use app\mch\forms\mch\EfpsReviewInfoForm;
+use app\models\EfpsMchReviewInfo;
 use app\models\Model;
-use app\models\Store;
 use app\models\User;
-use app\models\UserIdentity;
 use app\plugins\mch\forms\common\MchEditFormBase;
 use app\plugins\mch\models\Mch;
-use app\plugins\mch\models\MchMallSetting;
-use app\plugins\mch\models\MchSetting;
 use app\plugins\wxapp\models\WxappTemplate;
 
 class MchEditForm extends MchEditFormBase
@@ -20,28 +18,32 @@ class MchEditForm extends MchEditFormBase
     public $is_review;
     public $review_status;
     public $review_remark;
+    public $review_info;
 
     public function rules()
     {
         return array_merge(parent::rules(), [
             [['review_remark'], 'string'],
-            [['review_status', 'is_review'], 'integer']
+            [['review_status', 'is_review'], 'integer'],
+            [['review_info'], 'safe']
         ]);
     }
 
     public function save()
     {
         if (!$this->validate()) {
-            return $this->responseErrorMsg();
+            return $this->responseErrorInfo();
         }
 
         $transaction = \Yii::$app->db->beginTransaction();
         try {
             $this->checkData();
             $this->setMch();
+            $this->setReviewInfo();
             $this->setStore();
             $this->setMallMchSetting();
             $this->setMchSetting();
+            $this->setAdmin();
             $this->setUser();
             $this->sendTemplateMsg();
 
@@ -63,13 +65,91 @@ class MchEditForm extends MchEditFormBase
     }
 
     /**
+     * 设置审核信息
+     * @throws \Exception
+     */
+    protected function setReviewInfo(){
+
+        $form = new EfpsReviewInfoForm();
+        $form->attributes   = $this->review_info;
+        $form->mch_id       = $this->mch->id;
+        $form->merchantName = $this->name;
+        $res = $form->save();
+        if($res['code'] != ApiCode::CODE_SUCCESS){
+            throw new \Exception($res['msg']);
+        }
+        $this->setReviewStatus();
+    }
+
+    protected function setReviewStatus(){
+        if($this->review_status == Mch::REVIEW_STATUS_NOTPASS){ //审核不通过
+            EfpsMchReviewInfo::updateAll(['status' => 3], ["mch_id" => $this->mch->id]);
+            Mch::updateAll([
+                "review_status" => Mch::REVIEW_STATUS_NOTPASS,
+                "review_remark" => $this->review_remark
+            ], ["id" => $this->mch->id]);
+        }elseif($this->review_status == Mch::REVIEW_STATUS_CHECKED){ //审核通过
+
+            $reviewData = EfpsMchReviewInfo::find()->where(["mch_id" => $this->mch->id])->asArray()->one();
+
+            if(!$reviewData){
+                throw new \Exception("无法获取审核信息");
+            }
+
+            $params = [
+                'register_type' => $reviewData['register_type'],
+                'merchantName'  => $reviewData['merchantName'],
+                'acceptOrder'   => $reviewData['acceptOrder'],
+                'openAccount'   => $reviewData['openAccount']
+            ];
+            foreach($reviewData as $key => $value){
+                if(preg_match("/^(paper_stage_|paper_)(.*)/", trim($key), $match)){
+                    $params[$match[2]] = trim($value);
+                }
+            }
+
+            EfpsMchReviewInfo::updateAll(['status' => 2], ["mch_id" => $this->mch->id]);
+            Mch::updateAll(["review_status" => Mch::REVIEW_STATUS_CHECKED], [
+                "id" => $this->mch->id
+            ]);
+
+            /*if(empty($reviewData['acqMerId'])){
+                $res = \Yii::$app->efps->merchantApply($params);
+                if($res['code'] != Efps::CODE_SUCCESS){
+                    throw new \Exception($res['msg']);
+                }
+                EfpsMchReviewInfo::updateAll(["acqMerId" => $res['data']['acqMerId']], [
+                    "mch_id" => $this->mch->id
+                ]);
+                $acqMerId = $res['data']['acqMerId'];
+            }else{
+                $acqMerId = $reviewData['acqMerId'];
+            }
+
+            //查询是否审核通过了
+            $res = \Yii::$app->efps->merchantQuery(["acqMerId" => $acqMerId]);
+            if($res['code'] != Efps::CODE_SUCCESS){
+                throw new \Exception($res['msg']);
+            }
+
+            //审核通过
+            if($res['data']['accountStatus'] == 1 && $res['data']['auditStatus'] == 2){
+                EfpsMchReviewInfo::updateAll(['status' => 2], ["mch_id" => $this->mch->id]);
+                Mch::updateAll(["review_status" => Mch::REVIEW_STATUS_CHECKED], [
+                    "id" => $this->mch->id
+                ]);
+            }*/
+        }
+    }
+
+    /**
      * @param Mch $mch
      * @return bool
      * @throws \Exception
      */
     protected function extraMchInfo($mch)
     {
-        if ($this->is_review) {
+        /*if ($this->is_review) {
             if (!$this->review_status) {
                 throw new \Exception('请选择审核状态');
             }
@@ -80,7 +160,7 @@ class MchEditForm extends MchEditFormBase
                 $mch->review_remark = $this->review_remark;
                 $mch->review_time = mysql_timestamp();
             }
-        }
+        }*/
         return true;
     }
 

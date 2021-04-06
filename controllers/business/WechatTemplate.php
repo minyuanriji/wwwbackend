@@ -2,26 +2,10 @@
 namespace app\controllers\business;
 use yii;
 class WechatTemplate{
-    public $appid = 'wxd7ac6d41d564256c';
-    public $appsecret = '0e450b0ae95a035b4aab4de88b6f3aa7';
-    public function setToken(){
-//        $wechat = \Yii::$app->wechat;
-//        $token = $wechat->miniProgram->access_token->getToken();
-        $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s';
-        $url = sprintf($url,$this -> appid,$this -> appsecret);
-        $data = $this -> http_get($url);
-        $data = json_decode($data,true);
-        $result = yii::$app -> cache -> set("token",$data['access_token'],7100);
-//        41_uVKN2GIfsF6k2KkUfWLoxbhf2fqbG0kSl5Tvj6MPhFZdDBDbGdTpwOnjgzDfEqsSse_7K982GHVdn40Of7wNAu9WvMMQ8SNgyk034xtJlAT3G2y
-    }
 
-    public function getToken(){
-        $data = yii::$app -> cache -> get("token");
-        return $data;
-    }
 
     public function sendTemplate(){
-        $url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$this -> getToken();
+//        $url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$this -> getToken();
 //        var_dump($url);
         $data = [
             "touser" => "ohQHU50WSUDWOG3fhf2-nJhwBUck",

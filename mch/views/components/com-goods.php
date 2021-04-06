@@ -9,9 +9,6 @@ echo $this->render('../components/goods/com-area-limit');
 echo $this->render('../components/goods/com-preview');
 echo $this->render('../components/goods/com-attr-group');
 echo $this->render('../components/goods/com-goods-form');
-echo $this->render('../components/goods/com-goods-distribution');
-echo $this->render('../components/goods/com-goods-area');
-echo $this->render('../components/goods/com-goods-agent');
 ?>
 <style>
     .mt-24 {
@@ -159,8 +156,9 @@ echo $this->render('../components/goods/com-goods-agent');
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;" class="com-goods" v-loading="cardLoading">
         <div class='form-body'>
             <el-form :model="cForm" :rules="cRule" ref="ruleForm" label-width="180px" size="small" class="demo-ruleForm">
-                <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tabs v-model="activeName">
                     <el-tab-pane label="基础设置" name="first" v-if="is_basic == 1">
+
                         <!-- 选择分类 -->
                         <slot name="before_cats"></slot>
                         <el-card v-if="is_cats == 1" shadow="never" class="mt-24">
@@ -196,182 +194,102 @@ echo $this->render('../components/goods/com-goods-agent');
                             </div>
                             <el-row>
                                 <el-col :xl="12" :lg="16">
-                                    <template v-if="is_info == 1">
-                                        <el-form-item label="淘宝采集" hidden>
-                                            <el-input v-model="copyUrl">
-                                                <template slot="append">
-                                                    <el-button @click="copyGoods" :loading="copyLoading">获取
-                                                    </el-button>
-                                                </template>
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item prop="number">
-                                            <template slot="label">
-                                                <span>商城商品编码</span>
-                                                <el-tooltip effect="dark" placement="top" content="只能从商城中获取商品信息，且基本信息与商城商品保持一致">
-                                                    <i class="el-icon-info"></i>
-                                                </el-tooltip>
-                                            </template>
-                                            <el-input v-model="copyId" type="number" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="请输入商城商品id">
-                                                <template slot="append">
-                                                    <el-button @click="getDetail(copyId)" :loading="copyLoading">获取
-                                                    </el-button>
-                                                </template>
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item label="商品名称" prop="name">
-                                            <el-input v-model="ruleForm.name" maxlength="100" show-word-limit></el-input>
-                                        </el-form-item>
-
-                                        <el-form-item label="商品标签">
-                                            <el-select v-model="ruleForm.labels" multiple placeholder="请选择标签">
-                                                <el-option v-for="item in label_list" :key="item.title" :label="item.title" :value="item.title">
-                                                </el-option>
-                                            </el-select>
-                                        </el-form-item>
-                                        <el-form-item prop="pic_url">
-                                            <template slot="label">
-                                                <span>商品轮播图(多张)</span>
-                                                <el-tooltip effect="dark" placement="top" content="第一张图片为封面图">
-                                                    <i class="el-icon-info"></i>
-                                                </el-tooltip>
-                                            </template>
-                                            <div class="pic-url-remark">
-                                                第一张图片为缩略图,其它图片为轮播图,建议像素750*750,可拖拽使其改变顺序，最多支持上传9张
-                                            </div>
-                                            <div flex="dir:left">
-                                                <template v-if="ruleForm.pic_url.length">
-                                                    <draggable v-model="ruleForm.pic_url" flex="dif:left">
-                                                        <div v-for="(item,index) in ruleForm.pic_url" :key="index" style="margin-right: 20px;position: relative;cursor: move;">
-                                                            <com-attachment @selected="updatePicUrl" :params="{'currentIndex': index}">
-                                                                <com-image mode="aspectFill" width="100px" height='100px' :src="item.pic_url">
-                                                                </com-image>
-                                                            </com-attachment>
-                                                            <el-button class="del-btn" size="mini" type="danger" icon="el-icon-close" circle @click="delPic(index)"></el-button>
-                                                        </div>
-                                                    </draggable>
-                                                </template>
-                                                <template v-if="ruleForm.pic_url.length < 9">
-                                                    <com-attachment style="margin-bottom: 10px;" :multiple="true" :max="9" @selected="picUrl">
-                                                        <el-tooltip class="item" effect="dark" content="建议尺寸:750 * 750" placement="top">
-                                                            <div flex="main:center cross:center" class="add-image-btn">
-                                                                + 添加图片
-                                                            </div>
-                                                        </el-tooltip>
-                                                    </com-attachment>
-                                                </template>
-                                            </div>
-                                        </el-form-item>
-
-                                        <el-form-item label="商品视频" prop="video_url">
-                                            <el-input v-model="ruleForm.video_url" placeholder="请输入视频原地址或选择上传视频">
-                                                <template slot="append">
-                                                    <com-attachment :multiple="false" :max="1" @selected="videoUrl" type="video">
-                                                        <el-tooltip class="item" effect="dark" content="支持格式mp4;支持编码H.264;视频大小不能超过50 MB" placement="top">
-                                                            <el-button size="mini">添加视频</el-button>
-                                                        </el-tooltip>
-                                                    </com-attachment>
-                                                </template>
-                                            </el-input>
-                                            <el-link class="box-grow-0" type="primary" style="font-size:12px" v-if='ruleForm.video_url' :underline="false" target="_blank" :href="ruleForm.video_url">视频链接
-                                            </el-link>
-                                        </el-form-item>
-                                    </template>
-                                    <template v-else>
-                                        <!-- plugins -->
-                                        <el-form-item label="商品信息获取" width="120">
-                                            <label slot="label">
-                                                商品信息获取
-                                                <el-tooltip class="item" effect="dark" content="只能从商城中获取商品信息，且基本信息与商城商品保持一致" placement="top">
-                                                    <i class="el-icon-info"></i>
-                                                </el-tooltip>
-                                            </label>
-                                            <div>
-                                                <el-row type="flex">
-                                                    <el-button type="text" size="medium" style="max-width: 100%;" @click="$navigate({r:'mch/goods/edit', id: goods_warehouse.goods_id}, true)" v-if="goods_warehouse.goods_id">
-                                                        <com-ellipsis :line="1">
-                                                            ({{goods_warehouse.goods_id}}){{goods_warehouse.name}}
-                                                        </com-ellipsis>
-                                                    </el-button>
-                                                    <com-select-goods :multiple="false" @selected="selectGoodsWarehouse">
-                                                        <el-button>选择商品</el-button>
-                                                    </com-select-goods>
-                                                </el-row>
-                                                <el-button type="text" @click="$navigate({r:'mch/goods/edit'}, true)">
-                                                    商城还未添加商品？点击前往
+                                    <!-- 淘宝采集 -->
+                                    <el-form-item label="淘宝采集" hidden>
+                                        <el-input v-model="copyUrl">
+                                            <template slot="append">
+                                                <el-button @click="copyGoods" :loading="copyLoading">获取
                                                 </el-button>
-                                            </div>
-                                        </el-form-item>
-                                        <el-form-item label="商品名称">
-                                            <el-input :value="goods_warehouse.name" :disabled="true"></el-input>
-                                        </el-form-item>
-                                        <el-form-item>
-                                            <template slot="label">
-                                                <span>原价</span>
-                                                <el-tooltip effect="dark" content="以划线形式显示" placement="top">
-                                                    <i class="el-icon-info"></i>
-                                                </el-tooltip>
                                             </template>
-                                            <el-input :value="goods_warehouse.original_price" :disabled="true"></el-input>
-                                        </el-form-item>
-                                        <el-form-item label="规格" v-if="is_attr == 0">
-                                            <el-row type="flex">
-                                                <com-ellipsis :line="1">
-                                                    <template v-for="item in ruleForm.select_attr_groups">
-                                                        <span style="margin: 0 5px;">
-                                                            {{item.attr_group_name}}:{{item.attr_name}}
-                                                        </span>
-                                                    </template>
-                                                </com-ellipsis>
-                                                <com-attr-select :attr-groups="goods_warehouse.attr_groups" v-model="ruleForm.select_attr_groups">
-                                                    <el-button>选择</el-button>
-                                                </com-attr-select>
-                                            </el-row>
-                                        </el-form-item>
-                                    </template>
-                                    <el-form-item v-if="is_goods == 1" prop="app_share_title">
-                                        <label slot="label">
-                                            <span>自定义分享标题</span>
-                                            <el-tooltip class="item" effect="dark" content="分享给好友时，作为商品名称" placement="top">
-                                                <i class="el-icon-info"></i>
-                                            </el-tooltip>
-                                        </label>
-                                        <el-input placeholder="请输入分享标题" v-model="ruleForm.app_share_title"></el-input>
-                                        <el-button @click="app_share.dialog = true;app_share.type = 'name_bg'" type="text">查看图例
-                                        </el-button>
+                                        </el-input>
                                     </el-form-item>
-                                    <el-form-item v-if="is_goods == 1" prop="app_share_pic">
-                                        <label slot="label">
-                                            <span>自定义分享图片</span>
-                                            <el-tooltip class="item" effect="dark" content="分享给好友时，作为分享图片" placement="top">
+
+                                    <!-- 商城商品编码 -->
+                                    <el-form-item prop="number">
+                                        <template slot="label">
+                                            <span>商城商品编码</span>
+                                            <el-tooltip effect="dark" placement="top" content="只能从商城中获取商品信息，且基本信息与商城商品保持一致">
                                                 <i class="el-icon-info"></i>
                                             </el-tooltip>
-                                        </label>
-                                        <com-attachment v-model="ruleForm.app_share_pic" :multiple="false" :max="1">
-                                            <el-tooltip class="item" effect="dark" content="建议尺寸:420 * 336" placement="top">
-                                                <el-button size="mini">选择图片</el-button>
+                                        </template>
+                                        <el-input v-model="copyId" type="number" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="请输入商城商品id">
+                                            <template slot="append">
+                                                <el-button @click="getDetail(copyId)" :loading="copyLoading">获取
+                                                </el-button>
+                                            </template>
+                                        </el-input>
+                                    </el-form-item>
+
+                                    <el-form-item label="商品名称" prop="name">
+                                        <el-input v-model="ruleForm.name" maxlength="100" show-word-limit></el-input>
+                                    </el-form-item>
+
+                                    <el-form-item label="商品标签">
+                                        <el-select v-model="ruleForm.labels" multiple placeholder="请选择标签">
+                                            <el-option v-for="item in label_list" :key="item.title" :label="item.title" :value="item.title">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+
+                                    <!-- 商品轮播图(多张) -->
+                                    <el-form-item prop="pic_url">
+                                        <template slot="label">
+                                            <span>商品轮播图(多张)</span>
+                                            <el-tooltip effect="dark" placement="top" content="第一张图片为封面图">
+                                                <i class="el-icon-info"></i>
                                             </el-tooltip>
-                                        </com-attachment>
-                                        <div class="customize-share-title">
-                                            <com-image mode="aspectFill" width='80px' height='80px' :src="ruleForm.app_share_pic ? ruleForm.app_share_pic : ''"></com-image>
-                                            <el-button v-if="ruleForm.app_share_pic" class="del-btn" size="mini" type="danger" icon="el-icon-close" circle @click="ruleForm.app_share_pic = ''"></el-button>
+                                        </template>
+                                        <div class="pic-url-remark">
+                                            第一张图片为缩略图,其它图片为轮播图,建议像素750*750,可拖拽使其改变顺序，最多支持上传9张
                                         </div>
-                                        <el-button @click="app_share.dialog = true;app_share.type = 'pic_bg'" type="text">查看图例
-                                        </el-button>
+                                        <div flex="dir:left">
+                                            <template v-if="ruleForm.pic_url.length">
+                                                <draggable v-model="ruleForm.pic_url" flex="dif:left">
+                                                    <div v-for="(item,index) in ruleForm.pic_url" :key="index" style="margin-right: 20px;position: relative;cursor: move;">
+                                                        <com-attachment @selected="updatePicUrl" :params="{'currentIndex': index}">
+                                                            <com-image mode="aspectFill" width="100px" height='100px' :src="item.pic_url">
+                                                            </com-image>
+                                                        </com-attachment>
+                                                        <el-button class="del-btn" size="mini" type="danger" icon="el-icon-close" circle @click="delPic(index)"></el-button>
+                                                    </div>
+                                                </draggable>
+                                            </template>
+                                            <template v-if="ruleForm.pic_url.length < 9">
+                                                <com-attachment style="margin-bottom: 10px;" :multiple="true" :max="9" @selected="picUrl">
+                                                    <el-tooltip class="item" effect="dark" content="建议尺寸:750 * 750" placement="top">
+                                                        <div flex="main:center cross:center" class="add-image-btn">
+                                                            + 添加图片
+                                                        </div>
+                                                    </el-tooltip>
+                                                </com-attachment>
+                                            </template>
+                                        </div>
                                     </el-form-item>
-                                    <el-form-item v-if="!is_mch && is_goods == 1" label="上架状态" prop="status">
+
+                                    <!-- 商品视频 -->
+                                    <el-form-item label="商品视频" prop="video_url">
+                                        <el-input v-model="ruleForm.video_url" placeholder="请输入视频原地址或选择上传视频">
+                                            <template slot="append">
+                                                <com-attachment :multiple="false" :max="1" @selected="videoUrl" type="video">
+                                                    <el-tooltip class="item" effect="dark" content="支持格式mp4;支持编码H.264;视频大小不能超过50 MB" placement="top">
+                                                        <el-button size="mini">添加视频</el-button>
+                                                    </el-tooltip>
+                                                </com-attachment>
+                                            </template>
+                                        </el-input>
+                                        <el-link class="box-grow-0" type="primary" style="font-size:12px" v-if='ruleForm.video_url' :underline="false" target="_blank" :href="ruleForm.video_url">视频链接
+                                        </el-link>
+                                    </el-form-item>
+
+                                    <el-form-item label="上架状态" prop="status">
                                         <el-switch @change="statusChange" :active-value="1" :inactive-value="0" v-model="ruleForm.status">
                                         </el-switch>
                                     </el-form-item>
-                                    <!-- 自定义 -->
-                                    <el-dialog :title="app_share['type'] == 'pic_bg' ? `查看自定义分享图片图例`:`查看自定义分享标题图例`" :visible.sync="app_share.dialog" width="30%">
-                                        <div flex="dir:left main:center" class="app-share">
-                                            <div class="app-share-bg" :style="{backgroundImage: 'url('+app_share[app_share.type]+')'}"></div>
-                                        </div>
-                                        <div slot="footer" class="dialog-footer">
-                                            <el-button @click="app_share.dialog = false" type="primary">我知道了</el-button>
-                                        </div>
-                                    </el-dialog>
+
+                                    <el-form-item label="是否到店消费" prop="status">
+                                        <el-switch :active-value="1" :inactive-value="0" v-model="ruleForm.is_on_site_consumption">
+                                        </el-switch>
+                                    </el-form-item>
                                 </el-col>
                             </el-row>
                         </el-card>
@@ -384,164 +302,117 @@ echo $this->render('../components/goods/com-goods-agent');
                             </div>
                             <el-row>
                                 <el-col :xl="12" :lg="16">
-                                    <template v-if="is_attr == 1">
-                                        <el-form-item label="商品总库存" prop="goods_num">
-                                            <el-input type="number" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '');" :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_num">
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item label="默认规格名" prop="attr_default_name">
-                                            <el-input :disabled="ruleForm.use_attr == 1" v-model="ruleForm.attr_default_name">
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item prop="goods_num">
-                                            <label slot="label">
-                                                <span>商品规格</span>
-                                                <el-tooltip class="item" effect="dark" content="如有颜色、尺码等多种规格，请添加商品规格" placement="top">
-                                                    <i class="el-icon-info"></i>
-                                                </el-tooltip>
-                                            </label>
-                                            <div style="width:130%">
-                                                <com-attr-group @select="makeAttrGroup" v-model="attrGroups"></com-attr-group>
-                                            </div>
-                                            <div v-if="ruleForm.use_attr" style="width:130%;margin-top: 24px;">
-                                                <com-attr v-model="ruleForm.attr" :attr-groups="attrGroups" :extra="cForm.extra ? cForm.extra : {}"></com-attr>
-                                            </div>
-                                        </el-form-item>
-                                        <el-form-item prop="sort">
-                                            <template slot="label">
-                                                <span>排序</span>
-                                                <el-tooltip effect="dark" content="排序值越小排序越靠前" placement="top">
-                                                    <i class="el-icon-info"></i>
-                                                </el-tooltip>
-                                            </template>
-                                            <el-input type="number" placeholder="请输入排序" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '');" v-model.number="ruleForm.sort">
-                                            </el-input>
-                                        </el-form-item>
-                                        <!-- qwe -->
-                                        <el-form-item prop="price" label="售价" v-if="is_price !=3" class="diy_box">
-                                            <el-select v-loadmore="loadmore" class="bbb" v-model="pic_value" v-if="pic_options.length != 0" placeholder="请选择">
-                                                <el-option v-for="(item,index) in pic_options" :key="item.value" :label="item.label" :value="item.value">
-                                                    <span style="float: left">{{ item.label }}</span>
-                                                    <i class="el-icon-circle-close" @click.stop='deletePrice(index)' style="float: right; color: #8492a6; font-size: 13px;line-height:34px"></i>
-                                                    <!-- <span  >{{ item.value }}</span> -->
-                                                </el-option>
-                                            </el-select>
+                                    <el-form-item label="商品总库存" prop="goods_num">
+                                        <el-input type="number" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '');" :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_num">
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item label="默认规格名" prop="attr_default_name">
+                                        <el-input :disabled="ruleForm.use_attr == 1" v-model="ruleForm.attr_default_name">
+                                        </el-input>
+                                    </el-form-item>
+                                    <!-- 商品规格 -->
+                                    <el-form-item prop="goods_num">
+                                        <label slot="label">
+                                            <span>商品规格</span>
+                                            <el-tooltip class="item" effect="dark" content="如有颜色、尺码等多种规格，请添加商品规格" placement="top">
+                                                <i class="el-icon-info"></i>
+                                            </el-tooltip>
+                                        </label>
+                                        <div style="width:130%">
+                                            <com-attr-group @select="makeAttrGroup" v-model="attrGroups"></com-attr-group>
+                                        </div>
+                                        <div v-if="ruleForm.use_attr" style="width:130%;margin-top: 24px;">
+                                            <com-attr v-model="ruleForm.attr" :attr-groups="attrGroups" :extra="cForm.extra ? cForm.extra : {}"></com-attr>
+                                        </div>
+                                    </el-form-item>
+                                    <el-form-item prop="sort">
+                                        <template slot="label">
+                                            <span>排序</span>
+                                            <el-tooltip effect="dark" content="排序值越小排序越靠前" placement="top">
+                                                <i class="el-icon-info"></i>
+                                            </el-tooltip>
+                                        </template>
+                                        <el-input type="number" placeholder="请输入排序" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '');" v-model.number="ruleForm.sort">
+                                        </el-input>
+                                    </el-form-item>
+                                    <!-- qwe 售价 -->
+                                    <el-form-item prop="price" label="售价" v-if="is_price !=3" class="diy_box">
+                                        <el-select v-loadmore="loadmore" class="bbb" v-model="pic_value" v-if="pic_options.length != 0" placeholder="请选择">
+                                            <el-option v-for="(item,index) in pic_options" :key="item.value" :label="item.label" :value="item.value">
+                                                <span style="float: left">{{ item.label }}</span>
+                                                <i class="el-icon-circle-close" @click.stop='deletePrice(index)' style="float: right; color: #8492a6; font-size: 13px;line-height:34px"></i>
+                                                <!-- <span  >{{ item.value }}</span> -->
+                                            </el-option>
+                                        </el-select>
 
-                                            <div style="display:flex;justify-content: space-between;width:600px">
-                                                <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.price" style="width: 550px;">
-                                                    <template slot="append">元</template>
-                                                </el-input>
-
-                                                <el-button type="primary" :loading="is_loading" @click='addPriceName' style="margin-left: 10px;">新增</el-button>
-                                            </div>
-                                            <div style="font-size: 12px;color:#bcbcbc;">这是售价字段</div>
-                                        </el-form-item>
-
-                                        <el-form-item v-if="cForm.extra" v-for="(item, key, index) in cForm.extra" :key="item.id">
-                                            <label slot="label">{{item}}</label>
-                                            <el-input v-model="ruleForm[key]"></el-input>
-                                        </el-form-item>
-                                        <el-form-item v-if="is_show == 1" prop="original_price">
-                                            <template slot="label">
-                                                <span>原价</span>
-                                                <el-tooltip effect="dark" content="以划线形式显示" placement="top">
-                                                    <i class="el-icon-info"></i>
-                                                </el-tooltip>
-                                            </template>
-
-                                            <el-input type="number" min="0" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" v-model="ruleForm.original_price">
+                                        <div style="display:flex;justify-content: space-between;width:600px">
+                                            <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.price" style="width: 550px;">
                                                 <template slot="append">元</template>
                                             </el-input>
-                                        </el-form-item>
-                                        <el-form-item v-if="is_show == 1" label="单位" prop="unit">
-                                            <el-input v-model="ruleForm.unit"></el-input>
-                                        </el-form-item>
-                                        <el-form-item v-if="is_show == 1" label="成本价" prop="cost_price">
-                                            <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.cost_price">
-                                                <template slot="append">元</template>
-                                            </el-input>
-                                        </el-form-item>
-                                        <!--                                        <el-form-item v-if="is_show == 1 && !is_mch" prop="is_negotiable">-->
-                                        <!--                                            <template slot='label'>-->
-                                        <!--                                                <span>商品面议111</span>-->
-                                        <!--                                                <el-tooltip effect="dark" content="如果开启面议，则商品无法在线支付" placement="top">-->
-                                        <!--                                                    <i class="el-icon-info"></i>-->
-                                        <!--                                                </el-tooltip>-->
-                                        <!--                                            </template>-->
-                                        <!--                                            <el-switch :active-value="1"-->
-                                        <!--                                                       :inactive-value="0"-->
-                                        <!--                                                       v-model="ruleForm.is_negotiable">-->
-                                        <!--                                            </el-switch>-->
-                                        <!--                                        </el-form-item>-->
 
+                                            <el-button type="primary" :loading="is_loading" @click='addPriceName' style="margin-left: 10px;">新增</el-button>
+                                        </div>
+                                        <div style="font-size: 12px;color:#bcbcbc;">这是售价字段</div>
+                                    </el-form-item>
 
-                                        <el-form-item label="是否显示销量" prop="is_show_sales">
-                                            <el-switch v-model="ruleForm.is_show_sales" :active-value="1" :inactive-value="0">
-                                            </el-switch>
-                                        </el-form-item>
+                                    <el-form-item v-if="cForm.extra" v-for="(item, key, index) in cForm.extra" :key="item.id">
+                                        <label slot="label">{{item}}</label>
+                                        <el-input v-model="ruleForm[key]"></el-input>
+                                    </el-form-item>
+                                    <!-- 原价 -->
+                                    <el-form-item v-if="is_show == 1" prop="original_price">
+                                        <template slot="label">
+                                            <span>原价</span>
+                                            <el-tooltip effect="dark" content="以划线形式显示" placement="top">
+                                                <i class="el-icon-info"></i>
+                                            </el-tooltip>
+                                        </template>
 
-                                        <el-form-item label="是否启用虚拟销量" prop="use_virtual_sales">
-                                            <el-switch v-model="ruleForm.use_virtual_sales" :active-value="1" :inactive-value="0">
-                                            </el-switch>
-                                        </el-form-item>
+                                        <el-input type="number" min="0" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" v-model="ruleForm.original_price">
+                                            <template slot="append">元</template>
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item v-if="is_show == 1" label="单位" prop="unit">
+                                        <el-input v-model="ruleForm.unit"></el-input>
+                                    </el-form-item>
+                                    <el-form-item v-if="is_show == 1" label="成本价" prop="cost_price">
+                                        <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.cost_price">
+                                            <template slot="append">元</template>
+                                        </el-input>
+                                    </el-form-item>
 
-                                        <el-form-item prop="virtual_sales">
+                                    <el-form-item label="是否显示销量" prop="is_show_sales">
+                                        <el-switch v-model="ruleForm.is_show_sales" :active-value="1" :inactive-value="0">
+                                        </el-switch>
+                                    </el-form-item>
 
-                                            <template slot='label'>
-                                                <span>已出售量</span>
-                                                <el-tooltip effect="dark" content="前端展示的销量=实际销量+已出售量" placement="top">
-                                                    <i class="el-icon-info"></i>
-                                                </el-tooltip>
-                                            </template>
-                                            <el-input type="number" oninput="this.value = this.value.replace(/[^0-9]/, '')" min="0" v-model="ruleForm.virtual_sales">
-                                                <template slot="append">{{ruleForm.unit}}</template>
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item label="商品货号">
-                                            <el-input :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_no">
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item label="商品重量">
-                                            <el-input oninput="this.value = this.value.replace(/[^0-9]/g, '');" :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_weight">
-                                                <template slot="append">克</template>
-                                            </el-input>
-                                        </el-form-item>
-                                    </template>
-                                    <template v-else-if="is_price == 1">
-                                        <el-form-item label="售价" prop="price">
-                                            <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.price">
-                                                <template slot="append">元</template>
-                                            </el-input>
-                                        </el-form-item>
-                                    </template>
-                                    <template v-else>
-                                        <el-form-item label="售价" prop="price">
-                                            <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.price">
-                                                <template slot="append">元</template>
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item prop="sort">
-                                            <template slot="label">
-                                                <span>排序</span>
-                                                <el-tooltip effect="dark" content="排序值越小排序越靠前" placement="top">
-                                                    <i class="el-icon-info"></i>
-                                                </el-tooltip>
-                                            </template>
-                                            <el-input type="number" oninput="this.value = this.value.replace(/[^0-9]/, '');" min="0" placeholder="请输入排序" v-model.number="ruleForm.sort">
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item prop="virtual_sales">
-                                            <template slot='label'>
-                                                <span>已出售量</span>
-                                                <el-tooltip effect="dark" content="前端展示的销量=实际销量+已出售量" placement="top">
-                                                    <i class="el-icon-info"></i>
-                                                </el-tooltip>
-                                            </template>
-                                            <el-input type="number" oninput="this.value = this.value.replace(/[^0-9]/, '');" min="0" v-model="ruleForm.virtual_sales">
-                                                <template slot="append">{{ruleForm.unit}}</template>
-                                            </el-input>
-                                        </el-form-item>
-                                    </template>
+                                    <el-form-item label="是否启用虚拟销量" prop="use_virtual_sales">
+                                        <el-switch v-model="ruleForm.use_virtual_sales" :active-value="1" :inactive-value="0">
+                                        </el-switch>
+                                    </el-form-item>
+
+                                    <!-- 已出售量 -->
+                                    <el-form-item prop="virtual_sales">
+
+                                        <template slot='label'>
+                                            <span>已出售量</span>
+                                            <el-tooltip effect="dark" content="前端展示的销量=实际销量+已出售量" placement="top">
+                                                <i class="el-icon-info"></i>
+                                            </el-tooltip>
+                                        </template>
+                                        <el-input type="number" oninput="this.value = this.value.replace(/[^0-9]/, '')" min="0" v-model="ruleForm.virtual_sales">
+                                            <template slot="append">{{ruleForm.unit}}</template>
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item label="商品货号">
+                                        <el-input :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_no">
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item label="商品重量">
+                                        <el-input oninput="this.value = this.value.replace(/[^0-9]/g, '');" :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_weight">
+                                            <template slot="append">克</template>
+                                        </el-input>
+                                    </el-form-item>
                                 </el-col>
                             </el-row>
                         </el-card>
@@ -578,7 +449,7 @@ echo $this->render('../components/goods/com-goods-agent');
                                         </el-checkbox>
                                     </el-form-item>
 
-                                    <el-form-item prop="freight_id">
+                                    <el-form-item v-show="false" prop="freight_id">
                                         <template slot='label'>
                                             <span>运费设置</span>
                                             <el-tooltip effect="dark" content="选择第一项（默认运费）将会根据运费管理的（默认运费）变化而变化" placement="top">
@@ -635,7 +506,7 @@ echo $this->render('../components/goods/com-goods-agent');
                                         </div>
                                     </el-form-item>
 
-                                    <el-form-item label="" prop="pieces">
+                                    <el-form-item v-show="false" label="" prop="pieces">
                                         <template slot='label'>
                                             <span>单品满件包邮</span>
                                             <el-tooltip effect="dark" content="如果设置0或空，则不支持满件包邮" placement="top">
@@ -647,7 +518,7 @@ echo $this->render('../components/goods/com-goods-agent');
                                         </el-input>
                                     </el-form-item>
 
-                                    <el-form-item prop="forehead">
+                                    <el-form-item v-show="false" prop="forehead">
                                         <template slot='label'>
                                             <span>单品满额包邮</span>
                                             <el-tooltip effect="dark" content="如果设置0或空，则不支持满额包邮" placement="top">
@@ -717,155 +588,6 @@ echo $this->render('../components/goods/com-goods-agent');
                             </div>
                         </el-card>
 
-                        <!-- 营销设置 -->
-                        <slot name="before_marketing"></slot>
-                        <el-card shadow="never" class="mt-24" v-if="is_marketing == 1 && !is_mch">
-                            <div slot="header">
-                                <span>营销设置</span>
-                            </div>
-                            <el-row>
-                                <el-col :xl="12" :lg="16">
-                                    <!-- 积分券赠送 -->
-                                    <el-form-item  label="" prop="status">
-                                        <template slot='label'>
-                                            <span>积分券赠送</span>
-                                            <el-tooltip effect="dark" placement="top">
-                                                <div slot="content">积分券赠送开关，积分券、积分二选一<br />
-                                                    关闭， 则以积分（累加）形式赠送</br>
-                                                    开启， 则以积分券（充值）形式赠送 
-                                                </div>
-                                                <i class="el-icon-info"></i>
-                                            </el-tooltip>
-                                        </template>
-                                        <el-switch v-model="info.enable_score" :active-value="1" :inactive-value="0" active-text="开启" inactive-text="关闭">
-                                        </el-switch>
-                                        <div v-if="info.enable_score==1">
-                                            <el-switch v-model="isPermanentScore" :active-value="1" :inactive-value="0" active-text="限时有效" inactive-text="永久有效" @change="isPermanentScoreChange">
-                                            </el-switch>
-                                        </div>
-                                    
-                                        <div v-if="info.enable_score==1" class="demo-input-suffix agent-setting-item">
-                                    
-                                            <el-input type="number" :min="0" class="member-money" v-model="score_setting.integral_num" placeholder="">
-                                                <template slot="append">积分券</template>
-                                            </el-input>
-                                            <el-input type="number" :min="0" class="member-money" v-model="score_setting.period" placeholder="">
-                                                <template slot="append">月</template>
-                                            </el-input>
-                                            <el-input v-if="isPermanentScore==1" type="number" class="member-money" style="width: 180px;" v-model="score_setting.expire" placeholder="">
-                                                <template slot="append">有效期(天)</template>
-                                            </el-input>
-                                    
-                                        </div>
-                                    </el-form-item>
-                                    <el-form-item  v-if="info.enable_score==0">
-                                        <template slot='label'>
-                                            <span>积分赠送</span>
-                                            <el-tooltip effect="dark" placement="top">
-                                                <div slot="content">用户购物赠送的积分, 如果不填写或填写0，则默认为不赠送积分，
-                                                    如果为百分比则为按成交价格的比例计算积分"<br />
-                                                    如: 购买2件，设置10 积分, 不管成交价格是多少， 则购买后获得20积分</br>
-                                                    如: 购买2件，设置10%积分, 成交价格2 * 200= 400， 则购买后获得 40 积分（400*10%）
-                                                </div>
-                                                <i class="el-icon-info"></i>
-                                            </el-tooltip>
-                                        </template>
-                                        <el-input type="number" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="请输入赠送积分数量" v-model="ruleForm.give_score">
-                                            <template slot="append">
-                                                分
-                                                <el-radio v-model="ruleForm.give_score_type" :label="1">固定值
-                                                </el-radio>
-                                                <el-radio v-model="ruleForm.give_score_type" :label="2">百分比
-                                                </el-radio>
-                                            </template>
-                                        </el-input>
-                                    </el-form-item>
-                                    <el-form-item>
-                                        <template slot='label'>
-                                            <span>积分抵扣</span>
-                                            <el-tooltip effect="dark" content="如果设置0，则不支持积分抵扣" placement="top">
-                                                <i class="el-icon-info"></i>
-                                            </el-tooltip>
-                                        </template>
-                                        <el-input :disabled="ruleForm.full_forehead_score==1" type="number" min="0" oninput="this.value = this.value.replace(/[^0-9\.]/g, '');" placeholder="请输最高抵扣金额" v-model="ruleForm.forehead_score">
-                                            <template slot="prepend">最多抵扣</template>
-                                            <template slot="append">
-                                                元
-                                                <el-radio v-model="ruleForm.forehead_score_type" :label="1" :disabled="ruleForm.full_forehead_score==1">固定值
-                                                </el-radio>
-                                                <el-radio style="display: none" v-model="ruleForm.forehead_score_type" :label="2">百分比
-                                                </el-radio>
-                                            </template>
-                                        </el-input>
-                                        <el-checkbox :true-label="1" :false-label="0" :disabled="ruleForm.full_forehead_score==1" v-model="ruleForm.accumulative">
-                                            允许多件累计抵扣
-                                        </el-checkbox>
-
-                                        <el-checkbox :true-label="1" :false-label="0" @change="fullForeheadScore" v-model="ruleForm.full_forehead_score">
-                                            允许全额抵扣
-                                        </el-checkbox>
-                                    </el-form-item>
-                                <!-- </el-col>
-                                <el-col :xl="12" :lg="16"> -->
-									<!-- 购物券赠送 -->
-									<el-form-item  label="购物券赠送" prop="status">
-									    <el-switch v-model="info.enable_integral" :active-value="1" :inactive-value="0" active-text="开启" inactive-text="关闭">
-									    </el-switch>
-									    <div v-if="info.enable_integral==1">
-									        <el-switch v-model="isPermanent" :active-value="1" :inactive-value="0" active-text="限时有效" inactive-text="永久有效" @change="isPermanentChange">
-									        </el-switch>
-									    </div>
-									
-									    <div v-if="info.enable_integral==1" class="demo-input-suffix agent-setting-item">
-									
-									        <el-input type="number" :min="0" class="member-money" v-model="integral_setting.integral_num" placeholder="">
-									            <template slot="append">购物券</template>
-									        </el-input>
-									        <el-input type="number" :min="0" class="member-money" v-model="integral_setting.period" placeholder="">
-									            <template slot="append">月</template>
-									        </el-input>
-									        <el-input v-if="isPermanent==1" type="number" class="member-money" style="width: 180px;" v-model="integral_setting.expire" placeholder="">
-									            <template slot="append">有效期(天)</template>
-									        </el-input>
-									
-									    </div>
-									
-									    <!-- <el-input type="number" min="0" class="member-money" oninput="this.value = this.value.replace(/[^0-9\.]/g, '');" placeholder="请输最高抵扣金额" v-model="info.max_deduct_integral">
-									        <template slot="prepend">最多抵扣</template>
-									        <template slot="append">元</template>
-									    </el-input> -->
-									</el-form-item>
-									<!-- 购物券抵扣 -->
-									<el-form-item >
-									    <template slot='label'>
-									        <span>购物券抵扣</span>
-									        <!-- <el-tooltip effect="dark" content="如果设置0，则不支持积分抵扣"
-									                    placement="top">
-									            <i class="el-icon-info"></i>
-									        </el-tooltip> -->
-									    </template>
-									    <el-input type="number" min="0" 
-											oninput="this.value = this.value.replace(/[^0-9\.]/g, '');" 
-											placeholder="请输最高抵扣金额" v-model="info.max_deduct_integral">
-									        <template slot="prepend">最多抵扣</template>
-									        <template slot="append">元</template>
-									    </el-input>
-									</el-form-item>
-									
-									
-								
-								</el-col>
-                            </el-row>
-
-
-
-
-                            
-
-
-
-                        </el-card>
-
                         <!-- 商品详情 -->
                         <slot name="before_detail"></slot>
                         <el-card shadow="never" class="mt-24" v-if="is_detail == 1">
@@ -884,140 +606,6 @@ echo $this->render('../components/goods/com-goods-agent');
                         </el-card>
                         <slot name="after_detail"></slot>
                     </el-tab-pane>
-
-                    <el-tab-pane label="订单设置" name="order" v-if="is_order == 1">
-                        
-                        <el-form-item prop="is_order_paid">
-                            <template slot='label'>
-                                <span>订单支付后执行</span>
-                                <el-tooltip effect="dark" content="订单在支付后执行发放积分、积分券或购物券，否则默认订单完成后发放"
-                                            placement="top">
-                                    <i class="el-icon-info"></i>
-                                </el-tooltip>
-                            </template>
-                            <el-switch :active-value="1" :inactive-value="0" v-model="info.is_order_paid">
-                            </el-switch>
-                        </el-form-item>
-                        <template v-if="info.is_order_paid == 1">
-                            
-                            <el-form-item label="积分"  prop="paid_is_score">
-                                <el-radio-group v-model="order_paid.is_score" @change="isOrderSetting($event,'paid','is_score')">
-                                    <el-radio :label="1" >开启</el-radio>
-                                    <el-radio :label="0" >关闭</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-                            <el-form-item label="积分券"  prop="paid_is_score_card">
-                                <el-radio-group v-model="order_paid.is_score_card" @change="isOrderSetting($event,'paid','is_score_card')">
-                                    <el-radio :label="1" >开启</el-radio>
-                                    <el-radio :label="0" >关闭</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-                            <el-form-item label="购物券"  prop="paid_is_integral_card">
-                                <el-radio-group v-model="order_paid.is_integral_card" @change="isOrderSetting($event,'paid','is_integral_card')">
-                                    <el-radio :label="1" >开启</el-radio>
-                                    <el-radio :label="0" >关闭</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-                           
-                        </template>
-                        <el-form-item prop="cannotrefund">
-                            <template slot='label'>
-                                <span>是否支持退换货</span>
-                                <el-tooltip effect="dark" content="订单中有多个不同售后选项的商品时，整单发起售后只能满足相同选项条件进行售后"
-                                            placement="top">
-                                    <i class="el-icon-info"></i>
-                                </el-tooltip>
-                            </template>
-                            <div>
-                                <el-checkbox-group v-model="ruleForm.cannotrefund">
-                                    <el-checkbox label="1">退款</el-checkbox>
-                                    <el-checkbox label="2">退货退款</el-checkbox>
-                                    <el-checkbox label="3">换货</el-checkbox>
-                                </el-checkbox-group>
-                            </div>
-                        </el-form-item>
-                        <!-- <el-form-item label="订单结算后执行" prop="is_order_sales">
-                            <el-switch :active-value="1" :inactive-value="0" v-model="info.is_order_sales">
-                            </el-switch>
-                        </el-form-item>
-                        <template v-if="info.is_order_sales == 1">
-                            <el-form-item label="积分"  prop="sales_is_score">
-                                <el-radio-group v-model="order_sales.is_score" @change="isOrderSetting($event,'sales','is_score')">
-                                    <el-radio :label="1" >开启</el-radio>
-                                    <el-radio :label="0" >关闭</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-                            <el-form-item label="积分券"  prop="sales_is_score_card">
-                                <el-radio-group v-model="order_sales.is_score_card" @change="isOrderSetting($event,'sales','is_score_card')">
-                                    <el-radio :label="1" >开启</el-radio>
-                                    <el-radio :label="0" >关闭</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-                            <el-form-item label="购物券"  prop="sales_is_integral_card">
-                                <el-radio-group v-model="order_sales.is_integral_card" @change="isOrderSetting($event,'sales','is_integral_card')">
-                                    <el-radio :label="1" >开启</el-radio>
-                                    <el-radio :label="0" >关闭</el-radio>
-                                </el-radio-group>
-                            </el-form-item>
-                        </template> -->
-                    </el-tab-pane>
-
-                    <el-tab-pane label="会员价设置" name="second" v-if="is_member == 1">
-                        <el-form-item label="是否享受会员功能" prop="is_level">
-                            <el-switch :active-value="1" :inactive-value="0" v-model="ruleForm.is_level">
-                            </el-switch>
-                        </el-form-item>
-                        <template v-if="ruleForm.is_level == 1">
-                            <el-form-item label="是否单独设置会员价" prop="is_level_alone">
-                                <el-switch :active-value="1" :inactive-value="0" v-model="ruleForm.is_level_alone">
-                                </el-switch>
-                            </el-form-item>
-                            <template v-if="ruleForm.is_level_alone == 1">
-                                <template v-if="ruleForm.use_attr == 1 && memberLevel.length > 0">
-                                    <!--多规格会员价设置-->
-                                    <el-form-item label="会员价设置">
-                                        <com-attr v-model="ruleForm.attr" :attr-groups="attrGroups" :members="memberLevel" :is-level="true"></com-attr>
-                                    </el-form-item>
-                                </template>
-                                <!-- 无规格默认会员价 -->
-                                <template v-if="ruleForm.use_attr == 0 && memberLevel.length > 0">
-                                    <el-form-item label="默认规格会员价设置">
-                                        <el-col :xl="12" :lg="16">
-                                            <el-input v-for="item in defaultMemberPrice" :key="item.id" type="number" v-model="ruleForm.member_price[item.level]">
-                                                <span slot="prepend">{{item.name}}</span>
-                                                <span slot="append">元</span>
-                                            </el-input>
-                                        </el-col>
-                                    </el-form-item>
-                                    <el-form-item>
-                                        <el-tag type="danger">如需设置多规格会员价,请先添加商品规格</el-tag>
-                                    </el-form-item>
-                                </template>
-                                <el-form-item v-if="memberLevel.length == 0" label="会员价设置">
-                                    <el-button type="danger" @click="$navigate({r: 'mch/member-level/edit'})">
-                                        如需设置,请先添加会员
-                                    </el-button>
-                                </el-form-item>
-                            </template>
-                        </template>
-                        <el-form-item v-if="is_svip" label="是否享受超级会员功能" prop="is_vip_card_goods">
-                            <el-switch v-model="is_vip_card_goods" :active-value="1" :inactive-value="0"></el-switch>
-                        </el-form-item>
-                    </el-tab-pane>
-
-                    <el-tab-pane label="分销设置" name="third" v-if="is_show_distribution">
-                        <com-goods-distribution v-model="ruleForm" :is_mch="is_mch" :goods_type="goods_type" :goods_id="goods_id" v-if="activeName == 'third'">
-                        </com-goods-distribution>
-                    </el-tab-pane>
-                    <el-tab-pane label="经销设置" name="fourth" v-if="is_show_agent">
-                        <com-goods-agent v-model="ruleForm" :is_mch="is_mch" :goods_type="goods_type" :goods_id="goods_id" v-if="activeName == 'fourth'">
-                        </com-goods-agent>
-                    </el-tab-pane>
-                    <el-tab-pane label="区域设置" name="fifth" v-if="is_show_area">
-                        <com-goods-area v-model="ruleForm" :is_mch="is_mch" :goods_type="goods_type" :goods_id="goods_id" v-if="activeName == 'fifth'">
-                        </com-goods-area>
-                    </el-tab-pane>
-
                     <slot name="tab_pane"></slot>
                 </el-tabs>
             </el-form>
@@ -1072,31 +660,10 @@ echo $this->render('../components/goods/com-goods-agent');
                 type: Number,
                 default: 1
             },
-            // 营销设置
-            is_marketing: {
-                type: Number,
-                default: 1
-            },
             // 商品详情
             is_detail: {
                 type: Number,
                 default: 0
-            },
-            // 分销设置
-            is_distribution: {
-                type: Number,
-                default: 1
-            },
-            // 会员设置
-            is_member: {
-                type: Number,
-                default: 1
-            },
-
-            // 订单设置
-            is_order: {
-                type: Number,
-                default: 1
             },
 
             //todo 仅显示售价（抽奖） 秒杀3显示
@@ -1163,12 +730,12 @@ echo $this->render('../components/goods/com-goods-agent');
                 attr: [],
                 cats: [],
                 mchCats: [], //多商户系统分类
-                cards: [],
                 services: [],
                 pic_url: [],
                 use_attr: 0,
                 goods_num: 0,
                 status: 0,
+                is_on_site_consumption:0,//到店消费类商品
                 unit: '件',
                 virtual_sales: 0,
                 cover_pic: '',
@@ -1181,14 +748,8 @@ echo $this->render('../components/goods/com-goods-agent');
                 forehead_score_type: 1,
                 freight_id: 0,
                 freight: null,
-                give_score: 0,
-                give_score_type: 1,
-                individual_share: 0,
-                is_level: 1,
-                is_level_alone: 0,
 
                 pieces: 0,
-                share_type: 0,
                 attr_setting_type: 0,
                 video_url: '',
                 is_sell_well: 0,
@@ -1199,23 +760,17 @@ echo $this->render('../components/goods/com-goods-agent');
                 cost_price: 0,
                 detail: '',
                 extra: '',
-                app_share_title: '', //自定义分享标题,
-                app_share_pic: '', //自定义分享图片
                 is_default_services: 1,
-                member_price: {},
                 goods_no: '',
                 goods_weight: '',
                 select_attr_groups: [], // 已选择的规格
                 goodsWarehouse_attrGroups: [], // 商品库商品所有的规格
-                share_level_type: 0,
-                distributionLevelList: [],
                 form: null,
                 is_show_sales: 0,
                 use_virtual_sales: 0,
                 form_id: 0,
                 attr_default_name: '',
                 is_area_limit: 0,
-                use_score: 0,
                 area_limit: [{
                     list: []
                 }],
@@ -1309,7 +864,6 @@ echo $this->render('../components/goods/com-goods-agent');
                 priceName_page: 1,
                 priceName_page_count: 0,
                 detail_data: '',
-
                 goods_id: 0,
                 keyword: '',
                 goods_type: 'MALL_GOODS',
@@ -1319,27 +873,19 @@ echo $this->render('../components/goods/com-goods-agent');
                 dialogLoading: false,
                 activeName: 'first',
                 ruleForm: ruleForm,
-                // 分销层级
-                shareLevel: [],
-                // 会员等级
-                memberLevel: [],
                 rules: rules,
                 options: [], // 商品分类列表
                 mchOptions: [], //多商户商品编辑时使用
                 newOptions: [],
                 cats: [], //用于前端已选的分类展示
                 mchCats: [], //用于前端已选的分类展示 多商户
-                cards: [], // 优惠券
                 attrGroups: [], //规格组
-
                 attrGroupName: '',
                 attrName: [],
                 // 批量设置
                 batch: {},
                 dialogVisible: false, //分类选择弹框
                 mchDialogVisible: false,
-                is_vip_card_goods: 0,
-                is_svip: false,
                 goods_warehouse: {},
                 copyUrl: '',
                 copyLoading: false,
@@ -1357,74 +903,8 @@ echo $this->render('../components/goods/com-goods-agent');
                     loading: false
                 },
                 copyId: '',
-                app_share: {
-                    dialog: false,
-                    type: '',
-                    bg: "<?= \Yii::$app->request->baseUrl ?>/statics/img/mall/app-share.png",
-                    name_bg: "<?= \Yii::$app->request->baseUrl ?>/statics/img/mall/app-share-name.png",
-                    pic_bg: "<?= \Yii::$app->request->baseUrl ?>/statics/img/mall/app-share-pic.png",
-                },
-                is_show_distribution: 1,
-                is_show_agent: 1,
-                is_show_area: 1,
-                use_score: 0,
                 video_type: 1,
-                cardDialogVisible: false,
-
-                // 积分券赠送数据
-                score_setting: {
-                    "integral_num": 0, //积分数量
-                    "period": 12, //周期
-                    "period_unit": "month", //单位
-                    "expire": 30 //有效天数
-                },
-                isPermanentScore: 0, //默认永久
-
-
-                // 购物券赠送数据
-                integral_setting: {
-                    "integral_num": 0, //积分数量
-                    "period": 12, //周期
-                    "period_unit": "month", //单位
-                    "expire": 30 //有效天数
-                },
-                isPermanent: 0, //默认永久
-
-
-                // 购物券赠送数据
-                order_paid: {
-                    is_score:0,
-                    is_score_card:0,
-                    is_integral_card:0,
-                    is_member_upgrade:0,
-                },
-
-                // 购物券赠送数据
-                order_sales: {
-                    is_score:0,
-                    is_score_card:0,
-                    is_integral_card:0,
-                    is_member_upgrade:0,
-                },
-
-                info: {
-                    id: "1",
-                    mall_id: "5",
-                    goods_id: "45",
-                    enable_buy_reward: "0", //会员购物奖励
-                    enable_repurchase: "0", //复购设置开关
-                    is_percent: "0",
-                    // 这里是是否开启积分券赠送
-                    enable_score: "0", //是否开启赠送积分券
-                    // 这里是是否开启购物券赠送
-                    enable_integral: "0", //是否开启赠送购物券
-                    max_deduct_integral: 0, //购物券抵扣金额
-                    is_order_paid:"0",
-                    is_order_sales:"0",
-                    
-                },
-
-
+                cardDialogVisible: false
             };
         },
         created() {
@@ -1432,12 +912,6 @@ echo $this->render('../components/goods/com-goods-agent');
                 this.getDetail(getQuery('id'));
                 this.goods_id = getQuery('id');
             }
-            if (this.is_distribution == 1) {
-                this.getPermissions();
-            } else {
-                this.is_show_distribution = 0
-            }
-            //this.getSvip();
             this.getLabels();
         },
         watch: {
@@ -1446,11 +920,6 @@ echo $this->render('../components/goods/com-goods-agent');
             },
             'attrGroups'(newVal, oldVal) {
                 this.ruleForm.use_attr = newVal.length === 0 ? 0 : 1;
-            },
-            'ruleForm.is_level'(newVal, oldVal) {
-                if (newVal === 0) {
-                    this.ruleForm.is_level_alone = 0;
-                }
             }
         },
         computed: {
@@ -1491,41 +960,6 @@ echo $this->render('../components/goods/com-goods-agent');
             }
         },
         methods: {
-
-            // 如果是效时有效、购物券
-            isPermanentChange() {
-                if (this.isPermanent) {
-                    this.integral_setting.expire = 1;
-                }
-            },
-            // 如果是效时有效 、积分券
-            isPermanentScoreChange() {
-                if (this.isPermanentScore) {
-                    this.score_setting.expire = 1;
-                }
-            },
-
-            isOrderSetting(e,o,type){
-                let self = this;
-                console.log(e,o,type); 
-                if(self.info.is_order_paid == self.info.is_order_sales){
-                    if(type=='is_score'){
-                        console.log('is_score');
-                        o!='paid'?self.order_paid.is_score = 0:'';
-                        o!='sales'?self.order_sales.is_score = 0:'';
-                    }
-                    if(type=='is_score_card'){
-                        console.log('is_score_card');
-                        o!='paid'?self.order_paid.is_score_card = 0:'';
-                        o!='sales'?self.order_sales.is_score_card = 0:'';
-                    }
-                    if(type=='is_integral_card'){
-                        console.log('is_integral_card');
-                        o!='paid'?self.order_paid.is_integral_card = 0:'';
-                        o!='sales'?self.order_sales.is_integral_card = 0:'';
-                    }
-                }
-            },
 
             loadmore() {
                 if (this.page <= this.priceName_page_count) {
@@ -1656,24 +1090,9 @@ echo $this->render('../components/goods/com-goods-agent');
                 this.ruleForm.mchCats = arr;
                 this.$refs.ruleForm.validateField('mchCats');
             },
-            getSvip() {
-                request({
-                    params: {
-                        r: 'mch/member-level/vip-card-permission',
-                        plugin: this.sign
-                    },
-                }).then(e => {
-                    if (e.data.code === 0) {
-                        this.is_svip = true;
-                    } else {
-                        this.is_svip = false;
-                    }
-                })
-            },
             delPic(index) {
                 this.ruleForm.pic_url.splice(index, 1)
             },
-
             catDialogCancel() {
                 let that = this;
                 that.mchDialogVisible = false;
@@ -1691,30 +1110,6 @@ echo $this->render('../components/goods/com-goods-agent');
                     })
                 }
             },
-
-            getPermissions() {
-                let self = this;
-                request({
-                    params: {
-                        r: 'mch/index/mall-permissions'
-                    },
-                    method: 'get',
-                }).then(e => {
-                    if (e.data.code === 0) {
-                        self.is_show_distribution = 0;
-                        e.data.data.permissions.forEach(function(item) {
-                            if (item === 'distribution') {
-                                self.is_show_distribution = 1;
-                            }
-                        })
-                    } else {
-                        self.$message.error(e.data.msg);
-                    }
-                }).catch(e => {
-                    console.log(e);
-                });
-            },
-
             store(formName) {
                 let self = this;
                 try {
@@ -1733,35 +1128,8 @@ echo $this->render('../components/goods/com-goods-agent');
                 self.$refs[formName].validate((valid) => {
                     if (valid) {
                         self.btnLoading = true;
-                        if (self.is_svip) {
-                            self.cForm.is_vip_card_goods = self.is_vip_card_goods
-                        } else {
-                            delete self.cForm['is_vip_card_goods']
-                        }
-
 
                         let postData = JSON.parse(JSON.stringify(self.cForm));
-                        // 这里是追加购物券赠送的字段
-                        // max_deduct_integral 最大抵扣购物券
-                        // enable_integral 是否启用积分赠送
-                        // integral_setting 购物券赠送设置 
-                        // 0.2 是否开启积分赠送
-                        self.isPermanentScore == 0 ? self.score_setting.expire = -1 : ''; // 是否开启永久有效
-                        postData['enable_score'] = self.info.enable_score;
-                        self.info.enable_score == 1 ? postData['score_setting'] = self.score_setting : '';
-                        // 0.3 是否开启购物赠送
-                        self.isPermanent == 0 ? self.integral_setting.expire = -1 : ''; // 是否开启永久有效
-                        postData['enable_integral'] = self.info.enable_integral;
-                        self.info.enable_integral == 1 ? postData['integral_setting'] = self.integral_setting : '';
-                        // 0.4 购物券优惠
-                        postData['max_deduct_integral'] = self.info.max_deduct_integral;
-
-                        // 0.5 是否开启订单支付后
-                        postData['is_order_paid'] = self.info.is_order_paid;
-                        self.info.is_order_paid == 1 ? postData['order_paid'] = self.order_paid : '';
-                        // 0.6 是否开启订单完结后
-                        postData['is_order_sales'] = self.info.is_order_sales;
-                        self.info.is_order_sales == 1 ? postData['order_sales'] = self.order_sales : '';
 
                         var priceName_obj = [{
                             "key": "price",
@@ -1783,13 +1151,6 @@ echo $this->render('../components/goods/com-goods-agent');
                             if (e.data.code === 0) {
                                 //保存成功
                                 self.$message.success(e.data.msg);
-                                /*  if (typeof this.referrer === 'object') {
-                                      navigateTo(this.referrer)
-                                  } else {
-                                      navigateTo({
-                                          r: this.referrer,
-                                      })
-                                  }*/
                                 navigateTo({
                                     r: this.referrer,
                                 })
@@ -1816,7 +1177,6 @@ echo $this->render('../components/goods/com-goods-agent');
                     },
                     method: 'get',
                 }).then(e => {
-                    self.cardLoading = false;
                     if (e.data.code == 0) {
                         let detail = e.data.data.detail;
                         this.detail_data = e.data.data.detail;
@@ -1825,9 +1185,6 @@ echo $this->render('../components/goods/com-goods-agent');
 
                         if (detail['use_attr'] === 0) {
                             detail['attr_groups'] = [];
-                        }
-                        if (detail.is_vip_card_goods) {
-                            self.is_vip_card_goods = detail.is_vip_card_goods
                         }
                         if (this.form && this.form.extra) {
                             for (let i in this.form.extra) {
@@ -1869,39 +1226,6 @@ echo $this->render('../components/goods/com-goods-agent');
                         this.checkFullForeheadScore();
                         self.$emit('goods-success', self.ruleForm);
 
-                        // 购物券赠送&抵扣
-                        let infoObj = e.data.data.detail; //null
-                        // 0.2 判断是否开启积分券赠送
-                        self.info.enable_score = infoObj.enable_score * 1;
-                        if (infoObj.enable_score == 1) {
-                            self.score_setting = infoObj.score_setting;
-                            // 开关这里要注意数据类型的
-                            self.score_setting.expire == -1 ? self.isPermanentScore = 0 : self.isPermanentScore = 1;
-                            // 并在原对象中删除这个字段
-                            // delete infoObj.score_setting;
-                        }
-                        // 0.3 判断是否开启购物券赠送
-                        self.info.enable_integral = infoObj.enable_integral * 1;
-                        if (infoObj.enable_integral == 1) {
-                            self.integral_setting = infoObj.integral_setting;
-                            // 开关这里要注意数据类型的
-                            self.integral_setting.expire == -1 ? self.isPermanent = 0 : self.isPermanent = 1;
-                            // 并在原对象中删除这个字段
-                            // delete infoObj.integral_setting;
-                        }
-                        self.info.max_deduct_integral = infoObj.max_deduct_integral
-                        console.log(infoObj);
-                        // 0.4 判断是否开启订单支付后设置
-                        self.info.is_order_paid = infoObj.is_order_paid * 1;
-                        if (infoObj.is_order_paid == 1) {
-                            self.order_paid = infoObj.order_paid;
-                        }
-                        // 0.5 判断是否开启订单完结后设置
-                        self.info.is_order_sales = infoObj.is_order_sales * 1;
-                        if (infoObj.is_order_sales == 1) {
-                            self.order_sales = infoObj.order_sales;
-                        }
-
                     } else {
                         self.$message.error(e.data.msg);
                     }
@@ -1909,13 +1233,6 @@ echo $this->render('../components/goods/com-goods-agent');
                     self.cardLoading = false;
                     console.log(e);
                 });
-            },
-            // 标签页
-            handleClick(tab, event) {
-                this.$emit('change-tabs', tab.name);
-                if (tab.name == "third") {
-                    this.getMembers();
-                }
             },
             // 获取商品服务
             getServices() {
@@ -1947,37 +1264,6 @@ echo $this->render('../components/goods/com-goods-agent');
                     this.ruleForm.is_default_services = 0;
                 }
             },
-            // 获取会员列表
-            getMembers() {
-                let self = this;
-                self.cardLoading = true;
-                request({
-                    params: {
-                        r: 'mch/member-level/all-member'
-                    },
-                    method: 'get',
-                    data: {}
-                }).then(e => {
-                    self.cardLoading = false;
-                    if (e.data.code == 0) {
-                        self.memberLevel = e.data.data.list;
-                        let defaultMemberPrice = [];
-                        // 以下数据用于默认规格情况下的 会员价设置
-                        self.memberLevel.forEach(function(item, index) {
-                            let obj = {};
-                            obj['id'] = index;
-                            obj['name'] = item.name;
-                            obj['level'] = 'level' + parseInt(item.level);
-                            defaultMemberPrice.push(obj);
-                        });
-                        self.defaultMemberPrice = defaultMemberPrice;
-                    } else {
-                        self.$message.error(e.data.msg);
-                    }
-                }).catch(e => {
-                    console.log(e);
-                });
-            },
             // 获取运费规则选项
             getFreight() {
                 let self = this;
@@ -2005,7 +1291,6 @@ echo $this->render('../components/goods/com-goods-agent');
                     console.log(e);
                 });
             },
-
             // 规格组合
             makeAttrGroup(e) {
                 let self = this;
@@ -2056,13 +1341,6 @@ echo $this->render('../components/goods/com-goods-agent');
                             row[i] = 0;
                         }
                     }
-                    // 动态绑定多规格会员价
-                    let obj = {};
-                    self.memberLevel.forEach(function(memberLevelItem, memberLevelIndex) {
-                        let key = 'level' + memberLevelItem.level;
-                        obj[key] = 0;
-                    });
-                    row['member_price'] = obj;
                     // 3-1.已设置数据的优先使用原数据
                     if (self.ruleForm.attr.length) {
                         for (let j in self.ruleForm.attr) {
@@ -2094,13 +1372,7 @@ echo $this->render('../components/goods/com-goods-agent');
                 let self = this;
                 if (self.batch[key] && self.batch[key] >= 0 || key === 'no') {
                     self.ruleForm.attr.forEach(function(item, index) {
-                        // 批量设置会员价
-                        // 判断字符串是否出现过，并返回位置
-                        if (key.indexOf('level') !== -1) {
-                            item['member_price'][key] = self.batch[key];
-                        } else {
-                            item[key] = self.batch[key];
-                        }
+                        item[key] = self.batch[key];
                     });
                 }
             },
@@ -2265,22 +1537,6 @@ echo $this->render('../components/goods/com-goods-agent');
             selectForm(data) {
                 this.ruleForm.form = data;
                 this.ruleForm.form_id = data ? data.id : -1;
-            },
-            fullForeheadScore() {
-                this.ruleForm.forehead_score = 99999999;
-                this.ruleForm.forehead_score_type = 1;
-                this.ruleForm.accumulative = this.ruleForm.full_forehead_score;
-                if (this.ruleForm.full_forehead_score == 0) {
-                    this.ruleForm.forehead_score = 0;
-                }
-            },
-            //检查是否积分全额抵扣
-            checkFullForeheadScore() {
-                if (this.ruleForm.forehead_score == 99999999 &&
-                    this.ruleForm.accumulative == 1
-                ) {
-                    this.ruleForm.full_forehead_score = 1;
-                }
             },
             change(e) {
                 this.$forceUpdate();

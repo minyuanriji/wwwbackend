@@ -122,7 +122,7 @@ class GroupBuyGoodsServices
      * @param $group_buy_goods
      * @return int
      */
-//    public function groupBuyGoodsEnd($group_buy_goods)
+//    poster function groupBuyGoodsEnd($group_buy_goods)
 //    {
 //        $MultiActiveEditForm = new MultiActiveEditForm();
 //        $end_time            = $MultiActiveEditForm->getEndTime($group_buy_goods['vaild_time']);

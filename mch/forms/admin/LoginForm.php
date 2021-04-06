@@ -2,6 +2,7 @@
 namespace app\mch\forms\admin;
 
 use app\mch\models\MchAdmin;
+use app\models\Admin;
 use app\models\BaseModel;
 use app\core\ApiCode;
 use app\models\User;
@@ -43,27 +44,30 @@ class LoginForm extends BaseModel{
             return $this->responseErrorInfo();
         }
         try {
+
             $adminModel = MchAdmin::findOne(['username' => $this->username, 'is_delete' => 0]);
-            if (!$adminModel) {
-                throw new \Exception('账号不存在');
+            if(!$adminModel){
+                throw new \Exception('商户账号不存在');
             }
+
             if (!\Yii::$app->getSecurity()->validatePassword($this->password, $adminModel->password)) {
                 throw new \Exception('密码错误:' . $this->password);
             }
 
             $mchModel = $adminModel->mch_id ? Mch::findOne($adminModel->mch_id) : null;
+
             if(!$mchModel || $mchModel->is_delete){
                 throw new \Exception('商户不存在');
             }
 
             if($mchModel->review_status != Mch::REVIEW_STATUS_CHECKED){
-                throw new \Exception('商户ID:' . $mchModel->id . '仍在审核中');
+                throw new \Exception('商户正在审核中:' . $mchModel->id);
             }
 
             $adminModel->mchModel  = $mchModel;
 
             $duration = $this->checked == 'true' ? 86400 : 0;
-            $res = \Yii::$app->user->login($adminModel, $duration);
+            $res = \Yii::$app->mchAdmin->login($adminModel, $duration);
 
             setcookie('__mch_login_route', '/mch/admin/login');
             $route = 'mch/overview/index';

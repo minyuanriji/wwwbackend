@@ -77,12 +77,19 @@ class Payment extends Component
         $orderNos[] = $amount;
         $unionOrderNo = 'JX' . mb_substr(md5(json_encode($orderNos)), 2);
         $title = mb_substr($title, 0, 32);
-        $paymentOrderUnion = new PaymentOrderUnion();
-        $paymentOrderUnion->mall_id = \Yii::$app->mall->id;
-        $paymentOrderUnion->user_id = \Yii::$app->user->id;
+
+        $paymentOrderUnion = PaymentOrderUnion::findOne([
+            "order_no" => $unionOrderNo
+        ]);
+        if(!$paymentOrderUnion){
+            $paymentOrderUnion = new PaymentOrderUnion();
+        }
+        $paymentOrderUnion->is_pay   = 0;
+        $paymentOrderUnion->mall_id  = \Yii::$app->mall->id;
+        $paymentOrderUnion->user_id  = \Yii::$app->user->id;
         $paymentOrderUnion->order_no = $unionOrderNo;
-        $paymentOrderUnion->amount = $amount;
-        $paymentOrderUnion->title = $title;
+        $paymentOrderUnion->amount   = $amount;
+        $paymentOrderUnion->title    = $title;
         foreach ($paymentOrders as $paymentOrder) {
             $supportPayTypes = $paymentOrder->supportPayTypes;
             if (!empty($supportPayTypes)) {
@@ -97,12 +104,18 @@ class Payment extends Component
                 throw new PaymentException();
             }
             foreach ($paymentOrders as $paymentOrder) {
-                $model = new \app\models\PaymentOrder();
+                $model = \app\models\PaymentOrder::findOne([
+                    'order_no' => $paymentOrder->orderNo
+                ]);
+                if(!$model){
+                    $model = new \app\models\PaymentOrder();
+                }
+                $model->is_pay                 = 0;
                 $model->payment_order_union_id = $paymentOrderUnion->id;
-                $model->order_no = $paymentOrder->orderNo;
-                $model->amount = $paymentOrder->amount;
-                $model->title = $paymentOrder->title;
-                $model->notify_class = $paymentOrder->notifyClass;
+                $model->order_no               = $paymentOrder->orderNo;
+                $model->amount                 = $paymentOrder->amount;
+                $model->title                  = $paymentOrder->title;
+                $model->notify_class           = $paymentOrder->notifyClass;
                 if (!$model->save()) {
                     throw new PaymentException();
                 }
@@ -133,7 +146,8 @@ class Payment extends Component
                 if (!$orderInfo) {
                     throw new PaymentException('待支付订单不存在。');
                 }
-                if(!isset($orderInfo->paymentOrder[0]->order)){
+
+                /*if(!isset($orderInfo->paymentOrder[0]->order)){
                     $order = Order::getOneData(["order_no"=> $orderInfo->paymentOrder[0]->order_no]);
                 }else{
                     $order = $orderInfo->paymentOrder[0]->order;
@@ -141,7 +155,7 @@ class Payment extends Component
 
                 if($order->status > Order::STATUS_WAIT_PAY){
                     throw new PaymentException('该订单已经支付或已取消！');
-                }
+                }*/
 
                 $supportPayTypes = (array)$orderInfo->decodeSupportPayTypes($orderInfo->support_pay_types);
                 if (!empty($supportPayTypes)

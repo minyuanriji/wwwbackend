@@ -14,6 +14,8 @@ use app\core\ApiCode;
 use app\core\payment\Payment;
 use app\forms\common\order\OrderCommon;
 use app\models\BaseModel;
+use app\models\mysql\{PaymentOrder,MemberLevel};
+use app\controllers\business\OrderCommon as MemberLevelBus;
 
 class OrderPaymentDataForm extends BaseModel
 {
@@ -54,11 +56,9 @@ class OrderPaymentDataForm extends BaseModel
         $payment = new Payment();
         
         $payment_order_union_id = !empty($this->union_id) ? $this->union_id : 0;
-        // var_dump($payment);
         $message = "";
         $code = ApiCode::CODE_SUCCESS;
         $payResult = $payment->getPayData($payment_order_union_id, $this->pay_type,$this->pay_price);
-        
         if(!is_array($payResult)){
             $message = $payResult;
             // var_dump($message);exit();
@@ -75,6 +75,13 @@ class OrderPaymentDataForm extends BaseModel
                     $code = ApiCode::CODE_FAIL;
                 }else{
                     $message = "余额支付成功";
+                    $LevelFlag = (new MemberLevel()) -> getOneLevelData();
+                    if($LevelFlag['buy_compute_way'] == 1){
+                        $paymentData = PaymentOrder::find() ->alias('p') -> where(['payment_order_union_id' => $payment_order_union_id]) -> leftJoin('jxmall_common_order_detail od','p.order_no = od.order_no') -> select('p.order_no,od.goods_id,od.user_id') -> asArray() -> one();
+                        if(!empty($paymentData)){
+                            (new MemberLevelBus()) -> getMemberLevel($paymentData);
+                        }
+                    }
                 }
                 $payResult = [];
             }

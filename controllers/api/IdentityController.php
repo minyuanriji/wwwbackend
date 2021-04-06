@@ -19,6 +19,7 @@ use app\forms\api\user\UserBindForm;
 use app\helpers\ArrayHelper;
 use app\models\ErrorLog;
 use yii;
+use app\controllers\business\GetAttentionWeChat;
 
 class IdentityController extends ApiController
 {
@@ -54,8 +55,14 @@ class IdentityController extends ApiController
         return $result;
     }
 
+    public function actionSubscribeStatus(){
+        $data = $this->requestData;
+        $result = (new GetAttentionWeChat()) -> getUserAttentionWeChatInfo($data['user_id']);
+        return $this -> asJson($result);
+    }
+
     /**
-     * 授权登录
+     * 授权登录2
      * @Author: zal
      * @Date: 2020-04-27
      * @Time: 10:33
@@ -98,7 +105,6 @@ class IdentityController extends ApiController
         $form = new RegisterForm();
         $form->attributes = $this->requestData;
         $form->mall_id = \Yii::$app->mall->id;
-        
         $res = $form->parentInfo();
         return $this->asJson($res);
     }
@@ -155,7 +161,8 @@ class IdentityController extends ApiController
     public function actionBind(){
         $smsForm = new UserBindForm();
         $smsForm->attributes = $this->requestData;
-        return $smsForm->bind();
+        $user_id = !empty($this->requestData['user_id']) ? $this->requestData['user_id'] : 0;
+        return $smsForm->bind($user_id);
     }
 
     /**
@@ -164,7 +171,9 @@ class IdentityController extends ApiController
     public function actionMiniLogin(){
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
-        $result = $wechatForm->miniAuthorized();
+        $parent_user_id = !empty($this->requestData['parent_user_id']) ? $this->requestData['parent_user_id'] : 0;
+        $parent_source = !empty($this->requestData['parent_source']) ? $this->requestData['parent_source'] : null;
+        $result = $wechatForm->miniAuthorized($parent_user_id,$parent_source);
         return $result;
     }
 

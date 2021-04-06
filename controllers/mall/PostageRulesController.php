@@ -17,6 +17,7 @@ use app\forms\common\postage\CommonPostageRules;
 use app\forms\common\postage\PostageRulesEditForm;
 use app\forms\mall\postage\PostageRulesListForm;
 use app\models\PostageRules;
+use app\controllers\business\PostageRules as PostageRulesBus;
 
 class PostageRulesController extends MallController
 {
@@ -89,6 +90,18 @@ class PostageRulesController extends MallController
     {
         $form = new PostageRulesListForm();
         return $this->asJson($form->allList());
+    }
+
+    public function actionExpressList(){
+        $data = \Yii::$app->request->get();
+        $data = (new PostageRulesBus()) -> getExpressData($data['id']);
+        $result = [
+            'code' => 0,
+            'data' => [
+                'list' => $data
+            ]
+        ];
+        return $this -> asJson($result);
     }
 
 

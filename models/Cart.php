@@ -22,6 +22,7 @@ use Yii;
  * @property string $updated_at
  * @property Store $store
  * @property Goods $goods
+ * @property int $is_on_site_consumption 是否到店消费类商品
  * @property $attrs
  */
 class Cart extends BaseActiveRecord
@@ -49,7 +50,7 @@ class Cart extends BaseActiveRecord
     {
         return [
             [['mall_id', 'user_id', 'goods_id', 'attr_id', 'created_at', 'deleted_at', 'updated_at'], 'required'],
-            [['mall_id', 'user_id', 'goods_id', 'num', 'mch_id', 'is_delete', 'attr_id'], 'integer'],
+            [['mall_id', 'user_id', 'goods_id', 'num', 'mch_id', 'is_delete', 'attr_id', 'is_on_site_consumption'], 'integer'],
             [['created_at', 'deleted_at', 'updated_at', 'sign', 'attr_info'], 'safe'],
         ];
     }
@@ -112,7 +113,7 @@ class Cart extends BaseActiveRecord
         $list = $query->with(['goods.goodsWarehouse'])
                       ->with(['attrs.memberPrice' => function ($query) {
                             $query->where(['is_delete' => 0]);
-                }])->select(['c.id','c.goods_id','c.attr_id','c.num'])->orderBy(['c.id' => SORT_DESC])->all();
+                }])->select(['c.id', 'c.mch_id', 'c.goods_id','c.attr_id','c.num', 'c.is_on_site_consumption'])->orderBy(['c.id' => SORT_DESC])->all();
         return $list;
     }
 

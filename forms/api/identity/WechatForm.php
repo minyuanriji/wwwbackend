@@ -23,11 +23,12 @@ use app\models\BaseModel;
 use app\models\ErrorLog;
 use app\models\Mall;
 use app\models\User;
+use app\models\user\User as UserMode;
 use app\models\UserInfo;
 use jianyan\easywechat\Wechat;
 use function EasyWeChat\Kernel\Support\str_random;
 use function EasyWeChat\Kernel\Support\get_client_ip;
-
+use app\models\mysql\{UserParent,UserChildren,QrcodeParameter};
 class WechatForm extends BaseModel
 {
     public $code;
@@ -64,6 +65,7 @@ class WechatForm extends BaseModel
 
             if(!empty($result)){
                 $userInfo = $result->original;
+
                 $phoneConfig = AppConfigLogic::getPhoneConfig();
                 //没有开启全网通，则直接入库，如果开启了，返回给前端
                 if(empty($phoneConfig["all_network_enable"])){
@@ -93,7 +95,7 @@ class WechatForm extends BaseModel
 
     /**
      * 微信授权
-     * @Author: zal
+     * @Author: zal   2
      * @Date: 2020-04-27
      * @Time: 10:33
      * @return array
@@ -109,7 +111,6 @@ class WechatForm extends BaseModel
             $result = $wechatModel->app->oauth->user();
             \Yii::warning("授权结果 result:".json_encode($result));
             if(!empty($result)){
-
                 $userInfo = $result->original;
                 $phoneConfig = AppConfigLogic::getPhoneConfig();
                 //没有开启全网通，则直接入库，如果开启了，返回给前端
@@ -130,7 +131,6 @@ class WechatForm extends BaseModel
                         $result->access_token = $oauth->token;
                         $result->save();
                     }
-
                     \Yii::warning("wechatForm authorized result:".var_export($result,true));
                     if(!empty($result)){
                         \Yii::$app->user->login($result);
@@ -147,10 +147,6 @@ class WechatForm extends BaseModel
                 }
             }
         }
-        // echo '<pre>';
-        // var_dump($returnData);
-        // exit();
-        // $returnData['access_token'] = '1231';
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);
     }
 
@@ -160,8 +156,13 @@ class WechatForm extends BaseModel
      * @throws \EasyWeChat\Kernel\Exceptions\DecryptException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      */
-    public function miniAuthorized(){
+    public function miniAuthorized($parent_user_id = '',$parent_source = ''){
         try{
+            if(!empty($parent_source)){
+                $source_data = (new QrcodeParameter()) -> getParentData($parent_source);
+                $source_data = json_decode($source_data['data'],true);
+                $parent_user_id = $source_data['pid'];
+            }
             /** @var Wechat $wechatModel */
             $wechatModel = \Yii::$app->wechat;
             //微信小程序授权登录
@@ -209,6 +210,38 @@ class WechatForm extends BaseModel
             $openid = md5($data["openid"].$randStr);
             \Yii::$app->cache->set($openid,$data);
             $returnData["key"] = $openid;
+            if(!empty($parent_user_id)){
+                $transaction = \Yii::$app->db->beginTransaction();
+                try{
+                    $user_data = (new UserMode()) -> getOneUserParent($returnData['access_token']);
+                    (new UserMode()) -> updateUsers(['parent_id' => $parent_user_id],$user_data['id']);
+                    if(empty($user_data['parent_id'])){
+                        $parent_data = new UserParent();
+                        $parent_data -> mall_id = \Yii::$app->mall->id;
+                        $parent_data -> user_id = $user_data['id'];
+                        $parent_data -> parent_id = $parent_user_id;
+                        $parent_data -> updated_at = time();
+                        $parent_data -> created_at = time();
+                        $parent_data -> deleted_at = time();
+                        $parent_data -> is_delete = 0;
+                        $parent_data -> level = 1;
+                        $parent_data -> save();
+                        $UserChildren = new UserChildren();
+                        $UserChildren -> id = null;
+                        $UserChildren -> mall_id = \Yii::$app->mall->id;
+                        $UserChildren -> user_id = $parent_user_id;
+                        $UserChildren -> child_id = $user_data['id'];
+                        $UserChildren -> level = 1;
+                        $UserChildren -> created_at = time();
+                        $UserChildren -> updated_at = time();
+                        $UserChildren -> deleted_at = 0;
+                        $UserChildren -> is_delete = 0;
+                        $UserChildren -> save();
+                    }
+                    $transaction -> commit();
+                }catch (\Exception $e){
+                }
+            }
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);
         }catch (\Exception $ex){
 

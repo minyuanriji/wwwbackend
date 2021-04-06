@@ -30,7 +30,7 @@ class IntegralController extends ApiController
     }
 
     /**
-     * 购物券管理中心页面
+     * 红包券管理中心页面
      * @Author bing
      * @DateTime 2020-10-13 09:58:24
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -43,7 +43,7 @@ class IntegralController extends ApiController
             return $this->error('type参数错误');
         $controller_type = $reques_data['controller_type'] ?? 0;
         $user_id = Yii::$app->user->id ?? 0;
-        //查询用户的购物券、积分券余额
+        //查询用户的红包券、积分券余额
         $wallet = User::getUserWallet($user_id);
         $where = array(
             ['=','controller_type',$controller_type],
@@ -62,7 +62,7 @@ class IntegralController extends ApiController
     }
 
     /**
-     * 购物券、积分券发放计划
+     * 红包券、积分券发放计划
      * @Author bing
      * @DateTime 2020-10-13 14:45:49
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -91,7 +91,7 @@ class IntegralController extends ApiController
     }
     
     /**
-     * 动态购物券、积分券变动明细
+     * 动态红包券、积分券变动明细
      * @Author bing
      * @DateTime 2020-10-13 14:45:49
      * @copyright: Copyright (c) 2020 广东七件事集团

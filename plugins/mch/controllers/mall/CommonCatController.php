@@ -27,7 +27,6 @@ class CommonCatController extends Controller
                 $form->attributes = \Yii::$app->request->post('form');
                 return $this->asJson($form->save());
             } else {
-                exit('2');
                 $form = new CommonCatForm();
                 $form->attributes = \Yii::$app->request->get();
                 return $this->asJson($form->getDetail());

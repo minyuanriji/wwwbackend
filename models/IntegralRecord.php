@@ -79,7 +79,7 @@ class IntegralRecord extends BaseActiveRecord{
             $model->attributes = $log;
             $res = $model->save();
             if($res === false) throw new Exception($model->getErrorMessage());
-            $wallet = User::getUserWallet($log['user_id']);
+            $wallet = User::findOne($log['user_id']);
             if($log['controller_type'] == 1){
                 switch($log['type']){
                     case Integral::TYPE_ALWAYS:
@@ -95,10 +95,11 @@ class IntegralRecord extends BaseActiveRecord{
                         $wallet->static_score += $log['money'];
                     break;
                     case Integral::TYPE_DYNAMIC:
-                        $wallet->dynamic_score += $log['money'];
+                        $wallet->score         += $log['money'];
                     break;
                 }
-                if($log['source_table']=='integral') $wallet->score += $log['money']; 
+                $wallet->dynamic_score = $wallet->score;
+                $wallet->total_score   = $wallet->static_score + $wallet->score;
             }
 
             //绑定积分券所属上级
@@ -146,6 +147,7 @@ class IntegralRecord extends BaseActiveRecord{
         ->andWhere(array('=','type',Integral::TYPE_DYNAMIC))
         ->limit(100)
         ->all();
+//        \Yii::$app->redis -> set('key2',json_encode($expire_list));
         if(!empty($expire_list)){
             foreach($expire_list as $expire){
                 Yii::$app->mall = Mall::findOne(array('id'=>$expire['mall_id']));
@@ -161,19 +163,19 @@ class IntegralRecord extends BaseActiveRecord{
                     'record_id' => $expire['id']
                 );
     
-                //查询当前购物券的已经抵扣金额
+                //查询当前红包券的已经抵扣金额
                 $already_deduct = IntegralDeduct::countIntegralDeduct($expire['id']);
                 $can_deduct_money = $expire['money'] - $already_deduct;
 
                 if($expire['controller_type'] == 1){
                     if($dynamic_integral > 0 && intval(bcmul($dynamic_integral,100)) >= intval(bcmul($can_deduct_money,100))){
                         $deduct['money'] = -1 *  $can_deduct_money;
-                        $deduct['desc'] = '购物券('.$expire['id'].')超过过期时间：'.date('Y-m-d H:i:s',$expire['expire_time']).',清零余额';
-                        //足够扣除,则正常扣减 ：购物券
+                        $deduct['desc'] = '红包券('.$expire['id'].')超过过期时间：'.date('Y-m-d H:i:s',$expire['expire_time']).',清零余额';
+                        //足够扣除,则正常扣减 ：红包券
                     }else{
                         if($dynamic_integral != 0){
                             $deduct['money'] = -1 *  $dynamic_integral;
-                            $deduct['desc'] = '购物券('.$expire['id'].')超过过期时间：'.date('Y-m-d H:i:s',$expire['expire_time']).',清零余额';
+                            $deduct['desc'] = '红包券('.$expire['id'].')超过过期时间：'.date('Y-m-d H:i:s',$expire['expire_time']).',清零余额';
                         }
                     }
                 }else{
@@ -210,7 +212,7 @@ class IntegralRecord extends BaseActiveRecord{
     }
 
     /**
-     * 获取即将过期的积分、购物券
+     * 获取即将过期的积分、红包券
      * @Author bing
      * @DateTime 2020-10-08 19:07:16
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -222,7 +224,7 @@ class IntegralRecord extends BaseActiveRecord{
             'type' => Integral::TYPE_DYNAMIC,
             'status' => 1,
             'user_id' => $user_id
-        ))->with(['deduct'])
+        ))->with(['deduct'])->andWhere("expire_time>'".time()."'")
         ->orderBy('expire_time ASC')->all();
     }
 

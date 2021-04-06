@@ -18,13 +18,13 @@ use app\forms\api\poster\PosterForm;
 
 class GoodsController extends ApiController
 {
-    /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-04-30
-     * @Time: 16:11
-     * @Note:商品详情
-     * @return \yii\web\Response
-     */
+
+//     * @Author: 广东七件事 ganxiaohao
+//     * @Date: 2020-04-30
+//     * @Time: 16:11
+//     * @Note:商品详情
+//     * @return \yii\web\Response
+//     *
     public function actionDetail()
     {
         $form = new GoodsForm();
@@ -62,7 +62,7 @@ class GoodsController extends ApiController
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
+     * @Author: 广东七件事 ganxiaohao   1
      * @Date: 2020-04-30
      * @Time: 16:21
      * @Note:商品列表

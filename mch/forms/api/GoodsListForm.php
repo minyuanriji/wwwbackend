@@ -66,7 +66,8 @@ class GoodsListForm extends BaseModel{
                                   ->where([
                                        'g.is_delete' => 0,
                                        'g.status' => 1,
-                                       'g.mall_id' => \Yii::$app->mall->id
+                                       'g.mall_id' => \Yii::$app->mall->id,
+                                       'g.mch_id' => $this->mch_id
                                   ])->leftJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
 
             if ($this->keyword) {

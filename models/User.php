@@ -548,7 +548,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
 
 
     /**
-     * 获取用户可用购物券总额
+     * 获取用户可用红包券总额
      * @Author bing
      * @DateTime 2020-10-08 17:10:02
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -561,7 +561,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
     }
 
     /**
-     * 获取用户可用购物券总额
+     * 获取用户可用红包券总额
      * @Author bing
      * @DateTime 2020-10-08 17:10:02
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -581,12 +581,38 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
      * @param [type] $user_id
      * @return object|array|boolean
      */
-    public static function getUserWallet($user_id,$mall_id=null){
-        return self::find()
-        ->select('id,mall_id,parent_id,second_parent_id,third_parent_id,is_inviter,static_integral,dynamic_integral,score,static_score,dynamic_score')
-        ->where(array('id'=>$user_id,'mall_id'=>Yii::$app->mall->id ?? $mall_id))
-        ->one();
+    public static function getUserWallet($user_id, $mall_id = null){
+        $selects = 'id,mall_id,parent_id,second_parent_id,third_parent_id,is_inviter,static_integral,dynamic_integral,score,static_score,dynamic_score';
+        $wallet = self::find()->select($selects)
+                    ->where([
+                        'id'      =>$user_id,
+                        'mall_id' => Yii::$app->mall->id ?? $mall_id
+                    ])->one();
+        $wallet['dynamic_score'] = $wallet['score'];
+        return $wallet;
     }
+
+    /**
+     * 更新用户钱包
+     * @return boolean
+     */
+    public static function updateUserWallet(User $user){
+
+        //查询用户可用积分券按过期时间升序排列
+        $can_use_integrals = IntegralRecord::getIntegralAscExpireTime($user->id, 0);
+        $dynamicScores = 0;
+
+        foreach($can_use_integrals as $integral){
+            $dynamicScores += !empty($integral['deduct']) ? $integral['money'] + array_sum(array_column($integral['deduct'], 'money')) : $integral['money'];
+        }
+
+        $user->score         = $dynamicScores;
+        $user->dynamic_score = $user->score;
+        $user->total_score   = $user->dynamic_score + $user->static_score;
+
+        return $user->save();
+    }
+
 
     public static function getOneUserFlag($user_id,$mall_id=null){
         return self::find()

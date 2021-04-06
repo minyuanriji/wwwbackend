@@ -13,7 +13,7 @@ class GetMchsController extends ApiController {
     public function actionIndex(){
 
         $form = new CommonMchForm();
-        $form->attributes = \Yii::$app->request->post();
+        $form->attributes = $this->requestData;
 
         $this->asJson($form->getList());
     }

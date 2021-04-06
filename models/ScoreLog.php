@@ -41,7 +41,7 @@ class ScoreLog extends BaseActiveRecord
             [['mall_id', 'user_id', 'type', 'score','current_score', 'custom_desc', 'created_at'], 'required'],
             [['mall_id', 'user_id', 'type'], 'integer'],
             [['score','current_score'], 'number'],
-            [['custom_desc'], 'string'],
+            [['custom_desc', 'source_type'], 'string'],
             [['created_at'], 'safe'],
             [['desc'], 'string', 'max' => 255],
         ];

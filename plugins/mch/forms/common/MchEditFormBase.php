@@ -3,6 +3,7 @@
 namespace app\plugins\mch\forms\common;
 
 use app\forms\common\version\Compatible;
+use app\models\Admin;
 use app\models\BaseModel;
 use app\models\Store;
 use app\models\User;
@@ -33,6 +34,7 @@ abstract class MchEditFormBase extends BaseModel
     public $province_id;
     public $city_id;
     public $district_id;
+    public $integral_fee_rate;
 
     /**
      * @var Mch
@@ -43,11 +45,11 @@ abstract class MchEditFormBase extends BaseModel
     public function rules()
     {
         return [
-            [['mch_common_cat_id', 'address', 'username', 'mobile', 'service_mobile', 'realname', 'name'], 'required'],
+            [['mch_common_cat_id',  'mobile', 'service_mobile', 'realname', 'name'], 'required'],
             [['user_id', 'mch_common_cat_id', 'transfer_rate', 'sort', 'id', 'status', 'is_recommend',
-                'province_id', 'city_id', 'district_id'], 'integer'],
-            [['mobile', 'logo', 'service_mobile', 'password'], 'string', 'max' => 255],
-            [['realname', 'wechat', 'name', 'username', 'password'], 'string', 'max' => 65],
+                'province_id', 'city_id', 'district_id', 'integral_fee_rate'], 'integer'],
+            [['mobile', 'address', 'logo', 'service_mobile', 'password'], 'string', 'max' => 255],
+            [['username', 'realname', 'wechat', 'name', 'username', 'password'], 'string', 'max' => 65],
             [['bg_pic_url'], 'safe']
         ];
     }
@@ -80,12 +82,31 @@ abstract class MchEditFormBase extends BaseModel
     protected function setMch()
     {
         $mch = $this->getMch();
+
+        if(!$this->user_id)
+        {
+            throw new \Exception('请设置小程序用户！');
+        }
+
+        //切换小程序用户
+        //需要把原先所绑定用户的商家ID置0
+        if($mch->user_id && $mch->user_id != $this->user_id)
+        {
+            $user = User::findOne($mch->user_id);
+            if($user)
+            {
+                $user->mch_id = 0;
+                $user->save();
+            }
+        }
+
         $mch->user_id = $this->user_id ?: 0;
         $mch->realname = $this->realname;
         $mch->mobile = $this->mobile;
         $mch->mch_common_cat_id = $this->mch_common_cat_id;
         $mch->wechat = $this->wechat ?: '';
         $mch->transfer_rate = $this->transfer_rate ?: 0;
+        $mch->integral_fee_rate = $this->integral_fee_rate ? : 0;
         $mch->sort = $this->sort ?: 100;
         $mch->status = $this->status ?: 0;
         $mch->is_recommend = $this->is_recommend ?: 0;
@@ -184,53 +205,69 @@ abstract class MchEditFormBase extends BaseModel
         }
     }
 
-    protected function setUser()
+    protected function setAdmin()
     {
-        /** @var User $user */
-        $user = User::find()->where([
+        if(empty($this->username)){
+            $this->username = uniqid();
+        }
+
+        $admin = Admin::find()->where([
             'username' => $this->username,
             'mall_id' => \Yii::$app->mall->id,
             'is_delete' => 0,
-        ])->andWhere(['!=', 'mch_id', 0])->one();
-        // 商户编辑的时候无需判断
-        if ($user && $user->mch_id != $this->id) {
+        ])->one();
+
+        if ($admin && $admin->mch_id != $this->id) {
             throw new \Exception('商户账号已存在！');
         }
 
-        // 商户账号创建
-        $user = User::findOne(['mch_id' => $this->mch->id]);
-        if (!$user) {
-            if (!$this->password) {
-                throw new \Exception('请填写商户密码');
-            }
-
+        if ($this->password) {
             if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $this->password) > 0) {
                 throw new \Exception('密码不能包含中文字符');
             }
-
-            $user = new User();
-            $user->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
-            $user->mch_id = $this->mch->id;
-            $user->mall_id = \Yii::$app->mall->id;
-            $user->auth_key = \Yii::$app->security->generateRandomString();
-            $user->access_token = \Yii::$app->security->generateRandomString();
-        }
-        $user->nickname = $this->mch->realname;
-        $user->mobile = $this->mch->mobile;
-        $user->username = $this->username;
-        $res = $user->save();
-        if (!$res) {
-            throw new \Exception($this->responseErrorMsg($user));
         }
 
-        $userIdentity = UserIdentity::findOne(['user_id' => $user->id]);
-        if (!$userIdentity) {
-            $userIdentity = new UserIdentity();
-            $userIdentity->user_id = $user->id;
-            $res = $userIdentity->save();
-            if (!$res) {
-                throw new \Exception($this->responseErrorMsg($userIdentity));
+        // 商户账号创建
+        $admin = Admin::findOne(['mch_id' => $this->mch->id]);
+        if (!$admin) {
+            if (!$this->password) {
+                $this->password = uniqid();
             }
+
+            $admin = new Admin();
+            $admin->mch_id          = $this->mch->id;
+            $admin->mall_id         = \Yii::$app->mall->id;
+            $admin->auth_key        = \Yii::$app->security->generateRandomString();
+            $admin->access_token    = \Yii::$app->security->generateRandomString();
+            $admin->admin_type      = Admin::ADMIN_TYPE_OPERATE;
+        }
+
+        if ($this->password) {
+            $admin->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
+        }
+
+        $admin->username = $this->username;
+        if (!$admin->save()) {
+            throw new \Exception($this->responseErrorMsg($admin));
+        }
+    }
+
+    protected function setUser()
+    {
+        if(!$this->user_id){
+            throw new \Exception('请设置小程序用户！');
+        }
+        $user = User::findOne($this->user_id);
+        if(!$user){
+            throw new \Exception('小程序用户不存在！');
+        }
+        if($user->mch_id && $user->mch_id != $this->id){
+            throw new \Exception('小程序用户已绑定其它商户！');
+        }
+
+        $user->mch_id = $this->mch->id;
+        if (!$user->save()) {
+            throw new \Exception($this->responseErrorMsg($user));
         }
     }
 }

@@ -39,6 +39,7 @@ class OrderController extends OrderManagerController
             if (\Yii::$app->request->post('flag') === 'EXPORT') {
                 $fields = explode(',', \Yii::$app->request->post('fields'));
                 $form = new OrderForm();
+                $form->attributes = \Yii::$app->request->get();
                 $form->attributes = \Yii::$app->request->post();
                 $form->fields = $fields;
                 $form->search();
@@ -357,7 +358,6 @@ class OrderController extends OrderManagerController
         if (\Yii::$app->request->isPost) {
             $form = new OrderRefundForm();
             $form->attributes = \Yii::$app->request->post();
-            
             return $this->asJson($form->save());
         }
     }

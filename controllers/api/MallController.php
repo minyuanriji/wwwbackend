@@ -45,7 +45,7 @@ class MallController extends ApiController
             $top_pic_url = $userCenter["top_pic_url"];
         }
 
-        //获取购物券开启状态
+        //获取红包券开启状态
         $optionCache = OptionLogic::get(
             Option::NAME_PAYMENT,
             \Yii::$app->mall->id,

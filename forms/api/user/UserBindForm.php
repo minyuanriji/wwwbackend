@@ -11,7 +11,7 @@
 namespace app\forms\api\user;
 
 use app\core\ApiCode;
-use app\forms\api\identity\SmsForm;
+use app\forms\api\identity\{SmsForm,RegisterForm};
 use app\helpers\sms\Sms;
 use app\logic\CommonLogic;
 use app\logic\UserLogic;
@@ -40,7 +40,7 @@ class UserBindForm extends BaseModel
      * @Time: 14:33
      * @return array
      */
-    public function bind()
+    public function bind($parent_id)
     {
         if (!$this->validate()) {
             return $this->returnApiResultData();
@@ -93,7 +93,7 @@ class UserBindForm extends BaseModel
                     throw new \Exception("手机号已经被其他用户绑定过了");
                 }else if(empty($bindUserInfo)){
                     //当前平台没有该用户信息，就新增一条
-                    $userResult = UserLogic::userRegister($userInfo,$userResult);
+                    $userResult = UserLogic::userRegister($userInfo,$userResult,$parent_id);
                 }
             }else{
                 //没有绑定手机号
@@ -101,7 +101,7 @@ class UserBindForm extends BaseModel
                 $currentUserInfo = UserInfo::getOneUserInfo(["user_id" => \Yii::$app->user->id,"platform" => \Yii::$app->appPlatform,'is_delete' => 0]);
                 if(empty($currentUserInfo)){
                     $userInfo["mobile"] = $this->mobile;
-                    $userResult = UserLogic::userRegister($userInfo);
+                    $userResult = UserLogic::userRegister($userInfo,[],$parent_id);
                     if($userResult === false){
                         return $this->returnApiResultData(ApiCode::CODE_FAIL,'绑定失败');
                     }

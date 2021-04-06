@@ -125,6 +125,7 @@ class CommonLogic
         $url = $host . $path;
         $file = \Yii::getAlias('@runtime/image/') . $dir;//生成的二维码保存地址
 
+
         if (!file_exists($file)) {
             FileHelper::createDirectory(dirname($file));
             $qrCode = (new QrCode($url, ErrorCorrectionLevelInterface::HIGH))

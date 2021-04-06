@@ -31,7 +31,7 @@ class GoodsEditForm extends BaseModel
      * 保存
      * @return array
      */
-//    public function save()
+//    poster function save()
 //    {
 //        if (!$this->validate()) {
 //            return $this->returnApiResultData(0, $this->responseErrorMsg($this));

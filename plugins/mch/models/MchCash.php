@@ -43,9 +43,10 @@ class MchCash extends BaseActiveRecord
         return [
             [['mall_id', 'mch_id', 'money', 'created_at', 'updated_at', 'deleted_at', 'type'], 'required'],
             [['mall_id', 'mch_id', 'status', 'virtual_type', 'is_delete', 'transfer_status'], 'integer'],
-            [['money'], 'number'],
+            [['money', 'fact_price'], 'number'],
             [['type', 'content'], 'string'],
-            [['created_at', 'updated_at', 'deleted_at'], 'safe'],
+            [['created_at', 'updated_at', 'deleted_at', 'service_fee_rate', 'fact_price'], 'safe'],
+            [['service_fee_rate'], 'number', 'min' => 0, 'max' => 100],
             [['order_no', 'type_data'], 'string', 'max' => 255],
         ];
     }
@@ -61,6 +62,7 @@ class MchCash extends BaseActiveRecord
             'mch_id' => '多商户ID',
             'money' => '提现金额',
             'order_no' => '订单号',
+            'service_fee_rate' => '服务费',
             'status' => '提现状态：0=待处理，1=已转账，2=已拒绝',
             'transfer_status' => '打款状态: 0.未打款 | 1.已打款',
             'type' => '提现类型 wx 微信| alipay 支付宝 | bank 银行卡 | balance 余额',

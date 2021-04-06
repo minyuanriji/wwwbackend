@@ -393,7 +393,6 @@ Yii::$app->loadComponentView('order/com-edit-address');
                         </div>
                     </div>
 
-
                     <div flex="main:center cross:center" class="com-order-info" style="width:18%;">
                         <el-tooltip class="item" effect="dark" content="同意" placement="top">
                             <img class="com-order-icon" src="statics/img/mall/pass.png" alt="" v-if="item.status == 1"
@@ -412,8 +411,7 @@ Yii::$app->loadComponentView('order/com-edit-address');
                         </el-tooltip>
                         <el-tooltip class="item" effect="dark" content="打款" placement="top">
                             <img class="com-order-icon" src="statics/img/mall/pay.png" alt=""
-                                 v-if="(item.type == 1 && item.status == 2 && item.is_send == 1 && item.is_confirm == 1 && item.is_refund == 0) ||
-                                 (item.type == 0 && item.status == 2 && item.is_refund == 0)"
+                                 v-if="(item.type == 1 && item.status == 2 && item.is_send == 1 && item.is_confirm == 1 && item.is_refund == 0) || (item.type == 0 && item.status == 2 && item.is_refund == 0) || (item.type == 1 && item.status == 2 && item.is_send == 0 && item.is_confirm == 0 && item.is_refund == 0)"
                                  @click="openDialog(item, refundConfirmVisible = true)">
                         </el-tooltip>
                         <!-- 售后详情 -->
@@ -531,6 +529,9 @@ Yii::$app->loadComponentView('order/com-edit-address');
             };
         },
         created() {
+            // if(localStorage.getItem('refund_page')){
+            //     this.search.page = localStorage.getItem('refund_page');
+            // }
             this.getList();
         },
         methods: {
@@ -555,7 +556,6 @@ Yii::$app->loadComponentView('order/com-edit-address');
                 Object.keys(this.search).map((key) => {
                     params[key] = this.search[key]
                 });
-
                 request({
                     params: params,
                 }).then(e => {
@@ -577,7 +577,10 @@ Yii::$app->loadComponentView('order/com-edit-address');
             },
             // 分页
             pageChange(page) {
+                console.log(this.pagination);
                 this.search.page = page;
+                // localStorage.setItem('current_page',this.pagination.current_page);
+                // localStorage.setItem('refund_page',page);
                 this.getList();
             },
             // 新的
@@ -588,10 +591,13 @@ Yii::$app->loadComponentView('order/com-edit-address');
             },
             // 进入商品详情
             toDetail(id) {
-                this.$navigate({
-                    r: 'mall/order/detail',
-                    order_id: id
-                })
+                var path = window.location.origin + window.location.pathname + '?r=mall%2Forder%2Fdetail&order_id=' + id;
+                window.open(path,'_blank');
+                // return;
+                // this.$navigate({
+                //     r: 'mall/order/detail',
+                //     order_id: id
+                // })
             },
             toRefundDetail(id) {
                 this.$navigate({

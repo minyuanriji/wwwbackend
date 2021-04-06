@@ -172,7 +172,7 @@ class FinanceController extends MallController
     }
 
     /**
-     * 购物券发放计划
+     * 红包券发放计划
      * @Author bing
      * @DateTime 2020-10-13 14:45:49
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -211,7 +211,7 @@ class FinanceController extends MallController
     }
     
     /**
-     * 购物券管理中心页面
+     * 红包券管理中心页面
      * @Author bing
      * @DateTime 2020-10-13 09:58:24
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -243,7 +243,7 @@ class FinanceController extends MallController
     }
 
     /**
-     * 动态购物券变动明细
+     * 动态红包券变动明细
      * @Author bing
      * @DateTime 2020-10-13 14:45:49
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -343,7 +343,7 @@ class FinanceController extends MallController
     }
 
     /**
-     * 动态购物券变动明细
+     * 动态红包券变动明细
      * @Author bing
      * @DateTime 2020-10-13 14:45:49
      * @copyright: Copyright (c) 2020 广东七件事集团

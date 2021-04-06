@@ -11,6 +11,11 @@ class Integral extends Common{
             ['status' => 0]
         ]) -> asArray() -> all();
     }
+
+    public function getFirstIntegral($user_id){
+        return $this -> find() -> where(['user_id' => $user_id,'period_unit' => 'month']) -> one();
+    }
+
     //更新
     public function UpdateCouponStatus($id){
         return $this -> updateAll(['status' => 2,'finish_period' => 1],['id' => $id]);

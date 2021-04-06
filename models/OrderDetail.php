@@ -79,7 +79,7 @@ class OrderDetail extends BaseActiveRecord
     {
         return [
             [['order_id', 'goods_id', 'num', 'unit_price', 'total_original_price', 'total_price', 'member_discount_price', 'goods_info', 'created_at', 'updated_at', 'deleted_at'], 'required'],
-            [['order_id', 'goods_id', 'num', 'is_delete', 'is_refund', 'refund_status', 'form_id', 'use_user_coupon_id'], 'integer'],
+            [['order_id', 'goods_id', 'num', 'is_delete', 'is_refund', 'refund_status', 'form_id', 'use_user_coupon_id', 'integral_fee_rate', 'is_score_send'], 'integer'],
             [['unit_price', 'total_original_price', 'total_price', 'member_discount_price', 'back_price', 'coupon_discount_price', 'use_score_price', 'use_score', 'score_price', 'full_relief_price', 'integral_price'], 'number'],
             [['goods_info', 'goods_no', 'form_data'], 'string'],
             [['created_at', 'updated_at', 'deleted_at'], 'safe'],
@@ -116,7 +116,7 @@ class OrderDetail extends BaseActiveRecord
             'use_user_coupon_id'    => '优惠券id',
             'coupon_discount_price' => '优惠券价格',
             'full_relief_price'     => '满减金额',
-            'integral_price'        => '购物券抵扣金额',
+            'integral_price'        => '红包券抵扣金额',
         ];
     }
 
@@ -284,5 +284,9 @@ class OrderDetail extends BaseActiveRecord
             }
         }
         return $returnData;
+    }
+
+    public function getOrderGoodsConsumeVerification(){
+        return $this->hasOne(OrderGoodsConsumeVerification::className(), ['order_detail_id' => 'id']);
     }
 }

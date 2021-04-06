@@ -2,6 +2,8 @@
 namespace app\mch\forms\common\goods;
 
 use app\core\ApiCode;
+use app\forms\common\goods\CommonGoods;
+use app\forms\common\mch\MchSettingForm;
 use app\models\BaseModel;
 use app\models\Goods;
 use app\plugins\mch\models\MchGoods;
@@ -32,8 +34,26 @@ class PluginMchGoods extends BaseModel{
             if (!$mchGoods) {
                 throw new \Exception('商品不存在');
             }
-            $mchGoods->status = 1;
-            $mchGoods->remark = '申请上架';
+
+            // 多商户开启商品上架审核
+            $form = new MchSettingForm();
+            $setting = $form->search();
+            if ($setting['is_goods_audit'] != 1) {
+                $common = CommonGoods::getCommon();
+                $goods = $common->getGoods($mchGoods->goods_id);
+                if (!$goods) {
+                    throw new \Exception('goods商品不存在或以删除');
+                }
+                $goods->status = Goods::STATUS_ON;
+                if (!$goods->save()) {
+                    throw new \Exception($goods);
+                }
+                $mchGoods->status = 2;
+            }else{
+                $mchGoods->status = 1;
+                $mchGoods->remark = '申请上架';
+            }
+
             $res = $mchGoods->save();
             if (!$res) {
                 throw new \Exception($this->responseErrorMsg($mchGoods));

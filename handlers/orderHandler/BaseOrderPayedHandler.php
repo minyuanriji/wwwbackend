@@ -28,6 +28,7 @@ use app\models\OrderRefund;
 
 use app\models\User;
 use app\models\UserCard;
+use app\forms\efps\distribute\EfpsDistributeForm;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
 
 /**
@@ -84,17 +85,27 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
 
     protected function action()
     {
+
+        //赠送积分
+        IntegralLogic::sendScore($this->order);
+
         // 发放积分
-        $this->giveIntegral();
+       //$this->giveIntegral();
         // 发放积分券
         // echo '支付后发放积分券'.PHP_EOL;
-        IntegralLogic::shopSendScore($this->order,'paid');
-        // 发放购物券
-        // echo '支付后发放购物券'.PHP_EOL;
+        //IntegralLogic::shopSendScore($this->order,'paid');
+        // 发放红包券
+        // echo '支付后发放红包券'.PHP_EOL;
         IntegralLogic::shopSendIntegral($this->order,'paid');
         // 消费升级会员等级
         //echo '消费升级会员等级'.PHP_EOL;
         //$this->upLevel();
+
+        //分账
+        EfpsDistributeForm::goodsOrder($this->order);
+
+        //多商户订单结算
+        //GoodsOrderAutoSettleForm::settle($this->order);
     }
 
     /**

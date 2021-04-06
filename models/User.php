@@ -583,7 +583,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
                         'id'      =>$user_id,
                         'mall_id' => Yii::$app->mall->id ?? $mall_id
                     ])->one();
-        $wallet['dynamic_integral'] = $wallet['score'];
+        $wallet['dynamic_score'] = $wallet['score'];
         return $wallet;
     }
 

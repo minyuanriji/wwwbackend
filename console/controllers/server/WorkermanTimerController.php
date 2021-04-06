@@ -97,11 +97,11 @@ class WorkermanTimerController extends WorkermanBaseController
             try{
                 $res = Integral::sendIntegral();
                 if($res === false) throw new Exception(Integral::getError());
-                $lock_tools->unlock($lock_name);
+                //$lock_tools->unlock($lock_name);
             }catch(Exception $e){
                 Yii::error('定时任务：sendIntegral,执行失败,错误信息：'.$e->getMessage());
                 echo '定时任务：sendIntegral,执行失败,错误信息：'.$e->getMessage().PHP_EOL;
-                $lock_tools->unlock($lock_name);
+                //$lock_tools->unlock($lock_name);
                 Yii::getLogger()->flush(true);
             }
         //}

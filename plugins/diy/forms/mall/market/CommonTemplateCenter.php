@@ -184,12 +184,12 @@ class CommonTemplateCenter extends BaseModel
     {
         if ($templatePermission['is_all'] != 1) {
             $showList = $templatePermission['list'];
-            if (empty($showList)) {
-                $showList = [0];
-            }
         } else {
             // $showList = \Yii::$app->cloud->template->allId(['dont_validate_domain' => 1]);
             $showList = CloudTemplate::find()->select('id')->column();
+        }
+        if (empty($showList)) {
+            $showList = [0];
         }
         return $showList;
     }

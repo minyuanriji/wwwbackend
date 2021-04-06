@@ -60,7 +60,7 @@ class TemplateEditForm extends BaseModel
     {
         $common = CommonTemplate::getCommon();
         $data = [
-            'allComponents' => $common->allComponents(),
+            'allComponents' => $common->allComponentsa(),
             'overrun' => (new MallOverrunForm())->getSetting(),
         ];
 

@@ -345,6 +345,11 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
         return $this->hasOne(UserInfo::className(), ['user_id' => 'id']);
     }
 
+    public function getUserIdentity()
+    {
+        return $this->hasOne(UserIdentity::className(), ['user_id' => 'id']);
+    }
+
     public function getUserSetting()
     {
         return $this->hasOne(UserSetting::className(), ['user_id' => 'id']);

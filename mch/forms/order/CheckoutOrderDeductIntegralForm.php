@@ -120,7 +120,7 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
                     'mall_id'         => $user->mall_id,
                     'user_id'         => $user->id,
                     'money'           => $integralDeductionPrice * -1,
-                    'desc'            => $this->desc . '静态红包券抵扣：'.$integralDeductionPrice,
+                    'desc'            => $this->desc . '永久红包券抵扣：'.$integralDeductionPrice,
                     'before_money'    => $user['static_integral'],
                     'type'            => Integral::TYPE_ALWAYS,
                     'source_id'       => $this->source_id,

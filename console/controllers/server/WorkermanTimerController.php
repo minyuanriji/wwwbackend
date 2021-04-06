@@ -91,22 +91,22 @@ class WorkermanTimerController extends WorkermanBaseController
     public function sendIntegralTimer($worker){
 
         //获取一把锁
-        $lock_tools = new LockTools();
-        $lock_name = 'lock:sendIntegralTimer';
+        //$lock_tools = new LockTools();
+        //$lock_name = 'lock:sendIntegralTimer';
         //  $i = 0;
         // \Yii::$app->redis -> set('asda',$i++);
-        if($lock_tools->lock($lock_name)){
+        //if($lock_tools->lock($lock_name)){
             try{
                 $res = Integral::sendIntegral();
                 if($res === false) throw new Exception(Integral::getError());
-                $lock_tools->unlock($lock_name);
+                //$lock_tools->unlock($lock_name);
             }catch(Exception $e){
                 Yii::error('定时任务：sendIntegral,执行失败,错误信息：'.$e->getMessage());
                 echo '定时任务：sendIntegral,执行失败,错误信息：'.$e->getMessage().PHP_EOL;
-                $lock_tools->unlock($lock_name);
+                //$lock_tools->unlock($lock_name);
                 Yii::getLogger()->flush(true);
             }
-        }
+        //}
     }
     
     /**
@@ -119,20 +119,20 @@ class WorkermanTimerController extends WorkermanBaseController
      */
     public function expireIntegralTimer($worker){
         //获取一把锁
-        $lock_tools = new LockTools();
-        $lock_name = 'lock:expireIntegralTimer';
-        if($lock_tools->lock($lock_name)){
+        //$lock_tools = new LockTools();
+        //$lock_name = 'lock:expireIntegralTimer';
+        //if($lock_tools->lock($lock_name)){
             try{
                 $res = IntegralRecord::expireIntegralHandle();
                 if($res === false) throw new Exception(Integral::getError());
-                $lock_tools->unlock($lock_name);
+                //$lock_tools->unlock($lock_name);
             }catch(Exception $e){
                 Yii::error('定时任务：sendIntegral,执行失败,错误信息：'.$e->getMessage());
                 echo '定时任务：sendIntegral,执行失败,错误信息：'.$e->getMessage().PHP_EOL;
-                $lock_tools->unlock($lock_name);
+                //$lock_tools->unlock($lock_name);
                 Yii::getLogger()->flush(true);
             }
-        }
+        //}
     }
 
     /**
@@ -147,19 +147,19 @@ class WorkermanTimerController extends WorkermanBaseController
 
         //获取一把锁
         
-        $lock_tools = new LockTools();
-        $lock_name = 'lock:taskRetry';
-        if($lock_tools->lock($lock_name)){
+        //$lock_tools = new LockTools();
+        //$lock_name = 'lock:taskRetry';
+        //if($lock_tools->lock($lock_name)){
             try{
                 $res = Task::reTryFaildTask();
                 if($res === false) throw new Exception('异步任务补发失败');
-                $lock_tools->unlock($lock_name);
+                //$lock_tools->unlock($lock_name);
             }catch(Exception $e){
                 Yii::error('定时任务：taskRetry,执行失败,错误信息：'.$e->getMessage().PHP_EOL);
-                echo '定时任务：taskRetry,执行失败,错误信息：'.$e->getMessage().PHP_EOL;
-                $lock_tools->unlock($lock_name);
+                //echo '定时任务：taskRetry,执行失败,错误信息：'.$e->getMessage().PHP_EOL;
+                //$lock_tools->unlock($lock_name);
                 Yii::getLogger()->flush(true);
             }
-        }
+        //}
     }
 }

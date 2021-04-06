@@ -711,7 +711,7 @@ $hostInfo = Yii::$app->request->hostInfo;
                     message: '更新排序成功',
                     type: 'success'
                 });
-                return true;
+                // return true;
                 let ids = [];
                 for (let i in this.data.list) {
                     ids.push(this.data.list[i].id);

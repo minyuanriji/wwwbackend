@@ -627,5 +627,6 @@ class CommonTemplate extends BaseModel
             $newList = $result;
         }
         return $newList;
+        
     }
 }

@@ -48,8 +48,8 @@ class SetAccountForm extends BaseModel{
                 }
             }
 
-            $exists = Admin::find()->where(["username" => $this->username])->exists();
-            if($exists){
+            $exists = Admin::find()->where(["username" => $this->username])->one();
+            if($exists && $exists->id != $adminModel->id){
                 throw new \Exception("账号“".$this->username."”已被使用");
             }
 

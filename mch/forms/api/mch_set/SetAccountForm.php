@@ -40,7 +40,6 @@ class SetAccountForm extends BaseModel{
                 }
                 if(!$adminModel){
                     $adminModel = new Admin([
-                        "username"     => $this->username,
                         "mall_id"      => $this->mall_id,
                         "mch_id"       => $this->mch_id,
                         "auth_key"     => $security->generatePasswordHash(uniqid()),
@@ -52,6 +51,7 @@ class SetAccountForm extends BaseModel{
                 }
             }
 
+            $adminModel->username = $this->username;
             $adminModel->password = $security->generatePasswordHash($this->password);
             if(!$adminModel->save()){
                 throw new \Exception($this->responseErrorMsg($adminModel));

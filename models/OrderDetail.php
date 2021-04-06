@@ -116,7 +116,7 @@ class OrderDetail extends BaseActiveRecord
             'use_user_coupon_id'    => '优惠券id',
             'coupon_discount_price' => '优惠券价格',
             'full_relief_price'     => '满减金额',
-            'integral_price'        => '购物券抵扣金额',
+            'integral_price'        => '红包券抵扣金额',
         ];
     }
 

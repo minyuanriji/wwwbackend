@@ -163,19 +163,19 @@ class IntegralRecord extends BaseActiveRecord{
                     'record_id' => $expire['id']
                 );
     
-                //查询当前购物券的已经抵扣金额
+                //查询当前红包券的已经抵扣金额
                 $already_deduct = IntegralDeduct::countIntegralDeduct($expire['id']);
                 $can_deduct_money = $expire['money'] - $already_deduct;
 
                 if($expire['controller_type'] == 1){
                     if($dynamic_integral > 0 && intval(bcmul($dynamic_integral,100)) >= intval(bcmul($can_deduct_money,100))){
                         $deduct['money'] = -1 *  $can_deduct_money;
-                        $deduct['desc'] = '购物券('.$expire['id'].')超过过期时间：'.date('Y-m-d H:i:s',$expire['expire_time']).',清零余额';
-                        //足够扣除,则正常扣减 ：购物券
+                        $deduct['desc'] = '红包券('.$expire['id'].')超过过期时间：'.date('Y-m-d H:i:s',$expire['expire_time']).',清零余额';
+                        //足够扣除,则正常扣减 ：红包券
                     }else{
                         if($dynamic_integral != 0){
                             $deduct['money'] = -1 *  $dynamic_integral;
-                            $deduct['desc'] = '购物券('.$expire['id'].')超过过期时间：'.date('Y-m-d H:i:s',$expire['expire_time']).',清零余额';
+                            $deduct['desc'] = '红包券('.$expire['id'].')超过过期时间：'.date('Y-m-d H:i:s',$expire['expire_time']).',清零余额';
                         }
                     }
                 }else{
@@ -212,7 +212,7 @@ class IntegralRecord extends BaseActiveRecord{
     }
 
     /**
-     * 获取即将过期的积分、购物券
+     * 获取即将过期的积分、红包券
      * @Author bing
      * @DateTime 2020-10-08 19:07:16
      * @copyright: Copyright (c) 2020 广东七件事集团

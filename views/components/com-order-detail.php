@@ -604,7 +604,7 @@ Yii::$app->loadComponentView('order/com-city');
                         <el-form-item label="积分抵扣" v-if="order.score_deduction_price != 0.00">
                             <span style="color:#ff4544;">-￥{{ order.score_deduction_price }}</span>
                         </el-form-item>
-                        <el-form-item label="购物券抵扣" v-if="order.integral_deduction_price != 0.00">
+                        <el-form-item label="红包券抵扣" v-if="order.integral_deduction_price != 0.00">
                             <span style="color:#ff4544;">-￥{{ order.integral_deduction_price }}</span>
                         </el-form-item>
                         <el-form-item label="优惠券抵扣" v-if="order.coupon_discount_price != 0.00">

@@ -830,8 +830,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                     </el-form-item>
                                 <!-- </el-col>
                                 <el-col :xl="12" :lg="16"> -->
-									<!-- 购物券赠送 -->
-									<el-form-item  label="购物券赠送" prop="status">
+									<!-- 红包券赠送 -->
+									<el-form-item  label="红包券赠送" prop="status">
 									    <el-switch v-model="info.enable_integral" :active-value="1" :inactive-value="0" active-text="开启" inactive-text="关闭">
 									    </el-switch>
 									    <div v-if="info.enable_integral==1">
@@ -842,7 +842,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 									    <div v-if="info.enable_integral==1" class="demo-input-suffix agent-setting-item">
 									
 									        <el-input type="number" :min="0" class="member-money" v-model="integral_setting.integral_num" placeholder="">
-									            <template slot="append">购物券</template>
+									            <template slot="append">红包券</template>
 									        </el-input>
 									        <el-input type="number" :min="0" class="member-money" v-model="integral_setting.period" placeholder="">
 									            <template slot="append">月</template>
@@ -858,10 +858,10 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 									        <template slot="append">元</template>
 									    </el-input> -->
 									</el-form-item>
-									<!-- 购物券抵扣 -->
+									<!-- 红包券抵扣 -->
 									<el-form-item >
 									    <template slot='label'>
-									        <span>购物券抵扣</span>
+									        <span>红包券抵扣</span>
 									        <!-- <el-tooltip effect="dark" content="如果设置0，则不支持积分抵扣"
 									                    placement="top">
 									            <i class="el-icon-info"></i>
@@ -878,8 +878,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 
                                     <el-form-item >
                                         <template slot='label'>
-                                            <span>购物券抵扣服务费比例</span>
-                                            <el-tooltip effect="dark" content="使用抵扣券抵扣支付时，需要额外收取的抵扣券"
+                                            <span>红包券抵扣服务费比例</span>
+                                            <el-tooltip effect="dark" content="使用红包券抵扣支付时，需要额外收取的红包券"
                                                         placement="top">
                                                 <i class="el-icon-info"></i>
                                             </el-tooltip>
@@ -921,7 +921,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         <el-form-item prop="is_order_paid">
                             <template slot='label'>
                                 <span>订单支付后执行</span>
-                                <el-tooltip effect="dark" content="订单在支付后执行发放积分、积分券或购物券，否则默认订单完成后发放"
+                                <el-tooltip effect="dark" content="订单在支付后执行发放积分、积分券或红包券，否则默认订单完成后发放"
                                             placement="top">
                                     <i class="el-icon-info"></i>
                                 </el-tooltip>
@@ -943,7 +943,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                     <el-radio :label="0" >关闭</el-radio>
                                 </el-radio-group>
                             </el-form-item>
-                            <el-form-item label="购物券"  prop="paid_is_integral_card">
+                            <el-form-item label="红包券"  prop="paid_is_integral_card">
                                 <el-radio-group v-model="order_paid.is_integral_card" @change="isOrderSetting($event,'paid','is_integral_card')">
                                     <el-radio :label="1" >开启</el-radio>
                                     <el-radio :label="0" >关闭</el-radio>
@@ -984,7 +984,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                     <el-radio :label="0" >关闭</el-radio>
                                 </el-radio-group>
                             </el-form-item>
-                            <el-form-item label="购物券"  prop="sales_is_integral_card">
+                            <el-form-item label="红包券"  prop="sales_is_integral_card">
                                 <el-radio-group v-model="order_sales.is_integral_card" @change="isOrderSetting($event,'sales','is_integral_card')">
                                     <el-radio :label="1" >开启</el-radio>
                                     <el-radio :label="0" >关闭</el-radio>
@@ -1419,7 +1419,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 isPermanentScore: 0, //默认永久
 
 
-                // 购物券赠送数据
+                // 红包券赠送数据
                 integral_setting: {
                     "integral_num": 0, //积分数量
                     "period": 12, //周期
@@ -1429,7 +1429,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 isPermanent: 0, //默认永久
 
 
-                // 购物券赠送数据
+                // 红包券赠送数据
                 order_paid: {
                     is_score:0,
                     is_score_card:0,
@@ -1437,7 +1437,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     is_member_upgrade:0,
                 },
 
-                // 购物券赠送数据
+                // 红包券赠送数据
                 order_sales: {
                     is_score:0,
                     is_score_card:0,
@@ -1454,9 +1454,9 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     is_percent: "0",
                     // 这里是是否开启积分券赠送
                     enable_score: "0", //是否开启赠送积分券
-                    // 这里是是否开启购物券赠送
-                    enable_integral: "0", //是否开启赠送购物券
-                    max_deduct_integral: 0, //购物券抵扣金额
+                    // 这里是是否开启红包券赠送
+                    enable_integral: "0", //是否开启赠送红包券
+                    max_deduct_integral: 0, //红包券抵扣金额
                     integral_fee_rate: 0,
                     is_order_paid:"0",
                     is_order_sales:"0",
@@ -1560,7 +1560,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     })
                     .catch(_ => {});
             },
-            // 如果是效时有效、购物券
+            // 如果是效时有效、红包券
             isPermanentChange() {
                 if (this.isPermanent) {
                     this.integral_setting.expire = 1;
@@ -1809,10 +1809,10 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 
 
                         let postData = JSON.parse(JSON.stringify(self.cForm));
-                        // 这里是追加购物券赠送的字段
-                        // max_deduct_integral 最大抵扣购物券
+                        // 这里是追加红包券赠送的字段
+                        // max_deduct_integral 最大抵扣红包券
                         // enable_integral 是否启用积分赠送
-                        // integral_setting 购物券赠送设置 
+                        // integral_setting 红包券赠送设置 
                         // 0.2 是否开启积分赠送
                         self.isPermanentScore == 0 ? self.score_setting.expire = -1 : ''; // 是否开启永久有效
                         postData['enable_score'] = self.info.enable_score;
@@ -1821,7 +1821,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         self.isPermanent == 0 ? self.integral_setting.expire = -1 : ''; // 是否开启永久有效
                         postData['enable_integral'] = self.info.enable_integral;
                         self.info.enable_integral == 1 ? postData['integral_setting'] = self.integral_setting : '';
-                        // 0.4 购物券优惠
+                        // 0.4 红包券优惠
                         postData['max_deduct_integral'] = self.info.max_deduct_integral;
                         postData['integral_fee_rate'] = self.info.integral_fee_rate;
 
@@ -1939,7 +1939,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         this.checkFullForeheadScore();
                         self.$emit('goods-success', self.ruleForm);
 
-                        // 购物券赠送&抵扣
+                        // 红包券赠送&抵扣
                         let infoObj = e.data.data.detail; //null
                         // 0.2 判断是否开启积分券赠送
                         self.info.enable_score = infoObj.enable_score * 1;
@@ -1950,7 +1950,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             // 并在原对象中删除这个字段
                             // delete infoObj.score_setting;
                         }
-                        // 0.3 判断是否开启购物券赠送
+                        // 0.3 判断是否开启红包券赠送
                         self.info.enable_integral = infoObj.enable_integral * 1;
                         if (infoObj.enable_integral == 1) {
                             self.integral_setting = infoObj.integral_setting;

@@ -50,8 +50,8 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="integral_num" label="购物券数量"></el-table-column>
-                <el-table-column  label="购物券类型">
+                <el-table-column prop="integral_num" label="红包券数量"></el-table-column>
+                <el-table-column  label="红包券类型">
                     <template slot-scope="scope">
                             <div size="small">{{getTypeName(scope.row.type)}}</div>
                         </template>

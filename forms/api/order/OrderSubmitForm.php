@@ -91,7 +91,7 @@ class OrderSubmitForm extends BaseModel
     protected $enableScore = true;
 
     /**
-     * 是否开启购物券
+     * 是否开启红包券
      * @var bool
      */
     protected $enableIntegral= true;
@@ -318,7 +318,7 @@ class OrderSubmitForm extends BaseModel
                 $order->use_score = $orderItem['score']['use'] ? $orderItem['score']['use_num'] : 0;
                 //积分抵扣
                 $order->score_deduction_price = $orderItem['score']['use'] ? $orderItem['score']['deduction_price'] : 0;
-                //购物券抵扣
+                //红包券抵扣
                 $order->integral_deduction_price = $orderItem['integral']['use'] ? $orderItem['integral']['integral_deduction_price'] : 0;
 
                 $order->name = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
@@ -411,11 +411,11 @@ class OrderSubmitForm extends BaseModel
                 }
                 
 
-                // 扣除购物券
+                // 扣除红包券
                 if ($order->integral_deduction_price) {
                     $res = IntegralDeduct::buyGooodsDeduct($order,1);
                     if($res === false){
-                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'购物券扣除失败。');
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'红包券扣除失败。');
                     }
                 }
                 //开放额外的订单处理接口
@@ -533,7 +533,7 @@ class OrderSubmitForm extends BaseModel
                 $use_score = false;
             }
 
-            //是否使用购物券
+            //是否使用红包券
             if (isset($this->form_data['use_integral']) && $this->form_data['use_integral'] == 1) {
                 $use_integral = true;
             } else {
@@ -544,7 +544,7 @@ class OrderSubmitForm extends BaseModel
             $ScoreService = new ScoreService($item, $type, $use_score, $this->enableScore);
             $item         = $ScoreService->countScore();
 
-            //计算购物券总额
+            //计算红包券总额
             $user_integral   = isset($IntegralService) ? $IntegralService->getRemainingIntegral() : User::getCanUseIntegral(\Yii::$app->user->id);
             $IntegralService = new IntegralService($item, $user_integral, $type, $use_integral, $this->enableIntegral);
             $item            = $IntegralService->countIntegral();
@@ -674,7 +674,7 @@ class OrderSubmitForm extends BaseModel
         } else {
             $score_enable = false;
         }
-        //购物券开关
+        //红包券开关
         if ($this->enableIntegral) {
             $integral_enable = isset($optionCache->integral_status)?$optionCache->integral_status:false;
         } else {
@@ -712,7 +712,7 @@ class OrderSubmitForm extends BaseModel
             'all_self_mention'    => $allSelfMention,
             'hasCity'             => $hasCity,
             'score_enable'        => $score_enable,
-            'integral_enable'     => $integral_enable, //购物券
+            'integral_enable'     => $integral_enable, //红包券
             'form_data'           => [
                 'sign'             => isset($this->form_data['sign'])?$this->form_data['sign']:null,
                 'related_id'       => isset($this->form_data['related_id'])?$this->form_data['related_id']:null,
@@ -2368,7 +2368,7 @@ class OrderSubmitForm extends BaseModel
         $orderDetail->use_score       = $goodsItem['use_score'];
         $orderDetail->score_price       = $goodsItem['score_price'];
         
-        //购物券抵扣
+        //红包券抵扣
         $orderDetail->integral_price       = $goodsItem['integral_price'];
         $orderDetail->integral_fee_rate    = $goodsItem['integral_fee_rate'];
 

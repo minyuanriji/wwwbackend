@@ -543,7 +543,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
 
 
     /**
-     * 获取用户可用购物券总额
+     * 获取用户可用红包券总额
      * @Author bing
      * @DateTime 2020-10-08 17:10:02
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -556,7 +556,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
     }
 
     /**
-     * 获取用户可用购物券总额
+     * 获取用户可用红包券总额
      * @Author bing
      * @DateTime 2020-10-08 17:10:02
      * @copyright: Copyright (c) 2020 广东七件事集团

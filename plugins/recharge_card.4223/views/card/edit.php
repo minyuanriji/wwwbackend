@@ -41,8 +41,8 @@
                     <el-input :disabled="isLook" size="small" v-model="form.name" placeholder="请输入卡密名称" autocomplete="off"></el-input>
                 </el-form-item>
 				
-				<!-- 领卡送购物券 -->
-				<el-form-item label="领卡送购物券" prop="status">
+				<!-- 领卡送红包券 -->
+				<el-form-item label="领卡送红包券" prop="status">
 					<div>
 						<el-switch
 								:disabled="isLook"
@@ -57,7 +57,7 @@
 					<div class="demo-input-suffix agent-setting-item">
 						
 						<el-input :disabled="isLook" size="small" v-model="form.integral_setting.integral_num" type="number" class="member-money" placeholder="">
-							<template slot="append">购物券</template>
+							<template slot="append">红包券</template>
 						</el-input>
 						<el-input :disabled="isLook" size="small" v-model="form.integral_setting.period" type="number" class="member-money" placeholder="">
 							<template slot="append">{{form.integral_setting.period_unit=='month'?'月':'周'}}</template>

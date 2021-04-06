@@ -65,7 +65,7 @@ class MchCheckoutOrder extends BaseActiveRecord
             'pay_user_id' => '支付者用户ID',
             'pay_at' => '支付时间',
             'score_deduction_price' => '积分抵扣金额',
-            'integral_deduction_price' => '购物券抵扣价',
+            'integral_deduction_price' => '红包券抵扣价',
             'created_at' => 'Create At',
             'updated_at' => 'Update At',
             'is_delete' => 'Delete At'

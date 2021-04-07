@@ -29,7 +29,7 @@ class BossUpgradeHandler extends BaseHandler
         // TODO: Implement register() method.
 
         \Yii::$app->on(\app\handlers\HandlerRegister::TO_USER_UPGRADE, function ($event) {
-            \Yii::$app->queue->delay(1)->push(new BossLevelUpgradeJob(['user_id' => $event->user_id, 'mall_id' => $event->mall_id]));
+            //\Yii::$app->queue->delay(1)->push(new BossLevelUpgradeJob(['user_id' => $event->user_id, 'mall_id' => $event->mall_id]));
         });
     }
 }

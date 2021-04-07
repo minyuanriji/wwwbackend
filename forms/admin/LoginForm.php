@@ -30,15 +30,15 @@ class LoginForm extends BaseModel
         $rules = [
             [['username', 'password', 'captcha', 'checked'], 'required'],
             [['mall_id'], 'string'],
-            [['captcha'], 'captcha', 'captchaAction' => 'site/captcha']
+            [['captcha'], 'captcha', 'captchaAction' => 'site/captcha','message'=>'{attribute}有误']
         ];
 
-        if (YII_ENV == 'dev') {
+        /*if (YII_ENV == 'dev') {
             $rules = [
                 [['username', 'password', 'captcha', 'checked'], 'required'],
                 [['mall_id'], 'string'],
             ];
-        }
+        }*/
 
         return $rules;
     }

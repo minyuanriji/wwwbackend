@@ -33,6 +33,7 @@ abstract class BaseRole extends BaseModel
     public $adminInfo;
     public $admin;
     public $mall;
+    public $user;
     public $isSuperAdmin = false;
 
     public function init()

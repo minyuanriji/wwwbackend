@@ -92,7 +92,6 @@ class TemplateEditForm extends BaseModel
                 }
             }
             $data['name'] = $diyPage->title;
-        //    dd($newData);
             $data['data'] = json_encode($newData, JSON_UNESCAPED_UNICODE);
         }
         return [

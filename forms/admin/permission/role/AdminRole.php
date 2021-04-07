@@ -73,7 +73,12 @@ class AdminRole extends BaseRole
             'admin_id' => $this->admin->id,
             'is_delete' => 0
         ])->one();
-        $permission = \Yii::$app->branch->childPermission($adminInfo);
+        if ($adminInfo) {
+            $flag = 2;
+        } else {
+            $flag = 1;
+        }
+        $permission = \Yii::$app->branch->childPermission($flag);
         $this->pluginPermission = $permission;
         return $permission;
     }

@@ -55,7 +55,9 @@ class TemplateForm extends BaseModel
         ]);
         $templateId = CoreTemplateType::find()->where(['type' => $this->templateType])
             ->select('template_id')->column();
-
+        if (!$templateId) {
+            $templateId = [];
+        }
         if (!\Yii::$app->role->isSuperAdmin) {
             $templatePermission = \Yii::$app->role->getTemplate();
             $common = CommonTemplateCenter::getInstance();

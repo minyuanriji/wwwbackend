@@ -84,11 +84,11 @@ abstract class BaseBranch extends BaseModel
      */
     public function getSecondaryPermission($adminInfo)
     {
-        if ($adminInfo->admin->admin_type == Admin::ADMIN_TYPE_SUPER) {
+        if (isset($adminInfo->admin->admin_type) && $adminInfo->admin->admin_type == Admin::ADMIN_TYPE_SUPER) {
             return AuthLogic::getSecondaryPermissionAll();
         }
         $permission = [];
-        if ($adminInfo->secondary_permissions) {
+        if (isset($adminInfo->secondary_permissions)) {
             $permission = json_decode($adminInfo->secondary_permissions, true);
         }
         return $permission;

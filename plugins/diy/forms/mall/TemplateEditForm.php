@@ -60,7 +60,7 @@ class TemplateEditForm extends BaseModel
     {
         $common = CommonTemplate::getCommon();
         $data = [
-            'allComponents' => $common->allComponentsa(),
+            'allComponents' => $common->allComponents(),
             'overrun' => (new MallOverrunForm())->getSetting(),
         ];
 
@@ -92,7 +92,6 @@ class TemplateEditForm extends BaseModel
                 }
             }
             $data['name'] = $diyPage->title;
-        //    dd($newData);
             $data['data'] = json_encode($newData, JSON_UNESCAPED_UNICODE);
         }
         return [

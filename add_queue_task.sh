@@ -5,6 +5,8 @@ chmod a+x "$basepath/yii"
 
 command="/www/server/php/73/bin/php $basepath/yii add-queue-task/execute"
 
+ps -ef | grep "`echo $command`"|awk '{print $2}'|xargs kill -9
+
 result=$(ps -ef | grep "`echo $command`" | grep -v "grep")
 
 if [ ! -n "$result" ]

@@ -3,7 +3,7 @@
 basepath=$(cd `dirname $0`; pwd)
 chmod a+x "$basepath/yii"
 
-command="/www/server/php/73/bin/php $basepath/yii queue-task/execute"
+command="/www/server/php/73/bin/php $basepath/yii add-queue-task/execute"
 
 result=$(ps -ef | grep "`echo $command`" | grep -v "grep")
 

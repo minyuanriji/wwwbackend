@@ -2,4 +2,4 @@
 
 cd %~dp0
 set PROJECT_PATH=%~dp0
-start yii queue-task/listen -v
+start yii add-queue-task/execute

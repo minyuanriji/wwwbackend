@@ -1,13 +1,15 @@
 <?php
 namespace app\controllers\business;
 use app\models\mysql\Goods;
-use yii;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use yii;
 use app\models\mysql\{PostageRules,PluginDistributionGoods};
 set_time_limit(0);
 ini_set("memory_limit", "1024M");
 class ExportData{
     public function ExportData($start_id,$end_id){
+
         $Spreadsheet = new Spreadsheet();
         $sheet = $Spreadsheet -> getActiveSheet();
         $sheet -> setCellValue('A1','ID');
@@ -179,6 +181,7 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
     }
 
     public function ExportGoodsData($arrData){
+
         $ascii = 90;
         $ascii_arr = [];
         $add_ascii = ['AA','AB','AC','AD','AE','AF','AG','AH','AI'];
@@ -205,6 +208,7 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
             $sheet->getColumnDimension($key)->setWidth($val);
         }
         $sheet->fromArray($arrData,null,'A2');
+
         header('Content-Description: File Transfer');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
@@ -212,7 +216,7 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename=商品信息.xlsx');
         header('Cache-Control: max-age=0');
-        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save('php://output');
         exit();
     }

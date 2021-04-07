@@ -332,20 +332,20 @@ class OrderDistributionIncomeJob extends Component implements JobInterface{
         if($is_frozen){
             if($is_add){
                 $user->income_frozen += floatval($price);
-                $desc = "来自订单：" . $this->common_order_detail_id . "的未结算佣金";
+                $desc = "来自订单[商品ID:".$orderDetail->goods_id."，详情ID:".$orderDetail->order_id."]的未结算佣金";
             }else{
                 $user->income_frozen -= floatval($price);
-                $desc = "订单：" . $this->common_order_detail_id . "的未结算佣金扣除";
+                $desc = "订单[商品ID:".$orderDetail->goods_id."，详情ID:".$orderDetail->order_id."]的未结算佣金扣除";
             }
         }else{
             if($is_add){
                 $user->income += floatval($price);
                 $user->total_income += floatval($price);
-                $desc = "来自订单：" . $this->common_order_detail_id . "的佣金收入";
+                $desc = "来自订单[商品ID:".$orderDetail->goods_id."，详情ID:".$orderDetail->order_id."]的佣金收入";
             }else{
                 $user->income -= floatval($price);
                 $user->total_income -= floatval($price);
-                $desc = "来自订单：" . $this->common_order_detail_id . "的佣金扣除";
+                $desc = "订单[商品ID:".$orderDetail->goods_id."，详情ID:".$orderDetail->order_id."]的佣金扣除";
             }
         }
         if(!$user->save()){

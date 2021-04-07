@@ -121,7 +121,7 @@ class Integral extends BaseActiveRecord
     }
 
     /**
-     * 派发红包券
+     * 派发积分/红包券
      * @Author bing
      * @DateTime 2020-10-07 18:44:27
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -133,16 +133,18 @@ class Integral extends BaseActiveRecord
         try{
             //获取计划执行时间小于当前时间，状态未结束的计划
             $now = time();
-            $query = self::find()
-                ->where(array('<=','finish_period',$now))
-                ->andWhere(array('in','status',[self::STATUS_WAIT,self::STATUS_DOING]))
-                ->limit(250);
-            $plan_list = $query->orderBy([
-                'finish_period' => 'ASC',
+
+            $whereStr = "(period > finish_period)"; //周期数未达到
+            $whereStr.= " AND status IN (0, 1)"; //状态为未发放，发放中
+            $whereStr.= " AND next_publish_time<'".time()."'";
+            $query = static::find()->where($whereStr)->limit(10);
+            $planList = $query->orderBy([
+                'finish_period'     => 'ASC',
                 'next_publish_time' => 'ASC'
-            ]) -> all();
-            if(!empty($plan_list)){
-                foreach($plan_list as $plan){
+            ])->all();
+
+            if(!empty($planList)){
+                foreach($planList as $plan){
                     if($plan['controller_type'] == 0 && $plan['period_unit'] == 'month'){
                         if($now < $plan['next_publish_time']){
                             continue;

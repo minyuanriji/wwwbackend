@@ -16,6 +16,7 @@ use app\logic\OptionLogic;
 use app\models\Option;
 use app\models\Plugin;
 use app\models\User;
+use app\models\Admin;
 
 class OperatorRole extends BaseRole
 {
@@ -74,6 +75,27 @@ class OperatorRole extends BaseRole
     public function getAccountPermission()
     {
         /* @var User $user */
+        $user = Admin::find()
+            ->where(['id' => $this->admin->id])
+            ->one();
+        $config = [
+            'admin' =>$this->admin,
+            'mall' => $this->mall
+        ];
+        if ($user->admin_type == 1) {
+            $parent = new SuperAdminRole($config);
+        } elseif ($user->admin_type == 2 || $user->admin_type == 3) {
+            $parent = new AdminRole($config);
+        } else {
+            throw new \Exception('错误的账户');
+        }
+        return $parent->permission;
+    }
+
+    /*  2021/4/7 改之前版本  */
+    public function getAccountPermission2()
+    {
+        /* @var User $user */
         $user = User::find()->with(['identity'])
             ->where(['id' => $this->mall->user_id])
             ->one();
@@ -112,6 +134,28 @@ class OperatorRole extends BaseRole
     }
 
     public function getAccount()
+    {
+        /* @var User $user */
+        $user = Admin::find()->with(['adminInfo'])
+            ->where(['id' => $this->admin->id])
+            ->one();
+        $config = [
+            'admin'=> $this->admin,
+            'user' => $user,
+            'mall' => $this->mall
+        ];
+        if ($user->admin_type == 1) {
+            $parent = new SuperAdminRole($config);
+        } elseif ($user->admin_type == 2 || $user->admin_type == 3) {
+            $parent = new AdminRole($config);
+        } else {
+            throw new \Exception('错误的账户');
+        }
+        return $parent;
+    }
+
+    /*  2021/4/7 改之前版本  */
+    public function getAccount2()
     {
         /* @var User $user */
         $user = User::find()->with(['identity'])

@@ -269,7 +269,7 @@ class UserController extends ApiController
             $WeChatCode = $flag;
         }
         $config = array(
-            'bg_url' => \Yii::$app->basePath . '/web/statics' . '/bg/063bd7ebf5f752309d3cf3867209b8dq.jpg',//背景图片路径
+            'bg_url' => \Yii::$app->basePath . '/web/statics' . '/bg/redpack.png',//背景图片路径
             'text' => array(
 //                array(
 //                    'text' => '初夏',//文本内容

@@ -342,8 +342,8 @@ class UserController extends ApiController
                     'top' => 750,
                     'right' => 0,
                     'bottom' => 0,
-                    'width' => 220,
-                    'height' => 220,
+                    'width' => 120,
+                    'height' => 120,
                     'radius' => 0,
                     'opacity' => 100
                 ),

@@ -98,6 +98,7 @@ class DistributionController extends Controller
         if (\Yii::$app->request->isAjax) {
             $form = new DistributionUserEditForm();
             $form->attributes = \Yii::$app->request->post();
+            $form->apply_status = DistributionApply::STATUS_PASS;
             return $this->asJson($form->save());
         } else {
             return $this->render('edit');

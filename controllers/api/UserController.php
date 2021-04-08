@@ -299,8 +299,8 @@ class UserController extends ApiController
 //                ),
                 array(
                     'text' => '扫码领红包',
-                    'left' => 270,
-                    'top' => 760,
+                    'left' => 280,
+                    'top' => 710,
                     'width' => 400,
                     'fontSize' => 30, //字号
                     'fontColor' => '0,0,80', //字体颜色
@@ -339,7 +339,7 @@ class UserController extends ApiController
                     'url' => $WeChatCode,
                     'stream' => $qrCodeData,
                     'left' => 270,
-                    'top' => 800,
+                    'top' => 750,
                     'right' => 0,
                     'bottom' => 0,
                     'width' => 220,

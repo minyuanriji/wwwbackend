@@ -299,10 +299,10 @@ class UserController extends ApiController
 //                ),
                 array(
                     'text' => '扫码领红包',
-                    'left' => 155,
-                    'top' => 305,
+                    'left' => 120,
+                    'top' => 280,
                     'width' => 300,
-                    'fontSize' => 22, //字号
+                    'fontSize' => 14, //字号
                     'fontColor' => '0,0,80', //字体颜色
                     'angle' => 0,
                 ),
@@ -338,8 +338,8 @@ class UserController extends ApiController
                     'name' => '二维码', //图片名称，用于出错时定位
                     'url' => $WeChatCode,
                     'stream' => $qrCodeData,
-                    'left' => 150,
-                    'top' => 325,
+                    'left' => 110,
+                    'top' => 300,
                     'right' => 0,
                     'bottom' => 0,
                     'width' => 90,

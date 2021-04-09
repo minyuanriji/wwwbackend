@@ -12,6 +12,7 @@ use yii\web\Controller;
 class JobDebugController extends Controller{
 
     public function actionExecute(){
+
         (new EfpsPayQueryJob())->execute(null);
         (new OrderDistributionIncomeJob())->execute(null);
         (new CheckoutOrderDistributionIncomeJob())->execute(null);

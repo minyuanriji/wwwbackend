@@ -31,19 +31,22 @@ class CheckoutOrderDistributionIncomeJob extends Component implements JobInterfa
         try {
 
             $mall = Mall::findOne($checkoutOrder->mall_id);
+            if($mall){
+                \Yii::$app->setMall($mall);
+                $level = DistributionSetting::getValueByKey(DistributionSetting::LEVEL);
+            }
+
             $mch  = Mch::findOne($checkoutOrder->mch_id);
             $user = User::findOne($checkoutOrder->pay_user_id);
 
-            $level = DistributionSetting::getValueByKey(DistributionSetting::LEVEL);
-
-            if(empty($level) || $level < 1 || !$user || !$mall || !$mch || !$mch->distribution_detail_set){
+            if(!$mall || empty($level) || $level < 1 || !$user || !$mch || !$mch->distribution_detail_set){
                 $checkoutOrder->is_distribution = 1;
                 $checkoutOrder->save();
                 $t->commit();
                 return;
             }
 
-            \Yii::$app->setMall($mall);
+
 
             $distribution_detail_list = MchDistributionDetail::find()->andWhere([
                 'mch_id' => $mch->id

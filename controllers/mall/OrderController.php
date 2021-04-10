@@ -31,7 +31,7 @@ class OrderController extends OrderManagerController
 {
     public function actionIndex()
     {
-        \Yii::$app->log->targets['debug'] = null;
+//        \Yii::$app->log->targets['debug'] = null;
         if (\Yii::$app->request->isAjax) {
             $form = new OrderForm();
             $form->attributes = \Yii::$app->request->get();

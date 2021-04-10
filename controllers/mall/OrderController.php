@@ -10,6 +10,7 @@
 
 namespace app\controllers\mall;
 
+use app\core\ApiCode;
 use app\forms\common\order\OrderCancelForm;
 use app\forms\common\order\OrderPriceForm;
 use app\forms\common\order\OrderRefundForm;
@@ -30,6 +31,7 @@ class OrderController extends OrderManagerController
 {
     public function actionIndex()
     {
+        \Yii::$app->log->targets['debug'] = null;
         if (\Yii::$app->request->isAjax) {
             $form = new OrderForm();
             $form->attributes = \Yii::$app->request->get();
@@ -47,6 +49,37 @@ class OrderController extends OrderManagerController
             } else {
                 return $this->render('index');
             }
+        }
+    }
+
+    /**
+     * 订单总数
+     * @return string|\yii\web\Response
+     * @throws \Exception
+     */
+    public function actionOrderCount()
+    {
+        if (\Yii::$app->request->isAjax) {
+            $order = new OrderForm();
+            $order_count = $order->search_num();//全部
+            $order->status = 0;//未付款总数
+            $unpaid_count = $order->search_num();
+            $order->status = 1;//代发货总数
+            $consignment_count = $order->search_num();
+            $order->status = 2;//待收货总数
+            $received_count = $order->search_num();
+            return $this->asJson(
+                [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'data' => [
+                        'unpaid_count' => $unpaid_count,
+                        'order_count' => $order_count,
+                        'consignment_count' => $consignment_count,
+                        'received_count' => $received_count
+                    ]
+                ]);
+        } else {
+            return $this->render('index');
         }
     }
 

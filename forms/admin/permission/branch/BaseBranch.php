@@ -53,7 +53,7 @@ abstract class BaseBranch extends BaseModel
             /** @var AdminInfo $adminInfo */
             $adminInfo = AdminInfo::find()->where(["admin_id"=>$admin->id])->one();
             $permission = [];
-            if ($adminInfo->permissions) {
+            if (isset($adminInfo->permissions)) {
                 $permission = json_decode($adminInfo->permissions, true);
             }
         }else{

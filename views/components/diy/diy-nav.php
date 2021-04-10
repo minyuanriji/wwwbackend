@@ -48,7 +48,8 @@
 <!--                </el-form-item>-->
 
                 <el-form-item label="导航图标">
-                    <div v-for="(nav,index) in data.navs" class="edit-nav-item">
+                    <draggable v-model="data.navs">
+                        <div v-for="(nav,index) in data.navs" class="edit-nav-item">
                         <div class="nav-edit-options">
                             <el-button @click="navItemDelete(index)"
                                        type="primary"
@@ -57,8 +58,8 @@
                         </div>
                         <div flex="dir:left box:first cross:center">
                             <div>
-                                <com-image-upload style="margin-right: 5px;" v-model="nav.icon" width="88"
-                                                  height="88"></com-image-upload>
+                                <com-image-upload style="margin-right: 5px;" v-model="nav.icon" width="100"
+                                                  height="100"></com-image-upload>
                             </div>
                             <div>
                                 <el-input v-model="nav.name" placeholder="名称" size="small"
@@ -74,6 +75,7 @@
                             </div>
                         </div>
                     </div>
+                    </draggable>
                     <el-button size="small" @click="addNav">添加图标</el-button>
                 </el-form-item>
             </el-form>
@@ -82,6 +84,7 @@
         </div>
     </div>
 </template>
+<script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.3/Sortable.min.js"></script>
 <script>
     Vue.component('diy-nav', {
         template: '#diy-nav',

@@ -343,6 +343,7 @@
                     },
                     method: 'post',
                     data: {
+                        page: self.search_goods.page,
                         keyword: self.search_goods.keyword
                     }
                 }).then(e => {

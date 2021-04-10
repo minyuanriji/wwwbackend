@@ -17,41 +17,36 @@ class CheckoutOrderDistributionIncomeJob extends Component implements JobInterfa
 
     public function execute($queue){
 
+        $checkoutOrder = MchCheckoutOrder::find()->where([
+            "is_delete"       => 0,
+            "is_distribution" => 0,
+            "is_pay"          => 1
+        ])->orderBy("updated_at ASC")->limit(1)->one();
+        if(!$checkoutOrder) return;
+
+        $checkoutOrder->updated_at = time();
+        $checkoutOrder->save();
+
         $t = \Yii::$app->getDb()->beginTransaction();
         try {
-            $checkoutOrder = MchCheckoutOrder::find()->where([
-                "is_delete"       => 0,
-                "is_distribution" => 0,
-                "is_pay"          => 1
-            ])->orderBy("updated_at ASC")->limit(1)->one();
-            if(!$checkoutOrder){
-                throw new \Exception("暂无需要分佣订单记录");
-            }
 
-            //获取商户信息
-            $mch = Mch::findOne($checkoutOrder->mch_id);
-            if(!$mch || !$mch->distribution_detail_set){
-                throw new \Exception("无法获取商户或商户未设置分佣信息");
-            }
-
-            //设置商城
             $mall = Mall::findOne($checkoutOrder->mall_id);
-            if (!$mall) {
-                throw new \Exception("商城不存在");
+            if($mall){
+                \Yii::$app->setMall($mall);
+                $level = DistributionSetting::getValueByKey(DistributionSetting::LEVEL);
             }
-            \Yii::$app->setMall($mall);
 
-            //获取支付用户
+            $mch  = Mch::findOne($checkoutOrder->mch_id);
             $user = User::findOne($checkoutOrder->pay_user_id);
-            if (!$user) {
-                throw new \Exception("找不到支付用户");
+
+            if(!$mall || empty($level) || $level < 1 || !$user || !$mch || !$mch->distribution_detail_set){
+                $checkoutOrder->is_distribution = 1;
+                $checkoutOrder->save();
+                $t->commit();
+                return;
             }
 
-            //默认的分佣设置
-            $level = DistributionSetting::getValueByKey(DistributionSetting::LEVEL);
-            if (empty($level) || $level < 1) {
-                throw new \Exception("未开启分销");
-            }
+
 
             $distribution_detail_list = MchDistributionDetail::find()->andWhere([
                 'mch_id' => $mch->id

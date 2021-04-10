@@ -31,6 +31,7 @@ class SearchGoodsForm extends BaseModel{
             "AND",
             ["g.is_delete" => 0],
             ["gw.is_delete" => 0],
+            "(g.mch_id=0 OR g.mch_id IS NULL)",
             "pbg.id IS NULL"
         ]);
 

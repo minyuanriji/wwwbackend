@@ -391,7 +391,7 @@
                     self.do_save_loading = false;
                     if (e.data.code === 0) {
                         self.add_dialog_visible = false;
-                        self.toGoodsSearch();
+                        self.loadGoodsList();
                         self.loadData();
                         self.$message.success(e.data.msg);
                     } else {

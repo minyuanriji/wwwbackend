@@ -1203,8 +1203,26 @@ class Menus
                         'route' => 'mall/attachment/index',
                     ],
                     [
-                        'name' => '操作日志',
+                        'name' => '管理员操作日志',
                         'route' => 'mall/setting/operate-log',
+                    ],
+                    [
+                        'name' => '敏感词过滤日志',
+                        'route' => 'mall/sensitive/index',
+                        'action' => [
+                            [
+                                'name' => '商品服务删除',
+                                'route' => 'mall/sensitive/destroy'
+                            ],
+                            [
+                                'name' => '商品服务(S|U)',
+                                'route' => 'mall/sensitive/edit',
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => '用户日志',
+                        'route' => 'mall/setting/user-log',
                     ],
                 ],
             ],

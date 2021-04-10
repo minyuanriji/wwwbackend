@@ -18,6 +18,7 @@ use app\forms\mall\setting\MallSettingForm;
 use app\forms\mall\setting\OperateLogForm;
 use app\forms\mall\setting\SettingForm;
 use app\forms\mall\setting\TagForm;
+use app\forms\mall\setting\UserVisitLogForm;
 use app\forms\mall\sms\SmsEditForm;
 use app\forms\mall\sms\SmsForm;
 use app\helpers\SerializeHelper;
@@ -307,6 +308,25 @@ class SettingController extends MallController
             }
         } else {
             return $this->render('register-agree');
+        }
+    }
+
+    /**
+     * 用户日志
+     * @return string|\yii\web\Response
+     */
+    public function actionUserLog()
+    {
+        if (\Yii::$app->request->isAjax) {
+            if (\Yii::$app->request->isPost) {
+            } else {
+                $form = new UserVisitLogForm();
+                $form->attributes = \Yii::$app->request->get();
+                $res = $form->getList();
+                return $this->asJson($res);
+            }
+        } else {
+            return $this->render('user-log');
         }
     }
 }

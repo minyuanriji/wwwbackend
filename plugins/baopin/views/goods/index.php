@@ -173,7 +173,7 @@
                   v-model="search_goods.keyword"
                   clearable @clear="toGoodsSearch"
                   style="width:300px;">
-            <el-button slot="append" icon="el-icon-search" @click="loadGoodsList"></el-button>
+            <el-button slot="append" icon="el-icon-search" @click="toGoodsSearch"></el-button>
         </el-input>
         <el-table @selection-change="handleGoodsSelectionChange" v-loading="get_goods_loading" :data="goods_list">
             <el-table-column align='center' type="selection" width="60"></el-table-column>

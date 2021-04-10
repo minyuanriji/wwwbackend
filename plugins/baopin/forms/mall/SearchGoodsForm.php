@@ -45,6 +45,7 @@ class SearchGoodsForm extends BaseModel{
         $query->orderBy(['g.id' => SORT_DESC]);
 
         $select = ["g.id", "gw.name", "gw.cover_pic", "g.created_at",  "g.updated_at"];
+
         $list = $query->select($select)->asArray()->page($pagination, 10, $this->page)->all();
 
         return [

@@ -8,10 +8,12 @@ use app\plugins\baopin\models\BaopinGoods;
 
 class GoodsListForm extends BaseModel{
 
+    public $page;
     public $keyword;
 
     public function rules(){
         return array_merge(parent::rules(), [
+            [['page'], 'integer'],
             [['keyword'], 'safe']
         ]);
     }

@@ -8,10 +8,12 @@ use app\models\Goods;
 
 class SearchGoodsForm extends BaseModel{
 
+    public $page;
     public $keyword;
 
     public function rules(){
         return array_merge(parent::rules(), [
+            [['page'], 'integer'],
             [['keyword'], 'safe']
         ]);
     }
@@ -42,7 +44,7 @@ class SearchGoodsForm extends BaseModel{
         $query->orderBy(['g.id' => SORT_DESC]);
 
         $select = ["g.id", "gw.name", "gw.cover_pic", "g.created_at",  "g.updated_at"];
-        $list = $query->select($select)->asArray()->page($pagination, 10)->all();
+        $list = $query->select($select)->asArray()->page($pagination, 10, $this->page)->all();
 
         return [
             'code' => ApiCode::CODE_SUCCESS,

@@ -3,18 +3,19 @@ namespace app\plugins\baopin\forms\mall;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
-use app\models\Goods;
 use app\plugins\baopin\models\BaopinGoods;
 
 class GoodsListForm extends BaseModel{
 
     public $page;
     public $keyword;
+    public $sort_prop;
+    public $sort_type;
 
     public function rules(){
         return array_merge(parent::rules(), [
             [['page'], 'integer'],
-            [['keyword'], 'safe']
+            [['keyword', 'sort_prop', 'sort_type'], 'safe']
         ]);
     }
 
@@ -35,7 +36,21 @@ class GoodsListForm extends BaseModel{
             ]);
         }
 
-        $query->orderBy(['bg.id' => SORT_DESC]);
+        $orderBy = null;
+        if(!empty($this->sort_prop)){
+            $this->sort_type = (int)$this->sort_type;
+            if($this->sort_prop == "goods_id"){
+                $orderBy = "bg.goods_id " . (!$this->sort_type ? "DESC" : "ASC");
+            }elseif($this->sort_prop == "goods_name"){
+                $orderBy = "gw.name " . (!$this->sort_type? "DESC" : "ASC");
+            }
+        }
+
+        if(empty($orderBy)){
+            $orderBy = "bg.id " . (!$this->sort_type   ? "DESC" : "ASC");
+        }
+
+        $query->orderBy($orderBy);
 
         $select = ["bg.id", "bg.goods_id", "gw.name", "gw.cover_pic", "bg.created_at",
             "g.enable_score", "bg.updated_at", "g.score_setting", "g.enable_integral", "g.integral_setting"];

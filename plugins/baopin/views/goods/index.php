@@ -19,11 +19,11 @@
 
 
 
-                <el-table :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
+                <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           @selection-change="handleSelectionChange">
                     <el-table-column align='center' type="selection" width="60"></el-table-column>
-                    <el-table-column prop="goods_id" width="60" label="ID"></el-table-column>
-                    <el-table-column label="商品名称" width="320">
+                    <el-table-column sortable="custom" prop="goods_id" width="60" label="ID"></el-table-column>
+                    <el-table-column sortable="custom" prop="goods_name" label="商品名称" width="320">
                         <template slot-scope="scope">
                             <div flex="box:first">
                                 <div style="padding-right: 10px;">
@@ -230,11 +230,13 @@
             search: {
                 keyword: '',
                 page: 1,
-                platform: ''
+                platform: '',
+                sort_prop: '',
+                sort_type: '',
             },
             search_goods:{
                 keyword: '',
-                page: 1
+                page: 1,
             },
             loading: false,
             activeName: '-1',
@@ -254,6 +256,12 @@
             this.loadData();
         },
         methods: {
+
+            sortReload(column){
+                this.search.sort_prop = column.prop;
+                this.search.sort_type = column.order == "descending" ? 0 : 1;
+                this.loadData();
+            },
 
             handleGoodsSelectionChange(selection) {
                 this.goods_selections = selection;
@@ -312,7 +320,7 @@
                     self.loading = true;
                     request({
                         params: {
-                            r: "plugin/baopin/mall/goods/batch-delete-goods"
+                            r: "plugin/baopin/mall/goods/delete-goods"
                         },
                         method: 'post',
                         data: {

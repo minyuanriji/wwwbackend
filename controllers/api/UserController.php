@@ -404,8 +404,8 @@ class UserController extends ApiController
     public function actionRegisterAgree()
     {
         $form = new RegisterAgreeForm();
-        $res = $form->getDetail();
-        return $this->asJson($res);
+        $form->attributes = \Yii::$app->request->get();
+        return $form->getDefaults();
     }
 
 }

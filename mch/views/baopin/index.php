@@ -21,8 +21,8 @@
                 <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           @selection-change="handleSelectionChange">
                     <el-table-column align='center' type="selection" width="60"></el-table-column>
-                    <el-table-column sortable="custom" prop="goods_id" width="60" label="ID"></el-table-column>
-                    <el-table-column sortable="custom" prop="sort" width="100" label="排序">
+                    <el-table-column sortable="custom" prop="goods_id" width="60" label="商品ID"></el-table-column>
+                    <el-table-column v-loading="btnLoading" sortable="custom" prop="sort" :width="130" label="排序">
                         <template slot-scope="scope">
                             <div v-if="sort_id != scope.row.id" flex="dir:left cross:center">
                                 <span>{{scope.row.sort}}</span>
@@ -31,14 +31,14 @@
                             </div>
                             <div v-else style="display: flex;align-items: center">
                                 <el-input style="min-width: 70px" type="number" size="mini" class="change"
-                                          v-model="sort"
+                                          v-model="scope.row.sort"
                                           autocomplete="off"></el-input>
                                 <el-button class="change-quit" type="text" style="color: #F56C6C;padding: 0 5px"
                                            icon="el-icon-error"
-                                           circle @click="quit()"></el-button>
+                                           circle @click="quitSort()"></el-button>
                                 <el-button class="change-success" type="text"
                                            style="margin-left: 0;color: #67C23A;padding: 0 5px"
-                                           icon="el-icon-success" circle @click="changeSortSubmit(scope.row)">
+                                           icon="el-icon-success" circle @click="sortSubmit(scope.row)">
                                 </el-button>
                             </div>
                         </template>
@@ -76,7 +76,7 @@
 
                     <el-table-column label="操作">
                         <template slot-scope="scope">
-                            <el-link type="danger" underline="true" icon="el-icon-delete" @click="delete_bp(scope.row)">删除</el-link>&nbsp;
+                            <el-link type="danger" underline="true" icon="el-icon-delete" @click="delete_one(scope.row)">删除</el-link>&nbsp;
                         </template>
                     </el-table-column>
                 </el-table>
@@ -96,14 +96,14 @@
             </div>
 
             <div>
-                <el-button @click="batch_delete_bp()" style="border:1px solid #ddd;padding: 9px 15px !important;">批量删除</el-button>
+                <el-button @click="delete_muti()" style="border:1px solid #ddd;padding: 9px 15px !important;">批量删除</el-button>
             </div>
         </div>
 
     </el-card>
 
 
-    <el-dialog title="添加爆品" :visible.sync="add_dialog_visible" width="30%">
+    <el-dialog title="添加爆品" :visible.sync="add_dialog_visible" width="50%">
         <el-input @keyup.enter.native="loadGoodsList"
                   size="small" placeholder="搜索爆品"
                   v-model="search_goods.keyword"
@@ -111,9 +111,9 @@
                   style="width:300px;">
             <el-button slot="append" icon="el-icon-search" @click="toGoodsSearch"></el-button>
         </el-input>
-        <el-table @selection-change="handleGoodsSelectionChange" v-loading="get_goods_loading" :data="goods_list">
+        <el-table @sort-change="goodsSortReload" @selection-change="handleGoodsSelectionChange" v-loading="get_goods_loading" :data="goods_list">
             <el-table-column align='center' type="selection" width="60"></el-table-column>
-            <el-table-column property="id" label="商品ID" width="90"></el-table-column>
+            <el-table-column sortable="custom" property="goods_id" label="商品ID" width="90"></el-table-column>
             <el-table-column label="商品名称">
                 <template slot-scope="scope">
                     <div flex="box:first">
@@ -133,6 +133,8 @@
                     </div>
                 </template>
             </el-table-column>
+            <el-table-column sortable="custom" property="virtual_sales" label="销量" width="100"></el-table-column>
+            <el-table-column sortable="custom" property="goods_stock" label="库存" width="100"></el-table-column>
         </el-table>
 
         <el-pagination
@@ -146,7 +148,7 @@
 
         <span slot="footer" class="dialog-footer">
             <el-button @click="add_dialog_visible = false">关 闭</el-button>
-            <el-button :loading="do_save_loading" type="primary" @click="doSave">确 定</el-button>
+            <el-button :loading="do_save_loading" type="primary" @click="doImport">确 定</el-button>
         </span>
 
     </el-dialog>
@@ -173,25 +175,74 @@
             selections: [],
             add_dialog_visible: false,
             get_goods_loading: false,
-            ///////////////////////////////////////////////////////////////////
-
-            do_save_loading: false,
+            do_import_loading: false,
+            goods_list: [],
+            goods_pagination: null,
+            goods_selections: [],
             search_goods:{
                 keyword: '',
                 page: 1,
+                sort_prop: '',
+                sort_type: '',
             },
+            btnLoading: false,
             dialogLoading: false,
             edit: {
                 show: false,
             },
-            goods_list: [],
-            goods_pagination: null,
-            goods_selections: [],
         },
         mounted() {
             this.loadData();
         },
         methods: {
+
+            /**
+             * 编辑排序
+             */
+            editSort(row){
+                this.sort_id = row.id;
+            },
+
+            /**
+             * 退出排序
+             */
+            quitSort(){
+                this.sort_id = 0;
+            },
+
+            /**
+             * 保存排序
+             */
+            sortSubmit(row){
+                let self = this;
+                if (!row.sort || row.sort < 0) {
+                    self.$message.warning('排序值不能小于0')
+                    return;
+                }
+                self.btnLoading = true;
+                request({
+                    params: {
+                        r: 'mch/baopin/edit-sort'
+                    },
+                    method: 'post',
+                    data: {
+                        id  : row.id,
+                        sort: row.sort
+                    }
+                }).then(e => {
+                    self.btnLoading = false;
+                    if (e.data.code === 0) {
+                        self.$message.success(e.data.msg);
+                        self.sort_id = 0;
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.$message.error(e.data.msg);
+                    self.btnLoading = false;
+                });
+            },
+
             /**
              * 排序重载
              */
@@ -235,21 +286,34 @@
             },
 
             /**
+             * 爆品库排序
+             */
+            goodsSortReload(column){
+                this.search_goods.sort_prop = column.prop;
+                this.search_goods.sort_type = column.order == "descending" ? 0 : 1;
+                this.loadGoodsList();
+            },
+
+            /**
              * 搜索爆品库
              */
             loadGoodsList(){
+
                 let self = this;
                 self.get_goods_loading = true;
+
                 request({
                     params: {
                         r: "plugin/baopin/api/goods/search",
-                        mall_id: 5,
-                        mch_id: _mchId
+                        mall_id: 5
                     },
                     method: 'post',
                     data: {
-                        page: self.search_goods.page,
-                        keyword: self.search_goods.keyword
+                        page      : self.search_goods.page,
+                        keyword   : self.search_goods.keyword,
+                        mch_id    : _mchId,
+                        sort_prop : self.search_goods.sort_prop,
+                        sort_type : self.search_goods.sort_type
                     }
                 }).then(e => {
                     self.get_goods_loading = false;
@@ -265,56 +329,45 @@
                 });
             },
 
-            ///////////////////////////////////////////////////////////////////
+            doImport(){
 
-            handleGoodsSelectionChange(selection) {
-                this.goods_selections = selection;
-            },
-
-            //批量删除爆品
-            batch_delete_bp(){
-
-                if(this.selections.length <= 0){
-                    this.$alert('请选择爆品记录');
+                if(this.goods_selections.length <= 0){
+                    this.$alert('请选择商品');
                     return;
                 }
 
                 let self = this, i, goods_ids = [];
-                for(i=0; i < self.selections.length; i++){
-                    goods_ids.push(self.selections[i].goods_id);
+                for(i=0; i < self.goods_selections.length; i++){
+                    goods_ids.push(self.goods_selections[i].goods_id);
                 }
 
-                this.$confirm('此操作将永久删除爆品记录，是否继续？', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    self.loading = true;
-                    request({
-                        params: {
-                            r: "plugin/baopin/mall/goods/batch-delete-goods"
-                        },
-                        method: 'post',
-                        data: {
-                            goods_id_str: goods_ids.join(",")
-                        }
-                    }).then(e => {
-                        self.loading = false;
-                        if (e.data.code === 0) {
-                            self.loadData();
-                            self.$message.success(e.data.msg);
-                        } else {
-                            self.$message.error(e.data.msg);
-                        }
-                    }).catch(e => {
-                        self.loading = false;
-                        self.$message.error("request fail");
-                    });
+                self.do_import_loading = true;
+                request({
+                    params: {
+                        r: "mch/baopin/import"
+                    },
+                    method: 'post',
+                    data: {
+                        goods_id_str: goods_ids.join(",")
+                    }
+                }).then(e => {
+                    self.do_import_loading = false;
+                    if (e.data.code === 0) {
+                        self.add_dialog_visible = false;
+                        self.loadGoodsList();
+                        self.loadData();
+                        self.$message.success(e.data.msg);
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.do_import_loading = false;
+                    self.$message.error("request fail");
                 });
             },
 
             //删除记录
-            delete_bp(row){
+            delete_one(row){
                 var self = this;
                 this.$confirm('此操作将永久删除爆品记录，是否继续？', '提示', {
                     confirmButtonText: '确定',
@@ -324,7 +377,7 @@
                     self.loading = true;
                     request({
                         params: {
-                            r: "plugin/baopin/mall/goods/delete-goods"
+                            r: "mch/baopin/delete"
                         },
                         method: 'post',
                         data: {
@@ -345,48 +398,50 @@
                 });
             },
 
+            //批量删除爆品
+            delete_muti(){
 
-
-            doSave(){
-
-                if(this.goods_selections.length <= 0){
-                    this.$alert('请选择商品');
+                if(this.selections.length <= 0){
+                    this.$alert('请选择爆品记录');
                     return;
                 }
 
                 let self = this, i, goods_ids = [];
-                for(i=0; i < self.goods_selections.length; i++){
-                    goods_ids.push(self.goods_selections[i].id);
+                for(i=0; i < self.selections.length; i++){
+                    goods_ids.push(self.selections[i].goods_id);
                 }
 
-                self.do_save_loading = true;
-                request({
-                    params: {
-                        r: "plugin/baopin/mall/goods/save"
-                    },
-                    method: 'post',
-                    data: {
-                        goods_id_str: goods_ids.join(",")
-                    }
-                }).then(e => {
-                    self.do_save_loading = false;
-                    if (e.data.code === 0) {
-                        self.add_dialog_visible = false;
-                        self.loadGoodsList();
-                        self.loadData();
-                        self.$message.success(e.data.msg);
-                    } else {
-                        self.$message.error(e.data.msg);
-                    }
-                }).catch(e => {
-                    self.do_save_loading = false;
-                    self.$message.error("request fail");
+                this.$confirm('此操作将永久删除爆品记录，是否继续？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.loading = true;
+                    request({
+                        params: {
+                            r: "mch/baopin/delete-muti"
+                        },
+                        method: 'post',
+                        data: {
+                            goods_id_str: goods_ids.join(",")
+                        }
+                    }).then(e => {
+                        self.loading = false;
+                        if (e.data.code === 0) {
+                            self.loadData();
+                            self.$message.success(e.data.msg);
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        self.loading = false;
+                        self.$message.error("request fail");
+                    });
                 });
             },
 
-            //编辑爆品
-            addOrEdit(row){
-                this.openoff = true;
+            handleGoodsSelectionChange(selection) {
+                this.goods_selections = selection;
             },
 
             pageChange(page) {

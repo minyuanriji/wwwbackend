@@ -1,7 +1,8 @@
+
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
-            <span>爆品记录</span>
+            <span>我的爆品</span>
         </div>
         <div class="table-body">
 
@@ -17,12 +18,31 @@
             </div>
             <el-tabs v-model="activeName" @tab-click="handleClick">
 
-
-
                 <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           @selection-change="handleSelectionChange">
                     <el-table-column align='center' type="selection" width="60"></el-table-column>
                     <el-table-column sortable="custom" prop="goods_id" width="60" label="ID"></el-table-column>
+                    <el-table-column sortable="custom" prop="sort" width="100" label="排序">
+                        <template slot-scope="scope">
+                            <div v-if="sort_id != scope.row.id" flex="dir:left cross:center">
+                                <span>{{scope.row.sort}}</span>
+                                <img class="edit-sort-img" @click="editSort(scope.row)"
+                                     src="statics/img/mall/order/edit.png" alt="">
+                            </div>
+                            <div v-else style="display: flex;align-items: center">
+                                <el-input style="min-width: 70px" type="number" size="mini" class="change"
+                                          v-model="sort"
+                                          autocomplete="off"></el-input>
+                                <el-button class="change-quit" type="text" style="color: #F56C6C;padding: 0 5px"
+                                           icon="el-icon-error"
+                                           circle @click="quit()"></el-button>
+                                <el-button class="change-success" type="text"
+                                           style="margin-left: 0;color: #67C23A;padding: 0 5px"
+                                           icon="el-icon-success" circle @click="changeSortSubmit(scope.row)">
+                                </el-button>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column sortable="custom" prop="goods_name" label="商品名称" width="320">
                         <template slot-scope="scope">
                             <div flex="box:first">
@@ -43,89 +63,6 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="scope" width="100" label="积分赠送">
-                        <template slot-scope="scope">
-                            <el-popover placement="right" trigger="click" width="300">
-                                <el-form size="mini" :label-position="label_position_top" :model="scope.row.editable_score" label-width="80px">
-                                    <el-form-item label="类型">
-                                        <el-radio-group v-model="scope.row.editable_score.enable_score">
-                                            <el-radio label="1">积分券</el-radio>
-                                            <el-radio label="0">积分</el-radio>
-                                        </el-radio-group>
-                                    </el-form-item>
-                                    <template v-if="scope.row.editable_score.enable_score == 1">
-                                        <el-form-item label="有效期">
-                                            <el-radio-group v-model="scope.row.editable_score.is_permanent">
-                                                <el-radio label="1">永久</el-radio>
-                                                <el-radio label="0">限时</el-radio>
-                                            </el-radio-group>
-                                        </el-form-item>
-                                        <el-form-item label="赠送">
-                                            <el-input type="number" :min="0" placeholder="" v-model="scope.row.editable_score.integral_num">
-                                                <template slot="append">积分券</template>
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item label="按月">
-                                            <el-input type="number" :min="0" v-model="scope.row.editable_score.period" placeholder="">
-                                                <template slot="append">月</template>
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item label="有效期" v-if="scope.row.editable_score.is_permanent==0" >
-                                            <el-input type="number" :min="0" v-model="scope.row.editable_score.expire" placeholder="">
-                                                <template slot="append">天</template>
-                                            </el-input>
-                                        </el-form-item>
-                                    </template>
-                                    <template v-if="scope.row.editable_score.enable_score == 0">
-                                        <el-form-item label="按">
-                                            <el-radio-group v-model="scope.row.editable_score.give_score_type">
-                                                <el-radio label="1">固定值</el-radio>
-                                                <el-radio label="2">百分比</el-radio>
-                                            </el-radio-group>
-                                        </el-form-item>
-                                        <el-form-item label="赠送">
-                                            <el-input type="number" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="请输入赠送积分数量" v-model="scope.row.editable_score.give_score">
-                                                <template slot="append"><span v-if="scope.row.editable_score.give_score_type == 1">分</span><span v-else>%</span></template>
-                                            </el-input>
-                                        </el-form-item>
-                                    </template>
-                                    <el-button :loading="edit_score_loading" type="primary" @click="save_score_setting(scope.row.goods_id, scope.row.editable_score)">保存</el-button>
-                                </el-form>
-                                <el-link slot="reference" type="primary" icon="el-icon-edit-outline" >设置</el-link>
-                            </el-popover>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="scope" width="100" label="红包赠送">
-                        <template slot-scope="scope">
-                            <el-popover placement="right" trigger="click" width="300">
-                                <el-form size="mini" :label-position="label_position_top" :model="scope.row.editable_integral" label-width="80px">
-                                    <el-form-item label="赠送红包">
-                                        <el-switch v-model="scope.row.editable_integral.enable_integral" :active-value="1" :inactive-value="0" active-text="开启" inactive-text="关闭"></el-switch>
-                                    </el-form-item>
-                                    <template v-if="scope.row.editable_integral.enable_integral == 1">
-                                        <el-form-item label="有效期">
-                                            <el-radio-group v-model="scope.row.editable_integral.is_permanent">
-                                                <el-radio label="1">永久</el-radio>
-                                            </el-radio-group>
-                                        </el-form-item>
-                                        <el-form-item label="赠送">
-                                            <el-input type="number" :min="0" placeholder="" v-model="scope.row.editable_integral.integral_num">
-                                                <template slot="append">红包券</template>
-                                            </el-input>
-                                        </el-form-item>
-                                        <el-form-item label="按月">
-                                            <el-input type="number" :min="0" v-model="scope.row.editable_integral.period" placeholder="">
-                                                <template slot="append">月</template>
-                                            </el-input>
-                                        </el-form-item>
-                                    </template>
-
-                                    <el-button :loading="edit_integral_loading" type="primary" @click="save_integral_setting(scope.row.goods_id, scope.row.editable_integral)">保存</el-button>
-                                </el-form>
-                                <el-link slot="reference" type="primary" icon="el-icon-edit-outline" >设置</el-link>
-                            </el-popover>
-                        </template>
-                    </el-table-column>
                     <el-table-column prop="scope" width="100" label="添加时间">
                         <template slot-scope="scope">
                             {{scope.row.created_at|dateTimeFormat('Y-m-d')}}
@@ -139,7 +76,6 @@
 
                     <el-table-column label="操作">
                         <template slot-scope="scope">
-                            <el-link type="primary" underline="true" :href="'?r=mall/goods/edit&id='+scope.row.goods_id" icon="el-icon-view" target="_blank">查看</el-link>
                             <el-link type="danger" underline="true" icon="el-icon-delete" @click="delete_bp(scope.row)">删除</el-link>&nbsp;
                         </template>
                     </el-table-column>
@@ -149,12 +85,12 @@
                 <div></div>
                 <div>
                     <el-pagination
-                        v-if="list.length > 0"
-                        style="display: inline-block;float: right;"
-                        background :page-size="pagination.pageSize"
-                        @current-change="pageChange"
-                        layout="prev, pager, next" :current-page="pagination.current_page"
-                        :total="pagination.total_count">
+                            v-if="list.length > 0"
+                            style="display: inline-block;float: right;"
+                            background :page-size="pagination.pageSize"
+                            @current-change="pageChange"
+                            layout="prev, pager, next" :current-page="pagination.current_page"
+                            :total="pagination.total_count">
                     </el-pagination>
                 </div>
             </div>
@@ -169,7 +105,7 @@
 
     <el-dialog title="添加爆品" :visible.sync="add_dialog_visible" width="30%">
         <el-input @keyup.enter.native="loadGoodsList"
-                  size="small" placeholder="搜索商品"
+                  size="small" placeholder="搜索爆品"
                   v-model="search_goods.keyword"
                   clearable @clear="toGoodsSearch"
                   style="width:300px;">
@@ -222,11 +158,8 @@
     const app = new Vue({
         el: '#app',
         data: {
-            get_goods_loading: false,
-            add_dialog_visible: false,
-            edit_score_loading: false,
-            edit_integral_loading: false,
-            do_save_loading: false,
+            loading: false,
+            sort_id: 0,
             search: {
                 keyword: '',
                 page: 1,
@@ -234,34 +167,105 @@
                 sort_prop: '',
                 sort_type: '',
             },
+            activeName: '-1',
+            list: [],
+            pagination: null,
+            selections: [],
+            add_dialog_visible: false,
+            get_goods_loading: false,
+            ///////////////////////////////////////////////////////////////////
+
+            do_save_loading: false,
             search_goods:{
                 keyword: '',
                 page: 1,
             },
-            loading: false,
-            activeName: '-1',
-            list: [],
-            pagination: null,
             dialogLoading: false,
             edit: {
                 show: false,
             },
-            label_position_top: "top",
             goods_list: [],
             goods_pagination: null,
             goods_selections: [],
-            selections: []
         },
         mounted() {
             this.loadData();
         },
         methods: {
-
+            /**
+             * 排序重载
+             */
             sortReload(column){
                 this.search.sort_prop = column.prop;
                 this.search.sort_type = column.order == "descending" ? 0 : 1;
                 this.loadData();
             },
+
+            /**
+             * 加载爆品记录
+             */
+            loadData() {
+                this.loading = true;
+                let params = {
+                    r: 'mch/baopin/index'
+                };
+                params = Object.assign(params, this.search);
+                request({
+                    params: params,
+                    method: 'get',
+                }).then(e => {
+                    this.loading = false;
+                    if (e.data.code == 0) {
+                        this.list = e.data.data.list;
+                        this.pagination = e.data.data.pagination;
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    this.loading = false;
+                });
+            },
+
+            /**
+             * 添加爆品
+             */
+            addBaopin(){
+                this.add_dialog_visible = true;
+                this.loadGoodsList();
+            },
+
+            /**
+             * 搜索爆品库
+             */
+            loadGoodsList(){
+                let self = this;
+                self.get_goods_loading = true;
+                request({
+                    params: {
+                        r: "plugin/baopin/api/goods/search",
+                        mall_id: 5,
+                        mch_id: _mchId
+                    },
+                    method: 'post',
+                    data: {
+                        page: self.search_goods.page,
+                        keyword: self.search_goods.keyword
+                    }
+                }).then(e => {
+                    self.get_goods_loading = false;
+                    if (e.data.code === 0) {
+                        self.goods_list = e.data.data.list;
+                        self.goods_pagination = e.data.data.pagination;
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.get_goods_loading = false;
+                    self.$message.error("request fail");
+                });
+            },
+
+            ///////////////////////////////////////////////////////////////////
 
             handleGoodsSelectionChange(selection) {
                 this.goods_selections = selection;
@@ -341,38 +345,7 @@
                 });
             },
 
-            //加载商品数据
-            loadGoodsList(){
-                let self = this;
-                self.get_goods_loading = true;
-                request({
-                    params: {
-                        r: "plugin/baopin/mall/goods/search-goods"
-                    },
-                    method: 'post',
-                    data: {
-                        page: self.search_goods.page,
-                        keyword: self.search_goods.keyword
-                    }
-                }).then(e => {
-                    self.get_goods_loading = false;
-                    if (e.data.code === 0) {
-                        self.goods_list = e.data.data.list;
-                        self.goods_pagination = e.data.data.pagination;
-                    } else {
-                        self.$message.error(e.data.msg);
-                    }
-                }).catch(e => {
-                    self.get_goods_loading = false;
-                    self.$message.error("request fail");
-                });
-            },
 
-            //添加爆品
-            addBaopin(){
-                this.add_dialog_visible = true;
-                this.loadGoodsList();
-            },
 
             doSave(){
 
@@ -411,83 +384,11 @@
                 });
             },
 
-            //保存积分赠送设置
-            save_score_setting(goods_id, form){
-                this.edit_score_loading = true;
-                let self = this;
-                request({
-                    params: {
-                        r: "plugin/baopin/mall/goods/update-score-setting"
-                    },
-                    method: 'post',
-                    data: {
-                        goods_id: goods_id,
-                        form: form
-                    }
-                }).then(e => {
-                    self.edit_score_loading = false;
-                    if (e.data.code === 0) {
-                        self.$message.success(e.data.msg);
-                    } else {
-                        self.$message.error(e.data.msg);
-                    }
-                }).catch(e => {
-                    self.edit_score_loading = false;
-                    self.$message.error("request fail");
-                });
-            },
-
-            //保存购物券赠送设置
-            save_integral_setting(goods_id, form){
-                let self = this;
-                self.edit_integral_loading = true;
-                request({
-                    params: {
-                        r: "plugin/baopin/mall/goods/update-integra-setting"
-                    },
-                    method: 'post',
-                    data: {
-                        goods_id: goods_id,
-                        form: form
-                    }
-                }).then(e => {
-                    self.edit_integral_loading = false;
-                    if (e.data.code === 0) {
-                        self.$message.success(e.data.msg);
-                    } else {
-                        self.$message.error(e.data.msg);
-                    }
-                }).catch(e => {
-                    self.edit_integral_loading = false;
-                    self.$message.error("request fail");
-                });
-            },
-
             //编辑爆品
             addOrEdit(row){
                 this.openoff = true;
             },
-            loadData() {
-                this.loading = true;
-                let params = {
-                    r: 'plugin/baopin/mall/goods/list'
-                };
-                params = Object.assign(params, this.search);
-                request({
-                    params: params,
-                    method: 'get',
-                }).then(e => {
-                    this.loading = false;
-                    if (e.data.code == 0) {
-                        this.list = e.data.data.list;
-                        this.pagination = e.data.data.pagination;
-                    } else {
-                        this.$message.error(e.data.msg);
-                    }
-                }).catch(e => {
-                    this.loading = false;
-                });
-            },
+
             pageChange(page) {
                 this.search.page = page;
                 this.loadData();

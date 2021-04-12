@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\forms\efps\EfpsRefund;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -62,6 +63,9 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        $class = new EfpsRefund();
+        $class->refund(null, null);
+
         return $this->redirect(\Yii::$app->urlManager->createUrl(['admin/index/index']));
     }
 

@@ -453,14 +453,14 @@ class ApiController extends BaseController
         $paramsData = @file_get_contents('php://input');
         $json = CommonLogic::analyJson($paramsData);
         if ($json === false) {
-            throw new Exception('参数必须是json数据格式');
+            //throw new Exception('参数必须是json数据格式');
         }
         $requests = \Yii::$app->request;
         $jsonData = [];
         if (!empty($paramsData)) {
             $jsonData = json_decode($paramsData, true);
         }
-        $this->requestData = array_merge($requests->get(), $requests->post(), $jsonData);
+        $this->requestData = array_merge($requests->get(), $requests->post(), (!empty($jsonData) && is_array($jsonData) ? $jsonData : []));
         if (isset($this->requestData["r"])) {
             unset($this->requestData["r"]);
         }

@@ -72,6 +72,13 @@ class Menus
                 'icon_font' => 'el-icon-s-goods',
                 'children' => [
                     [
+                        'name' => '我的爆品',
+                        'route' => 'mch/baopin/index',
+                        'action' => [
+                            
+                        ]
+                    ],
+                    [
                         'name' => '商品列表',
                         'route' => 'mch/goods/index',
                         'action' => [

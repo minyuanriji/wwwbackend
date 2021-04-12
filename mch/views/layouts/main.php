@@ -33,6 +33,7 @@ $currentRoute = Yii::$app->controller->route;
             const _requestRoute = '<?=Yii::$app->requestedRoute?>';
             let _isWe7 = <?=is_we7() ? 'true' : 'false'?>;
             let _isInd = <?=is_we7() ? 'false' : 'true'?>;
+            let _mchId = <?= \Yii::$app->mchId;?>;
         </script>
         <script src="<?= Yii::$app->request->baseUrl ?>/statics/js/common.js"></script>
         <script src="<?= Yii::$app->request->baseUrl ?>/statics/js/dayjs.min.js"></script>

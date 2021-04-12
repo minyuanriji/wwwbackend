@@ -63,9 +63,6 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $class = new EfpsRefund();
-        $class->refund(null, null);
-
         return $this->redirect(\Yii::$app->urlManager->createUrl(['admin/index/index']));
     }
 

@@ -58,7 +58,7 @@ class GoodsListForm extends BaseModel{
 
         $query->orderBy($orderBy);
 
-        $select = ["bg.id", "bcg.sort", "bg.goods_id", "gw.name", "gw.cover_pic", "bg.created_at",
+        $select = ["bcg.id", "bcg.sort", "bg.goods_id", "gw.name", "gw.cover_pic", "bg.created_at",
             "g.enable_score", "bg.updated_at", "g.score_setting", "g.enable_integral", "g.integral_setting"];
         $list = $query->select($select)->asArray()->page($pagination)->all();
         if($list){

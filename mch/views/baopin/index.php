@@ -21,8 +21,8 @@
                 <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           @selection-change="handleSelectionChange">
                     <el-table-column align='center' type="selection" width="60"></el-table-column>
-                    <el-table-column sortable="custom" prop="goods_id" width="60" label="ID"></el-table-column>
-                    <el-table-column sortable="custom" prop="sort" :width="sort_id != id ? 150 : 100" label="排序">
+                    <el-table-column sortable="custom" prop="goods_id" width="60" label="商品ID"></el-table-column>
+                    <el-table-column v-loading="btnLoading" sortable="custom" prop="sort" :width="130" label="排序">
                         <template slot-scope="scope">
                             <div v-if="sort_id != scope.row.id" flex="dir:left cross:center">
                                 <span>{{scope.row.sort}}</span>
@@ -31,14 +31,14 @@
                             </div>
                             <div v-else style="display: flex;align-items: center">
                                 <el-input style="min-width: 70px" type="number" size="mini" class="change"
-                                          v-model="sort"
+                                          v-model="scope.row.sort"
                                           autocomplete="off"></el-input>
                                 <el-button class="change-quit" type="text" style="color: #F56C6C;padding: 0 5px"
                                            icon="el-icon-error"
-                                           circle @click="quit()"></el-button>
+                                           circle @click="quitSort()"></el-button>
                                 <el-button class="change-success" type="text"
                                            style="margin-left: 0;color: #67C23A;padding: 0 5px"
-                                           icon="el-icon-success" circle @click="changeSortSubmit(scope.row)">
+                                           icon="el-icon-success" circle @click="sortSubmit(scope.row)">
                                 </el-button>
                             </div>
                         </template>
@@ -185,7 +185,7 @@
                 sort_prop: '',
                 sort_type: '',
             },
-
+            btnLoading: false,
             dialogLoading: false,
             edit: {
                 show: false,
@@ -201,6 +201,46 @@
              */
             editSort(row){
                 this.sort_id = row.id;
+            },
+
+            /**
+             * 退出排序
+             */
+            quitSort(){
+                this.sort_id = 0;
+            },
+
+            /**
+             * 保存排序
+             */
+            sortSubmit(row){
+                let self = this;
+                if (!row.sort || row.sort < 0) {
+                    self.$message.warning('排序值不能小于0')
+                    return;
+                }
+                self.btnLoading = true;
+                request({
+                    params: {
+                        r: 'mch/baopin/edit-sort'
+                    },
+                    method: 'post',
+                    data: {
+                        id  : row.id,
+                        sort: row.sort
+                    }
+                }).then(e => {
+                    self.btnLoading = false;
+                    if (e.data.code === 0) {
+                        self.$message.success(e.data.msg);
+                        self.sort_id = 0;
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.$message.error(e.data.msg);
+                    self.btnLoading = false;
+                });
             },
 
             /**

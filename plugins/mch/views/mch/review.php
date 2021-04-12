@@ -163,6 +163,11 @@
                                 <img src="statics/img/mall/order/detail.png" alt="">
                             </el-tooltip>
                         </el-button>
+                        <el-button @click="destroy(scope.row, scope.$index)" type="text" circle size="mini">
+                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                <img src="statics/img/mall/del.png" alt="">
+                            </el-tooltip>
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>

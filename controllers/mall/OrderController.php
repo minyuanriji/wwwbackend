@@ -31,7 +31,7 @@ class OrderController extends OrderManagerController
 {
     public function actionIndex()
     {
-        \Yii::$app->log->targets['debug'] = null;
+//        \Yii::$app->log->targets['debug'] = null;
         if (\Yii::$app->request->isAjax) {
             $form = new OrderForm();
             $form->attributes = \Yii::$app->request->get();
@@ -61,7 +61,6 @@ class OrderController extends OrderManagerController
     {
         if (\Yii::$app->request->isAjax) {
             $order = new OrderForm();
-            $order_count = $order->search_num();//全部
             $order->status = 0;//未付款总数
             $unpaid_count = $order->search_num();
             $order->status = 1;//代发货总数
@@ -73,7 +72,6 @@ class OrderController extends OrderManagerController
                     'code' => ApiCode::CODE_SUCCESS,
                     'data' => [
                         'unpaid_count' => $unpaid_count,
-                        'order_count' => $order_count,
                         'consignment_count' => $consignment_count,
                         'received_count' => $received_count
                     ]

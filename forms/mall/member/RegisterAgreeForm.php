@@ -77,7 +77,7 @@ class RegisterAgreeForm extends BaseModel
     public function getDefaults()
     {
         $model = Option::findOne([
-            'name' => Option::NAME_PAYMENT,
+            'name' => Option::NAME_REGISTER_AGREE,
             'mall_id' => \Yii::$app->mall->id,
             'group' => Option::GROUP_APP
         ]);

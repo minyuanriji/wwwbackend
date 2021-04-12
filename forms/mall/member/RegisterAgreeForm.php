@@ -11,6 +11,7 @@
 namespace app\forms\mall\member;
 
 use app\core\ApiCode;
+use app\helpers\SerializeHelper;
 use app\logic\AppConfigLogic;
 use app\logic\OptionLogic;
 use app\models\BaseModel;
@@ -71,5 +72,26 @@ class RegisterAgreeForm extends BaseModel
                 'msg' => $e->getMessage(),
             ];
         }
+    }
+
+    public function getDefaults()
+    {
+        $model = Option::findOne([
+            'name' => Option::NAME_PAYMENT,
+            'mall_id' => \Yii::$app->mall->id,
+            'group' => Option::GROUP_APP
+        ]);
+
+        if (!$model) {
+            $result = '';
+        } else {
+            $result = $model->value;
+            $result = SerializeHelper::decode($result);
+        }
+        return [
+            'code' => ApiCode::CODE_SUCCESS,
+            'msg' => "请求成功",
+            'data' => $result
+        ];
     }
 }

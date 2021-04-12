@@ -115,7 +115,7 @@ class UserAddressForm extends BaseModel
         $notInPointList = [];
         foreach ($list as $i => $item) {
             unset($list[$i]["created_at"], $list[$i]["updated_at"], $list[$i]["deleted_at"], $list[$i]["is_delete"]);
-            $list[$i]['user_address'] = $item['province'] . $item['city'] . $item['district'] . $item['detail'];
+            $list[$i]['user_address'] = $item['province'] . $item['city'] . $item['district'] . $item['town'] . $item['detail'];
             if ($this->hasCity == 'true') {
                 if (!$item['longitude'] || !$item['latitude']) {
                     $notInPointList[] = $list[$i];

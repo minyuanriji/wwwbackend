@@ -21,6 +21,7 @@ use app\forms\api\user\UserForm;
 use app\forms\api\user\UserRechargeForm;
 use app\forms\common\attachment\CommonAttachment;
 use app\controllers\business\{Qrcode,Poster,NewUserIntegral};
+use app\forms\mall\member\RegisterAgreeForm;
 use app\models\user\User;
 
 class UserController extends ApiController
@@ -394,6 +395,17 @@ class UserController extends ApiController
         $form->number  = 300;
         $form->desc    = "新人领取300积分";
         return $form->execute();
+    }
+
+    /**
+     * @Note:注册协议
+     * @return string|\yii\web\Response
+     */
+    public function actionRegisterAgree()
+    {
+        $form = new RegisterAgreeForm();
+        $res = $form->getDetail();
+        return $this->asJson($res);
     }
 
 }

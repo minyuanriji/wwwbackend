@@ -10,12 +10,14 @@ class SearchForm extends BaseModel{
     public $mch_id;
     public $page;
     public $keyword;
+    public $sort_prop;
+    public $sort_type;
 
     public function rules(){
         return array_merge(parent::rules(), [
             [['mch_id'], 'required'],
             [['page', 'mch_id'], 'integer'],
-            [['keyword'], 'safe']
+            [['keyword', 'sort_prop', 'sort_type'], 'safe']
         ]);
     }
 
@@ -27,7 +29,7 @@ class SearchForm extends BaseModel{
 
         $pagination = null;
         $query = BaopinGoods::find()->alias('bg')
-                    ->leftJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id")
+                    ->leftJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id AND bmg.mch_id='".$this->mch_id."'")
                     ->innerJoin("{{%goods}} g", "g.id=bg.goods_id")
                     ->innerJoin("{{%goods_warehouse}} gw", "gw.id=g.goods_warehouse_id");
 
@@ -35,8 +37,7 @@ class SearchForm extends BaseModel{
             "AND",
             ["g.is_delete" => 0],
             ["gw.is_delete" => 0],
-            ["bmg.mch_id" => $this->mch_id],
-            "bmg IS NULL"
+            "bmg.id IS NULL"
         ]);
 
         if (!empty($this->keyword)) {
@@ -52,8 +53,10 @@ class SearchForm extends BaseModel{
             $this->sort_type = (int)$this->sort_type;
             if($this->sort_prop == "goods_id"){
                 $orderBy = "bg.goods_id " . (!$this->sort_type ? "DESC" : "ASC");
-            }elseif($this->sort_prop == "goods_name"){
-                $orderBy = "gw.name " . (!$this->sort_type? "DESC" : "ASC");
+            }elseif($this->sort_prop == "virtual_sales"){
+                $orderBy = "g.virtual_sales " . (!$this->sort_type? "DESC" : "ASC");
+            }elseif($this->sort_prop == "goods_stock"){
+                $orderBy = "g.goods_stock " . (!$this->sort_type? "DESC" : "ASC");
             }
         }
 
@@ -63,8 +66,8 @@ class SearchForm extends BaseModel{
 
         $query->orderBy($orderBy);
 
-        $select = ["bg.id", "bg.goods_id", "gw.name", "gw.cover_pic", "bg.created_at",
-            "g.enable_score", "bg.updated_at", "g.score_setting", "g.enable_integral", "g.integral_setting"];
+        $select = ["bg.id", "bg.goods_id", "gw.name", "gw.cover_pic",
+            "g.goods_stock", "g.virtual_sales", "bg.created_at", "bg.updated_at"];
         $list = $query->select($select)->asArray()->page($pagination)->all();
 
         return [

@@ -2,6 +2,9 @@
 namespace app\mch\controllers;
 
 
+use app\mch\forms\baopin\BaopinDeleteForm;
+use app\mch\forms\baopin\BaopinDeleteMutiForm;
+use app\mch\forms\baopin\BaopinImportForm;
 use app\mch\forms\baopin\GoodsListForm;
 
 class BaopinController extends MchController {
@@ -21,4 +24,36 @@ class BaopinController extends MchController {
         }
     }
 
+    /**
+     * 导入爆品
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionImport(){
+        $form = new BaopinImportForm();
+        $form->attributes = \Yii::$app->request->post();
+        $form->mch_id     = \Yii::$app->mchId;
+        return $this->asJson($form->import());
+    }
+
+    /**
+     * 删除爆品
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionDelete(){
+        $form = new BaopinDeleteForm();
+        $form->attributes = \Yii::$app->request->post();
+        $form->mch_id     = \Yii::$app->mchId;
+        return $this->asJson($form->delete());
+    }
+
+    /**
+     * 批量删除爆品
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionDeleteMuti(){
+        $form = new BaopinDeleteMutiForm();
+        $form->attributes = \Yii::$app->request->post();
+        $form->mch_id     = \Yii::$app->mchId;
+        return $this->asJson($form->deleteMuti());
+    }
 }

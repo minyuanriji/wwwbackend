@@ -42,7 +42,7 @@ Yii::$app->loadComponentView('order/com-send');
             <div style="text-align: center;font-size: 16px;" flex="main:center cross:center">
                 <i style="color: #E6A23C;margin-right: 10px;font-size: 24px" class="el-icon-warning"></i>
                 <span class="span-label">确认收货后,退款金额</span>
-                <el-input size="small" class="refund-price" type="number" v-model="para.refund_price"></el-input>
+                <el-input size="small" class="refund-price" type="number" v-model="para.refund_price" disabled="disabled"></el-input>
                 <span class="span-label">元将直接返还给用户！</span>
             </div>
             <span slot="footer" class="dialog-footer">

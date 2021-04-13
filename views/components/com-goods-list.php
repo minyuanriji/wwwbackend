@@ -321,6 +321,11 @@ Yii::$app->loadComponentView('goods/com-batch');
                                         <img src="statics/img/mall/del.png" alt="">
                                     </el-tooltip>
                                 </el-button>
+                                <el-button v-if="!scope.row.not_editable" @click="copy(scope.row, scope.$index)" type="text" circle size="mini">
+                                    <el-tooltip class="item" effect="dark" content="复制" placement="top">
+                                        <img src="statics/img/mall/copy1.png" alt="">
+                                    </el-tooltip>
+                                </el-button>
 								
 								<el-tooltip class="item" v-if="scope.row.not_editable&&scope.row.groupBuyGoods"
 								            effect="dark"

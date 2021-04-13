@@ -2582,7 +2582,6 @@ class OrderSubmitForm extends BaseModel
             $mch = Mch::findOne([
                 'mall_id'       => \Yii::$app->mall->id,
                 'is_delete'     => 0,
-                'status'        => 1,
                 'review_status' => 1,
                 'id'            => $goods->mch_id
             ]);

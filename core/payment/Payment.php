@@ -15,6 +15,7 @@ use Alipay\AlipayRequestFactory;
 use Alipay\AopClient;
 use app\core\ApiCode;
 use app\forms\api\user\UserRechargeForm;
+use app\forms\efps\EfpsRefund;
 use app\helpers\ArrayHelper;
 use app\helpers\WechatHelper;
 use app\logic\AppConfigLogic;
@@ -476,7 +477,11 @@ class Payment extends Component
             $paymentRefund->created_at = time();
             $paymentRefund->out_trade_no = $paymentOrderUnion->order_no;
 
-            $class = $this->refundClass($paymentOrderUnion->pay_type);
+            //$class = $this->refundClass($paymentOrderUnion->pay_type);
+
+            //全部通过易票联退款
+            $class = new EfpsRefund();
+
             $result = $class->refund($paymentRefund, $paymentOrderUnion);
             if ($result) {
                 $paymentOrder->refund += $price;

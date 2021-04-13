@@ -108,23 +108,24 @@ class WechatForm extends BaseModel
         $wechatModel = \Yii::$app->wechat;
         if($wechatModel->isWechat)
         {
-            $result = $wechatModel->app->oauth->user();
-            \Yii::warning("授权结果 result:".json_encode($result));
-            if(!empty($result)){
-                $userInfo = $result->original;
+            $authData = $wechatModel->app->oauth->user();
+            \Yii::warning("授权结果 result:".json_encode($authData));
+            if(!empty($authData)){
+                $authOriginalData = $authData->original;
                 $phoneConfig = AppConfigLogic::getPhoneConfig();
                 //没有开启全网通，则直接入库，如果开启了，返回给前端
                 if(empty($phoneConfig["all_network_enable"])){
-                    $returnData = $this->userHandle($userInfo);
+                    $returnData = $this->userHandle($authOriginalData);
                     if(empty($returnData)){
                         return $this->returnApiResultData(ApiCode::CODE_FAIL,'授权失败');
                     }
                 }else{
                     $returnData = ["access_token" => ""];
 
-                    $oauth =  $result;
+                    $oauth =  $authData;
+
                     //检测是否授权
-                    $result = UserLogic::checkIsAuthorized($userInfo);
+                    $result = UserLogic::checkIsAuthorized($authOriginalData);
                     // $result = $this->userHandle($userInfo);
                   
                     if($result && empty($result->access_token) && !empty($oauth->token)){
@@ -138,8 +139,8 @@ class WechatForm extends BaseModel
                     }else{
                         //将获得的数据存入缓存，key为openid加密字符串
                         $randStr = str_random(6);
-                        $openid = md5($userInfo["openid"].$randStr);
-                        \Yii::$app->cache->set($openid,$userInfo);
+                        $openid = md5($authOriginalData["openid"] . $randStr);
+                        \Yii::$app->cache->set($openid, $authOriginalData);
                         // $returnData['access_token'] = $oauth->token;
                         $returnData["key"] = $openid;
                         $returnData["config"] = $phoneConfig;

@@ -55,7 +55,7 @@ class AttrGoodsService
                     $temp['score_price'] = 0;
                 }
 
-                //购物券
+                //红包券
                 if (!isset($temp['integral_price'])) {
                     $temp['integral_price'] = 0;
                 }

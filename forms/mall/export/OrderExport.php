@@ -215,7 +215,7 @@ class OrderExport extends BaseExport
         /** @var Order $item */
         foreach ($list as $item) {
             $arr = [];
-            $platForm = isset($item->paymentOrder->pay_type) ? $this->getPayPlatform($item->paymentOrder->pay_type) : $this->getPlatform($item->user->userInfo->platform);
+            $platForm = isset($item->paymentOrder->pay_type) ? $this->getPayPlatform($item->paymentOrder->pay_type) : $this->getPlatform(isset($item->user->userInfo->platform) ? $item->user->userInfo->platform : '');
             $payType = isset($item->paymentOrder->pay_type) ? $paymentOrderModel->getPayTypeText($item->paymentOrder->pay_type) : $order->getPayTypeText($order->pay_type);
             $arr['platform'] = $platForm;
             $arr['order_no'] = $item['order_no'];

@@ -21,6 +21,7 @@ use app\forms\api\user\UserForm;
 use app\forms\api\user\UserRechargeForm;
 use app\forms\common\attachment\CommonAttachment;
 use app\controllers\business\{Qrcode,Poster,NewUserIntegral};
+use app\forms\mall\member\RegisterAgreeForm;
 use app\models\user\User;
 
 class UserController extends ApiController
@@ -269,7 +270,7 @@ class UserController extends ApiController
             $WeChatCode = $flag;
         }
         $config = array(
-            'bg_url' => \Yii::$app->basePath . '/web/statics' . '/bg/063bd7ebf5f752309d3cf3867209b8dq.jpg',//背景图片路径
+            'bg_url' => \Yii::$app->basePath . '/web/statics' . '/bg/redpack.png',//背景图片路径
             'text' => array(
 //                array(
 //                    'text' => '初夏',//文本内容
@@ -299,10 +300,10 @@ class UserController extends ApiController
 //                ),
                 array(
                     'text' => '扫码领红包',
-                    'left' => 200,
-                    'top' => 190,
-                    'width' => 400,
-                    'fontSize' => 30, //字号
+                    'left' => 116,
+                    'top' => 280,
+                    'width' => 300,
+                    'fontSize' => 14, //字号
                     'fontColor' => '0,0,80', //字体颜色
                     'angle' => 0,
                 ),
@@ -338,12 +339,12 @@ class UserController extends ApiController
                     'name' => '二维码', //图片名称，用于出错时定位
                     'url' => $WeChatCode,
                     'stream' => $qrCodeData,
-                    'left' => 200,
-                    'top' => 230,
+                    'left' => 118,
+                    'top' => 300,
                     'right' => 0,
                     'bottom' => 0,
-                    'width' => 184,
-                    'height' => 184,
+                    'width' => 90,
+                    'height' => 90,
                     'radius' => 0,
                     'opacity' => 100
                 ),
@@ -394,6 +395,17 @@ class UserController extends ApiController
         $form->number  = 300;
         $form->desc    = "新人领取300积分";
         return $form->execute();
+    }
+
+    /**
+     * @Note:注册协议
+     * @return string|\yii\web\Response
+     */
+    public function actionRegisterAgree()
+    {
+        $form = new RegisterAgreeForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $form->getDefaults();
     }
 
 }

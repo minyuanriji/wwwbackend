@@ -251,7 +251,7 @@ Yii::$app->loadComponentView('com-select-cat');
                         </el-form-item>
 						
 						<!-- 积分赠送 -->
-						<el-form-item  label="购物券赠送" prop="status">
+						<el-form-item  label="红包券赠送" prop="status">
 						    <el-switch v-model="info.enable_integral" 
 								:active-value="1" :inactive-value="0" 
 								active-text="开启" inactive-text="关闭">
@@ -265,7 +265,7 @@ Yii::$app->loadComponentView('com-select-cat');
 						
 						    <div v-if="info.enable_integral==1" class="demo-input-suffix agent-setting-item">
 								<el-input type="number" :min="0" class="member-money" v-model="levelup_integral_setting.integral_num" placeholder="">
-						            <template slot="append">购物券</template>
+						            <template slot="append">红包券</template>
 						        </el-input>
 						        <el-input type="number" :min="0" class="member-money" v-model="levelup_integral_setting.period" placeholder="">
 						            <template slot="append">月</template>
@@ -413,7 +413,7 @@ Yii::$app->loadComponentView('com-select-cat');
                 btnLoading: false,
                 cardLoading: false,
 				
-				// 购物券赠送
+				// 红包券赠送
 				levelup_integral_setting: {
 				    "integral_num": 0, //积分数量
 				    "period": 12, //周期
@@ -424,7 +424,7 @@ Yii::$app->loadComponentView('com-select-cat');
 				
 				// 这里的开关根据是否有返回值来本地判断的
 				info: {
-				    enable_integral: 0, //是否开启赠送购物券
+				    enable_integral: 0, //是否开启赠送红包券
 				},
             };
         },
@@ -512,7 +512,7 @@ Yii::$app->loadComponentView('com-select-cat');
                         self.btnLoading = true;
 						let postData = JSON.parse(JSON.stringify(self.ruleForm));
 						
-						// 0.3 购物券赠送
+						// 0.3 红包券赠送
 						let levelupIntegralSetting = JSON.parse(JSON.stringify(self.levelup_integral_setting));
 						if((!self.info.enable_integral) || (!levelupIntegralSetting.integral_num)){	//如果开关关闭or值为0
 							postData['levelup_integral_setting'] = '';

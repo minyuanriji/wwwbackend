@@ -36,7 +36,7 @@ class CheckoutOrderPaidHandler {
                     throw new \Exception('保存结账单失败');
                 }
 
-                //购物券抵扣
+                //红包券抵扣
                 if($checkoutOrder->integral_deduction_price > 0){
                     $deductIntegralForm = new CheckoutOrderDeductIntegralForm([
                         "user_id"           => $checkoutOrder->pay_user_id,

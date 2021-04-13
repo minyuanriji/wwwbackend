@@ -32,7 +32,7 @@ class CheckoutOrderPayForm extends BaseModel {
     public function attributeLabels(){
         return [
             'id'           => '商户ID',
-            'use_integral' => '使用抵扣券',
+            'use_integral' => '使用红包券',
             'order_price'  => '付款金额'
         ];
     }

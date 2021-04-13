@@ -916,6 +916,11 @@ Yii::$app->loadComponentView('order/com-city');
                 type: String,
                 default: 'mall/order/seller-remark'
             },
+            // 订单数量总数
+            orderCountUrl: {
+                type: String,
+                default: 'mall/order/order-count'
+            },
             // 控制按钮是否显示
             // 编辑收货地址
             isShowEditAddress: {

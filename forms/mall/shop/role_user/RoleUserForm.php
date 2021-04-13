@@ -123,9 +123,9 @@ class RoleUserForm extends BaseModel
         try {
             $admin = Admin::find()->alias('u')->where([
                 'u.id' => $this->id, 'u.mall_id' => \Yii::$app->mall->id, 'u.is_delete' => 0])
-                ->joinWith(['identity' => function ($query) {
+                /*->joinWith(['identity' => function ($query) {
                     $query->andWhere(['u.admin_type' => Admin::ADMIN_TYPE_OPERATE]);
-                }])->one();
+                }])*/->one();
 
             if (!$admin) {
                 throw new \Exception('数据异常,该条数据不存在');
@@ -138,18 +138,22 @@ class RoleUserForm extends BaseModel
             }
 
             $adminInfo = AdminInfo::find()->where(['admin_id' => $admin->id])->one();
-            $adminInfo->is_delete = 1;
-            $res = $adminInfo->save();
-            if (!$res) {
-                throw new \Exception($this->responseErrorMsg($adminInfo));
+            if ($adminInfo) {
+                $adminInfo->is_delete = 1;
+                $res = $adminInfo->save();
+                if (!$res) {
+                    throw new \Exception($this->responseErrorMsg($adminInfo));
+                }
             }
 
-            $res = RoleUser::updateAll([
-                'is_delete' => 1,
-            ], [
-                'admin_id' => $admin->id,
-            ]);
-
+            $roleUserRes = RoleUser::find()->where(['admin_id' => $admin->id])->one();
+            if ($roleUserRes) {
+                $roleUserRes->is_delete = 1;
+                $result = $roleUserRes->save();
+                if (!$result) {
+                    throw new \Exception($this->responseErrorMsg($roleUserRes));
+                }
+            }
             $transaction->commit();
             return [
                 'code' => ApiCode::CODE_SUCCESS,

@@ -445,11 +445,11 @@ abstract class BaseOrderForm extends BaseModel
         }
 
         if ($this->date_start) {
-            $query->andWhere(['>=', 'o.created_at', $this->date_start]);
+            $query->andWhere(['>=', 'o.created_at', strtotime($this->date_start)]);
         }
 
         if ($this->date_end) {
-            $query->andWhere(['<=', 'o.created_at', $this->date_end]);
+            $query->andWhere(['<=', 'o.created_at', strtotime($this->date_end)]);
         }
 
         if ($this->send_type != -1) {

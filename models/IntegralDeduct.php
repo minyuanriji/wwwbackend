@@ -190,7 +190,7 @@ class IntegralDeduct extends BaseActiveRecord{
     }
 
     /**
-     * 购物购物券、积分券抵扣
+     * 购物红包券、积分券抵扣
      * @Author bing
      * @DateTime 2020-10-08 14:14:26
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -200,13 +200,13 @@ class IntegralDeduct extends BaseActiveRecord{
         try{
             $user_id = $order->user_id;
             $wallet = User::getUserWallet($user_id,$order->mall_id);
-            //查询用户可用购物券,并且按过期时间升序排列
+            //查询用户可用红包券,并且按过期时间升序排列
             $can_use_integrals = IntegralRecord::getIntegralAscExpireTime($user_id,$ctype);
-            $integral_deduction_price = $ctype==1?$order->integral_deduction_price:$order->score_deduction_price; // 订单抵扣购物券或积分
+            $integral_deduction_price = $ctype==1?$order->integral_deduction_price:$order->score_deduction_price; // 订单抵扣红包券或积分
             if($integral_deduction_price > 0){
                 if($ctype==1){
                     if($wallet['dynamic_integral'] > 0){
-                        //有动态购物券优先扣减
+                        //有动态红包券优先扣减
                         $deduct = array(
                             'controller_type'=> $ctype,
                             'mall_id'=> $order['mall_id'],
@@ -215,7 +215,7 @@ class IntegralDeduct extends BaseActiveRecord{
                             'source_table'=> 'order',
                         );
                         $before_money = $wallet['dynamic_integral'];
-                        //动态购物券足够扣减
+                        //动态红包券足够扣减
                         foreach($can_use_integrals as $integral){
                             $deduct['record_id'] = $integral['id'];
                             $deduct['before_money'] =  $before_money;
@@ -224,7 +224,7 @@ class IntegralDeduct extends BaseActiveRecord{
                             if(intval(bcmul($can_deduct_money,100) >= intval(bcmul($integral_deduction_price,100)))){
                                 //当前券的面值足够抵扣掉订单，则从此券中扣除
                                 $deduct['money'] = $integral_deduction_price * -1;
-                                $deduct['desc'] = '订单('.$order->id.')创建扣除动态购物券('.$integral['id'].')抵扣：'.$integral_deduction_price;
+                                $deduct['desc'] = '订单('.$order->id.')创建扣除动态红包券('.$integral['id'].')抵扣：'.$integral_deduction_price;
                                 $res = self::deduct($deduct,$ctype);
                                 if($res === false) throw new Exception(self::getError());
                                 if(intval(bcmul($can_deduct_money,100) == intval(bcmul($integral_deduction_price,100)))){
@@ -239,7 +239,7 @@ class IntegralDeduct extends BaseActiveRecord{
                                 //当前券的面值不足够抵扣掉订单使用的券，则扣除当前全部面值
                                 $integral_deduction_price -= $can_deduct_money;
                                 $deduct['money'] = $can_deduct_money * -1;
-                                $deduct['desc'] = '订单('.$order->id.')创建扣除动态购物券('.$integral['id'].')抵扣：'. $can_deduct_money;
+                                $deduct['desc'] = '订单('.$order->id.')创建扣除动态红包券('.$integral['id'].')抵扣：'. $can_deduct_money;
                                 $before_money -= $integral_deduction_price;
                                 $res = self::deduct($deduct,$ctype);
                                 if($res === false) throw new Exception(self::getError());
@@ -248,11 +248,11 @@ class IntegralDeduct extends BaseActiveRecord{
                                 if($res === false) throw new Exception($integral->getErrorMessage());
                             }
                         }
-                        //使用永久购物券补足不够的
+                        //使用永久红包券补足不够的
                         if($integral_deduction_price > 0){
                             self::_deductStaticIntegral($wallet,$integral_deduction_price,$order,$ctype);
                         }
-                        //使用永久购物券补足不够的
+                        //使用永久红包券补足不够的
                         // if($integral_deduction_price > 0){
                         //     if($ctype==1){
                         //         self::_deductStaticIntegral($wallet,$integral_deduction_price,$order,$ctype);
@@ -345,7 +345,7 @@ class IntegralDeduct extends BaseActiveRecord{
     }
 
     /**
-     * 使用永久购物券抵扣
+     * 使用永久红包券抵扣
      * @Author bing
      * @DateTime 2020-10-09 15:50:03
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -355,15 +355,15 @@ class IntegralDeduct extends BaseActiveRecord{
      */
     private static function _deductStaticIntegral($wallet,$integral_deduction_price,$order,$ctype){
         
-        // 使用永久购物券抵扣
+        // 使用永久红包券抵扣
         $diff_integral = $wallet['static_integral'] - $integral_deduction_price;
-        if($diff_integral < 0) throw new Exception('永久购物券不足');
+        if($diff_integral < 0) throw new Exception('永久红包券不足');
         $record = array(
             'controller_type'=> $ctype,
             'mall_id'=> $order['mall_id'],
             'user_id'=> $order['user_id'],
             'money'=> $integral_deduction_price * -1,
-            'desc'=> '订单('.$order->id.')创建,扣除购物券'.$integral_deduction_price,
+            'desc'=> '订单('.$order->id.')创建,扣除红包券'.$integral_deduction_price,
             'before_money'=> $wallet['static_integral'],
             'type'=> Integral::TYPE_ALWAYS,
             'source_id'=>	$order->id,

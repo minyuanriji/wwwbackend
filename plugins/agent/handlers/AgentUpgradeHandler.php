@@ -29,7 +29,7 @@ class AgentUpgradeHandler extends BaseHandler
         // TODO: Implement register() method.
 
         \Yii::$app->on(\app\handlers\HandlerRegister::TO_USER_UPGRADE, function ($event) {
-            \Yii::$app->queue->delay(0)->push(new AgentLevelUpgradeJob(['user_id' => $event->user_id, 'mall_id' => $event->mall_id]));
+            //\Yii::$app->queue->delay(0)->push(new AgentLevelUpgradeJob(['user_id' => $event->user_id, 'mall_id' => $event->mall_id]));
         });
     }
 }

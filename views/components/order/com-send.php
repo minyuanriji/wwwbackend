@@ -324,6 +324,7 @@
                             }).then(e => {
                                 self.sendLoading = false;
                                 if (e.data.code === 0) {
+                                    location.reload();
                                     self.dialogVisible = false;
                                     self.$emit('submit');
                                     if (self.send_type == "send") {

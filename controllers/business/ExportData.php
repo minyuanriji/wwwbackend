@@ -1,13 +1,15 @@
 <?php
 namespace app\controllers\business;
 use app\models\mysql\Goods;
-use yii;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use yii;
 use app\models\mysql\{PostageRules,PluginDistributionGoods};
 set_time_limit(0);
 ini_set("memory_limit", "1024M");
 class ExportData{
     public function ExportData($start_id,$end_id){
+
         $Spreadsheet = new Spreadsheet();
         $sheet = $Spreadsheet -> getActiveSheet();
         $sheet -> setCellValue('A1','ID');
@@ -142,7 +144,7 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
             if(!empty($val['is_order_paid'])){
                 $val['is_order_paid'] = '订单支付设置：开启';
                 $order_paid = json_decode($val['order_paid'],true);
-                $order_paid_msg = '积分：' . (empty($order_paid['is_score']) ? '关闭，' : '开启，') . '积分劵：' . (empty($order_paid['is_score_card']) ? '关闭，' : '开启，') . '购物券：' . (empty($order_paid['is_integral_card']) ? '关闭。' : '开启。');
+                $order_paid_msg = '积分：' . (empty($order_paid['is_score']) ? '关闭，' : '开启，') . '积分劵：' . (empty($order_paid['is_score_card']) ? '关闭，' : '开启，') . '红包券：' . (empty($order_paid['is_integral_card']) ? '关闭。' : '开启。');
                 $val['order_paid'] = $order_paid_msg;
             }else{
                 $val['order_paid'] = '订单支付参数：无' ;
@@ -179,10 +181,11 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
     }
 
     public function ExportGoodsData($arrData){
+
         $ascii = 90;
         $ascii_arr = [];
         $add_ascii = ['AA','AB','AC','AD','AE','AF','AG','AH','AI'];
-        $title = ['编号', '商品名称', '是否上架', '售价', '使用规格组', '规格组', '商品库存', '已出售量', '购物数量限制', '单品满件包邮', '单口满额包邮', '运费模板ID', '赠送积分类型', '可抵扣积分', '可抵扣积分类型', '允许多件累计折扣', '是否单独分销设置', '分销设置类型', '分类佣金类型', '默认服务', '使用积分', '购物券可抵扣分', '是否启用购物券赠送', '购物券赠送设置', '是否启用积分券赠送', '积分券赠送设置','订单支付设置','订单支付参数','是否支持退换货','销量是否开启','虚拟销量是否开启','原价', '合伙人','联合创始人','分公司'
+        $title = ['编号', '商品名称', '是否上架', '售价', '使用规格组', '规格组', '商品库存', '已出售量', '购物数量限制', '单品满件包邮', '单口满额包邮', '运费模板ID', '赠送积分类型', '可抵扣积分', '可抵扣积分类型', '允许多件累计折扣', '是否单独分销设置', '分销设置类型', '分类佣金类型', '默认服务', '使用积分', '红包券可抵扣分', '是否启用红包券赠送', '红包券赠送设置', '是否启用积分券赠送', '积分券赠送设置','订单支付设置','订单支付参数','是否支持退换货','销量是否开启','虚拟销量是否开启','原价', '合伙人','联合创始人','分公司'
         ];
         $widthArr = ['B' => 30,'F' => 120,'Z' => 28,'AA' => 20,'AB' => 40,'AC' => 40,'AG' => 40,'AH' => 40,'AI' => 40,'X' => 20,'O' => 20,'V' => 20,'Y' => 20,'AD' => 18,'AE' => 18,'L' => 25,'Q' => 20,'R' => 25,'S' => 25];
         $num = 0;
@@ -205,6 +208,7 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
             $sheet->getColumnDimension($key)->setWidth($val);
         }
         $sheet->fromArray($arrData,null,'A2');
+
         header('Content-Description: File Transfer');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
@@ -212,7 +216,7 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename=商品信息.xlsx');
         header('Cache-Control: max-age=0');
-        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save('php://output');
         exit();
     }

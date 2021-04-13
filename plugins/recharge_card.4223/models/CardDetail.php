@@ -87,7 +87,7 @@ class CardDetail extends BaseActiveRecord{
             if(empty($model)) throw new Exception('充值卡不存在或已失效');
 
             $res = IntegralLogic::rechargeIntegral($model->integral_setting,$user_id,$ctype);
-            if($res === false) throw new Exception('添加购物券发放计划失败');
+            if($res === false) throw new Exception('添加红包券发放计划失败');
 
             $model->status = 1;
             $model->picker_id = $user_id;

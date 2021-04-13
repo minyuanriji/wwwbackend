@@ -345,6 +345,11 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
         return $this->hasOne(UserInfo::className(), ['user_id' => 'id']);
     }
 
+    public function getUserIdentity()
+    {
+        return $this->hasOne(UserIdentity::className(), ['user_id' => 'id']);
+    }
+
     public function getUserSetting()
     {
         return $this->hasOne(UserSetting::className(), ['user_id' => 'id']);
@@ -543,7 +548,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
 
 
     /**
-     * 获取用户可用购物券总额
+     * 获取用户可用红包券总额
      * @Author bing
      * @DateTime 2020-10-08 17:10:02
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -556,7 +561,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
     }
 
     /**
-     * 获取用户可用购物券总额
+     * 获取用户可用红包券总额
      * @Author bing
      * @DateTime 2020-10-08 17:10:02
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -583,7 +588,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
                         'id'      =>$user_id,
                         'mall_id' => Yii::$app->mall->id ?? $mall_id
                     ])->one();
-        $wallet['dynamic_integral'] = $wallet['score'];
+        $wallet['dynamic_score'] = $wallet['score'];
         return $wallet;
     }
 

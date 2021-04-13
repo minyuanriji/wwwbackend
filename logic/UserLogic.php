@@ -107,7 +107,7 @@ class UserLogic
                     $user->second_parent_id = isset($userData["second_parent_id"]) ? $userData["second_parent_id"] : 0;
                     $user->third_parent_id  = isset($userData["third_parent_id"]) ? $userData["third_parent_id"] : 0;
                     if(!empty($parent_id)){
-                        $parent = UserInfo::findOne(["id" => $parent_id, "is_delete" => 0]);
+                        $parent = User::findOne(["id" => $parent_id, "is_delete" => 0]);
                         if($parent){
                             $user->parent_id        = $parent->id;
                             $user->second_parent_id = $parent->parent_id;

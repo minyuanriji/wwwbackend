@@ -713,6 +713,59 @@ class Menus
                             ],
                         ]
                     ],
+                    [
+                        'name' => '分销',
+                        'route' => '',
+                        'children' => [
+                            [
+                                'name' => '分销商',
+                                'route' => 'plugin/distribution/mall/distribution/index'
+                            ],
+                            [
+                                'name' => '基础配置',
+                                'route' => 'plugin/distribution/mall/setting/index'
+                            ],
+                            [
+                                'name' => '申请列表',
+                                'route' => 'plugin/distribution/mall/distribution/apply'
+                            ],
+                            [
+                                'name' => '分销等级',
+                                'route' => 'plugin/distribution/mall/level/index'
+                            ],
+                            [
+                                'name' => '分销提成',
+                                'route' => 'plugin/distribution/mall/distribution/income-list'
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => '经销',
+                        'route' => '',
+                        'children' => [
+                            [
+                                'name' => '经销商',
+                                'route' => 'plugin/agent/mall/agent/index'
+                            ],
+                            [
+                                'name' => '基础配置',
+                                'route' => 'plugin/agent/mall/agent/setting'
+                            ],
+                            [
+                                'name' => '经销商等级',
+                                'route' => 'plugin/agent/mall/level/index'
+                            ],
+                            [
+                                'name' => '提成明细',
+                                'route' => 'plugin/agent/mall/agent/income-list'
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => '积分券充值卡',
+                        'route' => 'plugin/integral_card/admin/card/index',
+
+                    ],
                 ],
             ],
             [
@@ -1203,8 +1256,26 @@ class Menus
                         'route' => 'mall/attachment/index',
                     ],
                     [
-                        'name' => '操作日志',
+                        'name' => '管理员操作日志',
                         'route' => 'mall/setting/operate-log',
+                    ],
+                    [
+                        'name' => '敏感词过滤日志',
+                        'route' => 'mall/sensitive/index',
+                        'action' => [
+                            [
+                                'name' => '商品服务删除',
+                                'route' => 'mall/sensitive/destroy'
+                            ],
+                            [
+                                'name' => '商品服务(S|U)',
+                                'route' => 'mall/sensitive/edit',
+                            ]
+                        ]
+                    ],
+                    [
+                        'name' => '用户日志',
+                        'route' => 'mall/setting/user-log',
                     ],
                 ],
             ],

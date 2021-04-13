@@ -352,7 +352,7 @@ class CardController extends BaseController{
         
         $csv = new CsvExport();
         $fileName = "购物卡券-".date('YmdHis', time());
-        $headlist = ['ID','购物卡','发卡人','序列号','密码','购物券类型','购物券面值','购物券发放周期','购物券有效期（天）','过期时间','二维码链接'];
+        $headlist = ['ID','购物卡','发卡人','序列号','密码','红包券类型','红包券面值','红包券发放周期','红包券有效期（天）','过期时间','二维码链接'];
         return $csv->export($export_data, $headlist, $fileName);
     }
 

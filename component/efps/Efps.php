@@ -7,6 +7,7 @@ use app\component\efps\lib\MerchantApply;
 use app\component\efps\lib\MerchantQuery;
 use app\component\efps\lib\pay\AliJSAPIPayment;
 use app\component\efps\lib\pay\PaymentQuery;
+use app\component\efps\lib\pay\Refund;
 use app\component\efps\lib\pay\SplitOrder;
 use app\component\efps\lib\pay\UnifiedPayment;
 use app\component\efps\lib\pay\WithdrawalToCard;
@@ -48,6 +49,16 @@ class Efps extends Component{
 
     public function getCustomerCode(){
         return $this->main_config['acq_sp_id'];
+    }
+
+    /**
+     * 退款操作
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
+    public function refund($params){
+        return $this->request((new Refund())->build($params));
     }
 
     /**

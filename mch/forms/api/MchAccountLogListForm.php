@@ -8,10 +8,12 @@ use app\plugins\mch\models\MchAccountLog;
 class MchAccountLogListForm extends BaseModel{
 
     public $mch_id;
+    public $type;
 
     public function rules(){
         return [
             [['mch_id'], 'required'],
+            [['type'], 'string']
         ];
     }
 
@@ -25,6 +27,14 @@ class MchAccountLogListForm extends BaseModel{
             'mal.mall_id' => \Yii::$app->mall->id,
             'mal.mch_id'  => $this->mch_id,
         ]);
+
+        if(!empty($this->type) && in_array(strtoupper($this->type), ["IN", "OUT"])){
+            if(strtoupper($this->type) == "IN"){ //收入
+                $query->andWhere(["mal.type" => 1]);
+            }else{ //支出
+                $query->andWhere(["mal.type" => 2]);
+            }
+        }
 
         $list = $query->page($pagination)
                       ->orderBy(['mal.created_at' => SORT_DESC])

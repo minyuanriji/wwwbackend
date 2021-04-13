@@ -44,11 +44,13 @@ class OperateModelForm extends BaseModel
             "OssSetting" => "阿里云文件存储配置",
             "QiniuSetting" => "七牛云文件存储配置",
             "UploadSetting" => "上传配置",
+            "Option" => "底部导航",
         ],
         "order" => [
           "Order" => "订单",
           "OrderDetailExpress" => "订单物流",
           "OrderRefund" => "订单退款",
+          "OrderComments" => "订单评价",
         ],
         "agent" => [
             "Agent" => "经销商",

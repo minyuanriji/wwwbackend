@@ -28,7 +28,7 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
     }
 
     /**
-     * 购物券抵扣
+     * 红包券抵扣
      * @return boolean
      */
     public function save(){
@@ -43,16 +43,16 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
                 throw new \Exception("抵扣金额必须大于0");
             }
 
-            //需要抵扣的购物券数
+            //需要抵扣的红包券数
             $integralDeductionPrice = (float)$this->deduction_price ;
 
             //用户对象
             $user = User::findOne($this->user_id);
 
-            //有动态购物券优先扣减
+            //有动态红包券优先扣减
             if($user->dynamic_integral > 0){
 
-                //获取用户所有可用动态购物券记录，并且按过期时间升序排列
+                //获取用户所有可用动态红包券记录，并且按过期时间升序排列
                 $dynamicIntegrals = static::getDynamicIntegrals($this->user_id);
 
                 $deduct = array(
@@ -77,7 +77,7 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
 
                         //当前券的面值足够抵扣掉订单，则从此券中扣除
                         $deduct['money'] = $integralDeductionPrice * -1;
-                        $deduct['desc']  = $this->desc . '扣除动态购物券('.$integral['id'].')抵扣：'.$integralDeductionPrice;
+                        $deduct['desc']  = $this->desc . '扣除动态红包券('.$integral['id'].')抵扣：'.$integralDeductionPrice;
 
                         $this->deduct($deduct, $user);
 
@@ -97,7 +97,7 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
                         $integralDeductionPrice -= $canDeductMoney;
 
                         $deduct['money'] = $canDeductMoney * -1;
-                        $deduct['desc']  = $this->desc . '扣除动态购物券('.$integral['id'].')抵扣：'.$canDeductMoney;
+                        $deduct['desc']  = $this->desc . '扣除动态红包券('.$integral['id'].')抵扣：'.$canDeductMoney;
 
                         static::deduct($deduct, $user);
 
@@ -109,18 +109,18 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
                 }
             }
 
-            //使用永久购物券补足不够的
+            //使用永久红包券补足不够的
             if($integralDeductionPrice > 0){
                 $diffIntegral = $user->static_integral - $integralDeductionPrice;
                 if($diffIntegral < 0){
-                    throw new \Exception('永久购物券不足');
+                    throw new \Exception('永久红包券不足');
                 }
                 $record = array(
                     'controller_type' => 1,
                     'mall_id'         => $user->mall_id,
                     'user_id'         => $user->id,
                     'money'           => $integralDeductionPrice * -1,
-                    'desc'            => $this->desc . '静态购物券抵扣：'.$integralDeductionPrice,
+                    'desc'            => $this->desc . '永久红包券抵扣：'.$integralDeductionPrice,
                     'before_money'    => $user['static_integral'],
                     'type'            => Integral::TYPE_ALWAYS,
                     'source_id'       => $this->source_id,
@@ -143,7 +143,7 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
     }
 
     /**
-     * 新增购物券抵扣记录
+     * 新增红包券抵扣记录
      * @param array $log
      * @return void
      */
@@ -156,7 +156,7 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
                 throw new \Exception($model->getErrorMessage());
             }
 
-            //更新用户动态抵扣券数
+            //更新用户动态红包券数
             $wallet->dynamic_integral -= $log['money'];
 
             if(!$wallet->save(false)){
@@ -169,7 +169,7 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
     }
 
     /**
-     * @param $userId 获取用户所有可用动态购物券记录
+     * @param $userId 获取用户所有可用动态红包券记录
      * @return array
      */
     private function getDynamicIntegrals($userId){

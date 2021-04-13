@@ -37,7 +37,7 @@ class SearchForm extends BaseModel{
         }
 
         if(!empty($this->filter_mch_id)){
-            $query->innerJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id AND bmg.mch_id='".$this->filter_mch_id."'");
+            $query->leftJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id AND bmg.mch_id='".$this->filter_mch_id."'");
             $query->andWhere("bmg.id IS NULL");
         }
 

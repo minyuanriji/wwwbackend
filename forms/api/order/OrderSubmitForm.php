@@ -24,6 +24,7 @@ use app\logic\CouponLogic;
 use app\logic\OptionLogic;
 use app\logic\UserCouponLogic;
 use app\models\BaseModel;
+use app\models\Cart;
 use app\models\Coupon;
 use app\models\CouponCatRelation;
 use app\models\CouponGoodsRelation;
@@ -732,13 +733,27 @@ class OrderSubmitForm extends BaseModel
     }
 
     /**
-     * 获取传过来的商品列表（考虑从购物车跳转过来，有多商品情况）
-     * @param $formDataList
-     * @return array [ ['mch' => '商户信息', 'goods_list' => 'array 订单的商品信息和金额列表'] ]
+     * 获取购物车商品列表
+     * @param $cart_ids_str 购物车ID列表，多个ID以”,“分隔
      * @throws OrderException
      */
-    protected function getListData($formDataList)
+    protected function getListData($cart_ids_str)
     {
+        //获取购物车数据，按照商户、爆品、到店、线上分组
+        $cartIds = explode(",", trim($cart_ids_str));
+        $query = Cart::find()->alias("c")->andWhere([
+            "AND",
+            ["c.user_id" => (int)\Yii::$app->user->id],
+            ["IN", "id", $cartIds ? $cartIds : []],
+            ["c.is_delete" => 0]
+        ]);
+        $query->leftJoin("{{%goods}} g", "g.id=c.goods_id");
+        $query->leftJoin("{{%plugin_baopin_goods}} bg", "bg.goods_id=c.goods_id");
+        //$query->leftJoin("{{%}}")
+
+        $cartDatas = $query->asArray()->all();
+
+
         foreach ($formDataList as $i => $formDataItem) {
             $goodsList = $this->getGoodsListData($formDataItem['goods_list']);
             $mchItem = [

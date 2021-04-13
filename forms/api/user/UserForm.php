@@ -243,6 +243,12 @@ class UserForm extends BaseModel
                 "link_url"  => "/pages/personalCentre/personalCentre",
                 "open_type" => "navigate"
             ];
+            $userCenter['menus'][] = [
+                "icon_url"  => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                "name"      => "进货专区",
+                "link_url"  => "pages/user/stock/stock",
+                "open_type" => "navigate"
+            ];
         }
 
         $res = [

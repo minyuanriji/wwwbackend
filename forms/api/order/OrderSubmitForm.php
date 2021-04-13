@@ -744,14 +744,14 @@ class OrderSubmitForm extends BaseModel
         $query = Cart::find()->alias("c")->andWhere([
             "AND",
             ["c.user_id" => (int)\Yii::$app->user->id],
-            ["IN", "id", $cartIds ? $cartIds : []],
+            ["IN", "c.id", $cartIds ? $cartIds : []],
             ["c.is_delete" => 0]
         ]);
         $query->leftJoin("{{%goods}} g", "g.id=c.goods_id");
         $query->leftJoin("{{%plugin_baopin_goods}} bg", "bg.goods_id=c.goods_id");
-        //$query->leftJoin("{{%}}")
-
-        $cartDatas = $query->asArray()->all();
+        $query->leftJoin("{{%plugin_mch}} m", "m.id=g.mch_id");
+        $selects = ["g.mch_id", "g.id", "c.id as cart_id", "c.num", "c.attr_id as goods_attr_id"];
+        $cartDatas = $query->select($selects)->asArray()->all();
 
 
         foreach ($formDataList as $i => $formDataItem) {

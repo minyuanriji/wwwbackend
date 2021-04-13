@@ -750,9 +750,11 @@ class OrderSubmitForm extends BaseModel
         $query->leftJoin("{{%goods}} g", "g.id=c.goods_id");
         $query->leftJoin("{{%plugin_baopin_goods}} bg", "bg.goods_id=c.goods_id");
         $query->leftJoin("{{%plugin_mch}} m", "m.id=g.mch_id");
-        $selects = ["g.mch_id", "g.id", "c.id as cart_id", "c.num", "c.attr_id as goods_attr_id"];
+        $selects = ["g.mch_id", "bg.id as baopin_record_id", "g.id", "c.id as cart_id", "c.num", "c.attr_id as goods_attr_id"];
         $cartDatas = $query->select($selects)->asArray()->all();
+        foreach($cartDatas as $row){
 
+        }
 
         foreach ($formDataList as $i => $formDataItem) {
             $goodsList = $this->getGoodsListData($formDataItem['goods_list']);

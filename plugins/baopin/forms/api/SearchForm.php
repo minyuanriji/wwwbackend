@@ -8,6 +8,7 @@ use app\plugins\baopin\models\BaopinGoods;
 class SearchForm extends BaseModel{
 
     public $mch_id;
+    public $filter_mch_id;
     public $page;
     public $keyword;
     public $sort_prop;
@@ -15,8 +16,7 @@ class SearchForm extends BaseModel{
 
     public function rules(){
         return array_merge(parent::rules(), [
-            [['mch_id'], 'required'],
-            [['page', 'mch_id'], 'integer'],
+            [['page', 'mch_id', 'filter_mch_id'], 'integer'],
             [['keyword', 'sort_prop', 'sort_type'], 'safe']
         ]);
     }
@@ -29,15 +29,22 @@ class SearchForm extends BaseModel{
 
         $pagination = null;
         $query = BaopinGoods::find()->alias('bg')
-                    ->leftJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id AND bmg.mch_id='".$this->mch_id."'")
                     ->innerJoin("{{%goods}} g", "g.id=bg.goods_id")
                     ->innerJoin("{{%goods_warehouse}} gw", "gw.id=g.goods_warehouse_id");
+
+        if(!empty($this->mch_id)){
+            $query->innerJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id AND bmg.mch_id='".$this->mch_id."'");
+        }
+
+        if(!empty($this->filter_mch_id)){
+            $query->innerJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id AND bmg.mch_id='".$this->filter_mch_id."'");
+            $query->andWhere("bmg.id IS NULL");
+        }
 
         $query->andWhere([
             "AND",
             ["g.is_delete" => 0],
-            ["gw.is_delete" => 0],
-            "bmg.id IS NULL"
+            ["gw.is_delete" => 0]
         ]);
 
         if (!empty($this->keyword)) {

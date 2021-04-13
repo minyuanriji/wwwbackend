@@ -309,11 +309,11 @@
                     },
                     method: 'post',
                     data: {
-                        page      : self.search_goods.page,
-                        keyword   : self.search_goods.keyword,
-                        mch_id    : _mchId,
-                        sort_prop : self.search_goods.sort_prop,
-                        sort_type : self.search_goods.sort_type
+                        page            : self.search_goods.page,
+                        keyword         : self.search_goods.keyword,
+                        filter_mch_id   : _mchId,
+                        sort_prop       : self.search_goods.sort_prop,
+                        sort_type       : self.search_goods.sort_type
                     }
                 }).then(e => {
                     self.get_goods_loading = false;

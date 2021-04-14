@@ -580,6 +580,7 @@ class OrderSubmitForm extends BaseModel
         $listData = $this->getListData($this->groupByFormDataList());
 
         foreach ($listData as &$item) {
+
             $goods_list = $item['goods_list'];
             $this->checkGoodsStock($goods_list);
 
@@ -790,15 +791,12 @@ class OrderSubmitForm extends BaseModel
             $is_auth_phone = 0;
         }
 
-        //判断如果所有商品都是到店消费商品，配送地址可以不需要设置
+        //判断如果有一个不是线下自取商品 就需要地址
         $is_need_address = false;
         foreach ($listData as &$item) {
-            foreach($item['goods_list'] as $goodsItem){
-                //只要有一个商品不是到店消费类型，就需要设置地址
-                if(!$goodsItem['is_on_site_consumption']){
-                    $is_need_address = true;
-                    break;
-                }
+            if(!$item['form_data']['is_offline']){
+                $is_need_address = true;
+                break;
             }
         }
 
@@ -818,9 +816,9 @@ class OrderSubmitForm extends BaseModel
             'score_enable'        => $score_enable,
             'integral_enable'     => $integral_enable, //红包券
             'form_data'           => [
-                'sign'             => isset($this->form_data['sign'])?$this->form_data['sign']:null,
-                'related_id'       => isset($this->form_data['related_id'])?$this->form_data['related_id']:null,
-                'related_user_id' => isset($this->form_data['related_user_id'])?$this->form_data['related_user_id']:null,
+                'sign'             => isset($this->form_data['sign'])            ? $this->form_data['sign'] : null,
+                'related_id'       => isset($this->form_data['related_id'])      ? $this->form_data['related_id'] : null,
+                'related_user_id'  => isset($this->form_data['related_user_id']) ? $this->form_data['related_user_id'] : null,
             ],
         ];
     }

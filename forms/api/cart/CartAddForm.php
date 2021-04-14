@@ -97,7 +97,9 @@ class CartAddForm extends BaseModel
             $cart->mch_baopin_id = $this->mch_baopin_id;
             if ($cart->save()) {
                 \Yii::$app->trigger(Cart::EVENT_CART_ADD, new CartEvent(['cartIds' => [$cart->id]]));
-                return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"加入购物车成功");
+                return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"加入购物车成功", [
+                    "cart_id" => $cart->id
+                ]);
             } else {
                 return $this->returnApiResultData(999,"",$cart);
             }

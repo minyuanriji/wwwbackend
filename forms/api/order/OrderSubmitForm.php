@@ -303,27 +303,27 @@ class OrderSubmitForm extends BaseModel
             $event_data = array();//事件参数
             foreach ($data['list'] as $orderItem) {
                 $order = new Order();
-                $order->mall_id = \Yii::$app->mall->id;
-                $order->user_id = $user->getId();
-                $order->mch_id = $orderItem['mch']['id'];
-                $order->order_no = Order::getOrderNo('S');;
-                $order->total_price = $orderItem['total_price'];
-                $order->total_pay_price = $orderItem['total_price'];
-                $order->express_original_price = $orderItem['express_price'];
-                $order->express_price = $orderItem['express_price'];
-                $order->total_goods_price = $orderItem['total_goods_price'];
-                $order->total_goods_original_price = $orderItem['total_goods_original_price'];
-                $order->member_discount_price = $orderItem['member_discount'];
-                $order->use_user_coupon_id = 0;
-                $order->coupon_discount_price = 0;
-                $order->use_score = $orderItem['score']['use'] ? $orderItem['score']['use_num'] : 0;
+                $order->mall_id                     = \Yii::$app->mall->id;
+                $order->user_id                     = $user->getId();
+                $order->mch_id                      = $orderItem['mch']['id'];
+                $order->order_no                    = Order::getOrderNo('S');;
+                $order->total_price                 = $orderItem['total_price'];
+                $order->total_pay_price             = $orderItem['total_price'];
+                $order->express_original_price      = $orderItem['express_price'];
+                $order->express_price               = $orderItem['express_price'];
+                $order->total_goods_price           = $orderItem['total_goods_price'];
+                $order->total_goods_original_price  = $orderItem['total_goods_original_price'];
+                $order->member_discount_price       = $orderItem['member_discount'];
+                $order->use_user_coupon_id          = 0;
+                $order->coupon_discount_price       = 0;
+                $order->use_score                   = $orderItem['score']['use'] ? $orderItem['score']['use_num'] : 0;
                 //积分抵扣
-                $order->score_deduction_price = $orderItem['score']['use'] ? $orderItem['score']['deduction_price'] : 0;
+                $order->score_deduction_price       = $orderItem['score']['use'] ? $orderItem['score']['deduction_price'] : 0;
                 //红包券抵扣
-                $order->integral_deduction_price = $orderItem['integral']['use'] ? $orderItem['integral']['integral_deduction_price'] : 0;
+                $order->integral_deduction_price    = $orderItem['integral']['use'] ? $orderItem['integral']['integral_deduction_price'] : 0;
 
-                $order->name = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
-                $order->mobile = !empty($data['user_address']['mobile']) ? $data['user_address']['mobile'] : "";
+                $order->name                        = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
+                $order->mobile                      = !empty($data['user_address']['mobile']) ? $data['user_address']['mobile'] : "";
                 if ($data['is_need_address'] && $orderItem['delivery']['send_type'] !== 'offline') {
                     $order->address = $data['user_address']['province']
                         . ' '
@@ -338,18 +338,18 @@ class OrderSubmitForm extends BaseModel
                     $order->address_id=$data['user_address']['id'];
                 }
 
-                $order->province_id = $data['is_need_address'] ? $districtArr->getId($data['user_address']['province']) : 0;
-                $order->remark = empty($orderItem['remark']) ? "" : $orderItem['remark'];
-                $order->order_form = $order->encodeOrderForm($orderItem['order_form_data']);
-                $order->distance = isset($orderItem['form_data']['distance']) ? $orderItem['form_data']['distance'] : 0;//同城距离
-                $order->words = '';
+                $order->province_id                 = $data['is_need_address'] ? $districtArr->getId($data['user_address']['province']) : 0;
+                $order->remark                      = empty($orderItem['remark']) ? "" : $orderItem['remark'];
+                $order->order_form                  = $order->encodeOrderForm($orderItem['order_form_data']);
+                $order->distance                    = isset($orderItem['form_data']['distance']) ? $orderItem['form_data']['distance'] : 0;//同城距离
+                $order->words                       = '';
 
-                $order->is_pay = Order::IS_PAY_NO;
-                $order->pay_type = Order::IS_PAY_NO;
-                $order->is_send = 0;
-                $order->is_confirm = Order::IS_COMMENT_NO;
-                $order->is_sale = 0;
-                $order->support_pay_types = $order->encodeSupportPayTypes($this->supportPayTypes);
+                $order->is_pay                      = Order::IS_PAY_NO;
+                $order->pay_type                    = Order::IS_PAY_NO;
+                $order->is_send                     = 0;
+                $order->is_confirm                  = Order::IS_COMMENT_NO;
+                $order->is_sale                     = 0;
+                $order->support_pay_types           = $order->encodeSupportPayTypes($this->supportPayTypes);
 
                 if($data['is_need_address']){
                     if ($orderItem['delivery']['send_type'] === 'offline') {
@@ -368,12 +368,12 @@ class OrderSubmitForm extends BaseModel
                     }
                 }
 
-                $order->sign = $this->sign !== null ? $this->sign : '';
-                $order->token = $token;
-                $order->status = $this->status;
+                $order->sign                        = $this->sign !== null ? $this->sign : '';
+                $order->token                       = $token;
+                $order->status                      = $this->status;
 
                 //满减金额
-                $order->full_relief_price = $orderItem['total_full_relief_price'];
+                $order->full_relief_price           = $orderItem['total_full_relief_price'];
 
                 if (!$order->save()) {
                     return $this->returnApiResultData(ApiCode::CODE_FAIL,(new BaseModel())->responseErrorMsg($order));

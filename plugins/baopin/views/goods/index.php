@@ -17,8 +17,6 @@
             </div>
             <el-tabs v-model="activeName" @tab-click="handleClick">
 
-
-
                 <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           @selection-change="handleSelectionChange">
                     <el-table-column align='center' type="selection" width="60"></el-table-column>

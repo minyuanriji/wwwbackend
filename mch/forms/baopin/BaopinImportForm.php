@@ -41,7 +41,13 @@ class BaopinImportForm extends BaseModel{
                     "goods_id" => $goodsId,
                     "mch_id"   => $mch->id
                 ])->exists();
-                if($exists) continue;
+                if($exists){
+                    if($exists->is_delete){
+                        $exists->is_delete = 0;
+                        $exists->save();
+                        continue;
+                    }
+                }
 
                 $baopinMchGoods = new BaopinMchGoods([
                     "mall_id"    => $mch->mall_id,

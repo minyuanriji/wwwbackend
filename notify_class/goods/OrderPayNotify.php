@@ -47,6 +47,9 @@ class OrderPayNotify extends PaymentNotify{
         }
         $order->status = Order::STATUS_WAIT_DELIVER;
         $order->pay_at = time();
+
+        //如果是核销类商品
+
         $order->save();
         $event = new OrderEvent();
         $event->order = $order;

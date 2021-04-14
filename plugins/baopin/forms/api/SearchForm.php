@@ -33,11 +33,11 @@ class SearchForm extends BaseModel{
                     ->innerJoin("{{%goods_warehouse}} gw", "gw.id=g.goods_warehouse_id");
 
         if(!empty($this->mch_id)){
-            $query->innerJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id AND bmg.mch_id='".$this->mch_id."'");
+            $query->innerJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id AND bmg.mch_id='".$this->mch_id."' AND bmg.is_delete=0");
         }
 
         if(!empty($this->filter_mch_id)){
-            $query->leftJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id AND bmg.mch_id='".$this->filter_mch_id."'");
+            $query->leftJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.goods_id=bg.goods_id AND bmg.mch_id='".$this->filter_mch_id."' AND bmg.is_delete=0");
             $query->andWhere("bmg.id IS NULL");
         }
 

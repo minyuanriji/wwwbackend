@@ -32,7 +32,8 @@ class BaopinDeleteForm extends BaseModel{
                 throw new \Exception("爆品记录不存在");
             }
 
-            if(!$model->delete()){
+            $model->is_delete = 1;
+            if(!$model->save()){
                 throw new \Exception("爆品记录：".$this->goods_id."删除失败了");
             }
 

@@ -31,7 +31,10 @@ class GoodsListForm extends BaseModel{
                     ->innerJoin("{{%plugin_baopin_goods}} bg", "bg.goods_id=bcg.goods_id")
                     ->innerJoin("{{%goods}} g", "g.id=bg.goods_id")
                     ->innerJoin("{{%goods_warehouse}} gw", "gw.id=g.goods_warehouse_id");
-        $query->andWhere(["bcg.mch_id" => $this->mch_id]);
+        $query->andWhere([
+            "bcg.mch_id"    => $this->mch_id,
+            "bcg.is_delete" => 0
+        ]);
         if (!empty($this->keyword)) {
             $query->andWhere([
                 'or',

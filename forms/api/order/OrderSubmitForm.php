@@ -597,7 +597,6 @@ class OrderSubmitForm extends BaseModel
      */
     public function handleData($type = 1)
     {
-
         $listData = $this->getListData($this->groupByFormDataList());
 
         foreach ($listData as &$item) {

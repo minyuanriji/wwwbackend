@@ -73,7 +73,7 @@ class SearchForm extends BaseModel{
 
         $query->orderBy($orderBy);
 
-        $select = ["bg.id", "bg.goods_id", "gw.name", "gw.cover_pic",
+        $select = ["bg.id", "bmg.id as mch_baopin_id", "bg.goods_id", "gw.name", "gw.cover_pic",
             "g.goods_stock", "g.virtual_sales", "bg.created_at", "bg.updated_at",
             "g.price", "gw.original_price"];
         $list = $query->select($select)->asArray()->page($pagination)->all();

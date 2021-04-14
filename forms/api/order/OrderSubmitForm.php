@@ -583,7 +583,7 @@ class OrderSubmitForm extends BaseModel
         }
 
         $this->form_data = array_merge($formDataList, $this->form_data);
-        
+
         return $formDataList;
     }
 

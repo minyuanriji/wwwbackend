@@ -582,8 +582,8 @@ class OrderSubmitForm extends BaseModel
             }
         }
 
-        $this->form_data = $formDataList;
-
+        $this->form_data = array_merge($formDataList, $this->form_data);
+        
         return $formDataList;
     }
 
@@ -657,7 +657,6 @@ class OrderSubmitForm extends BaseModel
             } else {
                 $use_score = false;
             }
-
             //是否使用红包券
             if (isset($this->form_data['use_integral']) && $this->form_data['use_integral'] == 1) {
                 $use_integral = true;
@@ -668,6 +667,7 @@ class OrderSubmitForm extends BaseModel
             //计算积分
             $ScoreService = new ScoreService($item, $type, $use_score, $this->enableScore);
             $item         = $ScoreService->countScore();
+
 
             //计算红包券总额
             $user_integral   = isset($IntegralService) ? $IntegralService->getRemainingIntegral() : User::getCanUseIntegral(\Yii::$app->user->id);

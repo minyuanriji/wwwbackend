@@ -24,13 +24,13 @@ class CartAddForm extends BaseModel
     public $goods_id;
     public $attr;
     public $num;
-    public $mch_id;
+    public $mch_baopin_id;
 
     public function rules()
     {
         return [
             [['goods_id', 'attr', 'num'], 'required'],
-            [['goods_id', 'num', 'attr', 'mch_id'], 'integer'],
+            [['goods_id', 'num', 'attr', 'mch_baopin_id'], 'integer'],
         ];
     }
 
@@ -54,15 +54,15 @@ class CartAddForm extends BaseModel
             }
 
             $attr = GoodsAttr::find()->alias('g')->where([
-                'g.id' => $this->attr,
-                'g.goods_id' => $this->goods_id,
+                'g.id'        => $this->attr,
+                'g.goods_id'  => $this->goods_id,
                 'g.is_delete' => 0,
             ])->innerJoinwith(['goods o' => function ($query) {
                 $query->where([
-                    'o.id' => $this->goods_id,
-                    'o.mall_id' => \Yii::$app->mall->id,
+                    'o.id'        => $this->goods_id,
+                    'o.mall_id'   => \Yii::$app->mall->id,
                     'o.is_delete' => 0,
-                    'o.status' => Goods::STATUS_ON,
+                    'o.status'    => Goods::STATUS_ON,
                 ]);
             }])->one();
 
@@ -85,16 +85,16 @@ class CartAddForm extends BaseModel
 
             if (empty($cart)) {
                 $cart = new Cart();
-                $cart->mall_id = \Yii::$app->mall->id;
-                $cart->user_id = \Yii::$app->user->id;
-                $cart->goods_id = $this->goods_id;
-                $cart->attr_id = $this->attr;
-                $cart->num = 0;
-                $cart->mch_id = $goods->mch_id;
+                $cart->mall_id   = \Yii::$app->mall->id;
+                $cart->user_id   = \Yii::$app->user->id;
+                $cart->goods_id  = $this->goods_id;
+                $cart->attr_id   = $this->attr;
+                $cart->num       = 0;
+                $cart->mch_id    = $goods->mch_id;
                 $cart->attr_info = \Yii::$app->serializer->encode(ArrayHelper::toArray($attr));
-                $cart->is_on_site_consumption = $goods->is_on_site_consumption;
             }
             $cart->num += $this->num;
+            $cart->mch_baopin_id = $this->mch_baopin_id;
             if ($cart->save()) {
                 \Yii::$app->trigger(Cart::EVENT_CART_ADD, new CartEvent(['cartIds' => [$cart->id]]));
                 return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"加入购物车成功");

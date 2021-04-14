@@ -305,7 +305,6 @@ class OrderSubmitForm extends BaseModel
                 $order = new Order();
                 $order->mall_id                     = \Yii::$app->mall->id;
                 $order->user_id                     = $user->getId();
-                $order->mch_id                      = $orderItem['mch']['id'];
                 $order->order_no                    = Order::getOrderNo('S');;
                 $order->total_price                 = $orderItem['total_price'];
                 $order->total_pay_price             = $orderItem['total_price'];
@@ -374,6 +373,23 @@ class OrderSubmitForm extends BaseModel
 
                 //满减金额
                 $order->full_relief_price           = $orderItem['total_full_relief_price'];
+
+                //核销码、门店
+                $order->mch_id                      = $orderItem['form_data']['mch_id'];
+
+                //订单类型
+                $isOffline = $orderItem['form_data']['is_offline'];
+                $isBaopin  = $orderItem['form_data']['is_baopin'];
+                if($isOffline && $isBaopin){ //核销、爆品
+                    $order->order_type = "offline_baopin";
+                }elseif($isOffline && !$isBaopin){ //核销、商品
+                    $order->order_type = "offline_normal";
+                }elseif(!$isOffline && $isBaopin){ //寄送、爆品
+                    $order->order_type = "express_baopin";
+                }else{ //寄送、商品
+                    $order->order_type = "express_normal";
+                }
+
 
                 if (!$order->save()) {
                     return $this->returnApiResultData(ApiCode::CODE_FAIL,(new BaseModel())->responseErrorMsg($order));
@@ -480,8 +496,9 @@ class OrderSubmitForm extends BaseModel
         $query->leftJoin("{{%plugin_baopin_goods}} bg", "bg.goods_id=c.goods_id");
         $query->leftJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.id=c.mch_baopin_id");
         $query->leftJoin("{{%plugin_mch}} m", "m.id=g.mch_id");
+        $query->leftJoin("{{%store}} s", "s.mch_id=m.id");
 
-        $selects = ["g.mch_id", "g.is_on_site_consumption", "bg.id as baopin_id", "bmg.id as mch_baopin_id", "g.id", "c.id as cart_id", "c.num", "c.attr_id as goods_attr_id"];
+        $selects = ["g.mch_id", "s.id as store_id", "g.is_on_site_consumption", "bg.id as baopin_id", "bmg.id as mch_baopin_id", "g.id", "c.id as cart_id", "c.num", "c.attr_id as goods_attr_id"];
 
         $cartDatas = $query->select($selects)->asArray()->all();
 
@@ -494,7 +511,7 @@ class OrderSubmitForm extends BaseModel
                 $row['baopin_data'] = 1;
                 $dataGroupList['single'][] = $row;
             }elseif(!empty($row['mch_id'])){ //商家产品
-                $dataGroupList['mch'][$row['mch_id']][] = $row;
+                $dataGroupList['mch'][$row['mch_id'] . "_" . $row['store_id']][] = $row;
             }else{
                 $dataGroupList['muti'][] = $row;
             }
@@ -516,12 +533,13 @@ class OrderSubmitForm extends BaseModel
                         'is_baopin'       => isset($row['baopin_data']) ? 1 : 0,
                         'baopin_id'       => isset($row['baopin_data']) ? $row['baopin_id'] : 0,
                         'mch_id'          => $row['mch_id'],
+                        'store_id'        => $row['store_id'],
                         'goods_list'      => $goodsList,
                         'use_coupon_list' => []
                     ];
                 }
             }elseif($type == "mch"){ //商户分组
-                foreach($dataGroup as $mch_id => $list){
+                foreach($dataGroup as $key => $list){
                     $goodsList = [];
                     foreach($list as $row){
                         $goodsList[] = [
@@ -531,11 +549,13 @@ class OrderSubmitForm extends BaseModel
                             'cart_id'       => $row['cart_id']
                         ];
                     }
+                    $parts = explode("_", $key);
                     $formDataList[] = [
                         'is_offline'      => 0,
                         'is_baopin'       => 0,
                         'baopin_id'       => 0,
-                        'mch_id'          => $mch_id,
+                        'mch_id'          => $parts[0],
+                        'store_id'        => $parts[1],
                         'goods_list'      => $goodsList,
                         'use_coupon_list' => []
                     ];
@@ -555,6 +575,7 @@ class OrderSubmitForm extends BaseModel
                     'is_baopin'       => 0,
                     'baopin_id'       => 0,
                     'mch_id'          => 0,
+                    'store_id'        => 0,
                     'goods_list'      => $goodsList,
                     'use_coupon_list' => []
                 ];

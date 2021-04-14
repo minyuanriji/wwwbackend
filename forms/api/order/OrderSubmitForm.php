@@ -739,7 +739,7 @@ class OrderSubmitForm extends BaseModel
      */
     protected function getListData($cart_ids_str)
     {
-        //获取购物车数据，按照商户、爆品、到店、线上分组
+        //获取购物车数据，按照商户、爆品、到店、线上、核销分组
         $cartIds = explode(",", trim($cart_ids_str));
         $query = Cart::find()->alias("c")->andWhere([
             "AND",
@@ -749,11 +749,87 @@ class OrderSubmitForm extends BaseModel
         ]);
         $query->leftJoin("{{%goods}} g", "g.id=c.goods_id");
         $query->leftJoin("{{%plugin_baopin_goods}} bg", "bg.goods_id=c.goods_id");
+        $query->leftJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.id=c.mch_baopin_id");
         $query->leftJoin("{{%plugin_mch}} m", "m.id=g.mch_id");
-        $selects = ["g.mch_id", "bg.id as baopin_record_id", "g.id", "c.id as cart_id", "c.num", "c.attr_id as goods_attr_id"];
-        $cartDatas = $query->select($selects)->asArray()->all();
-        foreach($cartDatas as $row){
 
+        $selects = ["g.mch_id", "g.is_on_site_consumption", "bg.id as baopin_id", "bmg.id as mch_baopin_id", "g.id", "c.id as cart_id", "c.num", "c.attr_id as goods_attr_id"];
+
+        $cartDatas = $query->select($selects)->asArray()->all();
+
+        $dataGroupList = [];
+        foreach($cartDatas as $row){
+            if(!empty($row['is_on_site_consumption'])){ //到店核销商品
+                $row['offline_data'] = 1;
+                $dataGroupList['single'][] = $row;
+            }elseif(!empty($row['baopin_id'])){ //爆品
+                $row['baopin_data'] = 1;
+                $dataGroupList['single'][] = $row;
+            }elseif(!empty($row['mch_id'])){ //商家产品
+                $dataGroupList['mch'][$row['mch_id']][] = $row;
+            }else{
+                $dataGroupList['muti'][] = $row;
+            }
+        }
+        $formDataList = [];
+        foreach($dataGroupList as $type => $dataGroup){
+            if($type == "single"){ //一个订单只允许一个商品
+                foreach($dataGroup as $row){
+                    $goodsList = [
+                        [
+                            'id'            => $row['id'],
+                            'goods_attr_id' => $row['goods_attr_id'],
+                            'num'           => $row['num'],
+                            'cart_id'       => $row['cart_id']
+                        ]
+                    ];
+                    $formDataList[] = [
+                        'is_offline'      => isset($row['offline_data']) ? 1 : 0,
+                        'is_baopin'       => isset($row['baopin_data']) ? 1 : 0,
+                        'baopin_id'       => isset($row['baopin_data']) ? $row['baopin_id'] : 0,
+                        'mch_id'          => $row['mch_id'],
+                        'goods_list'      => $goodsList,
+                        'use_coupon_list' => []
+                    ];
+                }
+            }elseif($type == "mch"){ //商户分组
+                foreach($dataGroup as $mch_id => $list){
+                    $goodsList = [];
+                    foreach($list as $row){
+                        $goodsList[] = [
+                            'id'            => $row['id'],
+                            'goods_attr_id' => $row['goods_attr_id'],
+                            'num'           => $row['num'],
+                            'cart_id'       => $row['cart_id']
+                        ];
+                    }
+                    $formDataList[] = [
+                        'is_offline'      => 0,
+                        'is_baopin'       => 0,
+                        'baopin_id'       => 0,
+                        'mch_id'          => $mch_id,
+                        'goods_list'      => $goodsList,
+                        'use_coupon_list' => []
+                    ];
+                }
+            }else{ //其它平台商品
+                $goodsList = [];
+                foreach($dataGroup as $row){
+                    $goodsList[] = [
+                        'id'            => $row['id'],
+                        'goods_attr_id' => $row['goods_attr_id'],
+                        'num'           => $row['num'],
+                        'cart_id'       => $row['cart_id']
+                    ];
+                }
+                $formDataList[] = [
+                    'is_offline'      => 0,
+                    'is_baopin'       => 0,
+                    'baopin_id'       => 0,
+                    'mch_id'          => 0,
+                    'goods_list'      => $goodsList,
+                    'use_coupon_list' => []
+                ];
+            }
         }
 
         foreach ($formDataList as $i => $formDataItem) {
@@ -765,6 +841,7 @@ class OrderSubmitForm extends BaseModel
             ];
             $listData[] = $mchItem;
         }
+
         return $listData;
     }
 
@@ -783,7 +860,6 @@ class OrderSubmitForm extends BaseModel
             ];
         } else {
             $mch = Mch::findOne($id);
-            \Yii::$app->setMchId($mch->id);
             return [
                 'id'   => $id,
                 'name' => $mch ? $mch->store->name : '未知商户',

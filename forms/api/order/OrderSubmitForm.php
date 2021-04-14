@@ -740,11 +740,11 @@ class OrderSubmitForm extends BaseModel
     protected function getListData($cart_ids_str)
     {
         //获取购物车数据，按照商户、爆品、到店、线上、核销分组
-        $cartIds = explode(",", trim($cart_ids_str));
+        $cartIds = is_string($cart_ids_str) ? explode(",", trim($cart_ids_str)) : [];
         $query = Cart::find()->alias("c")->andWhere([
             "AND",
             ["c.user_id" => (int)\Yii::$app->user->id],
-            ["IN", "c.id", $cartIds ? $cartIds : []],
+            ["IN", "c.id", ($cartIds ? $cartIds : [])],
             ["c.is_delete" => 0]
         ]);
         $query->leftJoin("{{%goods}} g", "g.id=c.goods_id");
@@ -832,6 +832,8 @@ class OrderSubmitForm extends BaseModel
             }
         }
 
+        $listData = [];
+        
         foreach ($formDataList as $i => $formDataItem) {
             $goodsList = $this->getGoodsListData($formDataItem['goods_list']);
             $mchItem = [

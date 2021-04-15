@@ -43,6 +43,7 @@ class OrderListCommon extends BaseModel
     public $add_where = [];
     public $is_recycle;
     public $dateArr = [];
+    public $orderType = [];
     /**
      * 关联关系
      * @var
@@ -119,6 +120,10 @@ class OrderListCommon extends BaseModel
         }
 
         $this->query->andWhere(['!=', 'o.sign', 'group_buy']);
+
+        if(!empty($this->orderType)){
+            $this->query->andWhere(["IN", "o.order_type", $this->orderType]);
+        }
 
         if ($this->is_pagination) {
             $this->query->page($this->pagination, $this->limit, $this->page);

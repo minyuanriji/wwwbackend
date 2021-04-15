@@ -56,8 +56,9 @@ class OrderListCommon extends BaseModel
     public $is_refund;
     public $relations = [];
 
-    public $only_express_order = 0; //只显示
-    public $only_offline_order = 0;
+    public $only_express_order = 0; //只显示寄送订单
+    public $only_offline_order = 0; //只显示核销订单
+    public $only_offline_used  = 0; //只显示已使用的核销订单
 
     public function rules()
     {
@@ -124,8 +125,21 @@ class OrderListCommon extends BaseModel
 
         $this->query->andWhere(['!=', 'o.sign', 'group_buy']);
 
-        if(!empty($this->orderType)){
-            $this->query->andWhere(["IN", "o.order_type", $this->orderType]);
+        if($this->only_offline_order){ //只显示核销订单
+            $this->query->andWhere(["IN", "o.order_type", ["offline_baopin", "offline_normal"]]);
+            if(!$this->only_offline_used){
+                $this->query->andWhere([
+                    "AND",
+                    ["o.sale_status" => Order::SALE_STATUS_NO],
+                    ["o.status" => Order::STATUS_WAIT_DELIVER]
+                ]);
+            }else{
+                $this->query->andWhere("(o.sale_status <> '".Order::SALE_STATUS_NO."' OR o.status <> '".Order::STATUS_WAIT_DELIVER."')");
+            }
+        }
+
+        if($this->only_express_order){ //只显示寄送订单
+            $this->query->andWhere(["IN", "o.order_type", ["express_baopin", "express_normal"]]);
         }
 
         if ($this->is_pagination) {

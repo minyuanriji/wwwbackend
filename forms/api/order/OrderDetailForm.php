@@ -178,7 +178,9 @@ class OrderDetailForm extends BaseModel
 
             //兼容旧版本
             $orderDetailData['is_need_address'] = 1;
-
+            if(in_array($detail['order_type'], ["offline_normal", "offline_baopin"])){
+                $orderDetailData['is_need_address'] = 0;
+            }
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$orderDetailData);
         } catch (\Exception $e) {

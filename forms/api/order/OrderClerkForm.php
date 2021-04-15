@@ -132,7 +132,9 @@ class OrderClerkForm extends BaseModel
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
-                'data' => $res
+                'data' => array_merge($res, [
+                    "code" => $order->offline_qrcode
+                ])
             ];
         } catch (\Exception $e) {
             return [

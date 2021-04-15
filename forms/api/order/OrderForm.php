@@ -72,16 +72,13 @@ class OrderForm extends BaseModel
         $form->is_recycle = 0;
         $form->relations = ['mch.store', 'detailExpress.expressRelation.orderDetail','detail.expressRelation','detail.refund', 'detailExpressRelation.orderExpress'];
 
-        if($this->offline){
-            $form->orderType = ["offline_baopin", "offline_normal"];
-            if($this->offline_used){ //待使用
-                $form->sale_status = Order::SALE_STATUS_NO;
-                $form->status      = Order::STATUS_WAIT_DELIVER;
-            }else{ //已使用
-
-            }
-        }else{
-            $form->orderType = ["express_baopin", "express_normal"];
+        if($this->offline){ //核销
+            unset($form->status);
+            unset($form->sale_status);
+            $form->only_offline_order = 1;
+            $form->only_offline_used = $this->offline_used ? 1 : 0;
+        }else{ //寄送
+            $form->only_express_order = 1;
         }
 
         $list = $form->search();

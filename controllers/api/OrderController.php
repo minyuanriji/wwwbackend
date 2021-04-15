@@ -340,7 +340,8 @@ class OrderController extends ApiController
     public function actionOrderClerk()
     {
         $form = new OrderClerkForm();
-        $form->attributes = \Yii::$app->request->get();
+        $form->attributes  = $this->requestData;
+        $form->action_type = 1;
 
         return $this->asJson($form->OrderClerk());
     }

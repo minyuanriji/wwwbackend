@@ -276,10 +276,24 @@
                                     inactive-value="0">
                             </el-switch>
                         </el-form-item>
-                        <el-form-item v-if="ruleForm.is_order_bar_status == 1" label="订单栏">
+                        <el-form-item v-if="ruleForm.is_order_bar_status == 1" label="订单栏-1">
                             <div flex="box:mean" style="flex-wrap: wrap">
                                 <div v-for="(item, index) in ruleForm.order_bar"
                                      @click="openDialogForm(item,index, 1)"
+                                     class="order-box"
+                                     flex="dir:top box:mean main:center cross:center">
+                                    <div flex="cross:center">
+                                        <com-image width="30px" height="30px" mode="aspectFill" :src="item.icon_url">
+                                        </com-image>
+                                    </div>
+                                    <div>{{item.name}}</div>
+                                </div>
+                            </div>
+                        </el-form-item>
+                        <el-form-item v-if="ruleForm.is_order_bar_status == 1" label="订单栏-2">
+                            <div flex="box:mean" style="flex-wrap: wrap">
+                                <div v-for="(item, index) in ruleForm.order_bar2"
+                                     @click="openDialogForm(item,index, 6)"
                                      class="order-box"
                                      flex="dir:top box:mean main:center cross:center">
                                     <div flex="cross:center">
@@ -445,13 +459,14 @@
         <el-dialog :title="dialogFormType == 4 ? '收藏栏编辑':(dialogFormType == 2 ? '我的账户编辑' : (dialogFormType == 5 ? '我的功能编辑' : '订单栏编辑'))"
                    :visible.sync="dialogFormVisible">
             <el-form @submit.native.prevent :model="dialogForm" label-width="120px" size="small">
-                <template v-if="dialogFormType ===  1 || dialogFormType === 4">
+                <template v-if="dialogFormType ===  1 || dialogFormType === 6 || dialogFormType === 4">
                     <el-form-item label="名称">
                         <el-tag type="info">{{dialogForm.name}}</el-tag>
                     </el-form-item>
+
                     <el-form-item label="图标" prop="icon_url">
                         <com-attachment :multiple="false" :max="1" @selected="iconUrl">
-                            <el-tooltip v-if="dialogFormType === 1" class="item" effect="dark" content="建议尺寸:60*60"
+                            <el-tooltip v-if="dialogFormType === 1 || dialogFormType === 6" class="item" effect="dark" content="建议尺寸:60*60"
                                         placement="top">
                                 <el-button size="mini">选择文件</el-button>
                             </el-tooltip>
@@ -465,6 +480,9 @@
                                    mode="aspectFill"
                                    :src="dialogForm.icon_url">
                         </com-image>
+                    </el-form-item>
+                    <el-form-item label="路由">
+                        <el-input v-if="dialogFormType === 6" v-model="dialogForm.link_url" placeholder="输入路由"></el-input>
                     </el-form-item>
                 </template>
 
@@ -530,6 +548,15 @@
                     menu_title: '营销功能',
                     menu_style: '1',
                     menus: [],
+                    order_bar2: [
+                        {
+                            id: 100,
+                            name: '待使用',
+                            icon_url: '',
+                            link_url: '',
+                            open_type: 'navigate'
+                        }
+                    ],
                     order_bar: [
                         {
                             id: 1,
@@ -669,6 +696,9 @@
                     self.cardLoading = false;
                     if (e.data.code == 0) {
                         if (e.data.data.detail) {
+                            if(typeof e.data.data.detail['order_bar2'] == "undefined"){
+                                e.data.data.detail['order_bar2'] = self.ruleForm.order_bar2;
+                            }
                             self.ruleForm = e.data.data.detail;
                         }
                     } else {
@@ -767,6 +797,9 @@
                 this.dialogFormVisible = false;
                 if (this.dialogFormType == 1) {
                     this.ruleForm.order_bar[this.dialogFormIndex] = this.dialogForm;
+                }
+                if (this.dialogFormType == 6) {
+                    this.ruleForm.order_bar2[this.dialogFormIndex] = this.dialogForm;
                 }
                 if (this.dialogFormType == 2) {
                     this.ruleForm.account_bar[this.dialogFormIndex].text = this.dialogForm.name;

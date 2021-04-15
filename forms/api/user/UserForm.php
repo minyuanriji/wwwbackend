@@ -231,6 +231,9 @@ class UserForm extends BaseModel
             }
         }
 
+        $userCenter['order_bar'][] = $userCenter['order_bar2'][0];
+        unset($userCenter['order_bar2']);
+
         //TODO
         $isMch = Mch::find()->where([
             'user_id'   => \Yii::$app->user->id,

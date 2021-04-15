@@ -37,11 +37,13 @@ class OrderForm extends BaseModel
     public $limit;
     public $status;
     public $id;// 订单ID
+    public $offline;
+    public $offline_used;
 
     public function rules()
     {
         return [
-            [['page', 'limit', 'status', 'id'], 'integer'],
+            [['page', 'limit', 'status', 'id', 'offline', 'offline_used'], 'integer'],
             ['page', 'default', 'value' => 1],
             ['limit', 'default', 'value' => 20],
         ];
@@ -69,6 +71,19 @@ class OrderForm extends BaseModel
         $form->page = $this->page;
         $form->is_recycle = 0;
         $form->relations = ['mch.store', 'detailExpress.expressRelation.orderDetail','detail.expressRelation','detail.refund', 'detailExpressRelation.orderExpress'];
+
+        if($this->offline){
+            if($this->offline_used){ //待使用
+                $form->sale_status = Order::SALE_STATUS_NO;
+                $form->status      = Order::STATUS_WAIT_DELIVER;
+            }else{ //已使用
+
+            }
+            $form->orderType = ["offline_baopin", "offline_normal"];
+        }else{
+            $form->orderType = ["express_baopin", "express_normal"];
+        }
+
         $list = $form->search();
 
         $newList = [];

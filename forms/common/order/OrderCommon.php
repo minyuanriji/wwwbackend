@@ -124,6 +124,38 @@ class OrderCommon extends BaseModel
     }
 
     /**
+     * 获取核销订单不同状态下数量
+     * @return array
+     */
+    public function getOfflineOrderInfoCount()
+    {
+        if (\Yii::$app->user->isGuest) {
+            return [0, 0];
+        }
+
+        $form = new OrderListCommon();
+        $form->user_id    = \Yii::$app->user->id;
+        $form->mall_id    = \Yii::$app->mall->id;
+        $form->is_recycle = 0;
+
+        $form->getQuery();
+        $form->query->andWhere([
+            "OR",
+            ["o.order_type" => "offline_baopin"],
+            ["o.order_type" => "offline_normal"]
+        ]);
+
+        //待使用
+        $form->sale_status = Order::SALE_STATUS_NO;
+        $form->status = 1;
+        $form->getQuery();
+
+        $waitSend = $form->query->count();
+
+        return [$waitSend, 0];
+    }
+
+    /**
      * 获取不同订单状态下的订单数
      * @return array
      */

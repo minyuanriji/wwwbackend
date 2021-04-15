@@ -321,7 +321,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                                         <img src="statics/img/mall/del.png" alt="">
                                     </el-tooltip>
                                 </el-button>
-                                <el-button v-if="!scope.row.not_editable" @click="copy(scope.row, scope.$index)" type="text" circle size="mini">
+                                <el-button v-if="!scope.row.not_editable" @click="copy(scope.row)" type="text" circle size="mini">
                                     <el-tooltip class="item" effect="dark" content="复制" placement="top">
                                         <img src="statics/img/mall/copy1.png" alt="">
                                     </el-tooltip>
@@ -384,6 +384,10 @@ Yii::$app->loadComponentView('goods/com-batch');
             destroy_goods_url: {
                 type: String,
                 default: 'mall/goods/delete'
+            },
+            goods_copy_goods_url: {
+                type: String,
+                default: 'mall/goods/copy'
             },
             edit_goods_sort_url: {
                 type: String,
@@ -861,6 +865,43 @@ Yii::$app->loadComponentView('goods/com-batch');
                 catch(e => {
                     console.log(e);
             })
+                ;
+            },
+
+            //商品复制
+            copy(row) {
+                console.log(row.id);
+                let self = this;
+                self.$confirm('复制该条数据, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.listLoading = true;
+                    request({
+                        params: {
+                            r: this.goods_copy_goods_url,
+                        },
+                        method: 'post',
+                        data: {
+                            id: row.id,
+                        }
+                    }).then(e => {
+                        self.listLoading = false;
+                        if (e.data.code === 0) {
+                            self.$message.success(e.data.msg);
+                            location.reload();
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).
+                    catch(e => {
+                        console.log(e);
+                    })
+                    ;
+                }).catch(() => {
+                    self.$message.info('已取消复制')
+                })
                 ;
             },
         },

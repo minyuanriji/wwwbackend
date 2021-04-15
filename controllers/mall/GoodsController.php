@@ -106,6 +106,27 @@ class GoodsController extends MallController
         }
     }
 
+    /*
+     * 商品复制
+     * */
+    public function actionCopy()
+    {
+        $form = new GoodsForm();
+        $form->attributes = \Yii::$app->request->post();
+        $res = $form->getDetail();
+        if (is_array($res) && isset($res['code']) && $res['code'] == 1) {
+            return $res;
+        } else {
+            $form = new GoodsEditForm();
+            $data_form = $res['data']['detail'];
+            $form->attributes = $data_form;
+            $form->attrGroups = $res['data']['detail']['attr_groups'];
+            $form->expressName = isset($res['data']['detail']['expressName']) ? $res['data']['detail']['expressName'] : [];
+            $res = $form->save();
+            return $this->asJson($res);
+        }
+    }
+
 
 
 

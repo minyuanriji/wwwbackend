@@ -321,7 +321,11 @@ class GoodsEditForm extends BaseGoodsEdit
         $catIdList = array_column($goodsCatRelationList, 'cat_id');
         $cats = array_merge($this->cats, $this->mchCats);
         $catIdListDiff = array_diff($catIdList, $cats);
-        $catsDiff = array_diff($cats, $catIdList);
+        if (!$catIdList) {
+            $catsDiff = $cats;
+        } else {
+            $catsDiff = array_diff($cats, $catIdList);
+        }
         if (count($catIdListDiff) > 0) {
             foreach ($catIdListDiff as $key => $value) {
                 $goodsCatRelation = $goodsCatRelationList[$key];
@@ -332,7 +336,7 @@ class GoodsEditForm extends BaseGoodsEdit
         if (count($catsDiff) > 0) {
             foreach ($catsDiff as $item) {
                 $goodsCatRelation = new GoodsCatRelation();
-                $goodsCatRelation->cat_id = $item;
+                $goodsCatRelation->cat_id = isset($item['value']) ? $item['value'] : $item;
                 $goodsCatRelation->goods_warehouse_id = $this->goodsWarehouse->id;
                 $goodsCatRelation->save();
             }

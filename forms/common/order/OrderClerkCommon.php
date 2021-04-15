@@ -11,6 +11,7 @@ use app\models\Model;
 use app\models\Order;
 use app\models\OrderClerk;
 use app\models\User;
+use app\plugins\baopin\models\BaopinOrder;
 
 
 class OrderClerkCommon extends BaseModel
@@ -116,8 +117,8 @@ class OrderClerkCommon extends BaseModel
             $order = Order::find()->where([
                 'is_delete' => 0,
                 'send_type' => 1,
-                'id' => $this->id,
-                'mall_id' => \Yii::$app->mall->id,
+                'id'        => $this->id,
+                'mall_id'   => \Yii::$app->mall->id,
             ])->one();
 
             if (!$order) {
@@ -140,27 +141,37 @@ class OrderClerkCommon extends BaseModel
                 throw new \Exception('订单未支付，请先进行收款');
             }
 
+            if($order->order_type == "offline_baopin"){ //爆品
+                $baopinOrder = BaopinOrder::findOne([
+                    "order_id" => $order->id
+                ]);
+                if($baopinOrder){
+                    throw new \Exception('数据异常，获取不到爆品订单记录');
+                }
+                print_r($baopinOrder);exit;
+            }
+
             $clerkUserIds = ClerkUserStoreRelation::find()
-                ->where(['store_id' => $order->store_id])
+                ->where(['store_id' => (int)$order->store_id])
                 ->select('clerk_user_id');
 
             /** @var ClerkUser $clerkUser */
             $clerkUser = ClerkUser::find()->where([
-                'user_id' => $this->clerk_id,
-                'id' => $clerkUserIds,
-                'mall_id' => \Yii::$app->mall->id,
+                'user_id'   => $this->clerk_id,
+                'id'        => $clerkUserIds,
+                'mall_id'   => \Yii::$app->mall->id,
                 'is_delete' => 0,
-                'mch_id' => $order->mch_id
+                'mch_id'    => (int)$order->mch_id
             ])->with('store')->one();
             if (!$clerkUser) {
                 throw new \Exception('没有核销权限，禁止核销');
             }
 
-            $order->is_send = 1;
-            $order->send_at = time();
-            $order->is_confirm = 1;
-            $order->confirm_at = time();
-            $order->clerk_id = $clerkUser->id;
+            $order->is_send     = 1;
+            $order->send_at     = time();
+            $order->is_confirm  = 1;
+            $order->confirm_at  = time();
+            $order->clerk_id    = $clerkUser->id;
             $res = $order->save();
 
             if (!$res) {
@@ -170,12 +181,12 @@ class OrderClerkCommon extends BaseModel
             $orderClerk = OrderClerk::find()->where(['order_id' => $order->id])->one();
             if (!$orderClerk) {
                 $orderClerk = new OrderClerk();
-                $orderClerk->mall_id = \Yii::$app->mall->id;
-                $orderClerk->affirm_pay_type = $this->action_type;
-                $orderClerk->order_id = $order->id;
+                $orderClerk->mall_id          = \Yii::$app->mall->id;
+                $orderClerk->affirm_pay_type  = $this->action_type;
+                $orderClerk->order_id         = $order->id;
             }
             $orderClerk->clerk_remark = $this->clerk_remark ?: '';
-            $orderClerk->clerk_type = $this->clerk_type;
+            $orderClerk->clerk_type   = $this->clerk_type;
             $res = $orderClerk->save();
             if (!$res) {
                 throw new \Exception($this->responseErrorMsg($orderClerk));

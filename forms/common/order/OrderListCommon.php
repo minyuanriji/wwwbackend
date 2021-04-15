@@ -56,6 +56,9 @@ class OrderListCommon extends BaseModel
     public $is_refund;
     public $relations = [];
 
+    public $only_express_order = 0; //只显示
+    public $only_offline_order = 0;
+
     public function rules()
     {
         return [

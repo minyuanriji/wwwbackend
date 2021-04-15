@@ -27,7 +27,7 @@ class OrderClerkForm extends BaseModel
     {
         return [
             [['id', 'action_type'], 'integer'],
-            [['id', 'action_type'], 'required'],
+            [['id'], 'required'],
             [['clerk_remark'], 'string'],
         ];
     }
@@ -72,33 +72,21 @@ class OrderClerkForm extends BaseModel
 
         try {
             $commonOrderClerk = new OrderClerkCommon();
-            $commonOrderClerk->id = $this->id;
-            $commonOrderClerk->action_type = $this->action_type;
+            $commonOrderClerk->id           = $this->id;
+            $commonOrderClerk->action_type  = $this->action_type;
             $commonOrderClerk->clerk_remark = $this->clerk_remark;
-            $commonOrderClerk->clerk_id = \Yii::$app->admin->id;
-            $commonOrderClerk->clerk_type = 1;
+            $commonOrderClerk->clerk_id     = \Yii::$app->user->id;
+            $commonOrderClerk->clerk_type   = 1;
             $res = $commonOrderClerk->orderClerk();
 
-            //权限判断，用以核销后返回的页面判断
-            $is_clerk = 1;
-            $permission = \Yii::$app->branch->childPermission(\Yii::$app->mall->user->adminInfo);
-            if (empty(\Yii::$app->plugin->getInstalledPlugin('clerk')) || !in_array('clerk', $permission) || empty(ClerkUser::findOne(['user_id' => \Yii::$app->admin->id, 'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0]))) {
-                $is_clerk = 0;
-            }
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '核销成功',
-                'data' => [
-                    'is_clerk' => $is_clerk
-                ]
+                'msg' => '核销成功'
             ];
         } catch (\Exception $e) {
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg' => $e->getMessage(),
-                'data' => [
-                    'line' => $e->getLine()
-                ]
+                'msg' => $e->getMessage()
             ];
         }
     }
@@ -108,9 +96,10 @@ class OrderClerkForm extends BaseModel
         try {
             /** @var Order $order */
             $order = Order::find()->where([
-                'id' => $this->id,
+                'id'        => $this->id,
                 'is_delete' => 0,
-                'mall_id' => \Yii::$app->mall->id,
+                'mall_id'   => \Yii::$app->mall->id,
+                'user_id'   => \Yii::$app->user->id,
                 'send_type' => 1,
             ])->one();
 

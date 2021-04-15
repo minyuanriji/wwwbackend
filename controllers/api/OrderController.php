@@ -26,6 +26,7 @@ use app\forms\api\order\OrderRefundSendForm;
 use app\forms\api\order\OrderRefundSubmitForm;
 use app\forms\api\order\OrderPayResultForm;
 use app\forms\api\order\OrderSubmitForm;
+use app\forms\api\order\QueryClerkStatusForm;
 use app\logic\OrderLogic;
 use app\models\Express;
 use app\controllers\business\{PostageRules,OrderCommon};
@@ -344,6 +345,15 @@ class OrderController extends ApiController
         $form->action_type = 1;
 
         return $this->asJson($form->OrderClerk());
+    }
+
+    /**
+     * 查询核销状态
+     */
+    public function actionQueryClerkStatus(){
+        $form = new QueryClerkStatusForm();
+        $form->attributes  = $this->requestData;
+        return $this->asJson($form->queryClerk());
     }
 
     /**

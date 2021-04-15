@@ -231,7 +231,9 @@ class UserForm extends BaseModel
             }
         }
 
+        $userCenter['order_bar2'][0]['num'] = $userCenter['order_bar2'][0]['text'];
         $userCenter['order_bar'][] = $userCenter['order_bar2'][0];
+
         unset($userCenter['order_bar2']);
 
         //TODO

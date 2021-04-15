@@ -352,7 +352,7 @@ class OrderController extends ApiController
     public function actionClerkQrCode()
     {
         $form = new OrderClerkForm();
-        $form->attributes = \Yii::$app->request->get();
+        $form->attributes = $this->requestData;
 
         return $this->asJson($form->qrClerkCode());
     }

@@ -380,6 +380,7 @@ class OrderSubmitForm extends BaseModel
                 if($orderItem['is_offline']){
                     $order->offline_qrcode          = (string)rand(10000000, 99999999);
                     $order->store_id                = (int)$orderItem['form_data']['store_id'];
+                    $order->send_type               = Order::SEND_TYPE_SELF;
                 }
 
                 //订单类型

@@ -179,9 +179,6 @@ class OrderDetailForm extends BaseModel
             //兼容旧版本
             $orderDetailData['is_need_address'] = 1;
 
-            //如果订单属于核销商品，生成核销二维码
-
-
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$orderDetailData);
         } catch (\Exception $e) {

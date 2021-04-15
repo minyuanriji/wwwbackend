@@ -2482,7 +2482,17 @@ class OrderSubmitForm extends BaseModel
      * @throws \yii\db\StaleObjectException
      */
     public function extraBaopinOrder($order, $goodsItem){
-
+        $baopinOrder = new BaopinOrder();
+        $baopinOrder->mall_id       = $order->mall_id;
+        $baopinOrder->order_id      = $order->id;
+        $baopinOrder->baopin_id     = (int)$goodsItem['baopin_id'];
+        $baopinOrder->created_at    = time();
+        $baopinOrder->updated_at    = time();
+        $baopinOrder->mch_id        = (int)$order->mch_id;
+        $baopinOrder->mch_baopin_id = (int)$goodsItem['mch_baopin_id'];
+        if (!$baopinOrder->save()) {
+            throw new \Exception((new BaseModel())->responseErrorMsg($baopinOrder));
+        }
     }
 
     /**

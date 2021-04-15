@@ -48,6 +48,7 @@ use app\models\Store;
 use app\models\User;
 use app\models\UserAddress;
 use app\models\UserCoupon;
+use app\plugins\baopin\models\BaopinOrder;
 use app\plugins\mch\models\Mch;
 use app\services\Order\AttrGoodsService;
 use app\services\Order\CouponService;
@@ -376,10 +377,14 @@ class OrderSubmitForm extends BaseModel
 
                 //核销码、门店
                 $order->mch_id                      = $orderItem['form_data']['mch_id'];
+                if($orderItem['is_offline']){
+                    $order->offline_qrcode          = (string)rand(10000000, 99999999);
+                    $order->store_id                = (int)$orderItem['form_data']['store_id'];
+                }
 
                 //订单类型
-                $isOffline = $orderItem['form_data']['is_offline'];
-                $isBaopin  = $orderItem['form_data']['is_baopin'];
+                $isOffline = $orderItem['is_offline'];
+                $isBaopin  = $orderItem['is_baopin'];
                 if($isOffline && $isBaopin){ //核销、爆品
                     $order->order_type = "offline_baopin";
                 }elseif($isOffline && !$isBaopin){ //核销、商品
@@ -389,7 +394,6 @@ class OrderSubmitForm extends BaseModel
                 }else{ //寄送、商品
                     $order->order_type = "express_normal";
                 }
-
 
                 if (!$order->save()) {
                     return $this->returnApiResultData(ApiCode::CODE_FAIL,(new BaseModel())->responseErrorMsg($order));
@@ -404,9 +408,14 @@ class OrderSubmitForm extends BaseModel
                     // }
                 }
 
-                foreach ($orderItem['goods_list'] as $goodsItem) {
+                foreach ($orderItem['goods_list'] as $goodsItem){
                     $this->subGoodsNum($goodsItem['goods_attr'], $goodsItem['num'], $goodsItem);
                     $this->extraOrderDetail($order, $goodsItem);
+
+                    //爆品
+                    if($orderItem['is_baopin']){
+                        $this->extraBaopinOrder($order, $goodsItem);
+                    }
                 }
 
                 // 优惠券标记已使用(此段代码没有用)
@@ -525,15 +534,17 @@ class OrderSubmitForm extends BaseModel
                             'id'            => $row['id'],
                             'goods_attr_id' => $row['goods_attr_id'],
                             'num'           => $row['num'],
-                            'cart_id'       => $row['cart_id']
+                            'cart_id'       => $row['cart_id'],
+                            'mch_id'        => (int)$row['mch_id'],
+                            'mch_baopin_id' => (int)$row['mch_baopin_id'],
+                            'baopin_id'     => (int)$row['baopin_id']
                         ]
                     ];
                     $formDataList[] = [
                         'is_offline'      => isset($row['offline_data']) ? 1 : 0,
                         'is_baopin'       => isset($row['baopin_data']) ? 1 : 0,
-                        'baopin_id'       => isset($row['baopin_data']) ? $row['baopin_id'] : 0,
-                        'mch_id'          => $row['mch_id'],
-                        'store_id'        => $row['store_id'],
+                        'mch_id'          => (int)$row['mch_id'],
+                        'store_id'        => (int)$row['store_id'],
                         'goods_list'      => $goodsList,
                         'use_coupon_list' => []
                     ];
@@ -546,14 +557,16 @@ class OrderSubmitForm extends BaseModel
                             'id'            => $row['id'],
                             'goods_attr_id' => $row['goods_attr_id'],
                             'num'           => $row['num'],
-                            'cart_id'       => $row['cart_id']
+                            'cart_id'       => $row['cart_id'],
+                            'mch_id'        => (int)$row['mch_id'],
+                            'mch_baopin_id' => (int)$row['mch_baopin_id'],
+                            'baopin_id'     => (int)$row['baopin_id']
                         ];
                     }
                     $parts = explode("_", $key);
                     $formDataList[] = [
                         'is_offline'      => 0,
                         'is_baopin'       => 0,
-                        'baopin_id'       => 0,
                         'mch_id'          => $parts[0],
                         'store_id'        => $parts[1],
                         'goods_list'      => $goodsList,
@@ -567,13 +580,15 @@ class OrderSubmitForm extends BaseModel
                         'id'            => $row['id'],
                         'goods_attr_id' => $row['goods_attr_id'],
                         'num'           => $row['num'],
-                        'cart_id'       => $row['cart_id']
+                        'cart_id'       => $row['cart_id'],
+                        'mch_id'        => 0,
+                        'mch_baopin_id' => 0,
+                        'baopin_id'     => 0
                     ];
                 }
                 $formDataList[] = [
                     'is_offline'      => 0,
                     'is_baopin'       => 0,
-                    'baopin_id'       => 0,
                     'mch_id'          => 0,
                     'store_id'        => 0,
                     'goods_list'      => $goodsList,
@@ -864,6 +879,10 @@ class OrderSubmitForm extends BaseModel
         foreach ($formDataList as $i => $formDataItem) {
             $goodsList = $this->getGoodsListData($formDataItem['goods_list']);
             $mchItem = [
+                'is_offline' => $formDataItem['is_offline'],
+                'is_baopin'  => $formDataItem['is_baopin'],
+                'mch_id'     => $formDataItem['mch_id'],
+                'store_id'   => $formDataItem['store_id'],
                 'mch'        => $this->getMchInfo(isset($formDataItem['mch_id']) ? $formDataItem['mch_id'] : 0),
                 'goods_list' => $goodsList,
                 'form_data'  => $formDataItem,
@@ -906,9 +925,11 @@ class OrderSubmitForm extends BaseModel
     {
         $list = [];
         foreach ($goodsList as $i => $goodsItem) {
-            $result              = $this->getOneGoodsItemData($goodsItem);
-            $result['form_data'] = isset($goodsItem['form_data']) ? $goodsItem['form_data'] : null;
-            $list[]              = $result;
+            $result                  = $this->getOneGoodsItemData($goodsItem);
+            $result['form_data']     = isset($goodsItem['form_data']) ? $goodsItem['form_data'] : null;
+            $result['baopin_id']     = $goodsItem['baopin_id'];
+            $result['mch_baopin_id'] = $goodsItem['mch_baopin_id'];
+            $list[]                  = $result;
         }
         return $list;
     }
@@ -2454,6 +2475,27 @@ class OrderSubmitForm extends BaseModel
     }
 
     /**
+     * 爆品订单
+     * @param Order $order
+     * @param $goodsItem
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function extraBaopinOrder($order, $goodsItem){
+        $baopinOrder = new BaopinOrder();
+        $baopinOrder->mall_id       = $order->mall_id;
+        $baopinOrder->order_id      = $order->id;
+        $baopinOrder->baopin_id     = (int)$goodsItem['baopin_id'];
+        $baopinOrder->created_at    = time();
+        $baopinOrder->updated_at    = time();
+        $baopinOrder->mch_id        = (int)$order->mch_id;
+        $baopinOrder->mch_baopin_id = (int)$goodsItem['mch_baopin_id'];
+        if (!$baopinOrder->save()) {
+            throw new \Exception((new BaseModel())->responseErrorMsg($baopinOrder));
+        }
+    }
+
+    /**
      * 订单扩展
      * @param Order $order
      * @param $goodsItem
@@ -2525,21 +2567,7 @@ class OrderSubmitForm extends BaseModel
             }
         }
 
-        //到店消费商品，生成核销码
-        if($goodsItem['is_on_site_consumption']){
-            $orderGoodsVerification = new OrderGoodsConsumeVerification();
-            $orderGoodsVerification->mall_id           = $order->mall_id;
-            $orderGoodsVerification->mch_id            = $order->mch_id;
-            $orderGoodsVerification->order_id          = $order->id;
-            $orderGoodsVerification->order_detail_id   = $orderDetail->id;
-            $orderGoodsVerification->goods_id          = $goodsItem['id'];
-            $orderGoodsVerification->user_id           = $order->user_id;
-            $orderGoodsVerification->verification_code = "OGC" . date("ymdhis") . rand(1000, 9999);
-            $orderGoodsVerification->is_used           = OrderGoodsConsumeVerification::STATUS_UNUSED;
-            if (!$orderGoodsVerification->save()) {
-                throw new \Exception((new BaseModel())->responseErrorMsg($orderGoodsVerification));
-            }
-        }
+
 
     }
 

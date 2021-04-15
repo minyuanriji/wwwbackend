@@ -24,7 +24,7 @@ class OperateModelForm extends BaseModel
             "GoodsMemberPrice" => "商品规格价",
             "GoodsWarehouse" => "商品信息",
             "GoodsService" => "商品服务",
-            "GoodsCats" => "分类",
+            "GoodsCats" => "商品分类",
             "Coupon" => "优惠券",
             "CouponAutoSend" => "优惠券发送配置",
             "CouponCatRelation" => "分类下优惠券",

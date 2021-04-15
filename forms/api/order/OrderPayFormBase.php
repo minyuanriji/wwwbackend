@@ -63,11 +63,11 @@ abstract class OrderPayFormBase extends BaseModel
      * @Author: 广东七件事 zal
      * @Date: 2020-05-07
      * @Time: 11:20
-     * @param Order $order
+     * @param Order[] $order
      * @param User $userData
      * @return array
      */
-    public function loadOrderPayData($order,$userData = []){
+    public function loadOrderPayData($order, $userData = []){
         $supportPayTypes = OrderLogic::getPaymentTypeConfig();
         $balance = $userData["balance"];
 
@@ -78,18 +78,30 @@ abstract class OrderPayFormBase extends BaseModel
             }
         }
 
+        $totalPayPrice = 0;
+        $orderNo = "";
+        if(is_array($order)){
+            foreach($order as $item){
+                $totalPayPrice += (float)$item->total_pay_price;
+            }
+            $orderNo = $order[0]->order_no;
+        }else{
+            $totalPayPrice = (float)$order->total_pay_price;
+            $orderNo = $order->order_no;
+        }
+
         $data = [
                 //'title' => $this->getOrderTitle($order),
-                'balance' => $balance,
-                'amount' => (float)$order->total_pay_price,
-                'orderNo' => $order->order_no,
+                'balance'         => $balance,
+                'amount'          => $totalPayPrice,
+                'orderNo'         => $orderNo,
                 //'notifyClass' => OrderPayNotify::class,
                 'supportPayTypes' => $supportPayTypes,
         ];
         $paymentConfigs = AppConfigLogic::getPaymentConfig();
         $data["pay_password_status"] = isset($paymentConfigs["pay_password_status"]) ? $paymentConfigs["pay_password_status"] : 0;
         $isPayPassword = empty($userData["transaction_password"]) ? 0 : 1;
-        $returnData = $this->getReturnData([$order]);
+        $returnData = $this->getReturnData(is_array($order) ? $order : [$order]);
         $data["is_pay_password"] = $isPayPassword;
         $data["union_id"] = $returnData["id"];
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"",$data);

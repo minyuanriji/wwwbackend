@@ -64,20 +64,22 @@ class OrderDetailForm extends BaseModel
             $orderRefund = new OrderRefund();
             //订单详情数据
             $detail = $orderDetailData = [];
-            $detail["id"] = intval($order["id"]);
-            $detail["status"] = intval($order["status"]);
-            $detail["order_no"] = $order["order_no"];
-            $detail["express_no"] = $order["express_no"];
-            $detail["total_pay_price"] = $order["total_pay_price"];
+            $detail["id"]                         = intval($order["id"]);
+            $detail["status"]                     = intval($order["status"]);
+            $detail["order_no"]                   = $order["order_no"];
+            $detail["express_no"]                 = $order["express_no"];
+            $detail["total_pay_price"]            = $order["total_pay_price"];
             $detail["total_goods_original_price"] = $order["total_goods_original_price"];
-            $detail["express_price"] = $order["express_price"];
-            $detail["coupon_discount_price"] = $order["coupon_discount_price"];
-            $detail["score_deduction_price"] = $order["score_deduction_price"];
-            $detail["name"] = $order["name"];
-            $detail["mobile"] = $order["mobile"];
-            $detail["address"] = $order["address"];
-            $detail["remark"] = $order["remark"];
-            $detail["is_pay"] = intval($order["is_pay"]);
+            $detail["express_price"]              = $order["express_price"];
+            $detail["coupon_discount_price"]      = $order["coupon_discount_price"];
+            $detail["score_deduction_price"]      = $order["score_deduction_price"];
+            $detail["name"]                       = $order["name"];
+            $detail["mobile"]                     = $order["mobile"];
+            $detail["address"]                    = $order["address"];
+            $detail["remark"]                     = $order["remark"];
+            $detail["is_pay"]                     = intval($order["is_pay"]);
+            $detail['order_type']                 = $order['order_type'];
+
             $orderModel = new Order();
             // 订单状态
             $detail['status_text'] = $orderModel->orderStatusText($order);
@@ -147,6 +149,7 @@ class OrderDetailForm extends BaseModel
             $detail["express"] = $express;
             $detail['goods_num'] = $goodsNum;
             $detail['member_deduction_price_total'] = price_format($memberDeductionPriceCount);
+
             $orderDetailData["detail"] = $detail;
 
             //商家数据
@@ -171,14 +174,11 @@ class OrderDetailForm extends BaseModel
                 $orderDetailData['mch']['scope']            = $order['mch']['store']['scope'];
             }
 
-            //如果有一个不是到店消费商品，就需要设置地址
-            $orderDetailData['is_need_address'] = 0;
-            foreach ($orderDetailData['detail']['order_goods_list'] as $goodsItem) {
-                if(!$goodsItem['is_on_site_consumption']){
-                    $orderDetailData['is_need_address'] = 1;
-                    break;
-                }
-            }
+
+
+            //兼容旧版本
+            $orderDetailData['is_need_address'] = 1;
+
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$orderDetailData);
         } catch (\Exception $e) {

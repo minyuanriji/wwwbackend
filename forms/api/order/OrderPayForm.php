@@ -56,10 +56,10 @@ class OrderPayForm extends OrderPayFormBase
             ]);
         }else{
             /** @var Order[] $orders */
-            $orders = Order::getOneData([
-                'token' => $this->token,
+            $orders = Order::findAll([
+                'token'     => $this->token,
                 'is_delete' => 0,
-                'user_id' => \Yii::$app->user->id,
+                'user_id'   => \Yii::$app->user->id,
             ]);
         }
         if (empty($orders)) {
@@ -67,6 +67,6 @@ class OrderPayForm extends OrderPayFormBase
         }
         $userModel = new User();
         $userData = $userModel->findIdentity(\Yii::$app->user->id);
-        return $this->loadOrderPayData($orders,$userData);
+        return $this->loadOrderPayData($orders, $userData);
     }
 }

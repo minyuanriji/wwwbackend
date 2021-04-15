@@ -73,13 +73,13 @@ class OrderForm extends BaseModel
         $form->relations = ['mch.store', 'detailExpress.expressRelation.orderDetail','detail.expressRelation','detail.refund', 'detailExpressRelation.orderExpress'];
 
         if($this->offline){
+            $form->orderType = ["offline_baopin", "offline_normal"];
             if($this->offline_used){ //待使用
                 $form->sale_status = Order::SALE_STATUS_NO;
                 $form->status      = Order::STATUS_WAIT_DELIVER;
             }else{ //已使用
 
             }
-            $form->orderType = ["offline_baopin", "offline_normal"];
         }else{
             $form->orderType = ["express_baopin", "express_normal"];
         }

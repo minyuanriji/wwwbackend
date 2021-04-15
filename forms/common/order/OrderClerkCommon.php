@@ -11,7 +11,9 @@ use app\models\Model;
 use app\models\Order;
 use app\models\OrderClerk;
 use app\models\User;
+use app\plugins\baopin\models\BaopinMchGoods;
 use app\plugins\baopin\models\BaopinOrder;
+use app\plugins\mch\models\Mch;
 
 
 class OrderClerkCommon extends BaseModel
@@ -141,29 +143,49 @@ class OrderClerkCommon extends BaseModel
                 throw new \Exception('订单未支付，请先进行收款');
             }
 
-            if($order->order_type == "offline_baopin"){ //爆品
-                $baopinOrder = BaopinOrder::findOne([
-                    "order_id" => $order->id
-                ]);
-                if($baopinOrder){
-                    throw new \Exception('数据异常，获取不到爆品订单记录');
-                }
-                print_r($baopinOrder);exit;
+            if(!empty($order->clerk_id)){
+                throw new \Exception('请勿重复核销操作');
             }
 
-            $clerkUserIds = ClerkUserStoreRelation::find()
-                ->where(['store_id' => (int)$order->store_id])
-                ->select('clerk_user_id');
+            $hasPermission      = false;
+            $baopinMchGoodsList = [];
+            if($order->order_type == "offline_baopin"){ //爆品
+                $mch = Mch::findOne([
+                    'user_id'       => $this->clerk_id,
+                    'review_status' => Mch::REVIEW_STATUS_CHECKED
+                ]);
+                if($mch){ //用户是商户身份
+                    $details = $order->detail;
+                    if(!$details){
+                        throw new \Exception('数据异常，订单详情不存在');
+                    }
+                    $hasPermission = true;
+                    foreach($details as $detail){
+                        //查找商家爆品库是否有货
+                        $baopinMchGoods = BaopinMchGoods::findOne([
+                            "mch_id"    => $mch->id,
+                            "goods_id"  => $detail->goods_id,
+                            "is_delete" => 0
+                        ]);
+                        if(!$baopinMchGoods){
+                            $hasPermission = false;
+                            break;
+                        }
+                        $baopinMchGoodsList[] = $baopinMchGoods;
+                    }
+                }
+            }
 
-            /** @var ClerkUser $clerkUser */
-            $clerkUser = ClerkUser::find()->where([
-                'user_id'   => $this->clerk_id,
-                'id'        => $clerkUserIds,
-                'mall_id'   => \Yii::$app->mall->id,
-                'is_delete' => 0,
-                'mch_id'    => (int)$order->mch_id
-            ])->with('store')->one();
-            if (!$clerkUser) {
+            if(!$hasPermission){
+                $query = ClerkUserStoreRelation::find()->alias("cusr");
+                $query->innerJoin("{{%clerk_user}} cu", "cu.user_id=cusr.clerk_user_id AND cu.is_delete=0");
+                $hasPermission = $query->where([
+                    'cusr.store_id'      => (int)$order->store_id,
+                    'cusr.clerk_user_id' => $this->clerk_id
+                ])->exists() ? true : false;
+            }
+
+            if (!$hasPermission) {
                 throw new \Exception('没有核销权限，禁止核销');
             }
 
@@ -171,10 +193,9 @@ class OrderClerkCommon extends BaseModel
             $order->send_at     = time();
             $order->is_confirm  = 1;
             $order->confirm_at  = time();
-            $order->clerk_id    = $clerkUser->id;
-            $res = $order->save();
+            $order->clerk_id    = $this->clerk_id;
 
-            if (!$res) {
+            if (!$order->save()) {
                 throw new \Exception($this->responseErrorMsg($order));
             }
 
@@ -187,8 +208,7 @@ class OrderClerkCommon extends BaseModel
             }
             $orderClerk->clerk_remark = $this->clerk_remark ?: '';
             $orderClerk->clerk_type   = $this->clerk_type;
-            $res = $orderClerk->save();
-            if (!$res) {
+            if (!$orderClerk->save()) {
                 throw new \Exception($this->responseErrorMsg($orderClerk));
             }
 

@@ -48,7 +48,6 @@ use app\models\Store;
 use app\models\User;
 use app\models\UserAddress;
 use app\models\UserCoupon;
-use app\plugins\baopin\models\BaopinOrder;
 use app\plugins\mch\models\Mch;
 use app\services\Order\AttrGoodsService;
 use app\services\Order\CouponService;
@@ -412,11 +411,6 @@ class OrderSubmitForm extends BaseModel
                 foreach ($orderItem['goods_list'] as $goodsItem){
                     $this->subGoodsNum($goodsItem['goods_attr'], $goodsItem['num'], $goodsItem);
                     $this->extraOrderDetail($order, $goodsItem);
-
-                    //爆品
-                    if($orderItem['is_baopin']){
-                        $this->extraBaopinOrder($order, $goodsItem);
-                    }
                 }
 
                 // 优惠券标记已使用(此段代码没有用)
@@ -504,11 +498,10 @@ class OrderSubmitForm extends BaseModel
         ]);
         $query->leftJoin("{{%goods}} g", "g.id=c.goods_id");
         $query->leftJoin("{{%plugin_baopin_goods}} bg", "bg.goods_id=c.goods_id");
-        $query->leftJoin("{{%plugin_baopin_mch_goods}} bmg", "bmg.id=c.mch_baopin_id");
         $query->leftJoin("{{%plugin_mch}} m", "m.id=g.mch_id");
         $query->leftJoin("{{%store}} s", "s.mch_id=m.id");
 
-        $selects = ["g.mch_id", "s.id as store_id", "g.is_on_site_consumption", "bg.id as baopin_id", "bmg.id as mch_baopin_id", "g.id", "c.id as cart_id", "c.num", "c.attr_id as goods_attr_id"];
+        $selects = ["g.mch_id", "s.id as store_id", "g.is_on_site_consumption", "bg.id as baopin_id", "g.id", "c.id as cart_id", "c.num", "c.attr_id as goods_attr_id"];
 
         $cartDatas = $query->select($selects)->asArray()->all();
 
@@ -516,9 +509,15 @@ class OrderSubmitForm extends BaseModel
         foreach($cartDatas as $row){
             if(!empty($row['is_on_site_consumption'])){ //到店核销商品
                 $row['offline_data'] = 1;
+                if(!empty($row['baopin_id'])){
+                    $row['baopin_data'] = 1;
+                }
                 $dataGroupList['single'][] = $row;
             }elseif(!empty($row['baopin_id'])){ //爆品
                 $row['baopin_data'] = 1;
+                if(!empty($row['is_on_site_consumption'])){
+                    $row['offline_data'] = 1;
+                }
                 $dataGroupList['single'][] = $row;
             }elseif(!empty($row['mch_id'])){ //商家产品
                 $dataGroupList['mch'][$row['mch_id'] . "_" . $row['store_id']][] = $row;
@@ -537,7 +536,6 @@ class OrderSubmitForm extends BaseModel
                             'num'           => $row['num'],
                             'cart_id'       => $row['cart_id'],
                             'mch_id'        => (int)$row['mch_id'],
-                            'mch_baopin_id' => (int)$row['mch_baopin_id'],
                             'baopin_id'     => (int)$row['baopin_id']
                         ]
                     ];
@@ -560,7 +558,6 @@ class OrderSubmitForm extends BaseModel
                             'num'           => $row['num'],
                             'cart_id'       => $row['cart_id'],
                             'mch_id'        => (int)$row['mch_id'],
-                            'mch_baopin_id' => (int)$row['mch_baopin_id'],
                             'baopin_id'     => (int)$row['baopin_id']
                         ];
                     }
@@ -583,7 +580,6 @@ class OrderSubmitForm extends BaseModel
                         'num'           => $row['num'],
                         'cart_id'       => $row['cart_id'],
                         'mch_id'        => 0,
-                        'mch_baopin_id' => 0,
                         'baopin_id'     => 0
                     ];
                 }
@@ -929,7 +925,6 @@ class OrderSubmitForm extends BaseModel
             $result                  = $this->getOneGoodsItemData($goodsItem);
             $result['form_data']     = isset($goodsItem['form_data']) ? $goodsItem['form_data'] : null;
             $result['baopin_id']     = $goodsItem['baopin_id'];
-            $result['mch_baopin_id'] = $goodsItem['mch_baopin_id'];
             $list[]                  = $result;
         }
         return $list;
@@ -2475,26 +2470,6 @@ class OrderSubmitForm extends BaseModel
         (new GoodsAttr())->updateStock($subNum, 'sub', $goodsAttr->id);
     }
 
-    /**
-     * 爆品订单
-     * @param Order $order
-     * @param $goodsItem
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
-     */
-    public function extraBaopinOrder($order, $goodsItem){
-        $baopinOrder = new BaopinOrder();
-        $baopinOrder->mall_id       = $order->mall_id;
-        $baopinOrder->order_id      = $order->id;
-        $baopinOrder->baopin_id     = (int)$goodsItem['baopin_id'];
-        $baopinOrder->created_at    = time();
-        $baopinOrder->updated_at    = time();
-        $baopinOrder->mch_id        = (int)$order->mch_id;
-        $baopinOrder->mch_baopin_id = (int)$goodsItem['mch_baopin_id'];
-        if (!$baopinOrder->save()) {
-            throw new \Exception((new BaseModel())->responseErrorMsg($baopinOrder));
-        }
-    }
 
     /**
      * 订单扩展

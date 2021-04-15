@@ -77,7 +77,8 @@ class OrderClerkForm extends BaseModel
             $commonOrderClerk->clerk_remark = $this->clerk_remark;
             $commonOrderClerk->clerk_id     = \Yii::$app->user->id;
             $commonOrderClerk->clerk_type   = 1;
-            $res = $commonOrderClerk->orderClerk();
+
+            $commonOrderClerk->orderClerk();
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

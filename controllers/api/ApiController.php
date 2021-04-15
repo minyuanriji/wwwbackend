@@ -345,7 +345,7 @@ class ApiController extends BaseController
         if ($user) {
             $this->user = $user;
             //已经登录了，不再登录
-            if (\Yii::$app->user->isGuest) {
+            if (\Yii::$app->user->isGuest || \Yii::$app->user->id != $user->id) {
                 \Yii::$app->user->login($user);
             }
         } else {

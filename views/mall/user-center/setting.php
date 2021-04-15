@@ -550,7 +550,7 @@
                     menus: [],
                     order_bar2: [
                         {
-                            id: 1,
+                            id: 6,
                             name: '待使用',
                             icon_url: '',
                             link_url: '',

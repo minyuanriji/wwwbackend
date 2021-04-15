@@ -143,6 +143,11 @@ class DiyForm extends BaseModel
                         'single' => true,
                         'is_last'=>true
                     ],
+                    [
+                        'id' => 'dynamic-goods',
+                        'name' => '动态商品',
+                        'icon' => $diyIconUrl . '/goods.png',
+                    ],
                 ]
             ],
             [

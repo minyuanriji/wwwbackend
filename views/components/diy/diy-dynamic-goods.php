@@ -11,8 +11,8 @@ $baseUrl = Yii::$app->request->baseUrl;
 $diyIconPath = "{$baseUrl}/statics/img/mall/diy";
 $hostInfo = Yii::$app->request->hostInfo;
 ?>
-<template id="diy-goods">
-    <div class="diy-goods">
+<template id="diy-dynamic-goods">
+    <div class="diy-dynamic-goods">
         <div class="diy-component-preview">
 
             <div :flex="cMainFlex">
@@ -85,14 +85,14 @@ $hostInfo = Yii::$app->request->hostInfo;
         </div>
         <div class="diy-component-edit">
             <el-form label-width='160px' @submit.native.prevent>
-                <el-form-item label="显示分类">
-                    <el-switch v-model="data.showCat"
-                               @change="showCatChange"
-                               active-value="1"
-                               inactive-value="0"
-
-                    ></el-switch>
-                </el-form-item>
+<!--                <el-form-item label="显示分类">-->
+<!--                    <el-switch v-model="data.showCat"-->
+<!--                               @change="showCatChange"-->
+<!--                               active-value="1"-->
+<!--                               inactive-value="0"-->
+<!---->
+<!--                    ></el-switch>-->
+<!--                </el-form-item>-->
                 <template v-if="data.showCat==1">
                     <el-form-item label="分类栏位置">
                         <el-radio v-model="data.catPosition" label="top" @change="catPositionChange">顶部</el-radio>
@@ -110,17 +110,17 @@ $hostInfo = Yii::$app->request->hostInfo;
                                            @click="deleteCat(catIndex)"></el-button>
                             </div>
                             <div flex="box:first">
-                                <div class="diy-goods-label">商品分类</div>
+                                <div class="diy-dynamic-goods-label">商品分类</div>
                                 <div>{{cat.name}}</div>
                             </div>
                             <div flex="box:first">
-                                <div class="diy-goods-label">菜单名称</div>
+                                <div class="diy-dynamic-goods-label">菜单名称</div>
                                 <div>
                                     <el-input v-model="cat.menuName" size="small"></el-input>
                                 </div>
                             </div>
                             <div flex="box:first">
-                                <div class="diy-goods-label">商品数量</div>
+                                <div class="diy-dynamic-goods-label">商品数量</div>
                                 <div>
                                     <el-input v-model.number="cat.goodsNum" type="number" min="1" max="30"
                                               size="small" :disabled="cat.staticGoods"
@@ -128,13 +128,13 @@ $hostInfo = Yii::$app->request->hostInfo;
                                 </div>
                             </div>
                             <div flex="box:first">
-                                <div class="diy-goods-label">自定义商品</div>
+                                <div class="diy-dynamic-goods-label">自定义商品</div>
                                 <div>
                                     <el-switch v-model="cat.staticGoods"></el-switch>
                                 </div>
                             </div>
                             <div flex="box:first" v-if="cat.staticGoods">
-                                <div class="diy-goods-label">商品列表</div>
+                                <div class="diy-dynamic-goods-label">商品列表</div>
                                 <div>
                                     <draggable v-model="cat.goodsList" flex class="goods-list">
                                         <div class="goods-item" v-for="(goods,goodsIndex) in cat.goodsList">
@@ -333,8 +333,8 @@ $hostInfo = Yii::$app->request->hostInfo;
     </div>
 </template>
 <script>
-    Vue.component('diy-goods', {
-        template: '#diy-goods',
+    Vue.component('diy-dynamic-goods', {
+        template: '#diy-dynamic-goods',
         props: {
             value: Object,
         },
@@ -784,23 +784,23 @@ $hostInfo = Yii::$app->request->hostInfo;
 </script>
 <style>
     /*-----------------设置部分--------------*/
-    .diy-goods .diy-component-edit .diy-goods-label {
+    .diy-dynamic-goods .diy-component-edit .diy-dynamic-goods-label {
         width: 85px;
     }
 
-    .diy-goods .diy-component-edit .cat-item {
+    .diy-dynamic-goods .diy-component-edit .cat-item {
         border: 1px solid #e2e2e2;
         margin-bottom: 5px;
         padding: 15px;
         max-width: 400px;
     }
 
-    .diy-goods .diy-component-edit .goods-list {
+    .diy-dynamic-goods .diy-component-edit .goods-list {
         flex-wrap: wrap;
     }
 
-    .diy-goods .diy-component-edit .goods-item,
-    .diy-goods .diy-component-edit .goods-add {
+    .diy-dynamic-goods .diy-component-edit .goods-item,
+    .diy-dynamic-goods .diy-component-edit .goods-add {
         width: 50px;
         height: 50px;
         position: relative;
@@ -808,21 +808,21 @@ $hostInfo = Yii::$app->request->hostInfo;
         margin-bottom: 15px;
     }
 
-    .diy-goods .diy-component-edit .goods-add .el-button {
+    .diy-dynamic-goods .diy-component-edit .goods-add .el-button {
         width: 100%;
         height: 100%;
         border-radius: 0;
         padding: 0;
     }
 
-    .diy-goods .diy-component-edit .goods-pic {
+    .diy-dynamic-goods .diy-component-edit .goods-pic {
         width: 100%;
         height: 100%;
         background-size: cover;
         background-position: center;
     }
 
-    .diy-goods .diy-component-edit .goods-delete {
+    .diy-dynamic-goods .diy-component-edit .goods-delete {
         position: absolute;
         left: calc(100% - 13px);
         top: -13px;
@@ -834,15 +834,15 @@ $hostInfo = Yii::$app->request->hostInfo;
         z-index: 1;
     }
 
-    .diy-goods .diy-component-edit .goods-item:hover .goods-delete {
+    .diy-dynamic-goods .diy-component-edit .goods-item:hover .goods-delete {
         visibility: visible;
     }
 
-    .diy-goods .diy-component-edit .cat-item-options {
+    .diy-dynamic-goods .diy-component-edit .cat-item-options {
         position: relative;
     }
 
-    .diy-goods .diy-component-edit .cat-item-options .el-button {
+    .diy-dynamic-goods .diy-component-edit .cat-item-options .el-button {
         height: 25px;
         line-height: 25px;
         width: 25px;
@@ -858,19 +858,19 @@ $hostInfo = Yii::$app->request->hostInfo;
 
     /*-----------------预览部分--------------*/
 
-    .diy-goods .diy-component-preview .cat-list {
+    .diy-dynamic-goods .diy-component-preview .cat-list {
     }
 
-    .diy-goods .diy-component-preview .cat-list-top {
+    .diy-dynamic-goods .diy-component-preview .cat-list-top {
         background: #fff;
     }
 
-    .diy-goods .diy-component-preview .cat-list-left {
+    .diy-dynamic-goods .diy-component-preview .cat-list-left {
         width: 160px;
         background-color: #f7f7f7;
     }
 
-    .diy-goods .diy-component-preview .cat-item {
+    .diy-dynamic-goods .diy-component-preview .cat-item {
         height: 104px;
         padding: 0 10px;
         text-align: center;
@@ -878,58 +878,58 @@ $hostInfo = Yii::$app->request->hostInfo;
         white-space: nowrap;
     }
 
-    .diy-goods .diy-component-preview .cat-list-left .cat-name {
+    .diy-dynamic-goods .diy-component-preview .cat-list-left .cat-name {
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    .diy-goods .diy-component-preview .cat-item.active {
+    .diy-dynamic-goods .diy-component-preview .cat-item.active {
         background: #fff;
         color: #ff4544;
     }
 
-    .diy-goods .diy-component-preview .cat-list-top .cat-item {
+    .diy-dynamic-goods .diy-component-preview .cat-list-top .cat-item {
         margin: 0 20px;
     }
 
-    .diy-goods .diy-component-preview .cat-list-top {
+    .diy-dynamic-goods .diy-component-preview .cat-list-top {
         border-bottom: 1px solid #e2e2e2;
         overflow-x: auto;
     }
 
-    .diy-goods .diy-component-preview .cat-list-top.cat-style-1 .cat-item {
+    .diy-dynamic-goods .diy-component-preview .cat-list-top.cat-style-1 .cat-item {
         border-bottom: 4px solid transparent;
     }
 
-    .diy-goods .diy-component-preview .cat-list-top.cat-style-2 .cat-name {
+    .diy-dynamic-goods .diy-component-preview .cat-list-top.cat-style-2 .cat-name {
         background: #ff4544;
         color: #fff;
         border-radius: 100px;
         padding: 0 18px;
     }
 
-    .diy-goods .diy-component-preview .cat-list-top .cat-item.active {
+    .diy-dynamic-goods .diy-component-preview .cat-list-top .cat-item.active {
         border-bottom-color: #ff4544;
     }
 
-    .diy-goods .diy-component-preview .cat-list-left .cat-item {
+    .diy-dynamic-goods .diy-component-preview .cat-list-left .cat-item {
         border-left: 2px solid transparent;
     }
 
-    .diy-goods .diy-component-preview .cat-list-left .cat-item.active {
+    .diy-dynamic-goods .diy-component-preview .cat-list-left .cat-item.active {
         border-left-color: #ff4544;
     }
 
-    .diy-goods .diy-component-preview .goods-list {
+    .diy-dynamic-goods .diy-component-preview .goods-list {
         padding: 11px;
         background: #fff;
     }
 
-    .diy-goods .diy-component-preview .goods-item {
+    .diy-dynamic-goods .diy-component-preview .goods-item {
         padding: 11px;
     }
 
-    .diy-goods .diy-component-preview .goods-pic {
+    .diy-dynamic-goods .diy-component-preview .goods-pic {
         background-size: cover;
         background-position: center;
         width: 99.8%;
@@ -939,22 +939,22 @@ $hostInfo = Yii::$app->request->hostInfo;
         position: relative;
     }
 
-    .diy-goods .diy-component-preview .goods-pic-3-2 {
+    .diy-dynamic-goods .diy-component-preview .goods-pic-3-2 {
         height: 471px;
     }
 
-    .diy-goods .diy-component-preview .goods-name {
+    .diy-dynamic-goods .diy-component-preview .goods-name {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         margin-bottom: 10px;
     }
 
-    .diy-goods .diy-component-preview .goods-name-static {
+    .diy-dynamic-goods .diy-component-preview .goods-name-static {
         height: 94px;
     }
 
-    .diy-goods .diy-component-preview .goods-price {
+    .diy-dynamic-goods .diy-component-preview .goods-price {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -962,7 +962,7 @@ $hostInfo = Yii::$app->request->hostInfo;
         line-height: 48px;
     }
 
-    .diy-goods .diy-component-preview .goods-level-price {
+    .diy-dynamic-goods .diy-component-preview .goods-level-price {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -970,43 +970,43 @@ $hostInfo = Yii::$app->request->hostInfo;
         line-height: 48px;
     }
 
-    .diy-goods .diy-component-preview .goods-list-style--1 .goods-item,
-    .diy-goods .diy-component-preview .goods-list-style-1 .goods-item {
+    .diy-dynamic-goods .diy-component-preview .goods-list-style--1 .goods-item,
+    .diy-dynamic-goods .diy-component-preview .goods-list-style-1 .goods-item {
         width: 100%;
     }
 
-    .diy-goods .diy-component-preview .goods-list-style-2 .goods-item {
+    .diy-dynamic-goods .diy-component-preview .goods-list-style-2 .goods-item {
         width: 50%;
     }
 
-    .diy-goods .diy-component-preview .goods-list-style-3 .goods-item {
+    .diy-dynamic-goods .diy-component-preview .goods-list-style-3 .goods-item {
         width: 33.333333%;
     }
 
-    .diy-goods .diy-component-preview .goods-list-style-0 .goods-item {
+    .diy-dynamic-goods .diy-component-preview .goods-list-style-0 .goods-item {
         width: 249px;
     }
 
-    .diy-goods .diy-component-preview .goods-list-style--1 .goods-pic {
+    .diy-dynamic-goods .diy-component-preview .goods-list-style--1 .goods-pic {
         width: 152px;
         height: 152px;
         margin-left: 1px;
     }
 
-    .diy-goods .diy-component-preview .goods-list-style-2 .goods-pic {
+    .diy-dynamic-goods .diy-component-preview .goods-list-style-2 .goods-pic {
         height: 342px;
     }
 
-    .diy-goods .diy-component-preview .goods-list-style-0 .goods-pic,
-    .diy-goods .diy-component-preview .goods-list-style-3 .goods-pic {
+    .diy-dynamic-goods .diy-component-preview .goods-list-style-0 .goods-pic,
+    .diy-dynamic-goods .diy-component-preview .goods-list-style-3 .goods-pic {
         height: 200px;
     }
 
-    .diy-goods .diy-component-preview .goods-pic-fill-0 {
+    .diy-dynamic-goods .diy-component-preview .goods-pic-fill-0 {
         background-size: contain;
     }
 
-    .diy-goods .diy-component-preview .buy-btn {
+    .diy-dynamic-goods .diy-component-preview .buy-btn {
         border-color: #ff4544;
         color: #ff4544;
         padding: 0 20px;
@@ -1015,12 +1015,12 @@ $hostInfo = Yii::$app->request->hostInfo;
         font-size: 24px;
     }
 
-    .diy-goods .diy-component-preview .buy-btn.el-button--primary {
+    .diy-dynamic-goods .diy-component-preview .buy-btn.el-button--primary {
         background-color: #ff4544;
         color: #fff;
     }
 
-    .diy-goods .diy-component-preview .goods-tag {
+    .diy-dynamic-goods .diy-component-preview .goods-tag {
         position: absolute;
         top: 0;
         left: 0;
@@ -1032,21 +1032,21 @@ $hostInfo = Yii::$app->request->hostInfo;
         background-repeat: no-repeat;
     }
 
-    .diy-goods hr {
+    .diy-dynamic-goods hr {
         border: none;
         height: 1px;
         background-color: #e2e2e2;
     }
 
-    .diy-goods .diy-component-preview .goods-item .buy-btn.is-round {
+    .diy-dynamic-goods .diy-component-preview .goods-item .buy-btn.is-round {
         border-radius: 24px;
     }
 
-    .diy-goods .goods-item.goods-cat-list {
+    .diy-dynamic-goods .goods-item.goods-cat-list {
         border-top: 1px solid #e2e2e2;
     }
 
-    .diy-goods .goods-item.goods-cat-list:first-of-type {
+    .diy-dynamic-goods .goods-item.goods-cat-list:first-of-type {
         border-top: 0;
     }
     .price_input {

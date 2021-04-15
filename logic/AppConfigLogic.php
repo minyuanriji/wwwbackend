@@ -126,6 +126,7 @@ class AppConfigLogic
         if(isset($option['order_bar2'])){
             $offlineOrderInfoCount = (new OrderCommon())->getOfflineOrderInfoCount();
             $option['order_bar2'][0]['text'] = $offlineOrderInfoCount[0];
+            $option['order_bar'][] = $option['order_bar2'][0];
         }
 
         if (!isset($option['member_bg_pic_url'])) {

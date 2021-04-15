@@ -90,6 +90,19 @@ class MallController extends ApiController
         ]);
     }
 
+    /**
+     * @Note:获取客服接入链接
+     *
+     */
+    public function actionKeFuLink()
+    {
+        return $this->asJson([
+            'code' => ApiCode::CODE_SUCCESS,
+            'msg' => '请求成功',
+            'data' => "https://tb.53kf.com/code/client/78a1d7f63ae00f9fe02de653ca2024d68/1",
+        ]);
+    }
+
 
     /**
      * @Author: 广东七件事 ganxiaohao

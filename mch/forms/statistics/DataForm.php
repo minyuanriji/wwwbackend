@@ -8,6 +8,7 @@ use app\forms\api\admin\ReviewForm;
 use app\forms\mall\export\DataStatisticsExport;
 use app\forms\mall\order\OrderForm;
 use app\forms\mall\order\OrderRefundListForm;
+use app\models\StatisticsVirtualConfig;
 use app\plugins\mch\models\Mch;
 use app\models\BaseModel;
 use app\models\Goods;
@@ -209,8 +210,11 @@ class DataForm extends BaseModel{
         if ($this->platform) {
             $user_query->andWhere(['u.platform' => $this->platform]);
         }
-        $data_arr['user_count'] = $user_query->andWhere(['u.mch_id' => 0, 'u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id,])
-            ->count();//用户数
+        /*$data_arr['user_count'] = $user_query->andWhere(['u.mch_id' => 0, 'u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id,])
+            ->count();*///用户数
+        $user_sum = StatisticsVirtualConfig::find()->where(['mall_id'=>\Yii::$app->mall->id,'is_delete'=>0])->select(['user_sum'])->asArray()->one();
+        $data_arr['user_count'] = $user_sum['user_sum'];
+        
         //以下随时间查询改变
         $order_query = Order::find()->alias('o')->where(['o.is_recycle' => 0, 'o.is_delete' => 0, 'o.mall_id' => \Yii::$app->mall->id,])
             ->leftJoin(['i' => User::tableName()], 'i.id = o.user_id')

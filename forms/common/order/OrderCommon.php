@@ -137,13 +137,7 @@ class OrderCommon extends BaseModel
         $form->user_id    = \Yii::$app->user->id;
         $form->mall_id    = \Yii::$app->mall->id;
         $form->is_recycle = 0;
-
-        $form->getQuery();
-        $form->query->andWhere([
-            "OR",
-            ["o.order_type" => "offline_baopin"],
-            ["o.order_type" => "offline_normal"]
-        ]);
+        $form->orderType = ['offline_baopin', 'offline_normal'];
 
         //待使用
         $form->sale_status = Order::SALE_STATUS_NO;
@@ -168,6 +162,7 @@ class OrderCommon extends BaseModel
         $form->user_id = \Yii::$app->user->id;
         $form->mall_id = \Yii::$app->mall->id;
         $form->is_recycle = 0;
+        $form->orderType = ['express_baopin', 'express_normal'];
 
         // TODO 售后状态暂时没加
         // 'is_sale' => 0,

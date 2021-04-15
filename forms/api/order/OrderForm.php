@@ -73,8 +73,8 @@ class OrderForm extends BaseModel
         $form->relations = ['mch.store', 'detailExpress.expressRelation.orderDetail','detail.expressRelation','detail.refund', 'detailExpressRelation.orderExpress'];
 
         if($this->offline){ //核销
-            unset($form->status);
-            unset($form->sale_status);
+            $form->status = null;
+            $form->sale_status = null;
             $form->only_offline_order = 1;
             $form->only_offline_used = $this->offline_used ? 1 : 0;
         }else{ //寄送

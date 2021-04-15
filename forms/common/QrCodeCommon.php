@@ -93,7 +93,7 @@ class QrCodeCommon extends BaseModel
                     'wechat' => $wechat,
                     'alipay' => $alipay
                 ];
-            } elseif ($appPlatform == User::PLATFORM_MP_WX || $appPlatform == User::PLATFORM_WECHAT) {
+            } elseif ($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_MP_WX || $appPlatform == User::PLATFORM_WECHAT) {
                 return $this->wechat($scene, $width, $page);
             } elseif ($appPlatform == APP_PLATFORM_MP_ALI) {
                 return $this->alipay($scene, \Yii::$app->mall->id, $page, '二维码');

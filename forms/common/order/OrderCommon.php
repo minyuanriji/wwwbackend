@@ -137,7 +137,7 @@ class OrderCommon extends BaseModel
         $form->user_id    = \Yii::$app->user->id;
         $form->mall_id    = \Yii::$app->mall->id;
         $form->is_recycle = 0;
-        $form->orderType = ['offline_baopin', 'offline_normal'];
+        $form->orderType  = ['offline_baopin', 'offline_normal'];
 
         //待使用
         $form->sale_status = Order::SALE_STATUS_NO;

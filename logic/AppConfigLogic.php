@@ -122,6 +122,11 @@ class AppConfigLogic
         $arr[4]['text'] = $orderInfoCount[4] ?: '';
         $option['order_bar'] = $arr;
 
+        //待使用的核销码
+        if(isset($option['order_bar2'][0])){
+            $option['order_bar2'][0]['text'] = 3;
+        }
+
         if (!isset($option['member_bg_pic_url'])) {
             $option['member_bg_pic_url'] = $userCenterDefault['member_bg_pic_url'];
         }

@@ -77,7 +77,7 @@ class ClosestStoreForm extends BaseModel {
                             $item['city'] = $district->name;
                         }
                     }
-                    
+
                     $item['distance_format'] = "0m";
                     if(empty($item['distance_mi']))
                         continue;

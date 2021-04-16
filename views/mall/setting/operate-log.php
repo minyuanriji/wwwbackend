@@ -140,12 +140,14 @@
                 <el-table-column
                         prop="before_update"
                         width="220"
-                        label="更新前">
+                        label="更新前"
+                        :show-overflow-tooltip="true">
                 </el-table-column>
                 <el-table-column
                         prop="after_update"
                         width="220"
-                        label="更新后">
+                        label="更新后"
+                        :show-overflow-tooltip="true">
                 </el-table-column>
 <!--                <el-table-column-->
 <!--                        prop="remark"-->

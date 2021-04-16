@@ -32,7 +32,7 @@
 </style>
 
 <template id="com-search">
-    <div class="com-search">
+    <div class="com-search">    
         <div flex="wrap:wrap cross:center">
             <div style="height: 32px;">{{dateLabel}}：</div>
             <el-date-picker

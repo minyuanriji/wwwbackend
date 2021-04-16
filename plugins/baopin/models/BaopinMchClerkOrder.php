@@ -2,9 +2,9 @@
 namespace app\plugins\baopin\models;
 
 
-use app\models\BaseModel;
+use app\models\BaseActiveRecord;
 
-class BaopinMchClerkOrder extends BaseModel{
+class BaopinMchClerkOrder extends BaseActiveRecord{
 
     public static function tableName(){
         return '{{%plugin_baopin_mch_clerk_order}}';

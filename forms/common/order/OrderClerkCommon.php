@@ -183,7 +183,6 @@ class OrderClerkCommon extends BaseModel
                     }
                 }
             }
-
             if(!$hasPermission){
                 $query = ClerkUserStoreRelation::find()->alias("cusr");
                 $query->innerJoin("{{%clerk_user}} cu", "cu.user_id=cusr.clerk_user_id AND cu.is_delete=0");

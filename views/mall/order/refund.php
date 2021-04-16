@@ -6,7 +6,7 @@
  * Created by IntelliJ IDEA
  * Date Time: 2018/11/29 15:59
  */
-Yii::$app->loadComponentView('order/com-search');
+Yii::$app->loadComponentView('order/com-search-sales');
 Yii::$app->loadComponentView('refund/com-remark');
 Yii::$app->loadComponentView('refund/com-agree-refund');
 Yii::$app->loadComponentView('order/com-edit-address');

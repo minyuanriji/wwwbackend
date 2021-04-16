@@ -61,18 +61,23 @@ class ClosestStoreForm extends BaseModel {
                           ->asArray()->all();
             if($rows){
                 foreach($rows as &$item){
-                    $district = DistrictData::getDistrict($item['province_id']);
+
                     $item['province'] = "";
-                    if($district){
-                        $item['province'] = $district->name;
+                    if(!empty($item['province_id'])){
+                        $district = DistrictData::getDistrict($item['province_id']);
+                        if($district){
+                            $item['province'] = $district->name;
+                        }
                     }
 
-                    $district = DistrictData::getDistrict($item['city_id']);
                     $item['city'] = "";
-                    if($district){
-                        $item['city'] = $district->name;
+                    if(!empty($item['city_id'])){
+                        $district = DistrictData::getDistrict($item['city_id']);
+                        if($district){
+                            $item['city'] = $district->name;
+                        }
                     }
-
+                    
                     $item['distance_format'] = "0m";
                     if(empty($item['distance_mi']))
                         continue;

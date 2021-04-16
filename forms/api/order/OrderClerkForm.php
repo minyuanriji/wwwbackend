@@ -21,14 +21,16 @@ class OrderClerkForm extends BaseModel
 {
     public $id;
     public $clerk_remark;
+    public $clerk_code;
     public $action_type; // 1.小程序端确认收款 | 2.后台确认收款
+
 
     public function rules()
     {
         return [
             [['id', 'action_type'], 'integer'],
             [['id'], 'required'],
-            [['clerk_remark'], 'string'],
+            [['clerk_remark', 'clerk_code'], 'string'],
         ];
     }
 
@@ -73,6 +75,7 @@ class OrderClerkForm extends BaseModel
         try {
             $commonOrderClerk = new OrderClerkCommon();
             $commonOrderClerk->id           = $this->id;
+            $commonOrderClerk->clerk_code   = $this->clerk_code;
             $commonOrderClerk->action_type  = $this->action_type;
             $commonOrderClerk->clerk_remark = $this->clerk_remark;
             $commonOrderClerk->clerk_id     = \Yii::$app->user->id;

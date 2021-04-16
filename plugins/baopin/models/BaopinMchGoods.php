@@ -15,7 +15,7 @@ class BaopinMchGoods extends BaseActiveRecord{
      */
     public function rules(){
         return [
-            [['mch_id', 'mch_id', 'goods_id', 'created_at', 'updated_at'], 'required'],
+            [['mch_id', 'mch_id', 'store_id', 'goods_id', 'created_at', 'updated_at'], 'required'],
             [['sort', 'is_delete'], 'integer']
         ];
     }

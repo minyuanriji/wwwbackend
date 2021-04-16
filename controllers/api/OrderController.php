@@ -13,6 +13,7 @@ namespace app\controllers\api;
 use app\controllers\api\filters\LoginFilter;
 use app\core\ApiCode;
 use app\forms\api\order\ConsumeVerificationInfoForm;
+use app\forms\api\order\OrderClerkLogForm;
 use app\forms\api\order\OrderCommentForm;
 use app\forms\api\order\OrderClerkForm;
 use app\forms\api\order\OrderDetailForm;
@@ -345,6 +346,17 @@ class OrderController extends ApiController
         $form->action_type = 1;
 
         return $this->asJson($form->OrderClerk());
+    }
+
+    /**
+     * 查询订单核销记录
+     */
+    public function actionOrderClerkLog()
+    {
+        $form = new OrderClerkLogForm();
+        $form->attributes  = $this->requestData;
+
+        return $this->asJson($form->get());
     }
 
     /**

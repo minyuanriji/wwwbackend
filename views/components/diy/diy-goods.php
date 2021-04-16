@@ -85,14 +85,14 @@ $hostInfo = Yii::$app->request->hostInfo;
         </div>
         <div class="diy-component-edit">
             <el-form label-width='160px' @submit.native.prevent>
-<!--                <el-form-item label="显示分类">-->
-<!--                    <el-switch v-model="data.showCat"-->
-<!--                               @change="showCatChange"-->
-<!--                               active-value="1"-->
-<!--                               inactive-value="0"-->
-<!---->
-<!--                    ></el-switch>-->
-<!--                </el-form-item>-->
+                <el-form-item label="显示分类">
+                    <el-switch v-model="data.showCat"
+                               @change="showCatChange"
+                               active-value="1"
+                               inactive-value="0"
+
+                    ></el-switch>
+                </el-form-item>
                 <template v-if="data.showCat==1">
                     <el-form-item label="分类栏位置">
                         <el-radio v-model="data.catPosition" label="top" @change="catPositionChange">顶部</el-radio>

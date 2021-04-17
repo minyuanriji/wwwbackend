@@ -130,11 +130,12 @@ class OrderListCommon extends BaseModel
             if(!$this->only_offline_used){
                 $this->query->andWhere([
                     "AND",
+                    ["o.is_send" => 0],
                     ["o.sale_status" => Order::SALE_STATUS_NO],
                     ["o.status" => Order::STATUS_WAIT_DELIVER]
                 ]);
             }else{
-                $this->query->andWhere("(o.sale_status <> '".Order::SALE_STATUS_NO."' OR o.status <> '".Order::STATUS_WAIT_DELIVER."')");
+                $this->query->andWhere("(o.is_send=1 OR o.sale_status <> '".Order::SALE_STATUS_NO."' OR o.status <> '".Order::STATUS_WAIT_DELIVER."')");
             }
         }
 

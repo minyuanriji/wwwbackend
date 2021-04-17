@@ -13,9 +13,11 @@ namespace app\forms\api\order;
 use app\core\ApiCode;
 use app\forms\common\order\OrderClerkCommon;
 use app\forms\common\QrCodeCommon;
+use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\ClerkUser;
 use app\models\Order;
+use app\models\User;
 
 class OrderClerkForm extends BaseModel
 {
@@ -119,8 +121,20 @@ class OrderClerkForm extends BaseModel
                 throw new \Exception('订单未支付');
             }
 
-            $qrCode = new QrCodeCommon();
-            $res = $qrCode->getQrCode(['id' => $this->id], 100, 'pages/order/clerk/clerk');
+            $appPlatform = \Yii::$app->appPlatform;
+            if($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_WECHAT){
+                $dir = "order/offline-qrcode/" . $order->id . '.jpg';
+                $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
+                CommonLogic::createQrcode([], $this, 'pages/order/clerk/clerk' . "?id=" . $order->id, $dir);
+                return [
+                    'file_path' => $imgUrl,
+                ];
+            }else{
+                $qrCode = new QrCodeCommon();
+                $res = $qrCode->getQrCode(['id' => $this->id], 100, 'pages/order/clerk/clerk');
+
+            }
+
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

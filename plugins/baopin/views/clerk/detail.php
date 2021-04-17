@@ -2,7 +2,7 @@
 .form-body{}
 .form-body .detail-info{}
 .form-body .detail-info-hd{font-weight:bold;border-bottom:1px solid #ddd;padding-bottom:3px;}
-.form-body .detail-info-body{}
+.form-body .detail-info-body{padding:10px 10px;}
 .form-body .flex-2{}
 .form-body .flex-2 .flex-column1{flex-grow:1;}
 .form-body .flex-2 .flex-column2{flex-grow:2;}
@@ -25,8 +25,8 @@
                 <div class="detail-info-hd">店铺信息</div>
                 <div class="detail-info-body">
                     <div class="flex-2">
-                        <div class="flex-column1">店铺名称</div>
-                        <div class="flex-column2"></div>
+                        <div class="flex-column1" style="flex-grow:1;">店铺名称</div>
+                        <div class="flex-column2" style="flex-grow:2;">ddd</div>
                     </div>
                 </div>
             </div>

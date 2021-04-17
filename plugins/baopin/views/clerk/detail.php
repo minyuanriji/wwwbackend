@@ -29,6 +29,7 @@
     .el-input-group__append {
         background-color: #fff
     }
+
 </style>
 <div id="app" v-cloak>
     <el-card class="box-card" v-loading="cardLoading" shadow="never" style="border:0"
@@ -44,6 +45,13 @@
         </div>
         <div class="form-body">
 
+            <div class="store-info">
+                <div class="store-info-hd" style="border-bottom:1px solid #ddd;">店铺信息</div>
+            </div>
+
+
+            </div>
+
         </div>
 
     </el-card>
@@ -54,7 +62,9 @@
         el: '#app',
         data() {
             return {
-
+                store: {},
+                order: {},
+                details: []
             };
         },
         watch: {
@@ -64,6 +74,7 @@
 
             getDetail() {
                 this.cardLoading = true;
+                var self = this;
                 request({
                     params: {
                         r: 'plugin/baopin/mall/clerk/detail',
@@ -72,14 +83,19 @@
                 }).then(e => {
                     this.cardLoading = false;
                     if (e.data.code == 0) {
-
+                        self.store   = e.data.data.store;
+                        self.order   = e.data.data.order;
+                        self.details = e.data.data.details;
+                    }else{
+                        self.$message.error(e.data.msg);
                     }
                 }).catch(e => {
+                    self.$message.error('request fail');
                 });
             }
         },
         mounted: function () {
-
+            this.getDetail();
         }
     });
 </script>

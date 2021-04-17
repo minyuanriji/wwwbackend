@@ -125,8 +125,8 @@ Yii::$app->loadComponentView('goods/com-batch');
                         style="width: 100%;margin-bottom: 15px"
                         @selection-change="handleSelectionChange"
                         @sort-change="sortChange">
-                    <el-table-column type="selection" align="center" width="60"></el-table-column>
-                    <el-table-column prop="id" label="ID" sortable="false"></el-table-column>
+                    <el-table-column type="selection" align="center" width="50"></el-table-column>
+                    <el-table-column prop="id" label="ID" sortable="false" width="70"></el-table-column>
                     <el-table-column v-if="!is_mch" prop="sort" :width="sort_goods_id != id ? 150 : 100" label="排序"
                                      sortable="false">
                         <template slot-scope="scope">
@@ -173,7 +173,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                         </template>
                     </el-table-column>
                     <slot name="column-col-first"></slot>
-                    <el-table-column label="分类">
+                    <el-table-column label="分类"  width="100">
                         <template slot-scope="scope">
                             <div class="goods-cat" v-if="!is_mch">
                                 <el-tag v-if="scope.row.cats && scope.row.cats.length > 0"
@@ -203,7 +203,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="商品名称" width="320">
+                    <el-table-column label="商品名称" width="300">
                         <template slot-scope="scope">
                             <div flex="box:first">
                                 <div style="padding-right: 10px;">
@@ -248,8 +248,8 @@ Yii::$app->loadComponentView('goods/com-batch');
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="price" label="售价" sortable="false"></el-table-column>
-                    <el-table-column prop="goods_stock" label="库存" sortable="false">
+                    <el-table-column prop="price" label="售价" sortable="false" width="100"></el-table-column>
+                    <el-table-column prop="goods_stock" label="库存" sortable="false" width="100">
                         <template slot-scope="scope">
                             <div v-if="scope.row.goods_stock > 0">{{scope.row.goods_stock}}</div>
                             <div v-else style="color: red;">售罄</div>
@@ -411,7 +411,7 @@ Yii::$app->loadComponentView('goods/com-batch');
             },
             actionWitch: {
                 type: Number,
-                default: 180
+                default: 200
             },
             is_add_goods: {
                 type: Boolean,

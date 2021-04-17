@@ -251,7 +251,13 @@ class UserForm extends BaseModel
             $userCenter['menus'][] = [
                 "icon_url"  => "https://dev.mingyuanriji.cn/web/static/stock_img.png",
                 "name"      => "进货专区",
-                "link_url"  => "/pages/diy/diy?page_id=106",
+                "link_url"  => "/pages/diy/diy?page_id=103",
+                "open_type" => "navigate"
+            ];
+            $userCenter['menus'][] = [
+                "icon_url"  => "https://dev.mingyuanriji.cn/web/static/CancelTwo.png",
+                "name"      => "核销",
+                "link_url"  => "/pages/personalCentre/accountingOrder/accountingOrder",
                 "open_type" => "navigate"
             ];
         }

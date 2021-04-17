@@ -155,13 +155,15 @@ class OrderClerkCommon extends BaseModel
                 throw new \Exception('请勿重复核销操作');
             }
 
+            $mch = Mch::findOne([
+                'user_id'       => $this->clerk_id,
+                'review_status' => Mch::REVIEW_STATUS_CHECKED
+            ]);
+
             $hasPermission      = false;
             $baopinMchGoodsList = [];
+
             if($order->order_type == "offline_baopin"){ //爆品
-                $mch = Mch::findOne([
-                    'user_id'       => $this->clerk_id,
-                    'review_status' => Mch::REVIEW_STATUS_CHECKED
-                ]);
                 if($mch){ //用户是商户身份
                     $details = $order->detail;
                     if(!$details){
@@ -182,7 +184,12 @@ class OrderClerkCommon extends BaseModel
                         $baopinMchGoodsList[] = $baopinMchGoods;
                     }
                 }
+            }elseif($order->order_type == "offline_normal"){
+                if($mch && $order->mch_id == $mch->id){
+                    $hasPermission = true;
+                }
             }
+
             if(!$hasPermission){
                 $query = ClerkUserStoreRelation::find()->alias("cusr");
                 $query->innerJoin("{{%clerk_user}} cu", "cu.user_id=cusr.clerk_user_id AND cu.is_delete=0");

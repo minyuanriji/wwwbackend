@@ -475,13 +475,12 @@ class Order extends BaseActiveRecord
 
     public function getClerkUser()
     {
-        return $this->hasOne(ClerkUser::className(), ['id' => 'clerk_id']);
+        return null;
     }
 
     public function getClerk()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id'])
-            ->via('clerkUser');
+        return $this->hasOne(User::className(), ['id' => 'clerk_id']);
     }
 
     public function getOrderClerk()

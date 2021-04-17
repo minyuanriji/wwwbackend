@@ -1,35 +1,11 @@
-<style>
-    .form-body {
-        padding: 10px 20px;
-        background-color: #fff;
-        margin-bottom: 20px;
-    }
-
-    .form-button {
-        margin: 0;
-    }
-
-    .form-button .el-form-item__content {
-        margin-left: 0 !important;
-    }
-
-    .button-item {
-        padding: 9px 25px;
-        margin-bottom: 20px;
-    }
-
-    .open-img .el-dialog {
-        margin-top: 0 !important;
-    }
-
-    .click-img {
-        width: 100%;
-    }
-
-    .el-input-group__append {
-        background-color: #fff
-    }
-
+<style type="text/css">
+.form-body{}
+.form-body .detail-info{}
+.form-body .detail-info-hd{font-weight:bold;border-bottom:1px solid #ddd;padding-bottom:3px;}
+.form-body .detail-info-body{}
+.form-body .flex-2{}
+.form-body .flex-2 .flex-column1{flex-grow:1;}
+.form-body .flex-2 .flex-column2{flex-grow:2;}
 </style>
 <div id="app" v-cloak>
     <el-card class="box-card" v-loading="cardLoading" shadow="never" style="border:0"
@@ -45,13 +21,15 @@
         </div>
         <div class="form-body">
 
-            <div class="store-info">
-                <div class="store-info-hd" style="border-bottom:1px solid #ddd;">店铺信息</div>
+            <div class="detail-info">
+                <div class="detail-info-hd">店铺信息</div>
+                <div class="detail-info-body">
+                    <div class="flex-2">
+                        <div class="flex-column1">店铺名称</div>
+                        <div class="flex-column2"></div>
+                    </div>
+                </div>
             </div>
-
-
-            </div>
-
         </div>
 
     </el-card>

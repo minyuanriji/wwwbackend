@@ -131,7 +131,7 @@ class OrderClerkForm extends BaseModel
                 ];
             }else{
                 $qrCode = new QrCodeCommon();
-                $res = $qrCode->getQrCode(['id' => $this->id], 100, 'pages/more-shop/more-shop');
+                $res = $qrCode->getQrCode(['id' => $this->id, 'rnd' => time()], 100, 'pages/more-shop/more-shop');
             }
 
             return [

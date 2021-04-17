@@ -16,6 +16,7 @@ use app\forms\common\QrCodeCommon;
 use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\ClerkUser;
+use app\models\Mall;
 use app\models\Order;
 use app\models\User;
 
@@ -125,7 +126,7 @@ class OrderClerkForm extends BaseModel
             if($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_WECHAT){
                 $dir = "order/offline-qrcode/" . $order->id . '.jpg';
                 $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
-                CommonLogic::createQrcode([], $this, '/pages/more-shop/more-shop' . "?id=" . $order->id, $dir);
+                CommonLogic::createQrcode([], $this, '/h5/pages/more-shop/more-shop' . "?id=" . $order->id, $dir);
                 $res = [
                     'file_path' => $imgUrl,
                 ];

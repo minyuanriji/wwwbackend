@@ -49,7 +49,8 @@ class RoleUserForm extends BaseModel
         }
 
         $query = Admin::find()->alias('u')->where(['u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id])
-            ->andWhere(['u.admin_type' => Admin::ADMIN_TYPE_OPERATE]);
+            ->andWhere(['u.admin_type' => Admin::ADMIN_TYPE_OPERATE])
+            ->andWhere(['=','u.mch_id','0']);
 
         if ($this->keyword) {
             $query->andWhere(['like', 'username', $this->keyword]);

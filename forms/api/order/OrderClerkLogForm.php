@@ -45,7 +45,7 @@ class OrderClerkLogForm extends BaseModel{
             }
 
             return [
-                'code' => ApiCode::CODE_FAIL,
+                'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'list'       => $rows ? $rows : [],
                     'pagination' => $pagination

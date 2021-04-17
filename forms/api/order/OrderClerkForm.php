@@ -126,15 +126,13 @@ class OrderClerkForm extends BaseModel
                 $dir = "order/offline-qrcode/" . $order->id . '.jpg';
                 $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
                 CommonLogic::createQrcode([], $this, 'pages/order/clerk/clerk' . "?id=" . $order->id, $dir);
-                return [
+                $res = [
                     'file_path' => $imgUrl,
                 ];
             }else{
                 $qrCode = new QrCodeCommon();
                 $res = $qrCode->getQrCode(['id' => $this->id], 100, 'pages/order/clerk/clerk');
-
             }
-
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

@@ -100,12 +100,7 @@ class Payment extends Component
                 throw new PaymentException();
             }
             foreach ($paymentOrders as $paymentOrder) {
-                $model = \app\models\PaymentOrder::findOne([
-                    'order_no' => $paymentOrder->orderNo
-                ]);
-                if(!$model){
-                    $model = new \app\models\PaymentOrder();
-                }
+                $model = new \app\models\PaymentOrder();
                 $model->is_pay                 = 0;
                 $model->payment_order_union_id = $paymentOrderUnion->id;
                 $model->order_no               = $paymentOrder->orderNo;

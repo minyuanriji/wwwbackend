@@ -254,6 +254,12 @@ class UserForm extends BaseModel
                 "link_url"  => "/pages/diy/diy?page_id=106",
                 "open_type" => "navigate"
             ];
+            $userCenter['menus'][] = [
+                "icon_url"  => "https://dev.mingyuanriji.cn/web/static/CancelTwo.png",
+                "name"      => "核销",
+                "link_url"  => "/pages/personalCentre/accountingOrder/accountingOrder",
+                "open_type" => "navigate"
+            ];
         }
 
         $res = [

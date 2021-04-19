@@ -11,6 +11,7 @@ use app\models\Model;
 use app\models\Order;
 use app\models\OrderClerk;
 use app\models\User;
+use app\plugins\baopin\models\BaopinMchClerkOrder;
 use app\plugins\baopin\models\BaopinMchGoods;
 use app\plugins\baopin\models\BaopinOrder;
 use app\plugins\mch\models\Mch;
@@ -23,6 +24,7 @@ class OrderClerkCommon extends BaseModel
     public $clerk_remark;
     public $clerk_id;
     public $clerk_type;
+    public $clerk_code;
 
     public function rules()
     {
@@ -116,12 +118,18 @@ class OrderClerkCommon extends BaseModel
 //                throw new \Exception('请填写核销备注');
 //            }
             /** @var Order $order */
-            $order = Order::find()->where([
+            $where = [
                 'is_delete' => 0,
                 'send_type' => 1,
                 'id'        => $this->id,
                 'mall_id'   => \Yii::$app->mall->id,
-            ])->one();
+            ];
+            if(!empty($this->clerk_code)){
+                $where['offline_qrcode'] = $this->clerk_code;
+            }else{
+                $where['id'] = (int)$this->id;
+            }
+            $order = Order::find()->where($where)->one();
 
             if (!$order) {
                 throw new \Exception('订单不存在');
@@ -147,13 +155,15 @@ class OrderClerkCommon extends BaseModel
                 throw new \Exception('请勿重复核销操作');
             }
 
+            $mch = Mch::findOne([
+                'user_id'       => $this->clerk_id,
+                'review_status' => Mch::REVIEW_STATUS_CHECKED
+            ]);
+
             $hasPermission      = false;
             $baopinMchGoodsList = [];
+
             if($order->order_type == "offline_baopin"){ //爆品
-                $mch = Mch::findOne([
-                    'user_id'       => $this->clerk_id,
-                    'review_status' => Mch::REVIEW_STATUS_CHECKED
-                ]);
                 if($mch){ //用户是商户身份
                     $details = $order->detail;
                     if(!$details){
@@ -173,6 +183,10 @@ class OrderClerkCommon extends BaseModel
                         }
                         $baopinMchGoodsList[] = $baopinMchGoods;
                     }
+                }
+            }elseif($order->order_type == "offline_normal"){
+                if($mch && $order->mch_id == $mch->id){
+                    $hasPermission = true;
                 }
             }
 
@@ -210,6 +224,23 @@ class OrderClerkCommon extends BaseModel
             $orderClerk->clerk_type   = $this->clerk_type;
             if (!$orderClerk->save()) {
                 throw new \Exception($this->responseErrorMsg($orderClerk));
+            }
+
+            if($baopinMchGoodsList){
+                foreach($baopinMchGoodsList as $item){
+                    $baopinMchClerkOrder = new BaopinMchClerkOrder([
+                        "mall_id"    => $item->mall_id,
+                        "order_id"   => $order->id,
+                        "goods_id"   => $item->goods_id,
+                        "created_at" => time(),
+                        "updated_at" => time(),
+                        "mch_id"     => $item->mch_id,
+                        "store_id"   => $item->store_id
+                    ]);
+                    if(!$baopinMchClerkOrder->save()){
+                        throw new \Exception($this->responseErrorMsg($baopinMchClerkOrder));
+                    }
+                }
             }
 
             $transaction->commit();

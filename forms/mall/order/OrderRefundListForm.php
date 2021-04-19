@@ -94,16 +94,20 @@ class OrderRefundListForm extends BaseModel
             $newItem['nickname'] = isset($item->user->nickname)?$item->user->nickname:"";
 
             //插件名称
-            if ($item->order->sign == '' && $item->order->mch_id == 0) {
-                $newItem['plugin_name'] = '商城';
-            } elseif ($item->order->mch_id > 0) {
-                $newItem['plugin_name'] = isset($item->order->mch->store->name) ? $item->order->mch->store->name : '多商户';
-            } else {
-                try {
-                    $newItem['plugin_name'] = \Yii::$app->plugin->getPlugin($item->order->sign)->getDisplayName();
-                } catch (\Exception $exception) {
-                    $newItem['plugin_name'] = '未知插件';
+            if ($item->order) {
+                if ($item->order->sign == '' && $item->order->mch_id == 0) {
+                    $newItem['plugin_name'] = '商城';
+                } elseif ($item->order->mch_id > 0) {
+                    $newItem['plugin_name'] = isset($item->order->mch->store->name) ? $item->order->mch->store->name : '多商户';
+                } else {
+                    try {
+                        $newItem['plugin_name'] = \Yii::$app->plugin->getPlugin($item->order->sign)->getDisplayName();
+                    } catch (\Exception $exception) {
+                        $newItem['plugin_name'] = '未知插件';
+                    }
                 }
+            } else {
+                $newItem['plugin_name'] = '未知插件';
             }
             try {
                 $goodsInfo = json_decode($item->detail->goods_info, true);

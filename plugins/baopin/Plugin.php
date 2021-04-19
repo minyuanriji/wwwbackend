@@ -26,8 +26,16 @@ class Plugin extends \app\plugins\Plugin{
     public function getMenus(){
         return [
             [
-                'name' => '商品列表',
+                'name' => '爆品管理',
                 'route' => 'plugin/baopin/mall/goods/list',
+                'icon' => 'el-icon-setting',
+                'action' => [
+
+                ]
+            ],
+            [
+                'name' => '门店核销',
+                'route' => 'plugin/baopin/mall/clerk/list',
                 'icon' => 'el-icon-setting',
                 'action' => [
 

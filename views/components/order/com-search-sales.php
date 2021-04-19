@@ -16,23 +16,10 @@
         color: #419EFB;
         cursor: pointer;
     }
-    /*.com-search  .badge{*/
-    /*    position: absolute;*/
-    /*    right: 0;*/
-    /*    top: 0;*/
-    /*}*/
-/*    .com-search  . el-tab-pane {
-        position: absolute;
-        right: 0;
-        top: 0;
-        max-width: 20px !important;
-    }*/
-
-
 </style>
 
 <template id="com-search">
-    <div class="com-search">    
+    <div class="com-search">
         <div flex="wrap:wrap cross:center">
             <div style="height: 32px;">{{dateLabel}}：</div>
             <el-date-picker
@@ -93,17 +80,9 @@
         </div>
         <div class="tabs">
             <el-tabs v-model="newActiveName" @tab-click="handleClick">
-                <el-tab-pane v-for="(item, index) in tabs" :key="index" :name="item.value">
-                    <div slot="label" style="float: left;" >
-                        <span>{{item.name}}</span>
-                        <el-badge :value="item.count.num" class="item" v-if="
-                                                                        item.value==0 ||
-                                                                        item.value==1 ||
-                                                                        item.value==2"/>
-                    </div>
-                </el-tab-pane>
+                <el-tab-pane v-for="(item, index) in tabs" :key="index" :label="item.name"
+                             :name="item.value"></el-tab-pane>
             </el-tabs>
-
         </div>
     </div>
 </template>
@@ -191,7 +170,6 @@
                 search: {},
                 newActiveName: null,
                 isShowClear: false,
-                orderCount:'mall/order/order-count',
             }
         },
         methods: {
@@ -233,45 +211,12 @@
                 } else {
                     this.isShowClear = false;
                 }
-            },
-            getOrderCount() {
-                this.loading = true;
-                let params = {
-                    r: this.orderCount
-                };
-                request({
-                    params: params,
-                }).then(e => {
-                    this.loading = false;
-                    if (e.data.code === 0) {
-                        console.log(e.data.data)
-                        this.order_count = e.data.data;
-                        for (let i in this.tabs) {
-                            if (this.tabs[i].name=='未付款') {
-                                this.tabs[i].count={
-                                    num:e.data.data.unpaid_count
-                                }
-                            } else if (this.tabs[i].name=='待发货') {
-                                this.tabs[i].count={
-                                    num:e.data.data.consignment_count
-                                }
-                            } else if (this.tabs[i].name=='待收货') {
-                                this.tabs[i].count={
-                                    num:e.data.data.received_count
-                                }
-                            }
-                        }
-                        console.log(this.tabs)
-                    }
-                }).catch(e => {
-                });
-            },
+            }
         },
         created() {
             this.search = this.newSearch;
             this.newActiveName = this.activeName;
             this.checkSearch();
-            this.getOrderCount();
         }
     })
 </script>

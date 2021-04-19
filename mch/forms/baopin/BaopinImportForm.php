@@ -4,6 +4,7 @@ namespace app\mch\forms\baopin;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\models\Store;
 use app\plugins\baopin\models\BaopinMchGoods;
 use app\plugins\mch\models\Mch;
 
@@ -32,6 +33,11 @@ class BaopinImportForm extends BaseModel{
                 throw new \Exception("商家不存在");
             }
 
+            $store = Store::findOne(["mch_id" => $mch->id]);
+            if(!$store || $store->is_delete){
+                throw new \Exception("门店不存在");
+            }
+
             $goodsIdArray = explode(",", $this->goods_id_str);
             foreach($goodsIdArray as $goodsId) {
                 $goodsId = (int)$goodsId;
@@ -39,7 +45,8 @@ class BaopinImportForm extends BaseModel{
                 //只能添加一个
                 $exists = BaopinMchGoods::find()->where([
                     "goods_id" => $goodsId,
-                    "mch_id"   => $mch->id
+                    "mch_id"   => $mch->id,
+                    "store"    => $store->id
                 ])->exists();
                 if($exists){
                     if($exists->is_delete){
@@ -53,6 +60,7 @@ class BaopinImportForm extends BaseModel{
                     "mall_id"    => $mch->mall_id,
                     "goods_id"   => $goodsId,
                     "mch_id"     => $mch->id,
+                    "store"      => $store->id,
                     "created_at" => time(),
                     "updated_at" => time()
                 ]);

@@ -404,7 +404,7 @@ Yii::$app->loadComponentView('order/com-city');
                                     </div>
                                 </div>
                             </template>
-                            <div v-if="order.send_type == 1" class="item-box" flex="dir:top">
+                            <div v-if="order.store_id > 0" class="item-box" flex="dir:top">
                                 <div flex="dir:left cross:center">
                                     <span class="label">自提门店:</span>
                                     <el-tag type="info" hit size="small">{{ order.store.name }}</el-tag>

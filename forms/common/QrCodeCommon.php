@@ -10,6 +10,7 @@
 
 namespace app\forms\common;
 
+use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\QrcodeParameter;
 use app\models\User;
@@ -93,7 +94,7 @@ class QrCodeCommon extends BaseModel
                     'wechat' => $wechat,
                     'alipay' => $alipay
                 ];
-            } elseif ($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_MP_WX || $appPlatform == User::PLATFORM_WECHAT) {
+            }elseif ($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_WECHAT || $appPlatform == User::PLATFORM_MP_WX) {
                 return $this->wechat($scene, $width, $page);
             } elseif ($appPlatform == APP_PLATFORM_MP_ALI) {
                 return $this->alipay($scene, \Yii::$app->mall->id, $page, '二维码');
@@ -123,9 +124,21 @@ class QrCodeCommon extends BaseModel
         $this->accessToken = $accessTokenArray["access_token"];
         $token = \Yii::$app->security->generateRandomString(30);
         $api = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token={$this->accessToken}";
+
+        $sceneStr = "";
+        if(!empty($scene) && is_array($scene)){
+            foreach($scene as $k => $v){
+                $sceneStr .= "{$k}={$v}&";
+            }
+            $sceneStr = rtrim($sceneStr, "&");
+        }else{
+            $sceneStr = $token;
+        }
+
         $res = $this->post($api, [
-            'scene' => $token,
+            'scene' => $sceneStr,
             'width' => $width,
+            'page'  => $page
         ]);
 
         if ($res->getStatusCode() == 200) {

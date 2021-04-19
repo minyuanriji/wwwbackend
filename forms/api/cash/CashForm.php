@@ -67,6 +67,8 @@ class CashForm extends BaseModel
 
     public function save()
     {
+        return $this->returnApiResultData(ApiCode::CODE_FAIL, '非常抱歉，提现系统维护中!');
+
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }

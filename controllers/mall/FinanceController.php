@@ -80,7 +80,7 @@ class FinanceController extends MallController
             if (\Yii::$app->request->isPost) {
                 $form = new CashForm();
                 if(\Yii::$app->request->post()['status'] == 2){
-                    (new WithdrawDeposit()) -> getCashApply(\Yii::$app->request->post());
+                   // (new WithdrawDeposit()) -> getCashApply(\Yii::$app->request->post());
                 }
                 $form->attributes = \Yii::$app->request->post();
                 return $this->asJson($form->save());

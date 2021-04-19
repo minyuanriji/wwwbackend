@@ -112,7 +112,7 @@ class IntegralService
                 continue;
             }
 
-            $max_deduct_integral = (int)min($value['max_deduct_integral'], $this->user_remaining_integral, $this->item['total_goods_price'], $value['total_price']);
+            $max_deduct_integral = min($value['max_deduct_integral'], $this->user_remaining_integral, $this->item['total_goods_price'], $value['total_price']);
             $integral_fee_rate = (!empty($this->item['mch']['integral_fee_rate']) ? $this->item['mch']['integral_fee_rate'] : $value['integral_fee_rate']);
 
             //如果最大红包券加上红包券服务费大于用户剩余的红包券
@@ -144,7 +144,7 @@ class IntegralService
                 //抵扣红包券价格
                 $goods['integral_price'] = price_format($goods_item['total_price_percent'] * $value['max_deduct_integral']);
                 //抵扣红包券数量
-                $goods['use_integral_price'] = intval($goods_item['total_price_percent'] * $this->getIntegral($value['max_deduct_integral']));
+                $goods['use_integral_price'] = $goods_item['total_price_percent'] * $this->getIntegral($value['max_deduct_integral']);
                 //是否使用红包券
                 $goods['use_integral'] = $goods['use_integral_price'] > 0 ? 1 : 0;
             }
@@ -172,9 +172,9 @@ class IntegralService
     {
         return $this->item['integral'] = [
             'use'                      => $this->use_integral,
-            'use_num'                  => intval($this->user_use_integral),
+            'use_num'                  => $this->user_use_integral,//intval($this->user_use_integral),
             //红包券抵扣总金额
-            'integral_deduction_price' => intval($this->user_use_integral),
+            'integral_deduction_price' => $this->user_use_integral,//intval($this->user_use_integral),
             'can_use'                  => $this->user_use_integral > 0 ? true : false,
             'user_integral'            => $this->user_integral,
             //剩余红包券金额

@@ -371,6 +371,10 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         <el-switch @change="statusChange" :active-value="1" :inactive-value="0" v-model="ruleForm.status">
                                         </el-switch>
                                     </el-form-item>
+                                    <el-form-item label="是否到店消费" prop="status">
+                                        <el-switch :active-value="1" :inactive-value="0" v-model="ruleForm.is_on_site_consumption">
+                                        </el-switch>
+                                    </el-form-item>
                                     <!-- 自定义 -->
                                     <el-dialog :title="app_share['type'] == 'pic_bg' ? `查看自定义分享图片图例`:`查看自定义分享标题图例`" :visible.sync="app_share.dialog" width="30%">
                                         <div flex="dir:left main:center" class="app-share">
@@ -1238,6 +1242,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 goods_weight: '',
                 select_attr_groups: [], // 已选择的规格
                 goodsWarehouse_attrGroups: [], // 商品库商品所有的规格
+                is_on_site_consumption:0,//到店消费类商品
                 share_level_type: 0,
                 distributionLevelList: [],
                 form: null,

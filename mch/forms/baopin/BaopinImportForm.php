@@ -60,7 +60,7 @@ class BaopinImportForm extends BaseModel{
                     "mall_id"    => $mch->mall_id,
                     "goods_id"   => $goodsId,
                     "mch_id"     => $mch->id,
-                    "store"      => $store->id,
+                    "store_id"   => $store->id,
                     "created_at" => time(),
                     "updated_at" => time()
                 ]);

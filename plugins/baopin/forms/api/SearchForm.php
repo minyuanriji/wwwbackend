@@ -76,7 +76,7 @@ class SearchForm extends BaseModel{
         $select = ["bg.id", "bmg.id as mch_baopin_id", "bg.goods_id", "gw.name", "gw.cover_pic",
             "g.goods_stock", "g.virtual_sales", "bg.created_at", "bg.updated_at",
             "g.price", "gw.original_price"];
-        $list = $query->select($select)->asArray()->page($pagination)->all();
+        $list = $query->select($select)->asArray()->page($pagination, 10, max(1, (int)$this->page))->all();
 
         return [
             'code' => ApiCode::CODE_SUCCESS,

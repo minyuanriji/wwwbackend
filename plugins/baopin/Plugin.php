@@ -33,14 +33,14 @@ class Plugin extends \app\plugins\Plugin{
 
                 ]
             ],
-            [
+            /*[
                 'name' => '门店核销',
                 'route' => 'plugin/baopin/mall/clerk/list',
                 'icon' => 'el-icon-setting',
                 'action' => [
 
                 ]
-            ],
+            ],*/
         ];
     }
 

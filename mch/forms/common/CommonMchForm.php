@@ -24,7 +24,7 @@ class CommonMchForm extends BaseModel{
 
     public function rules(){
         return [
-            [['cat_id'], 'integer'],
+            [['cat_id', 'page'], 'integer'],
             [['keyword'], 'string']
         ];
     }

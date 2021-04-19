@@ -505,6 +505,12 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                 <template slot="append">{{ruleForm.unit}}</template>
                                             </el-input>
                                         </el-form-item>
+
+                                        <el-form-item label="真实销量">
+                                            <el-input v-model="ruleForm.real_sales" disabled>
+                                            </el-input>
+                                        </el-form-item>
+
                                         <el-form-item label="商品货号">
                                             <el-input :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_no">
                                             </el-input>

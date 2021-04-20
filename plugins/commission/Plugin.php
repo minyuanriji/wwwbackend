@@ -26,8 +26,8 @@ class Plugin extends \app\plugins\Plugin{
     public function getMenus(){
         return [
             [
-                'name' => '全局配置',
-                'route' => 'plugin/commission/mall/setting/options',
+                'name' => '分佣规则',
+                'route' => 'plugin/commission/mall/rules/index',
                 'icon' => 'el-icon-setting',
             ],
             [

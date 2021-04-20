@@ -79,12 +79,7 @@ class Payment extends Component
         $unionOrderNo = 'JX' . mb_substr(md5(json_encode($orderNos)), 2);
         $title = mb_substr($title, 0, 32);
 
-        $paymentOrderUnion = PaymentOrderUnion::findOne([
-            "order_no" => $unionOrderNo
-        ]);
-        if(!$paymentOrderUnion){
-            $paymentOrderUnion = new PaymentOrderUnion();
-        }
+        $paymentOrderUnion = new PaymentOrderUnion();
         $paymentOrderUnion->is_pay   = 0;
         $paymentOrderUnion->mall_id  = \Yii::$app->mall->id;
         $paymentOrderUnion->user_id  = \Yii::$app->user->id;
@@ -105,12 +100,7 @@ class Payment extends Component
                 throw new PaymentException();
             }
             foreach ($paymentOrders as $paymentOrder) {
-                $model = \app\models\PaymentOrder::findOne([
-                    'order_no' => $paymentOrder->orderNo
-                ]);
-                if(!$model){
-                    $model = new \app\models\PaymentOrder();
-                }
+                $model = new \app\models\PaymentOrder();
                 $model->is_pay                 = 0;
                 $model->payment_order_union_id = $paymentOrderUnion->id;
                 $model->order_no               = $paymentOrder->orderNo;

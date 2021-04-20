@@ -49,12 +49,12 @@ abstract class OrderPayFormBase extends BaseModel
             $paymentOrders[] = $paymentOrder;
         }
         /** @var \app\models\PaymentOrder $paymentOrderData */
-        $paymentOrderData = \app\models\PaymentOrder::getOneData(["order_no"=>$order->order_no]);
-        if(empty($paymentOrderData)){
+        //$paymentOrderData = \app\models\PaymentOrder::getOneData(["order_no"=>$order->order_no]);
+        //if(empty($paymentOrderData)){
             $id = \Yii::$app->payment->createOrder($paymentOrders);
-        }else{
-            $id = $paymentOrderData->payment_order_union_id;
-        }
+        //}else{
+            //$id = $paymentOrderData->payment_order_union_id;
+        //}
         return ["id" => $id];
     }
 

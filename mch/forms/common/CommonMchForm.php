@@ -24,7 +24,7 @@ class CommonMchForm extends BaseModel{
 
     public function rules(){
         return [
-            [['cat_id'], 'integer'],
+            [['cat_id', 'page'], 'integer'],
             [['keyword'], 'string']
         ];
     }
@@ -67,7 +67,7 @@ class CommonMchForm extends BaseModel{
 
         $list = $query->orderBy("distance_mi ASC")
             ->with('store', 'category')
-            ->page($pagination)->asArray()->all();
+            ->page($pagination, 15, max(1, (int)$this->page))->asArray()->all();
         if($list){
             foreach($list as &$item){
                 $item['distance_format'] = "0m";

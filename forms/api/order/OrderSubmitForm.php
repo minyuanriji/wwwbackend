@@ -520,9 +520,6 @@ class OrderSubmitForm extends BaseModel
                 }
                 $dataGroupList['single'][] = $row;
             }elseif(!empty($row['mch_id'])){ //商家产品
-                if(!empty($row['is_on_site_consumption'])){
-                    $row['offline_data'] = 1;
-                }
                 $dataGroupList['mch'][$row['mch_id'] . "_" . $row['store_id']][] = $row;
             }else{
                 $dataGroupList['muti'][] = $row;

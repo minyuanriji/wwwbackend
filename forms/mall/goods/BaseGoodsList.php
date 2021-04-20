@@ -113,6 +113,9 @@ abstract class BaseGoodsList extends BaseModel
         $list = $query->with('goodsWarehouse.cats', 'attr')->page($pagination)->all();
 
         $newList = $this->handleData($list);
+        /*$goods_ids = array_unique(array_column($newList,'id'));
+
+        print_r($newList);die;*/
 
         return [
             'code' => ApiCode::CODE_SUCCESS,

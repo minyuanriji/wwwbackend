@@ -168,6 +168,10 @@ class Menus
                             ],
                         ]
                     ],
+                    [
+                        'name' => '退货地址',
+                        'route' => 'mall/refund-setting/index',
+                    ],
                 ],
             ],
             [

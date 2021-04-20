@@ -178,6 +178,7 @@ class GoodsForm extends GoodsBase
                 'is_sell_well' => $mallGoods->is_sell_well,
                 'is_negotiable' => $mallGoods->is_negotiable,
             ]);
+            $detail['real_sales'] = GoodsEditForm::real_sales($this->id) ?: 0;
 
             if ($detail) {
                 return [

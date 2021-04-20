@@ -143,7 +143,7 @@ class ScoreService
             }
 
             $value['forehead_score'] = min($value['forehead_score'], $this->user_remaining_score, $this->item['total_goods_price'], $value['total_price']);
-            $value['forehead_score'] = intval($value['forehead_score']);
+//            $value['forehead_score'] = intval($value['forehead_score']);
 
             if ($value['forehead_score_type'] == 1) {
                 if ($value['accumulative'] == 0) {
@@ -216,8 +216,8 @@ class ScoreService
     {
         return $this->item['score'] = [
             'use'                  => $this->use_score,
-            'use_num'              => intval($this->user_use_score),
-            'deduction_price'      => intval($this->user_use_score),
+            'use_num'              => $this->user_use_score,//intval($this->user_use_score),
+            'deduction_price'      => $this->user_use_score,//intval($this->user_use_score),
             'can_use'              => $this->user_use_score > 0 ? true : false,
             'score_price'          => $this->score_price,
             'user_score'           => $this->user_score,

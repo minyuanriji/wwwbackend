@@ -25,6 +25,8 @@ use app\models\GoodsServiceRelation;
 use app\models\GoodsWarehouse;
 
 
+use app\models\OrderDetail;
+use app\models\Order;
 use app\plugins\mch\models\Mch;
 use yii\db\Exception;
 
@@ -792,5 +794,20 @@ abstract class BaseGoodsEdit extends BaseModel
                 }
             }
         }
+    }
+
+    //获取真实销量
+    public static function real_sales($goods_id)
+    {
+        $status = [1,2,3,8];
+        $query =  OrderDetail::find()
+            ->alias('od')
+            ->where(['od.is_delete' => 0, 'od.is_refund' => 0, 'od.refund_status' => 0,'od.goods_id' => $goods_id])
+            ->leftJoin(['o' => Order::tableName()], 'od.order_id=o.id')
+            ->andWhere(['o.is_pay' => 1, 'o.is_recycle' => 0, 'o.is_delete' => 0])
+            ->andWhere(['in','o.status',$status])
+            ->sum('od.num');
+//        echo $query->createCommand()->getRawSql();die;
+        return $query;
     }
 }

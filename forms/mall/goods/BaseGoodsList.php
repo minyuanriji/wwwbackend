@@ -234,7 +234,7 @@ abstract class BaseGoodsList extends BaseModel
         $fields = ["od.goods_id","sum(od.num) as num"];
         $query = OrderDetail::find()
             ->alias('od')
-            ->where(['od.is_delete' => 0, 'od.is_refund' => 0, 'od.refund_status' => 0])
+            ->where(['od.is_delete' => 0, 'od.is_refund' => 0])
             ->leftJoin(['o' => Order::tableName()], 'od.order_id=o.id')
             ->andWhere(['in','od.goods_id',$goods_ids])
             ->andWhere(['o.is_pay' => 1, 'o.is_recycle' => 0, 'o.is_delete' => 0])

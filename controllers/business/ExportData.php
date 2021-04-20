@@ -174,8 +174,6 @@ WHERE ca.name >= {$start_id} AND ca.name <= {$end_id} AND ca.id = de.card_id AND
 
             array_push($goods_data,$val);
         }
-//        echo '<pre>';
-//        var_dump($goods_data);exit();
 
         $this -> ExportGoodsData($goods_data);
     }

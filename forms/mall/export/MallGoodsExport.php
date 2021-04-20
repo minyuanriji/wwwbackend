@@ -9,6 +9,8 @@ namespace app\forms\mall\export;
 
 use app\core\ApiCode;
 use app\core\BasePagination;
+use app\forms\mall\goods\BaseGoodsList;
+use app\forms\mall\goods\GoodsListForm;
 use app\forms\mall\goods\ImportGoodsLogForm;
 use app\models\BaseActiveQuery;
 use app\models\Goods;
@@ -29,6 +31,10 @@ class MallGoodsExport extends BaseExport
             [
                 'key' => 'name',
                 'value' => '商品名称',
+            ],
+            [
+                'key' => 'goods_brand',
+                'value' => '品牌'
             ],
             [
                 'key' => 'original_price',
@@ -58,10 +64,13 @@ class MallGoodsExport extends BaseExport
                 'key' => 'unit',
                 'value' => '单位',
             ],
-
             [
                 'key' => 'price',
                 'value' => '售价',
+            ],
+            [
+                'key' => 'first_attr_price',
+                'value' => '第一规格价',
             ],
             [
                 'key' => 'use_attr',
@@ -78,6 +87,10 @@ class MallGoodsExport extends BaseExport
             [
                 'key' => 'virtual_sales',
                 'value' => '虚拟销量',
+            ],
+            [
+                'key' => 'real_sales',
+                'value' => '真实销量',
             ],
             [
                 'key' => 'confine_count',
@@ -150,7 +163,7 @@ class MallGoodsExport extends BaseExport
             [
                 'key' => 'is_negotiable',
                 'value' => '是否面议',
-            ],
+            ]
         ];
 
         return $fieldsList;
@@ -259,6 +272,21 @@ class MallGoodsExport extends BaseExport
 
     protected function transform($list)
     {
+        $goodsIds = [];
+        foreach ($list as $item)
+        {
+            $goodsIds[] = $item->id;
+        }
+        $realSales = [];
+        $realSaleDatas = (new GoodsListForm())->real_sales($goodsIds);
+        if($realSaleDatas)
+        {
+            foreach($realSaleDatas as $realSale)
+            {
+                $realSales[$realSale->goods_id] = $realSale->num;
+            }
+        }
+
         $newList = [];
         $number = 1;
         /** @var Goods $item */
@@ -303,6 +331,16 @@ class MallGoodsExport extends BaseExport
           //  $arr['is_quick_shop'] = $item->mallGoods->is_quick_shop;
             $arr['is_sell_well'] = $item->mallGoods->is_sell_well;
             $arr['is_negotiable'] = $item->mallGoods->is_negotiable;
+
+            //品牌
+            $arr['goods_brand'] = $item->goods_brand;
+
+            //第一规格价
+            $arr['first_attr_price'] = isset($newAttr[0]) ? $newAttr[0]['price'] : 0;
+
+            //真实销量
+            $arr['real_sales'] = isset($realSales[$item->id]) ? $realSales[$item->id] : 0;
+
             $newList[] = $arr;
         }
         $this->dataList = $newList;

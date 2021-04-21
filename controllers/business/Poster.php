@@ -1,5 +1,7 @@
 <?php
 namespace app\controllers\business;
+
+use app\forms\common\prints\Exceptions\PrintException;
 class poster {
 
     public static $errMsg = '';
@@ -225,14 +227,19 @@ class poster {
 
     public static function mkdirs($dir, $mode = 0777)
     {
-        $file = substr($dir,0,strpos($dir,'images') + 6);
-        if (is_dir($file) || @mkdir($file, $mode)) {
+        try {
+            $file = substr($dir,0,strpos($dir,'images') + 6);
+            if (!is_dir($file)) {
+                if (@mkdir('../runtime/image/poster/images/', $mode,true)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
             return true;
+        } catch (PrintException $exception) {
+            \Yii::error("生成文件夹错误：" . $exception->getMessage());
         }
-        if (!self::mkdirs(dirname($file), $mode)) {
-            return false;
-        }
-        return @mkdir($file, $mode);
     }
 
     /*

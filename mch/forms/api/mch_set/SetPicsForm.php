@@ -14,7 +14,7 @@ class SetPicsForm extends BaseModel{
     public function rules(){
         return array_merge(parent::rules(), [
             [['mch_id', 'act', 'pic_url'], 'required'],
-            [['act', 'pic_url'], 'string']
+            [['act'], 'string']
         ]);
     }
 
@@ -30,22 +30,45 @@ class SetPicsForm extends BaseModel{
             }
 
             $picUrls = (array)@json_decode($mchStore->pic_url, true);
-            if(isset($picUrls[0]) && empty($picUrls[0])){
+            /*if(isset($picUrls[0]) && empty($picUrls[0])){
                 unset($picUrls[0]);
-            }
-
+            }*/
+            $new_picUrls = [];
+            array_values($picUrls);
             if(strtoupper($this->act) == "ADD"){ //添加图片
+                foreach ($picUrls as $key => $value) {
+                    if (isset($value['id'])) {
+                        $new_picUrls[$key] = $value;
+                        unset($picUrls[$key]);
+                    }
+                }
                 $picUrls[] = $this->pic_url;
             }else{ //删除图片
                 foreach($picUrls as $key => $pic){
-                    if(strtoupper($pic) == strtoupper($this->pic_url)){
-                        unset($picUrls[$key]);
+                    if (is_array($this->pic_url)) {
+                        if (is_array($pic)) {
+                            if(strtoupper($pic['pic_url']) == strtoupper($this->pic_url['pic_url'])){
+                                unset($picUrls[$key]);
+                                break;
+                            }
+                        }
+                        continue;
+                    } else {
+                        if(strtoupper($pic) == strtoupper($this->pic_url)){
+                            unset($picUrls[$key]);
+                            break;
+                        }
                     }
                 }
             }
 
             $picUrls = array_unique($picUrls);
             sort($picUrls);
+            if ($new_picUrls) {
+                foreach (array_values($new_picUrls) as $pic_key => $pic_val) {
+                    array_push($picUrls,$pic_val);
+                }
+            }
 
             $mchStore->pic_url = json_encode($picUrls);
             if(!$mchStore->save()){

@@ -48,7 +48,7 @@ class SetPicsForm extends BaseModel{
                     if (is_array($this->pic_url)) {
                         if (is_array($pic)) {
                             if(strtoupper($pic['pic_url']) == strtoupper($this->pic_url['pic_url'])){
-                                unset($picUrls[$key]);
+                                unset($picUrls[$key]); 
                                 break;
                             }
                         }

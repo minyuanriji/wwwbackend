@@ -33,22 +33,15 @@ class SetPicsForm extends BaseModel{
             /*if(isset($picUrls[0]) && empty($picUrls[0])){
                 unset($picUrls[0]);
             }*/
-            $new_picUrls = [];
             array_values($picUrls);
             if(strtoupper($this->act) == "ADD"){ //添加图片
-                foreach ($picUrls as $key => $value) {
-                    if (isset($value['id'])) {
-                        $new_picUrls[$key] = $value;
-                        unset($picUrls[$key]);
-                    }
-                }
                 $picUrls[] = $this->pic_url;
             }else{ //删除图片
                 foreach($picUrls as $key => $pic){
                     if (is_array($this->pic_url)) {
                         if (is_array($pic)) {
                             if(strtoupper($pic['pic_url']) == strtoupper($this->pic_url['pic_url'])){
-                                unset($picUrls[$key]); 
+                                unset($picUrls[$key]);
                                 break;
                             }
                         }
@@ -61,7 +54,13 @@ class SetPicsForm extends BaseModel{
                     }
                 }
             }
-
+            $new_picUrls = [];
+            foreach ($picUrls as $key => $value) {
+                if (isset($value['id'])) {
+                    $new_picUrls[$key] = $value;
+                    unset($picUrls[$key]);
+                }
+            }
             $picUrls = array_unique($picUrls);
             sort($picUrls);
             if ($new_picUrls) {

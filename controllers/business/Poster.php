@@ -188,6 +188,7 @@ class poster {
             }
         }
         if ($fileName) {
+            self::mkdirs($fileName);
             $res = ImagePng($bgImgData, $fileName, 8); //保存到本地
             ImageDestroy($bgImgData);
             if (!$res) {
@@ -220,6 +221,18 @@ class poster {
             self::$bgImageData = null;
         }
         return true;
+    }
+
+    public static function mkdirs($dir, $mode = 0777)
+    {
+        $file = substr($dir,0,strpos($dir,'images') + 6);
+        if (is_dir($file) || @mkdir($file, $mode)) {
+            return true;
+        }
+        if (!self::mkdirs(dirname($file), $mode)) {
+            return false;
+        }
+        return @mkdir($file, $mode);
     }
 
     /*

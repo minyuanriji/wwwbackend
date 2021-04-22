@@ -467,10 +467,12 @@ class Payment extends Component
             $paymentRefund->created_at = time();
             $paymentRefund->out_trade_no = $paymentOrderUnion->order_no;
 
-            //$class = $this->refundClass($paymentOrderUnion->pay_type);
-
-            //全部通过易票联退款
-            $class = new EfpsRefund();
+            if($paymentOrderUnion->pay_type == 3){
+                $class = $this->refundClass($paymentOrderUnion->pay_type);
+            }else{
+                //全部通过易票联退款
+                $class = new EfpsRefund();
+            }
 
             $result = $class->refund($paymentRefund, $paymentOrderUnion);
             if ($result) {

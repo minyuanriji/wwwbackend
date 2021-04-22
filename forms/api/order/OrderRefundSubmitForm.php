@@ -36,13 +36,16 @@ class OrderRefundSubmitForm extends BaseModel
     /** @var int 退货方式0快递配送 */
     public $refund_type = 0;
 
+    public $refund_total_price;
+
     public function rules()
     {
         return [
             [['order_detail_id','reason', 'type', 'pic_list', 'refund_price'], 'required'],
             [['order_detail_id','is_receipt', 'type'], 'integer'],
             [['refund_price'],'number'],
-            [['remark'], 'string']
+            [['remark'], 'string'],
+            [['refund_total_price'],'safe']
         ];
     }
 

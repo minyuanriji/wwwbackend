@@ -119,7 +119,7 @@ class OrderRefundSubmitForm extends BaseModel
             $orderRefund->refund_type = $this->refund_type;
             $orderRefund->is_receipt = ($this->is_receipt == -1 || $this->is_receipt == "") ? 0 : $this->is_receipt;
             $orderRefund->reason = $this->reason;
-            $orderRefund->refund_price = $this->refund_price;
+            $orderRefund->refund_price = $this->refund_total_price;
             $orderRefund->remark = $this->remark;
             $orderRefund->pic_list = $this->pic_list;
             $orderRefund->is_refund = OrderRefund::NO;

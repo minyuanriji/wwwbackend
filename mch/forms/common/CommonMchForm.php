@@ -67,22 +67,35 @@ class CommonMchForm extends BaseModel{
 
         $list = $query->orderBy("distance_mi ASC")
             ->with('store', 'category')
-            ->page($pagination, 15, max(1, (int)$this->page))->asArray()->all();
+//            ->page($pagination, 15, max(1, (int)$this->page))
+            ->asArray()->all();
         if($list){
-            foreach($list as &$item){
+            $new_list = [];
+            foreach($list as $key => &$item){
                 $item['distance_format'] = "0m";
-                if(empty($item['distance_mi']))
+                if(empty($item['distance_mi'])) {
+                    $new_list[$key] = $item;
+                    unset($list[$key]);
                     continue;
+                }
                 if($item['distance_mi'] < 1000){
                     $item['distance_format'] = intval($item['distance_mi']) . "m";
                 }else if($item['distance_mi'] >= 1000){
                     $item['distance_format'] = round(($item['distance_mi']/1000), 1) . "km";
                 }
             }
+            $list = array_merge_recursive($list,$new_list);
         }
+        $count_num = count($list);
+        $list = array_slice($list, ((int)$this->page - 1) * 15,15);
         return [
             'list' => $list,
-            'pagination' => $pagination
+            'pagination' => [
+                'current_page' => (int)$this->page,
+                'pageSize' => 15,
+                'page_count' => ceil($count_num / 15),
+                'total_count' => $count_num,
+            ]
         ];
     }
 

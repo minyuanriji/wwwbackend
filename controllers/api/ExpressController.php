@@ -22,4 +22,11 @@ class ExpressController extends ApiController
         return $this->asJson($form->search());
     }
 
+    public function actionNewQuery()
+    {
+        $form = new ExpressForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->search());
+    }
+
 }

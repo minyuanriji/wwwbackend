@@ -293,9 +293,9 @@ class OrderRefundForm extends BaseModel
     {
         $t = \Yii::$app->db->beginTransaction();
         try {
-            if (($orderRefund->type == OrderRefund::TYPE_REFUND_RETURN || $orderRefund->type == OrderRefund::TYPE_EXCHANGE) && $orderRefund->is_confirm == 0) {
+            /*if (($orderRefund->type == OrderRefund::TYPE_REFUND_RETURN || $orderRefund->type == OrderRefund::TYPE_EXCHANGE) && $orderRefund->is_confirm == 0) {
                 throw new \Exception('售后订单未确认收货');
-            }
+            }*/
 
             /** @var PaymentOrder $paymentOrder */
             $paymentOrder = PaymentOrder::find()->where(['order_no' => $orderRefund->order->order_no])->with('paymentOrderUnion')->one();

@@ -644,7 +644,9 @@ class AppConfigLogic
     private static function getDefaultRefundReasonList()
     {
         $data = [
+            "我不想要了",
             "商品信息描述不符",
+            "商品瑕疵",
             "退运费",
             "质量问题",
             "包装/商品破损/污渍",

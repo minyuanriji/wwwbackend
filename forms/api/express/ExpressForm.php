@@ -137,7 +137,7 @@ class ExpressForm extends BaseModel
         $method = "GET";
         $headers = array();
         array_push($headers, "Authorization:APPCODE " . $app_code);
-        if ($shipping_code = 'SF') {
+        if ($shipping_code == 'SF') {
             $querys = "n=".$express_code.":".$this->getMobileLast4Num()."&t=".$shipping_code."";  //参数写在这里
         } else {
             $querys = "n=".$express_code."&t=".$shipping_code."";  //参数写在这里

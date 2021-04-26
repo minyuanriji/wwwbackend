@@ -30,7 +30,7 @@ use app\models\Order;
 class OrderController extends OrderManagerController
 {
     public function actionIndex()
-    {
+    { 
 //        \Yii::$app->log->targets['debug'] = null;
         if (\Yii::$app->request->isAjax) {
             $form = new OrderForm();

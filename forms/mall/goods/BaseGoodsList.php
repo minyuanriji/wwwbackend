@@ -74,6 +74,9 @@ abstract class BaseGoodsList extends BaseModel
             if ($search['sort_prop'] == 'mchGoods.sort') {
                 $query->leftJoin(['mg' => MchGoods::tableName()], 'mg.goods_id=g.id');
                 $query->orderBy(['mg.sort' => $sortType]);
+            } elseif ($search['sort_prop'] == 'goods_brand') {
+                $order_by = "CONVERT(" . 'g.' . $search['sort_prop'] ." USING GBK) ". ($search['sort_type'] ? 'desc' : 'asc');
+                $query->orderBy($order_by);
             } else {
                 $query->orderBy(['g.' . $search['sort_prop'] => $sortType]);
             }

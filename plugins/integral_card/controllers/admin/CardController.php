@@ -29,7 +29,7 @@ class CardController extends BaseController{
             $where = array(['=', 'c.mall_id', Yii::$app->mall->id]);
             // $keyword && $where[] = array('like', 'user.nickname',$keyword.'%', false);
             if($keyword){
-                $where[] = ['or',['like', 'c.name', $keyword . '%', false],['like', 'u.nickname', $keyword . '%', false], ['like', 'u.username', $keyword . '%', false]];
+                $where[] = ['or',['like', 'c.name', '%' . $keyword . '%', false],['like', 'u.nickname', '%' . $keyword . '%', false], ['like', 'u.username', '%' . $keyword . '%', false]];
             }
             $params = array(
                 'alias' => 'c',

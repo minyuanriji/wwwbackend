@@ -203,7 +203,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="商品名称" width="300">
+                    <el-table-column label="商品名称" width="220">
                         <template slot-scope="scope">
                             <div flex="box:first">
                                 <div style="padding-right: 10px;">
@@ -248,6 +248,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                             </div>
                         </template>
                     </el-table-column>
+                    <el-table-column prop="goods_brand" label="品牌" sortable="false" width="80"></el-table-column>
                     <el-table-column prop="price" label="售价" sortable="false" width="160"></el-table-column>
                     <el-table-column prop="goods_stock" label="库存" sortable="false" width="100">
                         <template slot-scope="scope">

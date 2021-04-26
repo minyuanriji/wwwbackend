@@ -22,11 +22,13 @@ class CommonMchForm extends BaseModel{
 
     public $cat_id;
     public $keyword;
+    public $effect;
 
     public function rules(){
         return [
             [['cat_id', 'page'], 'integer'],
-            [['keyword'], 'string']
+            [['keyword'], 'string'],
+            [['effect'], 'safe'],
         ];
     }
 

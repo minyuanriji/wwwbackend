@@ -29,6 +29,9 @@ class CommonMchForm extends BaseModel{
         ];
     }
 
+    /*
+     *  string screen 筛选  nearby附近
+     * */
     public function getList(){
 
         $cityId = \Yii::$app->request->headers->get("x-city-id");

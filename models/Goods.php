@@ -51,6 +51,7 @@ use Yii;
  * @property int $is_area_limit 是否单独区域购买
  * @property string $area_limit
  * @property string $goods_brand
+ * @property string $goods_supplier 商品供应商
  * @property GoodsDistribution[] $share
  * @property GoodsAttr[] $attr
  * @property GoodsCards[] $cards

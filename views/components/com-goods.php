@@ -213,6 +213,12 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                             </template>
                                             <el-input v-model="ruleForm.goods_brand" type="text" placeholder="请输入品牌名称"></el-input>
                                         </el-form-item>
+                                        <el-form-item>
+                                            <template slot="label">
+                                                <span>供应商</span>
+                                            </template>
+                                            <el-input v-model="ruleForm.goods_supplier" type="text" placeholder="请输入供应商名称"></el-input>
+                                        </el-form-item>
                                         <el-form-item prop="number">
                                             <template slot="label">
                                                 <span>商城商品编码</span>
@@ -1228,6 +1234,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 is_level: 1,
                 is_level_alone: 0,
                 goods_brand:'',
+                goods_supplier:'',
                 pieces: 0,
                 share_type: 0,
                 attr_setting_type: 0,

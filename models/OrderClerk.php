@@ -59,4 +59,8 @@ class OrderClerk extends BaseActiveRecord
             'is_delete' => 'Is Delete',
         ];
     }
+
+    public function getOrderDetail(){
+        return $this->hasMany(OrderDetail::className(), ["order_id" => "order_id"]);
+    }
 }

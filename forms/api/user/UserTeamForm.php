@@ -12,6 +12,7 @@ namespace app\forms\api\user;
 
 use app\core\ApiCode;
 use app\core\BasePagination;
+use app\forms\common\UserRelationshipLinkForm;
 use app\logic\UserLogic;
 use app\models\BaseModel;
 use app\models\Order;
@@ -20,6 +21,7 @@ use app\models\MemberLevel;
 use app\models\User;
 use app\models\UserChildren;
 use app\models\PriceLog;
+use app\models\UserRelationshipLink;
 
 class UserTeamForm extends BaseModel
 {
@@ -48,15 +50,33 @@ class UserTeamForm extends BaseModel
      */
     public function getMyTeamData()
     {
-        $user_id = \Yii::$app->user->id;
-        $teamAllData = UserLogic::getUserTeamAllData($user_id, "");
-        $teamList = $teamAllData["child_list"];
         $result = [
-            //团队成员
-            'team_level' => $this->getUserTeamLevelTotal($teamList),
-            //团队佣金
-            'team_commission' => $this->getUserTeamCommissionTotal($teamAllData),
+            'team_level' => [],
+            'team_commission' => [
+                'direct_push_total' => 0,
+                'space_push_total'  => 0, //团队数
+                'team_order_count'  => 0, //团队订单
+                'team_order_total'  => 0  //订单金额
+            ]
         ];
+
+        //获取用户
+        $user = User::findOne(\Yii::$app->user->id);
+        $levelInfo = $user->getUserLevel();
+        $teamOnlys = [];
+        if($levelInfo['level'] == "store"){ //我是店主
+            $teamOnlys[] = "user";
+        }
+
+        //用户直推统计
+        $result['team_commission']['direct_push_total'] = User::find()->where([
+            "parent_id" => \Yii::$app->user->id,
+            "is_delete" => 0
+        ])->count();
+
+        //用户团队统计
+        $result['team_commission']['space_push_total'] = 0;
+
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '请求成功', $result);
     }
 

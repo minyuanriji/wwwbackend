@@ -33,6 +33,7 @@ class UserForm extends BaseModel
 {
     public $id;
     public $member_level;
+    public $role_type;
     public $page_size;
     public $keyword;
     public $platform;
@@ -57,6 +58,7 @@ class UserForm extends BaseModel
             [['fields'], 'safe'],
             [['keyword', 'platform'], 'default', 'value' => ''],
             [['is_change_name'], 'boolean'],
+            [['role_type'], 'string']
         ];
     }
 
@@ -198,6 +200,10 @@ class UserForm extends BaseModel
             ['like', 'u.id', $this->keyword],
         ]);
 
+        if(!empty($this->role_type)){
+            $query->andWhere(["u.role_type" => $this->role_type]);
+        }
+
         if ($this->flag == "EXPORT") {
             $new_query = clone $query;
             $exp = new UserExport();
@@ -225,7 +231,7 @@ class UserForm extends BaseModel
         $mall_members = MemberLevel::findAll(['mall_id' => $mall_id, 'status' => 1, 'is_delete' => 0]);
 
         $list = $query
-            ->select(['u.id as user_id', 'u.avatar_url', 'u.nickname', 'u.mobile', 'u.balance', 'u.level', 'u.score', 'u.static_score', 'coupon_count' => $couponQuery,
+            ->select(['u.id as user_id', 'u.role_type', 'u.avatar_url', 'u.nickname', 'u.mobile', 'u.balance', 'u.level', 'u.score', 'u.static_score', 'coupon_count' => $couponQuery,
                 'order_count' => $orderQuery,
                 'order_sum' => $orderSum,
                 'order_sum_cancel' => $orderSumCancel,
@@ -278,6 +284,7 @@ class UserForm extends BaseModel
             'id' => $user->id,
             'username' => $user->username,
             'nickname' => $user->nickname,
+            'role_type' => $user->role_type,
             'mobile' => $user->mobile,
             'avatar' => $user->avatar_url,
             'is_inviter'=>$user->is_inviter,

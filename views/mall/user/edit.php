@@ -36,7 +36,7 @@
                 <el-form-item label="用户">
                     <com-image width="80px" height="80px" mode="aspectFill" :src="form.avatar"></com-image>
                 </el-form-item>
-                <el-form-item label="会员等级" prop="member_level">
+                <!--<el-form-item label="会员等级" prop="member_level">
                     <el-select size="small" v-model="form.member_level" placeholder="请选择会员等级">
                         <el-option key="普通用户" label="普通用户" :value="-1"></el-option>
                         <el-option
@@ -46,12 +46,21 @@
                                 :value="item.level">
                         </el-option>
                     </el-select>
+                </el-form-item>-->
+                <el-form-item label="会员类型" prop="role_type">
+                    <el-select size="small" v-model="form.role_type" placeholder="请选择会员类型">
+                        <el-option key="user" label="普通用户" value="user"></el-option>
+                        <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
+                        <el-option key="partner" label="合伙人" value="partner"></el-option>
+                        <el-option key="store" label="店主" value="store"></el-option>
+                    </el-select>
                 </el-form-item>
+<!--
                 <el-form-item label="上级推荐人" prop="parent_id">
                     <el-autocomplete size="small" v-model="form.parent_name" value-key="nickname"
                                      :fetch-suggestions="querySearchAsync" placeholder="请输入搜索内容"
                                      @select="inviterClick"></el-autocomplete>
-                </el-form-item>
+                </el-form-item>-->
                 <!-- --- -->
                 <el-form-item label="加入黑名单" prop="is_blacklist">
                     <el-switch v-model="form.is_blacklist" :active-value="1" :inactive-value="0"></el-switch>
@@ -93,6 +102,7 @@
             return {
                 form: {
                     share: {},
+                    role_type: 'user'
                 },
                 mall_members: [],
                 keyword: '',

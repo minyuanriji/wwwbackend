@@ -5,14 +5,14 @@ use app\models\BaseActiveRecord;
 use app\models\Store;
 use app\plugins\mch\models\Goods;
 
-class CommissionRuleList extends BaseActiveRecord
+class CommissionRules extends BaseActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return '{{%plugin_commission_rule_list}}';
+        return '{{%plugin_commission_rules}}';
     }
 
 
@@ -22,9 +22,9 @@ class CommissionRuleList extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mch_id', 'item_type', 'item_id', 'json_params', 'is_delete',
-              'created_at', 'updated_at', 'deleted_at', 'apply_all_item'], 'required'],
-            [['mch_id', 'apply_all_item', 'item_id', 'is_delete', 'created_at', 'updated_at', 'deleted_at'], 'integer'],
+            [['mall_id', 'mch_id', 'item_type', 'item_id', 'json_params',
+              'created_at', 'commission_type', 'updated_at', 'apply_all_item'], 'required'],
+            [['mch_id', 'commission_type', 'apply_all_item', 'item_id', 'is_delete', 'created_at', 'updated_at', 'deleted_at'], 'integer'],
             [['json_params'], 'string']
         ];
     }

@@ -23,6 +23,7 @@ class UserEditForm extends BaseModel
 {
     public $id;
     public $member_level;
+    public $role_type;
     public $money;
 
     public $is_blacklist;
@@ -37,6 +38,7 @@ class UserEditForm extends BaseModel
             [['parent_id', 'is_blacklist', 'id', 'member_level', 'is_inviter'], 'integer'],
             [['money'], 'number'],
             [['contact_way', 'remark'], 'string', 'max' => 255],
+            [['role_type'], 'string']
         ];
     }
 
@@ -93,9 +95,11 @@ class UserEditForm extends BaseModel
 
         $beforeParentId = $form->parent_id;
         $form->is_blacklist = $this->is_blacklist;
-        $form->parent_id = $this->parent_id;
+        //$form->parent_id = $this->parent_id;
         $form->junior_at = time();
         $form->level = $this->member_level;
+        $form->role_type = $this->role_type;
+
         //推广资格被选中
         if ($this->is_inviter && $form->is_inviter == User::IS_INVITER_NO) {
             $form->setInviter();

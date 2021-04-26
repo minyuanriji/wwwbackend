@@ -35,9 +35,9 @@ class DistributionForm extends BaseModel
 
     public function getInfo()
     {
-        $user = User::findOne(\Yii::$app->user->identity->id);
+        /*$user = User::findOne(\Yii::$app->user->identity->id);
         $common = Common::getCommon(\Yii::$app->mall);
-        /** @var Distribution $distributions */
+
         $returnData = $common->getDistributionInfo($user);
         if (!$returnData["is_distribution"]) {
             $is_apply = DistributionSetting::getValueByKey(DistributionSetting::IS_APPLY, \Yii::$app->mall->id);
@@ -53,7 +53,25 @@ class DistributionForm extends BaseModel
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, '您不是分销商，请填写申请信息',
                     ['is_distribution' => 0, 'is_apply' => $is_apply,'protocol' => $protocol,'status' => $status,'reason' => $reason]);
             }
+        }*/
+
+        $returnData = [
+            'avatar_url'        => '',
+            'parent_level_name' => '',
+            'parent_name'       => ''
+        ];
+
+        $user = User::findOne(\Yii::$app->user->identity->id);
+        if($user){
+            $parent = User::findOne($user->parent_id);
+            if($parent){
+                $parentLevel                     = $parent->getUserLevel();
+                $returnData['avatar_url']        = $parent->avatar_url;
+                $returnData['parent_level_name'] = $parentLevel['name'];
+                $returnData['parent_name']       = $parent->nickname;
+            }
         }
+
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, ['info' => $returnData]);
     }
 

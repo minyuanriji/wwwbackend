@@ -18,9 +18,12 @@
             </div>
         </div>
         <div class="table-body">
-            <el-select size="small" v-model="member_level" @change='search' class="select">
-                <el-option key="0" label="全部会员" value="0"></el-option>
-                <el-option :key="item.level" :label="item.name" :value="item.level" v-for="item in member"></el-option>
+            <el-select size="small" v-model="role_type" @change='search' class="select">
+                <el-option key="" label="全部用户" value=""></el-option>
+                <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
+                <el-option key="partner" label="合伙人" value="partner"></el-option>
+                <el-option key="store" label="店主" value="store"></el-option>
+                <el-option key="user" label="普通用户" value="user"></el-option>
             </el-select>
             <el-select size="small" v-model="platform" @change='search' class="select">
                 <el-option key="0" label="全部平台" value="0"></el-option>
@@ -61,10 +64,12 @@
                 </el-table-column>
                 <el-table-column prop="mobile" label="手机号" width="120">
                 </el-table-column>
-                <el-table-column prop="member_level" label="会员类型" width="120">
+                <el-table-column prop="role_type" label="会员类型" width="120">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.level == item.level" v-for="item in mall_members">{{item.name}}</div>
-                        <div v-if="scope.row.level == -1">普通用户</div>
+                        <div v-if="scope.row.role_type == 'branch_office'">分公司</div>
+                        <div v-if="scope.row.role_type == 'partner'">合伙人</div>
+                        <div v-if="scope.row.role_type == 'store'">店主</div>
+                        <div v-if="scope.row.role_type == 'user'">普通用户</div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="order_count" label="订单数">
@@ -195,6 +200,7 @@
                 },
                 platform: '0',
                 member_level: '0',
+                role_type: '',
                 mall_members: [],
                 keyword: '',
                 form: [],
@@ -344,6 +350,7 @@
                         r: 'mall/user/index',
                         page: this.page,
                         member_level: this.member_level,
+                        role_type: this.role_type,
                         platform: this.platform,
                         keyword: this.keyword,
                     },

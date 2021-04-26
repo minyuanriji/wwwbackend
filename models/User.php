@@ -21,6 +21,7 @@ use Yii;
  * @property string $mobile
  * @property string $access_token
  * @property string $nickname
+ * @property string $role_type
  * @property int $birthday
  * @property int $temp_parent_id 临时父级id
  * @property int $parent_id 第一父级ID（直推人id）
@@ -116,7 +117,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
             [['username', 'password'], 'required'],
             [['mall_id', 'mch_id', 'parent_id', 'second_parent_id', 'third_parent_id', 'is_delete', 'is_blacklist',
                  'created_at', 'last_login_at', 'junior_at', 'level', 'birthday', 'is_inviter', 'inviter_at','source','upgrade_status'], 'integer'],
-            [['password', 'auth_key', 'access_token', 'mobile', 'avatar_url', 'platform', 'login_ip', 'transaction_password'], 'string'],
+            [['password', 'auth_key', 'access_token', 'mobile', 'avatar_url', 'platform', 'login_ip', 'transaction_password', 'role_type'], 'string'],
             [['balance', 'total_balance', 'total_income', 'income','income_frozen','total_score','score'], 'number'],
             [['username'], 'string', 'max' => 64],
         ];
@@ -621,4 +622,36 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
             ->one();
     }
 
+    /**
+     * 获取级别信息
+     * @return array
+     */
+    public function getUserLevel(){
+        $levelList = [
+            'branch_office' => [
+                "name" => "分公司",
+                "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/branch_office.png"
+            ],
+            'partner' => [
+                "name" => "合伙人",
+                "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/partner.png"
+            ],
+            'store' => [
+                "name" => "店主",
+                "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/store.png"
+            ],
+            'user' => [
+                "name" => "普通用户",
+                "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/user.png"
+            ],
+        ];
+
+        $userLevel = isset($levelList[$this->role_type]) ? $levelList[$this->role_type] : null;
+
+        return [
+            'level' => $this->role_type,
+            'name'  => $userLevel != null ? $userLevel['name'] : "",
+            'icon'  => $userLevel != null ? $userLevel['icon'] : ""
+        ];
+    }
 }

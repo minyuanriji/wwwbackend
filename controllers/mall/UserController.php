@@ -11,6 +11,7 @@
 namespace app\controllers\mall;
 
 use app\core\ApiCode;
+use app\forms\common\UserRelationshipLinkForm;
 use app\forms\mall\user\BalanceForm;
 use app\forms\mall\user\ClerkEditForm;
 use app\forms\mall\user\ClerkForm;
@@ -369,5 +370,13 @@ class UserController extends UserManagerController
         }
     }
 
+    public function actionRelationRebuild(){
+        $res = UserRelationshipLinkForm::rebuild();
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res['data']['long'] = time() - $res['data']['start'];
+            $res['data']['start'] = date("Y-m-d H:i:s", $res['data']['start']);
+        }
+        return $this->asJson($res);
+    }
 
 }

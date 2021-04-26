@@ -566,12 +566,14 @@ class Menus
                             ],
                         ]
                     ],
+                    [
                         'name' => '核销记录',
                         'route' => 'mall/order-clerk/index',
                         'action' => [
                         ]
-                    ]
+                    ],
                 ],
+            ],
             [
                 'name' => '会员',
                 'key' => 'user-manager',

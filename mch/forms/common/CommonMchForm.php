@@ -10,6 +10,7 @@ use app\models\DistrictData;
 use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchVisitLog;
 use app\plugins\mch\Plugin;
 
 class CommonMchForm extends BaseModel{
@@ -30,7 +31,7 @@ class CommonMchForm extends BaseModel{
     }
 
     /*
-     *  string screen 筛选  nearby附近
+     *  string  effect  功能   {nearby附近:获取最近5km的数据  intelligence智能排序:根据用户点击次数排序  screen 筛选}
      * */
     public function getList(){
 
@@ -88,6 +89,40 @@ class CommonMchForm extends BaseModel{
                 }
             }
             $list = array_merge_recursive($list,$new_list);
+            if (isset($this->effect) && $this->effect == 'nearby') {
+                foreach ($list as $key => $list_val) {
+                    if($item['distance_mi'] > 5000){
+                        unset($list[$key]);
+                    }
+                }
+            }
+            if (isset($this->effect) && $this->effect == 'intelligence') {
+                $model = MchVisitLog::find()->where([
+                    'mall_id' => \Yii::$app->mall->id,
+                    'user_id' => \Yii::$app->user->id,
+                ])->asArray()->all();
+                if ($model) {
+                    $model_list = [];
+                    $new_model = array_combine(array_column($model,'mch_id'),$model);
+                    foreach ($list as $key => $value) {
+                        $list[$key]['num'] = 0;
+                        if (isset($new_model[$value['id']])) {
+                            $list[$key]['num'] = (int)$new_model[$value['id']]['num'];
+                        }
+
+                        if(empty($value['distance_mi'])) {
+                            $model_list[$key] = $value;
+                            unset($list[$key]);
+                            continue;
+                        }
+                    }
+                    array_multisort(
+                        array_column($list,'num'),SORT_DESC ,
+                        array_column($list,'distance_mi'),SORT_ASC ,
+                        $list);
+                    $list = array_merge_recursive($list,$model_list);
+                }
+            }
         }
         $count_num = count($list);
         $list = array_slice($list, ((int)$this->page - 1) * 15,15);

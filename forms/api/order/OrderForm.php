@@ -39,6 +39,7 @@ class OrderForm extends BaseModel
     public $id;// 订单ID
     public $offline;
     public $offline_used;
+    public $order_refund_id;
 
     public function rules()
     {
@@ -46,6 +47,7 @@ class OrderForm extends BaseModel
             [['page', 'limit', 'status', 'id', 'offline', 'offline_used'], 'integer'],
             ['page', 'default', 'value' => 1],
             ['limit', 'default', 'value' => 20],
+            ['order_refund_id', 'safe'],
         ];
     }
 

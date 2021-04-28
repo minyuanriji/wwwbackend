@@ -156,7 +156,7 @@ class QrCodeCommon extends BaseModel
                 throw new \Exception($res['errmsg']);
             }
         } else {
-            throw new \Exception($res['errmsg']);
+            throw new \Exception($res['errmsg'],$res['errcode']);
         }
     }
 

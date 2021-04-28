@@ -65,6 +65,7 @@ class GoodsListForm extends BaseModel{
                                   ->with(['goodsWarehouse', 'attr'])
                                   ->where([
                                        'g.is_delete' => 0,
+                                       'g.is_recycle' => 0,
                                        'g.status' => 1,
                                        'g.mall_id' => \Yii::$app->mall->id,
                                        'g.mch_id' => $this->mch_id

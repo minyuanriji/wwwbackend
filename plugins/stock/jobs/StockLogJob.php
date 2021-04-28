@@ -299,7 +299,7 @@ class StockLogJob extends Component implements JobInterface
                     if ($stock_agent->save()) {
                         \Yii::warning('StockLogJob agentUpgrade else stock_agent success');
                         if ($bag->is_stock) {
-                            $goods = Goods::findOne(['is_delete' => 0, 'id' => $bag->stock_goods_id]);
+                            $goods = Goods::findOne(['is_delete' => 0, 'is_recycle' => 0, 'id' => $bag->stock_goods_id]);
                             if (!$goods) {
                                 \Yii::warning('商品不存在');
                                 return;

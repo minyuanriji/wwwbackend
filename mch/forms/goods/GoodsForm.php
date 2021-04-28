@@ -29,6 +29,7 @@ class GoodsForm extends GoodsBase {
         $query = Goods::find()->where([
             'mall_id'   => \Yii::$app->mall->id,
             'is_delete' => 0,
+            'is_recycle' => 0,
             'sign'      => 'mch',
             'mch_id'    => \Yii::$app->mchAdmin->identity->mchModel->id,
         ]);

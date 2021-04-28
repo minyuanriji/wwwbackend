@@ -105,6 +105,7 @@ class CommonMallMember
         $query = Goods::find()->alias('g')->where([
             'g.mall_id' => \Yii::$app->mall->id,
             'g.is_delete' => 0,
+            'g.is_recycle' => 0,
             'g.mch_id' => 0,
             'g.sign' => '',
             'g.status' => 1,

@@ -64,7 +64,7 @@ class GoodsListForm extends BaseModel
             $query = Goods::find()
                 ->alias('g')
                 ->with(['goodsWarehouse', 'attr'])
-                ->where(['g.is_delete' => 0, 'g.status' => 1, 'g.mall_id' => \Yii::$app->mall->id,])
+                ->where(['g.is_delete' => 0,'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => \Yii::$app->mall->id,])
                 ->leftJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
             if ($this->keyword) {
                 $query->keyword($this->keyword, [

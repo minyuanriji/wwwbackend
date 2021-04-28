@@ -34,6 +34,7 @@ class GoodsPosterForm extends GrafikaOption implements BasePoster
 
         $goods = Goods::find()->where([
             'is_delete' => 0,
+            'is_recycle' => 0,
             'id'        => $this->goods_id,
         ])->with(['goodsWarehouse', 'attr', 'mallGoods'])->one();
 

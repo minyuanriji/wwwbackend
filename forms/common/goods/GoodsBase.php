@@ -128,6 +128,62 @@ class GoodsBase extends BaseModel
         }
     }
 
+    public function deleteRecycle()
+    {
+        try {
+            $this->findGoods();
+            $goods = $this->goods;
+            if (!$goods) {
+                throw new \Exception('商品不存在');
+            }
+            $goods->is_recycle = 1;
+            $res = $goods->save();
+            if (!$res) {
+                throw new \Exception($this->responseErrorMsg($goods));
+            }
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '删除成功',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => $e->getMessage(),
+                'error' => [
+                    'line' => $e->getLine()
+                ]
+            ];
+        }
+    }
+
+    public function recoveryGoods()
+    {
+        try {
+            $this->findGoods();
+            $goods = $this->goods;
+            if (!$goods) {
+                throw new \Exception('商品不存在');
+            }
+            $goods->is_recycle = 0;
+            $res = $goods->save();
+            if (!$res) {
+                throw new \Exception($this->responseErrorMsg($goods));
+            }
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '恢复成功',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => $e->getMessage(),
+                'error' => [
+                    'line' => $e->getLine()
+                ]
+            ];
+        }
+    }
+
     public function switchStatus()
     {
         try {

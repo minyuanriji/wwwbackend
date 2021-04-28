@@ -115,7 +115,8 @@ class GoodsList extends BaseModel
         $model = $this->model;
         $this->query = $model::find()->alias('g')->where([
             'g.mall_id' => \Yii::$app->mall->id,
-            'g.is_delete' => 0
+            'g.is_delete' => 0,
+            'g.is_recycle' => 0,
         ])->select('g.*');
         if ($this->sign) {
             $this->query->andWhere(['g.sign' => $this->sign]);

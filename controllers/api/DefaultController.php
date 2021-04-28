@@ -117,7 +117,7 @@ class DefaultController extends ApiController
                                         //首先获取这些分类下面有哪些商品
                                         $catGoodsIds = [];
                                         $cat_goods_list = Goods::find()->alias('g')
-                                            ->andWhere(['g.is_delete' => 0])
+                                            ->andWhere(['g.is_delete' => 0, 'g.is_recycle' => 0])
                                             ->leftJoin(['gcr' => GoodsCatRelation::tableName()], 'gcr.goods_warehouse_id=g.goods_warehouse_id')
                                             ->andWhere(['gcr.cat_id' => $cat_ids])
                                             ->select('g.id')
@@ -254,7 +254,7 @@ class DefaultController extends ApiController
                                     //首先获取这些分类下面有哪些商品
                                     $catGoodsIds = [];
                                     $cat_goods_list = Goods::find()->alias('g')
-                                        ->andWhere(['g.is_delete' => 0])
+                                        ->andWhere(['g.is_delete' => 0, 'g.is_recycle' => 0])
                                         ->leftJoin(['gcr' => GoodsCatRelation::tableName()], 'gcr.goods_warehouse_id=g.goods_warehouse_id')
                                         ->andWhere(['gcr.cat_id' => $cat_ids])
                                         ->select('g.id')

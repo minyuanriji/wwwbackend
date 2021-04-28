@@ -257,7 +257,7 @@ class OrderForm extends BaseModel
             if (!$res) {
                 throw new \Exception($this->responseErrorMsg($order));
             }
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'取消成功');
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'删除成功');
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($e));
         }

@@ -476,6 +476,16 @@ class Menus
                             ],
                         ],
                     ],
+                    [
+                        'name' => '商品回收站',
+                        'route' => 'mall/goods/recycle-bin',
+                        'action' => [
+                            [
+                                'name' => '恢复商品',
+                                'route' => 'mall/goods/delete'
+                            ],
+                        ]
+                    ],
                 ],
             ],
             [

@@ -30,6 +30,7 @@ class SearchGoodsForm extends BaseModel{
         $query->andWhere([
             "AND",
             ["g.is_delete" => 0],
+            ["g.is_recycle" => 0],
             ["gw.is_delete" => 0],
             "(g.mch_id=0 OR g.mch_id IS NULL)",
             "pbg.id IS NULL"

@@ -9,8 +9,7 @@
  */
 
 $mchId = Yii::$app->admin->identity->mch_id;
-Yii::$app->loadComponentView('goods/com-search');
-Yii::$app->loadComponentView('goods/com-batch');
+Yii::$app->loadComponentView('goods/com-recycle-search');
 ?>
 
 <style>
@@ -53,53 +52,7 @@ Yii::$app->loadComponentView('goods/com-batch');
         <el-card v-loading="listLoading" class="box-card" shadow="never" style="border:0"
                  body-style="background-color: #f3f3f3;padding: 10px 0 0;">
             <div slot="header">
-                <span>商品列表</span>
-                <div style="float: right; margin: -5px 0">
-                    <el-button v-if="is_add_goods" type="primary" size="small" @click="edit">添加商品</el-button>
-<!--                    <a href="http://8.129.63.124/web/index.php?r=mall%2Fgoods%2Fexport-goods-list2">导出</a>-->
-                    <el-button v-if="isShowExportGoods" type="primary" size="small" @click="exportGoods">商品导出
-                    </el-button>
-                    <el-dialog
-                            flex="cross:center"
-                            class="export-dialog"
-                            :title="exportParams.is_show_download ? '下载' : '提示'"
-                            :visible.sync="exportDialogVisible"
-                            width="20%">
-                        <template v-if="!exportParams.is_show_download">
-                            <div flex="cross:center">
-                                <i style="color: #E6A23C;font-size: 20px;margin-right: 5px" class="el-icon-warning"></i>
-                                <span>选中{{choose_list.length == 0 ? '全部,共计'+ exportParams.goods_count +'件' : choose_list.length + '个'}}商品，是否确认导出</span>
-                            </div>
-                            <span slot="footer" class="dialog-footer">
-                                    <el-button @click="exportDialogVisible = false" size="small">取 消</el-button>
-<!--                                    <el-button @click="exportGoodsData" size="small" type="primary">确定</el-button>-->
-                                <el-button @click="newExportGoodsData" size="small" type="primary">确定</el-button>
-                                </span>
-                        </template>
-                        <template v-else>
-                            <el-progress :text-inside="true" :stroke-width="18"
-                                         :percentage="exportParams.percentage"></el-progress>
-                            <span slot="footer" class="dialog-footer">
-<!--                                <el-button @click="download" v-if="exportParams.percentage == 100" size="small"-->
-                                <!--                                           type="primary">-->
-                                <!--                                    点击下载-->
-                                <!--                                </el-button>-->
-                                <form target="_blank" :action="exportParams.action_url" method="post">
-                                    <div class="modal-body">
-                                        <input name="_csrf" type="hidden" id="_csrf"
-                                               value="<?= Yii::$app->request->csrfToken ?>">
-                                        <input name="flag" value="EXPORT" type="hidden">
-                                        <input name="is_download" :value="exportParams.is_download" type="hidden">
-                                    </div>
-                                    <div flex="dir:right" style="margin-top: 20px;">
-                                        <button v-if="exportParams.percentage == 100" type="submit"
-                                                class="el-button el-button--primary el-button--small">点击下载</button>
-                                    </div>
-                                </form>
-                            </span>
-                        </template>
-                    </el-dialog>
-                </div>
+                <span>商品回收站列表</span>
             </div>
             <div class="table-body">
                 <com-search :tabs="tabs" :new-search="search" @to-search="toSearch"
@@ -125,7 +78,6 @@ Yii::$app->loadComponentView('goods/com-batch');
                         style="width: 100%;margin-bottom: 15px"
                         @selection-change="handleSelectionChange"
                         @sort-change="sortChange">
-                    <el-table-column type="selection" align="center" width="50"></el-table-column>
                     <el-table-column prop="id" label="ID" sortable="false" width="100"></el-table-column>
                     <el-table-column v-if="!is_mch" prop="sort" :width="sort_goods_id != id ? 150 : 100" label="排序"
                                      sortable="false">
@@ -173,7 +125,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                         </template>
                     </el-table-column>
                     <slot name="column-col-first"></slot>
-                    <el-table-column label="分类"  width="100">
+                    <el-table-column label="分类"  width="200">
                         <template slot-scope="scope">
                             <div class="goods-cat" v-if="!is_mch">
                                 <el-tag v-if="scope.row.cats && scope.row.cats.length > 0"
@@ -248,7 +200,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="goods_brand" label="品牌" sortable="false" width="80"></el-table-column>
+                    <el-table-column prop="goods_brand" label="品牌" sortable="false" width="130"></el-table-column>
                     <el-table-column prop="price" label="售价" sortable="false" width="160"></el-table-column>
                     <el-table-column prop="goods_stock" label="库存" sortable="false" width="100">
                         <template slot-scope="scope">
@@ -258,32 +210,11 @@ Yii::$app->loadComponentView('goods/com-batch');
                     </el-table-column>
                     <el-table-column prop="virtual_sales" width="110" label="虚拟销量" sortable="false"></el-table-column>
                     <el-table-column prop="real_sales" width="110" label="真实销量" sortable="false"></el-table-column>
-                    <el-table-column label="状态" width="100">
-                        <template slot-scope="scope">
-                            <template v-if="!is_mch || mchMallSetting.is_goods_audit == 0">
-                                <el-tag size="small" type="success" v-if="scope.row.status">销售中</el-tag>
-                                <el-tag size="small" type="warning" v-else>下架中</el-tag>
-                            </template>
-                            <template v-else>
-                                <template v-if="scope.row.status == 1">
-                                    <div flex="dir:top">
-                                        <div flex="main:center">已上架</div>
-                                        <el-button :loading="btnLoading" size="mini" @click="switchStatus(scope.row)">
-                                            下架
-                                        </el-button>
-                                    </div>
-                                </template>
-                                <el-tag size="small" type="danger" v-else>下架中</el-tag>
-                            </template>
-                        </template>
-                    </el-table-column>
-
                     <el-table-column prop="scope" width="180" label="添加时间">
                         <template slot-scope="scope">
                             {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
                         </template>
                     </el-table-column>
-
                     <el-table-column width="100" v-if="is_mch && mchMallSetting.is_goods_audit == 1" label="申请状态">
                         <template slot-scope="scope">
                             <template>
@@ -313,22 +244,21 @@ Yii::$app->loadComponentView('goods/com-batch');
                         <template slot-scope="scope">
                             <slot name="action" :item="scope.row"></slot>
                             <template v-if="is_action">
-                                <el-button v-if="!scope.row.not_editable" @click="edit(scope.row)" type="text" circle size="mini">
-                                    <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-                                        <img src="statics/img/mall/edit.png" alt="">
+                                <el-button v-if="!scope.row.not_editable" @click="recovery(scope.row, scope.$index)" type="text" circle size="mini">
+                                    <el-tooltip class="item" effect="dark" content="恢复商品" placement="top">
+                                        <img src="statics/img/mall/order/renew.png" alt="">
                                     </el-tooltip>
                                 </el-button>
                                 <el-button v-if="!scope.row.not_editable" @click="destroy(scope.row, scope.$index)" type="text" circle size="mini">
-                                    <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                    <el-tooltip class="item" effect="dark" content="彻底删除" placement="top">
                                         <img src="statics/img/mall/del.png" alt="">
                                     </el-tooltip>
                                 </el-button>
-                                <el-button v-if="!scope.row.not_editable" @click="copy(scope.row)" type="text" circle size="mini">
-                                    <el-tooltip class="item" effect="dark" content="复制" placement="top">
-                                        <img src="statics/img/mall/copy1.png" alt="">
+                                <!--<el-button v-if="!scope.row.not_editable" @click="edit(scope.row)" type="text" circle size="mini">
+                                    <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                        <img src="statics/img/mall/edit.png" alt="">
                                     </el-tooltip>
-                                </el-button>
-								
+                                </el-button>-->
 								<el-tooltip class="item" v-if="scope.row.not_editable&&scope.row.groupBuyGoods"
 								            effect="dark"
 								            placement="top">
@@ -340,17 +270,8 @@ Yii::$app->loadComponentView('goods/com-batch');
 										        size="mini">
 										    拼团商品
 										</el-tag>
-										<!-- <el-tooltip v-if="scope.row.cats && scope.row.cats.length > 1" placement="top">
-										    <div slot="content">
-										        <span v-for="item in scope.row.cats" :key="item.id">{{item.name}}&nbsp;</span>
-										    </div>
-										    <span>...</span>
-										</el-tooltip> -->
 									</com-ellipsis>
 								</el-tooltip>
-								
-								
-								
                             </template>
                         </template>
                     </el-table-column>
@@ -377,7 +298,7 @@ Yii::$app->loadComponentView('goods/com-batch');
         props: {
             goods_url: {
                 type: String,
-                default: 'mall/goods/index'
+                default: 'mall/goods/recycle-bin'
             },
             edit_goods_url: {
                 type: String,
@@ -385,11 +306,11 @@ Yii::$app->loadComponentView('goods/com-batch');
             },
             destroy_goods_url: {
                 type: String,
-                default: 'mall/goods/put-recycle'
+                default: 'mall/goods/delete'
             },
-            goods_copy_goods_url: {
+            recovery_goods_url: {
                 type: String,
-                default: 'mall/goods/copy'
+                default: 'mall/goods/recovery-goods'
             },
             edit_goods_sort_url: {
                 type: String,
@@ -427,22 +348,6 @@ Yii::$app->loadComponentView('goods/com-batch');
                 type: Array,
                 default: function () {
                     return [
-                        {
-                            name: '全部',
-                            value: '-1'
-                        },
-                        {
-                            name: '销售中',
-                            value: '1'
-                        },
-                        {
-                            name: '下架中',
-                            value: '0'
-                        },
-                        {
-                            name: '售罄',
-                            value: '2'
-                        },
                     ];
                 }
             },
@@ -668,6 +573,39 @@ Yii::$app->loadComponentView('goods/com-batch');
                 }).catch(() => {
                     self.$message.info('已取消删除')
             })
+                ;
+            },
+            recovery(row, index) {
+                let self = this;
+                self.$confirm('是否移出回收站?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.listLoading = true;
+                    request({
+                        params: {
+                            r: this.recovery_goods_url,
+                        },
+                        method: 'post',
+                        data: {
+                            id: row.id,
+                        }
+                    }).then(e => {
+                        self.listLoading = false;
+                        if (e.data.code === 0) {
+                            self.list.splice(index, 1);
+                            self.$message.success(e.data.msg);
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).
+                    catch(e => {
+                        console.log(e);
+                    })
+                    ;
+                }).catch(() => {
+                })
                 ;
             },
             applyStatus(id) {

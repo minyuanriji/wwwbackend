@@ -75,6 +75,7 @@ class UserForm extends BaseModel
             //商户商品数量
             $returnData['stat']['goods_num'] = (int)Goods::find()->where([
                 'is_delete' => 0,
+                'is_recycle' => 0,
                 'mch_id'    => $mchInfo['id']
             ])->count();
         }
@@ -134,7 +135,7 @@ class UserForm extends BaseModel
 
         $favoriteCount = GoodsCollect::find()->alias('f')->where(['f.user_id' => $user->id, 'f.is_delete' => 0])
             ->leftJoin(['g' => Goods::tableName()], 'g.id = f.goods_id')
-            ->andWhere(['g.status' => 1, 'g.is_delete' => 0])->count();
+            ->andWhere(['g.status' => 1, 'g.is_delete' => 0,'g.is_recycle' => 0])->count();
 
         //商户信息
         $mchInfo = $this->getMchInfo();

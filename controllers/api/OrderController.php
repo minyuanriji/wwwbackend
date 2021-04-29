@@ -162,6 +162,18 @@ class OrderController extends ApiController
         return $form->getRefundOrderList();
     }
 
+    /**
+     * 订单售后删除记录
+     * @return array
+     * @throws \Exception
+     */
+    public function actionDelRefundOrder()
+    {
+        $form = new OrderForm();
+        $form->attributes = $this->requestData;
+        return $form->DelRefundOrder();
+    }
+
 
     /**
      * 订单详情

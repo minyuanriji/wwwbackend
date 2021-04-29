@@ -200,6 +200,7 @@ class OrderSubmitForm extends ParentOrderSubmitForm
             'mall_id'   => \Yii::$app->mall->id,
             'status'    => 1,
             'is_delete' => 0,
+            'is_recycle' => 0,
         ])->one();
     }
 

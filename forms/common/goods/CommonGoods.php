@@ -58,7 +58,7 @@ class CommonGoods extends BaseModel
             ->with(['cards' => function ($query) {
                 $query->via->andWhere(['is_delete' => 0]);
             }])
-            ->where(['id' => $id, 'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, 'mch_id' => $mchId]);
+            ->where(['id' => $id, 'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, 'is_recycle' => 0, 'mch_id' => $mchId]);
 
         return $query->asArray($asArray)->one();
     }

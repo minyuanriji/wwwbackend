@@ -66,7 +66,7 @@ class CollectForm extends BaseModel
         if (!$this->goods_id) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL, '收藏失败');
         }
-        $goods_exist = Goods::find()->where(['id' => $this->goods_id, 'is_delete' => 0])->exists();
+        $goods_exist = Goods::find()->where(['id' => $this->goods_id, 'is_delete' => 0, 'is_recycle' => 0])->exists();
         if (!$goods_exist) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL, '商品不存在或已被删除');
         }

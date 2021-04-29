@@ -27,6 +27,10 @@ class OrderExport extends BaseExport
                 'value' => '订单号',
             ],
             [
+                'key' => 'goods_supplier',
+                'value' => '供应商',
+            ],
+            [
                 'key' => 'pay_order_no',
                 'value' => '商户单号',
             ],

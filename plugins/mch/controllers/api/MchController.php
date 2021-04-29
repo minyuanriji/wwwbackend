@@ -97,7 +97,7 @@ class MchController extends ApiController
     public function actionAddVisit()
     {
         $form = new VisitLogEditForm();
-        $form->attributes = \Yii::$app->request->post();
+        $form->attributes = $this->requestData;
         return $this->asJson($form->save());
     }
 

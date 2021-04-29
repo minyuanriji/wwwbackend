@@ -56,6 +56,7 @@ abstract class BaseGoodsList extends BaseModel
         $query = $model::find()->alias('g')->where([
             'g.mall_id' => \Yii::$app->mall->id,
             'g.is_delete' => 0,
+            'g.is_recycle' => 0,
         ]);
         // 商品名称搜索
         if (isset($search['keyword']) && $search['keyword']) {
@@ -74,6 +75,9 @@ abstract class BaseGoodsList extends BaseModel
             if ($search['sort_prop'] == 'mchGoods.sort') {
                 $query->leftJoin(['mg' => MchGoods::tableName()], 'mg.goods_id=g.id');
                 $query->orderBy(['mg.sort' => $sortType]);
+            } elseif ($search['sort_prop'] == 'goods_brand') {
+                $order_by = "CONVERT(" . 'g.' . $search['sort_prop'] ." USING GBK) ". ($search['sort_type'] ? 'desc' : 'asc');
+                $query->orderBy($order_by);
             } else {
                 $query->orderBy(['g.' . $search['sort_prop'] => $sortType]);
             }
@@ -244,5 +248,82 @@ abstract class BaseGoodsList extends BaseModel
             ->all();
 //        echo $query->createCommand()->getRawSql();die;
         return $query;
+    }
+
+    //获取商品回收站列表
+    public function getRecycleList()
+    {
+        if (!$this->validate()) {
+            return $this->responseErrorInfo();
+        }
+
+        try {
+            $search = \Yii::$app->serializer->decode($this->search);
+        } catch (\Exception $exception) {
+            $search = [];
+        }
+
+        /** @var Goods $model */
+        $model = $this->goodsModel;
+        $query = $model::find()->alias('g')->where([
+            'g.mall_id' => \Yii::$app->mall->id,
+            'g.is_delete' => 0,
+            'g.is_recycle' => 1,
+        ]);
+        // 商品名称搜索
+        if (isset($search['keyword']) && $search['keyword']) {
+            $keyword = trim($search['keyword']);
+            $goodsIds = GoodsWarehouse::find()->andWhere(['is_delete' => 0])
+                ->keyword($keyword, ['LIKE', 'name', $keyword])->select('id');
+            $query->andWhere([
+                'or',
+                ['like', 'g.id', $search['keyword']],
+                ['g.goods_warehouse_id' => $goodsIds]
+            ]);
+        }
+        // 商品排序
+        if (isset($search['sort_prop']) && $search['sort_prop'] && isset($search['sort_type'])) {
+            $sortType = $search['sort_type'] ? SORT_ASC : SORT_DESC;
+            if ($search['sort_prop'] == 'mchGoods.sort') {
+                $query->leftJoin(['mg' => MchGoods::tableName()], 'mg.goods_id=g.id');
+                $query->orderBy(['mg.sort' => $sortType]);
+            } elseif ($search['sort_prop'] == 'goods_brand') {
+                $order_by = "CONVERT(" . 'g.' . $search['sort_prop'] ." USING GBK) ". ($search['sort_type'] ? 'desc' : 'asc');
+                $query->orderBy($order_by);
+            } else {
+                $query->orderBy(['g.' . $search['sort_prop'] => $sortType]);
+            }
+        } else {
+            $query->orderBy(['g.created_at' => SORT_DESC]);
+        }
+        $query = $this->setQuery($query);
+
+        $newQuery = clone $query;
+
+        $goodsCount = $newQuery->count();
+        /**
+         * @var BasePagination $pagination
+         */
+        $list = $query->with('goodsWarehouse.cats', 'attr')->page($pagination)->all();
+
+        $newList = $this->handleData($list);
+        $goods_ids = array_unique(array_column($newList,'id'));
+        $goods_num = $this->real_sales($goods_ids);
+        $new_goods_num = array_combine(array_column($goods_num,'goods_id'),$goods_num);
+        foreach ($newList as $key => $value) {
+            $newList[$key]['real_sales'] = 0;
+            if (isset($new_goods_num[$value['id']])) {
+                $newList[$key]['real_sales'] = $new_goods_num[$value['id']]['num'];
+            }
+        }
+        return [
+            'code' => ApiCode::CODE_SUCCESS,
+            'msg' => '请求成功',
+            'data' => [
+                'list' => $newList,
+                'pagination' => $pagination,
+                'goods_count' => $goodsCount
+            ]
+        ];
     }
 }

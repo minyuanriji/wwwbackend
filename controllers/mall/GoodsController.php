@@ -221,6 +221,32 @@ class GoodsController extends MallController
     }
 
     /**
+     * @Note:商品放入回收站
+     * @return \yii\web\Response
+     */
+    public function actionPutRecycle()
+    {
+        $form = new GoodsForm();
+        $form->attributes = \Yii::$app->request->post();
+        $res = $form->deleteRecycle();
+
+        return $this->asJson($res);
+    }
+
+    /**
+     * @Note:恢复商品
+     * @return \yii\web\Response
+     */
+    public function actionRecoveryGoods()
+    {
+        $form = new GoodsForm();
+        $form->attributes = \Yii::$app->request->post();
+        $res = $form->recoveryGoods();
+
+        return $this->asJson($res);
+    }
+
+    /**
      * @Author: 广东七件事 ganxiaohao
      * @Date: 2020-04-25
      * @Time: 9:59
@@ -558,6 +584,24 @@ class GoodsController extends MallController
         $goods_id = \Yii::$app->request->get('choose_list');
         $goods_id = !empty($goods_id) ? $goods_id : '*';
         $res = (new ExportData()) -> getGoodsData($goods_id);
+    }
+
+    /**
+     *
+     * @Note:商品回收站
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionRecycleBin()
+    {
+        if (\Yii::$app->request->isAjax) {
+            $form = new GoodsListForm();
+            $form->attributes = \Yii::$app->request->get();
+            $form->attributes = \Yii::$app->request->get('search');
+            $res = $form->getRecycleList();
+            return $this->asJson($res);
+        } else {
+            return $this->render('recycle-bin');
+        }
     }
 
 

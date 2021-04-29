@@ -85,6 +85,7 @@ abstract class BaseGoodsEdit extends BaseModel
     public $order_sales;
     public $cannotrefund;
     public $goods_brand;
+    public $goods_supplier;
 
     //分销
     public $individual_share;
@@ -136,7 +137,7 @@ abstract class BaseGoodsEdit extends BaseModel
                 'attr_setting_type', 'goods_weight', 'is_area_limit', 'form_id'], 'default', 'value' => 0],
             [['app_share_title', 'app_share_pic', 'attr_default_name'], 'default', 'value' => ''],
             [['sort'], 'default', 'value' => 100],
-            [['area_limit','goods_brand'], 'trim'],
+            [['area_limit','goods_brand','goods_supplier'], 'trim'],
             [['confine_count', 'confine_order_count'], 'default', 'value' => -1],
             [['forehead_score_type', 'give_score_type', 'is_level',
                 'is_default_services'], 'default', 'value' => 1],
@@ -381,6 +382,7 @@ abstract class BaseGoodsEdit extends BaseModel
         $goods->is_area_limit = $this->is_area_limit;
         $goods->area_limit = \Yii::$app->serializer->encode($this->area_limit);
         $goods ->goods_brand = $this -> goods_brand;
+        $goods ->goods_supplier = $this -> goods_supplier;
         if($this->labels!=[]){
             $goods->labels = SerializeHelper::encode($this->labels);
         }

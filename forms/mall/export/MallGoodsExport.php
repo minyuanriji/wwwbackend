@@ -37,6 +37,10 @@ class MallGoodsExport extends BaseExport
                 'value' => '品牌'
             ],
             [
+                'key' => 'goods_supplier',
+                'value' => '供应商'
+            ],
+            [
                 'key' => 'original_price',
                 'value' => '原价',
             ],

@@ -219,7 +219,7 @@ class DataForm extends BaseModel{
         $order_query = Order::find()->alias('o')->where(['o.is_recycle' => 0, 'o.is_delete' => 0, 'o.mall_id' => \Yii::$app->mall->id,])
             ->leftJoin(['i' => User::tableName()], 'i.id = o.user_id')
             ->andWhere(['not', ['o.cancel_status' => 1]])->andWhere(['o.mch_id' => 0]);
-        $good_query = Goods::find()->alias('g')->where(['g.is_delete' => 0, 'g.mall_id' => \Yii::$app->mall->id,])->groupBy('goods_warehouse_id');
+        $good_query = Goods::find()->alias('g')->where(['g.is_delete' => 0,'g.is_recycle' => 0, 'g.mall_id' => \Yii::$app->mall->id,])->groupBy('goods_warehouse_id');
         //时间查询
 
         if ($this->date_start) {

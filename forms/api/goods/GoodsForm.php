@@ -69,7 +69,7 @@ class GoodsForm extends BaseModel
             return $this->returnApiResultData();
         }
         try {
-            $goods = Goods::findOne(['is_delete' => 0, 'id' => $this->id, 'status' => 1, 'mall_id' => \Yii::$app->mall->id]);
+            $goods = Goods::findOne(['is_delete' => 0, 'is_recycle' => 0, 'id' => $this->id, 'status' => 1, 'mall_id' => \Yii::$app->mall->id]);
             if (!$goods) {
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, '该商品不存在或者已下架！');
             }

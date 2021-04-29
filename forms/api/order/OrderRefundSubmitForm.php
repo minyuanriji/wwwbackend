@@ -41,10 +41,10 @@ class OrderRefundSubmitForm extends BaseModel
     public function rules()
     {
         return [
-            [['order_detail_id','reason', 'type', 'pic_list', 'refund_price'], 'required'],
+            [['order_detail_id','reason', 'type', 'pic_list', 'refund_price', 'reason'], 'required'],
             [['order_detail_id','is_receipt', 'type'], 'integer'],
             [['refund_price'],'number'],
-            [['remark'], 'string'],
+            [['remark', 'reason'], 'string'],
             [['refund_total_price'],'safe']
         ];
     }
@@ -66,7 +66,7 @@ class OrderRefundSubmitForm extends BaseModel
             }
 
             if($this->type == OrderRefund::TYPE_ONLY_REFUND && ($this->is_receipt == -1 || $this->is_receipt === "")){
-                throw new \Exception('请选择货物状态');
+                return $this->returnApiResultData(1,'请选择货物状态');
             }
 
             /** @var OrderDetail $orderDetail */

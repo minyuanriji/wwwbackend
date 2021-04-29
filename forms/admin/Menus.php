@@ -476,6 +476,13 @@ class Menus
                             ],
                         ],
                     ],
+                    [
+                        'name' => '商品回收站',
+                        'route' => 'mall/goods/recycle-bin',
+                        'action' => [
+
+                        ]
+                    ],
                 ],
             ],
             [
@@ -571,7 +578,11 @@ class Menus
                         'route' => 'mall/order-clerk/index',
                         'action' => [
                         ]
+<<<<<<< HEAD
                     ]
+=======
+                    ],
+>>>>>>> 9909581ec6cd14c8491004e1ca0d7bbb2c3efabb
                 ],
             ],
             [

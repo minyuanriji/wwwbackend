@@ -39,6 +39,7 @@ class OrderForm extends BaseModel
     public $id;// 订单ID
     public $offline;
     public $offline_used;
+    public $order_refund_id;
 
     public function rules()
     {
@@ -46,6 +47,7 @@ class OrderForm extends BaseModel
             [['page', 'limit', 'status', 'id', 'offline', 'offline_used'], 'integer'],
             ['page', 'default', 'value' => 1],
             ['limit', 'default', 'value' => 20],
+            ['order_refund_id', 'safe'],
         ];
     }
 
@@ -230,6 +232,35 @@ class OrderForm extends BaseModel
             // dd($exception);
         }
         return $goodsInfo;
+    }
+
+    /**
+     * 售后订单取消
+     * @return array
+     */
+    public function DelRefundOrder()
+    {
+        try {
+            /* @var Order $order */
+            $order = OrderRefund::find()->where([
+                'mall_id' => \Yii::$app->mall->id,
+                'user_id' => \Yii::$app->user->id,
+                'is_delete' => 0,
+                'id' => $this->order_refund_id,
+            ])->one();
+
+            if (!$order) {
+                throw new \Exception('售后订单数据异常');
+            }
+            $order->is_delete = 1;
+            $res = $order->save();
+            if (!$res) {
+                throw new \Exception($this->responseErrorMsg($order));
+            }
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'删除成功');
+        } catch (\Exception $e) {
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($e));
+        }
     }
 
 }

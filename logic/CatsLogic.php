@@ -81,6 +81,7 @@ class CatsLogic
         $list = Goods::find()->alias('g')->where([
             'g.sign' => $this->sign,
             'g.is_delete' => 0,
+            'g.is_recycle' => 0,
             'g.mall_id' => \Yii::$app->mall->id,
             'g.status' => 1,
             'g.mch_id' => \Yii::$app->admin->identity->mch_id,

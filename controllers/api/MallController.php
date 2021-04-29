@@ -36,6 +36,10 @@ class MallController extends ApiController
         $setting['setting'] = $mall_setting['setting'];
         $pageTitle = AppConfigLogic::getPageTitleConfig();
         $navbar = AppConfigLogic::getNavbar();
+        /*$navbar = json_decode(json_encode($navbar),true);
+        if (is_array($navbar) && $navbar && isset($navbar['navs'][2]))
+            $navbar['navs'][2]['url'] = $navbar['navs'][2]['url'] ? '/pages/enter/enter' : '';
+*/
 
         $userCenter = AppConfigLogic::getUserCenter(1);
 

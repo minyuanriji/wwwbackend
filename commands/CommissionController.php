@@ -245,7 +245,7 @@ class CommissionController extends BaseCommandController{
             //先判断是否直推
             $newQuery = clone $query;
             $newQuery->andWhere(["crc.unique_key" => $parentData['role_type'] . "#all"]);
-            $ruleData = $getChainRuleData($newQuery, $parentData);
+            $ruleData = $getChainRuleData($newQuery, $item_id);
 
             //不是直推，模糊查询
             if(!$ruleData){

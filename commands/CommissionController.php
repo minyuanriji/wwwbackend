@@ -182,11 +182,11 @@ class CommissionController extends BaseCommandController{
 
         //对获取的所有上级进行处理
         $existData = $newParentDatas = [];
-        $partner2 = null;
+        $partner2Data = null;
         foreach($parentDatas as $parentData){
             if(count($existData) >= 3) break;
             if($parentData['role_type'] == "partner" && isset($existData['partner'])){
-                $partner2 = $parentData['id'];
+                $partner2Data = $parentData;
                 continue;
             }
             if(!isset($existData[$parentData['role_type']])){
@@ -195,9 +195,21 @@ class CommissionController extends BaseCommandController{
             }
         }
 
+        //平级合伙人插入
+        $newParentDatas = array_reverse($newParentDatas);
+        if(!empty($partner2Data)){
+            $tmpDatas = [];
+            foreach($newParentDatas as $parentData){
+                if($parentData['role_type'] == "partner"){
+                    $tmpDatas[] = $partner2Data;
+                }
+                $tmpDatas[] = $parentData;
+            }
+            $newParentDatas = $tmpDatas;
+        }
+        
         //生成相关规则键
         $parentDatas = [];
-        $newParentDatas = array_reverse($newParentDatas);
         while(!empty($newParentDatas)){
             $relKeys = [];
             foreach($newParentDatas as $newParentData){

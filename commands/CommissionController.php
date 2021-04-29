@@ -251,6 +251,9 @@ class CommissionController extends BaseCommandController{
                 $newQuery = clone $query;
                 $newQuery->andWhere("crc.unique_key LIKE '%{$relKey}'" );
                 $ruleData = $getChainRuleData($newQuery, $item_id);
+                $this->commandOut("current LEVEL:" . $currentLevel);
+                $this->commandOut($newQuery->createCommand()->getRawSql());
+                $this->commandOut(json_encode($ruleData));
                 if($ruleData) break;
             }
 

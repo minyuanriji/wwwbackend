@@ -156,6 +156,9 @@ class CommissionController extends BaseCommandController{
      * @return array
      */
     private function getCommissionParentRuleDatas($user_id, $item_id, $item_type){
+
+
+
         //获取支付用户信息
         $user = User::findOne($user_id);
         $userLink = UserRelationshipLink::findOne(["user_id" => $user_id]);
@@ -205,25 +208,7 @@ class CommissionController extends BaseCommandController{
             $parentDatas[] = $parentData;
         }
 
-        foreach($parentDatas as $key => $parentData){
-
-            $query = CommissionRuleChain::find()->alias("crc");
-            $query->leftJoin("{{%plugin_commission_rules}} cr", "cr.id=crc.rule_id");
-            $subWheres = [];
-            foreach($parentData['rel_keys'] as $rel_key){
-                $subWheres[] = "crc.unique_key LIKE '%{$rel_key}'";
-            }
-            $query->andWhere([
-                "AND",
-                ["cr.is_delete" => 0],
-                ['cr.item_type' => $item_type],
-                ['crc.role_type' => $parentData['role_type']],
-                "(".implode(" OR ", $subWheres).")"
-            ]);
-            $query->orderBy("crc.level DESC");
-            $query->select(["cr.commission_type", "crc.level", "crc.commisson_value"]);
-            $query->asArray();
-
+        $getChainRuleData = function(ActiveQuery $query, $item_id){
             //商品独立设置规则
             $newQuery = clone $query;
             $newQuery->andWhere([
@@ -238,6 +223,39 @@ class CommissionController extends BaseCommandController{
                 $newQuery = clone $query;
                 $newQuery->andWhere(['cr.apply_all_item' => 1]);
                 $ruleData = $newQuery->one();
+            }
+
+            return $ruleData;
+        };
+
+        foreach($parentDatas as $key => $parentData){
+
+            $query = CommissionRuleChain::find()->alias("crc");
+            $query->leftJoin("{{%plugin_commission_rules}} cr", "cr.id=crc.rule_id");
+            $query->andWhere([
+                "AND",
+                ["cr.is_delete"  => 0],
+                ['cr.item_type'  => $item_type],
+                ['crc.role_type' => $parentData['role_type']]
+            ]);
+            $query->orderBy("crc.level DESC");
+            $query->select(["cr.commission_type", "crc.level", "crc.commisson_value"]);
+            $query->asArray();
+
+            //先判断是否直推
+            $newQuery = clone $query;
+            $newQuery->andWhere(["crc.unique_key" => $parentData['role_type'] . "#all"]);
+            $ruleData = $getChainRuleData($newQuery, $parentData);
+
+            //不是直推，模糊查询
+            if(!$ruleData){
+                $subWheres = [];
+                foreach($parentData['rel_keys'] as $rel_key){
+                    $subWheres[] = "crc.unique_key LIKE '%{$rel_key}'";
+                }
+                $newQuery = clone $query;
+                $newQuery->andWhere("(".implode(" OR ", $subWheres).")");
+                $ruleData = $getChainRuleData($newQuery, $item_id);
             }
 
             $parentDatas[$key]['rule_data'] = $ruleData ? $ruleData : null;

@@ -18,7 +18,8 @@ class UserRelationshipLink extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'parent_id', 'left', 'right'], 'required']
+            [['user_id', 'parent_id', 'left', 'right'], 'required'],
+            [['is_delete', 'delete_reason'], 'safe']
         ];
     }
 }

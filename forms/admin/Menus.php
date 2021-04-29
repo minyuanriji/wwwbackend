@@ -557,13 +557,21 @@ class Menus
                         ]
                     ],
                     [
+                        'name' => '批量发货',
+                        'route' => 'mall/order/batch-send',
+                        'action' => [
+                            [
+                                'name' => '批量发货',
+                                'route' => 'mmall/order/batch-send'
+                            ],
+                        ]
+                    ],
+                    [
                         'name' => '核销记录',
                         'route' => 'mall/order-clerk/index',
                         'action' => [
-
                         ]
                     ]
-
                 ],
             ],
             [

@@ -18,6 +18,7 @@ use app\handlers\UserRelationChangeHandler;
 use app\logic\UserLogic;
 use app\models\BaseModel;
 use app\models\User;
+use app\models\UserRelationshipLink;
 
 class UserEditForm extends BaseModel
 {
@@ -74,28 +75,39 @@ class UserEditForm extends BaseModel
             ];
         }
 
-        if ($this->id == $this->parent_id) {
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => '自己不能设置自己为父级id'
-            ];
-        }
+        //设置上级推荐人
+        if($this->parent_id){
+            try {
+                if ($this->id == $this->parent_id) {
+                    throw new \Exception("自己不能设置自己为父级id");
+                }
 
-        //获取所有下级
-        //$childList = $form->getChildList();
-        //获取用户团队所有成员
-        $userTeamList = UserLogic::getUserTeamAllData($form->id);
-        //上级不能是团队下级
-        if (in_array($this->parent_id, $userTeamList["child_list"])) {
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => '上级推荐人不能变更为团队下级，必须是平级和上级'
-            ];
+                $parentUser = User::findOne($this->parent_id);
+                if(!$parentUser){
+                    throw new \Exception("上级推荐人不存在");
+                }
+
+                $parentLink = UserRelationshipLink::findOne(["user_id" => $parentUser->id]);
+                $userLink = UserRelationshipLink::findOne(["user_id" => $this->id]);
+                if(!$parentLink || !$userLink){
+                    throw new \Exception("用户关系链建立异常");
+                }
+
+                if($parentLink->left > $userLink->left && $parentLink->right < $userLink->right){
+                    throw new \Exception("上级推荐人不能变更为团队下级，必须是平级和上级");
+                }
+            }catch (\Exception $e){
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => $e->getMessage()
+                ];
+            }
+
         }
 
         $beforeParentId = $form->parent_id;
         $form->is_blacklist = $this->is_blacklist;
-        //$form->parent_id = $this->parent_id;
+        $form->parent_id = $this->parent_id;
         $form->junior_at = time();
         $form->level = $this->member_level;
         $form->role_type = $this->role_type;

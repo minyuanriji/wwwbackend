@@ -1,175 +1,290 @@
 <?php
 namespace app\commands;
 
-use app\core\ApiCode;
-use app\forms\common\UserRelationshipLinkForm;
 use app\models\User;
 use app\models\UserRelationshipLink;
-use yii\console\Controller;
-use yii\log\Logger;
 
-class UserRelationshipLinkController extends Controller {
-
-    const JOB_HEAT_TIMEOUT      = 60;
-    const JOB_CAHCE_DURATION    = 3600 * 24 * 7;
-    const JOB_UNIQUE_CACHE_KEY  = "UserRelationshipLinkUniqueCacheKey";
+class UserRelationshipLinkController extends BaseCommandController {
 
     /**
-     * 重建用户关系表
+     * 维护用户关系链
      */
-    public function actionRebuildJob(){
+    public function actionMaintantJob(){
+
+        $this->mutiKill(); //只能只有一个维护服务
+
+        echo date("Y-m-d H:i:s") . " 关系链守候程序启动...完成\n";
+
         while (true){
 
-            if(!$this->hasJob())
+            $this->sleep(1);
+
+            /**
+             * ================================================
+             *  丢失父级
+             * ------------------------------------------------
+             */
+            if($this->maintantMissParent()){
                 continue;
-
-            /** 开始执行重建任务 */
-            $cache = \Yii::$app->getCache();
-            $cacheData = $cache->get(UserRelationshipLinkForm::REBUILD_JOB_CACHE_KEY);
-            $cacheData['status'] = UserRelationshipLinkForm::REBUILD_JOB_STATUS_RUNNING;
-            $cache->set(UserRelationshipLinkForm::REBUILD_JOB_CACHE_KEY, $cacheData, self::JOB_CAHCE_DURATION);
-
-            //清空所有关系链
-            UserRelationshipLink::deleteAll();
-
-            //表前缀
-            $tablePrefix = \Yii::$app->db->tablePrefix;
-
-            //锁住待操作表
-            \Yii::$app->db->pdo->exec("LOCK TABLES {$tablePrefix}user AS u READ,{$tablePrefix}user READ,{$tablePrefix}user_relationship_link WRITE,{$tablePrefix}user_relationship_link AS url WRITE");
-
-            try {
-                while (true){
-
-                    //获取一个待操作用户
-                    $query = User::find()->alias("u");
-                    $query->leftJoin("{{%user_relationship_link}} url", "url.user_id=u.id");
-                    $query->andWhere("url.user_id IS NULL");
-                    $query->orderBy("u.id ASC");
-                    $user = $query->one();
-
-                    if(!$user) break;
-
-                    echo "running rebuild job:" . $user->id . "\n";
-
-                    //设置运行时缓存
-                    $cacheData['user_id'] = $user->id;       //当前操作用户ID
-                    $cacheData['count']   = $query->count(); //剩余待才操作用户数
-                    $this->setRuntimeCache($cacheData);
-
-                    $parent = User::findOne($user->parent_id);
-                    $userList = [$user];
-                    while($parent){
-                        array_unshift($userList, $parent);
-                        if($parent->id == $parent->parent_id){
-                            $parent->parent_id = 0;
-                        }
-                        $parent = User::findOne($parent->parent_id);
-                    }
-
-                    try {
-                        foreach($userList as $key => $user){
-
-                            $link = UserRelationshipLink::findOne(["user_id" => $user->id]);
-                            if($link) continue;
-
-                            if($key > 0){
-                                $parent = $userList[$key - 1];
-                            }else{
-                                $user->parent_id = ($user->id != $user->parent_id) ? $user->parent_id : 0;
-                                $parent = User::findOne($user->parent_id);
-                            }
-
-                            if($parent){
-                                $link = UserRelationshipLink::findOne(["user_id" => $parent->id]);
-                                if(!$link){
-                                    throw new \Exception("关系链异常");
-                                }
-
-                                $left = $link->right;
-                                $right = $left + 1;
-
-                                UserRelationshipLink::updateAllCounters(["left" => 2, "right" => 2],
-                                    "`left` > '".$link->right."'");
-                                UserRelationshipLink::updateAllCounters(["right" => 2],
-                                    "`left` <= '".$link->left."' AND `right` >= '".$link->right."'");
-
-                            }else{
-                                $maxLink = UserRelationshipLink::find()->select(["right"])->orderBy("`right` DESC")->limit(1)->one();
-                                $left = $maxLink ? ($maxLink->right + 1) : 0;
-                                $right = $left + 1;
-                            }
-
-                            $link = new UserRelationshipLink([
-                                "user_id"   => $user->id,
-                                "parent_id" => $user->parent_id,
-                                "left"      => $left,
-                                "right"     => $right
-                            ]);
-                            if(!$link->save()){
-                                throw new \Exception(json_encode($link->getErrors()));
-                            }
-                        }
-                    }catch (\Exception $e){
-                        throw $e;
-                    }
-                }
-            }catch (\Exception $e){
-                $cacheData['error'] = $e->getMessage();
-                //\Yii::$app->log->getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, "UserRelationshipLinkRebuildJob");
             }
 
-            \Yii::$app->db->createCommand("UNLOCK tables")->execute();
+            /**
+             * ================================================
+             *  新增
+             * ------------------------------------------------
+             */
+            if($this->maintantInsert()){
+                continue;
+            }
 
-            //结束
-            $cacheData['status'] = UserRelationshipLinkForm::REBUILD_JOB_STATUS_FINISHED;
-            $cache->set(UserRelationshipLinkForm::REBUILD_JOB_CACHE_KEY, $cacheData, self::JOB_CAHCE_DURATION);
+            /**
+             * ================================================
+             *  修改
+             * ------------------------------------------------
+             */
+            if($this->maintantModified()){
+                continue;
+            }
+
         }
-
     }
 
     /**
-     * 设置运行时缓存
+     * 丢失父级
      */
-    private function setRuntimeCache($data = []){
-        $cache = \Yii::$app->getCache();
-        $cacheData = $cache->get(UserRelationshipLinkForm::REBUILD_JOB_CACHE_KEY);
-        if(!empty($cacheData) && $cacheData['status'] != UserRelationshipLinkForm::REBUILD_JOB_STATUS_RUNNING){ //运行状态异常
-            exit("runtime status error");
+    private function maintantMissParent(){
+        \Yii::$app->db->schema->refresh();
+        try {
+            //获取一个待操作用户
+            $query = UserRelationshipLink::find()->alias("c");
+            $query->leftJoin("{{%user_relationship_link}} p", "p.user_id=c.parent_id");
+            $query->leftJoin("{{%user}} u", "u.id=p.user_id");
+            $query->andWhere([
+                "AND",
+                "c.parent_id > 0",
+                "p.user_id IS NULL",
+                "u.id > 0"
+            ]);
+            $userLink = $query->orderBy("c.left ASC")->one();
+            if(!$userLink){
+                return false;
+            }
+
+            $this->commandOut("user[" . $userLink->user_id . "] miss parent[".$userLink->parent_id."]");
+
+            //把缺失父级的所有下级删掉
+            $whereStr = "`left` >= '".$userLink->left."' AND `right` <= '".$userLink->right."'";
+            UserRelationshipLink::deleteAll($whereStr);
+
+        }catch (\Exception $e){
+            $this->commandOut($e->getMessage());
         }
 
-        $cacheData = array_merge($data, [
-            'heat_time' => time(),
-            'status'    => UserRelationshipLinkForm::REBUILD_JOB_STATUS_RUNNING
-        ]);
-
-        $cache->set(UserRelationshipLinkForm::REBUILD_JOB_CACHE_KEY, $cacheData, self::JOB_CAHCE_DURATION );
-
+        return true;
     }
 
     /**
-     * 判断是否有任务要执行
-     * @return bool
+     * 新增关系
      */
-    private function hasJob(){
-        $cache = \Yii::$app->getCache();
-        $cacheData = $cache->get(UserRelationshipLinkForm::REBUILD_JOB_CACHE_KEY);
-        if(empty($cacheData) || $cacheData['status'] != UserRelationshipLinkForm::REBUILD_JOB_STATUS_WAITTING){
-            if($cacheData && $cacheData['status'] == UserRelationshipLinkForm::REBUILD_JOB_STATUS_RUNNING){ //还在运行中
-                if(!empty($cacheData['heat_time']) ){
-                    if((time() - $cacheData['heat_time']) > self::JOB_HEAT_TIMEOUT){ //超时处理
-                        $cacheData['error']  = 'rebuild job timeout';
-                        $cacheData['status'] = UserRelationshipLinkForm::REBUILD_JOB_STATUS_FINISHED;
-                        $cache->set(UserRelationshipLinkForm::REBUILD_JOB_CACHE_KEY, $cacheData, self::JOB_CAHCE_DURATION);
+    private function maintantInsert(){
+
+        \Yii::$app->db->schema->refresh();
+        try {
+
+            //获取一个待操作用户
+            $query = User::find()->alias("u");
+            $query->leftJoin("{{%user_relationship_link}} url", "url.user_id=u.id");
+            $query->andWhere("url.user_id IS NULL");
+            $query->orderBy("u.id ASC");
+            $user = $query->one();
+
+            if(!$user) {
+                return false;
+            }
+
+            $this->commandOut("新增用户：".$user->id."关系链记录");
+
+            //找出用户所有上级
+            $userList = [$user];
+            while(true){
+                $parent = null;
+                if($user->parent_id && $user->id != $user->parent_id){
+                    $parent = User::findOne($user->parent_id);
+                }
+
+                if(!$parent) break;
+
+                array_unshift($userList, $parent);
+
+                $user = $parent;
+            }
+
+            $userList[0]->parent_id = 0;
+
+            $trans = \Yii::$app->getDb()->beginTransaction();
+            try {
+                foreach($userList as $key => $user){
+
+                    $link = UserRelationshipLink::findOne(["user_id" => $user->id]);
+                    if($link) continue;
+
+                    if($key > 0){
+                        $parent = $userList[$key - 1];
                     }else{
-                        exit("任务重复！");
+                        $user->parent_id = ($user->id != $user->parent_id) ? $user->parent_id : 0;
+                        $parent = User::findOne($user->parent_id);
+                    }
+
+                    if($parent){
+                        $parentLink = UserRelationshipLink::findOne(["user_id" => $parent->id]);
+                        if(!$parentLink){
+                            throw new \Exception("关系链异常");
+                        }
+
+                        $left  = $parentLink->right;
+                        $right = $left + 1;
+
+                        UserRelationshipLink::updateAllCounters(["left" => 2, "right" => 2],
+                            "`left` > '".$parentLink->right."'");
+
+                        UserRelationshipLink::updateAllCounters(["right" => 2],
+                            "`left` <= '".$parentLink->left."' AND `right` >= '".$parentLink->right."'");
+
+                    }else{
+                        $maxLink = UserRelationshipLink::find()->select(["right"])->orderBy("`right` DESC")->limit(1)->one();
+                        $left = $maxLink ? ($maxLink->right + 1) : 1;
+                        $right = $left + 1;
+                    }
+
+                    $link = new UserRelationshipLink([
+                        "user_id"   => $user->id,
+                        "parent_id" => $user->parent_id,
+                        "left"      => $left,
+                        "right"     => $right
+                    ]);
+                    if(!$link->save()){
+                        throw new \Exception(json_encode($link->getErrors()));
+                    }
+                }
+
+                $trans->commit();
+            }catch (\Exception $e){
+                $trans->rollBack();
+                throw $e;
+            }
+
+        }catch (\Exception $e){
+            $this->commandOut($e->getMessage());
+        }
+
+        return true;
+    }
+
+    /**
+     * 修改关系
+     */
+    private function maintantModified(){
+
+        \Yii::$app->db->schema->refresh();
+
+        $editLink = null;
+
+        $trans = \Yii::$app->db->beginTransaction();
+        try {
+            //获取一个待操作用户
+            $query = User::find()->alias("u");
+            $query->leftJoin("{{%user_relationship_link}} url", "url.user_id=u.id");
+            $query->leftJoin("{{%user}} new_p", "new_p.id=u.parent_id");
+            $query->andWhere([
+                "AND",
+                "url.user_id IS NOT NULL",
+                "u.parent_id <> url.parent_id",
+                "u.id <> u.parent_id",
+                "(new_p.id IS NOT NULL OR u.parent_id=0)"
+            ]);
+            $query->orderBy("u.id ASC");
+            $user = $query->one();
+
+            if(!$user){
+                $trans->rollBack();
+                return false;
+            };
+
+            $this->commandOut("修改用户：".$user->id."关系链记录");
+
+            $editLink = UserRelationshipLink::findOne(["user_id" => $user->id]);
+            if(!$editLink){
+                throw new \Exception("关系链获取失败");
+            }
+
+            //进行收缩处理
+            UserRelationshipLink::updateAll([
+                "is_delete"     => 1,
+                "delete_reason" => "parent changed"
+            ], "`left` >= '".$editLink->left."' AND `right` <= '".$editLink->right."'");
+
+            $gap  = $editLink->right - $editLink->left + 1;
+            UserRelationshipLink::updateAllCounters(["left" => -1 * $gap, "right" => -1 * $gap],
+                "`left` > '".$editLink->right."'");
+            if($editLink->parent_id){
+                UserRelationshipLink::updateAllCounters(["right" => -1 * $gap],
+                    "`left` < '".$editLink->left."' AND `right` > '".$editLink->right."'");
+            }
+
+            //新父级关系记录
+            $newParentLink = null;
+            if($user->parent_id && $user->id != $user->parent_id){
+                $newParent = User::findOne($user->parent_id);
+                if($newParent){
+                    $newParentLink = UserRelationshipLink::findOne(["user_id" => $user->parent_id]);
+                    if(!$newParentLink){
+                        throw new \Exception("无法获取父级关系链记录");
                     }
                 }else{
-                    $cache->delete(UserRelationshipLinkForm::REBUILD_JOB_CACHE_KEY);
+                    $user->parent_id = 0;
                 }
             }
-            return false;
+
+            //计算出最右值
+            if($newParentLink){
+                $maxRight = $newParentLink->right;
+            }else{
+                $maxLink  = UserRelationshipLink::find()->andWhere([
+                    "OR",
+                    "`left` < '".$editLink->left."'",
+                    "`right` > '".$editLink->right."'"
+                ])->select(["right"])->orderBy("`right` DESC")->limit(1)->one();
+                $maxRight = $maxLink ? ($maxLink->right+1) : 1;
+            }
+
+            $diff = $maxRight - $editLink->left;
+
+            //对新的父级关系进行扩展
+            UserRelationshipLink::updateAllCounters(["left" => $gap, "right" => $gap],
+                "`left` >= '".$maxRight."' AND is_delete=0");
+            UserRelationshipLink::updateAllCounters(["right" => $gap],
+                "`left` < '".$maxRight."' AND `right` >= '".$maxRight."' AND is_delete=0");
+
+            UserRelationshipLink::updateAllCounters(["left" => $diff, "right" => $diff],
+                "`left` >= '".$editLink->left."' AND `right` <= '".$editLink->right."' AND is_delete='1'");
+
+            $editLink = UserRelationshipLink::findOne($editLink->user_id);
+            $editLink->parent_id = $user->parent_id;
+            if(!$editLink->save()){
+                throw new \Exception(json_encode($editLink->getErrors()));
+            }
+
+            UserRelationshipLink::updateAll([
+                "is_delete"     => 0,
+                "delete_reason" => ""
+            ], "`left` >= '".$editLink->left."' AND `right` <= '".$editLink->right."'");
+
+            $trans->commit();
+        }catch (\Exception $e){
+            $trans->rollBack();
+            $this->commandOut($e->getMessage() . "\nline" . $e->getLine());
         }
+
         return true;
     }
 }

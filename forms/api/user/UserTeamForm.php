@@ -62,20 +62,19 @@ class UserTeamForm extends BaseModel
 
         //获取用户
         $user = User::findOne(\Yii::$app->user->id);
-        $levelInfo = $user->getUserLevel();
-        $teamOnlys = [];
-        if($levelInfo['level'] == "store"){ //我是店主
-            $teamOnlys[] = "user";
-        }
+        $userLink = UserRelationshipLink::findOne(["user_id" => $user->id]);
 
         //用户直推统计
-        $result['team_commission']['direct_push_total'] = User::find()->where([
-            "parent_id" => \Yii::$app->user->id,
-            "is_delete" => 0
-        ])->count();
+        $result['team_commission']['direct_push_total'] = UserRelationshipLinkForm::countDirectPush($user, $userLink);
 
         //用户团队统计
-        $result['team_commission']['space_push_total'] = 0;
+        $result['team_commission']['space_push_total'] = UserRelationshipLinkForm::countUserTeam($user, $userLink);
+
+        //团队订单
+        $result['team_commission']['team_order_count'] = UserRelationshipLinkForm::countUserTeamOrder($user, $userLink);
+
+        //团队订单
+        $result['team_commission']['team_order_total'] = UserRelationshipLinkForm::countUserTeamOrderTotoal($user, $userLink);
 
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '请求成功', $result);
     }
@@ -195,56 +194,71 @@ class UserTeamForm extends BaseModel
         if (!$this->validate()) {
             return $this->returnApiResultData();
         }
-        $query = UserChildren::find()->where(['user_id' => \Yii::$app->user->identity->id, 'is_delete' => 0]);
-        if ($this->flag == 1) {
-            $query->andWhere(['level' => 1]);
+
+        //获取用户
+        $user = User::findOne(\Yii::$app->user->id);
+        $userLink = UserRelationshipLink::findOne(["user_id" => $user->id]);
+
+        if ($this->flag == 1) { //直推
+            $query = UserRelationshipLinkForm::getDirectListQuery($user, $userLink);
+        }else{ //间推
+            $query = UserRelationshipLinkForm::getSecondList($user, $userLink);
         }
-        if ($this->flag == 2) {
-            //$query->andWhere(['>', 'level', 1]);
-            $query->andWhere(['level' => 2]);
-        }
-        /**
-         * @var BasePagination $pagination
-         */
-        $list = $query->with(['children' => function ($query) {
-            $query->select('id, nickname, avatar_url, junior_at, mobile');
-        }])->page($pagination, 10, $this->page)->orderBy(['id'=>SORT_DESC])->asArray()->all();
-        foreach($list as $key => $item){
-            if(empty($item['children'])){
-                unset($list[$key]);
+        $select = ["u.id", "u.role_type", "u.avatar_url", "u.nickname", "u.mobile", "u.junior_at", "u.created_at"];
+        $users = $query->orderBy("u.id DESC")->select($select)->page($pagination, 10, max(1, $this->page))->all();
+        $list = [];
+        if($users){
+            foreach($users as $user){
+                $item = [
+                    'id'            => $user->id,
+                    'user_id'       => $user->id,
+                    'children'  => [
+                        'avatar_url' => $user->avatar_url,
+                        'id'         => $user->id,
+                        'junior_at'  => $user->junior_at,
+                        'mobile'     => $user->mobile,
+                        'nickname'   => $user->nickname
+                    ],
+                    'created_at'    => date("Y-m-d H:i:s", $user->created_at),
+                ];
+
+                //订单数量
+                $item['order_count'] = (int)Order::find()->where([
+                    "user_id"    => $user->id,
+                    "is_pay"     => 1,
+                    "is_delete"  => 0,
+                    "is_recycle" => 0
+                ])->count();
+
+                //订单金额
+                $item['total_price'] = round((float)Order::find()->where([
+                    "user_id"    => $user->id,
+                    "is_pay"     => 1,
+                    "is_delete"  => 0,
+                    "is_recycle" => 0
+                ])->sum("total_goods_original_price"), 2);
+
+                //团队数量
+                $userLink = UserRelationshipLink::findOne(["user_id" => $user->id]);
+                $teamQuery = UserRelationshipLinkForm::userTeamQuery($user, $userLink);
+                $item['team_user_count'] = (int)$teamQuery->count();
+
+                //团队订单金额
+                $item['team_total_price'] = round((float)Order::find()->andWhere([
+                    "AND",
+                    ["is_pay" => 1],
+                    ["is_delete" => 0],
+                    ["is_recycle" => 0],
+                    ["IN", "user_id", $teamQuery->select(["ut.id"])]
+                ])->sum("total_goods_original_price"), 2);
+
+                $list[] = $item;
             }
         }
-
-        $list = array_values($list);
-        
-        foreach ($list as &$item) {
-            $query = CommonOrder::find()->alias('o')
-                ->leftJoin(['uc' => UserChildren::tableName()], 'uc.child_id=o.user_id')
-                ->andWhere(['uc.user_id' => $item['child_id'], 'uc.is_delete' => 0])
-                ->andWhere(['o.is_pay' => 1]);
-            
-            $team_order_count = $query->count();
-            $item['team_order_count'] = $team_order_count ?? 0;
-            $team_total_price = $query->sum('o.pay_price');
-            $item['team_total_price'] = $team_total_price ?? '0.00';
-            $query = CommonOrder::find()->alias('o')
-                ->andWhere(['o.user_id' => $item['child_id'], 'o.is_delete' => 0, 'o.is_pay' => 1]);
-            $order_count = $query->count();
-            $item['order_count'] = $order_count ?? 0;
-            $total_price = $query->sum('o.pay_price');
-            $total_price = $total_price ?? '0.00';
-            $item['total_price'] = $total_price;
-            $item['team_order_count'] += $order_count;
-            $team_total_price = $item['team_total_price'] + $total_price;
-            $item['team_total_price'] = number_format($team_total_price,2);
-            $team_user_count = UserChildren::find()->where(['user_id' => $item['child_id'], 'is_delete' => 0])->count();
-            $item['team_user_count'] = $team_user_count ?? '0';
-            $item['created_at']=date('Y-m-d H:i:s',$item['created_at']);
-            $item['avatar_url'] = !empty($item['avatar_url']) ? $item['avatar_url'] : "http://";
-           
-        }
-        
-        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, ['list' => $list, 'pagination' => $pagination]);
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, [
+            'list'       => $list,
+            'pagination' => $pagination
+        ]);
     }
 
 
@@ -285,31 +299,42 @@ class UserTeamForm extends BaseModel
         if (!$this->validate()) {
             return $this->returnApiResultData();
         }
-        
-        $query = UserChildren::find()->alias('uc')->where(['uc.user_id' => \Yii::$app->user->identity->id, 'uc.is_delete' => 0])
-            ->select('u.nickname,u.avatar_url,u.mobile,u.id as uid,pl.price,pl.common_order_detail_id,o.order_no,o.status,o.created_at')
-            ->leftJoin(['u' => User::tableName()], 'u.id=uc.child_id')
-            ->leftJoin(['co' => CommonOrder::tableName()], 'co.user_id=u.id and co.is_delete=0')
-            ->leftJoin(['o' => Order::tableName()], 'o.id=co.order_id')
-            ->leftJoin(['pl' => PriceLog::tableName()], 'pl.user_id=\''.\Yii::$app->user->identity->id.'\' and pl.order_id=co.order_id') -> orderBy('created_at DESC');
-        if ($this->status>=0 && $this->status<=2) {
-            $query->andWhere(['co.status' => $this->status]);
+
+        //获取用户
+        $user = User::findOne(\Yii::$app->user->id);
+        $userLink = UserRelationshipLink::findOne(["user_id" => $user->id]);
+
+        $query = Order::find()->alias("o")
+                    ->leftJoin("{{%user}} u", "u.id=o.user_id");
+        $query->andWhere([
+            "AND",
+            ["o.is_delete" => 0],
+            ["o.is_recycle" => 0],
+            ["IN", "o.user_id", UserRelationshipLinkForm::userTeamQuery($user, $userLink)->select("ut.id")]
+        ]);
+
+        if(is_numeric($this->status)){
+            if($this->status == 0){
+                $query->andWhere(["o.status" => 0]);
+            }elseif($this->status == 1){
+                $query->andWhere(["o.status" => 1]);
+            }elseif($this->status == 2){
+                $query->andWhere(["o.status" => 2]);
+            }
         }
-        $query->andWhere('pl.price > 0 OR pl.level=1');
-        $list = $query->page($pagination, 10, $this->page)->asArray()->all();
+        $select = ['u.nickname', 'u.avatar_url', 'u.mobile', 'u.id as uid',  'o.order_no', 'o.status', 'o.created_at'];
+        $select[] = "(SELECT sum(price) FROM {{%plugin_commission_goods_price_log}} WHERE order_id=o.id AND user_id='".$user->id."') AS price";
+        $list = $query->orderBy("o.id DESC")->select($select)->page($pagination, 10, $this->page)->asArray()->all();
 
         if($list){
             $order = new Order();
             foreach ($list as &$item) {
                 $item['status_text'] = $order->orderStatusText($item);
-                $item['created_at'] = date('Y-m-d H:i:s',$item['created_at']);
-                  if(!empty($item['price'])){
-                    $item['price'] = mb_substr($item['price'],0,strpos($item['price'],'.')) . substr($item['price'],strpos($item['price'],'.'),3);
-                }
+                $item['created_at']  = date('Y-m-d H:i:s',$item['created_at']);
+                $item['price']       = round((float)$item['price'], 2);
             }
         }
-        //print_r(debug_backtrace());
-        //exit;
+
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, ['list' => $list, 'pagination' => $pagination]);
     }
 }

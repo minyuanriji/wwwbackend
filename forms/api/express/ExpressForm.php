@@ -47,6 +47,7 @@ class ExpressForm extends BaseModel
                 throw new \Exception('京东物流必须填写京东商家编码');
             }
             $expressData = $this->getExpressData();
+//            $expressData = $this->getNTxExpressData();
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => 'success',
@@ -88,7 +89,7 @@ class ExpressForm extends BaseModel
         return [$express_aliapy_code, $mch_id, $api_key];
     }
 
-
+    //阿里云暂时不用
     private function getExpressData()
     {
         $statusMap = [
@@ -115,7 +116,9 @@ class ExpressForm extends BaseModel
         // $express = new ExpressBird($EBusinessID, $AppKey);
         // $list = $express->track($this->express_no, $this->express_code, '', $this->customer_name);
         $list = (json_decode($list, true));
-        $status = $statusMap[$list['State']];
+        if ($list) {
+            $status = $statusMap[$list['State']];
+        }
         return [
             'status' => $status,
             'list' => $list,
@@ -129,13 +132,16 @@ class ExpressForm extends BaseModel
         }else if(!$shipping_code && !$express_code){
             throw new \Exception('缺少快递单号或快递公司代码');
         }
-        //var_dump($app_code,$shipping_code,$express_code);exit;
         $host = "http://wdexpress.market.alicloudapi.com";//api访问链接
         $path = "/gxali";//API访问后缀
         $method = "GET";
         $headers = array();
         array_push($headers, "Authorization:APPCODE " . $app_code);
-        $querys = "n=".$express_code."&t=".$shipping_code."";  //参数写在这里
+        if ($shipping_code == 'SF') {
+            $querys = "n=".$express_code.":".$this->getMobileLast4Num()."&t=".$shipping_code."";  //参数写在这里
+        } else {
+            $querys = "n=".$express_code."&t=".$shipping_code."";  //参数写在这里
+        }
         $bodys = "";
         $url = $host . $path . "?" . $querys;//url拼接
         $curl = curl_init();
@@ -153,6 +159,88 @@ class ExpressForm extends BaseModel
         return curl_exec($curl);
     }
 
+    //腾讯物流
+    private function getNTxExpressData()
+    {
+        $statusMap = [
+            -1 => '待查询',
+            0 => '查询异常',
+            1 => '暂无记录',
+            2 => '在途中',
+            3 => '派送中',
+            4 => '已签收',
+            5 => '用户拒签',
+            6 => '疑难件',
+            7 => '无效单',
+            8 => '超时单',
+            9 => '签收失败',
+            10 => '退回',
+        ];
+        $status = null;
+        list($secretId, $secretKey,$source) = ['AKIDkHhRcy7odBqR2Y6m403Ic3YPfb378Fmu6sy','ko8OOwY1Jz2NO4x0DAwqJZCMGx8RLJ18WNhQph04','market'];
+        $list = $this->getExpressTx($secretId,$secretKey,$source,'shunfeng',$this->express_no);//$this->express_code
+        $list = (json_decode($list, true));
+        if ($list) {
+            $status = $statusMap[$list['State']];
+        }
+        return [
+            'status' => $status,
+            'list' => $list,
+        ];
+    }
+
+    private function getExpressTx($secretId,$secretKey,$source,$shipping_code,$express_code)
+    {
+        if(!$secretId || !$secretKey){
+            throw new \Exception('缺少主要参数');
+        }else if(!$shipping_code && !$express_code){
+            throw new \Exception('缺少快递单号或快递公司代码');
+        }
+
+        // 签名
+        $datetime = gmdate('D, d M Y H:i:s T');
+        $signStr = sprintf("x-date: %s\nx-source: %s", $datetime, $source);
+        $sign = base64_encode(hash_hmac('sha1', $signStr, $secretKey, true));
+        $auth = sprintf('hmac id="%s", algorithm="hmac-sha1", headers="x-date x-source", signature="%s"', $secretId, $sign);
+
+        // 请求方法
+        $method = 'GET';
+        // 请求头
+        $headers = array(
+            'X-Source' => $source,
+            'X-Date' => $datetime,
+            'Authorization' => $auth,
+        );
+        // 查询参数
+        $queryParams = array (
+            'com' => $shipping_code,
+            'nu' => $express_code,
+            'phone' => '8185',//$this->getMobileLast4Num(),
+        );
+        // url参数拼接
+        $url = 'https://service-6t1c9ush-1255468759.ap-shanghai.apigateway.myqcloud.com/release/point-list';
+        if (count($queryParams) > 0) {
+            $url .= '?' . http_build_query($queryParams);
+        }
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array_map(function ($v, $k) {
+            return $k . ': ' . $v;
+        }, array_values($headers), array_keys($headers)));
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+        $data = curl_exec($ch);
+        if (curl_errno($ch)) {
+            echo "Error: " . curl_error($ch);
+        } else {
+            print_r($data);
+        }
+        curl_close($ch);die;
+    }
 
     /**
      * 获取订单收件人手机号最后4位

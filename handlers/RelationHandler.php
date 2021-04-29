@@ -30,13 +30,10 @@ class RelationHandler extends BaseHandler
     {
         \Yii::warning("---RelationHandler start--");
         try{
+            /*
             \Yii::$app->on(RelationHandler::CHANGE_PARENT, function ($event) {
-                // todo 事件相应处理
                 try {
                     //启动队列去维护关系相关的表
-                    /**
-                     * @var UserInfoEvent $event
-                     */
                     \Yii::$app->queue->delay(0)->push(new ParentChangeJob([
                         'user_id'=>$event->user_id,
                         'mall_id'=>$event->mall_id,
@@ -62,6 +59,7 @@ class RelationHandler extends BaseHandler
                     'mall_id' => $event->mall_id
                 ]));
             });
+            */
         }catch (\Exception $exception){
             \Yii::error('RelationHandler_exception 出现异常'."File:".$exception->getFile().";Line:".$exception->getLine().";message:".$exception->getMessage());
         }

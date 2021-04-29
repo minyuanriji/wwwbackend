@@ -20,6 +20,8 @@ use app\models\GoodsCatRelation;
 use app\models\GoodsCats;
 use app\models\GoodsWarehouse;
 use app\models\Model;
+use app\models\Order;
+use app\models\OrderDetail;
 use app\plugins\group_buy\models\PluginGroupBuyGoods;
 use app\plugins\mch\models\MchGoods;
 use app\services\Plugins\PluginsService;
@@ -113,7 +115,15 @@ abstract class BaseGoodsList extends BaseModel
         $list = $query->with('goodsWarehouse.cats', 'attr')->page($pagination)->all();
 
         $newList = $this->handleData($list);
-
+        $goods_ids = array_unique(array_column($newList,'id'));
+        $goods_num = $this->real_sales($goods_ids);
+        $new_goods_num = array_combine(array_column($goods_num,'goods_id'),$goods_num);
+        foreach ($newList as $key => $value) {
+            $newList[$key]['real_sales'] = 0;
+            if (isset($new_goods_num[$value['id']])) {
+                $newList[$key]['real_sales'] = $new_goods_num[$value['id']]['num'];
+            }
+        }
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '请求成功',
@@ -215,5 +225,24 @@ abstract class BaseGoodsList extends BaseModel
     protected function handleGoodsData($goods)
     {
         return [];
+    }
+
+    //获取真实销量
+    public function real_sales($goods_ids)
+    {
+        $status = [1,2,3,8];
+        $fields = ["od.goods_id","sum(od.num) as num"];
+        $query = OrderDetail::find()
+            ->alias('od')
+            ->where(['od.is_delete' => 0, 'od.is_refund' => 0])
+            ->leftJoin(['o' => Order::tableName()], 'od.order_id=o.id')
+            ->andWhere(['in','od.goods_id',$goods_ids])
+            ->andWhere(['o.is_pay' => 1, 'o.is_recycle' => 0, 'o.is_delete' => 0])
+            ->andWhere(['in','o.status',$status])
+            ->groupBy("od.goods_id")
+            ->select($fields)
+            ->all();
+//        echo $query->createCommand()->getRawSql();die;
+        return $query;
     }
 }

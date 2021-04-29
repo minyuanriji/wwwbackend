@@ -214,9 +214,9 @@ abstract class BaseRole extends BaseModel
         foreach ($list as $Plugin) {
             try {
                 $plugin = \Yii::$app->plugin->getPlugin($Plugin->name);
-                if (!$this->checkPlugin($plugin)) {
+                /*if (!$this->checkPlugin($plugin)) {
                     continue;
-                }
+                }*/
                 $plugins[$Plugin->name] = $plugin;
             } catch (ClassNotFoundException $exception) {
                 continue;

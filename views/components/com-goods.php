@@ -397,6 +397,13 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             <el-row>
                                 <el-col :xl="12" :lg="16">
                                     <template v-if="is_attr == 1">
+
+                                        <el-form-item label="商品利润">
+                                            <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.profit_price">
+                                                <template slot="append">元</template>
+                                            </el-input>
+                                        </el-form-item>
+
                                         <el-form-item label="商品总库存" prop="goods_num">
                                             <el-input type="number" min="0" oninput="this.value = this.value.replace(/[^0-9]/g, '');" :disabled="ruleForm.use_attr == 1 ? true : false" v-model="ruleForm.goods_num">
                                             </el-input>
@@ -1263,7 +1270,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 }],
                 full_relief_price: 0,
                 fulfil_price: 0,
-                cannotrefund:["1","2","3"]
+                cannotrefund:["1","2","3"],
+                profit_price: 0  //商品利润
             };
             let rules = {
                 cats: [{
@@ -1473,7 +1481,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     is_order_sales:"0",
                     
                 },
-
 
             };
         },

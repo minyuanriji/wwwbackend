@@ -204,7 +204,7 @@ class Mall extends BaseActiveRecord
             'send_type' => [
                 'express', 'offline'
             ],// 发货方式 express--快递 offline--自提 city--同城
-            'express_aliapy_code' => '', //支付宝code
+            'express_aliapy_code' => 'a528130ef25245138b1d02727a0bc726', //支付宝code
             'kdniao_mch_id' => '',// 快递鸟商户ID
             'kdniao_api_key' => '',// 快递鸟API KEY
             'score' => '0',// 会员积分抵扣比例

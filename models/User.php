@@ -386,30 +386,6 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
     public function bindParent($before_parent_id)
     {
 
-        \Yii::warning('绑定上级');
-
-        \Yii::$app->trigger(RelationHandler::CHANGE_PARENT, new UserInfoEvent([
-            'user_id' => $this->id,
-            'mall_id' => $this->mall_id,
-            'parent_id' => $this->parent_id,
-        ]));
-        if ($this->save()) {
-            //变更记录记录
-            $log = new ParentLog();
-            $log->user_id = $this->id;
-            $log->before_parent_id = $before_parent_id;
-            $log->after_parent_id = $this->parent_id;
-            $log->mall_id = $this->mall_id;
-            $log->save();
-            \Yii::warning($log->getErrors());
-
-            $this->sendWechatTemp($this->id);
-            //发送模板消息
-
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public function sendWechatTemp($user_id)

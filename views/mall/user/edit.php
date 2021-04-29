@@ -55,12 +55,12 @@
                         <el-option key="store" label="店主" value="store"></el-option>
                     </el-select>
                 </el-form-item>
-<!--
+
                 <el-form-item label="上级推荐人" prop="parent_id">
                     <el-autocomplete size="small" v-model="form.parent_name" value-key="nickname"
                                      :fetch-suggestions="querySearchAsync" placeholder="请输入搜索内容"
                                      @select="inviterClick"></el-autocomplete>
-                </el-form-item>-->
+                </el-form-item>
                 <!-- --- -->
                 <el-form-item label="加入黑名单" prop="is_blacklist">
                     <el-switch v-model="form.is_blacklist" :active-value="1" :inactive-value="0"></el-switch>

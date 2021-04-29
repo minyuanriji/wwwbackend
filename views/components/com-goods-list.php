@@ -126,7 +126,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                         @selection-change="handleSelectionChange"
                         @sort-change="sortChange">
                     <el-table-column type="selection" align="center" width="50"></el-table-column>
-                    <el-table-column prop="id" label="ID" sortable="false" width="70"></el-table-column>
+                    <el-table-column prop="id" label="ID" sortable="false" width="100"></el-table-column>
                     <el-table-column v-if="!is_mch" prop="sort" :width="sort_goods_id != id ? 150 : 100" label="排序"
                                      sortable="false">
                         <template slot-scope="scope">
@@ -248,7 +248,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="price" label="售价" sortable="false" width="100"></el-table-column>
+                    <el-table-column prop="price" label="售价" sortable="false" width="160"></el-table-column>
                     <el-table-column prop="goods_stock" label="库存" sortable="false" width="100">
                         <template slot-scope="scope">
                             <div v-if="scope.row.goods_stock > 0">{{scope.row.goods_stock}}</div>
@@ -256,6 +256,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                         </template>
                     </el-table-column>
                     <el-table-column prop="virtual_sales" width="110" label="虚拟销量" sortable="false"></el-table-column>
+                    <el-table-column prop="real_sales" width="110" label="真实销量" sortable="false"></el-table-column>
                     <el-table-column label="状态" width="100">
                         <template slot-scope="scope">
                             <template v-if="!is_mch || mchMallSetting.is_goods_audit == 0">
@@ -826,9 +827,10 @@ Yii::$app->loadComponentView('goods/com-batch');
                 }
             },
             newExportGoodsData(){
-                let self = this;
+                /*let self = this;
                 window.location.href = 'https://' + document.domain + '/web/index.php?r=mall%2Fgoods%2Fget-goods-data' + '&choose_list=' + self.choose_list;
-                this.exportDialogVisible = false;
+                this.exportDialogVisible = false;*/
+                this.exportGoodsData();
             },
             exportGoodsData() {
                 let self = this;

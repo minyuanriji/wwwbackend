@@ -217,6 +217,7 @@ class CommissionController extends BaseCommandController{
                 "AND",
                 ["cr.is_delete" => 0],
                 ['cr.item_type' => $item_type],
+                ['crc.role_type' => $parentData['role_type']],
                 "(".implode(" OR ", $subWheres).")"
             ]);
             $query->orderBy("crc.level DESC");

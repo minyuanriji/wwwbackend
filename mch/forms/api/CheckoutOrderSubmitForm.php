@@ -10,6 +10,7 @@ use app\helpers\ArrayHelper;
 use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\Order;
+use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
@@ -44,6 +45,12 @@ class CheckoutOrderSubmitForm extends BaseModel {
                 throw new \Exception('商户不存在');
             }
 
+            //门店信息
+            $storeModel = Store::findOne(["mch_id" => $mchModel->id]);
+            if(!$storeModel){
+                throw new \Exception('门店信息不存在');
+            }
+
             //判断收款金额
             if(empty($this->order_price) || $this->order_price <= 0){
                 throw new \Exception('收款金额必须大于0');
@@ -52,14 +59,16 @@ class CheckoutOrderSubmitForm extends BaseModel {
             //判断是否有未支付的订单
             //有就复用订单1
             $order = MchCheckoutOrder::find()->where([
-                'is_pay'  => 0,
-                'mall_id' => $mchModel->mall_id,
-                'mch_id'  => $mchModel->id
+                'is_pay'   => 0,
+                'mall_id'  => $mchModel->mall_id,
+                'mch_id'   => $mchModel->id,
+                'store_id' => $storeModel->id,
             ])->one();
             if(!$order){
                 $order = new MchCheckoutOrder();
                 $order->mall_id  = \Yii::$app->mall->id;
                 $order->mch_id   = $mchModel->id;
+                $order->store_id = $storeModel->id;
                 $order->order_no = Order::getOrderNo('MS');
             }
 

@@ -11,6 +11,7 @@ use app\mch\events\CheckoutOrderPaidEvent;
 use app\mch\payment\CheckoutOrderPayNotify;
 use app\models\BaseModel;
 use app\models\Order;
+use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
@@ -53,12 +54,19 @@ class CheckoutOrderPayForm extends BaseModel {
             if(!$mchModel){
                 throw new \Exception('商户信息不存在');
             }
+            
+            //门店信息
+            $storeModel = Store::findOne(["mch_id" => $mchModel->id]);
+            if(!$storeModel){
+                throw new \Exception('门店信息不存在');
+            }
 
             //获取未支付的
             $checkoutOrder = MchCheckoutOrder::find()->where([
                 'is_pay'      => 0,
                 'mall_id'     => \Yii::$app->mall->id,
                 'mch_id'      => $mchModel->id,
+                'store_id'    => $storeModel->id,
                 'pay_user_id' => \Yii::$app->user->id
             ])->one();
 
@@ -66,6 +74,7 @@ class CheckoutOrderPayForm extends BaseModel {
                 $checkoutOrder = new MchCheckoutOrder();
                 $checkoutOrder->mall_id     = \Yii::$app->mall->id;
                 $checkoutOrder->mch_id      = $mchModel->id;
+                $checkoutOrder->store_id    = $storeModel->id;
                 $checkoutOrder->order_no    = Order::getOrderNo('MS');
                 $checkoutOrder->pay_user_id = \Yii::$app->user->id;
             }

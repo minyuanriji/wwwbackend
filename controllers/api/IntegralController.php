@@ -54,6 +54,7 @@ class IntegralController extends ApiController
         $params = array(
             'select'=>'id,user_id,money,desc,before_money,type,expire_time,status,created_at',
             'where' => $where,
+            'page' => $this->page,
             'limit' => $this->pageSize,
             'order' => 'id DESC'
         );

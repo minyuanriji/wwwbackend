@@ -228,6 +228,7 @@ class CommissionController extends BaseCommandController{
             return $ruleData;
         };
 
+        $this->commandOut(json_encode($parentDatas));
         $currentLevel = count($parentDatas);
         foreach($parentDatas as $key => $parentData){
 
@@ -251,7 +252,7 @@ class CommissionController extends BaseCommandController{
                 $newQuery = clone $query;
                 $newQuery->andWhere("crc.unique_key LIKE '%{$relKey}'" );
                 $ruleData = $getChainRuleData($newQuery, $item_id);
-                $this->commandOut(json_encode($parentDatas));
+
                 $this->commandOut("current LEVEL:" . $currentLevel);
                 $this->commandOut($newQuery->createCommand()->getRawSql());
                 $this->commandOut(json_encode($ruleData));

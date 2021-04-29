@@ -1,9 +1,9 @@
 <?php
-namespace app\plugins\commission\forms;
+namespace app\plugins\commission\forms\mall;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
-use app\plugins\commission\models\CommissionRuleList;
+use app\plugins\commission\models\CommissionRules;
 
 class CommissionRuleListForm extends BaseModel{
 
@@ -26,7 +26,7 @@ class CommissionRuleListForm extends BaseModel{
             return $this->responseErrorInfo();
         }
 
-        $query = CommissionRuleList::find()->alias("crl");
+        $query = CommissionRules::find()->alias("crl");
         $query->leftJoin("{{%goods}} g", "g.id=crl.item_id AND crl.item_type='goods'");
         $query->leftJoin("{{%goods_warehouse}} gw", "gw.id=g.goods_warehouse_id");
         $query->leftJoin("{{%store}} s", "s.id=crl.item_id AND crl.item_type='checkout'");

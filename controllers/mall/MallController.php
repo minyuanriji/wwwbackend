@@ -14,6 +14,7 @@ namespace app\controllers\mall;
 use app\controllers\admin\BaseController;
 use app\controllers\behavior\AdminPermissionsBehavior;
 use app\controllers\behavior\LoginFilter;
+use app\forms\common\UserRelationshipLinkForm;
 use app\logic\AppConfigLogic;
 use app\logic\OptionLogic;
 use app\models\Admin;

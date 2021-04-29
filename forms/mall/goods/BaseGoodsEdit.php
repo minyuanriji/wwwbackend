@@ -77,6 +77,7 @@ abstract class BaseGoodsEdit extends BaseModel
     public $enable_integral;
     public $integral_setting;
     public $enable_score;
+    public $profit_price;
     public $score_setting;
     public $is_order_paid;
     public $order_paid;
@@ -140,8 +141,8 @@ abstract class BaseGoodsEdit extends BaseModel
             [['confine_count', 'confine_order_count'], 'default', 'value' => -1],
             [['forehead_score_type', 'give_score_type', 'is_level',
                 'is_default_services'], 'default', 'value' => 1],
-            [['price', 'forehead_score'], 'number', 'min' => 0],
-            [['price'], 'number', 'max' => 9999999],
+            [['price', 'forehead_score', 'profit_price'], 'number', 'min' => 0],
+            [['price', 'profit_price'], 'number', 'max' => 9999999],
             [['is_on_site_consumption'], 'number'],
             [['fulfil_price','full_relief_price'],'default','value'=>0],
             [['integral_fee_rate'], 'integer', 'min' => 0, 'max' => 100]
@@ -405,6 +406,7 @@ abstract class BaseGoodsEdit extends BaseModel
         $goods->enable_score = $this->enable_score;
         $goods->is_order_paid = $this->is_order_paid;
         $goods->is_order_sales = $this->is_order_sales;
+        $goods->profit_price = (float)$this->profit_price;
 
         if(!empty($this->integral_setting)){
             $goods->integral_setting = json_encode($this->integral_setting);

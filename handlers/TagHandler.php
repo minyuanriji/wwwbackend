@@ -31,14 +31,14 @@ class TagHandler extends BaseHandler
             \Yii::$app->on(TagHandler::ADD_TAG, function ($event) {
                 // todo 事件相应处理
                 /** @var TagEvent $event */
-                \Yii::$app->queue->delay(0)->push(new TagJob([
+                /*\Yii::$app->queue->delay(0)->push(new TagJob([
                     'user_id' => $event->user_id,
                     'mall_id' => $event->mall_id,
                     'cat_id' => $event->cat_id,
                     'type' => $event->type,
                     'action' => $event->action,
                 ]));
-                \Yii::warning('标签任务处理事件');
+                \Yii::warning('标签任务处理事件');*/
             });
         }catch (\Exception $exception){
             \Yii::error('TagHandler_exception 出现异常'.CommonLogic::getExceptionMessage($exception));

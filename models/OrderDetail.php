@@ -82,7 +82,7 @@ class OrderDetail extends BaseActiveRecord
             [['order_id', 'goods_id', 'num', 'is_delete', 'is_refund', 'refund_status', 'form_id', 'use_user_coupon_id', 'integral_fee_rate', 'is_score_send'], 'integer'],
             [['unit_price', 'total_original_price', 'total_price', 'member_discount_price', 'back_price', 'coupon_discount_price', 'use_score_price', 'use_score', 'score_price', 'full_relief_price', 'integral_price'], 'number'],
             [['goods_info', 'goods_no', 'form_data'], 'string'],
-            [['created_at', 'updated_at', 'deleted_at'], 'safe'],
+            [['created_at', 'updated_at', 'deleted_at', 'commission_status'], 'safe'],
             [['sign'], 'string', 'max' => 255],
         ];
     }

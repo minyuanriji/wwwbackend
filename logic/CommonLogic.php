@@ -121,7 +121,10 @@ class CommonLogic
     public static function createQrcode($option, $model, $path, $dir)
     {
         $mallSettings = AppConfigLogic::getMallSettingConfig(["web_url"]);
-        $host = isset($mallSettings["web_url"]) ? urldecode($mallSettings["web_url"]) : "";
+//        $host = isset($mallSettings["web_url"]) ? urldecode($mallSettings["web_url"]) : "";
+        $host = \Yii::$app->request->hostInfo;//isset($mallSettings["web_url"]) ? urldecode($mallSettings["web_url"]) : "";
+        \Yii::error("二维码域名----".$host);
+
         $url = $host . $path;
         $file = \Yii::getAlias('@runtime/image/') . $dir;//生成的二维码保存地址
 

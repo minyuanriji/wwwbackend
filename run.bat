@@ -13,11 +13,11 @@ set PROJECT_PATH=%~dp0
 
 ::==================================================================
 ::用户关系链守候程序
-start yii user-relationship-link/maintant-job
+::start yii user-relationship-link/maintant-job
 
 ::==================================================================
 ::分佣守候程序
-::start yii commission/maintant-job
+start yii commission/maintant-job
 
 ::==================================================================
 ::cd shell

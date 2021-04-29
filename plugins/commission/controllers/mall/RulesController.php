@@ -1,6 +1,7 @@
 <?php
 namespace app\plugins\commission\controllers\mall;
 
+use app\plugins\commission\forms\mall\CommissionRuleDeleteForm;
 use app\plugins\commission\forms\mall\CommissionRuleListForm;
 use app\plugins\commission\forms\mall\CommissionRuleDetailForm;
 use app\plugins\commission\forms\mall\CommissionRuleEditForm;
@@ -34,6 +35,16 @@ class RulesController extends Controller{
         }else{
             return $this->render('edit');
         }
+    }
+
+    /**
+     * 删除规则
+     * @return string|yii\web\Response
+     */
+    public function actionDelete(){
+        $form = new CommissionRuleDeleteForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->delete());
     }
 
     /**

@@ -228,6 +228,7 @@ class CommissionController extends BaseCommandController{
             return $ruleData;
         };
 
+        $currentLevel = count($parentDatas);
         foreach($parentDatas as $key => $parentData){
 
             $query = CommissionRuleChain::find()->alias("crc");
@@ -236,7 +237,8 @@ class CommissionController extends BaseCommandController{
                 "AND",
                 ["cr.is_delete"  => 0],
                 ['cr.item_type'  => $item_type],
-                ['crc.role_type' => $parentData['role_type']]
+                ['crc.role_type' => $parentData['role_type']],
+                ['crc.level'     => $currentLevel]
             ]);
             $query->orderBy("crc.level DESC");
             $query->select(["cr.commission_type", "crc.level", "crc.commisson_value"]);
@@ -253,6 +255,8 @@ class CommissionController extends BaseCommandController{
             }
 
             $parentDatas[$key]['rule_data'] = $ruleData ? $ruleData : null;
+
+            $currentLevel--;
         }
 
         return $parentDatas;

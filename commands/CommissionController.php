@@ -242,20 +242,14 @@ class CommissionController extends BaseCommandController{
             $query->select(["cr.commission_type", "crc.level", "crc.commisson_value"]);
             $query->asArray();
 
-            //先判断是否直推
-            $newQuery = clone $query;
-            $newQuery->andWhere(["crc.unique_key" => $parentData['role_type'] . "#all"]);
-            $ruleData = $getChainRuleData($newQuery, $item_id);
-
-            //不是直推，模糊查询
-            if(!$ruleData){
-                $subWheres = [];
-                foreach($parentData['rel_keys'] as $rel_key){
-                    $subWheres[] = "crc.unique_key LIKE '%{$rel_key}'";
-                }
+            //查找规则
+            $relKeys = array_reverse($parentData['rel_keys']);
+            $ruleData = null;
+            foreach($relKeys as $relKey){
                 $newQuery = clone $query;
-                $newQuery->andWhere("(".implode(" OR ", $subWheres).")");
+                $newQuery->andWhere("crc.unique_key LIKE '%{$relKey}'" );
                 $ruleData = $getChainRuleData($newQuery, $item_id);
+                if($ruleData) break;
             }
 
             $parentDatas[$key]['rule_data'] = $ruleData ? $ruleData : null;

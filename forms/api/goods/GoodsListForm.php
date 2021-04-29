@@ -81,11 +81,12 @@ class GoodsListForm extends BaseModel
             if ($this->cat_id) {
                 $query->leftJoin(['gc' => GoodsCatRelation::tableName()], 'gc.goods_warehouse_id=gw.id');
                 $query->andWhere(['gc.is_delete'=>0]);
-                if($this->keyword){
+                $query->andWhere(['in', 'gc.cat_id', $catIds]);
+                /*if($this->keyword){
                     $query->orWhere(['in', 'gc.cat_id', $catIds]);
                 }else{
                     $query->andWhere(['in', 'gc.cat_id', $catIds]);
-                }
+                }*/
             }
             /**
              * @var BasePagination $pagination

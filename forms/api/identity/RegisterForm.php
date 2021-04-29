@@ -12,6 +12,7 @@ namespace app\forms\api\identity;
 
 use app\component\jobs\ParentChangeJob;
 use app\events\TagEvent;
+use app\forms\common\UserRelationshipLinkForm;
 use app\handlers\TagHandler;
 use app\helpers\ArrayHelper;
 use app\models\RelationSetting;
@@ -161,10 +162,6 @@ class RegisterForm extends BaseModel
         }
         $trans = \Yii::$app->db->beginTransaction();
         try {
-//            if($this->password !== $this->confirm_password){
-//                return $this->returnApiResultData(ApiCode::CODE_FAIL,'两次密码不一致');
-//            }
-
             //上级绑定
             if(empty($this->recommend_id) && !empty($this->parent_mobile)){
                 $existParentUser = User::getOneUser(['=', 'mobile', $this->parent_mobile]);
@@ -188,12 +185,14 @@ class RegisterForm extends BaseModel
                 $third_parent_id  = $recommendUsers["second_parent_id"];
             }
 
+
             $smsForm = new SmsForm();
             $smsForm->captcha = $this->captcha;
             $smsForm->mobile = $this->mobile;
             if(!$smsForm->checkCode()){
                 return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
             }
+
             $user = new User();
             $user->username = $this->mobile;
             $user->mobile = $this->mobile;
@@ -212,6 +211,7 @@ class RegisterForm extends BaseModel
                 $messages = $this->responseErrorInfo($user);
                 throw new \Exception($messages["msg"]);
             }
+
             $userInfoModel = new UserInfo();
             $userInfoModel->mall_id = $this->mall_id;
             $userInfoModel->mch_id = 0;

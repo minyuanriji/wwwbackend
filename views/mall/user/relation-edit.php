@@ -23,6 +23,7 @@ Yii::$app->loadComponentView('com-select-cat');
             </div>
         </div>
         <div class="form-body">
+
             <el-form :model="ruleForm" size="small" ref="ruleForm" label-width="150px">
                 <el-card>
                     <div slot="header">关系设置</div>
@@ -304,6 +305,26 @@ Yii::$app->loadComponentView('com-select-cat');
 <!--                    </el-button>-->
 <!--                </el-form-item>-->
             </el-form>
+
+            <el-card style="margin-top: 10px" >
+                <div slot="header">重建用户关系链</div>
+                <div>
+                    <div v-if="rebuild.status == -1 || rebuild.status == 2" >
+                        <el-button @click="rebuild_link" :loading="rebuildLoading" type="danger">{{rebuildLoading ? '请稍等' : '重建用户关系链'}}</el-button>
+                        <div v-if="rebuild.start != ''" style="margin-top:10px;">上一次执行时间：{{rebuild.start}}</div>
+                        <div v-if="rebuild.error != ''" style="margin-top:10px;">上一次执行结果：{{rebuild.error}}</div>
+                        <div v-if="rebuild.long != ''" style="margin-top:10px;">执行耗时：{{rebuild.long}}秒</div>
+                    </div>
+                    <div v-else style="color:gray;">
+                        <div>执行状态：
+                            <span v-if="rebuild.status == 0">等待执行</span>
+                            <span v-if="rebuild.status == 1">运行中</span>
+                        </div>
+                        <div>执行开始时间：{{rebuild.start}}</div>
+                        <div>已执行时间：{{rebuild.long}}秒</div>
+                    </div>
+                </div>
+            </el-card>
         </div>
     </el-card>
 </div>
@@ -320,6 +341,13 @@ Yii::$app->loadComponentView('com-select-cat');
                 submitLoading: false,
                 dialogInDialogVisible: false,
                 name: '',
+                rebuildLoading: false,
+                rebuild: {
+                    status: -1,
+                    error: '',
+                    start: '',
+                    long: ''
+                },
                 ruleForm: {
                     use_relation: '0',
                     is_income_cash: 0,
@@ -410,6 +438,7 @@ Yii::$app->loadComponentView('com-select-cat');
 
                     if (e.data.code === 0) {
                         this.ruleForm = e.data.data.relation;
+                        this.rebuild = e.data.data.rebuild;
                     } else {
                         this.$message.error(e.data.msg);
                     }
@@ -466,6 +495,34 @@ Yii::$app->loadComponentView('com-select-cat');
                     }
                 });
             },
+
+            rebuild_link(){
+                this.$confirm('执行重建用户关系链将暂停用户的一切相关操作，在任务运行结束前，用户将无法注册与登录...你确定?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    var self = this;
+                    self.rebuildLoading = true;
+                    request({
+                        params: {
+                            r: 'mall/user/relation-rebuild',
+                        },
+                        method: 'post',
+                    }).then(e => {
+                        self.rebuildLoading = false;
+                        if (e.data.code === 0) {
+                            self.rebuild.status = e.data.data.status;
+                            self.rebuild.start = e.data.data.start;
+                            self.rebuild.long = e.data.data.start;
+                            this.$message.success(e.data.msg);
+                        } else {
+                            this.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                    });
+                }).catch(() => {});
+            }
         }
     });
 </script>

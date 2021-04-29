@@ -183,7 +183,34 @@
                 });
             },
             deleteRule(id){
-
+                var self = this;
+                this.$confirm('你确定要删除规则？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.listLoading = true;
+                    request({
+                        params: {
+                            r: "plugin/commission/mall/rules/delete"
+                        },
+                        method: 'post',
+                        data: {
+                            id: id
+                        }
+                    }).then(e => {
+                        if (e.data.code === 0) {
+                            self.getList();
+                            self.$message.success(e.data.msg);
+                        } else {
+                            self.listLoading = false;
+                            self.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        self.listLoading = false;
+                        self.$message.error("request fail");
+                    });
+                });
             },
             pagination(currentPage) {
                 let self = this;

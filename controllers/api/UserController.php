@@ -31,7 +31,7 @@ class UserController extends ApiController
         return array_merge(parent::behaviors(), [
             'login' => [
                 'class' => LoginFilter::class,
-                'ignore' => ['config']
+                'ignore' => ['config', 'register-agree']
             ],
         ]);
     }

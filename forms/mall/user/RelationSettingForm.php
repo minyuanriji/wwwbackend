@@ -12,6 +12,7 @@ namespace app\forms\mall\user;
 
 
 use app\core\ApiCode;
+use app\forms\common\UserRelationshipLinkForm;
 use app\helpers\SerializeHelper;
 use app\models\BaseModel;
 use app\models\RelationSetting;
@@ -207,6 +208,14 @@ class RelationSettingForm extends BaseModel
         } else {
             $relation->cash_type = SerializeHelper::decode($relation->cash_type);
         }
-        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['relation' => $relation]);
+
+        $cacheData = \Yii::$app->getCache()->get(UserRelationshipLinkForm::REBUILD_JOB_CACHE_KEY);
+
+        $cacheData['status'] = isset($cacheData['status']) ? (int)$cacheData['status'] : -1;
+        $cacheData['error']  = isset($cacheData['error']) ? $cacheData['error'] : "";
+        $cacheData['long']   = isset($cacheData['start']) ? (time() - $cacheData['start']) : "";
+        $cacheData['start']  = isset($cacheData['start']) ? date("Y-m-d H:i:s", $cacheData['start']) : "";
+
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['relation' => $relation, 'rebuild' => $cacheData]);
     }
 }

@@ -32,7 +32,7 @@ class CommonOrderPayedHandler extends BaseHandler
         // TODO: Implement register() method.
 
 
-        \Yii::$app->on(Order::EVENT_PAYED, function ($event) {
+        /*\Yii::$app->on(Order::EVENT_PAYED, function ($event) {
             \Yii::warning('检测到订单支付时间-----------------');
             $order_type = $event->order_type ?? 0;
             $order_id = $event->order->id;
@@ -40,7 +40,7 @@ class CommonOrderPayedHandler extends BaseHandler
                 'order_type' => $order_type,
                 'order_id' => $order_id
             ]));
-        });
+        });*/
 
     }
 }

@@ -117,7 +117,7 @@ class UserForm extends BaseModel
             }
         }
 
-        $levelName = '普通用户';
+        /*$levelName = '普通用户';
         $memberPicUrl = '';
         if ($user->level != 0) {
             $level = MemberLevel::findOne([
@@ -129,7 +129,7 @@ class UserForm extends BaseModel
                 $levelName = $level->name;
                 $memberPicUrl = $level->pic_url;
             }
-        }
+        }*/
 
         $couponCount = UserCoupon::find()->andWhere(['user_id' => $user->id, 'is_delete' => 0,'is_failure'=> 0, 'is_use' => 0])->count();
 
@@ -145,6 +145,9 @@ class UserForm extends BaseModel
             "user_id"     => $user->id,
             "source_type" => "new_user"
         ])->exists() ? 1 : 0;
+
+        //用户级别
+        $userLevel = $user->getUserLevel();
 
 
         $result = [
@@ -168,10 +171,10 @@ class UserForm extends BaseModel
             'favorite' => $favoriteCount ?? '0',
             //'footprint' => FootprintGoodsLog::find()->where(['user_id' => $user->id, 'is_delete' => 0])->count() ?? '0',
             'identity' => [
-                'parent_name' => $parentName,
-                'level_name' => $levelName,
-                'member_level' => $user->level,
-                'member_pic_url' => $memberPicUrl,
+                'parent_name'    => $parentName,
+                'level_name'     => $userLevel['name'],
+                'member_level'   => $userLevel['level'],
+                'member_pic_url' => $userLevel['icon'],
             ],
             'parent_id' => $user->parent_id,
             'coupon' => $couponCount,

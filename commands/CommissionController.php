@@ -171,7 +171,7 @@ class CommissionController extends BaseCommandController{
             ["u.is_delete" => 0],
             ["IN", "u.role_type", ["store", "partner", "branch_office"]],
             ("url.`left` < '".$userLink->left."' AND url.`right` > '".$userLink->right."'")
-        ])->select(["u.id", "u.total_income", "u.role_type", "u.nickname"])->orderBy("url.`left` DESC");
+        ])->select(["u.id", "u.parent_id", "u.total_income", "u.role_type", "u.nickname"])->orderBy("url.`left` DESC");
 
         $parentDatas = $query->asArray()->all();
         if(!$parentDatas){
@@ -183,12 +183,14 @@ class CommissionController extends BaseCommandController{
         $partner2Data = null;
         foreach($parentDatas as $parentData){
             if(count($existData) >= 3) break;
-            if(empty($partner2Data) && $parentData['role_type'] == "partner" && isset($existData['partner'])){
-                $partner2Data = $parentData;
-                continue;
+            if(empty($partner2Data) && isset($existData['partner']) && $parentData['role_type'] == "partner"){
+                if($existData['partner']['parent_id'] == $parentData['id']){
+                    $partner2Data = $parentData;
+                    continue;
+                }
             }
             if(!isset($existData[$parentData['role_type']])){
-                $existData[$parentData['role_type']] = $parentData['id'];
+                $existData[$parentData['role_type']] = $parentData;
                 $newParentDatas[] = $parentData;
             }
         }

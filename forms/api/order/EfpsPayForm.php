@@ -240,10 +240,11 @@ class EfpsPayForm extends BaseModel{
 
                 if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){ //小程序
                     $efpsPaymentOrder->payMethod = "1";
+                    $efpsPaymentOrder->appId = "wx3ab6add3406998a1";
                 }else{ //公众号
                     $efpsPaymentOrder->payMethod = "35";
+                    $efpsPaymentOrder->appId = \Yii::$app->params['wechatConfig']['app_id'];
                 }
-                $efpsPaymentOrder->appId = \Yii::$app->params['wechatConfig']['app_id'];
                 $efpsPaymentOrder->openId = $userInfo->openid;
             }else{ //支付宝主扫支付
                 $efpsPaymentOrder->payMethod = "7";

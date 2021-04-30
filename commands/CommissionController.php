@@ -207,7 +207,7 @@ class CommissionController extends BaseCommandController{
             }
             $newParentDatas = $tmpDatas;
         }
-        
+
         //生成相关规则键
         $parentDatas = [];
         while(!empty($newParentDatas)){

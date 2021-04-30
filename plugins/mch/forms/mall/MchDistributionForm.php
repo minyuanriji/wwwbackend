@@ -7,7 +7,7 @@ use app\models\BaseModel;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchDistributionDetail;
 
-class DistributionForm extends BaseModel{
+class MchDistributionForm extends BaseModel{
 
     public $mch_id;
     public $share_type;

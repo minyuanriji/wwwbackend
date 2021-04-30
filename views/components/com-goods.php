@@ -9,7 +9,7 @@ Yii::$app->loadComponentView('goods/com-area-limit');
 Yii::$app->loadComponentView('goods/com-preview');
 Yii::$app->loadComponentView('goods/com-attr-group');
 Yii::$app->loadComponentView('com-goods-form', __DIR__ . '/goods');
-Yii::$app->loadComponentView('com-goods-distribution', __DIR__ . '/goods');
+Yii::$app->loadComponentView('com-goods-distribution-new', __DIR__ . '/goods');
 Yii::$app->loadComponentView('goods/com-goods-area');
 Yii::$app->loadComponentView('goods/com-goods-agent');
 ?>
@@ -1060,8 +1060,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     </el-tab-pane>
 
                     <el-tab-pane label="分销设置" name="third" v-if="is_show_distribution">
-                        <com-goods-distribution v-model="ruleForm" :is_mch="is_mch" :goods_type="goods_type" :goods_id="goods_id" v-if="activeName == 'third'">
-                        </com-goods-distribution>
+                        <com-goods-distribution-new v-model="ruleForm" :is_mch="is_mch" :goods_type="goods_type" :goods_id="goods_id" v-if="activeName == 'third'">
+                        </com-goods-distribution-new>
                     </el-tab-pane>
                     <el-tab-pane label="经销设置" name="fourth" v-if="is_show_agent">
                         <com-goods-agent v-model="ruleForm" :is_mch="is_mch" :goods_type="goods_type" :goods_id="goods_id" v-if="activeName == 'fourth'">

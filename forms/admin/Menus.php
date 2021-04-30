@@ -578,11 +578,7 @@ class Menus
                         'route' => 'mall/order-clerk/index',
                         'action' => [
                         ]
-<<<<<<< HEAD
-                    ]
-=======
                     ],
->>>>>>> 9909581ec6cd14c8491004e1ca0d7bbb2c3efabb
                 ],
             ],
             [

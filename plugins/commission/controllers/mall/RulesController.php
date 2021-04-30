@@ -1,6 +1,7 @@
 <?php
 namespace app\plugins\commission\controllers\mall;
 
+use app\plugins\commission\forms\mall\CommissionRuleOpenForm;
 use app\plugins\commission\forms\mall\CommissionRuleDeleteForm;
 use app\plugins\commission\forms\mall\CommissionRuleListForm;
 use app\plugins\commission\forms\mall\CommissionRuleDetailForm;
@@ -45,6 +46,26 @@ class RulesController extends Controller{
         $form = new CommissionRuleDeleteForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->delete());
+    }
+
+    /**
+     * 打开或者关闭商品独立分佣规则
+     * @return string|yii\web\Response
+     */
+    public function actionCommissionGoodsOpen(){
+        $form = new CommissionRuleOpenForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->open());
+    }
+
+    /**
+     * 打开或者关闭门店独立分佣规则
+     * @return string|yii\web\Response
+     */
+    public function actionCommissionStoreOpen(){
+        $form = new CommissionRuleOpenForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->open());
     }
 
     /**

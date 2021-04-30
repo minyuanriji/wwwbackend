@@ -1,3 +1,6 @@
+<?php
+echo $this->render('@app/plugins/commission/views/components/com-commission-rule-edit');
+?>
 <style>
     .form-body {
         padding: 10px 20px;
@@ -31,7 +34,7 @@
     }
 </style>
 <div id="app" v-cloak>
-    <el-card id="com-goods-distribution" class="box-card" v-loading="cardLoading" shadow="never" style="border:0"
+    <el-card id="com-goods-distribution" class="box-card" v-loading="loading" shadow="never" style="border:0"
              body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <el-breadcrumb separator="/">
@@ -42,66 +45,19 @@
             </el-breadcrumb>
         </div>
         <div class="form-body">
-            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="160px" size="small">
-                <el-row>
-                    <el-card shadow="never" style="margin-bottom: 20px">
-                        <div slot="header">
-                            <span>分佣信息</span>
-                        </div>
-                        <el-col>
-                            <el-form-item label="分销佣金类型" prop="share_type">
-                                <el-radio v-model="share_type" :label="0">固定金额</el-radio>
-                                <el-radio v-model="share_type" :label="1">百分比</el-radio>
-                            </el-form-item>
-                            <el-form-item label="分销佣金">
-                                <template v-if="distributionLevelArray.length == 0">
-                                    <el-button type="danger" @click="$navigate({r: 'plugin/distribution/mall/setting/index'})">
-                                        请先在分销应用的中开启功能
-                                    </el-button>
-                                </template>
-                                <template v-else>
-                                    <div class="box">
-                                        <label style="margin-bottom:0;padding:18px 10px;">批量设置</label>
-                                        <el-select v-model="selectData" slot="prepend" placeholder="请选择层级">
-                                            <el-option v-for="(item, index) in distributionLevelArray" :value="item.value"
-                                                       :key="item.id"
-                                                       :label="item.label">{{item.label}}
-                                            </el-option>
-                                        </el-select>
-                                        <el-input @keyup.enter.native="enter" type="number" style="width: 150px;"
-                                                  v-model="batchShareLevel">
-                                            <span slot="append">{{share_type == 1 ? '%' : '元'}}</span>
-                                        </el-input>
-                                        <el-button type="primary" size="small" @click="batchAttr">设置</el-button>
-                                    </div>
-
-                                    <el-table ref="normal" :data="distributionLevelList" border stripe style="margin-top:10px;width: 100%;"
-                                              @selection-change="handleSelectionChange">
-                                        <el-table-column type="selection" width="70"></el-table-column>
-                                        <el-table-column label="等级名称" prop="name"></el-table-column>
-                                        <el-table-column :label="item.label" :prop="item.value" :property="item.value"
-                                                         v-for="(item, index) in distributionLevelArray" :key="index" width="200">
-                                            <template slot-scope="scope">
-                                                <el-input type="number" v-model="scope.row[scope.column.property]">
-                                                    <span slot="append">{{share_type == 1 ? '%' : '元'}}</span>
-                                                </el-input>
-                                            </template>
-                                        </el-table-column>
-                                    </el-table>
-
-
-                                </template>
-
-                                </template>
-                            </el-form-item>
-                        </el-col>
-                    </el-card>
-
-                </el-row>
+            <el-form label-width="180px" size="small">
+                <el-form-item label="是否开启独立分佣设置" >
+                    <el-switch @change="commissionOpen" :active-value="1" :inactive-value="0" v-model="is_alone">
+                    </el-switch>
+                </el-form-item>
+                <el-form-item label="" v-if="is_alone == 1">
+                    <com-commission-rule-edit @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-rule-edit>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" style="margin-top: 10px;margin-bottom:30px;" size="small" @click="saveGoodsCommission">保存分佣设置</el-button>
+                </el-form-item>
             </el-form>
         </div>
-        <el-button class="button-item" :loading="btnLoading" type="primary" @click="save('ruleForm')" size="small">保存
-        </el-button>
     </el-card>
 </div>
 <script>
@@ -109,31 +65,33 @@ const app = new Vue({
     el: '#app',
     data() {
         return {
-            ruleForm: {},
-            rules: {},
-            share_type: 0,
-            distributionLevelArray: [],
-            distributionLevelList: [],
-            distributionDetails: [],
-            batchShareLevel: 0,
-            selectList: [],
-            selectData: '',
-            cardLoading: false,
+            is_alone:0,
+            loading: false,
             btnLoading: false,
+            commissionType: 1,
+            commissionRuleChains: []
         };
     },
+    mounted: function () {
+        this.getDetail();
+    },
     methods: {
-        save(){
-            let self = this;
+        saveGoodsCommission(){
+            if(!(getQuery('id') > 0))
+                return;
+            var self = this;
+            self.loading = true;
             request({
                 params: {
-                    r: 'plugin/mch/mall/distribution/edit',
+                    r: 'plugin/commission/mall/rules/edit'
                 },
                 method: 'post',
                 data: {
-                    mch_id: getQuery('id'),
-                    share_type: self.share_type,
-                    distribution_level_list: self.distributionLevelList
+                    item_type: 'checkout',
+                    apply_all_item: 0,
+                    item_id: getQuery('id'),
+                    commission_type: self.commissionType,
+                    commission_chains_json: JSON.stringify(self.commissionRuleChains)
                 }
             }).then(e => {
                 self.loading = false;
@@ -143,78 +101,67 @@ const app = new Vue({
                     self.$message.error(e.data.msg);
                 }
             }).catch(e => {
-                console.log(e);
+                self.$message.error(e.data.msg);
+                self.loading = false;
             });
         },
-        handleSelectionChange(data) {
-            this.selectList = data;
-        },
-        getDetail() {
+        getDetail(){
             var self = this;
-            self.cardLoading = true;
+            self.loading = true;
             request({
                 params: {
-                    r: 'plugin/mch/mall/distribution/edit',
-                    id: getQuery('id')
+                    r: 'plugin/commission/mall/rules/edit',
+                    store_id: getQuery('id'),
                 },
-                method: 'get',
-                data: {}
             }).then(e => {
-                self.cardLoading = false;
+                self.loading = false;
                 if (e.data.code == 0) {
-                    self.share_type = e.data.data.shareType;
-                    self.distributionLevelArray = e.data.data.distributionLevelArray;
-                    self.distributionLevelList = self.setDistriburtionLevel(e.data.data.distributionLevelList, e.data.data.distributionDetails);
+                    var data = e.data.data;
+                    if(data.rule.is_delete == 0){
+                        self.is_alone = 1;
+                    }else{
+                        self.is_alone = 0;
+                    }
+                    self.commissionType       = data.rule.commission_type;
+                    self.commissionRuleChains = data.chains;
                 }
             }).catch(e => {
-                console.log(e);
-            });
-        },
-        setDistriburtionLevel(distributionLevelList, list) {
-            let newDistributionLevelList = [];
-            distributionLevelList.forEach((item) => {
-                let newItem = {
-                    level: item.level,
-                    name: item.name,
-                    commission_first: 0,
-                    commission_second: 0,
-                    commission_third: 0,
-                };
-                for (let i in list) {
-                    if (list[i].level == item.level) {
-                        newItem = Object.assign(newItem, list[i]);
-                    }
-                }
-                newDistributionLevelList.push(newItem);
-            });
 
-            return JSON.parse(JSON.stringify(newDistributionLevelList));
+            })
         },
-        batchAttr() {
-            if (!this.selectList || this.selectList.length === 0) {
-                this.$message.warning('请勾选分销商等级');
+        commissionOpen(){
+            if(!(getQuery('id') > 0))
                 return;
-            }
-            if (this.selectData === '') {
-                this.$message.warning('请选择分销层级');
-                return;
-            }
-            this.distributionLevelList.forEach((item, index) => {
-                let flag = false;
-                this.selectList.map((item1) => {
-                    if (JSON.stringify(item1) === JSON.stringify(item)) {
-                        flag = true;
-                    }
-                });
-                if (flag) {
-                    item[this.selectData] = this.batchShareLevel
+            let self = this;
+            self.loading = true;
+            request({
+                params: {
+                    r: 'plugin/commission/mall/rules/commission-store-open',
+                },
+                method: 'post',
+                data: {
+                    store_id: getQuery('id'),
+                    open: self.is_alone > 0 ? 1 : 0
                 }
+            }).then(e => {
+                self.loading = false;
+                if (e.data.code == 0) {
+                    self.$message.success(e.data.msg);
+                } else {
+                    self.$message.error(e.data.msg);
+                }
+            }).catch(e => {
+                self.$message.error('error');
             });
-        }
-    },
-    mounted: function () {
-        this.getDetail();
-        this.navigateToUrl = 'plugin/mch/mall/distribution/edit';
+        },
+        updateCommissionRule(data){
+            if(data['type'] != null && typeof data.type != "undefined"){
+                this.commissionType = data.type;
+            }
+            if(data['chains'] != null && typeof data.chains == "object"){
+                this.commissionRuleChains = data.chains;
+            }
+        },
     }
 });
 </script>

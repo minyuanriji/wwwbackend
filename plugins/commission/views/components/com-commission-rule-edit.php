@@ -156,29 +156,35 @@
         props: ['ctype', 'chains'],
         computed: {},
         watch: {
-            chains(rows, oldval){
-                rows = typeof rows == "object" ? rows : [];
-                var chains = [], item, key;
-                for(var i=0; i < rows.length; i++){
-                    item = rows[i];
-                    key = item.role_type+'_'+item.level+'_'+item.unique_key;
-                    chains[key] = item.commisson_value;
-                }
-                var m, n, i, l;
-                for(m in this.groupData){
-                    for(n in this.groupData[m]){
-                        l = this.groupData[m][n].level;
-                        for(i in this.groupData[m][n].chain){
-                            key = m + '_' + l + '_' + this.groupData[m][n].chain[i].unique_key;
-                             if(typeof chains[key] != "undefined"){
-                                this.groupData[m][n].chain[i].commisson_value = chains[key] ;
+            chains: {
+                handler(rows, oldval) {
+                    rows = typeof rows == "object" ? rows : [];
+                    var chains = [], item, key;
+                    for(var i=0; i < rows.length; i++){
+                        item = rows[i];
+                        key = item.role_type+'_'+item.level+'_'+item.unique_key;
+                        chains[key] = item.commisson_value;
+                    }
+                    var m, n, i, l;
+                    for(m in this.groupData){
+                        for(n in this.groupData[m]){
+                            l = this.groupData[m][n].level;
+                            for(i in this.groupData[m][n].chain){
+                                key = m + '_' + l + '_' + this.groupData[m][n].chain[i].unique_key;
+                                if(typeof chains[key] != "undefined"){
+                                    this.groupData[m][n].chain[i].commisson_value = chains[key] ;
+                                }
                             }
                         }
                     }
-                }
+                },
+                immediate: true
             },
-            ctype(val, oldval){
-                this.commission_type = val;
+            ctype: {
+                handler(val, oldval) {
+                    this.commission_type = val;
+                },
+                immediate: true
             }
         },
         data() {

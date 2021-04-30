@@ -157,8 +157,6 @@ class CommissionController extends BaseCommandController{
      */
     private function getCommissionParentRuleDatas($user_id, $item_id, $item_type){
 
-
-
         //获取支付用户信息
         $user = User::findOne($user_id);
         $userLink = UserRelationshipLink::findOne(["user_id" => $user_id]);
@@ -185,7 +183,7 @@ class CommissionController extends BaseCommandController{
         $partner2Data = null;
         foreach($parentDatas as $parentData){
             if(count($existData) >= 3) break;
-            if($parentData['role_type'] == "partner" && isset($existData['partner'])){
+            if(empty($partner2Data) && $parentData['role_type'] == "partner" && isset($existData['partner'])){
                 $partner2Data = $parentData;
                 continue;
             }

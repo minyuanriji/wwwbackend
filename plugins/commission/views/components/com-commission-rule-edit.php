@@ -196,6 +196,9 @@
                         {role:'branch_office', level:3, chain:[
                                 {commisson_value:0, relationship:['branch_office', 'partner', 'store', 'all'], unique_key:'branch_office#partner#store#all'},
                                 {commisson_value:0, relationship:['branch_office', 'partner', 'partner', 'all'], unique_key:'branch_office#partner#partner#all'},
+                            ]},
+                        {role:'branch_office', level:4, chain:[
+                                {commisson_value:0, relationship:['branch_office', 'partner', 'partner', 'store', 'all'], unique_key:'branch_office#partner#partner#store#all'},
                             ]}
                     ],
                     partner:[
@@ -205,6 +208,9 @@
                         {role:'partner', level:2, chain:[
                                 {commisson_value:0, relationship:['partner', 'partner', 'all'], unique_key:'partner#partner#all'},
                                 {commisson_value:0, relationship:['partner', 'store', 'all'], unique_key:'partner#store#all'}
+                            ]},
+                        {role:'partner', level:3, chain:[
+                                {commisson_value:0, relationship:['partner', 'partner', 'store', 'all'], unique_key:'partner#partner#store#all'},
                             ]}
                     ],
                     store:[

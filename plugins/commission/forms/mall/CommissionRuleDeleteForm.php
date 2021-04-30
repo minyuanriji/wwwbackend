@@ -4,7 +4,6 @@ namespace app\plugins\commission\forms\mall;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\commission\models\CommissionRules;
-use MongoDB\Driver\Exception\Exception;
 
 class CommissionRuleDeleteForm  extends BaseModel{
 

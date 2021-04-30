@@ -123,43 +123,30 @@
                 <el-table-column :show-overflow-tooltip="true" label="店铺信息" width="200">
                     <template slot-scope="scope">
                         <div flex="cross:center">
-                            <com-image width="25" height="25" :src="scope.row.store.cover_url"></com-image>
-                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.store.name}}</div>
+                            <com-image width="25" height="25" :src="scope.row.cover_url"></com-image>
+                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.name}}</div>
                             <!--                            <com-ellipsis style="margin-left: 10px;" :line="1">{{scope.row.store.name}}</com-ellipsis>-->
                         </div>
                     </template>
                 </el-table-column>
                 <el-table-column label="用户" width="200">
                     <template slot-scope="scope">
-                        <div flex="dir:left cross:center" v-if="scope.row.user">
-                            <el-tooltip class="item" effect="dark" v-if="scope.row.user.userInfo.platform == 'wxapp'"
-                                        content="微信" placement="top">
-                                <img style="margin-right: 10px" src="statics/img/mall/wx.png" alt="">
-                            </el-tooltip>
-                            <el-tooltip class="item" effect="dark"
-                                        v-else-if="scope.row.user.userInfo.platform == 'aliapp'" content="支付宝"
-                                        placement="top">
-                                <img style="margin-right: 10px" src="statics/img/mall/ali.png" alt="">
-                            </el-tooltip>
-                            <el-tooltip class="item" effect="dark" v-else content="未知" placement="top">
-                                <img style="margin-right: 10px" src="statics/img/mall/site.png" alt="">
-                            </el-tooltip>
-                            <com-image width="25" height="25" :src="scope.row.user.userInfo.avatar"></com-image>
-                            <div style="margin-left: 10px;width: 115px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.user.nickname}}</div>
+                        <div flex="dir:left cross:center">
+                            <com-image width="25" height="25" :src="scope.row.avatar_url"></com-image>
+                            <div style="margin-left: 10px;width: 115px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.nickname}}</div>
                         </div>
                     </template>
                 </el-table-column>
                 <el-table-column label="分佣信息" width="200">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.distribution_detail_set == 1" style="color:green">已设置</div>
+                        <div v-if="scope.row.rule_id > 0" style="color:green">已设置</div>
                         <div v-else style="color:gray">未设置</div>
                     </template>
-                    distribution_detail_set
                 </el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
                         <el-button @click="edit(scope.row.id)" type="text" circle size="mini">
-                            <el-tooltip class="item" effect="dark" content="设置分佣信息" placement="top">
+                            <el-tooltip class="item" effect="dark" content="分佣设置" placement="top">
                                 <img src="statics/img/mall/edit.png" alt="">
                             </el-tooltip>
                         </el-button>
@@ -208,7 +195,7 @@
                 self.listLoading = true;
                 request({
                     params: {
-                        r: 'plugin/mch/mall/mch/index',
+                        r: 'plugin/mch/mall/distribution/list',
                         page: self.page,
                         keyword: self.search.keyword
                     },

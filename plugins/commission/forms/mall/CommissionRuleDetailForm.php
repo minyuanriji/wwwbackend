@@ -13,11 +13,12 @@ use app\plugins\commission\models\CommissionRules;
 class CommissionRuleDetailForm extends BaseModel{
 
     public $id;
+    public $store_id;
+    public $goods_id;
 
     public function rules(){
         return [
-            [['id'], 'required'],
-            [['id'], 'integer']
+            [['id', 'goods_id', 'store_id'], 'integer']
         ];
     }
 
@@ -28,8 +29,21 @@ class CommissionRuleDetailForm extends BaseModel{
         }
 
         try {
-            $rule = CommissionRules::findOne($this->id);
-            if(!$rule || $rule->is_delete){
+            if(!empty($this->goods_id)) {
+                $rule = CommissionRules::findOne([
+                    "item_type" => "goods",
+                    "item_id"   => $this->goods_id
+                ]);
+            }elseif(!empty($this->store_id)){
+                $rule = CommissionRules::findOne([
+                    "item_type" => "checkout",
+                    "item_id"   => $this->store_id
+                ]);
+            }else{
+                $rule = CommissionRules::findOne($this->id);
+            }
+
+            if(!$rule){
                 throw new \Exception("无法获取规则记录");
             }
 
@@ -81,4 +95,5 @@ class CommissionRuleDetailForm extends BaseModel{
             ];
         }
     }
+
 }

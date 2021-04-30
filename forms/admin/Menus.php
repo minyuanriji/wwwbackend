@@ -578,7 +578,7 @@ class Menus
                         'route' => 'mall/order-clerk/index',
                         'action' => [
                         ]
-                    ]
+                    ],
                 ],
             ],
             [

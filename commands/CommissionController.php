@@ -183,13 +183,20 @@ class CommissionController extends BaseCommandController{
         $partner2Data = null;
         foreach($parentDatas as $parentData){
             if(count($existData) >= 3) break;
+            $appendNew = false;
             if(empty($partner2Data) && isset($existData['partner']) && $parentData['role_type'] == "partner"){
                 if($existData['partner']['parent_id'] == $parentData['id']){
                     $partner2Data = $parentData;
                     continue;
                 }
+            }elseif($parentData['role_type'] == "store" && !isset($existData['store']) && !isset($existData['branch_office']) && !isset($existData['partner'])){
+                $appendNew = true;
+            }elseif($parentData['role_type'] == "partner"&& !isset($existData['partner']) && !isset($existData['branch_office'])){
+                $appendNew = true;
+            }elseif($parentData['role_type'] == "branch_office" && !isset($existData['branch_office'])){
+                $appendNew = true;
             }
-            if(!isset($existData[$parentData['role_type']])){
+            if($appendNew){
                 $existData[$parentData['role_type']] = $parentData;
                 $newParentDatas[] = $parentData;
             }

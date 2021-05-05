@@ -158,10 +158,10 @@ abstract class BaseOrderForm extends BaseModel
             ->all();
 
         $order = new Order();
-        $address = new UserAddress();
+//        $address = new UserAddress();
         foreach ($list as &$item) {
-            $user_address = $address -> getUserAddress($item['user_id'],$item['address_id']);
-            $item['address'] = $user_address['province'] . ' ' . $user_address['city'] . ' ' . $user_address['district'] . ' ' . $user_address['town'] . ' ' . $user_address['detail'];
+            /*$user_address = $address -> getUserAddress($item['user_id'],$item['address_id']);
+            $item['address'] = $user_address['province'] . ' ' . $user_address['city'] . ' ' . $user_address['district'] . ' ' . $user_address['town'] . ' ' . $user_address['detail'];*/
             $item['platform'] = $item['user']['platform'];
             //插件名称
             if ($item['sign'] == '' && $item['mch_id'] == 0) {

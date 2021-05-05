@@ -57,6 +57,16 @@ class MchApplyMoreController extends ApiController{
     }
 
     /**
+     * 修改入驻状态
+     */
+    public function actionUpStatus(){
+        $form = new QueryStatusForm();
+        $form->attributes = $this->requestData;
+        $form->mch_id = $this->mch_id;
+        $this->asJson($form->upQuery());
+    }
+
+    /**
      * 保存商户类型
      * @return \yii\web\Response
      * @throws \app\core\exceptions\ClassNotFoundException

@@ -71,17 +71,18 @@ class CommonMchForm extends BaseModel{
 
         $query->select($selects);
 
-        $list = $query->orderBy("distance_mi ASC")
+        $list = $query->andWhere(['>', "ST_Distance_sphere(point(longitude, latitude), point({$longitude}, {$latitude}))", 0])
+            ->orderBy("distance_mi ASC")
             ->with('store', 'category')
-//            ->page($pagination, 15, max(1, (int)$this->page))
+            ->page($pagination, 15, max(1, (int)$this->page))
             ->asArray()->all();
         if($list){
-            $new_list = [];
+//            $new_list = [];
             foreach($list as $key => &$item){
                 $item['distance_format'] = "0m";
                 if(empty($item['distance_mi'])) {
-                    $new_list[$key] = $item;
-                    unset($list[$key]);
+                    /*$new_list[$key] = $item;
+                    unset($list[$key]);*/
                     continue;
                 }
                 if($item['distance_mi'] < 1000){
@@ -90,7 +91,7 @@ class CommonMchForm extends BaseModel{
                     $item['distance_format'] = round(($item['distance_mi']/1000), 1) . "km";
                 }
             }
-            $list = array_merge_recursive($list,$new_list);
+//            $list = array_merge_recursive($list,$new_list);
             if (isset($this->effect) && $this->effect == 'nearby') {
                 foreach ($list as $key => $list_val) {
                     if($item['distance_mi'] > 5000){
@@ -104,7 +105,7 @@ class CommonMchForm extends BaseModel{
                     'user_id' => \Yii::$app->user->id,
                 ])->asArray()->all();
                 if ($model) {
-                    $model_list = [];
+//                    $model_list = [];
                     $new_model = array_combine(array_column($model,'mch_id'),$model);
                     foreach ($list as $key => $value) {
                         $list[$key]['num'] = 0;
@@ -112,21 +113,25 @@ class CommonMchForm extends BaseModel{
                             $list[$key]['num'] = (int)$new_model[$value['id']]['num'];
                         }
 
-                        if(empty($value['distance_mi'])) {
+                        /*if(empty($value['distance_mi'])) {
                             $model_list[$key] = $value;
                             unset($list[$key]);
                             continue;
-                        }
+                        }*/
                     }
                     array_multisort(
                         array_column($list,'num'),SORT_DESC ,
                         array_column($list,'distance_mi'),SORT_ASC ,
                         $list);
-                    $list = array_merge_recursive($list,$model_list);
+                    /*$list = array_merge_recursive($list,$model_list);*/
                 }
             }
         }
-        $count_num = count($list);
+        return [
+            'list' => $list,
+            'pagination' => $pagination
+        ];
+        /*$count_num = count($list);
         $list = array_slice($list, ((int)$this->page - 1) * 15,15);
         return [
             'list' => $list,
@@ -136,7 +141,7 @@ class CommonMchForm extends BaseModel{
                 'page_count' => ceil($count_num / 15),
                 'total_count' => $count_num,
             ]
-        ];
+        ];*/
     }
 
     /**

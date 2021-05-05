@@ -111,7 +111,7 @@ class RegisterForm extends BaseModel
                 'id' => $user_id,
                 'mall_id' => \Yii::$app->mall->id
             ]);
-            $beforeParentId = $user->parent_id;
+
             if($user->parent_id){
                 return $this->returnApiResultData(ApiCode::CODE_FAIL,'已经存在推荐人');
             }
@@ -126,19 +126,16 @@ class RegisterForm extends BaseModel
             if ($recommendUsers->id == $user->id) {
                 throw new \Exception('自己不能绑定自己');
             }
-            $second_parent_id = $recommendUsers["parent_id"];
-            $third_parent_id = $recommendUsers["second_parent_id"];
             
-            $user->id = $user_id;
-            $user->parent_id = $recommendUsers['id'];
-            $user->second_parent_id = $second_parent_id;
-            $user->third_parent_id = $third_parent_id;
+            $user->id               = $user_id;
+            $user->parent_id        = $recommendUsers['id'];
+            $user->second_parent_id = 0;
+            $user->third_parent_id  = 0;
             if (!$user->save()) {
                 $messages = $this->responseErrorInfo($user);
                 throw new \Exception($messages["msg"]);
-            }else{
-                $user->bindParent($beforeParentId);
             }
+
             $trans->commit();
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'绑定成功');
         } catch (\Exception $e) {

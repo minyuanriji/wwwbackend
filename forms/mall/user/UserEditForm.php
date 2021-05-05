@@ -90,7 +90,7 @@ class UserEditForm extends BaseModel
                 $parentLink = UserRelationshipLink::findOne(["user_id" => $parentUser->id]);
                 $userLink = UserRelationshipLink::findOne(["user_id" => $this->id]);
                 if(!$parentLink || !$userLink){
-                    throw new \Exception("用户关系链建立异常");
+                    throw new \Exception("用户关系链异常");
                 }
 
                 if($parentLink->left > $userLink->left && $parentLink->right < $userLink->right){

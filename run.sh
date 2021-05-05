@@ -14,6 +14,7 @@ command5="efps-pay-query/maintant-job"
 
 commands=($command1 $command2 $command3 $command4 $command5)
 
+
 for command in ${commands[@]}
 do
         command="$phpexe $basepath/yii $command"

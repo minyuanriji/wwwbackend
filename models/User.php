@@ -385,7 +385,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
      */
     public function bindParent($before_parent_id)
     {
-
+        return true;
     }
 
     public function sendWechatTemp($user_id)

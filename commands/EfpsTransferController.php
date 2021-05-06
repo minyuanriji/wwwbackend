@@ -45,6 +45,11 @@ class EfpsTransferController extends BaseCommandController{
 
             }catch (\Exception $e){
                 $this->commandOut($e->getMessage());
+                $mchCash->content = $e->getMessage();
+                if($mchCash->retry_count >= 3){
+                    $mchCash->status = 2;
+                }
+                $mchCash->save();
             }
         }
 

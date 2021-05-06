@@ -45,7 +45,7 @@ class CheckoutOrderQrcodeForm extends BaseModel {
                 $codeUrl = $res['file_path'];
             }else{
                 $dir = "mch/checkout-order-qrcode/" . $mchModel->id . time() . '.jpg';
-                $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
+                $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;           
                 $file = CommonLogic::createQrcode([], $this, $this->route . "?id=" . $mchModel->id, $dir);
                 //$codeUrl = CommonLogic::uploadImgToCloudStorage($file, $dir, $imgUrl);
                 $codeUrl = $imgUrl;

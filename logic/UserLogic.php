@@ -19,6 +19,7 @@ use app\models\User;
 use app\models\UserChildren;
 use app\models\UserInfo;
 use app\models\UserParent;
+use app\models\UserRelationshipLink;
 use yii\base\Exception;
 use function EasyWeChat\Kernel\Support\get_client_ip;
 use app\models\mysql\{UserParent as UserParentModel,UserChildren as UserChildrenModel};
@@ -104,45 +105,17 @@ class UserLogic
                     $user->login_ip         = get_client_ip();
                     $user->source           = isset($userData["source"]) ? $userData["source"] : \Yii::$app->source;
                     $user->parent_id        = isset($userData["parent_id"]) ? $userData["parent_id"] : 0;
-                    $user->second_parent_id = isset($userData["second_parent_id"]) ? $userData["second_parent_id"] : 0;
-                    $user->third_parent_id  = isset($userData["third_parent_id"]) ? $userData["third_parent_id"] : 0;
-                    if(!empty($parent_id)){
-                        $parent = User::findOne(["id" => $parent_id, "is_delete" => 0]);
-                        if($parent){
-                            $user->parent_id        = $parent->id;
-                            $user->second_parent_id = $parent->parent_id;
-                            $user->third_parent_id  = $parent->second_parent_id;
+                    $user->second_parent_id = 0;
+                    $user->third_parent_id  = 0;
+                    if(!empty($user->parent_id)){
+                        $parentLink = UserRelationshipLink::findOne(["user_id" => $user->parent_id]);
+                        if(!$parentLink){
+                            throw new Exception("推荐人关系链异常");
                         }
                     }
                     if ($user->save() === false) {
                         \Yii::error("userRegister ".var_export($user->getErrors(),true));
                         throw new Exception("用户新增失败");
-                    }
-                    $Parent = (new UserParentModel()) -> getUserParentData($user -> attributes['id']);
-                    if(empty($Parent)){
-                        if(!empty($parent_id)){
-                            $parent_data = new UserParentModel();
-                            $parent_data -> mall_id = \Yii::$app->mall->id;
-                            $parent_data -> user_id = $user -> attributes['id'];
-                            $parent_data -> parent_id = $parent_id;
-                            $parent_data -> updated_at = time();
-                            $parent_data -> created_at = time();
-                            $parent_data -> deleted_at = time();
-                            $parent_data -> is_delete = 0;
-                            $parent_data -> level = 1;
-                            $parent_data -> save();
-                            $UserChildren = new UserChildrenModel();
-                            $UserChildren -> id = null;
-                            $UserChildren -> mall_id = \Yii::$app->mall->id;
-                            $UserChildren -> user_id = $parent_id;
-                            $UserChildren -> child_id = $user -> attributes['id'];
-                            $UserChildren -> level = 1;
-                            $UserChildren -> created_at = time();
-                            $UserChildren -> updated_at = time();
-                            $UserChildren -> deleted_at = 0;
-                            $UserChildren -> is_delete = 0;
-                            $UserChildren -> save();
-                        }
                     }
                 }
             }

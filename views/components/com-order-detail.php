@@ -496,55 +496,38 @@ Yii::$app->loadComponentView('order/com-city');
                         <div v-if="isShowShare" flex="dir:top" class="card-box">
                             <h3>分润信息</h3>
 
-                            <div v-if="common_order_detail_list.length"
-                                 v-for="(common_order_detail, index) in common_order_detail_list" :key="index">
-
-                                <div  v-if="common_order_detail.price_list"
-                                     v-for="(log,i) in common_order_detail.price_list">
-                                    <template v-if="log.is_price==1">
-
-
-                                        <div v-if="log.price_list.length">
-                                            <el-table
-                                                    :data="log.price_list"
-                                                    border
-                                                    style="width: 100%">
-                                                <el-table-column label="用户">
-                                                    <template slot-scope="scope">
-                                                        <com-image style="float: left;margin-right: 5px;"
-                                                                   mode="aspectFill"
-                                                                   :src="scope.row.avatar_url"></com-image>
-                                                        <div>{{scope.row.nickname}}</div>
-                                                    </template>
-                                                </el-table-column>
-                                                <el-table-column
-                                                        prop="price"
-                                                        label="佣金"
-                                                        width="180">
-                                                </el-table-column>
-                                                <el-table-column
-                                                        prop="type_name"
-                                                        label="佣金类型">
-                                                </el-table-column>
-                                                <el-table-column
-
-                                                        label="所属插件">
-
-
-                                                    <div class="share-title">
-                                                        {{log.display_name}}
-                                                    </div>
-
-                                                </el-table-column>
-                                            </el-table>
-
-
-                                        </div>
-
-
-                                    </template>
-
-                                </div>
+                            <div v-if="price_logs.length">
+                                <el-table :data="price_logs" border style="width: 100%">
+                                    <el-table-column label="用户">
+                                        <template slot-scope="scope">
+                                            <com-image style="float: left;margin-right: 5px;"
+                                                       mode="aspectFill"
+                                                       :src="scope.row.avatar_url"></com-image>
+                                            <div>{{scope.row.nickname}}</div>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="等级">
+                                        <template slot-scope="scope">
+                                            <div v-if="scope.row.role_type=='branch_office'">分公司</div>
+                                            <div v-if="scope.row.role_type=='partner'">合伙人</div>
+                                            <div v-if="scope.row.role_type=='store'">店主</div>
+                                            <div v-if="scope.row.role_type=='user'">用户</div>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="price" label="佣金">
+                                    </el-table-column>
+                                    <el-table-column label="佣金类型">
+                                        <template slot-scope="scope">
+                                            <div>分销</div>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="状态">
+                                        <template slot-scope="scope">
+                                            <div v-if="scope.row.status == 0">未结算</div>
+                                            <div v-if="scope.row.status == 1">已结算</div>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
 
                             </div>
                         </div>
@@ -787,6 +770,7 @@ Yii::$app->loadComponentView('order/com-city');
                     detailExpress: [],
                 },
                 common_order_detail_list: [],
+                price_logs: [],
                 btnLoading: false,
                 citySendVisible: false,//选择配送员
             };
@@ -817,6 +801,7 @@ Yii::$app->loadComponentView('order/com-city');
                 }).then(e => {
                     this.loading = false;
                     if (e.data.code == 0) {
+                        this.price_logs = e.data.data.price_logs
                         this.common_order_detail_list = e.data.data.common_order_detail_list
 
                         this.order = e.data.data.order;

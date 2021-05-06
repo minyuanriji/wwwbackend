@@ -36,7 +36,6 @@ class RelationLogic extends BaseLogic
      */
     public static function bindParent($user, $parent_id, $is_manual = 0)
     {
-        //throw new Exception('xxxxxxxxxxxxxxx'.$user->id.'->'.$user->parent_id.'->'.$user->is_inviter.'->'.$parent_id);
         $relation = RelationSetting::findOne(['mall_id' => \Yii::$app->mall->id, 'use_relation' => 1, 'is_delete' => 0]);
         if (!$relation) {
             throw new Exception('未启用关系链'.$parent_id);
@@ -45,10 +44,6 @@ class RelationLogic extends BaseLogic
         if ($parent_id == $user->id) {
             throw new Exception('自己不能绑定自己'.$parent_id);
         }
-
-        // if ($user->is_inviter == 1) {
-        //     throw new Exception('用户自身是分销商'.$parent_id);
-        // }
 
         if ($user->parent_id != 0 && !$is_manual) {
             throw new Exception('用户存在上级'.$parent_id);
@@ -76,28 +71,15 @@ class RelationLogic extends BaseLogic
                 }
             }
         }
-        $beforeParentId = $user->parent_id;
+
         $user->parent_id = $parent_id;
         $user->junior_at = time();
-        
-        
+
         if($user->save() !== false){
-            //throw new Exception('绑定异常xxx');
-            if ($user->bindParent($beforeParentId)) {
-                //触发营销偏好类型标签条件
-                \Yii::$app->trigger(TagHandler::ADD_TAG, new TagEvent([
-                    'user_id' => $parent_id,
-                    'mall_id' => \Yii::$app->mall->id,
-                    'cat_id' => 1,
-                    'type' => 3
-                ]));
-                self::pluginsHandler($user->id,$parent_id,\Yii::$app->mall->id);
-                return true;
-            } else {
-                throw new Exception('绑定异常');
-            }
+            throw new Exception('绑定异常');
         }
 
+        return true;
     }
 
     

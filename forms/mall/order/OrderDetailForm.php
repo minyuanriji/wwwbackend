@@ -18,6 +18,8 @@ use app\models\Order;
 use app\models\OrderRefund;
 use app\models\PriceLog;
 use app\models\User;
+use app\models\UserRelationshipLink;
+use app\plugins\commission\models\CommissionGoodsPriceLog;
 use app\plugins\distribution\forms\common\DistributionOrderCommon;
 use app\plugins\distribution\Plugin;
 use app\plugins\mch\models\Mch;
@@ -137,66 +139,26 @@ class OrderDetailForm extends BaseModel
             $order['is_confirm_show'] = $mchSetting['is_confirm_order'] ? 1 : 0;
         }
 
-
-        $common_order_detail_list = CommonOrderDetail::find()->where(['order_id' => $this->order_id, 'goods_type' => CommonOrderDetail::TYPE_MALL_GOODS])->asArray()->all();
-
-        //  dd($common_order_detail_list);
-
-
-        $plugin_list = \Yii::$app->plugin->list;
-        foreach ($common_order_detail_list as &$item) {
-            $price_log_list = PriceLog::find()->alias('p')
-                ->where(['p.common_order_detail_id' => $item['id'], 'p.is_delete' => 0])
-                ->leftJoin(['u'=>User::tableName()],'u.id=p.user_id')
-                ->select('u.nickname,u.avatar_url,p.*')
-                ->asArray()->all();
-
-
-            foreach ($price_log_list as &$log) {
-                if ($log['sign'] != 'mall') {
-                    $plugin = \Yii::$app->plugin->getPlugin($log['sign']);
-                    $log['type_name'] = $plugin->getPriceTypeName($log['id']);
-                }
-            }
-            unset($log);
-
-            $log_list = $price_log_list;
-            $newList = [];
-
-            foreach ($plugin_list as $plugin) {
-                /**
-                 * @var \app\models\Plugin $plugin
-                 */
-                $newItem['plugin'] = $plugin->name;
-                $newItem['display_name'] = $plugin->display_name;
-                $is_price = 0;
-                $newItem['price_list']=[];
-                foreach ($log_list as $log) {
-                    if ($log['sign'] == $plugin->name) {
-                        $newItem['price_list'][] = $log;
-                       // array_push($newItem['price_list'],$log);
-                        $is_price = 1;
-                    }
-                }
-                $newItem['is_price'] = $is_price;
-                $newList[] = $newItem;
-            }
-            $item['price_list'] = $newList;
-        }
-
-        unset($item);
-        unset($log);
-        unset($plugin);
-        unset($newItem);
-
-
+        //订单分润信息
+        $query = CommissionGoodsPriceLog::find()->alias("cgpl");
+        $query->innerJoin(["u" => User::tableName()], "u.id=cgpl.user_id");
+        $query->innerJoin(["url" => UserRelationshipLink::tableName()], "url.user_id=u.id");
+        $query->orderBy("url.left ASC");
+        $query->andWhere([
+            "AND",
+            ["cgpl.order_id" => $order['id']],
+            ["IN", "cgpl.status", [0, 1]]
+        ]);
+        $query->select(["u.nickname", "u.avatar_url", "u.role_type", "cgpl.price", "cgpl.status"]);
+        $priceLogs = $query->asArray()->all();
 
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'data' => [
-                'order' => $order,
-                'mch' => $mch,
-                'common_order_detail_list' => $common_order_detail_list
+                'order'                    => $order,
+                'mch'                      => $mch,
+                'price_logs'               => $priceLogs ? $priceLogs : [],
+                'common_order_detail_list' => []
             ]
         ];
     }

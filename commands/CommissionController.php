@@ -59,82 +59,89 @@ class CommissionController extends BaseCommandController{
         }
 
         foreach($checkoutOrders as $checkoutOrder){
-            $parentDatas = $this->getCommissionParentRuleDatas($checkoutOrder['pay_user_id'], $checkoutOrder['store_id'], 'checkout');
 
-            //通过相关规则键获取分佣规则进行分佣
-            foreach($parentDatas as $parentData) {
+            try {
+                $parentDatas = $this->getCommissionParentRuleDatas($checkoutOrder['pay_user_id'], $checkoutOrder['store_id'], 'checkout');
 
-                $ruleData = $parentData['rule_data'];
+                //通过相关规则键获取分佣规则进行分佣
+                foreach($parentDatas as $parentData) {
 
-                //无分佣规则 跳过
-                if (!$ruleData) continue;
+                    $ruleData = $parentData['rule_data'];
 
-                //计算分佣金额
-                $transferRate = (int)$checkoutOrder['transfer_rate'];
-                $ruleData['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];
-                if($ruleData['commission_type'] == 1){ //按百分比
-                    $price = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
-                }else{ //按固定值
-                    $price = (float)$ruleData['commisson_value'];
-                }
+                    //无分佣规则 跳过
+                    if (!$ruleData) continue;
 
-                //生成分佣记录
-                if($price > 0){
-                    $priceLog = CommissionCheckoutPriceLog::findOne([
-                        "checkout_order_id" => $checkoutOrder['id'],
-                        "user_id"           => $parentData['id'],
-                    ]);
-                    if(!$priceLog){ //没有生成过再去生成
-                        $trans = \Yii::$app->db->beginTransaction();
-                        try {
-                            $priceLog = new CommissionCheckoutPriceLog([
-                                "mall_id"           => $checkoutOrder['mall_id'],
-                                "checkout_order_id" => $checkoutOrder['id'],
-                                "user_id"           => $parentData['id'],
-                                "price"             => round($price, 5),
-                                "status"            => 1,
-                                "created_at"        => $checkoutOrder['created_at'],
-                                "updated_at"        => $checkoutOrder['updated_at'],
-                                "rule_data_json"    => json_encode($ruleData)
-                            ]);
-                            if(!$priceLog->save()){
-                                throw new \Exception(json_encode($priceLog->getErrors()));
+                    //计算分佣金额
+                    $transferRate = (int)$checkoutOrder['transfer_rate'];
+                    $ruleData['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];
+                    if($ruleData['commission_type'] == 1){ //按百分比
+                        $price = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
+                    }else{ //按固定值
+                        $price = (float)$ruleData['commisson_value'];
+                    }
+
+                    //生成分佣记录
+                    if($price > 0){
+                        $priceLog = CommissionCheckoutPriceLog::findOne([
+                            "checkout_order_id" => $checkoutOrder['id'],
+                            "user_id"           => $parentData['id'],
+                        ]);
+                        if(!$priceLog){ //没有生成过再去生成
+                            $trans = \Yii::$app->db->beginTransaction();
+                            try {
+                                $priceLog = new CommissionCheckoutPriceLog([
+                                    "mall_id"           => $checkoutOrder['mall_id'],
+                                    "checkout_order_id" => $checkoutOrder['id'],
+                                    "user_id"           => $parentData['id'],
+                                    "price"             => round($price, 5),
+                                    "status"            => 1,
+                                    "created_at"        => $checkoutOrder['created_at'],
+                                    "updated_at"        => $checkoutOrder['updated_at'],
+                                    "rule_data_json"    => json_encode($ruleData)
+                                ]);
+                                if(!$priceLog->save()){
+                                    throw new \Exception(json_encode($priceLog->getErrors()));
+                                }
+                                $this->commandOut("生成分佣记录 [ID:".$priceLog->id."]");
+
+                                //收入记录
+                                $incomeLog = new IncomeLog([
+                                    'mall_id'     => $checkoutOrder['mall_id'],
+                                    'user_id'     => $parentData['id'],
+                                    'type'        => 1,
+                                    'money'       => $parentData['total_income'],
+                                    'income'      => $priceLog->price,
+                                    'desc'        => "来自店铺“".$checkoutOrder['name']."”的分佣记录[ID:".$priceLog->id."]",
+                                    'flag'        => 1, //到账
+                                    'source_id'   => $priceLog->id,
+                                    'source_type' => 'checkout',
+                                    'created_at'  => $checkoutOrder['created_at'],
+                                    'updated_at'  => $checkoutOrder['updated_at']
+                                ]);
+                                if(!$incomeLog->save()){
+                                    throw new \Exception(json_encode($incomeLog->getErrors()));
+                                }
+
+                                User::updateAllCounters([
+                                    "total_income"  => $priceLog->price,
+                                    "income" => $priceLog->price
+                                ], ["id" => $parentData['id']]);
+
+                                $trans->commit();
+                            }catch (\Exception $e){
+                                $trans->rollBack();
+                                $this->commandOut($e->getMessage());
                             }
-                            $this->commandOut("生成分佣记录 [ID:".$priceLog->id."]");
-
-                            //收入记录
-                            $incomeLog = new IncomeLog([
-                                'mall_id'     => $checkoutOrder['mall_id'],
-                                'user_id'     => $parentData['id'],
-                                'type'        => 1,
-                                'money'       => $parentData['total_income'],
-                                'income'      => $priceLog->price,
-                                'desc'        => "来自店铺“".$checkoutOrder['name']."”的分佣记录[ID:".$priceLog->id."]",
-                                'flag'        => 1, //到账
-                                'source_id'   => $priceLog->id,
-                                'source_type' => 'checkout',
-                                'created_at'  => $checkoutOrder['created_at'],
-                                'updated_at'  => $checkoutOrder['updated_at']
-                            ]);
-                            if(!$incomeLog->save()){
-                                throw new \Exception(json_encode($incomeLog->getErrors()));
-                            }
-
-                            User::updateAllCounters([
-                                "total_income"  => $priceLog->price,
-                                "income" => $priceLog->price
-                            ], ["id" => $parentData['id']]);
-
-                            $trans->commit();
-                        }catch (\Exception $e){
-                            $trans->rollBack();
-                            $this->commandOut($e->getMessage());
                         }
                     }
+
+
                 }
-
-
+            }catch (\Exception $e){
+                $this->commandOut($e->getMessage());
             }
+
+
 
             MchCheckoutOrder::updateAll([
                 "commission_status" => 1
@@ -149,11 +156,12 @@ class CommissionController extends BaseCommandController{
      * @return array
      */
     private function getCommissionParentRuleDatas($user_id, $item_id, $item_type){
+
         //获取支付用户信息
         $user = User::findOne($user_id);
         $userLink = UserRelationshipLink::findOne(["user_id" => $user_id]);
         if(!$user || !$userLink){
-            throw new \Exception("支付用户不存在或关系链异常");
+            throw new \Exception("支付用户[ID:".($user ? $user->id : 0)."]不存在或关系链异常");
         }
 
         $query = User::find()->alias("u")
@@ -163,31 +171,52 @@ class CommissionController extends BaseCommandController{
             ["u.is_delete" => 0],
             ["IN", "u.role_type", ["store", "partner", "branch_office"]],
             ("url.`left` < '".$userLink->left."' AND url.`right` > '".$userLink->right."'")
-        ])->select(["u.id", "u.total_income", "u.role_type", "u.nickname"])->orderBy("url.`left` DESC");
+        ])->select(["u.id", "u.parent_id", "u.total_income", "u.role_type", "u.nickname"])->orderBy("url.`left` DESC");
 
         $parentDatas = $query->asArray()->all();
         if(!$parentDatas){
-            throw new \Exception("无法获取上级信息");
+            throw new \Exception("无法获取上级[ID:".$userLink->parent_id."]信息");
         }
 
         //对获取的所有上级进行处理
         $existData = $newParentDatas = [];
-        $partner2 = null;
+        $partner2Data = null;
         foreach($parentDatas as $parentData){
             if(count($existData) >= 3) break;
-            if($parentData['role_type'] == "partner" && isset($existData['partner'])){
-                $partner2 = $parentData['id'];
-                continue;
+            $appendNew = false;
+            if(empty($partner2Data) && isset($existData['partner']) && $parentData['role_type'] == "partner"){
+                if($existData['partner']['parent_id'] == $parentData['id']){
+                    $partner2Data = $parentData;
+                    continue;
+                }
+            }elseif($parentData['role_type'] == "store" && !isset($existData['store']) && !isset($existData['branch_office']) && !isset($existData['partner'])){
+                $appendNew = true;
+            }elseif($parentData['role_type'] == "partner"&& !isset($existData['partner']) && !isset($existData['branch_office'])){
+                $appendNew = true;
+            }elseif($parentData['role_type'] == "branch_office" && !isset($existData['branch_office'])){
+                $appendNew = true;
             }
-            if(!isset($existData[$parentData['role_type']])){
-                $existData[$parentData['role_type']] = $parentData['id'];
+            if($appendNew){
+                $existData[$parentData['role_type']] = $parentData;
                 $newParentDatas[] = $parentData;
             }
         }
 
+        //平级合伙人插入
+        $newParentDatas = array_reverse($newParentDatas);
+        if(!empty($partner2Data)){
+            $tmpDatas = [];
+            foreach($newParentDatas as $parentData){
+                if($parentData['role_type'] == "partner"){
+                    $tmpDatas[] = $partner2Data;
+                }
+                $tmpDatas[] = $parentData;
+            }
+            $newParentDatas = $tmpDatas;
+        }
+
         //生成相关规则键
         $parentDatas = [];
-        $newParentDatas = array_reverse($newParentDatas);
         while(!empty($newParentDatas)){
             $relKeys = [];
             foreach($newParentDatas as $newParentData){
@@ -198,24 +227,7 @@ class CommissionController extends BaseCommandController{
             $parentDatas[] = $parentData;
         }
 
-        foreach($parentDatas as $key => $parentData){
-
-            $query = CommissionRuleChain::find()->alias("crc");
-            $query->leftJoin("{{%plugin_commission_rules}} cr", "cr.id=crc.rule_id");
-            $subWheres = [];
-            foreach($parentData['rel_keys'] as $rel_key){
-                $subWheres[] = "crc.unique_key LIKE '%{$rel_key}'";
-            }
-            $query->andWhere([
-                "AND",
-                ["cr.is_delete" => 0],
-                ['cr.item_type' => $item_type],
-                "(".implode(" OR ", $subWheres).")"
-            ]);
-            $query->orderBy("crc.level DESC");
-            $query->select(["cr.commission_type", "crc.level", "crc.commisson_value"]);
-            $query->asArray();
-
+        $getChainRuleData = function(ActiveQuery $query, $item_id){
             //商品独立设置规则
             $newQuery = clone $query;
             $newQuery->andWhere([
@@ -232,7 +244,43 @@ class CommissionController extends BaseCommandController{
                 $ruleData = $newQuery->one();
             }
 
+            return $ruleData;
+        };
+
+        $this->commandOut(json_encode($parentDatas));
+        $currentLevel = count($parentDatas);
+        foreach($parentDatas as $key => $parentData){
+
+            $query = CommissionRuleChain::find()->alias("crc");
+            $query->leftJoin("{{%plugin_commission_rules}} cr", "cr.id=crc.rule_id");
+            $query->andWhere([
+                "AND",
+                ["cr.is_delete"  => 0],
+                ['cr.item_type'  => $item_type],
+                ['crc.role_type' => $parentData['role_type']],
+                ['crc.level'     => $currentLevel]
+            ]);
+            $query->orderBy("crc.level DESC");
+            $query->select(["cr.commission_type", "crc.level", "crc.commisson_value"]);
+            $query->asArray();
+
+            //查找规则
+            $relKeys = array_reverse($parentData['rel_keys']);
+            $ruleData = null;
+            foreach($relKeys as $relKey){
+                $newQuery = clone $query;
+                $newQuery->andWhere("crc.unique_key LIKE '%{$relKey}'" );
+                $ruleData = $getChainRuleData($newQuery, $item_id);
+
+                $this->commandOut("current LEVEL:" . $currentLevel);
+                $this->commandOut($newQuery->createCommand()->getRawSql());
+                $this->commandOut(json_encode($ruleData));
+                if($ruleData) break;
+            }
+
             $parentDatas[$key]['rule_data'] = $ruleData ? $ruleData : null;
+
+            $currentLevel--;
         }
 
         return $parentDatas;
@@ -244,7 +292,7 @@ class CommissionController extends BaseCommandController{
      */
     private function goodsOrderNew(){
 
-        //订单已付款、未确认收货，分佣状态未处理
+        //订单已付款、分佣状态未处理
         $query = OrderDetail::find()->alias("od");
         $query->innerJoin("{{%order}} o", "o.id=od.order_id");
         $query->innerJoin("{{%goods}} g", "g.id=od.goods_id");
@@ -254,18 +302,22 @@ class CommissionController extends BaseCommandController{
             ["o.is_pay" => 1],
             ["o.is_delete" => 0],
             ["o.is_recycle" => 0],
-            ["IN", "o.status", [1, 2]],
             ["od.is_delete" => 0],
-            ["od.is_refund" => 0],
             ["od.commission_status" => 0]
         ]);
-        $query->select(["od.id as order_detail_id", "od.created_at", "od.updated_at", "o.mall_id", "o.user_id", "od.order_id", "od.goods_id", "od.total_original_price", "od.total_price", "g.profit_price", "gw.name"]);
+        $query->select(["od.id as order_detail_id", "od.is_refund", "od.refund_status", "od.created_at", "od.updated_at", "o.mall_id", "o.user_id", "od.order_id", "od.goods_id", "od.total_original_price", "od.total_price", "g.profit_price", "gw.name"]);
         $orderDetailData = $query->asArray()->one();
         if(!$orderDetailData){
             return false;
         }
 
+
         try {
+
+            if($orderDetailData['is_refund'] && $orderDetailData['refund_status'] == 20){
+                throw new \Exception("订单商品[ID:".$orderDetailData['order_detail_id']."]已退款");
+            }
+
             $parentDatas = $this->getCommissionParentRuleDatas($orderDetailData['user_id'], $orderDetailData['goods_id'], 'goods');
 
             //通过相关规则键获取分佣规则进行分佣

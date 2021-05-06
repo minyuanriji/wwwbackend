@@ -76,6 +76,7 @@ class CommissionRuleEditForm extends BaseModel {
                 ]);
             }
 
+            $rule->is_delete = 0;
             $rule->commission_type = in_array($this->commission_type, [1, 2]) ? $this->commission_type : 1;
             $rule->json_params = "{}";
             $rule->updated_at = time();

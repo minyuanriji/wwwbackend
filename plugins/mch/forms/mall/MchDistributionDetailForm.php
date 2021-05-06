@@ -8,7 +8,7 @@ use app\plugins\distribution\forms\common\DistributionLevelCommon;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchDistributionDetail;
 
-class DistributionDetailForm extends BaseModel{
+class MchDistributionDetailForm extends BaseModel{
 
     public $id;
 

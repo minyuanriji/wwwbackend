@@ -13,11 +13,19 @@ set PROJECT_PATH=%~dp0
 
 ::==================================================================
 ::用户关系链守候程序
-start yii user-relationship-link/maintant-job
+::start yii user-relationship-link/maintant-job
 
 ::==================================================================
 ::分佣守候程序
 ::start yii commission/maintant-job
+
+::==================================================================
+::易票联提现转账守护程序
+start yii efps-transfer/maintant-job
+
+::==================================================================
+::支付结果状态守护程序
+::start yii efps-pay-query/maintant-job
 
 ::==================================================================
 ::cd shell

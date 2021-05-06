@@ -7,9 +7,11 @@ use app\forms\common\template\tplmsg\Tplmsg;
 use app\models\BaseModel;
 use app\models\ClerkUser;
 use app\models\ClerkUserStoreRelation;
+use app\models\GoodsWarehouse;
 use app\models\Model;
 use app\models\Order;
 use app\models\OrderClerk;
+use app\models\OrderDetail;
 use app\models\User;
 use app\plugins\baopin\models\BaopinMchClerkOrder;
 use app\plugins\baopin\models\BaopinMchGoods;
@@ -121,7 +123,7 @@ class OrderClerkCommon extends BaseModel
             $where = [
                 'is_delete' => 0,
                 'send_type' => 1,
-                'id'        => $this->id,
+//                'id'        => $this->id,
                 'mall_id'   => \Yii::$app->mall->id,
             ];
             if(!empty($this->clerk_code)){
@@ -129,8 +131,7 @@ class OrderClerkCommon extends BaseModel
             }else{
                 $where['id'] = (int)$this->id;
             }
-            $order = Order::find()->where($where)->one();
-
+            $order = Order::find()->with(['detail.goods.goodsWarehouse'])->where($where)->one();
             if (!$order) {
                 throw new \Exception('订单不存在');
             }
@@ -250,7 +251,14 @@ class OrderClerkCommon extends BaseModel
             //通知
             $tplMsg = new Tplmsg();
             $tplMsg->orderClerkTplMsg($order, '订单已核销');
-            return true;
+//            return true;
+            return [
+                'name' => $order->detail[0]->goods->goodsWarehouse->name,
+                'cover_pic' => $order->detail[0]->goods->goodsWarehouse->cover_pic,
+                'total_original_price' => $order->detail[0]->total_original_price,
+                'num' => $order->detail[0]->num,
+                'offline_qrcode' => $order->offline_qrcode,
+            ];
         } catch (\Exception $e) {
             throw $e;
         }

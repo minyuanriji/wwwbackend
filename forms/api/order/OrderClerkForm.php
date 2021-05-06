@@ -71,8 +71,16 @@ class OrderClerkForm extends BaseModel
 
     public function orderClerk()
     {
-        if (!$this->validate()) {
+        /*if (!$this->validate()) {
             return $this->responseErrorInfo();
+        }*/
+        if (empty($this->id)) {
+            if (empty($this->clerk_code)) {
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '缺少参数'
+                ];
+            }
         }
 
         try {
@@ -84,11 +92,12 @@ class OrderClerkForm extends BaseModel
             $commonOrderClerk->clerk_id     = \Yii::$app->user->id;
             $commonOrderClerk->clerk_type   = 1;
 
-            $commonOrderClerk->orderClerk();
+            $order_res = $commonOrderClerk->orderClerk();
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '核销成功'
+                'msg' => '核销成功',
+                'data' => $order_res,
             ];
         } catch (\Exception $e) {
             return [

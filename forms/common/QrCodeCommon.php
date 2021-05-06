@@ -95,7 +95,7 @@ class QrCodeCommon extends BaseModel
                     'alipay' => $alipay
                 ];
             }elseif ($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_WECHAT || $appPlatform == User::PLATFORM_MP_WX) {
-                return $this->wechat($scene, $width, $page);
+                return $this->wechat($scene, $width, $page, $appPlatform);
             } elseif ($appPlatform == APP_PLATFORM_MP_ALI) {
                 return $this->alipay($scene, \Yii::$app->mall->id, $page, '二维码');
             } elseif ($appPlatform == APP_PLATFORM_MP_TT) {
@@ -111,7 +111,7 @@ class QrCodeCommon extends BaseModel
     }
 
 
-    private function wechat($scene, $width = 430, $page = null)
+    private function wechat($scene, $width = 430, $page = null,$appForm = '')
     {
         /** @var Wechat $wechat */
         $wechat = \Yii::$app->wechat;
@@ -128,11 +128,20 @@ class QrCodeCommon extends BaseModel
         $sceneStr = "";
         if(!empty($scene) && is_array($scene)){
             foreach($scene as $k => $v){
+                if ($k == "source") {
+                    unset($scene[$k]);
+                    continue;
+                }
                 $sceneStr .= "{$k}={$v}&";
             }
             $sceneStr = rtrim($sceneStr, "&");
         }else{
             $sceneStr = $token;
+        }
+        if ($appForm == User::PLATFORM_MP_WX) {
+            if (stripos($page,'#/')) {
+                $page = substr($page,stripos($page,'#/') + 2);
+            }
         }
 
         $res = $this->post($api, [

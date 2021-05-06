@@ -253,10 +253,10 @@ class OrderClerkCommon extends BaseModel
             $tplMsg->orderClerkTplMsg($order, '订单已核销');
 //            return true;
             return [
-                'name' => $order->detail->goods->goodsWarehouse->name,
-                'cover_pic' => $order->detail->goods->goodsWarehouse->cover_pic,
-                'total_original_price' => $order->detail->total_original_price,
-                'num' => $order->detail->num,
+                'name' => $order->detail[0]->goods->goodsWarehouse->name,
+                'cover_pic' => $order->detail[0]->goods->goodsWarehouse->cover_pic,
+                'total_original_price' => $order->detail[0]->total_original_price,
+                'num' => $order->detail[0]->num,
             ];
         } catch (\Exception $e) {
             throw $e;

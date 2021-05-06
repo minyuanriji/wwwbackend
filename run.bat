@@ -21,11 +21,11 @@ set PROJECT_PATH=%~dp0
 
 ::==================================================================
 ::易票联提现转账守护程序
-::start yii efps-transfer/maintant-job
+start yii efps-transfer/maintant-job
 
 ::==================================================================
 ::支付结果状态守护程序
-start yii efps-pay-query/maintant-job
+::start yii efps-pay-query/maintant-job
 
 ::==================================================================
 ::cd shell

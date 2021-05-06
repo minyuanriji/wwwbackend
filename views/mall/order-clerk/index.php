@@ -18,8 +18,15 @@
                 <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           @selection-change="handleSelectionChange">
                     <el-table-column align='center' type="selection" width="60"></el-table-column>
-                    <el-table-column sortable="custom" prop="id" label="ID" width="90"></el-table-column>
-                    <el-table-column label="订单信息">
+                    <el-table-column align="center" sortable="custom" prop="id" label="ID" width="90"></el-table-column>
+                    <el-table-column align="center" label="门店" width="70">
+                        <template slot-scope="scope">
+                            <div v-if="scope.row.clerk_role=='store'" style="color:green">是</div>
+                            <div v-else>否</div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="核销员" prop="nickname"></el-table-column>
+                    <el-table-column label="订单信息" width="350">
                         <template slot-scope="scope">
                             <div v-for="(orderDetail, key, index) in scope.row.orderDetail" flex="box:first">
                                 <div style="padding-right: 10px;">
@@ -34,26 +41,34 @@
                                             <com-ellipsis :line="2">{{orderDetail.goods_info.goods_attr.name}}</com-ellipsis>
                                         </el-tooltip>
                                     </div>
-                                    <div style="flex-grow: 1;font-weight:bold;color:#999">数量 x {{orderDetail.num}}</div>
+                                    <div style="text-align:right;flex-grow: 1;font-weight:bold;color:#999">数量 x {{orderDetail.num}}</div>
                                 </div>
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="clerk_remark" label="备注"  width="150"> </el-table-column>
-                    <el-table-column label="类型" width="100">
+                    <el-table-column label="类型" width="70"  align="center">
                         <template slot-scope="scope">
                             <div v-if="scope.row.order_type == 'offline_baopin'">爆品</div>
-                            <div v-elseif="scope.row.order_type == 'offline_normal'">商品</div>
+                            <div v-else>商品</div>
                         </template>
                     </el-table-column>
-                    <el-table-column sortable="custom" prop="created_at" label="核销时间" width="150">
+                    <el-table-column sortable="custom" prop="created_at" label="核销时间" width="110"  align="center">
                         <template slot-scope="scope">
                             {{scope.row.created_at|dateTimeFormat('Y-m-d')}}
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" width="100">
+                    <el-table-column label="操作" width="130" align="center">
                         <template slot-scope="scope">
-                            <el-link type="primary" underline="true" :href="'?r=mall/order-clerk/detail&id='+scope.row.id" icon="el-icon-view" target="_blank">详情</el-link>
+                            <el-link type="default" :underline="false" >
+                                <el-tooltip class="item" effect="dark" content="发货" placement="top">
+                                    <img class="com-order-icon" src="statics/img/mall/order/send.png" alt="">
+                                </el-tooltip>
+                            </el-link>
+                            <el-link style="margin-left:10px;" type="default" :underline="false" :href="'?r=mall/order-clerk/detail&id='+scope.row.id" target="_blank">
+                                <el-tooltip class="item" effect="dark" content="查看详情" placement="top">
+                                    <img class="com-order-icon" src="statics/img/mall/order/detail.png" alt="">
+                                </el-tooltip>
+                            </el-link>
                         </template>
                     </el-table-column>
                 </el-table>

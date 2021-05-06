@@ -265,12 +265,14 @@ class UserForm extends BaseModel
                 "open_type" => "navigate"
             ];
         }
-        $userCenter['menus'][] = [
-            "icon_url"  => "https://dev.mingyuanriji.cn/web/static/shopSettle.png",
-            "name"      => "商家入驻",
-            "link_url"  => "/pages/enter/enter",
-            "open_type" => "navigate"
-        ];
+        if (getenv('YII_WEIXIN_APPLETS') == 'true') {
+            $userCenter['menus'][] = [
+                "icon_url"  => "https://dev.mingyuanriji.cn/web/static/shopSettle.png",
+                "name"      => "商家入驻",
+                "link_url"  => "/pages/enter/enter",
+                "open_type" => "navigate"
+            ];
+        }
         $res = [
             'config' => [
                     'title_bar' => [

@@ -121,7 +121,7 @@ class OrderClerkCommon extends BaseModel
             $where = [
                 'is_delete' => 0,
                 'send_type' => 1,
-                'id'        => $this->id,
+//                'id'        => $this->id,
                 'mall_id'   => \Yii::$app->mall->id,
             ];
             if(!empty($this->clerk_code)){

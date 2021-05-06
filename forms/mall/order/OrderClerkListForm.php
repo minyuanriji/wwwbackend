@@ -32,6 +32,8 @@ class OrderClerkListForm extends BaseModel{
         $query->innerJoin("{{%order_detail}} od", "od.order_id=oc.order_id");
         $query->innerJoin("{{%goods}} g", "g.id=od.goods_id");
         $query->innerJoin("{{%goods_warehouse}} gw", "g.goods_warehouse_id=gw.id");
+        $query->leftJoin("{{%plugin_mch}} m", "m.user_id=u.id");
+        $query->leftJoin("{{%store}} s", "s.mch_id=m.id");
 
         $query->where(["oc.is_delete" => 0]);
 
@@ -41,7 +43,8 @@ class OrderClerkListForm extends BaseModel{
                 ['o.id' => (int)$this->keyword],
                 ['LIKE', 'u.nickname', $this->keyword],
                 ['LIKE', 'o.order_no', $this->keyword],
-                ['LIKE', 'gw.name', $this->keyword]
+                ['LIKE', 'gw.name', $this->keyword],
+                ['LIKE', 's.name', $this->keyword]
             ]);
         }
 
@@ -61,7 +64,7 @@ class OrderClerkListForm extends BaseModel{
 
         $query->orderBy($orderBy);
 
-        $select = ["oc.id", "oc.order_id", "o.order_no", "o.order_type", "oc.clerk_remark", "u.nickname", "o.created_at"];
+        $select = ["oc.id", "oc.order_id", "o.order_no", "o.order_type", "oc.clerk_remark", "u.nickname", "s.name as store_name", "o.created_at"];
 
         $list = $query->select($select)->asArray()->page($pagination, 10, max(1, (int)$this->page))->all();
         if($list){
@@ -69,6 +72,11 @@ class OrderClerkListForm extends BaseModel{
                 foreach($item['orderDetail'] as $key => $detail){
                     $goodsInfo = !empty($detail['goods_info']) ? @json_decode($detail['goods_info'], true) : [];
                     $item['orderDetail'][$key]['goods_info'] = $goodsInfo;
+                    $item['clerk_role'] = 'mall';
+                    if(!empty($item['store_name'])){
+                        $item['clerk_role'] = 'store';
+                    }
+                    $item['nickname'] = !empty($item['store_name']) ? $item['store_name'] : $item['nickname'];
                 }
             }
         }

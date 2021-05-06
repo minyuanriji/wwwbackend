@@ -814,8 +814,12 @@ class Menus
                         'route' => 'mall/finance/score-log',
                     ],
                     [
-                        'name' => '提现记录',
+                        'name' => '用户提现',
                         'route' => 'mall/finance/cash',
+                    ],
+                    [
+                        'name' => '商户提现',
+                        'route' => 'mall/mch-cash/index',
                     ],
                     [
                         'name' => '用户收益',

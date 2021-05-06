@@ -64,9 +64,9 @@ class EfpsMchCashTransfer extends BaseModel{
                     $res['code'] = ApiCode::CODE_SUCCESS;
                     $res['msg']  = '打款成功';
                 }else{
-                    $transferOrder->remark = $res['msg'];
+                    $transferOrder->remark = $res['data']['returnMsg'];
                     $res['code'] = ApiCode::CODE_FAIL;
-                    $res['msg']  = $res['msg'];
+                    $res['msg']  = $res['data']['returnMsg'];
                 }
 
                 $transferOrder->updated_at = time();

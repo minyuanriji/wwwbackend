@@ -41,7 +41,7 @@ class CheckoutOrderQrcodeForm extends BaseModel {
 
             if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
                 $qrCode = new QrCodeCommon();
-                $res = $qrCode->getQrCode([], 100, $this->route . "?id=" . $mchModel->id);
+                $res = $qrCode->getQrCode(['id' => $mchModel->id], 100, $this->route);
                 $codeUrl = $res['file_path'];
             }else{
                 $dir = "mch/checkout-order-qrcode/" . $mchModel->id . time() . '.jpg';

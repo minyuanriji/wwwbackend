@@ -311,7 +311,6 @@ class CommissionController extends BaseCommandController{
             return false;
         }
 
-
         try {
 
             if($orderDetailData['is_refund'] && $orderDetailData['refund_status'] == 20){

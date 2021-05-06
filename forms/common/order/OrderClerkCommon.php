@@ -257,6 +257,7 @@ class OrderClerkCommon extends BaseModel
                 'cover_pic' => $order->detail[0]->goods->goodsWarehouse->cover_pic,
                 'total_original_price' => $order->detail[0]->total_original_price,
                 'num' => $order->detail[0]->num,
+                'offline_qrcode' => $order->offline_qrcode,
             ];
         } catch (\Exception $e) {
             throw $e;

@@ -7,9 +7,11 @@ use app\forms\common\template\tplmsg\Tplmsg;
 use app\models\BaseModel;
 use app\models\ClerkUser;
 use app\models\ClerkUserStoreRelation;
+use app\models\GoodsWarehouse;
 use app\models\Model;
 use app\models\Order;
 use app\models\OrderClerk;
+use app\models\OrderDetail;
 use app\models\User;
 use app\plugins\baopin\models\BaopinMchClerkOrder;
 use app\plugins\baopin\models\BaopinMchGoods;
@@ -129,8 +131,7 @@ class OrderClerkCommon extends BaseModel
             }else{
                 $where['id'] = (int)$this->id;
             }
-            $order = Order::find()->where($where)->one();
-
+            $order = Order::find()->with(['detail.goods.goodsWarehouse'])->where($where)->one();
             if (!$order) {
                 throw new \Exception('订单不存在');
             }
@@ -250,7 +251,13 @@ class OrderClerkCommon extends BaseModel
             //通知
             $tplMsg = new Tplmsg();
             $tplMsg->orderClerkTplMsg($order, '订单已核销');
-            return true;
+//            return true;
+            return [
+                'name' => $order->detail->goods->goodsWarehouse->name,
+                'cover_pic' => $order->detail->goods->goodsWarehouse->cover_pic,
+                'total_original_price' => $order->detail->total_original_price,
+                'num' => $order->detail->num,
+            ];
         } catch (\Exception $e) {
             throw $e;
         }

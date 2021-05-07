@@ -12,6 +12,7 @@ namespace app\forms\mall\finance;
 
 use app\core\ApiCode;
 
+use app\forms\common\UserIncomeForm;
 use app\helpers\SerializeHelper;
 use app\logic\OptionLogic;
 use app\models\BaseModel;
@@ -245,6 +246,14 @@ class CashForm extends BaseModel
         if (!$cash->save()) {
             throw new \Exception($this->responseErrorMsg($cash));
         }
+
+        $user = User::findOne($cash->user_id);
+
+        $res = UserIncomeForm::cashReject($user, $cash);
+        if($res['code'] != ApiCode::CODE_SUCCESS){
+            throw new \Exception($res['msg']);
+        }
+
         return true;
     }
 }

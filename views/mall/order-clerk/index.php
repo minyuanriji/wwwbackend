@@ -1,9 +1,31 @@
+<?php
+Yii::$app->loadComponentView('order/com-clerk-send');
+?>
+
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <span>核销记录</span>
         </div>
         <div class="table-body">
+
+            <com-clerk-send
+                    @close="dialogClose"
+                    @submit="dialogSubmit"
+                    :clerk-id="clerkId"
+                    :is-show="clerkSendVisible"></com-clerk-send>
+
+            <el-select size="small" @change="toSearch" v-model="search.order_type" placeholder="请选择" style="width:110px;">
+                <el-option :label="'全部类型'" :value="''"></el-option>
+                <el-option :label="'爆品'" :value="'offline_baopin'"></el-option>
+                <el-option :label="'商品'" :value="'offline_normal'"></el-option>
+            </el-select>
+
+            <el-select size="small" @change="toSearch" v-model="search.express_status" placeholder="请选择" style="width:110px;">
+                <el-option :label="'补货状态'" :value="''"></el-option>
+                <el-option :label="'未补货'" :value="'no_express'"></el-option>
+                <el-option :label="'已补货'" :value="'is_express'"></el-option>
+            </el-select>
 
             <div class="input-item">
                 <el-input @keyup.enter.native="loadData" size="small" placeholder="请输入搜索内容" v-model="search.keyword"
@@ -21,11 +43,18 @@
                     <el-table-column align="center" sortable="custom" prop="id" label="ID" width="90"></el-table-column>
                     <el-table-column align="center" label="门店" width="70">
                         <template slot-scope="scope">
-                            <div v-if="scope.row.clerk_role=='store'" style="color:green">是</div>
-                            <div v-else>否</div>
+                            <div v-if="scope.row.clerk_role=='store'" style="color:green">商家</div>
+                            <div v-else>-</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="核销员" prop="nickname"></el-table-column>
+                    <el-table-column label="补货" width="90" align="center" >
+                        <template slot-scope="scope" >
+                            <el-switch @change="switchExpressStatus(scope.row)" v-model="scope.row.express_status" ></el-switch>
+                            <div v-if="scope.row.express_status">已补货</div>
+                            <div v-else style="color:gray;">未补货</div>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="订单信息" width="350">
                         <template slot-scope="scope">
                             <div v-for="(orderDetail, key, index) in scope.row.orderDetail" flex="box:first">
@@ -46,7 +75,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="类型" width="70"  align="center">
+                    <el-table-column label="类型" width="70" align="center">
                         <template slot-scope="scope">
                             <div v-if="scope.row.order_type == 'offline_baopin'">爆品</div>
                             <div v-else>商品</div>
@@ -59,8 +88,8 @@
                     </el-table-column>
                     <el-table-column label="操作" width="130" align="center">
                         <template slot-scope="scope">
-                            <el-link type="default" :underline="false" >
-                                <el-tooltip class="item" effect="dark" content="发货" placement="top">
+                            <el-link @click="clerkSend(scope.row)" type="default" :underline="false" >
+                                <el-tooltip class="item" effect="dark" content="补货" placement="top">
                                     <img class="com-order-icon" src="statics/img/mall/order/send.png" alt="">
                                 </el-tooltip>
                             </el-link>
@@ -101,6 +130,8 @@
         el: '#app',
         data: {
             search: {
+                order_type: '',
+                express_status: '',
                 keyword: '',
                 page: 1,
                 platform: '',
@@ -114,12 +145,53 @@
             edit: {
                 show: false,
             },
-            selections: []
+            selections: [],
+            clerkSendVisible: false,
+            clerkId: 0
         },
         mounted() {
             this.loadData();
         },
         methods: {
+
+            dialogSubmit() {
+
+            },
+
+            switchExpressStatus(row){
+                var self = this;
+                request({
+                    params: {
+                        r: 'mall/order-clerk/update-express-status',
+                    },
+                    data: {
+                        id: row.id,
+                        express_status: row.express_status ? 1 : 0
+                    },
+                    method: 'post',
+                }).then(e => {
+                    if (e.data.code === 0) {
+                        self.$message({
+                            message: e.data.msg,
+                            type: 'success'
+                        });
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+
+                });
+            },
+
+            dialogClose() {
+                this.clerkSendVisible = false;
+                this.clerkId = 0;
+            },
+
+            clerkSend(row){
+                this.clerkId = parseInt(row.id);
+                this.clerkSendVisible = true;
+            },
 
             sortReload(column){
                 this.search.sort_prop = column.prop;

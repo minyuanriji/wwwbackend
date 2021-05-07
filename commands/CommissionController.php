@@ -24,6 +24,7 @@ class CommissionController extends BaseCommandController{
         while(true){
             $this->sleep(1);
             try {
+
                 //商品订单分佣。先检查新增情况，再处理状态改变
                 if(!$this->goodsOrderNew()){
                     $this->goodsStatusChanged();
@@ -310,7 +311,6 @@ class CommissionController extends BaseCommandController{
         if(!$orderDetailData){
             return false;
         }
-
 
         try {
 

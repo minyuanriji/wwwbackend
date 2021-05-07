@@ -30,6 +30,8 @@ class MchDistributionListForm extends BaseModel{
 
         $query->select(["s.id", "cr.id as rule_id", "s.name", "s.cover_url", "u.id as user_id", "u.nickname", "u.avatar_url"]);
 
+        $query->andWhere(["m.review_status" => Mch::REVIEW_STATUS_CHECKED]);
+
         if ($this->keyword) {
             $query->andWhere([
                 "OR",

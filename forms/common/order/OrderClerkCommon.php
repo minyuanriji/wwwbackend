@@ -12,6 +12,7 @@ use app\models\Model;
 use app\models\Order;
 use app\models\OrderClerk;
 use app\models\OrderDetail;
+use app\models\Store;
 use app\models\User;
 use app\plugins\baopin\models\BaopinMchClerkOrder;
 use app\plugins\baopin\models\BaopinMchGoods;
@@ -161,6 +162,8 @@ class OrderClerkCommon extends BaseModel
                 'review_status' => Mch::REVIEW_STATUS_CHECKED
             ]);
 
+            $store = Store::findOne(["mch_id" => $mch->id]);
+
             $hasPermission      = false;
             $baopinMchGoodsList = [];
 
@@ -209,6 +212,7 @@ class OrderClerkCommon extends BaseModel
             $order->is_confirm  = 1;
             $order->confirm_at  = time();
             $order->clerk_id    = $this->clerk_id;
+            $order->store_id    = $store->id;
 
             if (!$order->save()) {
                 throw new \Exception($this->responseErrorMsg($order));

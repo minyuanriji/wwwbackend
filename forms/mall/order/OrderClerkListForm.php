@@ -12,11 +12,13 @@ class OrderClerkListForm extends BaseModel{
     public $keyword;
     public $sort_prop;
     public $sort_type;
+    public $order_type;
+    public $express_status;
 
     public function rules(){
         return array_merge(parent::rules(), [
             [['page'], 'integer'],
-            [['keyword', 'sort_prop', 'sort_type'], 'safe']
+            [['keyword', 'sort_prop', 'sort_type', 'order_type', 'express_status'], 'safe']
         ]);
     }
 
@@ -36,6 +38,18 @@ class OrderClerkListForm extends BaseModel{
         $query->leftJoin("{{%store}} s", "s.mch_id=m.id");
 
         $query->where(["oc.is_delete" => 0]);
+
+        if(!empty($this->order_type)){
+            $query->andWhere(["o.order_type" => $this->order_type]);
+        }
+
+        if(!empty($this->express_status)){
+            if($this->express_status == "no_express"){
+                $query->andWhere(["oc.express_status" => 0]);
+            }else{
+                $query->andWhere(["oc.express_status" => 1]);
+            }
+        }
 
         if (!empty($this->keyword)) {
             $query->andWhere([
@@ -64,7 +78,7 @@ class OrderClerkListForm extends BaseModel{
 
         $query->orderBy($orderBy);
 
-        $select = ["oc.id", "oc.order_id", "o.order_no", "o.order_type", "oc.clerk_remark", "u.nickname", "s.name as store_name", "o.created_at"];
+        $select = ["oc.id", "oc.express_status", "oc.order_id", "o.order_no", "o.order_type", "oc.clerk_remark", "u.nickname", "s.name as store_name", "o.created_at"];
 
         $list = $query->select($select)->asArray()->page($pagination, 10, max(1, (int)$this->page))->all();
         if($list){
@@ -78,6 +92,7 @@ class OrderClerkListForm extends BaseModel{
                     }
                     $item['nickname'] = !empty($item['store_name']) ? $item['store_name'] : $item['nickname'];
                 }
+                $item['express_status'] = $item['express_status'] ? true : false;
             }
         }
 

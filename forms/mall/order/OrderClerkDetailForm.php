@@ -6,6 +6,8 @@ use app\core\ApiCode;
 use app\helpers\ArrayHelper;
 use app\models\BaseModel;
 use app\models\OrderClerk;
+use app\models\OrderClerkExpress;
+use app\models\OrderClerkExpressDetail;
 use app\models\User;
 use app\plugins\group_buy\models\Order;
 
@@ -15,8 +17,7 @@ class OrderClerkDetailForm extends BaseModel
 
     public function rules(){
         return [
-            [['id'], 'required'],
-            [['id'], 'integer']
+            [['id'], 'required']
         ];
     }
 
@@ -56,6 +57,15 @@ class OrderClerkDetailForm extends BaseModel
                     $goodsInfo = @json_decode($detail->goods_info, true);
                     $detail->goods_info = $goodsInfo;
                     $result['details'][] = ArrayHelper::toArray($detail);
+                }
+            }
+
+            $orderClerkExpress = OrderClerkExpress::findOne(["order_id" => $orderClerk->order_id]);
+            $result['express'] = '';
+            if($orderClerkExpress){
+                $expressDetail = OrderClerkExpressDetail::findOne($orderClerkExpress->express_detail_id);
+                if($expressDetail){
+                    $result['express'] = ArrayHelper::toArray($expressDetail);
                 }
             }
 

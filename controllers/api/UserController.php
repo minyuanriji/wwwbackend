@@ -304,7 +304,7 @@ class UserController extends ApiController
                     'top' => 280,
                     'width' => 300,
                     'fontSize' => 14, //字号
-                    'fontColor' => '0,0,80', //字体颜色
+                    'fontColor' => '255,255,255', //字体颜色
                     'angle' => 0,
                 ),
             ),

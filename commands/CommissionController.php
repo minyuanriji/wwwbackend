@@ -79,7 +79,7 @@ class CommissionController extends BaseCommandController{
 
                     //计算分佣金额
                     $transferRate = (int)$checkoutOrder['transfer_rate'];
-                    $ruleData['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];
+                    $ruleData['profit_price'] = $this->calculateCheckoutOrderProfitPrice($transferRate, $checkoutOrder['order_price']);
                     if($ruleData['commission_type'] == 1){ //按百分比
                         $price = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
                     }else{ //按固定值
@@ -147,14 +147,22 @@ class CommissionController extends BaseCommandController{
                 $this->commandOut($e->getMessage());
             }
 
-
-
             MchCheckoutOrder::updateAll([
                 "commission_status" => 1
             ], ["id" => $checkoutOrder['id']]);
         }
 
         return true;
+    }
+
+    /**
+     * 计算商家二维码收款单利润
+     * @param $order_price
+     * @param $transfer_rate
+     * @return number
+     */
+    private function calculateCheckoutOrderProfitPrice($order_price, $transfer_rate){
+        return max(0, $order_price * ($transfer_rate/100 - 0.1) * 0.6);
     }
 
     /**
@@ -205,7 +213,7 @@ class CommissionController extends BaseCommandController{
                 if ($commission_res) {
                     //计算分佣金额
                     $transferRate = (int)$checkoutOrder['transfer_rate'];//商户手续费
-                    $commission_res['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];
+                    $commission_res['profit_price'] = $this->calculateCheckoutOrderProfitPrice($transferRate, $checkoutOrder['order_price']);
                     if($commission_res['commission_type'] == 1){ //按百分比
                         $price = (floatval($commission_res['commisson_value'])/100) * floatval($commission_res['profit_price']);
                     }else{ //按固定值

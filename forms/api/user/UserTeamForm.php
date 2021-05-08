@@ -314,8 +314,8 @@ class UserTeamForm extends BaseModel
         $query->andWhere([
             "AND",
             ["cgpl.user_id" => $user->id],
-            ["o.is_delete" => 0],
-            ["o.is_recycle" => 0]
+            /*["o.is_delete" => 0],
+            ["o.is_recycle" => 0]*/
          ]);
 
         if(is_numeric($this->status)){
@@ -329,6 +329,7 @@ class UserTeamForm extends BaseModel
         }
         $select = ['u.nickname', 'u.avatar_url', 'u.mobile', 'u.id as uid',  'o.order_no', 'o.status', 'o.created_at'];
         $select[] = "sum(cgpl.price) AS price";
+
         $list = $query->orderBy("cgpl.id DESC")->select($select)->page($pagination, 10, $this->page)->asArray()->all();
 
         if($list){

@@ -324,6 +324,9 @@ class UserTeamForm extends BaseModel
         }
         $select = ['u.nickname', 'u.avatar_url', 'u.mobile', 'u.id as uid',  'o.order_no', 'o.status', 'o.created_at'];
         $select[] = "(SELECT sum(price) FROM {{%plugin_commission_goods_price_log}} WHERE order_id=o.id AND user_id='".$user->id."') AS price";
+
+        $query->andWhere("price > 0");
+
         $list = $query->orderBy("o.id DESC")->select($select)->page($pagination, 10, $this->page)->asArray()->all();
 
         if($list){

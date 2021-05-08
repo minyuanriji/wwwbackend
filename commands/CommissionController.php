@@ -17,7 +17,8 @@ use yii\db\ActiveQuery;
 
 class CommissionController extends BaseCommandController{
 
-    public function actionMaintantJob(){
+    public function actionMaintantJob()
+    {
         $this->mutiKill();
 
         echo date("Y-m-d H:i:s") . " 分佣守候程序启动...完成\n";
@@ -227,7 +228,7 @@ class CommissionController extends BaseCommandController{
                 }
                 //计算分佣金额
                 $transferRate = (int)$checkoutOrder['transfer_rate'];//商户手续费
-                $commission_res['profit_price'] = $this->calculateCheckoutOrderProfitPrice($transferRate, $checkoutOrder['order_price']);
+                $commission_res['profit_price'] = $this->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate);
                 if($commission_res['commission_type'] == 1){ //按百分比
                     $price = (floatval($commission_res['commisson_value'])/100) * floatval($commission_res['profit_price']);
                 }else{ //按固定值

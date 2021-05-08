@@ -18,7 +18,7 @@ use yii\db\ActiveQuery;
 class CommissionController extends BaseCommandController{
 
     public function actionMaintantJob(){
-
+        $this->storeOrderNew();die;
         $this->mutiKill();
 
         echo date("Y-m-d H:i:s") . " 分佣守候程序启动...完成\n";
@@ -271,7 +271,7 @@ class CommissionController extends BaseCommandController{
                                 'desc'        => "来自店铺“".$checkoutOrder['name']."”的分佣记录[ID:".$priceLog->id."]",
                                 'flag'        => 1, //到账
                                 'source_id'   => $priceLog->id,
-                                'source_type' => 'checkout',
+                                'source_type' => 'store',
                                 'created_at'  => $checkoutOrder['created_at'],
                                 'updated_at'  => $checkoutOrder['updated_at']
                             ]);

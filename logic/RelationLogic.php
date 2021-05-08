@@ -18,6 +18,7 @@ use app\models\CommonOrder;
 use app\models\ErrorLog;
 use app\models\RelationSetting;
 use app\models\User;
+use app\models\UserRelationshipLink;
 use app\plugins\business_card\jobs\BusinessCardCustomerJob;
 use Exception;
 
@@ -41,20 +42,23 @@ class RelationLogic extends BaseLogic
             throw new Exception('未启用关系链'.$parent_id);
         }
 
+        if($user->parent_id){
+            throw new Exception('用户已存在上级');
+        }
+
         if ($parent_id == $user->id) {
             throw new Exception('自己不能绑定自己'.$parent_id);
         }
 
-        if ($user->parent_id != 0 && !$is_manual) {
-            throw new Exception('用户存在上级'.$parent_id);
-        }
         $parent = User::findOne($parent_id);
         
         if (!$parent) {
             throw new Exception('绑定的上级用户不存在'.$parent_id);
         }
+
+        /*
         if (!$parent->is_inviter) {
-            //throw new Exception('绑定的上级用户没有推广资格'.$parent_id);
+            throw new Exception('绑定的上级用户没有推广资格'.$parent_id);
         }
         
         if (!$is_manual) {
@@ -70,7 +74,12 @@ class RelationLogic extends BaseLogic
                     throw new Exception('不满足成为下级的条件！！ user_id='.$user->id.";mall_id=".\Yii::$app->mall->id.';parent_id='.$parent_id);
                 }
             }
-        }
+        }*/
+
+        //如果用户已有关系链，删除
+        UserRelationshipLink::deleteAll([
+            "user_id" => $user->id
+        ]);
 
         $user->parent_id = $parent_id;
         $user->junior_at = time();

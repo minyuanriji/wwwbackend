@@ -327,8 +327,7 @@ class WechatForm extends BaseModel
             $user->access_token = $access_token;
             $user->auth_key = $access_token;
             $user->nickname = isset($userInfo["nickname"]) ? $userInfo["nickname"] : "";
-            $password = 'myrj2021';//"jx888888";
-            $user->password = \Yii::$app->getSecurity()->generatePasswordHash($password);
+            $user->password = \Yii::$app->getSecurity()->generatePasswordHash(uniqid());
             $user->avatar_url = $userInfo['headimgurl'];
             $user->last_login_at = time();
             $user->login_ip = get_client_ip();

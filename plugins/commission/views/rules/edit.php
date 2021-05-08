@@ -26,14 +26,12 @@ echo $this->render('../components/com-commission-store-rule-edit');
                             </el-radio-group>
                         </el-form-item>
 
-                        <div v-if = "ruleForm.item_type != 'store'">
-                            <el-form-item v-if="ruleForm.item_type != ''" :label="ruleForm.item_type == 'goods' ? '全部商品' : '全部'" prop="apply_all_item">
-                                <el-switch v-model="ruleForm.apply_all_item"
-                                           active-text="是"
-                                           inactive-text="否">
-                                </el-switch>
-                            </el-form-item>
-                        </div>
+                        <el-form-item v-if="ruleForm.item_type != ''" :label="ruleForm.item_type == 'goods' ? '全部商品' : '全部'" prop="apply_all_item">
+                            <el-switch v-model="ruleForm.apply_all_item"
+                                       active-text="是"
+                                       inactive-text="否">
+                            </el-switch>
+                        </el-form-item>
 
                         <!-- 选择一个商品或门店 -->
                         <template v-if="!ruleForm.apply_all_item">

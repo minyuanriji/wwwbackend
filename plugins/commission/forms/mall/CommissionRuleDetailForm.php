@@ -85,7 +85,8 @@ class CommissionRuleDetailForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'rule'   => $ruleData,
-                    'chains' => $rows ? $rows : []
+                    'chains' => $rows ? $rows : [],
+                    'store' => $this->store_id ? [$this->getStore($this->store_id)] : []
                 ]
             ];
         }catch (\Exception $e){
@@ -94,6 +95,18 @@ class CommissionRuleDetailForm extends BaseModel{
                 'msg'  => $e->getMessage()
             ];
         }
+    }
+
+    public function getStore ($store_id)
+    {
+        $query = CommissionRules::find()->alias("cr");
+        $query->leftJoin("{{%plugin_commission_rule_chain}} crc", "cr.id=crc.rule_id");
+        $query->andWhere([
+            "AND",
+            ["cr.item_type"  => 'store'],
+            ["cr.item_id"    => $store_id],
+        ]);
+        return $query->select(["cr.*", "crc.level", "crc.commisson_value"])->asArray()->one();
     }
 
 }

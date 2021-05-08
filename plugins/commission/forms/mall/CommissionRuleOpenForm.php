@@ -10,10 +10,12 @@ class CommissionRuleOpenForm  extends BaseModel{
     public $goods_id;
     public $store_id;
     public $open;
+    public $item_type;
 
     public function rules(){
         return [
             [['open'], 'required'],
+            [['item_type'], 'string'],
             [['goods_id', 'store_id', 'open'], 'integer']
         ];
     }
@@ -24,17 +26,18 @@ class CommissionRuleOpenForm  extends BaseModel{
         }
 
         try {
+            $where = [];
             if(!empty($this->goods_id)){
-                $rule = CommissionRules::findOne([
-                    "item_type" => "goods",
-                    "item_id"   => $this->goods_id
-                ]);
-            }else{
-                $rule = CommissionRules::findOne([
-                    "item_type" => "checkout",
-                    "item_id"   => $this->store_id
-                ]);
+                $where['item_type'] = 'goods';
+                $where['item_id'] = $this->goods_id;
+            }elseif (isset($this->item_type) && $this->item_type == 'store') {
+                $where['item_type'] = $this->item_type;
+                $where['item_id'] = $this->store_id;
+            } else {
+                $where['item_type'] = 'checkout';
+                $where['item_id'] = $this->store_id;
             }
+            $rule = CommissionRules::findOne($where);
 
             if($rule){
                 if($this->open){

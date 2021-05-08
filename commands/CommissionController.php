@@ -117,7 +117,7 @@ class CommissionController extends BaseCommandController{
                                     'type'        => 1,
                                     'money'       => $parentData['total_income'],
                                     'income'      => $priceLog->price,
-                                    'desc'        => "来自店铺“".$checkoutOrder['name']."”的分佣记录[ID:".$priceLog->id."]",
+                                    'desc'        => "来自店铺“".$checkoutOrder['name']."”的用户消费分佣记录[ID:".$priceLog->id."]",
                                     'flag'        => 1, //到账
                                     'source_id'   => $priceLog->id,
                                     'source_type' => 'checkout',
@@ -268,7 +268,7 @@ class CommissionController extends BaseCommandController{
                                 'type'        => 1,
                                 'money'       => $parent_user['total_income'],
                                 'income'      => $priceLog->price,
-                                'desc'        => "来自店铺“".$checkoutOrder['name']."”的分佣记录[ID:".$priceLog->id."]",
+                                'desc'        => "来自店铺“".$checkoutOrder['name']."”的营业额分佣记录[ID:".$priceLog->id."]",
                                 'flag'        => 1, //到账
                                 'source_id'   => $priceLog->id,
                                 'source_type' => 'store',

@@ -79,7 +79,7 @@ class CommissionController extends BaseCommandController{
 
                     //计算分佣金额
                     $transferRate = (int)$checkoutOrder['transfer_rate'];
-                    $ruleData['profit_price'] = $this->calculateCheckoutOrderProfitPrice($transferRate, $checkoutOrder['order_price']);
+                    $ruleData['profit_price'] = $this->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate);
                     if($ruleData['commission_type'] == 1){ //按百分比
                         $price = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
                     }else{ //按固定值
@@ -213,7 +213,7 @@ class CommissionController extends BaseCommandController{
                 if ($commission_res) {
                     //计算分佣金额
                     $transferRate = (int)$checkoutOrder['transfer_rate'];//商户手续费
-                    $commission_res['profit_price'] = $this->calculateCheckoutOrderProfitPrice($transferRate, $checkoutOrder['order_price']);
+                    $commission_res['profit_price'] = $this->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate);
                     if($commission_res['commission_type'] == 1){ //按百分比
                         $price = (floatval($commission_res['commisson_value'])/100) * floatval($commission_res['profit_price']);
                     }else{ //按固定值

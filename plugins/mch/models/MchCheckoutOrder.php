@@ -43,7 +43,7 @@ class MchCheckoutOrder extends BaseActiveRecord
     {
         return [
             [['mall_id', 'mch_id', 'order_no', 'order_price', 'created_at', 'updated_at'], 'required'],
-            [['is_pay', 'mch_id', 'mall_id', 'pay_user_id', 'pay_at', 'created_at', 'updated_at', 'is_delete', 'store_id', 'commission_status'], 'integer'],
+            [['is_pay', 'mch_id', 'mall_id', 'pay_user_id', 'pay_at', 'created_at', 'updated_at', 'is_delete', 'store_id', 'commission_status', 'store_commission_status'], 'integer'],
             [['order_price', 'pay_price', 'score_deduction_price', 'integral_deduction_price', 'integral_fee_rate'], 'number'],
             [['order_no'], 'string']
         ];

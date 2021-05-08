@@ -177,7 +177,7 @@ class CommissionController extends BaseCommandController{
             "AND",
             ["mco.is_pay" => 1],
             ["mco.is_delete" => 0],
-            ["mco.commission_status" => 0]
+            ["mco.store_commission_status" => 0]
         ]);
         $query->select(["mco.*", "s.name", "m.transfer_rate","m.user_id"]);
         $checkoutOrders = $query->asArray()->limit(10)->all();
@@ -284,7 +284,7 @@ class CommissionController extends BaseCommandController{
 
 
             MchCheckoutOrder::updateAll([
-                "commission_status" => 1
+                "store_commission_status" => 1
             ], ["id" => $checkoutOrder['id']]);
         }
 

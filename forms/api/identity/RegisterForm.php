@@ -121,7 +121,7 @@ class RegisterForm extends BaseModel
                 throw new \Exception('推荐人手机号不存在');
             }
             if (!$recommendUsers->is_inviter) {
-                throw new \Exception('绑定的手机号没有推广资格');
+                //throw new \Exception('绑定的手机号没有推广资格');
             }
             if ($recommendUsers->id == $user->id) {
                 throw new \Exception('自己不能绑定自己');

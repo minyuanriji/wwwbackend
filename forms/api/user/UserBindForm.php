@@ -51,7 +51,7 @@ class UserBindForm extends BaseModel
         $smsForm->captcha = $this->captcha;
         $result = $smsForm->checkCode();
         if (!$result) {
-            return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
+            //return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
         }
         try {
             $userInfo = \Yii::$app->cache->get($this->key);

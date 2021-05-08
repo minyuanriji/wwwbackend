@@ -104,7 +104,7 @@ class UserLogic
                     $user->last_login_at    = time();
                     $user->login_ip         = get_client_ip();
                     $user->source           = isset($userData["source"]) ? $userData["source"] : \Yii::$app->source;
-                    $user->parent_id        = isset($userData["parent_id"]) ? $userData["parent_id"] : 0;
+                    $user->parent_id        = isset($userData["parent_id"]) ? $userData["parent_id"] : $parent_id;
                     $user->second_parent_id = 0;
                     $user->third_parent_id  = 0;
                     if(!empty($user->parent_id)){

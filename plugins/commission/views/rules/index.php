@@ -87,6 +87,7 @@
                     <template slot-scope="scope">
                         <div v-if="scope.row.item_type == 'checkout'">二维码收款</div>
                         <div v-if="scope.row.item_type == 'goods'">商品</div>
+                        <div v-if="scope.row.item_type == 'store'">门店</div>
                     </template>
                 </el-table-column>
                 <el-table-column label="对象名称">
@@ -96,7 +97,7 @@
                             <div v-if="scope.row.item_type == 'goods'">全部商品</div>
                         </div>
                         <div v-else>
-                            <div v-if="scope.row.item_type == 'checkout'">
+                            <div v-if="scope.row.item_type == 'checkout' || scope.row.item_type == 'store'">
                                 店铺：{{scope.row.store_name}}[ID:{{scope.row.item_id}}]
                             </div>
                             <div v-if="scope.row.item_type == 'goods'">
@@ -165,6 +166,10 @@
                     {
                         value: 'checkout',
                         label: '二维码收款'
+                    },
+                    {
+                        value: 'store',
+                        label: '门店'
                     }
                 ]
             };

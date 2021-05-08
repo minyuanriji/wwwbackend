@@ -1,5 +1,6 @@
 <?php
 echo $this->render('../components/com-commission-rule-edit');
+echo $this->render('../components/com-commission-store-rule-edit');
 ?>
 <div id="app" v-cloak>
     <el-card class="box-card" v-loading="loading" shadow="never" style="border:0"
@@ -20,16 +21,19 @@ echo $this->render('../components/com-commission-rule-edit');
                         <el-form-item label="对象类型" prop="item_type">
                             <el-radio-group v-model="ruleForm.item_type">
                                 <el-radio :label="'goods'">商品</el-radio>
-                                <el-radio :label="'checkout'">门店</el-radio>
+                                <el-radio :label="'checkout'">二维码收款</el-radio>
+                                <el-radio :label="'store'">门店</el-radio>
                             </el-radio-group>
                         </el-form-item>
 
-                        <el-form-item v-if="ruleForm.item_type != ''" :label="ruleForm.item_type == 'goods' ? '全部商品' : '全部门店'" prop="apply_all_item">
-                            <el-switch v-model="ruleForm.apply_all_item"
-                                       active-text="是"
-                                       inactive-text="否">
-                            </el-switch>
-                        </el-form-item>
+                        <div v-if = "ruleForm.item_type != 'store'">
+                            <el-form-item v-if="ruleForm.item_type != ''" :label="ruleForm.item_type == 'goods' ? '全部商品' : '全部'" prop="apply_all_item">
+                                <el-switch v-model="ruleForm.apply_all_item"
+                                           active-text="是"
+                                           inactive-text="否">
+                                </el-switch>
+                            </el-form-item>
+                        </div>
 
                         <!-- 选择一个商品或门店 -->
                         <template v-if="!ruleForm.apply_all_item">
@@ -50,7 +54,11 @@ echo $this->render('../components/com-commission-rule-edit');
                         </template>
 
                         <el-form-item label="设置规则">
-                            <com-commission-rule-edit @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-rule-edit>
+
+                            <com-commission-store-rule-edit v-if="ruleForm.item_type == 'store'" @number = "newNumber" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains" :commiss_value = "commissonValue"></com-commission-store-rule-edit>
+
+                            <com-commission-rule-edit v-else @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-rule-edit>
+
                         </el-form-item>
 
                         <el-form-item label="">
@@ -231,6 +239,7 @@ echo $this->render('../components/com-commission-rule-edit');
                 },
                 cardLoading: false,
                 commissionType: 1,
+                commissonValue: 0,
                 commissionRuleChains: []
             }
         },
@@ -247,6 +256,11 @@ echo $this->render('../components/com-commission-rule-edit');
                 }
                 if(data['chains'] != null && typeof data.chains == "object"){
                     this.commissionRuleChains = data.chains;
+                }
+            },
+            newNumber (data) {
+                if (data['value'] != null && typeof data.value != "undefined"){
+                    this.commissonValue = data.value;
                 }
             },
 
@@ -266,6 +280,7 @@ echo $this->render('../components/com-commission-rule-edit');
                         self.ruleForm.apply_all_item = data.rule.apply_all_item == 1 ? true : false;
                         self.ruleForm.item_id        = data.rule.item_id;
                         self.commissionType          = data.rule.commission_type;
+                        self.commissonValue          = data.chains[0].commisson_value;
                         self.commissionRuleChains    = data.chains;
                         self.ChooseGoods.goods_name  = data.rule.goods_name;
                         self.ChooseGoods.goods_pic   = data.rule.goods_pic;
@@ -280,6 +295,14 @@ echo $this->render('../components/com-commission-rule-edit');
             saveCommissionRule(){
                 this.$refs['ruleForm'].validate((valid) => {
                     let self = this;
+                    if (self.ruleForm.item_type == 'store') {
+                        self.commissionRuleChains = [{
+                            "role_type":"user",
+                            "level":1,
+                            "commisson_value": self.commissonValue,
+                            "unique_key":"user#all"
+                        }]
+                    }
                     if (valid) {
                         self.loading = true;
                         request({

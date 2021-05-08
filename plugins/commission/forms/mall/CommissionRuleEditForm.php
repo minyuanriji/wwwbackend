@@ -88,7 +88,7 @@ class CommissionRuleEditForm extends BaseModel {
             if($chainList){
                 foreach($chainList as $item){
                     $roleType = $item['role_type'];
-                    if(empty($item['unique_key']) || !in_array($roleType, ['store', 'partner', 'branch_office']))
+                    if(empty($item['unique_key']) || !in_array($roleType, ['store', 'partner', 'user', 'branch_office']))
                         continue;
                     $ruleChain = CommissionRuleChain::findOne([
                         "rule_id"    => $rule->id,

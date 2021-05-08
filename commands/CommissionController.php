@@ -18,7 +18,7 @@ use yii\db\ActiveQuery;
 class CommissionController extends BaseCommandController{
 
     public function actionMaintantJob(){
-        $this->storeOrderNew();die;
+
         $this->mutiKill();
 
         echo date("Y-m-d H:i:s") . " 分佣守候程序启动...完成\n";

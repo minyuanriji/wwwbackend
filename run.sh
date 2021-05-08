@@ -7,12 +7,12 @@ chmod a+x "$basepath/yii"
 
 
 command1="add-queue-task/execute"
-command2="user-relationship-link/maintant-job"
-command3="commission/maintant-job"
-command4="efps-transfer/maintant-job"
-command5="efps-pay-query/maintant-job"
+#command2="user-relationship-link/maintant-job"
+#command3="commission/maintant-job"
+#command4="efps-transfer/maintant-job"
+#command5="efps-pay-query/maintant-job"
 
-commands=($command1 $command2 $command3 $command4 $command5)
+commands=($command1 $command5)
 
 
 for command in ${commands[@]}

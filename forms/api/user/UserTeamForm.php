@@ -22,6 +22,7 @@ use app\models\User;
 use app\models\UserChildren;
 use app\models\PriceLog;
 use app\models\UserRelationshipLink;
+use app\plugins\commission\models\CommissionGoodsPriceLog;
 
 class UserTeamForm extends BaseModel
 {
@@ -304,14 +305,18 @@ class UserTeamForm extends BaseModel
         $user = User::findOne(\Yii::$app->user->id);
         $userLink = UserRelationshipLink::findOne(["user_id" => $user->id]);
 
-        $query = Order::find()->alias("o")
-                    ->leftJoin("{{%user}} u", "u.id=o.user_id");
+
+        $query = CommissionGoodsPriceLog::find()->alias("cgpl");
+        $query->innerJoin(["o" => Order::tableName()], "o.id=cgpl.order_id");
+        $query->innerJoin(["u" => User::tableName()], "u.id=o.user_id");
+        $query->groupBy("o.order_no");
+
         $query->andWhere([
             "AND",
-            ["o.is_delete" => 0],
-            ["o.is_recycle" => 0],
-            ["IN", "o.user_id", UserRelationshipLinkForm::userTeamQuery($user, $userLink)->select("ut.id")]
-        ]);
+            ["cgpl.user_id" => $user->id],
+            /*["o.is_delete" => 0],
+            ["o.is_recycle" => 0]*/
+         ]);
 
         if(is_numeric($this->status)){
             if($this->status == 0){
@@ -323,11 +328,9 @@ class UserTeamForm extends BaseModel
             }
         }
         $select = ['u.nickname', 'u.avatar_url', 'u.mobile', 'u.id as uid',  'o.order_no', 'o.status', 'o.created_at'];
-        $select[] = "(SELECT sum(price) FROM {{%plugin_commission_goods_price_log}} WHERE order_id=o.id AND user_id='".$user->id."') AS price";
+        $select[] = "sum(cgpl.price) AS price";
 
-        $query->andWhere("price > 0");
-
-        $list = $query->orderBy("o.id DESC")->select($select)->page($pagination, 10, $this->page)->asArray()->all();
+        $list = $query->orderBy("cgpl.id DESC")->select($select)->page($pagination, 10, $this->page)->asArray()->all();
 
         if($list){
             $order = new Order();

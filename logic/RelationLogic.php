@@ -54,7 +54,7 @@ class RelationLogic extends BaseLogic
             throw new Exception('绑定的上级用户不存在'.$parent_id);
         }
         if (!$parent->is_inviter) {
-            throw new Exception('绑定的上级用户没有推广资格'.$parent_id);
+            //throw new Exception('绑定的上级用户没有推广资格'.$parent_id);
         }
         
         if (!$is_manual) {

@@ -4,7 +4,7 @@
 .commission-rule td:last-child{width:230px;}
 </style>
 <template id="com-commission-store-rule-edit">
-    <el-card class="box-card">
+    <el-card class="box-card" style="width:300px;">
         <div slot="header" class="clearfix">
             <el-radio-group @change="changeCommissionType" v-model="commission_type">
                 <el-radio :label="1">按百分比</el-radio>
@@ -24,7 +24,6 @@
         watch: {
             chains: {
                 handler(rows, oldval) {
-
                 },
                 immediate: true
             },
@@ -42,7 +41,8 @@
             };
         },
         created() {
-            this.commisson_value = this.commiss_value
+            console.log(this.chains);
+            this.commisson_value = this.chains[0].commisson_value
         },
         methods: {
             baseRowClassName({row, rowIndex}){

@@ -33,7 +33,10 @@ class VisitLogEditForm extends BaseModel
             }
 
             if ($mch->user_id == \Yii::$app->user->id) {
-                throw new \Exception('商户是用户自己！不记录访问日志');
+                return [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'msg' => '保存成功'
+                ];
             }
 
             /** @var MchVisitLog $model */

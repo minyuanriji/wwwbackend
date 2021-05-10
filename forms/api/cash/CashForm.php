@@ -226,7 +226,7 @@ class CashForm extends BaseModel
                 $cash__type_name[$i]['name'] = '提现微信';
             }
             if ($item == 'auto') {
-                $cash__type_name[$i]['name'] = '自动打款到微信零钱';
+                $cash__type_name[$i]['name'] = '提现到微信零钱';
             }
             if ($item == 'alipay') {
                 $cash__type_name[$i]['name'] = '提现到支付宝';

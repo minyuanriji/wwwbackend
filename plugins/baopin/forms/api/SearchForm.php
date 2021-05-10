@@ -10,13 +10,14 @@ class SearchForm extends BaseModel{
     public $mch_id;
     public $filter_mch_id;
     public $page;
+    public $limit;
     public $keyword;
     public $sort_prop;
     public $sort_type;
 
     public function rules(){
         return array_merge(parent::rules(), [
-            [['page', 'mch_id', 'filter_mch_id'], 'integer'],
+            [['page', 'limit', 'mch_id', 'filter_mch_id'], 'integer'],
             [['keyword', 'sort_prop', 'sort_type'], 'safe']
         ]);
     }
@@ -73,10 +74,16 @@ class SearchForm extends BaseModel{
 
         $query->orderBy($orderBy);
 
+        if (isset($this->limit) && $this->limit) {
+            $limit = $this->limit;
+        } else {
+            $limit = 10;
+        }
+
         $select = ["bg.id", "bmg.id as mch_baopin_id", "bg.goods_id", "gw.name", "gw.cover_pic",
             "g.goods_stock", "g.virtual_sales", "bg.created_at", "bg.updated_at",
             "g.price", "gw.original_price"];
-        $list = $query->select($select)->asArray()->page($pagination, 10, max(1, (int)$this->page))->all();
+        $list = $query->select($select)->asArray()->page($pagination, $limit, max(1, (int)$this->page))->all();
 
         return [
             'code' => ApiCode::CODE_SUCCESS,

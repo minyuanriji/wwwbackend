@@ -31,8 +31,10 @@ class LiveForm extends BaseModel
     public function getList()
     {
         try {
-            $accessToken = \Yii::$app->getWechat()->getAccessToken();
-            if (!$accessToken) {
+//            $accessToken = \Yii::$app->getWechat()->getAccessToken();
+            $wechat = \Yii::$app->wechat;
+            $accessTokenArray = $wechat->miniProgram->access_token->getToken();
+            if (!$accessTokenArray) {
                 throw new \Exception('微信配置有误');
             }
         } catch (\Exception $exception) {
@@ -47,7 +49,7 @@ class LiveForm extends BaseModel
         if (!$res || $this->is_refresh) {
             try {
                 // 接口每天上限调用10000次
-                $api = "https://api.weixin.qq.com/wxa/business/getliveinfo?access_token={$accessToken}";
+                $api = "https://api.weixin.qq.com/wxa/business/getliveinfo?access_token={$accessTokenArray["access_token"]}";
                 $res = CommonLive::post($api, [
                     'start' => $this->page * $this->limit - $this->limit,
                     'limit' => $this->limit,

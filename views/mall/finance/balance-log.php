@@ -53,7 +53,7 @@
                 <el-table-column label="备注">
                     <template slot-scope="scope">
                         <div flex="box:first" v-if="scope.row.info_desc">
-                            <div style="padding-right: 10px" v-if="scope.row.info_desc.hasOwnProperty('pic_url')">
+                            <div style="padding-right: 10px" v-if="scope.row.info_desc.hasOwnProperty('pic_url') && scope.row.info_desc.pic_url.length > 0">
                                 <com-image mode="aspectFill" :src="scope.row.info_desc.pic_url"></com-image>
                             </div>
                             <div v-if="scope.row.info_desc.hasOwnProperty('remark')">{{scope.row.info_desc.remark}}

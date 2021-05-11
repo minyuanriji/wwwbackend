@@ -74,12 +74,14 @@ class CommonLive extends BaseModel
     public static function checkAccessToken()
     {
         try {
-            $accessToken = \Yii::$app->getWechat()->getAccessToken();
-            if (!$accessToken) {
+            $wechat = \Yii::$app->wechat;
+            $accessTokenArray = $wechat->miniProgram->access_token->getToken();
+//            $accessToken = \Yii::$app->getWechat()->getAccessToken();
+            if (!$accessTokenArray) {
                 throw new \Exception('微信配置有误');
             }
 
-            return $accessToken;
+            return $accessTokenArray["access_token"];
         } catch (\Exception $exception) {
             throw $exception;
         }

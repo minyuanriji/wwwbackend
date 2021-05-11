@@ -265,7 +265,7 @@ class UserForm extends BaseModel
                 "open_type" => "navigate"
             ];
         }
-        if (getenv('YII_WEIXIN_APPLETS') == 'true') {
+        if (YII_WEIXIN_APPLETS == 'true') {
             $userCenter['menus'][] = [
                 "icon_url"  => "https://dev.mingyuanriji.cn/web/static/shopSettle.png",
                 "name"      => "商家入驻",

@@ -35,8 +35,8 @@
                 <el-table-column prop="user.nickname" label="昵称"></el-table-column>
                 <el-table-column label="收支情况(收益)" width="150">
                     <template slot-scope="scope">
-                        <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.money}}</div>
-                        <div style="font-size: 18px;color: #F6AA5A" v-if="scope.row.type == 2">-{{scope.row.money}}</div>
+                        <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.income}}</div>
+                        <div style="font-size: 18px;color: #F6AA5A" v-if="scope.row.type == 2">-{{scope.row.income}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="desc" label="说明" width="400"></el-table-column>

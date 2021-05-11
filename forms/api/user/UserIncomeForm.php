@@ -125,7 +125,7 @@ class UserIncomeForm extends BaseModel
         $end_time = strtotime($yesterday . " 23:59:59");
         $query = IncomeLog::find()->where(["mall_id" => \Yii::$app->mall->id, "user_id" => \Yii::$app->user->id, "type" => IncomeLog::TYPE_IN]);
         $query->andWhere(['between', "created_at", $begin_time, $end_time]);
-        $incomeMoney = $query->sum("money");
+        $incomeMoney = $query->sum("income");
         return floatval($incomeMoney);
     }
 

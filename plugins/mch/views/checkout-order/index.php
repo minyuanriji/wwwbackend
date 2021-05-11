@@ -149,7 +149,33 @@
                         <div v-else>-</div>
                     </template>
                 </el-table-column>
-                <el-table-column fixed="right" width="150" label="操作">
+
+                <el-table-column :show-overflow-tooltip="true" label="订单金额" >
+                    <template slot-scope="scope">
+                        <div flex="cross:center">
+                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.order_price}}</div>
+                        </div>
+                    </template>
+                </el-table-column>
+
+                <el-table-column :show-overflow-tooltip="true" label="实际支付金额" >
+                    <template slot-scope="scope">
+                        <div flex="cross:center">
+                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.pay_price}}</div>
+                        </div>
+                    </template>
+                </el-table-column>
+
+
+                <el-table-column :show-overflow-tooltip="true" label="支付方式">
+                    <template slot-scope="scope">
+                        <div flex="cross:center">
+                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">余额{{scope.row.pay_price}}+红包{{scope.row.integral_deduction_price}}</div>
+                        </div>
+                    </template>
+                </el-table-column>
+
+                <el-table-column :show-overflow-tooltip="true" label="操作">
                     <template slot-scope="scope">
                         <el-button @click="view(scope.row.id)" type="text" circle size="mini">
                             <el-tooltip class="item" effect="dark" content="详情" placement="top">
@@ -158,6 +184,7 @@
                         </el-button>
                     </template>
                 </el-table-column>
+
             </el-table>
 
             <div flex="dir:right" style="margin-top: 20px;">

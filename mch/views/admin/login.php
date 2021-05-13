@@ -85,9 +85,12 @@ $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
         position: absolute;
         top: 0;
         right: 0;
-        padding: 150px 60px 180px;
-        width: 470px;
-        min-height: 100%;
+        left: 0;
+        bottom: 0;
+        margin: auto;
+        padding: 0 20px;
+        width: 370px;
+        height: 360px;
         background-color: #fff;
     }
 
@@ -123,9 +126,9 @@ $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
         <div class="site-content__wrapper">
             <div class="site-content">
                 <div class="brand-info">
-                    <img class="logo" :src="login_logo" alt="">
-                    <h2 class="brand-info__text">补商汇后台管理系统</h2>
-                    <p class="brand-info__intro">补商汇商城后台管理系统。</p>
+<!--                    <img class="logo" :src="login_logo" alt="">-->
+<!--                    <h2 class="brand-info__text">补商汇后台管理系统</h2>-->
+<!--                    <p class="brand-info__intro">补商汇商城后台管理系统。</p>-->
                 </div>
                 <div class="login-main">
                     <h3 class="login-title">商户登录</h3>

@@ -124,8 +124,8 @@ $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
             <div class="site-content">
                 <div class="brand-info">
                     <img class="logo" :src="login_logo" alt="">
-                    <h2 class="brand-info__text">聚象后台管理系统</h2>
-                    <p class="brand-info__intro">聚象商城后台管理系统。</p>
+                    <h2 class="brand-info__text">补商汇后台管理系统</h2>
+                    <p class="brand-info__intro">补商汇商城后台管理系统。</p>
                 </div>
                 <div class="login-main">
                     <h3 class="login-title">商户登录</h3>

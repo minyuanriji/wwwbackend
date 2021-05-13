@@ -85,6 +85,9 @@ $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
         position: absolute;
         top: 0;
         right: 0;
+        left: 0;
+        bottom: 0;
+        margin: auto;
         padding: 150px 60px 180px;
         width: 470px;
         min-height: 100%;
@@ -123,9 +126,9 @@ $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
         <div class="site-content__wrapper">
             <div class="site-content">
                 <div class="brand-info">
-                    <img class="logo" :src="login_logo" alt="">
-                    <h2 class="brand-info__text">聚象后台管理系统</h2>
-                    <p class="brand-info__intro">聚象商城后台管理系统。</p>
+<!--                    <img class="logo" :src="login_logo" alt="">-->
+                    <h2 class="brand-info__text">补商汇后台管理系统</h2>
+                    <p class="brand-info__intro">补商汇商城后台管理系统。</p>
                 </div>
                 <div class="login-main">
                     <h3 class="login-title">{{user_type == 1 ? '管理员' : '员工'}}登录</h3>

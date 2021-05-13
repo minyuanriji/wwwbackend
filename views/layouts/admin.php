@@ -172,7 +172,7 @@ if ($indSetting && !empty($indSetting['name'])) {
     <div id="_header">
         <header class="el-header" :style="{'background-image':'url('+nav+')','height':'200px'}">
             <div class="main-container" flex="box:last cross:center">
-                <div><img class="logo" :src="logo" alt=""></div>
+<!--                <div><img class="logo" :src="logo" alt=""></div>-->
                 <el-dropdown @command="handleCommand">
                     <span class="el-dropdown-link">
                         <span style="font-size: 16px;"><i class="el-icon-user-solid" style="margin-right: 6px"></i>{{user.username}}</span>
@@ -233,7 +233,7 @@ if ($indSetting && !empty($indSetting['name'])) {
                href="<?= isset($indSetting['copyright_url']) ? $indSetting['copyright_url'] : '' ?>"
                target="_blank"><?= $indSetting['copyright'] ?></a>
         <?php else : ?>
-            &copy;2020 <a href="https://www.gdqijianshi.com" target="_blank">广东七件事集团</a>
+
         <?php endif; ?>
     </footer>
 </el-container>

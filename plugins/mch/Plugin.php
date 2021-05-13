@@ -1,7 +1,7 @@
 <?php
 /**
  * @link:http://www.mingyuan.cn/
- * @copyright: Copyright (c) 2020 名媛日记
+ * @copyright: Copyright (c) 2020 补商汇
  * 多商户插件核心
  * Author: vita
  * Date: 2020-12-03

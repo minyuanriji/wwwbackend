@@ -88,8 +88,9 @@ $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
         left: 0;
         bottom: 0;
         margin: auto;
+        padding: 0 20px;
         width: 370px;
-        height: 400px;
+        height: 360px;
         background-color: #fff;
     }
 

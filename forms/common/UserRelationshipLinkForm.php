@@ -8,6 +8,7 @@ use app\models\BaseModel;
 use app\models\Order;
 use app\models\User;
 use app\models\UserRelationshipLink;
+use app\plugins\commission\models\CommissionGoodsPriceLog;
 
 class UserRelationshipLinkForm extends BaseModel{
 
@@ -157,14 +158,9 @@ class UserRelationshipLinkForm extends BaseModel{
      */
     public static function countUserTeamOrder($user, $userLink){
         if($userLink && !empty($user->role_type)){
-            $query = static::userTeamQuery($user, $userLink);
-            $query->innerJoin("{{%order}} o", "o.user_id=ut.id");
-            $query->andWhere([
-                "AND",
-                ["o.is_delete" => 0],
-                ["o.is_recycle" => 0],
-                ["o.is_pay" => 1]
-            ]);
+            $query = CommissionGoodsPriceLog::find()->alias("cgpl");
+            $query->groupBy("cgpl.order_id");
+            $query->where(["cgpl.user_id" => $user->id]);
             $count = (int)$query->count();
         }else{
             $count = 0;
@@ -180,15 +176,11 @@ class UserRelationshipLinkForm extends BaseModel{
      */
     public static function countUserTeamOrderTotoal($user, $userLink){
         if($userLink && !empty($user->role_type)){
-            $query = static::userTeamQuery($user, $userLink);
-            $query->innerJoin("{{%order}} o", "o.user_id=ut.id");
-            $query->andWhere([
-                "AND",
-                ["o.is_delete" => 0],
-                ["o.is_recycle" => 0],
-                ["o.is_pay" => 1]
-            ]);
-            $sum = (float)$query->sum("o.total_goods_original_price");
+            $query = CommissionGoodsPriceLog::find()->alias("cgpl");
+            $query->innerJoin(["o" => Order::tableName()], "o.id=cgpl.order_id");
+            $query->groupBy("cgpl.order_id");
+            $query->where(["cgpl.user_id" => $user->id]);
+            $sum = (float)$query->select("o.total_goods_original_price")->sum("total_goods_original_price");
         }else{
             $sum = 0;
         }

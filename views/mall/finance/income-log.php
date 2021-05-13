@@ -33,11 +33,13 @@
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
                 <el-table-column prop="user.nickname" label="昵称"></el-table-column>
-                <el-table-column label="收支情况(收益)" width="150">
+                <el-table-column label="收支情况(收益)" width="130">
                     <template slot-scope="scope">
                         <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.income}}</div>
                         <div style="font-size: 18px;color: #F6AA5A" v-if="scope.row.type == 2">-{{scope.row.income}}</div>
                     </template>
+                </el-table-column>
+                <el-table-column label="总收益"  prop="money" width="130">
                 </el-table-column>
                 <el-table-column prop="desc" label="说明" width="400"></el-table-column>
                 <el-table-column prop="scope" width="180" label="收益时间">

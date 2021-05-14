@@ -91,11 +91,12 @@ $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
         padding: 0 20px;
         width: 370px;
         height: 360px;
-        background-color: #fff;
+        /*background-color: #fff;*/
     }
 
     .site-wrapper.site-page--login .login-title {
         font-size: 16px;
+        color: #fff;
     }
 
     .site-wrapper.site-page--login .login-captcha {
@@ -149,7 +150,7 @@ $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
                                 </el-col>
                             </el-row>
                         </el-form-item>
-                        <el-form-item>
+                        <el-form-item  style="color: #fff">
                             <el-checkbox v-model="ruleForm.checked">记住我，以后自动登录</el-checkbox>
                         </el-form-item>
                         <el-form-item>

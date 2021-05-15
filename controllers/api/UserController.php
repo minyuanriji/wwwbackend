@@ -11,6 +11,7 @@
 namespace app\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
+use app\core\ApiCode;
 use app\forms\api\identity\ForgetPasswordForm;
 use app\forms\api\identity\SmsForm;
 use app\forms\api\poster\PosterForm;
@@ -189,13 +190,36 @@ class UserController extends ApiController
 
     /**
      * 上传头像图片（仅上传，不修改头像数据）
+     * type 1 上传营业执照1500*1500  2 头像500*500
      * @return array
      */
     public function actionUpload(){
         $admin_id = \Yii::$app->user->id;
+        $params = $this->requestData;
+        if (!isset($params['width']) && !$params['width']) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'data' => '请上传图片宽度'
+            ];
+        }
+        if (!isset($params['height'])  && !$params['height']) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'data' => '请上传图片高度'
+            ];
+        }
         //来源1后台2前台
         $from = 2;
         $result = CommonAttachment::addAttachmentInfo($from,$this->mall_id,$admin_id);
+        if ($result && $result['code'] === 0) {
+            list($width, $height) = getimagesize($result['data']['thumb_url']);
+            if ($width + $height > $params['width'] + $params['height']) {
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'data' => '请上传小于'. $params['width'] . '*' . $params['height'] . '的图片'
+                ];
+            }
+        }
         return $result;
     }
 

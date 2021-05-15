@@ -232,7 +232,7 @@ class CashForm extends BaseModel
                 $cash__type_name[$i]['name'] = '提现到支付宝';
             }
             if ($item == 'balance') {
-                $cash__type_name[$i]['name'] = '提现到余额';
+                $cash__type_name[$i]['name'] = '提现到余额（余额仅用于消费）';
             }
             if ($item == 'bank') {
                 $cash__type_name[$i]['name'] = '提现到银行卡';

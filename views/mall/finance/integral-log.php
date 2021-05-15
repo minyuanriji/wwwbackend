@@ -97,6 +97,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                 :title="forDlgSelect.title"
                 :list-key="forDlgSelect.listKey"
                 :params="forDlgSelect.params"
+                :columns="forDlgSelect.columns"
                 :visible="forDlgSelect.visible"></com-dialog-select>
 
     </el-card>
@@ -118,6 +119,11 @@ Yii::$app->loadComponentView('com-dialog-select');
                     multiple: false,
                     title: "选择用户",
                     params: {},
+                    columns: [
+                        {label:"红包", key:"static_integral"},
+                        {label:"手机号", key:"mobile"},
+                        {label:"等级", key:"role_type_text"}
+                    ],
                     listKey: 'nickname',
                     url: "mall/user/index",
                 },

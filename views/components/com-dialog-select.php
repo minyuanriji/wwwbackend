@@ -38,6 +38,14 @@
                                 <com-ellipsis :line="2">{{props.row[listKey]}}</com-ellipsis>
                             </template>
                         </el-table-column>
+                        <template v-for="column in columns" >
+                            <el-table-column :label="column.label" >
+                                <template slot-scope="props">
+                                    <div>{{props.row[column.key]}}</div>
+                                </template>
+                            </el-table-column>
+                        </template>
+
                     </el-table>
                     <div style="margin-top: 24px;">
                         <el-row>
@@ -80,6 +88,7 @@
                 default: 'name'
             },
             params: Object,
+            columns: Array,
             display: Boolean,
             extraSearch: Object,
         },

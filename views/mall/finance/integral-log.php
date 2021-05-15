@@ -1,23 +1,13 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-13
- * Time: 14:21
- */
-
 Yii::$app->loadComponentView('com-dialog-select');
 ?>
-
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <div>
-                <span>收益记录</span>
+                <span>红包记录</span>
                 <div style="float: right;margin: -5px 0">
-                    <el-button @click="handleIncome" type="primary" size="small">收益充值</el-button>
+                    <el-button @click="handleIntegral" type="primary" size="small">红包充值</el-button>
                 </div>
             </div>
         </div>
@@ -36,20 +26,24 @@ Yii::$app->loadComponentView('com-dialog-select');
             </div>
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column prop="user.nickname" label="昵称"></el-table-column>
-                <el-table-column label="收支情况(收益)" width="130">
+                <el-table-column prop="nickname" label="昵称"></el-table-column>
+                <el-table-column label="变动红包" width="150">
                     <template slot-scope="scope">
-                        <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.income}}</div>
-                        <div style="font-size: 18px;color: #F6AA5A" v-if="scope.row.type == 2">-{{scope.row.income}}</div>
+                        <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.integral}}</div>
+                        <div style="font-size: 18px;color: #F6AA5A" v-if="scope.row.type == 2">-{{scope.row.integral}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column label="总收益"  prop="money" width="130">
+
+                <el-table-column label="当前红包数"  prop="current_integral" width="130">
                 </el-table-column>
                 <el-table-column prop="desc" label="说明" width="400"></el-table-column>
-                <el-table-column prop="scope" width="180" label="收益时间">
+                <el-table-column prop="scope" width="180" label="充值时间">
+
                        <template slot-scope="scope">
                            {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
+
                        </template>
+
                 </el-table-column>
             </el-table>
 
@@ -68,30 +62,30 @@ Yii::$app->loadComponentView('com-dialog-select');
         </div>
 
         <!-- 充值收益 -->
-        <el-dialog title="充值收益" :visible.sync="dialogIncome" width="30%">
-            <el-form :model="incomeForm" label-width="80px" :rules="incomeFormRules" ref="incomeForm">
+        <el-dialog title="充值红包" :visible.sync="dialogIntegral" width="30%">
+            <el-form :model="integralForm" label-width="80px" :rules="integralFormRules" ref="integralForm">
                 <el-form-item label="操作" prop="type">
-                    <el-radio v-model="incomeForm.type" label="1">充值</el-radio>
-                    <el-radio v-model="incomeForm.type" label="2">扣除</el-radio>
+                    <el-radio v-model="integralForm.type" label="1">充值</el-radio>
+                    <el-radio v-model="integralForm.type" label="2">扣除</el-radio>
                 </el-form-item>
                 <el-form-item label="用户" prop="user_id">
-                    <el-input style="display: none;" v-model="incomeForm.user_id"></el-input>
-                    <el-input disabled v-model="incomeForm.nickname">
+                    <el-input style="display: none;" v-model="integralForm.user_id"></el-input>
+                    <el-input disabled v-model="integralForm.nickname">
                         <template slot="append">
                             <el-button @click="getUsers" type="primary">选择</el-button>
                         </template>
                     </el-input>
                 </el-form-item>
                 <el-form-item label="金额" prop="price" size="small">
-                    <el-input type="number" v-model="incomeForm.price"></el-input>
+                    <el-input type="number" v-model="integralForm.price"></el-input>
                 </el-form-item>
                 <el-form-item label="备注" prop="remark" size="small">
-                    <el-input v-model="incomeForm.remark"></el-input>
+                    <el-input v-model="integralForm.remark"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogIncome = false">取消</el-button>
-                <el-button :loading="btnLoading" type="primary" @click="incomeSubmit">充值</el-button>
+                <el-button @click="dialogIntegral = false">取消</el-button>
+                <el-button :loading="btnLoading" type="primary" @click="integralSubmit">充值</el-button>
             </div>
         </el-dialog>
 
@@ -104,6 +98,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                 :list-key="forDlgSelect.listKey"
                 :params="forDlgSelect.params"
                 :visible="forDlgSelect.visible"></com-dialog-select>
+
     </el-card>
 </div>
 <script>
@@ -111,7 +106,7 @@ Yii::$app->loadComponentView('com-dialog-select');
         el: '#app',
         data() {
             return {
-                incomeForm: {
+                integralForm: {
                     type: "1",
                     user_id: '',
                     price: 0.00,
@@ -126,7 +121,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     listKey: 'nickname',
                     url: "mall/user/index",
                 },
-                incomeFormRules: {
+                integralFormRules: {
                     user_id: [
                         {required: true, message: '请选择用户', trigger: 'blur'},
                     ],
@@ -149,8 +144,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                 form: [],
                 pagination: null,
                 listLoading: false,
-                dialogIncome: false,
-
+                dialogIntegral: false,
             };
         },
         methods: {
@@ -158,33 +152,33 @@ Yii::$app->loadComponentView('com-dialog-select');
                 this.forDlgSelect.visible = true;
             },
             selectUser(row){
-                this.incomeForm.user_id = row.user_id;
-                this.incomeForm.nickname = row.nickname;
+                this.integralForm.user_id = row.user_id;
+                this.integralForm.nickname = row.nickname;
             },
             closeDlgSelect(){
                 this.forDlgSelect.visible = false;
             },
-            handleIncome() {
-                this.dialogIncome = true;
-                this.incomeForm.user_id = '';
-                this.incomeForm.nickname = '';
+            handleIntegral() {
+                this.dialogIntegral = true;
+                this.integralForm.user_id = '';
+                this.integralForm.nickname = '';
             },
-            incomeSubmit() {
+            integralSubmit() {
                 var self = this;
-                this.$refs.incomeForm.validate((valid) => {
+                this.$refs.integralForm.validate((valid) => {
                     if (valid) {
-                        let para = Object.assign({}, self.incomeForm);
+                        let para = Object.assign({}, self.integralForm);
                         self.btnLoading = true;
                         request({
                             params: {
-                                r: 'mall/finance/income-modified',
+                                r: 'mall/finance/integral-modified',
                             },
                             method: 'post',
                             data: para,
                         }).then(e => {
                             if (e.data.code === 0) {
                                 location.reload();
-                                self.dialogIncome = false;
+                                self.dialogIntegral = false;
                             } else {
                                 self.$message.error(e.data.msg);
                             }
@@ -194,11 +188,6 @@ Yii::$app->loadComponentView('com-dialog-select');
                         });
                     }
                 });
-            },
-            exportConfirm() {
-                this.searchData.keyword = this.keyword;
-                this.searchData.start_date = this.date[0];
-                this.searchData.end_date = this.date[1];
             },
             pageChange(currentPage) {
                 this.page = currentPage;
@@ -225,7 +214,7 @@ Yii::$app->loadComponentView('com-dialog-select');
 
             getList() {
                 let params = {
-                    r: 'mall/finance/income-log',
+                    r: 'mall/finance/integral-log',
                     page: this.page,
                     date: this.date,
                     user_id: getQuery('user_id'),

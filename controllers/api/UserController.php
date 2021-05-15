@@ -194,7 +194,7 @@ class UserController extends ApiController
      * @return array
      */
     public function actionUpload(){
-        $admin_id = \Yii::$app->user->id;
+        $admin_id = 1;//\Yii::$app->user->id;前端调用借口走admin账号1
         $params = $this->requestData;
         if (!isset($params['width']) && !$params['width']) {
             return [

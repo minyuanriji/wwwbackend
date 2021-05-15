@@ -814,6 +814,10 @@ class Menus
                         'route' => 'mall/finance/score-log',
                     ],
                     [
+                        'name' => '红包记录',
+                        'route' => 'mall/finance/integral-log',
+                    ],
+                    [
                         'name' => '用户提现',
                         'route' => 'mall/finance/cash',
                     ],

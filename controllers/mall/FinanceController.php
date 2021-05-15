@@ -15,6 +15,9 @@ use app\forms\mall\finance\BalanceLogListForm;
 use app\forms\mall\finance\CashForm;
 use app\forms\mall\finance\CashListForm;
 use app\forms\mall\finance\IncomeLogListForm;
+use app\forms\mall\finance\IncomeModifiedForm;
+use app\forms\mall\finance\IntegralLogListForm;
+use app\forms\mall\finance\IntegralModifiedForm;
 use app\forms\mall\finance\ScoreLogListForm;
 use app\forms\mall\finance\SettingForm;
 use app\forms\mall\finance\UserFinanceListForm;
@@ -363,4 +366,36 @@ class FinanceController extends MallController
         return $this->success('success',compact('deduct'));
     }
 
+    /**
+     * 收益修改
+     */
+    public function actionIncomeModified(){
+        $form = new IncomeModifiedForm();
+        $form->attributes = \Yii::$app->getRequest()->post();
+        return $this->asJson($form->modified());
+    }
+
+    /**
+     * 红包记录
+     * @return string|\yii\web\Response
+     */
+    public function actionIntegralLog()
+    {
+        if (\Yii::$app->request->isAjax) {
+            $form = new IntegralLogListForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->getList());
+        } else {
+            return $this->render('integral-log');
+        }
+    }
+
+    /**
+     * 充值红包
+     */
+    public function actionIntegralModified(){
+        $form = new IntegralModifiedForm();
+        $form->attributes = \Yii::$app->getRequest()->post();
+        return $this->asJson($form->modified());
+    }
 }

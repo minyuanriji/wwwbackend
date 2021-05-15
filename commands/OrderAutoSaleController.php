@@ -28,8 +28,7 @@ class OrderAutoSaleController extends BaseCommandController {
                 "is_send"     => 1,
                 "is_delete"   => 0,
                 "is_recycle"  => 0,
-                "sale_status" => 0,
-                "is_confirm"  => Order::IS_CONFIRM_NO
+                "sale_status" => 0
             ])->andWhere(["IN", "status", [Order::STATUS_WAIT_RECEIVE]]);
             $query->andWhere("created_at <= '{$offset}'");
             $query->andWhere("pay_type <> '".Order::PAY_TYPE_GOODS_PAY."'");

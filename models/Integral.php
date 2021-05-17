@@ -140,7 +140,8 @@ class Integral extends BaseActiveRecord
             $query = static::find()->where($whereStr)->limit(10);
             $planList = $query->orderBy([
                 'finish_period'     => 'ASC',
-                'next_publish_time' => 'ASC'
+                'next_publish_time' => 'ASC',
+		'updated_at' => 'ASC'
             ])->all();
 
             if(!empty($planList)){

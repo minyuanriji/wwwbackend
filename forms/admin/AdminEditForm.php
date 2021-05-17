@@ -57,7 +57,7 @@ class AdminEditForm extends BaseModel
      * @Time: 19:49
      * @Note:数据保存
      */
-    public function save()
+    public function save($type = 0)
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
@@ -110,7 +110,7 @@ class AdminEditForm extends BaseModel
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '保存成功',
                 'data' => [
-                    'url' => \Yii::$app->urlManager->createUrl('admin/index/index'),
+                    'url' => $type ? \Yii::$app->urlManager->createUrl('mall/mirror/son-account-list') : \Yii::$app->urlManager->createUrl('admin/index/index'),
                     'admin_id' => $adminUser->id
                 ]
             ];

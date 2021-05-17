@@ -16,7 +16,8 @@ class EfpsTransferOrder extends BaseActiveRecord
             [['status'], 'required'],
             [['outTradeNo', 'customerCode', 'notifyUrl', 'amount',
               'bankUserName', 'bankCardNo', 'bankName', 'bankAccountType',
-              'remark', 'fail_retry_count', 'created_at', 'updated_at'], 'safe']
+              'remark', 'fail_retry_count', 'created_at', 'updated_at',
+              'request_text', 'resonse_text'], 'safe']
         ];
     }
 }

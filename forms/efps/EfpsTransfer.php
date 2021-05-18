@@ -9,6 +9,28 @@ use app\models\EfpsTransferOrder;
 
 class EfpsTransfer extends BaseModel{
 
+    /**
+     * 查询打款状态
+     * @param $outTradeNo
+     * @return array
+     */
+    public static function query($outTradeNo){
+        $res = \Yii::$app->efps->withdrawalToCardQuery([
+            "customerCode" => \Yii::$app->efps->getCustomerCode(),
+            "outTradeNo"   => $outTradeNo
+        ]);
+
+        if($res['code'] == Efps::CODE_SUCCESS && $res['data']['returnCode'] == "0000" && $res['data']['payState'] == "00"){
+            $res['code'] = ApiCode::CODE_SUCCESS;
+            $res['msg']  = '打款成功';
+        }else{
+            $res['code'] = ApiCode::CODE_FAIL;
+            $res['msg']  = "打款失败：" . $res['data']['returnMsg'];
+        }
+
+        return $res;
+    }
+
     public static function execute(EfpsTransferData $transferData){
 
         if(!$transferData->validate()){
@@ -41,7 +63,7 @@ class EfpsTransfer extends BaseModel{
         }
 
         try {
-
+            $isTransmitting = 1;
             if($transferOrder->status == 2){ //成功
                 $res['code'] = ApiCode::CODE_SUCCESS;
                 $res['msg']  = '打款成功';
@@ -65,6 +87,7 @@ class EfpsTransfer extends BaseModel{
                         }
 
                         if($res['data']['returnCode'] == "0000" && $res['data']['payResult'] == "03"){
+                            $isTransmitting = 1;
                             $transferOrder->status = 2;
                             $transferOrder->remark = "提交打款成功";
                         }
@@ -83,6 +106,7 @@ class EfpsTransfer extends BaseModel{
                     ]);
 
                     if($res['code'] == Efps::CODE_SUCCESS && $res['data']['returnCode'] == "0000" && $res['data']['payState'] == "00"){
+                        $isTransmitting = 0;
                         $transferOrder->status = 2;
                         $res['code'] = ApiCode::CODE_SUCCESS;
                         $res['msg']  = '打款成功';
@@ -99,6 +123,8 @@ class EfpsTransfer extends BaseModel{
                 $transferOrder->updated_at = time();
                 $transferOrder->save();
             }
+
+            $res['is_transmitting'] = $isTransmitting;
 
             return $res;
         }catch (\Exception $e){

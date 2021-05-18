@@ -213,6 +213,7 @@ class CashForm extends BaseModel
             if($res['code'] != ApiCode::CODE_SUCCESS) { //打款失败
                 throw new \Exception($res['msg']);
             }
+            $cash->is_transmitting = $res['is_transmitting'];
         }
 
         // 保存提现信息

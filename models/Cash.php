@@ -41,7 +41,7 @@ class Cash extends BaseActiveRecord
     {
         return [
             [['mall_id', 'user_id'], 'required'],
-            [['mall_id', 'user_id', 'status', 'is_delete', 'created_at', 'deleted_at', 'updated_at'], 'integer'],
+            [['mall_id', 'user_id', 'status', 'is_delete', 'created_at', 'deleted_at', 'updated_at', 'is_transmitting'], 'integer'],
             [['price', 'service_fee_rate', 'fact_price'], 'number'],
             [['extra', 'content'], 'string'],
             [['type'], 'string', 'max' => 45],

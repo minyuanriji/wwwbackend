@@ -69,6 +69,7 @@ class CashListForm extends BaseModel
                 'order_no' => $item->order_no,
                 'type' => $item->type,
                 'status' => $item->status,
+                'is_transmitting' => $item->is_transmitting,
                 'extra' => $extra,
                 'created_at' => $item->created_at,
                 'updated_at' => $item->updated_at,

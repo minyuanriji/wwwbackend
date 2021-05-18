@@ -20,6 +20,7 @@ use app\forms\mall\finance\IntegralLogListForm;
 use app\forms\mall\finance\IntegralModifiedForm;
 use app\forms\mall\finance\ScoreLogListForm;
 use app\forms\mall\finance\SettingForm;
+use app\forms\mall\finance\TransmitCheckForm;
 use app\forms\mall\finance\UserFinanceListForm;
 use app\models\Integral;
 use app\models\IntegralDeduct;
@@ -84,6 +85,15 @@ class FinanceController extends MallController
         return $this->asJson($form->save());
     }
 
+    /**
+     * 打款核实
+     */
+    public function actionCashTransmitCheck()
+    {
+        $form = new TransmitCheckForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->check());
+    }
 
     /**
      * @Author: 广东七件事 ganxiaohao

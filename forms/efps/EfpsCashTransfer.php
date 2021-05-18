@@ -1,6 +1,7 @@
 <?php
 namespace app\forms\efps;
 
+use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\Cash;
 
@@ -13,19 +14,23 @@ class EfpsCashTransfer extends BaseModel{
      * @return array
      */
     public static function transfer(Cash $cash){
-        $extra = (array)@json_decode($cash->extra, true);
+        if($cash->status == 1){
+            $extra = (array)@json_decode($cash->extra, true);
 
-        $transferData = new EfpsTransferData([
-            'outTradeNo'      => $cash->order_no,
-            'source_type'     => 'user_income_cash',
-            'amount'          => (float)$cash->fact_price,
-            'bankUserName'    => !empty($extra['name']) ? $extra['name'] : "",
-            'bankCardNo'      => !empty($extra['bank_account']) ? $extra['bank_account'] : "",
-            'bankName'        => !empty($extra['bank_name']) ? $extra['bank_name'] : "",
-            'bankAccountType' => !empty($extra['bankAccountType']) ? $extra['bankAccountType'] : "2"
-        ]);
+            $transferData = new EfpsTransferData([
+                'outTradeNo'      => $cash->order_no,
+                'source_type'     => 'user_income_cash',
+                'amount'          => (float)$cash->fact_price,
+                'bankUserName'    => !empty($extra['name']) ? $extra['name'] : "",
+                'bankCardNo'      => !empty($extra['bank_account']) ? $extra['bank_account'] : "",
+                'bankName'        => !empty($extra['bank_name']) ? $extra['bank_name'] : "",
+                'bankAccountType' => !empty($extra['bankAccountType']) ? $extra['bankAccountType'] : "2"
+            ]);
 
-        return EfpsTransfer::execute($transferData);
+            return EfpsTransfer::execute($transferData);
+        }
+
+        return ['code' => ApiCode::CODE_FAIL, 'msg' => '未同意该提现'];
     }
 
 }

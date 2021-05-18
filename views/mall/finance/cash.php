@@ -89,6 +89,11 @@
                                     <img src="statics/img/mall/pass.png" alt="">
                                 </el-tooltip>
                             </el-button>
+                            <el-button size="mini" circle style="margin-top: 10px" v-if="scope.row.status == 2 && scope.row.is_transmitting == 1" @click="applyDetail(scope.row)">
+                                <el-tooltip class="item" effect="dark" content="核实" placement="top">
+                                    <img src="statics/img/mall/detail.png" alt="">
+                                </el-tooltip>
+                            </el-button>
                             <el-button size="mini" circle v-if="scope.row.status == 1" style="margin-top: 10px" @click="apply(scope.row, 2)">
                                 <el-tooltip class="item" effect="dark" content="打款" placement="top">
                                     <img src="statics/img/mall/pay.png" alt="">
@@ -213,6 +218,29 @@
                         type: 'info',
                         message: '取消输入'
                     });
+                });
+            },
+            applyDetail(cash){
+                this.loading = true;
+                var self = this;
+                request({
+                    params: {
+                        r: 'mall/finance/cash-transmit-check',
+                    },
+                    method: 'post',
+                    data: {
+                        id: cash.id
+                    }
+                }).then(e => {
+                    self.loading = false;
+                    if (e.data.code === 0) {
+                        self.$message.success(e.data.msg);
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                    self.loadData(self.activeName);
+                }).catch(e => {
+                    self.loading = false;
                 });
             }
         }

@@ -93,6 +93,7 @@ class EfpsTransferController extends BaseCommandController{
                 throw new \Exception($res['msg']);
             }
 
+            $cash->is_transmitting = $res['is_transmitting'];
             $cash->status = 2;
             if (!$cash->save()) {
                 throw new \Exception(json_encode($cash->getErrors()));

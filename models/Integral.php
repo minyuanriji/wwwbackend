@@ -141,11 +141,7 @@ class Integral extends BaseActiveRecord
             $planList = $query->orderBy([
                 'finish_period'     => 'ASC',
                 'next_publish_time' => 'ASC',
-<<<<<<< HEAD
-		'updated_at' => 'ASC'
-=======
                 'updated_at'        => 'ASC'
->>>>>>> 4632b094b50fc43f174717cca1adea6a97984b13
             ])->all();
 
             if(!empty($planList)){

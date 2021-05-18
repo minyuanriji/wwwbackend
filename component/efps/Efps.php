@@ -243,9 +243,19 @@ class Efps extends Component{
                 }
             }
         }catch (\Exception $e){
-            return ["code" => self::CODE_FALI, "msg" => $e->getMessage(), "data" => @json_decode(!empty($resText) ? $resText : "{}", true)];
+            return [
+                "code"     => self::CODE_FALI,
+                "msg"      => $e->getMessage(),
+                "data"     => @json_decode(!empty($resText) ? $resText : "{}", true),
+                "json_str" => $jsonStr
+            ];
         }
 
-        return ["code" => self::CODE_SUCCESS, "data" => json_decode($resText, true)];
+        return [
+            "code"     => self::CODE_SUCCESS,
+            "data"     => json_decode($resText, true),
+            "json_str" => $jsonStr,
+            "res_text" => $resText
+        ];
     }
 }

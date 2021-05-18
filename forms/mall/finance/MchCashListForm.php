@@ -37,7 +37,7 @@ class MchCashListForm extends BaseModel{
         $query->leftJoin(["m" => Mch::tableName()], "m.id=s.mch_id");
         $query->select(["mc.id", "s.mch_id", "s.name", "s.cover_url", "mc.money", "mc.fact_price", "mc.type", "mc.created_at",
             "mc.status", "mc.transfer_status", "m.account_money", "mc.order_no", "mc.service_fee_rate", "mc.updated_at",
-            "eto.remark", "mc.content", "eto.bankUserName", "eto.bankCardNo", "eto.bankName", "eto.bankAccountType"]);
+            "eto.remark", "mc.content", "mc.type_data"]);
 
         $query->orderBy(['mc.created_at' => SORT_DESC]);
 
@@ -58,6 +58,12 @@ class MchCashListForm extends BaseModel{
         }
 
         $list = $query->asArray()->page($pagination, $this->limit, $this->page)->all();
+        if($list){
+            foreach($list as &$item){
+                $typeData = @json_decode($item['type_data'], true);
+                $item = array_merge($item, is_array($typeData) ? $typeData : []);
+            }
+        }
 
         return [
             'code' => ApiCode::CODE_SUCCESS,

@@ -227,6 +227,10 @@ class Efps extends Component{
 
             @curl_close($ch);
 
+            if(!empty($error)){
+                throw new \Exception($error);
+            }
+
             if(!empty($resText)){
                 $resObj = @json_decode($resText);
                 if(is_object($resObj)){

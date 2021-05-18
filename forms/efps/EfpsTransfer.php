@@ -7,39 +7,40 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\EfpsTransferOrder;
 
-class EfpsTransfer extends BaseModel
-{
+class EfpsTransfer extends BaseModel{
 
     public static function execute(EfpsTransferData $transferData){
 
-        $t = \Yii::$app->getDb()->beginTransaction();
+        if(!$transferData->validate()){
+            throw new \Exception(json_encode($transferData->getErrors()));
+        }
+
+        $transferOrder = EfpsTransferOrder::findOne(["outTradeNo" => $transferData->outTradeNo]);
+
+        if(!$transferOrder){
+            $transferOrder = new EfpsTransferOrder([
+                "status"          => 0,
+                "outTradeNo"      => $transferData->outTradeNo,
+                "source_type"     => $transferData->source_type,
+                "customerCode"    => \Yii::$app->efps->getCustomerCode(),
+                "notifyUrl"       => "http://",
+                "amount"          => $transferData->amount,
+                "bankUserName"    => $transferData->bankUserName,
+                "bankCardNo"      => $transferData->bankCardNo,
+                "bankName"        => $transferData->bankName,
+                "bankAccountType" => $transferData->bankAccountType,
+                "created_at"      => time(),
+                "updated_at"      => time()
+            ]);
+            if(!$transferOrder->save()){
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg'  => json_encode($transferOrder->getErrors())
+                ];
+            }
+        }
+
         try {
-
-            if(!$transferData->validate()){
-                throw new \Exception(json_encode($transferData->getErrors()));
-            }
-
-            $transferOrder = EfpsTransferOrder::findOne(["outTradeNo" => $transferData->outTradeNo]);
-
-            if(!$transferOrder){
-                $transferOrder = new EfpsTransferOrder([
-                    "status"          => 0,
-                    "outTradeNo"      => $transferData->outTradeNo,
-                    "source_type"     => $transferData->source_type,
-                    "customerCode"    => \Yii::$app->efps->getCustomerCode(),
-                    "notifyUrl"       => "http://",
-                    "amount"          => $transferData->amount,
-                    "bankUserName"    => $transferData->bankUserName,
-                    "bankCardNo"      => $transferData->bankCardNo,
-                    "bankName"        => $transferData->bankName,
-                    "bankAccountType" => $transferData->bankAccountType,
-                    "created_at"      => time(),
-                    "updated_at"      => time()
-                ]);
-                if(!$transferOrder->save()){
-                    throw new \Exception(json_encode($transferOrder->getErrors()));
-                }
-            }
 
             if($transferOrder->status == 2){ //成功
                 $res['code'] = ApiCode::CODE_SUCCESS;
@@ -80,7 +81,6 @@ class EfpsTransfer extends BaseModel
                         "outTradeNo"   => $transferOrder->outTradeNo
                     ]);
 
-
                     if($res['code'] == Efps::CODE_SUCCESS && $res['data']['returnCode'] == "0000" && $res['data']['payState'] == "00"){
                         $transferOrder->status = 2;
                         $res['code'] = ApiCode::CODE_SUCCESS;
@@ -99,11 +99,8 @@ class EfpsTransfer extends BaseModel
                 $transferOrder->save();
             }
 
-            $t->commit();
-
             return $res;
         }catch (\Exception $e){
-            $t->rollBack();
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg'  => $e->getMessage()

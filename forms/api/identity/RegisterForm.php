@@ -182,7 +182,6 @@ class RegisterForm extends BaseModel
                 $third_parent_id  = $recommendUsers["second_parent_id"];
             }
 
-
             $smsForm = new SmsForm();
             $smsForm->captcha = $this->captcha;
             $smsForm->mobile = $this->mobile;
@@ -190,7 +189,14 @@ class RegisterForm extends BaseModel
                 return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
             }
 
+            //生成用户的ID
+            $randUid = 100000 + rand(0, 999999);
+            while(User::findOne($randUid)){
+                $randUid = 100000 + rand(0, 999999);
+            }
+
             $user = new User();
+            $user->id = $randUid;
             $user->username = $this->mobile;
             $user->mobile = $this->mobile;
             $user->mall_id = $this->mall_id;
@@ -202,8 +208,8 @@ class RegisterForm extends BaseModel
             $user->last_login_at = time();
             $user->login_ip = get_client_ip();
             $user->parent_id = $this->recommend_id;
-            $user->second_parent_id = $second_parent_id;
-            $user->third_parent_id = $third_parent_id;
+            $user->second_parent_id = 0;
+            $user->third_parent_id = 0;
             if (!$user->save()) {
                 $messages = $this->responseErrorInfo($user);
                 throw new \Exception($messages["msg"]);

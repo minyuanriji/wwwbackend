@@ -17,6 +17,7 @@ class EfpsMchCashTransfer extends BaseModel{
 
         $transferData = new EfpsTransferData([
             'outTradeNo'      => $mchCash->order_no,
+            'source_type'     => 'mch_cash',
             'amount'          => (float)$mchCash->fact_price,
             'bankUserName'    => !empty($typeData['bankUserName']) ? $typeData['bankUserName'] : "",
             'bankCardNo'      => !empty($typeData['bankCardNo']) ? $typeData['bankCardNo'] : "",

@@ -7,6 +7,7 @@ use app\models\BaseModel;
 class EfpsTransferData extends BaseModel{
 
     public $outTradeNo;
+    public $source_type;
     public $amount;
     public $bankUserName;
     public $bankCardNo;
@@ -15,7 +16,7 @@ class EfpsTransferData extends BaseModel{
 
     public function rules(){
         return [
-            [['outTradeNo', 'amount', 'bankUserName', 'bankCardNo', 'bankName', 'bankAccountType'], 'required']
+            [['outTradeNo', 'source_type', 'amount', 'bankUserName', 'bankCardNo', 'bankName', 'bankAccountType'], 'required']
         ];
     }
 

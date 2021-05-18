@@ -25,6 +25,7 @@ class EfpsTransfer extends BaseModel
                 $transferOrder = new EfpsTransferOrder([
                     "status"          => 0,
                     "outTradeNo"      => $transferData->outTradeNo,
+                    "source_type"     => $transferData->source_type,
                     "customerCode"    => \Yii::$app->efps->getCustomerCode(),
                     "notifyUrl"       => "http://",
                     "amount"          => $transferData->amount,

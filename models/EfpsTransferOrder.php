@@ -14,7 +14,7 @@ class EfpsTransferOrder extends BaseActiveRecord
     public function rules(){
         return [
             [['status'], 'required'],
-            [['outTradeNo', 'customerCode', 'notifyUrl', 'amount',
+            [['outTradeNo', 'source_type', 'customerCode', 'notifyUrl', 'amount',
               'bankUserName', 'bankCardNo', 'bankName', 'bankAccountType',
               'remark', 'fail_retry_count', 'created_at', 'updated_at',
               'request_text', 'resonse_text'], 'safe']

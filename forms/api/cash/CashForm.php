@@ -246,6 +246,21 @@ class CashForm extends BaseModel
             $isTransactionPassword = true;
         }
 
+        //获取最近一次提现的银行卡
+        $lastBankCash = Cash::find()->where([
+            "user_id" => \Yii::$app->user->id,
+            "type"    => "bank"
+        ])->asArray()->select(["extra"])->orderBy("id DESC")->one();
+        $defaultBank = [
+            "name"         => "",
+            "bank_name"    => "",
+            "bank_account" => ""
+        ];
+        if(!empty($lastBankCash['extra'])){
+            $extra = !empty($lastBankCash['extra']) ? @json_decode($lastBankCash['extra'], true) : [];
+            $defaultBank = array_merge($defaultBank, $extra);
+        }
+
         return $this->returnApiResultData(
             ApiCode::CODE_SUCCESS,
             '',
@@ -260,7 +275,8 @@ class CashForm extends BaseModel
                 'user_info' => [
                     'income' => \Yii::$app->user->identity->income,
                     'is_transaction_password' => $isTransactionPassword
-                ]
+                ],
+                'default_bank' => $defaultBank
             ]);
     }
 

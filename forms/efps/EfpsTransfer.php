@@ -66,6 +66,7 @@ class EfpsTransfer extends BaseModel{
 
                         if($res['data']['returnCode'] == "0000" && $res['data']['payResult'] == "03"){
                             $transferOrder->status = 2;
+                            $transferOrder->remark = "提交打款成功";
                         }
 
                         $transferOrder->request_text = !empty($res['json_str']) ? $res['json_str'] : "";

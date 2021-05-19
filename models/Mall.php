@@ -23,6 +23,11 @@ use Yii;
  * @property integer $deleted_at
  * @property integer $expired_at
  * @property string $name
+ * @property string $app_id
+ * @property string $logo
+ * @property string $app_share_title
+ * @property string $app_share_desc
+ * @property string $app_share_pic
  * @property integer $admin_id
  * @property integer $is_recycle
  * @property integer $is_disable
@@ -60,6 +65,7 @@ class Mall extends BaseActiveRecord
         return [
             [['created_at', 'updated_at', 'deleted_at', 'expired_at'], 'safe'],
             [['admin_id', 'is_recycle', 'is_delete', 'is_disable'], 'integer'],
+            [['app_id', 'logo', 'app_share_title', 'app_share_desc', 'app_share_pic'], 'string'],
             [['name'], 'string', 'max' => 64],
         ];
     }
@@ -79,7 +85,11 @@ class Mall extends BaseActiveRecord
             'admin_id' => '用户 ID',
             'is_recycle' => '商城回收状态',
             'is_disable' => '商城禁用状态',
-            'is_delete' => 'Is Delete',
+            'app_id' => 'APP ID',
+            'logo' => 'LOGO',
+            'app_share_title' => '自定义分享标题',
+            'app_share_desc' => '自定义分享描述',
+            'app_share_pic' => '自定义分享图片',
         ];
     }
 

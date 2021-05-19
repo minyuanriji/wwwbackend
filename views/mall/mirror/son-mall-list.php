@@ -176,9 +176,85 @@
     <!-- 创建商城 -->
     <el-dialog title="创建商城" :visible.sync="createMallDialogVisible" width="40%" :close-on-click-modal="false">
         <el-form label-width="100px" size="small" :model="createMallForm" :rules="createMallRules" ref="createMallForm">
+
             <el-form-item label="商城名称" prop="name">
                 <el-input type="text" size="small" v-model="createMallForm.name" autocomplete="off"></el-input>
             </el-form-item>
+
+            <el-form-item label="app_id" prop="app_id">
+                <el-input type="text" size="small" v-model="createMallForm.app_id" autocomplete="off"></el-input>
+            </el-form-item>
+
+            <el-form-item prop="logo">
+                <label slot="label">
+                    <span>商城logo</span>
+                    <el-tooltip effect="dark" content="在授权登录页显示"
+                                placement="top">
+                        <i class="el-icon-info"></i>
+                    </el-tooltip>
+                </label>
+                <com-attachment v-model="createMallForm.logo" :multiple="false" :max="1">
+                    <el-tooltip class="item" effect="dark" content="建议尺寸:100 * 100"
+                                placement="top">
+                        <el-button size="mini">选择图片</el-button>
+                    </el-tooltip>
+                </com-attachment>
+                <div class="customize-share-title">
+                    <com-image mode="aspectFill" width='80px' height='80px'
+                               :src="createMallForm.logo ? createMallForm.logo : ''"></com-image>
+                    <el-button v-if="createMallForm.logo" class="del-btn" size="mini"
+                               type="danger" icon="el-icon-close" circle
+                               @click="createMallForm.logo = ''"></el-button>
+                </div>
+            </el-form-item>
+
+            <el-form-item prop="app_share_title">
+                <label slot="label">
+                    <span>自定义分享标题</span>
+                    <el-tooltip effect="dark" content="分享给好友时，显示的标题"
+                                placement="top">
+                        <i class="el-icon-info"></i>
+                    </el-tooltip>
+                </label>
+                <el-input placeholder="请输入分享标题"
+                          v-model="createMallForm.app_share_title"></el-input>
+            </el-form-item>
+
+            <el-form-item prop="app_share_desc">
+                <label slot="label">
+                    <span>自定义分享描述</span>
+                    <el-tooltip effect="dark" content="分享给好友时，显示的描述"
+                                placement="top">
+                        <i class="el-icon-info"></i>
+                    </el-tooltip>
+                </label>
+                <el-input type="textarea" placeholder="请输入分享描述"
+                          v-model="createMallForm.app_share_desc"></el-input>
+            </el-form-item>
+
+            <el-form-item prop="app_share_pic">
+                <label slot="label">
+                    <span>自定义分享图片</span>
+                    <el-tooltip effect="dark" content="分享给好友时，作为分享图片"
+                                placement="top">
+                        <i class="el-icon-info"></i>
+                    </el-tooltip>
+                </label>
+                <com-attachment v-model="createMallForm.app_share_pic" :multiple="false" :max="1">
+                    <el-tooltip class="item" effect="dark" content="建议尺寸:420 * 336"
+                                placement="top">
+                        <el-button size="mini">选择图片</el-button>
+                    </el-tooltip>
+                </com-attachment>
+                <div class="customize-share-title">
+                    <com-image mode="aspectFill" width='80px' height='80px'
+                               :src="createMallForm.app_share_pic ? createMallForm.app_share_pic : ''"></com-image>
+                    <el-button v-if="createMallForm.app_share_pic" class="del-btn" size="mini"
+                               type="danger" icon="el-icon-close" circle
+                               @click="createMallForm.app_share_pic = ''"></el-button>
+                </div>
+            </el-form-item>
+
             <el-form-item label="商城有效期" prop="expired_at" ref="expired_at">
                 <el-date-picker type="datetime" v-if="isCheckExpired" :disabled="true"></el-date-picker>
                 <el-date-picker v-else

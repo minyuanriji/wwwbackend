@@ -388,7 +388,7 @@ class CashForm extends BaseModel
              * @var Cash $item
              */
             $newItem['created_at'] = date('Y-m-d H:i:s', $item->created_at);
-            $newItem['content'] = $item->content;
+            $newItem['content'] = @json_decode($item->content, true);
             $newItem['fact_price'] = $item->fact_price;
             $newItem['price'] = $item->price;
             $newItem['status'] = $item->status;

@@ -106,7 +106,7 @@
                         label="用户" width="200">
                     <template slot-scope="scope">
                         <div flex="dir:left cross:center" v-if="scope.row.user">
-                            <com-image width="25" height="25" :src="scope.row.user.userInfo.avatar"></com-image>
+                            <com-image width="25" height="25" :src="scope.row.user.avatar"></com-image>
                             <com-ellipsis style="margin-left: 10px;" :line="1">{{scope.row.user.nickname}}
                             </com-ellipsis>
                         </div>

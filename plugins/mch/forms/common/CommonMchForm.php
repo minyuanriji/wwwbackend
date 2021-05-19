@@ -37,7 +37,7 @@ class CommonMchForm extends BaseModel
         }
 
         $list = $query->orderBy(['sort' => SORT_ASC])
-            ->with('user.userInfo', 'store', 'category')
+            ->with('user', 'store', 'category')
             ->page($pagination)->asArray()->all();
 
         return [

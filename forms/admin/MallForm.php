@@ -46,8 +46,13 @@ class MallForm extends BaseModel
             $model = new Mall();
             $model->admin_id = \Yii::$app->admin->id;
         }
-        $model->name = $data["name"];
-        $model->expired_at = $data["expired_at"] != 0 ? strtotime($data["expired_at"]) : $data["expired_at"];
+        $model->name                = $data["name"];
+        $model->app_id              = $data["app_id"];
+        $model->logo                = $data["logo"];
+        $model->app_share_title     = $data["app_share_title"];
+        $model->app_share_desc      = $data["app_share_desc"];
+        $model->app_share_pic       = $data["app_share_pic"];
+        $model->expired_at          = $data["expired_at"] != 0 ? strtotime($data["expired_at"]) : $data["expired_at"];
         if (!$model->save()) {
             return $this->responseErrorInfo($model);
         }

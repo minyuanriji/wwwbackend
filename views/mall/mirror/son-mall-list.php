@@ -68,7 +68,7 @@
                 <span>子商城列表</span>
             </div>
             <div style="float: right;margin-top: -5px">
-                <el-button type="primary" @click="edit" size="small">回收站</el-button>
+<!--                <el-button type="primary" @click="edit" size="small">回收站</el-button>-->
             </div>
         </div>
         <div class="table-body">
@@ -90,7 +90,7 @@
             </div>
             <el-table v-loading="searchLoading" border :data="list" style="margin-bottom: 20px">
                 <el-table-column prop="id" label="ID" width="60"></el-table-column>
-                <el-table-column prop="name" label="商城名称">
+                <el-table-column prop="name" width="260" label="商城名称">
                     <template slot-scope="scope">
                         <el-button v-if="isInd && scope.row.is_disable == '0'"
                                    @click="toEnter(scope.row)"
@@ -102,7 +102,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="site" label="数据统计">
+                <!--<el-table-column prop="site" label="数据统计">
                     <template slot="header" slot-scope="scope">
                         <el-tooltip effect="dark" content="数据统计每10分钟刷新一次" placement="top">
                             <span>数据统计<i class="el-icon-question"></i></span>
@@ -112,7 +112,7 @@
                         <div>用户数: {{scope.row.count_data.user_count}}</div>
                         <div>订单数: {{scope.row.count_data.order_count}}</div>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
                 <el-table-column width="170" prop="expired_at_text" label="有效期"></el-table-column>
                 <el-table-column label="操作" width="380">
                     <template slot-scope="scope">
@@ -356,6 +356,11 @@
                 createMallForm: {
                     id: null,
                     name: '',
+                    app_id: '',
+                    logo: '',
+                    app_share_title: '',
+                    app_share_desc: '',
+                    app_share_pic: '',
                     expired_at: '',
                 },
                 isCheckExpired: false,
@@ -363,6 +368,12 @@
                 createMallRules: {
                     name: [
                         {required: true, message: '请填写商城名称。'},
+                    ],
+                    app_id: [
+                        {required: true, message: '请填写小程序appid。'},
+                    ],
+                    logo: [
+                        {required: true, message: '请上传小程序logo。'},
                     ],
                     expired_at: [
                         {required: true, message: '请选择商城有效期'},
@@ -401,6 +412,11 @@
             showCreateMallDialog() {
                 this.createMallDialogVisible = true;
                 this.createMallForm.name = '';
+                this.createMallForm.app_id = '';
+                this.createMallForm.logo = '';
+                this.createMallForm.app_share_title = '';
+                this.createMallForm.app_share_desc = '';
+                this.createMallForm.app_share_pic = '';
                 this.createMallForm.expired_at = '';
                 this.createMallForm.id = null;
             },
@@ -645,6 +661,11 @@
                 this.createMallDialogVisible = true;
                 this.createMallForm.id = row.id;
                 this.createMallForm.name = row.name;
+                this.createMallForm.app_id = row.app_id;
+                this.createMallForm.logo = row.logo;
+                this.createMallForm.app_share_title = row.app_share_title;
+                this.createMallForm.app_share_desc = row.app_share_desc;
+                this.createMallForm.app_share_pic = row.app_share_pic;
                 if (row.expired_at == 0) {
                     this.createMallForm.expired_at = row.expired_at;
                     this.isCheckExpired = true;

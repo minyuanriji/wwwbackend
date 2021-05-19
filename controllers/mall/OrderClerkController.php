@@ -4,9 +4,21 @@ namespace app\controllers\mall;
 use app\forms\mall\order\OrderClerkDetailForm;
 use app\forms\mall\order\OrderClerkListForm;
 use app\forms\mall\order\OrderClerkSendForm;
+use app\forms\mall\order\OrderClerkStoreForm;
 use app\forms\mall\order\OrderClerkUpdateExpressStatusForm;
 
 class OrderClerkController extends MallController{
+
+    public function actionStore(){
+
+        if (\Yii::$app->request->isAjax) {
+            $form = new OrderClerkStoreForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->getList());
+        } else {
+            return $this->render('store');
+        }
+    }
 
     public function actionIndex(){
 

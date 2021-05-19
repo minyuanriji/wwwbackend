@@ -160,19 +160,7 @@
                         label="用户" width="200">
                     <template slot-scope="scope">
                         <div flex="dir:left cross:center" v-if="scope.row.user">
-                            <el-tooltip class="item" effect="dark" v-if="scope.row.user.userInfo.platform == 'wxapp'"
-                                        content="微信" placement="top">
-                                <img style="margin-right: 10px" src="statics/img/mall/wx.png" alt="">
-                            </el-tooltip>
-                            <el-tooltip class="item" effect="dark"
-                                        v-else-if="scope.row.user.userInfo.platform == 'aliapp'" content="支付宝"
-                                        placement="top">
-                                <img style="margin-right: 10px" src="statics/img/mall/ali.png" alt="">
-                            </el-tooltip>
-                            <el-tooltip class="item" effect="dark" v-else content="未知" placement="top">
-                                <img style="margin-right: 10px" src="statics/img/mall/site.png" alt="">
-                            </el-tooltip>
-                            <com-image width="25" height="25" :src="scope.row.user.userInfo.avatar"></com-image>
+                            <com-image width="25" height="25" :src="scope.row.user.avatar"></com-image>
                             <div style="margin-left: 10px;width: 115px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.user.nickname}}</div>
 <!--                            <com-ellipsis style="margin-left: 10px;" :line="1">{{scope.row.user.nickname}}-->
 <!--                            </com-ellipsis>-->

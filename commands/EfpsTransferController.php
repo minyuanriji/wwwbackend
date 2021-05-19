@@ -23,7 +23,7 @@ class EfpsTransferController extends BaseCommandController{
             $this->actionMchCashTransfer();
 
             //用户提现转账
-            $this->actionCashTransfer();
+            //$this->actionCashTransfer();
         }
 
     }

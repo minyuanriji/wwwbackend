@@ -32,47 +32,52 @@ class OrderClerkSendForm extends BaseModel{
 
         try {
 
-            $orderClerk = OrderClerk::findOne($this->clerk_id);
-            if(!$orderClerk || $orderClerk->is_delete){
+            $clerkIds = explode(",", $this->clerk_id);
+            $orderClerks = OrderClerk::find()->andWhere(["IN", "id", $clerkIds])->all();
+            if(!$orderClerks){
                 throw new \Exception("核销记录不存在");
             }
 
-            $order = Order::findOne($orderClerk->order_id);
-            if(!$order || $order->is_delete){
-                throw new \Exception("订单不存在");
-            }
+            foreach($orderClerks as $orderClerk){
 
-            if(!$order->is_pay){
-                throw new \Exception("订单未支付");
-            }
-
-            $orderDetails = OrderDetail::findAll(["is_delete" => 0, "order_id" => $order->id, "is_refund" => 0]);
-            if(!$orderDetails){
-                throw new \Exception("订单详情记录不存在");
-            }
-
-            foreach($orderDetails as $orderDetail){
-                $form = new OrderClerkExpressForm([
-                    "order_id"        => $order->id,
-                    "order_detail_id" => $orderDetail->id,
-                    "goods_id"        => $orderDetail->goods_id,
-                    "send_type"       => $this->send_type,
-                    "express_no"      => $this->express_no,
-                    "express_content" => $this->express_content,
-                    "express"         => $this->express,
-                    "express_code"    => $this->express_code,
-                    "store_id"        => $order->store_id
-                ]);
-                $res = $form->save();
-                if($res['code'] != ApiCode::CODE_SUCCESS){
-                    throw new \Exception($res['msg']);
+                $order = Order::findOne($orderClerk->order_id);
+                if(!$order || $order->is_delete){
+                    throw new \Exception("订单不存在");
                 }
-            }
 
-            $orderClerk->express_status = 1;
-            $orderClerk->updated_at     = time();
-            if(!$orderClerk->save()){
-                throw new \Exception($this->responseErrorMsg($orderClerk));
+                if(!$order->is_pay){
+                    throw new \Exception("订单未支付");
+                }
+
+                $orderDetails = OrderDetail::findAll(["is_delete" => 0, "order_id" => $order->id, "is_refund" => 0]);
+                if(!$orderDetails){
+                    throw new \Exception("订单详情记录不存在");
+                }
+
+                foreach($orderDetails as $orderDetail){
+
+                    $form = new OrderClerkExpressForm([
+                        "order_id"        => $order->id,
+                        "order_detail_id" => $orderDetail->id,
+                        "goods_id"        => $orderDetail->goods_id,
+                        "send_type"       => $this->send_type,
+                        "express_no"      => $this->express_no,
+                        "express_content" => $this->express_content,
+                        "express"         => $this->express,
+                        "express_code"    => $this->express_code,
+                        "store_id"        => $order->store_id
+                    ]);
+                    $res = $form->save();
+                    if($res['code'] != ApiCode::CODE_SUCCESS){
+                        throw new \Exception($res['msg']);
+                    }
+                }
+
+                $orderClerk->express_status = 1;
+                $orderClerk->updated_at     = time();
+                if(!$orderClerk->save()){
+                    throw new \Exception($this->responseErrorMsg($orderClerk));
+                }
             }
 
             return [

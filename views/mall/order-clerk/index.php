@@ -5,7 +5,13 @@ Yii::$app->loadComponentView('order/com-clerk-send');
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
-            <span>核销记录</span>
+            <el-breadcrumb separator="/">
+                <el-breadcrumb-item>
+                    <span style="color: #409EFF;cursor: pointer"
+                          @click="$navigate({r:'mall/order-clerk/store'})">核销记录</span>
+                </el-breadcrumb-item>
+                <el-breadcrumb-item>{{store.name}}</el-breadcrumb-item>
+            </el-breadcrumb>
         </div>
         <div class="table-body">
 
@@ -21,12 +27,6 @@ Yii::$app->loadComponentView('order/com-clerk-send');
                 <el-option :label="'商品'" :value="'offline_normal'"></el-option>
             </el-select>
 
-            <el-select size="small" @change="toSearch" v-model="search.express_status" placeholder="请选择" style="width:110px;">
-                <el-option :label="'补货状态'" :value="''"></el-option>
-                <el-option :label="'未补货'" :value="'no_express'"></el-option>
-                <el-option :label="'已补货'" :value="'is_express'"></el-option>
-            </el-select>
-
             <div class="input-item">
                 <el-input @keyup.enter.native="loadData" size="small" placeholder="请输入搜索内容" v-model="search.keyword"
                           clearable @clear="toSearch">
@@ -34,20 +34,23 @@ Yii::$app->loadComponentView('order/com-clerk-send');
                 </el-input>
             </div>
 
-            <div style="float: right"></div>
-            <el-tabs v-model="activeName" @tab-click="handleClick">
+            <div class="input-item" style="float:right;text-align:right">
+                <el-button @click="batchClerkSend" type="primary" size="small" >批量补货</el-button>
+            </div>
 
-                <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
+            <div style="padding:10px 10px;margin-bottom:10px;background:#f7f7f7;border:1px solid #eee;">
+                <span style="margin-right:5px;">商户：{{store.name}}</span>
+                <span style="margin-right:5px;">手机：{{store.mobile}}</span>
+                <span>地址：{{store.address}}</span>
+            </div>
+
+            <el-tabs v-model="search.express_status" @tab-click="toSearch">
+
+                <el-tab-pane label="待补货" name="no_express">
+                    <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           @selection-change="handleSelectionChange">
                     <el-table-column align='center' type="selection" width="60"></el-table-column>
                     <el-table-column align="center" sortable="custom" prop="id" label="ID" width="90"></el-table-column>
-                    <el-table-column align="center" label="门店" width="70">
-                        <template slot-scope="scope">
-                            <div v-if="scope.row.clerk_role=='store'" style="color:green">商家</div>
-                            <div v-else>-</div>
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="核销员" prop="nickname"></el-table-column>
                     <el-table-column label="补货" width="90" align="center" >
                         <template slot-scope="scope" >
                             <el-switch @change="switchExpressStatus(scope.row)" v-model="scope.row.express_status" ></el-switch>
@@ -55,7 +58,7 @@ Yii::$app->loadComponentView('order/com-clerk-send');
                             <div v-else style="color:gray;">未补货</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="订单信息" width="350">
+                    <el-table-column label="订单信息" >
                         <template slot-scope="scope">
                             <div v-for="(orderDetail, key, index) in scope.row.orderDetail" flex="box:first">
                                 <div style="padding-right: 10px;">
@@ -101,20 +104,85 @@ Yii::$app->loadComponentView('order/com-clerk-send');
                         </template>
                     </el-table-column>
                 </el-table>
+                </el-tab-pane>
+
+                <el-tab-pane label="已补货" name="is_express">
+                    <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;">
+                        <el-table-column align="center" sortable="custom" prop="id" label="ID" width="90"></el-table-column>
+                        <el-table-column label="补货" width="90" align="center" >
+                            <template slot-scope="scope" >
+                                <el-switch @change="switchExpressStatus(scope.row)" v-model="scope.row.express_status" ></el-switch>
+                                <div v-if="scope.row.express_status">已补货</div>
+                                <div v-else style="color:gray;">未补货</div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="订单信息" >
+                            <template slot-scope="scope">
+                                <div v-for="(orderDetail, key, index) in scope.row.orderDetail" flex="box:first">
+                                    <div style="padding-right: 10px;">
+                                        <com-image mode="aspectFill" :src="orderDetail.goods_info.goods_attr.cover_pic"></com-image>
+                                    </div>
+                                    <div flex="cross:top cross:center">
+                                        <div style="flex-grow: 3">
+                                            <el-tooltip class="item" effect="dark" placement="top">
+                                                <template slot="content">
+                                                    <div style="width: 320px;">{{orderDetail.goods_info.goods_attr.name}}</div>
+                                                </template>
+                                                <com-ellipsis :line="2">{{orderDetail.goods_info.goods_attr.name}}</com-ellipsis>
+                                            </el-tooltip>
+                                        </div>
+                                        <div style="text-align:right;flex-grow: 1;font-weight:bold;color:#999">数量 x {{orderDetail.num}}</div>
+                                    </div>
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="物流信息" >
+                            <template slot-scope="scope">
+                                <div v-if="scope.row.send_type == 1">
+                                    <div>快递：{{scope.row.express}}</div>
+                                    <div>单号：{{scope.row.express_no}}</div>
+                                </div>
+                                <div v-if="scope.row.send_type == 2">
+                                    <div>物流内容：</div>
+                                    <div>{{scope.row.express_content}}</div>
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="类型" width="70" align="center">
+                            <template slot-scope="scope">
+                                <div v-if="scope.row.order_type == 'offline_baopin'">爆品</div>
+                                <div v-else>商品</div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column sortable="custom" prop="created_at" label="核销时间" width="110"  align="center">
+                            <template slot-scope="scope">
+                                {{scope.row.created_at|dateTimeFormat('Y-m-d')}}
+                            </template>
+                        </el-table-column>
+                    </el-table>
+
+                </el-tab-pane>
+
             </el-tabs>
-            <div flex="box:last cross:center">
-                <div></div>
-                <div>
-                    <el-pagination
-                        v-if="list.length > 0"
-                        style="display: inline-block;float: right;"
-                        background :page-size="pagination.pageSize"
-                        @current-change="pageChange"
-                        layout="prev, pager, next" :current-page="pagination.current_page"
-                        :total="pagination.total_count">
-                    </el-pagination>
+
+
+
+            <div>
+                <div flex="box:last cross:center">
+                    <div></div>
+                    <div>
+                        <el-pagination
+                                v-if="list.length > 0"
+                                style="display: inline-block;float: right;"
+                                background :page-size="pagination.pageSize"
+                                @current-change="pageChange"
+                                layout="prev, pager, next" :current-page="pagination.current_page"
+                                :total="pagination.total_count">
+                        </el-pagination>
+                    </div>
                 </div>
             </div>
+
 
         </div>
 
@@ -131,7 +199,7 @@ Yii::$app->loadComponentView('order/com-clerk-send');
         data: {
             search: {
                 order_type: '',
-                express_status: '',
+                express_status: getQuery('express_status'),
                 keyword: '',
                 page: 1,
                 platform: '',
@@ -147,7 +215,8 @@ Yii::$app->loadComponentView('order/com-clerk-send');
             },
             selections: [],
             clerkSendVisible: false,
-            clerkId: 0
+            clerkId: [],
+            store: {name: ''}
         },
         mounted() {
             this.loadData();
@@ -155,7 +224,7 @@ Yii::$app->loadComponentView('order/com-clerk-send');
         methods: {
 
             dialogSubmit() {
-
+                this.toSearch();
             },
 
             switchExpressStatus(row){
@@ -185,11 +254,24 @@ Yii::$app->loadComponentView('order/com-clerk-send');
 
             dialogClose() {
                 this.clerkSendVisible = false;
-                this.clerkId = 0;
+                this.clerkId = [];
+            },
+
+            batchClerkSend(){
+                if(this.selections.length <= 0){
+                    this.$message.error("请选择要操作的订单");
+                    return;
+                }
+                var clerkIds = [];
+                for(var i=0; i < this.selections.length; i++){
+                    clerkIds.push(this.selections[i].id);
+                }
+                this.clerkId = clerkIds;
+                this.clerkSendVisible = true;
             },
 
             clerkSend(row){
-                this.clerkId = parseInt(row.id);
+                this.clerkId = [parseInt(row.id)];
                 this.clerkSendVisible = true;
             },
 
@@ -202,7 +284,8 @@ Yii::$app->loadComponentView('order/com-clerk-send');
             loadData() {
                 this.loading = true;
                 let params = {
-                    r: 'mall/order-clerk/index'
+                    r: 'mall/order-clerk/index',
+                    store_id: getQuery('store_id')
                 };
                 params = Object.assign(params, this.search);
                 request({
@@ -211,6 +294,7 @@ Yii::$app->loadComponentView('order/com-clerk-send');
                 }).then(e => {
                     this.loading = false;
                     if (e.data.code == 0) {
+                        this.store = e.data.data.store;
                         this.list = e.data.data.list;
                         this.pagination = e.data.data.pagination;
                     } else {
@@ -240,20 +324,11 @@ Yii::$app->loadComponentView('order/com-clerk-send');
     });
 </script>
 <style>
-    .el-tabs__header {
-        font-size: 16px;
-    }
-
     .table-body {
         padding: 20px;
         background-color: #fff;
     }
 
-    .table-body .el-button {
-        padding: 0 !important;
-        border: 0;
-        margin: 0 5px;
-    }
 
     .input-item {
         width: 250px;
@@ -261,43 +336,4 @@ Yii::$app->loadComponentView('order/com-clerk-send');
         display: inline-block;
     }
 
-    .input-item .el-input__inner {
-        border-right: 0;
-    }
-
-    .input-item .el-input__inner:hover {
-        border: 1px solid #dcdfe6;
-        border-right: 0;
-        outline: 0;
-    }
-
-    .input-item .el-input__inner:focus {
-        border: 1px solid #dcdfe6;
-        border-right: 0;
-        outline: 0;
-    }
-
-    .input-item .el-input-group__append {
-        background-color: #fff;
-        border-left: 0;
-        width: 10%;
-        padding: 0;
-    }
-
-    .input-item .el-input-group__append .el-button {
-        padding: 0;
-    }
-
-    .input-item .el-input-group__append .el-button {
-        margin: 0;
-    }
-
-    .batch {
-        margin: 0 0 20px;
-        display: inline-block;
-    }
-
-    .batch .el-button {
-        padding: 9px 15px !important;
-    }
 </style>

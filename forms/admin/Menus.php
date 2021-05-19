@@ -1146,12 +1146,12 @@ class Menus
                 'icon_font' => 'el-icon-pie-chart',
                 'children' => [
                     [
-                        'name' => '子商城列表',
+                        'name' => '子账号列表',
                         'route' => 'mall/mirror/son-account-list',
                     ],
                     [
-                        'name' => '子账号列表',
-                        'route' => 'mall/mirror/son-shop-list',
+                        'name' => '子商城列表',
+                        'route' => 'mall/mirror/son-mall-list',
                     ],
                 ]
             ],

@@ -127,17 +127,17 @@ class WechatForm extends BaseModel
 
                         //检测是否授权
                         $result = UserLogic::checkIsAuthorized($authOriginalData);
-                        // $result = $this->userHandle($userInfo);
-                        $accessToken = $result ? trim($result->access_token) : null;
-                        if($result && empty($accessToken) && !empty($oauth->token)){
-                            $result->access_token = $oauth->token;
-                            if(!$result->save()){
-                                throw new \Exception(json_encode($result->getErrors()));
+                        if($result){
+
+                            if(empty($result->access_token) && !empty($oauth->token)){
+                                $result->access_token = $oauth->token;
+                                if(!$result->save()){
+                                    throw new \Exception(json_encode($result->getErrors()));
+                                }
                             }
-                        }
-                        \Yii::warning("wechatForm authorized result:".var_export($result,true));
-                        if(!empty($result)){
+
                             \Yii::$app->user->login($result);
+
                             $returnData["access_token"] = $result->access_token;
                         }else{
                             //将获得的数据存入缓存，key为openid加密字符串
@@ -145,7 +145,7 @@ class WechatForm extends BaseModel
                             $openid = md5($authOriginalData["openid"] . $randStr);
                             \Yii::$app->cache->set($openid, $authOriginalData);
                             // $returnData['access_token'] = $oauth->token;
-                            $returnData["key"] = $openid;
+                            $returnData["key"]    = $openid;
                             $returnData["config"] = $phoneConfig;
                         }
                     }

@@ -129,7 +129,7 @@ class WechatForm extends BaseModel
                         $result = UserLogic::checkIsAuthorized($authOriginalData);
                         if($result){
 
-                            if(empty($result->access_token) && !empty($oauth->token)){
+                            if(empty($result->access_token) && strlen($oauth->token) > 0){
                                 $result->access_token = $oauth->token;
                                 if(!$result->save()){
                                     throw new \Exception(json_encode($result->getErrors()));

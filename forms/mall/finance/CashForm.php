@@ -12,6 +12,7 @@ namespace app\forms\mall\finance;
 
 use app\core\ApiCode;
 
+use app\core\currency\BalanceModel;
 use app\forms\common\UserIncomeForm;
 use app\helpers\SerializeHelper;
 use app\logic\OptionLogic;
@@ -156,7 +157,6 @@ class CashForm extends BaseModel
     {
         /**
          * @var Cash $cash
-         *
          */
         if ($cash->type === 'auto') {
             /**
@@ -196,7 +196,19 @@ class CashForm extends BaseModel
             if ($res['result_code'] == 'FAIL') {
                 throw new \Exception($res['err_code_des']);
             }
+        }elseif($cash->type == "balance"){
+            $user = User::findOne($cash->user_id);
+            if(!$user || $user->is_delete){
+                throw new \Exception("用户不存在");
+            }
+            $balanceModel = new BalanceModel([
+                "mall" => \Yii::$app->mall,
+                "user" => $user
+            ]);
+            $balanceModel->add((float)$cash->fact_price, '收益提现');
         }
+
+
         // 保存提现信息
         if ($cash->content) {
             $content = SerializeHelper::decode($cash->content);
@@ -211,12 +223,12 @@ class CashForm extends BaseModel
             throw new \Exception($this->responseErrorMsg($cash));
         }
         $log = new RemitLog();
-        $log->user_id = $cash->user_id;
-        $log->mall_id = $cash->mall_id;
-        $log->content = '用户收益汇款';
+        $log->user_id     = $cash->user_id;
+        $log->mall_id     = $cash->mall_id;
+        $log->content     = '用户收益汇款';
         $log->operator_id = \Yii::$app->admin->identity->id;
-        $log->price = $cash->fact_price;
-        $log->type=$cash->type;
+        $log->price       = $cash->fact_price;
+        $log->type        = $cash->type;
         $log->save();
         return true;
     }

@@ -231,7 +231,7 @@ class UserForm extends BaseModel
         $mall_members = MemberLevel::findAll(['mall_id' => $mall_id, 'status' => 1, 'is_delete' => 0]);
 
         $list = $query
-            ->select(['u.id as user_id', 'u.role_type', 'u.avatar_url', 'u.nickname', 'u.mobile', 'u.balance', 'u.level', 'u.score', 'u.static_score', 'coupon_count' => $couponQuery,
+            ->select(['u.id', 'u.role_type', 'u.total_income', 'u.static_integral', 'u.id as user_id', 'u.role_type', 'u.avatar_url', 'u.nickname', 'u.mobile', 'u.balance', 'u.level', 'u.score', 'u.static_score', 'coupon_count' => $couponQuery,
                 'order_count' => $orderQuery,
                 'order_sum' => $orderSum,
                 'order_sum_cancel' => $orderSumCancel,
@@ -242,10 +242,17 @@ class UserForm extends BaseModel
             ->asArray()
             ->all();
 
+        $roleTypes = [
+            'store' => '店主',
+            'partner' => '合伙人',
+            'branch_office' => '分公司',
+            'user' => '用户'
+        ];
         foreach ($list as &$v) {
             if ($this->is_change_name) {
                 $v['nickname'] = User::getPlatformText($v['platform']) . '（' . $v['nickname'] . '）';
             }
+            $v['role_type_text'] = isset($roleTypes[$v['role_type']]) ? $roleTypes[$v['role_type']] : '';
             $v['order_sum'] = price_format($v['order_sum'] - $v['order_sum_cancel'] - $v['order_sum_refund']);
         }
         unset($v);

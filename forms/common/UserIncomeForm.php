@@ -17,6 +17,65 @@ class UserIncomeForm extends BaseModel{
     const TYPE_SUB      = 2;
 
     /**
+     * 管理员充值
+     * @param User $user
+     * @param $price
+     * @param string $remark
+     * @return void
+     */
+    public static function adminAdd(User $user, $price, $source_id, $remark = ""){
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+
+            $desc = "管理员[ID:{$source_id}]充值：" . $remark;
+            static::change($user, $price, self::TYPE_ADD, self::FLAG_INCOME, "admin", time(), $desc);
+
+            $t->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '操作成功'
+            ];
+        }catch (\Exception $e){
+            $t->rollBack();
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * 管理员扣减
+     * @param User $user
+     * @param $price
+     * @param string $remark
+     * @return void
+     */
+    public static function adminSub(User $user, $price, $source_id, $remark = ""){
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+
+            $desc = "管理员[ID:{$source_id}]扣减：" . $remark;
+
+            static::change($user, $price, self::TYPE_SUB, self::FLAG_INCOME, "admin", time(), $desc);
+
+            $t->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '操作成功'
+            ];
+        }catch (\Exception $e){
+            $t->rollBack();
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
      * 拒绝提现加收入
      * @param User $user
      * @param $price
@@ -75,7 +134,7 @@ class UserIncomeForm extends BaseModel{
 
     }
 
-    private static function change(User $user, $price, $type, $flag, $source_type, $source_id){
+    private static function change(User $user, $price, $type, $flag, $source_type, $source_id, $desc = null){
 
         $totalIncome = floatval($user->total_income);
 
@@ -99,13 +158,15 @@ class UserIncomeForm extends BaseModel{
             throw new \Exception(json_encode($user->getErrors()));
         }
 
-        //提现操作
-        $desc = "";
-        if($source_type == "cash"){
-            if($type == 2){ //申请支出
-                $desc = "提现申请[ID:".$source_id."]收入扣减";
-            }else{ //提现失败返还
-                $desc = "提现失败[ID:".$source_id."]收入返还";
+
+        if($desc === null){
+            $desc = "";
+            if($source_type == "cash"){
+                if($type == 2){ //申请支出
+                    $desc = "提现申请[ID:".$source_id."]收入扣减";
+                }else{ //提现失败返还
+                    $desc = "提现失败[ID:".$source_id."]收入返还";
+                }
             }
         }
 

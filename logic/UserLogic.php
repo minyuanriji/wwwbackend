@@ -240,7 +240,7 @@ class UserLogic
                 }
             }else if(!empty($userInfo)){
                 $returnData = User::findIdentity($userInfo->user_id);
-                if (!$returnData->access_token) {
+                if (strlen($returnData->access_token) <= 0) {
                     $access_token = \Yii::$app->security->generateRandomString();
                     $returnData->access_token = $access_token;
                     if (!$returnData->save()) {

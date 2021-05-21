@@ -103,52 +103,49 @@ class WechatForm extends BaseModel
      */
     public function authorized()
     {
-        $returnData = [];
-        /** @var Wechat $wechatModel */
-        $wechatModel = \Yii::$app->wechat;
-        if($wechatModel->isWechat)
-        {
-            $authData = $wechatModel->app->oauth->user();
-            \Yii::warning("授权结果 result:".json_encode($authData));
-            if(!empty($authData)){
-                $authOriginalData = $authData->original;
-                $phoneConfig = AppConfigLogic::getPhoneConfig();
-                //没有开启全网通，则直接入库，如果开启了，返回给前端
-                if(empty($phoneConfig["all_network_enable"])){
-                    $returnData = $this->userHandle($authOriginalData);
-                    if(empty($returnData)){
-                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'授权失败');
-                    }
-                }else{
-                    $returnData = ["access_token" => ""];
-
-                    $oauth =  $authData;
-
-                    //检测是否授权
-                    $result = UserLogic::checkIsAuthorized($authOriginalData);
-                    // $result = $this->userHandle($userInfo);
-                  
-                    if($result && empty($result->access_token) && !empty($oauth->token)){
-                        $result->access_token = $oauth->token;
-                        $result->save();
-                    }
-                    \Yii::warning("wechatForm authorized result:".var_export($result,true));
-                    if(!empty($result)){
-                        \Yii::$app->user->login($result);
-                        $returnData["access_token"] = $result->access_token;
+        try {
+            $returnData = [];
+            /** @var Wechat $wechatModel */
+            $wechatModel = \Yii::$app->wechat;
+            if($wechatModel->isWechat)
+            {
+                $authData = $wechatModel->app->oauth->user();
+                \Yii::warning("授权结果 result:".json_encode($authData));
+                if(!empty($authData)){
+                    $authOriginalData = $authData->original;
+                    $phoneConfig = AppConfigLogic::getPhoneConfig();
+                    //没有开启全网通，则直接入库，如果开启了，返回给前端
+                    if(empty($phoneConfig["all_network_enable"])){
+                        $returnData = $this->userHandle($authOriginalData);
+                        if(empty($returnData)){
+                            throw new \Exception('授权失败');
+                        }
                     }else{
-                        //将获得的数据存入缓存，key为openid加密字符串
-                        $randStr = str_random(6);
-                        $openid = md5($authOriginalData["openid"] . $randStr);
-                        \Yii::$app->cache->set($openid, $authOriginalData);
-                        // $returnData['access_token'] = $oauth->token;
-                        $returnData["key"] = $openid;
-                        $returnData["config"] = $phoneConfig;
+                        $returnData = ["access_token" => ""];
+
+                        $oauth =  $authData;
+
+                        //检测是否授权
+                        $result = UserLogic::checkIsAuthorized($authOriginalData);
+                        if($result){
+                            \Yii::$app->user->login($result);
+                            $returnData["access_token"] = $result->access_token;
+                        }else{
+                            //将获得的数据存入缓存，key为openid加密字符串
+                            $randStr = str_random(6);
+                            $openid = md5($authOriginalData["openid"] . $randStr);
+                            \Yii::$app->cache->set($openid, $authOriginalData);
+                            // $returnData['access_token'] = $oauth->token;
+                            $returnData["key"]    = $openid;
+                            $returnData["config"] = $phoneConfig;
+                        }
                     }
                 }
             }
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);
+        }catch (\Exception $e){
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());
         }
-        return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);
     }
 
     /**

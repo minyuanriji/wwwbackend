@@ -85,7 +85,7 @@ class WechatForm extends BaseModel
                         $returnData["access_token"] = $result->access_token;
                     }else{
                         //开始注册用户
-                        $this->registerx($userInfo);
+                        $res = $this->registerx($userInfo);
                     }
                 }
             }
@@ -320,7 +320,6 @@ class WechatForm extends BaseModel
 
             $user = new User();
             $user->username = 'wechat_user';
-            $user->mobile = '';
             $user->mall_id = \Yii::$app->mall->id;
             $user->access_token = $access_token;
             $user->auth_key = $access_token;

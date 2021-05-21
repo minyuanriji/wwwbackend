@@ -81,7 +81,6 @@ class EfpsTransfer extends BaseModel{
                             "bankName"        => $transferOrder->bankName,
                             "bankAccountType" => $transferOrder->bankAccountType
                         ]);
-
                         if($res['code'] != Efps::CODE_SUCCESS){
                             throw new \Exception($res['msg']);
                         }

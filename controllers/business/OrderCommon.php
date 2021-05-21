@@ -1,5 +1,6 @@
 <?php
 namespace app\controllers\business;
+use app\forms\common\UserIntegralForm;
 use app\models\OrderDetail;
 use app\models\user\User as UserModel;
 use yii;
@@ -85,6 +86,7 @@ class OrderCommon{
         $user = User::findOne($order_detail->order->user_id);
         if($order_detail -> use_score === 0 && $order_detail -> integral_price > 0){
             try{
+
                 $integral = new IntegralRecord();
                 $integral -> id = null;
                 $integral -> controller_type = 1;
@@ -100,12 +102,12 @@ class OrderCommon{
                 $integral -> source_table = 'order';
                 $integral -> created_at = time();
                 $integral -> updated_at = time();
-                $falg = $integral -> save();
-                if($falg){
-                    $static_integral = $user -> static_integral + $order_detail -> integral_price;
-                    $user_data = (new UserModel()) -> updateUsers(['static_integral' => $static_integral],$user -> id);
+                if($integral -> save()){
+                    UserIntegralForm::orderRefundAdd($user, $order_detail->integral_price, $order_detail->id);
                 }
+
             }catch (\Exception $e){
+
             }
 
         }

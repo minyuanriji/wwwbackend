@@ -240,6 +240,14 @@ class UserLogic
                 }
             }else if(!empty($userInfo)){
                 $returnData = User::findIdentity($userInfo->user_id);
+                if (!$returnData->access_token) {
+                    $access_token = \Yii::$app->security->generateRandomString();
+                    $returnData->access_token = $access_token;
+                    if (!$returnData->save()) {
+                        \Yii::error("UpdateUserAccessToken ".var_export($returnData->getErrors(),true));
+                        throw new Exception("更新用户access_token失败");
+                    }
+                }
             }
         }catch (\Exception $ex){
             \Yii::error("checkIsAuthorized error:".CommonLogic::getExceptionMessage($ex));

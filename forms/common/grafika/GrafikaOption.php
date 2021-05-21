@@ -85,7 +85,7 @@ class GrafikaOption extends ApiGrafika
                     $option[$k]['url'] = self::saveTempImage($this->destroyList($option[$k]['url']));
                 }
                 $this->model->open($goods_qrcode, $option[$k]['url']);
-                $this->model->resizeExact($goods_qrcode, 750, 1334);
+                $this->model->resizeExact($goods_qrcode, 750, 1314);
             }
             if (array_key_exists('file_type', $v) && $v['file_type'] == 'image') {
                 if(array_key_exists('size', $option[$k])){

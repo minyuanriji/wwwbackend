@@ -20,9 +20,6 @@ class MallForm extends BaseModel
 {
 
     /**
-     * @Author: 广东七件事 zal
-     * @Date: 2020-04-08
-     * @Time: 19:49
      * @Note: 保存
      * @param array $data
      * @return array
@@ -49,8 +46,13 @@ class MallForm extends BaseModel
             $model = new Mall();
             $model->admin_id = \Yii::$app->admin->id;
         }
-        $model->name = $data["name"];
-        $model->expired_at = $data["expired_at"] != 0 ? strtotime($data["expired_at"]) : $data["expired_at"];
+        $model->name                = $data["name"];
+        $model->app_id              = $data["app_id"];
+        $model->logo                = $data["logo"];
+        $model->app_share_title     = $data["app_share_title"];
+        $model->app_share_desc      = $data["app_share_desc"];
+        $model->app_share_pic       = $data["app_share_pic"];
+        $model->expired_at          = $data["expired_at"] != 0 ? strtotime($data["expired_at"]) : $data["expired_at"];
         if (!$model->save()) {
             return $this->responseErrorInfo($model);
         }
@@ -58,6 +60,45 @@ class MallForm extends BaseModel
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '保存成功。',
             'data' => $model,
+        ];
+    }
+
+    /**
+     * @Note: 迁移
+     * @param array $data
+     * @return array
+     */
+    public function transfer($data)
+    {
+        if (!$this->validate()) {
+            return $this->responseErrorInfo($this);
+        }
+        $model = Admin::findOne($data["id"]);
+        $count = Mall::find()->where([
+            'admin_id' => $data["id"],
+            'is_delete' => 0,
+        ])->count();
+        if ($model->mall_num >= 0 && $count >= $model->mall_num && $model->admin_type != 1) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => '超出创建商城最大数量',
+            ];
+        }
+        $mall_model = Mall::findOne($data["id"]);
+        if (!$mall_model) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => '商城不存在',
+            ];
+        }
+        $mall_model->admin_id = $data["user_id"];
+        if (!$mall_model->save()) {
+            return $this->responseErrorInfo($mall_model);
+        }
+        return [
+            'code' => ApiCode::CODE_SUCCESS,
+            'msg' => '保存成功。',
+            'data' => $mall_model,
         ];
     }
 

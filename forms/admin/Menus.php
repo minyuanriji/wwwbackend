@@ -1138,6 +1138,24 @@ class Menus
                 ]
             ],
             [
+                'name' => '商城',
+                'route' => '',
+                'key' => 'mirror',
+                'icon' => 'statics/img/mall/nav/mall.png',
+                'icon_active' => 'statics/img/mall/nav/mall.png',
+                'icon_font' => 'el-icon-pie-chart',
+                'children' => [
+                    [
+                        'name' => '子账号列表',
+                        'route' => 'mall/mirror/son-account-list',
+                    ],
+                    [
+                        'name' => '子商城列表',
+                        'route' => 'mall/mirror/son-mall-list',
+                    ],
+                ]
+            ],
+            [
                 'name' => '设置',
                 'key' => 'setting',
                 'route' => '',

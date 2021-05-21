@@ -183,6 +183,7 @@ class WechatForm extends BaseModel
             $data["unionid"] = isset($data["unionId"]) ? $data["unionId"] : ((isset($data["unionid"])) ? $data["unionid"] : "");
             $returnData = $this->userHandle($data);
 
+            \Yii::warning("userData resultData=".json_encode($returnData));
             $setting = \Yii::$app->mall->getMallSetting(['close_auth_bind']);
 
             //是否开启全网通

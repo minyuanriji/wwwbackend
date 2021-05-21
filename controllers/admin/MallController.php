@@ -157,8 +157,8 @@ class MallController extends BaseController
     public function actionRemoval()
     {
         $form = new MallCopyrightForm();
-        $form->attributes = \Yii::$app->request->get();
-        return $this->asJson($form->save());
+        $data = \Yii::$app->request->get();
+        return $this->asJson($form->transfer($data));
     }
 
     /**

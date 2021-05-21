@@ -1854,7 +1854,6 @@ class OrderSubmitForm extends BaseModel
                 foreach ($goodsList as $goods) {
                     $totalNum += $goods['num'];
                 }
-
                 if ($rule['second'] > 0) {
                     $secondPrice = ceil(($totalNum - $rule['first']) / $rule['second']) // 向上取整
                         * $rule['secondPrice'];
@@ -1881,10 +1880,10 @@ class OrderSubmitForm extends BaseModel
             'order_id' => $order_data,
             'data' => $address -> province
         ];
-        $express_price = (new PostageRulesBus()) -> getExpressPrice($goods_data,1);
-        $express_price = array_sum($express_price);
+        //$express_price = (new PostageRulesBus()) -> getExpressPrice($goods_data,1);
+        //$express_price = array_sum($express_price);
         $expressItem['express_price'] = price_format(max($firstPriceList) + $totalSecondPrice);
-        $expressItem['express_price'] = $express_price;
+        //$expressItem['express_price'] = $express_price;
         $expressItem['total_price']   = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
         return $expressItem;
     }

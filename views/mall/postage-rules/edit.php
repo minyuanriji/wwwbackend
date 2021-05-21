@@ -184,6 +184,8 @@
                     firstPrice: 0,
                     second: 0,
                     secondPrice: 0,
+                    max:0,
+                    maxPrice: 0,
                     list: []
                 },
                 detailRules: {

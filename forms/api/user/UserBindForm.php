@@ -89,11 +89,20 @@ class UserBindForm extends BaseModel
                             \Yii::warning("userBindForm res = ".$res.";error:".var_export($users->getErrors(),true));
                         }
                     }
+
                 }else if(!empty($bindUserInfo)){
                     throw new \Exception("手机号已经被其他用户绑定过了");
                 }else if(empty($bindUserInfo)){
                     //当前平台没有该用户信息，就新增一条
                     $userResult = UserLogic::userRegister($userInfo,$userResult,$parent_id);
+ if (!$userResult->access_token) {
+                        $access_token = \Yii::$app->security->generateRandomString();
+                        $userResult->access_token = $access_token;
+                        if (!$userResult->save()) {
+                            \Yii::error("UpdateUserAccessToken ".var_export($userResult->getErrors(),true));
+                            throw new Exception("更新用户access_token失败");
+                        }
+                    }
                 }
             }else{
                 //没有绑定手机号

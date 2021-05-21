@@ -128,16 +128,7 @@ class WechatForm extends BaseModel
                         //检测是否授权
                         $result = UserLogic::checkIsAuthorized($authOriginalData);
                         if($result){
-
-                            if(empty($result->access_token) && strlen($oauth->token) > 0){
-                                $result->access_token = $oauth->token;
-                                if(!$result->save()){
-                                    throw new \Exception(json_encode($result->getErrors()));
-                                }
-                            }
-
                             \Yii::$app->user->login($result);
-
                             $returnData["access_token"] = $result->access_token;
                         }else{
                             //将获得的数据存入缓存，key为openid加密字符串

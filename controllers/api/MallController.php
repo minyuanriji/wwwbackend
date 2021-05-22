@@ -14,7 +14,9 @@ use app\core\ApiCode;
 use app\forms\api\user\UserForm;
 use app\logic\AppConfigLogic;
 use app\logic\OptionLogic;
+use app\models\Mall;
 use app\models\Option;
+use app\plugins\mpwx\models\MpwxConfig;
 
 /**
  * Class DefaultController
@@ -60,6 +62,19 @@ class MallController extends ApiController
 
         $integral_enable = isset($optionCache->integral_status) ? $optionCache->integral_status : 0;
 
+        $config = null;
+        //通过app_id获取mall_id
+        if (\Yii::$app->request->get('app_id')) {
+            //微信小程序授权登录
+            $config = MpwxConfig::findOne(['app_id' => \Yii::$app->request->get('app_id'), 'is_delete' => 0]);
+            if (!$config) {
+                return [
+                    'code'  => ApiCode::CODE_FAIL,
+                    'msg'   =>'此商城不存在'
+                ];
+            }
+        }
+
         return $this->asJson([
             'code' => 0,
             'data' => [
@@ -72,6 +87,7 @@ class MallController extends ApiController
                 'top_pic_url' => $top_pic_url,
                 'register_agree' => AppConfigLogic::getRegisterAgree(),
                 'integral_enable' =>$integral_enable,
+                'stand_mall_id' => $config->mall_id,
             ],
         ]);
     }

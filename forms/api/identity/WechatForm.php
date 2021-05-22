@@ -25,6 +25,7 @@ use app\models\Mall;
 use app\models\User;
 use app\models\user\User as UserMode;
 use app\models\UserInfo;
+use app\plugins\mpwx\models\MpwxConfig;
 use jianyan\easywechat\Wechat;
 use function EasyWeChat\Kernel\Support\str_random;
 use function EasyWeChat\Kernel\Support\get_client_ip;
@@ -154,7 +155,7 @@ class WechatForm extends BaseModel
      * @throws \EasyWeChat\Kernel\Exceptions\DecryptException
      * @throws \EasyWeChat\Kernel\Exceptions\InvalidConfigException
      */
-    public function miniAuthorized($parent_user_id = '',$parent_source = ''){
+    public function miniAuthorized($parent_user_id = '',$parent_source = '',$stand_mall_id = 0){
         try{
             if(!empty($parent_source)){
                 $source_data = (new QrcodeParameter()) -> getParentData($parent_source);
@@ -164,6 +165,14 @@ class WechatForm extends BaseModel
             /** @var Wechat $wechatModel */
             $wechatModel = \Yii::$app->wechat;
             //微信小程序授权登录
+            if ($stand_mall_id) {
+                $config = MpwxConfig::findOne(['mall_id' => $stand_mall_id, 'is_delete' => 0]);
+                if (!$config) {
+                    return $this->returnApiResultData(ApiCode::CODE_FAIL, '此商城不存在');
+                }
+                $this->app['config']['app_id'] = $config->app_id;
+                $this->app['config']['secret'] = $config->secret;
+            }
             $resultData = $wechatModel->miniProgram->auth->session($this->code);
             \Yii::warning("miniAuthorized resultData=".json_encode($resultData));
             if(isset($resultData["errcode"]) && $resultData["errcode"] != 0){

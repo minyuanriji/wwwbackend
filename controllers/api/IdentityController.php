@@ -168,12 +168,14 @@ class IdentityController extends ApiController
     /**
      * 小程序授权登录
      */
-    public function actionMiniLogin(){
+    public function actionMiniLogin ()
+    {
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
         $parent_user_id = !empty($this->requestData['parent_user_id']) ? $this->requestData['parent_user_id'] : 0;
         $parent_source = !empty($this->requestData['parent_source']) ? $this->requestData['parent_source'] : null;
-        $result = $wechatForm->miniAuthorized($parent_user_id,$parent_source);
+        $stand_mall_id = !empty($this->requestData['stand_mall_id']) ? $this->requestData['stand_mall_id'] : 0;
+        $result = $wechatForm->miniAuthorized($parent_user_id,$parent_source,$stand_mall_id);
         return $result;
     }
 

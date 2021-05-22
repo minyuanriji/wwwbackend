@@ -185,6 +185,10 @@
                 <el-input type="text" size="small" v-model="createMallForm.app_id" autocomplete="off"></el-input>
             </el-form-item>
 
+            <el-form-item label="app_secret" prop="app_secret">
+                <el-input type="text" size="small" v-model="createMallForm.app_secret" autocomplete="off"></el-input>
+            </el-form-item>
+
             <el-form-item prop="logo">
                 <label slot="label">
                     <span>商城logo</span>
@@ -357,6 +361,7 @@
                     id: null,
                     name: '',
                     app_id: '',
+                    app_secret: '',
                     logo: '',
                     app_share_title: '',
                     app_share_desc: '',
@@ -371,6 +376,9 @@
                     ],
                     app_id: [
                         {required: true, message: '请填写小程序appid。'},
+                    ],
+                    app_secret: [
+                        {required: true, message: '请填写小程序app_secret'},
                     ],
                     logo: [
                         {required: true, message: '请上传小程序logo。'},
@@ -413,6 +421,7 @@
                 this.createMallDialogVisible = true;
                 this.createMallForm.name = '';
                 this.createMallForm.app_id = '';
+                this.createMallForm.app_secret = '';
                 this.createMallForm.logo = '';
                 this.createMallForm.app_share_title = '';
                 this.createMallForm.app_share_desc = '';
@@ -662,6 +671,7 @@
                 this.createMallForm.id = row.id;
                 this.createMallForm.name = row.name;
                 this.createMallForm.app_id = row.app_id;
+                this.createMallForm.app_secret = row.app_secret;
                 this.createMallForm.logo = row.logo;
                 this.createMallForm.app_share_title = row.app_share_title;
                 this.createMallForm.app_share_desc = row.app_share_desc;

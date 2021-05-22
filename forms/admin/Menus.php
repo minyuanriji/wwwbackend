@@ -1426,18 +1426,18 @@ class Menus
                         'route' => 'admin/index/me',
                         'icon' => 'icon-person',
                     ],
-                    [
+                    /*[
                         'key' => 'account_list',// 超级管理员 显示
                         'name' => '账户列表',
                         'route' => 'admin/index/index',
                         'icon' => 'icon-liebiao',
-                    ],
-                    [
+                    ],*/
+                    /*[
                         'key' => 'add_account',// 超级管理员 显示
                         'name' => '新增子账户',
                         'route' => 'admin/index/edit',
                         'icon' => 'icon-add1',
-                    ],
+                    ],*/
 //                    [
 //                        'key' => 'register_audit',// 超级管理员 显示
 //                        'name' => '注册审核',

@@ -87,7 +87,7 @@
                         <el-button slot="append" @click="search" icon="el-icon-search"></el-button>
                     </el-input>
                 </div>
-                <div v-if="isInd">
+                <!--<div v-if="isInd">
                     <el-button type="primary"
                                size="small"
                                @click="showCreateMallDialog()">添加小程序商城
@@ -98,7 +98,7 @@
                             <b>{{adminInfo.app_max_count == -1 ? '无限制' : adminInfo.app_max_count}}</b>
                         </span>
                     </div>
-                </div>
+                </div>-->
                 <span v-else>商城列表</span>
             </div>
 
@@ -117,7 +117,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="site" label="数据统计">
+                <!--<el-table-column prop="site" label="数据统计">
                     <template slot="header" slot-scope="scope">
                         <el-tooltip effect="dark" content="数据统计每10分钟刷新一次" placement="top">
                             <span>数据统计<i class="el-icon-question"></i></span>
@@ -127,9 +127,10 @@
                         <div>用户数: {{scope.row.count_data.user_count}}</div>
                         <div>订单数: {{scope.row.count_data.order_count}}</div>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
                 <el-table-column width="170" prop="expired_at_text" label="有效期"></el-table-column>
-                <el-table-column label="操作" width="380">
+
+                <!--<el-table-column label="操作" width="380">
                     <template slot-scope="scope">
                         <el-button plain size="mini" @click="edit(scope.row)">编辑</el-button>
 
@@ -169,11 +170,13 @@
                             </el-button>
                         </el-popover>
 
-<!--                        <el-button v-if="isInd && isSuperAdmin" plain size="mini" type="danger"-->
-<!--                                   @click="showChangeOwnerDialog(scope.row)">迁移-->
-<!--                        </el-button>-->
+                        <el-button v-if="isInd && isSuperAdmin" plain size="mini" type="danger"
+                                   @click="showChangeOwnerDialog(scope.row)">迁移
+                        </el-button>
+
                     </template>
-                </el-table-column>
+                </el-table-column>-->
+
             </el-table>
 
             <el-pagination

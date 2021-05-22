@@ -11,9 +11,14 @@
 namespace app\forms\admin;
 
 use app\core\ApiCode;
+use app\logic\OptionLogic;
 use app\models\Admin;
 use app\models\BaseModel;
 use app\models\Mall;
+use app\models\Option;
+use app\plugins\mpwx\models\MpwxConfig;
+use EasyWeChat\Kernel\Exceptions\HttpException;
+use jianyan\easywechat\Wechat;
 use yii\web\NotFoundHttpException;
 
 class MallForm extends BaseModel
@@ -46,20 +51,103 @@ class MallForm extends BaseModel
             $model = new Mall();
             $model->admin_id = \Yii::$app->admin->id;
         }
+        // 检测参数是否有效
+        $config = \Yii::$app->params['wechatMiniProgramConfig'];
+        $config['app_id'] = $data["app_id"];
+        $config['secret'] = $data["app_secret"];
+        \Yii::$app->params['wechatMiniProgramConfig'] = $config;
+        if (!$data["app_id"]) {
+            throw new \Exception('小程序AppId有误');
+        }
+        if (!$data["app_secret"]) {
+            throw new \Exception('小程序appSecret有误');
+        }
+        $t = \Yii::$app->db->beginTransaction();
         $model->name                = $data["name"];
         $model->app_id              = $data["app_id"];
+        $model->app_secret          = $data["app_secret"];
         $model->logo                = $data["logo"];
         $model->app_share_title     = $data["app_share_title"];
         $model->app_share_desc      = $data["app_share_desc"];
         $model->app_share_pic       = $data["app_share_pic"];
         $model->expired_at          = $data["expired_at"] != 0 ? strtotime($data["expired_at"]) : $data["expired_at"];
-        if (!$model->save()) {
-            return $this->responseErrorInfo($model);
+        if ($model->save()) {
+            /** @var Wechat $wechat */
+            $wechat = \Yii::$app->wechat;
+            $app = $wechat->miniProgram;
+            $accessToken = $app->access_token;
+            try {
+                $token = $accessToken->getToken(); // token 数组  token['access_token'] 字符串
+                $token = $accessToken->getToken(true); // 强制重新从微信服务器获取 token.
+            } catch (HttpException $e) {
+                if ($e->formattedResponse['errcode'] == '41002') {
+                    $message = '小程序AppId有误(' . $e->formattedResponse['errmsg'] . ')';
+                    return [
+                        'code' => ApiCode::CODE_FAIL,
+                        'msg' => $message,
+                    ];
+                }
+                if ($e->formattedResponse['errcode'] == '41013') {
+                    $message = '小程序AppId有误(' . $e->formattedResponse['errmsg'] . ')';
+                    return [
+                        'code' => ApiCode::CODE_FAIL,
+                        'msg' => $message,
+                    ];
+                }
+                if ($e->formattedResponse['errcode'] == '40125') {
+                    $message = '小程序密钥有误(' . $e->formattedResponse['errmsg'] . ')';
+                    return [
+                        'code' => ApiCode::CODE_FAIL,
+                        'msg' => $message,
+                    ];
+                }
+            }
+            try {
+                $config = null;
+                if ($data["id"]) {
+                    $config = MpwxConfig::findOne(['mall_id' => $data["id"], 'is_delete' => 0]);
+                    if (!$config) {
+                        $t->rollBack();
+                        return [
+                            'code' => ApiCode::CODE_FAIL,
+                            'msg' => '数据异常,该条数据不存在',
+                        ];
+                    }
+                } else {
+                    $config = new MpwxConfig();
+                }
+                $config->mall_id    = $model->id;
+                $config->name       = $model->name;
+                $config->app_id     = $model->app_id;
+                $config->secret     = $model->app_secret;
+                if ($config->save()) {
+                    $t->commit();
+//                    OptionLogic::set(Option::NAME_MPWX, $this->attributes, $model->id, Option::GROUP_APP);
+                    return [
+                        'code' => ApiCode::CODE_SUCCESS,
+                        'msg' => '保存成功',
+                        'data' => $model
+                    ];
+                }
+                $t->rollBack();
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '保存失败',
+                    'error' => $config->getErrors()
+                ];
+            } catch (\Exception $e) {
+                $t->rollBack();
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => $e->getMessage(),
+                ];
+            }
         }
+        $t->rollBack();
         return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'msg' => '保存成功。',
-            'data' => $model,
+            'code' => ApiCode::CODE_FAIL,
+            'msg' => '保存失败。',
+            'data' => $model->getErrors(),
         ];
     }
 

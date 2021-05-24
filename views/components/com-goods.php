@@ -154,6 +154,10 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
         z-index: 9;
         width: 130px;
     }
+
+    #goods_aera :before {
+        content: none;
+    }
 </style>
 <template id="com-goods">
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;" class="com-goods" v-loading="cardLoading">
@@ -418,8 +422,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                             <el-input :disabled="ruleForm.use_attr == 1" v-model="ruleForm.attr_default_name">
                                             </el-input>
                                         </el-form-item>
-                                        <el-form-item prop="goods_num">
-                                            <label slot="label">
+                                        <el-form-item prop="goods_num" id="goods_aera">
+                                            <label slot="label" >
                                                 <span>商品规格</span>
                                                 <el-tooltip class="item" effect="dark" content="如有颜色、尺码等多种规格，请添加商品规格" placement="top">
                                                     <i class="el-icon-info"></i>

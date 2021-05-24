@@ -19,6 +19,10 @@ class EfpsPayForm extends BaseModel{
 
     public $union_id;
 
+    public $stand_mall_id;
+
+    public $wx_type;
+
     public static $notifyUri = "/web/pay-notify/efps.php";
 
     public function rules(){
@@ -154,6 +158,10 @@ class EfpsPayForm extends BaseModel{
                 throw new \Exception("支付记录不存在");
             }
 
+            if(!$this->stand_mall_id){
+                throw new \Exception("商城ID不存在");
+            }
+
             if($paymentOrderUnion->is_pay){
                 throw new \Exception("请勿重新支付");
             }
@@ -230,9 +238,18 @@ class EfpsPayForm extends BaseModel{
 
             if($payAPI == "IF-WeChat-01"){ //微信公众号/小程序支付
 
+                if ($this->wx_type == 'wechat') { //公众号
+                    $platform = User::PLATFORM_WECHAT;
+                } elseif ($this->wx_type == 'mp-wx')  {  //小程序
+                    $platform = User::PLATFORM_MP_WX;
+                } else {  //默认 公众号
+                    $platform = User::PLATFORM_WECHAT;
+                }
+
                 $userInfo = UserInfo::findOne([
                     "user_id"  => \Yii::$app->user->id,
-                    "platform" => User::PLATFORM_WECHAT
+                    "platform" => $platform,
+                    "mall_id" => $this->stand_mall_id,
                 ]);
                 if(!$userInfo || empty($userInfo->openid)){
                     throw new \Exception("用户需要授权获取openid");

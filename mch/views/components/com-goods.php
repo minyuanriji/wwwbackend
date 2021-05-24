@@ -151,6 +151,10 @@ echo $this->render('../components/goods/com-goods-form');
         z-index: 9;
         width: 130px;
     }
+
+    #goods_aera :before {
+        content: none;
+    }
 </style>
 <template id="com-goods">
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;" class="com-goods" v-loading="cardLoading">
@@ -281,7 +285,7 @@ echo $this->render('../components/goods/com-goods-form');
                                         </el-input>
                                     </el-form-item>
                                     <!-- 商品规格 -->
-                                    <el-form-item prop="goods_num">
+                                    <el-form-item prop="goods_num"  id="goods_aera">
                                         <label slot="label">
                                             <span>商品规格</span>
                                             <el-tooltip class="item" effect="dark" content="如有颜色、尺码等多种规格，请添加商品规格" placement="top">

@@ -27,8 +27,9 @@ class EfpsPayForm extends BaseModel{
 
     public function rules(){
         return [
-            [['union_id'], 'required'],
-            [['union_id'], 'integer'],
+            [['union_id','stand_mall_id'], 'required'],
+            [['union_id','stand_mall_id'], 'integer'],
+            [['wx_type'], 'safe'],
         ];
     }
 

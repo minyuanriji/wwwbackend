@@ -26,6 +26,7 @@ use app\models\User;
 use app\models\user\User as UserMode;
 use app\models\UserInfo;
 use app\plugins\mpwx\models\MpwxConfig;
+use EasyWeChat\Factory;
 use jianyan\easywechat\Wechat;
 use function EasyWeChat\Kernel\Support\str_random;
 use function EasyWeChat\Kernel\Support\get_client_ip;
@@ -166,12 +167,13 @@ class WechatForm extends BaseModel
             $wechatModel = \Yii::$app->wechat;
             //微信小程序授权登录
             if ($stand_mall_id) {
-                $config = MpwxConfig::findOne(['mall_id' => $stand_mall_id, 'is_delete' => 0]);
-                if (!$config) {
-                    return $this->returnApiResultData(ApiCode::CODE_FAIL, '此商城不存在');
+                $info = MpwxConfig::findOne(['mall_id' => $stand_mall_id, 'is_delete' => 0]);
+                if ($info) {
+                    \Yii::$app->params['wechatMiniProgramConfig'] = [
+                        'app_id'     => $info->app_id,
+                        'secret'     => $info->secret,
+                    ];
                 }
-                $this->app['config']['app_id'] = $config->app_id;
-                $this->app['config']['secret'] = $config->secret;
             }
             $resultData = $wechatModel->miniProgram->auth->session($this->code);
             \Yii::warning("miniAuthorized resultData=".json_encode($resultData));

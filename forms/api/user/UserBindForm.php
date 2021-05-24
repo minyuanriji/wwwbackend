@@ -94,9 +94,8 @@ class UserBindForm extends BaseModel
                     throw new \Exception("手机号已经被其他用户绑定过了");
                 }else if(empty($bindUserInfo)){
                     //当前平台没有该用户信息，就新增一条
-<<<<<<< HEAD
-                    $userResult = UserLogic::userRegister($userInfo,$userResult,$parent_id);
- if (!$userResult->access_token) {
+                    $userResult = UserLogic::userRegister($userInfo,$userResult,$parent_id,$stand_mall_id);
+                    if (!$userResult->access_token) {
                         $access_token = \Yii::$app->security->generateRandomString();
                         $userResult->access_token = $access_token;
                         if (!$userResult->save()) {
@@ -104,9 +103,6 @@ class UserBindForm extends BaseModel
                             throw new Exception("更新用户access_token失败");
                         }
                     }
-=======
-                    $userResult = UserLogic::userRegister($userInfo,$userResult,$parent_id,$stand_mall_id);
->>>>>>> 122ae1aff0532f5e66dede8a358ddfad2245fedd
                 }
             }else{
                 //没有绑定手机号

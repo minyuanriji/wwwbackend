@@ -55,7 +55,7 @@ class WechatForm extends BaseModel
      * @return array
      * @throws \Exception
      */
-    public function wxAuthorized()
+    public function wxAuthorized($stand_mall_id)
     {
         $returnData = [];
         /** @var Wechat $wechatModel */
@@ -71,14 +71,14 @@ class WechatForm extends BaseModel
                 $phoneConfig = AppConfigLogic::getPhoneConfig();
                 //没有开启全网通，则直接入库，如果开启了，返回给前端
                 if(empty($phoneConfig["all_network_enable"])){
-                    $returnData = $this->userHandle($userInfo);
+                    $returnData = $this->userHandle($userInfo,$stand_mall_id);
                     if(empty($returnData)){
                         return $this->returnApiResultData(ApiCode::CODE_FAIL,'授权失败');
                     }
                 }else{
                     $returnData = ["access_token" => ""];
                     //检测是否授权
-                    $result = UserLogic::checkIsAuthorized($userInfo);
+                    $result = UserLogic::checkIsAuthorized($userInfo,0,$stand_mall_id);
                     //$result = $this->userHandle($userInfo);
                     \Yii::warning("wechatForm authorized result:".var_export($result,true));
                     if(!empty($result)){
@@ -103,7 +103,7 @@ class WechatForm extends BaseModel
      * @return array
      * @throws \Exception
      */
-    public function authorized()
+    public function authorized($stand_mall_id)
     {
         try {
             $returnData = [];
@@ -118,7 +118,7 @@ class WechatForm extends BaseModel
                     $phoneConfig = AppConfigLogic::getPhoneConfig();
                     //没有开启全网通，则直接入库，如果开启了，返回给前端
                     if(empty($phoneConfig["all_network_enable"])){
-                        $returnData = $this->userHandle($authOriginalData);
+                        $returnData = $this->userHandle($authOriginalData,$stand_mall_id);
                         if(empty($returnData)){
                             throw new \Exception('授权失败');
                         }
@@ -128,7 +128,7 @@ class WechatForm extends BaseModel
                         $oauth =  $authData;
 
                         //检测是否授权
-                        $result = UserLogic::checkIsAuthorized($authOriginalData);
+                        $result = UserLogic::checkIsAuthorized($authOriginalData,0,$stand_mall_id);
                         if($result){
                             \Yii::$app->user->login($result);
                             $returnData["access_token"] = $result->access_token;
@@ -192,7 +192,7 @@ class WechatForm extends BaseModel
             $data["headimgurl"] = $data["avatarUrl"];
             $data["session_key"] = $sessionKey;
             $data["unionid"] = isset($data["unionId"]) ? $data["unionId"] : ((isset($data["unionid"])) ? $data["unionid"] : "");
-            $returnData = $this->userHandle($data);
+            $returnData = $this->userHandle($data,$stand_mall_id);
 
             \Yii::warning("userData resultData=".json_encode($returnData));
             $setting = \Yii::$app->mall->getMallSetting(['close_auth_bind']);
@@ -284,13 +284,13 @@ class WechatForm extends BaseModel
      * @return array
      * @throws \yii\base\Exception
      */
-    private function userHandle($userInfo){
-        $userResult = UserLogic::checkIsAuthorized($userInfo,$this->user_id);
+    private function userHandle($userInfo,$stand_mall_id){
+        $userResult = UserLogic::checkIsAuthorized($userInfo,$this->user_id,$stand_mall_id);
 
         \Yii::warning("userHandle 是否授权 userResult:".var_export($userResult,true));
         if(empty($userResult)){
             /** @var User $userResult */
-            $userResult = UserLogic::userRegister($userInfo);
+            $userResult = UserLogic::userRegister($userInfo,[],0,$stand_mall_id);
             if($userResult === false){
                 return [];
             }

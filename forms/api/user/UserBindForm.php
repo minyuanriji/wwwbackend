@@ -93,7 +93,7 @@ class UserBindForm extends BaseModel
                     throw new \Exception("手机号已经被其他用户绑定过了");
                 }else if(empty($bindUserInfo)){
                     //当前平台没有该用户信息，就新增一条
-                    $userResult = UserLogic::userRegister($userInfo,$userResult,$parent_id);
+                    $userResult = UserLogic::userRegister($userInfo,$userResult,$parent_id,$stand_mall_id);
                 }
             }else{
                 //没有绑定手机号
@@ -101,7 +101,7 @@ class UserBindForm extends BaseModel
                 $currentUserInfo = UserInfo::getOneUserInfo(["user_id" => \Yii::$app->user->id, "mall_id" => $stand_mall_id,"platform" => \Yii::$app->appPlatform,'is_delete' => 0]);
                 if(empty($currentUserInfo)){
                     $userInfo["mobile"] = $this->mobile;
-                    $userResult = UserLogic::userRegister($userInfo,[],$parent_id);
+                    $userResult = UserLogic::userRegister($userInfo,[],$parent_id,$stand_mall_id);
                     if($userResult === false){
                         return $this->returnApiResultData(ApiCode::CODE_FAIL,'绑定失败');
                     }

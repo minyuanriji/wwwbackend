@@ -51,7 +51,8 @@ class IdentityController extends ApiController
     {
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
-        $result = $wechatForm->wxAuthorized();
+        $stand_mall_id = !empty($this->requestData['stand_mall_id']) ? $this->requestData['stand_mall_id'] : 0;
+        $result = $wechatForm->wxAuthorized($stand_mall_id);
         return $result;
     }
 
@@ -73,7 +74,8 @@ class IdentityController extends ApiController
     {
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
-        $result = $wechatForm->authorized();
+        $stand_mall_id = !empty($this->requestData['stand_mall_id']) ? $this->requestData['stand_mall_id'] : 0;
+        $result = $wechatForm->authorized($stand_mall_id);
         return $result;
     }
 

@@ -33,7 +33,7 @@ set PROJECT_PATH=%~dp0
 
 ::==================================================================
 ::WebSocket监听程序
-::start yii ws-server/listen
+start yii ws-server/listen
 
 ::==================================================================
 ::cd shell

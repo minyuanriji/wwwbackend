@@ -7,7 +7,7 @@ class WsServerController extends BaseCommandController {
     public function actionListen(){
 
         //创建WebSocket Server对象，监听0.0.0.0:9515端口
-        $ws = new Swoole\WebSocket\Server('0.0.0.0', 9515);
+        $ws = new \Swoole\WebSocket\Server('0.0.0.0', 9515);
 
         //监听WebSocket连接打开事件
         $ws->on('Open', function ($ws, $request) {

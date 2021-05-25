@@ -29,7 +29,11 @@ set PROJECT_PATH=%~dp0
 
 ::==================================================================
 ::订单自动结束守护程序
-start yii order-auto-sale/maintant-job
+::start yii order-auto-sale/maintant-job
+
+::==================================================================
+::WebSocket监听程序
+::start yii ws-server/listen
 
 ::==================================================================
 ::cd shell

@@ -19,7 +19,7 @@ class EfpsPayForm extends BaseModel{
 
     public $union_id;
 
-    public $stand_mall_id;
+    public $stands_mall_id;
 
     public $wx_type;
 
@@ -28,7 +28,7 @@ class EfpsPayForm extends BaseModel{
     public function rules(){
         return [
             [['union_id'], 'required'],
-            [['union_id','stand_mall_id'], 'integer'],
+            [['union_id','stands_mall_id'], 'integer'],
             [['wx_type'], 'safe'],
         ];
     }
@@ -242,14 +242,14 @@ class EfpsPayForm extends BaseModel{
                         "platform" => $platform,
                     ];
                 } elseif ($this->wx_type == 'mp-wx')  {  //小程序
-                    if(!$this->stand_mall_id){
+                    if(!$this->stands_mall_id){
                         throw new \Exception("商城ID不存在");
                     }
                     $platform = User::PLATFORM_MP_WX;
                     $where = [
                         "user_id"  => \Yii::$app->user->id,
                         "platform" => $platform,
-                        "mall_id" => $this->stand_mall_id,
+                        "mall_id" => $this->stands_mall_id,
                     ];
                 } else {  //默认 公众号
                     $platform = User::PLATFORM_WECHAT;

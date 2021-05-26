@@ -27,7 +27,7 @@ class EfpsPayForm extends BaseModel{
 
     public function rules(){
         return [
-            [['union_id','stand_mall_id'], 'required'],
+            [['union_id'], 'required'],
             [['union_id','stand_mall_id'], 'integer'],
             [['wx_type'], 'safe'],
         ];
@@ -159,10 +159,6 @@ class EfpsPayForm extends BaseModel{
                 throw new \Exception("支付记录不存在");
             }
 
-            if(!$this->stand_mall_id){
-                throw new \Exception("商城ID不存在");
-            }
-
             if($paymentOrderUnion->is_pay){
                 throw new \Exception("请勿重新支付");
             }
@@ -241,17 +237,29 @@ class EfpsPayForm extends BaseModel{
 
                 if ($this->wx_type == 'wechat') { //公众号
                     $platform = User::PLATFORM_WECHAT;
+                    $where = [
+                        "user_id"  => \Yii::$app->user->id,
+                        "platform" => $platform,
+                    ];
                 } elseif ($this->wx_type == 'mp-wx')  {  //小程序
+                    if(!$this->stand_mall_id){
+                        throw new \Exception("商城ID不存在");
+                    }
                     $platform = User::PLATFORM_MP_WX;
+                    $where = [
+                        "user_id"  => \Yii::$app->user->id,
+                        "platform" => $platform,
+                        "mall_id" => $this->stand_mall_id,
+                    ];
                 } else {  //默认 公众号
                     $platform = User::PLATFORM_WECHAT;
+                    $where = [
+                        "user_id"  => \Yii::$app->user->id,
+                        "platform" => $platform,
+                    ];
                 }
 
-                $userInfo = UserInfo::findOne([
-                    "user_id"  => \Yii::$app->user->id,
-                    "platform" => $platform,
-                    "mall_id" => $this->stand_mall_id,
-                ]);
+                $userInfo = UserInfo::findOne($where);
                 if(!$userInfo || empty($userInfo->openid)){
                     throw new \Exception("用户需要授权获取openid");
                 }

@@ -161,6 +161,7 @@ class OrderCommon extends BaseModel
         $form->user_id = \Yii::$app->user->id;
         $form->mall_id = \Yii::$app->mall->id;
         $form->is_recycle = 0;
+        $form->mch_id = 0;
         $form->orderType = ['express_baopin', 'express_normal'];
 
         // TODO 售后状态暂时没加

@@ -87,7 +87,7 @@ class MallController extends ApiController
                 'top_pic_url' => $top_pic_url,
                 'register_agree' => AppConfigLogic::getRegisterAgree(),
                 'integral_enable' =>$integral_enable,
-                'stand_mall_id' => $config->mall_id,
+                'stands_mall_id' => $config->mall_id,
             ],
         ]);
     }

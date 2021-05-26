@@ -124,6 +124,7 @@ class OrderListCommon extends BaseModel
         }
 
         $this->query->andWhere(['!=', 'o.sign', 'group_buy']);
+        $this->query->andWhere(['send_type' => 0]);
 
         if($this->only_offline_order){ //只显示核销订单
             $this->query->andWhere(["IN", "o.order_type", ["offline_baopin", "offline_normal"]]);

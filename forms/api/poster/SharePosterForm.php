@@ -12,7 +12,7 @@ use app\models\User;
 class SharePosterForm extends GrafikaOption implements BasePoster
 {
     use CustomizeFunction;
-    public function get($path="pages/index/index")
+    public function get($path = "pages/index/index", $stands_mall_id = 0)
     {
         $default = (new \app\forms\mall\poster\PosterForm())->getDefault()['share'];
         $options = AppConfigLogic::getPosterConfig();
@@ -35,7 +35,7 @@ class SharePosterForm extends GrafikaOption implements BasePoster
             isset($option['head']) && $option['head']['file_path'] = self::head($this);
         }else{
             $path = $this->h5Path();
-            $path = empty($path) ? "/h5/#/?mall_id=".\Yii::$app->mall->id."&pid=".\Yii::$app->user->id."&source=".User::SOURCE_SHARE_POSTER : $path;
+            $path = empty($path) ? "/h5/#/?mall_id=".\Yii::$app->mall->id."&pid=".\Yii::$app->user->id."&source=".User::SOURCE_SHARE_POSTER . "&stands_mall_id=" . $stands_mall_id : $path;
             $dir = $this->h5Dir();
             $dir = empty($dir) ? 'share/' . \Yii::$app->mall->id."_".\Yii::$app->user->id. '.jpg' : $dir;
             $file = CommonLogic::createQrcode($option,$this,$path,$dir);

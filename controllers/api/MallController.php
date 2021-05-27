@@ -16,6 +16,7 @@ use app\logic\AppConfigLogic;
 use app\logic\OptionLogic;
 use app\models\Mall;
 use app\models\Option;
+use app\models\Wechat;
 use app\plugins\mpwx\models\MpwxConfig;
 
 /**
@@ -62,12 +63,6 @@ class MallController extends ApiController
 
         $integral_enable = isset($optionCache->integral_status) ? $optionCache->integral_status : 0;
 
-        $config = null;
-        //通过app_id获取mall_id
-        if (\Yii::$app->request->get('stands_mall_id')) {
-            $config = \Yii::$app->request->get('stands_mall_id');
-        }
-
         return $this->asJson([
             'code' => 0,
             'data' => [
@@ -80,7 +75,6 @@ class MallController extends ApiController
                 'top_pic_url' => $top_pic_url,
                 'register_agree' => AppConfigLogic::getRegisterAgree(),
                 'integral_enable' =>$integral_enable,
-                'stands_mall_id' => $config,
             ],
         ]);
     }

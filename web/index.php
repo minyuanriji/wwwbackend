@@ -1,6 +1,5 @@
 <?php
 // comment out the following two lines when deployed to production
-
 error_reporting(E_ALL);
 define('ROOT_PATH',__DIR__);
 require __DIR__ . '/../config/const.php';

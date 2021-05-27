@@ -6,6 +6,7 @@ namespace app\mch\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\forms\api\identity\SmsForm;
+use app\mch\forms\api\BindDeviceForm;
 
 class BindDeviceController extends ApiController {
 
@@ -15,9 +16,19 @@ class BindDeviceController extends ApiController {
      * @throws \Exception
      */
     public function actionPhoneCode(){
-        $smsForom = new SmsForm();
-        $smsForom->attributes = $this->requestData;
-        return $this->asJson($smsForom->getPhoneCode());
+        $smsForm = new SmsForm();
+        $smsForm->attributes = $this->requestData;
+        return $this->asJson($smsForm->getPhoneCode());
     }
 
+    /**
+     * 绑定设备
+     * @return yii\web\Response
+     * @throws \Exception
+     */
+    public function actionBindDevice(){
+        $form = new BindDeviceForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->bind());
+    }
 }

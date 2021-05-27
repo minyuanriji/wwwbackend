@@ -63,6 +63,19 @@ class MallController extends ApiController
 
         $integral_enable = isset($optionCache->integral_status) ? $optionCache->integral_status : 0;
 
+        //获取当前logo
+        $headers = \Yii::$app->request->headers;
+        if (isset($headers['stands_mall_id']) && $headers['stands_mall_id'] && $headers['stands_mall_id'] != 5) {
+            $mal_res = Mall::findOne(['id' => $headers['stands_mall_id'], 'is_delete' => 0, 'is_recycle' => 0, 'is_disable' => 0]);
+            if (!$mal_res) {
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '此商城不存在，请联系客服！',
+                ];
+            }
+            $mall_logo = $mal_res->logo;
+        }
+
         return $this->asJson([
             'code' => 0,
             'data' => [
@@ -75,6 +88,7 @@ class MallController extends ApiController
                 'top_pic_url' => $top_pic_url,
                 'register_agree' => AppConfigLogic::getRegisterAgree(),
                 'integral_enable' =>$integral_enable,
+                'mall_log' => $mall_logo
             ],
         ]);
     }

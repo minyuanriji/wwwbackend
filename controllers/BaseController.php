@@ -79,12 +79,12 @@ class BaseController extends Controller
      * @Time: 18:12
      * @Note:设置微信公众号，微信支付
      */
-    protected function setWechatParmas($mall_id, $stands_mall_id)
+    protected function setWechatParmas($mall_id, $stands_mall_id = 0)
     {
 /*        if (!$mall_id) {
             return;
         }*/
-        if ($stands_mall_id) {
+        /*if ($stands_mall_id) {
             $info = MpwxConfig::findOne(['mall_id' => $mall_id, 'is_delete' => 0]);
             if ($info) {
                 \Yii::$app->params['wechatConfig'] = [
@@ -104,7 +104,20 @@ class BaseController extends Controller
             }
         } else {
             return;
+        }*/
+        if (!$mall_id) {
+            return;
         }
+        $info = Wechat::findOne(['mall_id' => $mall_id, 'is_delete' => 0]);
+        if ($info) {
+            \Yii::$app->params['wechatConfig'] = [
+                'app_id' => $info->app_id,
+                'secret' => $info->secret,
+                'token' => $info->token,
+                'aes_key' => $info->aes_key,
+            ];
+        }
+
         $payment = OptionLogic::get(Option::NAME_PAYMENT, $mall_id, Option::GROUP_APP);
         if (!empty($payment) && $payment["wechat_status"] == 1) {
             \Yii::$app->params['wechatPaymentConfig'] = [

@@ -18,6 +18,7 @@ use app\forms\api\identity\WechatForm;
 use app\forms\api\user\UserBindForm;
 use app\helpers\ArrayHelper;
 use app\models\ErrorLog;
+use phpDocumentor\Reflection\Types\Integer;
 use yii;
 use app\controllers\business\GetAttentionWeChat;
 
@@ -51,7 +52,8 @@ class IdentityController extends ApiController
     {
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
-        $stands_mall_id = !empty($this->requestData['stands_mall_id']) ? $this->requestData['stands_mall_id'] : 0;
+        $headers = \Yii::$app->request->headers;
+        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 0;
         $result = $wechatForm->wxAuthorized($stands_mall_id);
         return $result;
     }
@@ -74,7 +76,8 @@ class IdentityController extends ApiController
     {
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
-        $stands_mall_id = !empty($this->requestData['stands_mall_id']) ? $this->requestData['stands_mall_id'] : 0;
+        $headers = \Yii::$app->request->headers;
+        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 0;
         $result = $wechatForm->authorized($stands_mall_id);
         return $result;
     }
@@ -164,7 +167,8 @@ class IdentityController extends ApiController
         $smsForm = new UserBindForm();
         $smsForm->attributes = $this->requestData;
         $recommend_id = !empty($this->requestData['recommend_id']) ? $this->requestData['recommend_id'] : 0;
-        $stands_mall_id = !empty($this->requestData['stands_mall_id']) ? $this->requestData['stands_mall_id'] : 0;
+        $headers = \Yii::$app->request->headers;
+        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 0;
         return $smsForm->bind($recommend_id,$stands_mall_id);
     }
 
@@ -177,7 +181,8 @@ class IdentityController extends ApiController
         $wechatForm->attributes = $this->requestData;
         $parent_user_id = !empty($this->requestData['parent_user_id']) ? $this->requestData['parent_user_id'] : 0;
         $parent_source = !empty($this->requestData['parent_source']) ? $this->requestData['parent_source'] : null;
-        $stands_mall_id = !empty($this->requestData['stands_mall_id']) ? $this->requestData['stands_mall_id'] : 0;
+        $headers = \Yii::$app->request->headers;
+        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 0;
         $result = $wechatForm->miniAuthorized($parent_user_id,$parent_source,$stands_mall_id);
         return $result;
     }

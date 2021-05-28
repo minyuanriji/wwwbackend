@@ -36,6 +36,7 @@ class AdminController extends BaseController
                 $form->attributes = \Yii::$app->request->post('form');
                 //var_dump($form->attributes);exit;
                 $form->mall_id = \Yii::$app->request->post('mall_id');
+                \Yii::error('获取到的参数：'.json_encode($form->attributes));
                 $res = $form->login();
                 return $this->asJson($res);
             }

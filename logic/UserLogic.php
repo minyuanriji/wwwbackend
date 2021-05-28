@@ -78,8 +78,8 @@ class UserLogic
      * @return bool
      * @throws \yii\base\Exception
      */
-    public static function userRegister($userData, $user = [],$parent_id=0,$stand_mall_id = 0){
-        $userData = self::loadUserFields($userData,$stand_mall_id);
+    public static function userRegister($userData, $user = [],$parent_id=0,$stands_mall_id = 0){
+        $userData = self::loadUserFields($userData,$stands_mall_id);
         $transaction = \Yii::$app->db->beginTransaction();
         try{
             $appPlatform = isset($userData["platform"]) ? $userData["platform"] : \Yii::$app->appPlatform;
@@ -120,7 +120,7 @@ class UserLogic
                 }
             }
             $userInfoModel = new UserInfo();
-            $userInfoModel->mall_id       = $stand_mall_id ? $stand_mall_id : \Yii::$app->mall->id;
+            $userInfoModel->mall_id       = $stands_mall_id ? $stands_mall_id : \Yii::$app->mall->id;
             $userInfoModel->mch_id        = 0;
             $userInfoModel->user_id       = $user->id;
             $userInfoModel->unionid       = isset($userData["unionid"]) ? $userData["unionid"] : "";
@@ -176,7 +176,7 @@ class UserLogic
      * @param $userInfo
      * @return array
      */
-    public static function loadUserFields($userInfo,$stand_mall_id){
+    public static function loadUserFields($userInfo,$stands_mall_id){
         $registerData = [];
         $registerData["nickname"] = isset($userInfo["nickname"]) ? $userInfo["nickname"] : "";
         $registerData["openid"] = $userInfo["openid"];
@@ -186,7 +186,7 @@ class UserLogic
         $registerData["source"] = empty(\Yii::$app->source) ? 0 : \Yii::$app->source;
         $registerData["platform_data"] = json_encode($userInfo);
         $registerData["password"] = "jx888888";
-        $registerData["mall_id"] = $stand_mall_id ? $stand_mall_id : \Yii::$app->mall->id;
+        $registerData["mall_id"] = $stands_mall_id ? $stands_mall_id : \Yii::$app->mall->id;
         $registerData["mobile"] = isset($userInfo["mobile"]) ? $userInfo["mobile"] : "";
         $registerData["username"] = isset($userInfo["username"]) ? $userInfo["username"] : "wechat_user";
         return $registerData;
@@ -198,13 +198,13 @@ class UserLogic
      * @param $userId
      * @return User|array|null
      */
-    public static function checkIsAuthorized($userData,$userId = 0,$stand_mall_id = 0){
-        \Yii::warning("checkIsAuthorized userId={$userId} and stand_mall_id={$stand_mall_id} userData:".var_export($userData,true));
+    public static function checkIsAuthorized($userData,$userId = 0,$stands_mall_id = 0){
+        \Yii::warning("checkIsAuthorized userId={$userId} and stands_mall_id={$stands_mall_id} userData:".var_export($userData,true));
         $returnData = [];
         try{
             $platform = isset($userData["platform"]) ? $userData["platform"] : \Yii::$app->appPlatform;
-            if ($stand_mall_id) {
-                $mall_id = $stand_mall_id;
+            if ($stands_mall_id) {
+                $mall_id = $stands_mall_id;
             } else {
                 $mall_id = \Yii::$app->mall->id;
             }

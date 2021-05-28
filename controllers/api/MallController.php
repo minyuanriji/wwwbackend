@@ -16,6 +16,7 @@ use app\logic\AppConfigLogic;
 use app\logic\OptionLogic;
 use app\models\Mall;
 use app\models\Option;
+use app\models\Wechat;
 use app\plugins\mpwx\models\MpwxConfig;
 
 /**
@@ -62,17 +63,17 @@ class MallController extends ApiController
 
         $integral_enable = isset($optionCache->integral_status) ? $optionCache->integral_status : 0;
 
-        $config = null;
-        //通过app_id获取mall_id
-        if (\Yii::$app->request->get('app_id')) {
-            //微信小程序授权登录
-            $config = MpwxConfig::findOne(['app_id' => \Yii::$app->request->get('app_id'), 'is_delete' => 0]);
-            if (!$config) {
+        //获取当前logo
+        $headers = \Yii::$app->request->headers;
+        if (isset($headers['x-stands-mall-id']) && $headers['x-stands-mall-id'] && $headers['x-stands-mall-id'] != 5) {
+            $mal_res = Mall::findOne(['id' => $headers['x-stands-mall-id'], 'is_delete' => 0, 'is_recycle' => 0, 'is_disable' => 0]);
+            if (!$mal_res) {
                 return [
-                    'code'  => ApiCode::CODE_FAIL,
-                    'msg'   =>'此商城不存在'
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '此商城不存在，请联系客服！',
                 ];
             }
+            $mall_logo = $mal_res->logo;
         }
 
         return $this->asJson([
@@ -87,7 +88,7 @@ class MallController extends ApiController
                 'top_pic_url' => $top_pic_url,
                 'register_agree' => AppConfigLogic::getRegisterAgree(),
                 'integral_enable' =>$integral_enable,
-                'stand_mall_id' => $config->mall_id,
+                'mall_log' => $mall_logo
             ],
         ]);
     }

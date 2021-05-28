@@ -256,7 +256,9 @@ class UserController extends ApiController
         $form = new PosterForm();
         $shareForm = $form->share();
         $shareForm->sign = "share/";
-        return $shareForm->get('pages/index/index');
+        $headers = \Yii::$app->request->headers;
+        $stands_mall_id = isset($headers['x-stands-mall-id']) ? $headers['x-stands-mall-id'] : 0;
+        return $shareForm->get('pages/index/index',$stands_mall_id);
     }
 
     public function actionLinkPoster2(){

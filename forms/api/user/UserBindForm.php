@@ -40,7 +40,7 @@ class UserBindForm extends BaseModel
      * @Time: 14:33
      * @return array
      */
-    public function bind($parent_id,$stand_mall_id)
+    public function bind($parent_id,$stands_mall_id)
     {
         if (!$this->validate()) {
             return $this->returnApiResultData();
@@ -66,12 +66,12 @@ class UserBindForm extends BaseModel
             if($userResult){
                 //当前登录用户是不是已经授权了当前平台
                 /** @var UserInfo $currentUserInfo */
-                $currentUserInfo = UserInfo::getOneUserInfo(["user_id" => \Yii::$app->user->id, "mall_id" => $stand_mall_id,"platform" => \Yii::$app->appPlatform,'is_delete' => 0]);
+                $currentUserInfo = UserInfo::getOneUserInfo(["user_id" => \Yii::$app->user->id, "mall_id" => $stands_mall_id,"platform" => \Yii::$app->appPlatform,'is_delete' => 0]);
                 \Yii::warning("userBindForm currentUserInfo = ".var_export($currentUserInfo,true));
                 \Yii::$app->user->logout();
                 \Yii::$app->user->login($userResult);
                 //绑定过的用户是不是已经授权了当前平台
-                $bindUserInfo = UserInfo::getOneUserInfo(["user_id" => $userResult->id, "mall_id" => $stand_mall_id,"platform" => \Yii::$app->appPlatform,'is_delete' => 0]);
+                $bindUserInfo = UserInfo::getOneUserInfo(["user_id" => $userResult->id, "mall_id" => $stands_mall_id,"platform" => \Yii::$app->appPlatform,'is_delete' => 0]);
                 \Yii::warning("userBindForm bindUserInfo = ".var_export($bindUserInfo,true));
                 //如果绑定过的用户也已经授权了当前平台，则不做操作，如果没有授权，则将当前登录用户的授权信息更新到绑定过的账户上
                 if(!empty($currentUserInfo) && empty($bindUserInfo)){
@@ -94,7 +94,7 @@ class UserBindForm extends BaseModel
                     throw new \Exception("手机号已经被其他用户绑定过了");
                 }else if(empty($bindUserInfo)){
                     //当前平台没有该用户信息，就新增一条
-                    $userResult = UserLogic::userRegister($userInfo,$userResult,$parent_id,$stand_mall_id);
+                    $userResult = UserLogic::userRegister($userInfo,$userResult,$parent_id,$stands_mall_id);
                     if (!$userResult->access_token) {
                         $access_token = \Yii::$app->security->generateRandomString();
                         $userResult->access_token = $access_token;
@@ -107,10 +107,10 @@ class UserBindForm extends BaseModel
             }else{
                 //没有绑定手机号
                 /** @var UserInfo $currentUserInfo */
-                $currentUserInfo = UserInfo::getOneUserInfo(["user_id" => \Yii::$app->user->id, "mall_id" => $stand_mall_id,"platform" => \Yii::$app->appPlatform,'is_delete' => 0]);
+                $currentUserInfo = UserInfo::getOneUserInfo(["user_id" => \Yii::$app->user->id, "mall_id" => $stands_mall_id,"platform" => \Yii::$app->appPlatform,'is_delete' => 0]);
                 if(empty($currentUserInfo)){
                     $userInfo["mobile"] = $this->mobile;
-                    $userResult = UserLogic::userRegister($userInfo,[],$parent_id,$stand_mall_id);
+                    $userResult = UserLogic::userRegister($userInfo,[],$parent_id,$stands_mall_id);
                     if($userResult === false){
                         return $this->returnApiResultData(ApiCode::CODE_FAIL,'绑定失败');
                     }

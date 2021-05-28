@@ -75,6 +75,14 @@ class Plugin extends \app\plugins\Plugin
                     ],
                 ]
             ],
+            [
+                'name' => '奖金池',
+                'route' => 'plugin/boss/mall/Prize/index',
+                'icon' => '',
+                'action' => [
+                    [],
+                ]
+            ],
         ];
     }
 

@@ -27,14 +27,13 @@ class BindDeviceForm extends BaseModel{
         }
 
         try {
-
             //手机验证码验证
-            $smsForm = new SmsForm();
+            /*$smsForm = new SmsForm();
             $smsForm->mobile = $this->mobile;
             $smsForm->captcha = $this->verify_code;
             if (!$smsForm->checkCode()) {
                 throw new \Exception("验证码不正确");
-            }
+            }*/
 
             $mch = Mch::findOne([
                 'mobile'    => $this->mobile,
@@ -57,29 +56,31 @@ class BindDeviceForm extends BaseModel{
                     'password'     => $security->generatePasswordHash(uniqid()),
                     'mall_id'      => 5,
                     'mch_id'       => $mch->id,
-                    'auth_key'     => '',
-                    'access_token' => '',
                     'admin_type'   => '3',
                     'mall_num'     => 0,
-                    'expired_at'   => '',
+                    'expired_at'   => 0,
                     'is_delete'    => 0,
                     'created_at'   => time(),
                     'updated_at'   => time()
                 ]);
-                if(!$admin->save()){
-                    throw new \Exception("账号保存失败");
-                }
+
             }
 
-            \Yii::$app->user->login($admin);
+            $admin->auth_key = \Yii::$app->security->generateRandomString();
+            $admin->access_token = \Yii::$app->security->generateRandomString();
 
-            Sms::updateCodeStatus($this->mobile, $this->verify_code);
+            if(!$admin->save()){
+                throw new \Exception("账号保存失败");
+            }
+
+            //Sms::updateCodeStatus($this->mobile, $this->verify_code);
 
             return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg'  => '操作成功',
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '登陆成功',
                 'data' => [
-                    'auth_key' => $admin->auth_key
+                    'auth_key' => $admin->auth_key,
+                    'mobile'   => $this->mobile
                 ]
             ];
 

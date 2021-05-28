@@ -1,12 +1,5 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: zal
- * Date: 2020-04-09
- * Time: 10:36
- */
+
 $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
 ?>
 <script>const passportBg = '<?=($indSetting && !empty($indSetting['passport_bg'])) ? $indSetting['passport_bg'] : ''?>';</script>

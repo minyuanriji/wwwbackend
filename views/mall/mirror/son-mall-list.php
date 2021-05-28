@@ -212,7 +212,7 @@
                 </div>
             </el-form-item>
 
-            <el-form-item prop="app_share_title">
+<!--            <el-form-item prop="app_share_title">
                 <label slot="label">
                     <span>自定义分享标题</span>
                     <el-tooltip effect="dark" content="分享给好友时，显示的标题"
@@ -257,7 +257,7 @@
                                type="danger" icon="el-icon-close" circle
                                @click="createMallForm.app_share_pic = ''"></el-button>
                 </div>
-            </el-form-item>
+            </el-form-item>-->
 
             <el-form-item label="商城有效期" prop="expired_at" ref="expired_at">
                 <el-date-picker type="datetime" v-if="isCheckExpired" :disabled="true"></el-date-picker>
@@ -363,9 +363,9 @@
                     app_id: '',
                     app_secret: '',
                     logo: '',
-                    app_share_title: '',
+                    /*app_share_title: '',
                     app_share_desc: '',
-                    app_share_pic: '',
+                    app_share_pic: '',*/
                     expired_at: '',
                 },
                 isCheckExpired: false,
@@ -374,12 +374,12 @@
                     name: [
                         {required: true, message: '请填写商城名称。'},
                     ],
-                    app_id: [
+                    /*app_id: [
                         {required: true, message: '请填写小程序appid。'},
                     ],
                     app_secret: [
                         {required: true, message: '请填写小程序app_secret'},
-                    ],
+                    ],*/
                     logo: [
                         {required: true, message: '请上传小程序logo。'},
                     ],
@@ -423,9 +423,9 @@
                 this.createMallForm.app_id = '';
                 this.createMallForm.app_secret = '';
                 this.createMallForm.logo = '';
-                this.createMallForm.app_share_title = '';
+                /*this.createMallForm.app_share_title = '';
                 this.createMallForm.app_share_desc = '';
-                this.createMallForm.app_share_pic = '';
+                this.createMallForm.app_share_pic = '';*/
                 this.createMallForm.expired_at = '';
                 this.createMallForm.id = null;
             },
@@ -454,7 +454,6 @@
                                 this.$message.error(e.data.msg);
                             }
                         }).catch(e => {
-
                             console.log(e,"失败了？")
                         });
                     } else {
@@ -673,9 +672,9 @@
                 this.createMallForm.app_id = row.app_id;
                 this.createMallForm.app_secret = row.app_secret;
                 this.createMallForm.logo = row.logo;
-                this.createMallForm.app_share_title = row.app_share_title;
+                /*this.createMallForm.app_share_title = row.app_share_title;
                 this.createMallForm.app_share_desc = row.app_share_desc;
-                this.createMallForm.app_share_pic = row.app_share_pic;
+                this.createMallForm.app_share_pic = row.app_share_pic;*/
                 if (row.expired_at == 0) {
                     this.createMallForm.expired_at = row.expired_at;
                     this.isCheckExpired = true;

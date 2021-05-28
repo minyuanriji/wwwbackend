@@ -228,7 +228,7 @@ localStorage.removeItem(\'goods_page\');
                 if (_isWe7) {
                     this.$navigate({r: 'mall/we7-entry/logout'});
                 } else {
-                    this.$navigate({r: 'admin/index'});
+                    this.$navigate({r: 'admin/mall/index'});
                 }
             },
             updatePassword() {

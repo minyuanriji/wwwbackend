@@ -43,7 +43,7 @@ class SharePosterForm extends GrafikaOption implements BasePoster
             }
             \Yii::warning("pathData result:".$path);
             $dir = $this->h5Dir();
-            $dir = empty($dir) ? 'share/' . \Yii::$app->mall->id."_".\Yii::$app->user->id. '.jpg' : $dir;
+            $dir = empty($dir) ? 'share/' . $stands_mall_id ."_".\Yii::$app->user->id. '.jpg' : $dir;
             $file = CommonLogic::createQrcode($option,$this,$path,$dir);
 
             isset($option['qr_code']) && $option['qr_code']['file_path'] = $file;

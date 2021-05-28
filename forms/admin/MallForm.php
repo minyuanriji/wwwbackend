@@ -205,6 +205,9 @@ class MallForm extends BaseModel
         }
 
         try {
+            if($id = 5) {
+                throw new \Exception('不能删除自己商城');
+            }
             $mall = Mall::find()->where([
                 'id' => $id,
                 'is_delete' => 0,

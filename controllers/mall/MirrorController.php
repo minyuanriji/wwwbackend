@@ -22,10 +22,7 @@ use app\models\Label;
 class MirrorController extends MallController
 {
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-04-29
-     * @Time: 17:43
-     * @Note:商品标签
+     * @Note:子账号列表
      */
     public function actionSonMallList()
     {
@@ -43,9 +40,6 @@ class MirrorController extends MallController
 
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-04-29
-     * @Time: 17:43
      * @Note:标签编辑
      */
     public function actionSonMallEdit()

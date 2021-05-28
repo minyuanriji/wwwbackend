@@ -8,7 +8,7 @@ use app\controllers\api\ApiController;
 use app\forms\api\identity\SmsForm;
 use app\mch\forms\api\BindDeviceForm;
 
-class BindDeviceController extends ApiController {
+class AppBindDeviceController extends ApiController {
 
     /**
      * 获取手机验证码

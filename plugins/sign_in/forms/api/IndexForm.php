@@ -70,12 +70,22 @@ class IndexForm extends ApiModel
 
             $signInUser = $this->signInList($this->user);
 
+            $continueDay = 0;
+            if($signInDay){
+                foreach($signInDay as $item){
+                    if($item['is_sign']){
+                        $continueDay += 1;
+                    }
+                }
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '',
                 'data' => [
                     'is_sign_in' => $signInUser['is_sign_in'],
-                    'continue_day' => $signInUser['continue_day'],
+                    //'continue_day' => $signInUser['continue_day'],
+                    'continue_day' => $continueDay,
                     'config' => $newList,
                     'sign_in_day' => $signInDay,
                     //'template_message' => TemplateList::getInstance()->getTemplate(\Yii::$app->appPlatform, ['sign_in_tpl'])

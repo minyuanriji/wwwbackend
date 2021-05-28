@@ -64,6 +64,7 @@ class MallController extends ApiController
         $integral_enable = isset($optionCache->integral_status) ? $optionCache->integral_status : 0;
 
         //获取当前logo
+        $mall_logo = '';
         $headers = \Yii::$app->request->headers;
         if (isset($headers['x-stands-mall-id']) && $headers['x-stands-mall-id'] && $headers['x-stands-mall-id'] != 5) {
             $mal_res = Mall::findOne(['id' => $headers['x-stands-mall-id'], 'is_delete' => 0, 'is_recycle' => 0, 'is_disable' => 0]);

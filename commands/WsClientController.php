@@ -17,7 +17,11 @@ class WsClientController extends BaseCommandController {
                     //$data = "PAID:" . json_encode(["text" => "11111", "url" => "https://img-qn.51miz.com/preview/sound/00/27/20/51miz-S272046-BC428C3F.mp3"]);
                     //$cli->get('/?action=MchPaidNotify&notify_mobile=13422078495&notify_data=' . $data);
                     $data = $form->notify_data;
-                    $cli->get('/?action='.$form->action.'&notify_mobile='.$form->notify_mobile.'&notify_data=' . $data);
+                    $cli->post('/', [
+                        "action"        => $form->action,
+                        "notify_mobile" => $form->notify_mobile,
+                        "notify_data"   => $form->notify_data
+                    ]);
                     $cli->close();
                     if($cli->body != "SUCCESS"){
                         if($form->fail_try > 3){
@@ -27,6 +31,8 @@ class WsClientController extends BaseCommandController {
                             $form->fail_try += 1;
                             WebSocketRequestForm::add($form);
                         }
+                    }else{
+                        $this->commandOut("队列[ID:".$form->queue_tag."]操作成功");
                     }
                 });
             }

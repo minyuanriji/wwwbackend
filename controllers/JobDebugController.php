@@ -14,7 +14,7 @@ class JobDebugController extends Controller{
 
     public function actionIndex(){
 
-        $voiceText = "王工收到100块钱";
+        $voiceText = "今天下雨记得带伞";
         $base64Data = $this->requestAudio($voiceText);
         if(!empty($base64Data)){
             $data = [
@@ -49,7 +49,7 @@ class JobDebugController extends Controller{
             $req = new TextToVoiceRequest();
 
             $params = array(
-                "Text" => $text,
+                "Text"      => $text,
                 "SessionId" => md5(uniqid()),
                 "ModelType" => 1
             );

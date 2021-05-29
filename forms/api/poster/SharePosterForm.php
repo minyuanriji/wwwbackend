@@ -47,7 +47,7 @@ class SharePosterForm extends GrafikaOption implements BasePoster
             $file = CommonLogic::createQrcode($option,$this,$path,$dir);
 
             isset($option['qr_code']) && $option['qr_code']['file_path'] = $file;
-            isset($option['head']) && $option['head']['file_path'] = self::head($this,"share/");
+            isset($option['head']) && $option['head']['file_path'] = self::head($this, "share/");
         }
 
         $editor = $this->getPoster($option);

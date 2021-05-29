@@ -17,6 +17,7 @@ class BaseModel extends \yii\base\Model
 {
     const YES = 1;
     const NO = 0;
+    const MY_Mall_ID = 5;
 
     const IS_DELETE_YES = self::YES;
     const IS_DELETE_NO = self::NO;

@@ -92,14 +92,21 @@
                 <el-table-column prop="id" label="ID" width="60"></el-table-column>
                 <el-table-column prop="name" width="260" label="商城名称">
                     <template slot-scope="scope">
-                        <el-button v-if="isInd && scope.row.is_disable == '0'"
+                        <!--<el-button v-if="isInd && scope.row.is_disable == '0'"
                                    @click="toEnter(scope.row)"
                                    type="text">{{scope.row.name}}
                         </el-button>
-                        <el-button v-else type="text" :disabled="true">{{scope.row.name}}</el-button>
+                        <el-button v-else type="text" :disabled="true">{{scope.row.name}}</el-button>-->
+                        <el-button type="text" :disabled="true" style="background-color: RGB(49,49,49)">商城名称：{{scope.row.name}}</el-button>
                         <div>
-                            <span>{{scope.row.admin.username}}</span>
+                            <span>归属人：{{scope.row.admin.username}}</span>
                         </div>
+
+                        <div>
+                            <span>绑定用户：{{scope.row.user[0] ? scope.row.user[0].username : ''}}</span>
+                        </div>
+
+
                     </template>
                 </el-table-column>
                 <!--<el-table-column prop="site" label="数据统计">
@@ -183,6 +190,10 @@
 
             <el-form-item label="app_id" prop="app_id">
                 <el-input type="text" size="small" v-model="createMallForm.app_id" autocomplete="off"></el-input>
+            </el-form-item>
+
+            <el-form-item label="user_id" prop="user_id">
+                <el-input type="text" size="small" v-model="createMallForm.user_id" autocomplete="off"></el-input>
             </el-form-item>
 
             <el-form-item label="app_secret" prop="app_secret">
@@ -361,6 +372,7 @@
                     id: null,
                     name: '',
                     app_id: '',
+                    user_id: '',
                     app_secret: '',
                     logo: '',
                     /*app_share_title: '',
@@ -382,6 +394,9 @@
                     ],*/
                     logo: [
                         {required: true, message: '请上传小程序logo。'},
+                    ],
+                    user_id: [
+                        {required: true, message: '请添加用户ID。'},
                     ],
                     expired_at: [
                         {required: true, message: '请选择商城有效期'},
@@ -421,6 +436,7 @@
                 this.createMallDialogVisible = true;
                 this.createMallForm.name = '';
                 this.createMallForm.app_id = '';
+                this.createMallForm.user_id = '';
                 this.createMallForm.app_secret = '';
                 this.createMallForm.logo = '';
                 /*this.createMallForm.app_share_title = '';
@@ -466,6 +482,7 @@
                 params['is_recycle'] = this.searchForm.isRecycle;
                 params['user_id'] = getQuery('user_id');
                 params['page'] = this.mallListPage;
+                params['is_show'] = 1;
                 this.searchLoading = true;
                 this.$request({
                     params: params,
@@ -670,6 +687,7 @@
                 this.createMallForm.id = row.id;
                 this.createMallForm.name = row.name;
                 this.createMallForm.app_id = row.app_id;
+                this.createMallForm.user_id = row.user_id;
                 this.createMallForm.app_secret = row.app_secret;
                 this.createMallForm.logo = row.logo;
                 /*this.createMallForm.app_share_title = row.app_share_title;

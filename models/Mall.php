@@ -25,6 +25,7 @@ use Yii;
  * @property string $name
  * @property string $app_id
  * @property string $app_secret
+ * @property string $user_id
  * @property string $logo
  * @property string $app_share_title
  * @property string $app_share_desc
@@ -65,7 +66,7 @@ class Mall extends BaseActiveRecord
     {
         return [
             [['created_at', 'updated_at', 'deleted_at', 'expired_at'], 'safe'],
-            [['admin_id', 'is_recycle', 'is_delete', 'is_disable'], 'integer'],
+            [['admin_id', 'is_recycle', 'is_delete', 'user_id', 'is_disable'], 'integer'],
             [['app_id','app_secret', 'logo', 'app_share_title', 'app_share_desc', 'app_share_pic'], 'string'],
             [['name'], 'string', 'max' => 64],
         ];
@@ -87,6 +88,7 @@ class Mall extends BaseActiveRecord
             'is_recycle' => '商城回收状态',
             'is_disable' => '商城禁用状态',
             'app_id' => 'APP ID',
+            'user_id' => 'USER ID',
             'app_secret' => 'APP SECRET',
             'logo' => 'LOGO',
             'app_share_title' => '自定义分享标题',
@@ -103,6 +105,11 @@ class Mall extends BaseActiveRecord
     public function getOption()
     {
         return $this->hasMany(MallSetting::className(), ['mall_id' => 'id']);
+    }
+
+    public function getUser()
+    {
+        return $this->hasMany(User::className(), ['id' => 'user_id']);
     }
 
 

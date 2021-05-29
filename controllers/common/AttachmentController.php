@@ -57,10 +57,10 @@ class AttachmentController extends BaseController
 
         $mall = $this->getMall();
         if (!$mall) {
-            return $this->asJson([
+            return [
                 'code' => ApiCode::CODE_FAIL,
                 'data' => 'Mall为空，请刷新页面后重试。'
-            ]);
+            ];
         }
         $query = AttachmentInfo::find()->where([
             'mall_id' => $mall->id,
@@ -82,13 +82,13 @@ class AttachmentController extends BaseController
         foreach ($list as &$item) {
             $item['thumb_url'] = $item['thumb_url'] ? $item['thumb_url'] : $item['url'];
         }
-        return $this->asJson([
+        return [
             'code' => ApiCode::CODE_SUCCESS,
             'data' => [
                 'list' => $list,
                 'pagination' => $pagination,
             ],
-        ]);
+        ];
     }
 
     public function actionGroupList($type = null, $is_recycle = null)

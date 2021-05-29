@@ -51,55 +51,58 @@ class MallForm extends BaseModel
             $model = new Mall();
             $model->admin_id = \Yii::$app->admin->id;
         }
-        // 检测参数是否有效
-        $config = \Yii::$app->params['wechatMiniProgramConfig'];
-        $config['app_id'] = $data["app_id"];
-        $config['secret'] = $data["app_secret"];
-        \Yii::$app->params['wechatMiniProgramConfig'] = $config;
-        if (!$data["app_id"]) {
-            throw new \Exception('小程序AppId有误');
-        }
-        if (!$data["app_secret"]) {
-            throw new \Exception('小程序appSecret有误');
-        }
+
         $t = \Yii::$app->db->beginTransaction();
         $model->name                = $data["name"];
-        $model->app_id              = $data["app_id"];
-        $model->app_secret          = $data["app_secret"];
+        $model->app_id              = isset($data["app_id"]) ? $data["app_id"] : '';
+        $model->app_secret          = isset($data["app_secret"]) ? $data["app_secret"] : '';
+        $model->user_id             = intval($data["user_id"]);
         $model->logo                = $data["logo"];
-        $model->app_share_title     = $data["app_share_title"];
-        $model->app_share_desc      = $data["app_share_desc"];
-        $model->app_share_pic       = $data["app_share_pic"];
+        $model->app_share_title     = isset($data["app_share_title"]) ? $data["app_share_title"] : '';
+        $model->app_share_desc      = isset($data["app_share_desc"]) ? $data["app_share_desc"] : '';
+        $model->app_share_pic       = isset($data["app_share_pic"]) ? $data["app_share_pic"] : '';
         $model->expired_at          = $data["expired_at"] != 0 ? strtotime($data["expired_at"]) : $data["expired_at"];
         if ($model->save()) {
             /** @var Wechat $wechat */
-            $wechat = \Yii::$app->wechat;
-            $app = $wechat->miniProgram;
-            $accessToken = $app->access_token;
-            try {
-                $token = $accessToken->getToken(); // token 数组  token['access_token'] 字符串
-                $token = $accessToken->getToken(true); // 强制重新从微信服务器获取 token.
-            } catch (HttpException $e) {
-                if ($e->formattedResponse['errcode'] == '41002') {
-                    $message = '小程序AppId有误(' . $e->formattedResponse['errmsg'] . ')';
-                    return [
-                        'code' => ApiCode::CODE_FAIL,
-                        'msg' => $message,
-                    ];
+            if ((isset($data["app_id"]) && $data["app_id"]) && (isset($data["app_secret"]) && $data["app_secret"])) {
+                $config = \Yii::$app->params['wechatMiniProgramConfig'];
+                $config['app_id'] = $data["app_id"];
+                $config['secret'] = $data["app_secret"];
+                \Yii::$app->params['wechatMiniProgramConfig'] = $config;
+                if (!$data["app_id"]) {
+                    throw new \Exception('小程序AppId有误');
                 }
-                if ($e->formattedResponse['errcode'] == '41013') {
-                    $message = '小程序AppId有误(' . $e->formattedResponse['errmsg'] . ')';
-                    return [
-                        'code' => ApiCode::CODE_FAIL,
-                        'msg' => $message,
-                    ];
+                if (!$data["app_secret"]) {
+                    throw new \Exception('小程序appSecret有误');
                 }
-                if ($e->formattedResponse['errcode'] == '40125') {
-                    $message = '小程序密钥有误(' . $e->formattedResponse['errmsg'] . ')';
-                    return [
-                        'code' => ApiCode::CODE_FAIL,
-                        'msg' => $message,
-                    ];
+                $wechat = \Yii::$app->wechat;
+                $app = $wechat->miniProgram;
+                $accessToken = $app->access_token;
+                try {
+                    $token = $accessToken->getToken(); // token 数组  token['access_token'] 字符串
+                    $token = $accessToken->getToken(true); // 强制重新从微信服务器获取 token.
+                } catch (HttpException $e) {
+                    if ($e->formattedResponse['errcode'] == '41002') {
+                        $message = '小程序AppId有误(' . $e->formattedResponse['errmsg'] . ')';
+                        return [
+                            'code' => ApiCode::CODE_FAIL,
+                            'msg' => $message,
+                        ];
+                    }
+                    if ($e->formattedResponse['errcode'] == '41013') {
+                        $message = '小程序AppId有误(' . $e->formattedResponse['errmsg'] . ')';
+                        return [
+                            'code' => ApiCode::CODE_FAIL,
+                            'msg' => $message,
+                        ];
+                    }
+                    if ($e->formattedResponse['errcode'] == '40125') {
+                        $message = '小程序密钥有误(' . $e->formattedResponse['errmsg'] . ')';
+                        return [
+                            'code' => ApiCode::CODE_FAIL,
+                            'msg' => $message,
+                        ];
+                    }
                 }
             }
             try {
@@ -118,8 +121,8 @@ class MallForm extends BaseModel
                 }
                 $config->mall_id    = $model->id;
                 $config->name       = $model->name;
-                $config->app_id     = $model->app_id;
-                $config->secret     = $model->app_secret;
+                $config->app_id     = isset($data["app_id"]) ? $data["app_id"] : '';
+                $config->secret     = isset($data["app_secret"]) ? $data["app_secret"] : '';
                 if ($config->save()) {
                     $t->commit();
 //                    OptionLogic::set(Option::NAME_MPWX, $this->attributes, $model->id, Option::GROUP_APP);
@@ -161,9 +164,9 @@ class MallForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo($this);
         }
-        $model = Admin::findOne($data["id"]);
+        $model = Admin::findOne($data["user_id"]);
         $count = Mall::find()->where([
-            'admin_id' => $data["id"],
+            'admin_id' => $data["user_id"],
             'is_delete' => 0,
         ])->count();
         if ($model->mall_num >= 0 && $count >= $model->mall_num && $model->admin_type != 1) {
@@ -205,6 +208,9 @@ class MallForm extends BaseModel
         }
 
         try {
+            if($id == self::MY_Mall_ID) {
+                throw new \Exception('不能删除自己商城');
+            }
             $mall = Mall::find()->where([
                 'id' => $id,
                 'is_delete' => 0,

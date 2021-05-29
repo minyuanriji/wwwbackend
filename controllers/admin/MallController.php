@@ -19,7 +19,8 @@ use yii\db\Query;
 
 class MallController extends BaseController
 {
-    public function actionIndex($keyword = null, $is_recycle = 0)
+
+    public function actionIndex ($keyword = null, $is_recycle = 0,$is_show = 0)
     {
         if (\Yii::$app->request->isAjax) {
             $query = Mall::find()->where([
@@ -35,6 +36,9 @@ class MallController extends BaseController
             if (!empty($keyword)) {
                 $query->andWhere(['LIKE', 'name', $keyword]);
             }
+            if ($is_show) {
+                $query->andWhere(['!=', 'id', 5]);
+            }
             $count = $query->count();
             $pagination = new \yii\data\Pagination(['totalCount' => intval($count)]);
             $list = $query
@@ -42,6 +46,11 @@ class MallController extends BaseController
                     /** @var Query $query */
                     $query->select('id,username');
                 }])
+                ->with(
+                    ['user' => function ($query) {
+                        $query->select('id,username');
+                    }]
+                )
                 ->orderBy('id DESC')
                 ->offset($pagination->offset)
                 ->limit($pagination->limit)
@@ -79,7 +88,6 @@ class MallController extends BaseController
         }
     }
 
-
     /**
      * @Author: zal
      * @Date: 2020-04-09
@@ -88,7 +96,7 @@ class MallController extends BaseController
      * @param $mallId
      * @return array|mixed
      */
-    private function getMallCountData($mallId)
+    private function getMallCountData ($mallId)
     {
         $cacheKey = 'SIMPLE_MALL_DATA_OF_' . $mallId;
         $cacheDuration = 600;
@@ -113,7 +121,7 @@ class MallController extends BaseController
      * @Note: 创建商城
      * @return \yii\web\Response
      */
-    public function actionCreate()
+    public function actionCreate ()
     {
         $form = new MallForm();
         $data = \Yii::$app->request->post();

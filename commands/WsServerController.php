@@ -75,11 +75,10 @@ class WsServerController extends BaseCommandController {
         $cacheKey = self::CLIENT_REL_MOBILE_CACHE_KEY_PREFIX . $param['request']->get['notify_mobile'];
         $cache = \Yii::$app->getCache();
         $fd = $cache->get($cacheKey);
+        $param['response']->end("ERROR");
+        if(empty($fd) || !$param['ws']->isEstablished($fd)){
+            $this->commandOut("通知商户已付款失败！客户端已断开");
 
-        if(empty($fd)){
-            $this->commandOut("无法找到客户端");
-        }elseif(!$param['ws']->isEstablished($fd)){
-            $this->commandOut("客户端：" . $fd . "已断开");
         }else{
             $this->commandOut("通知商户已付款：" . $text);
             $param['ws']->push($fd, $text);

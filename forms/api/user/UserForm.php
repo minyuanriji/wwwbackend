@@ -214,6 +214,7 @@ class UserForm extends BaseModel
             \Yii::$app->cache->delete($cacheKey);
         }
 
+        $result['mall_user_mobile']['mobile'] = '';
         //获取独立公众号绑定用户手机号
         if ($stands_mall_id && $stands_mall_id != 5) {
             $mall_user_id = Mall::find()->where([
@@ -226,7 +227,10 @@ class UserForm extends BaseModel
                 $result['mall_user_mobile'] = User::find()->where([
                     'id'   => $mall_user_id->user_id,
                     'is_delete' => 0,
-                ])->select('mobile')->one()->toArray();
+                ])->select('mobile')->one();
+                if (!$result['mall_user_mobile']) {
+                    $result['mall_user_mobile']['mobile'] = '';
+                }
             }
         }
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"ok",$result);

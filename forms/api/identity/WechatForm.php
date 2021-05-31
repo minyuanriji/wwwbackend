@@ -113,9 +113,11 @@ class WechatForm extends BaseModel
             {
                 $authData = $wechatModel->app->oauth->user();
                 \Yii::warning("授权结果 result:".json_encode($authData));
+                \Yii::warning("stands_mall_id result:".json_encode($stands_mall_id));
                 if(!empty($authData)){
                     $authOriginalData = $authData->original;
                     $phoneConfig = AppConfigLogic::getPhoneConfig();
+                    \Yii::warning("全网通 result:".json_encode($phoneConfig));
                     //没有开启全网通，则直接入库，如果开启了，返回给前端
                     if(empty($phoneConfig["all_network_enable"])){
                         $returnData = $this->userHandle($authOriginalData,$stands_mall_id);
@@ -144,6 +146,7 @@ class WechatForm extends BaseModel
                     }
                 }
             }
+            \Yii::warning("最终结果 result:".json_encode($returnData));
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);
         }catch (\Exception $e){
             return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());

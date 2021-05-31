@@ -50,7 +50,7 @@ class  MpwxConfig extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mall_id', 'name', 'app_id', 'secret'], 'required'],
+            [['mall_id', 'name'], 'required'],
             [['mall_id', 'is_delete', 'mch_id', 'created_at', 'updated_at', 'deleted_at'], 'integer'],
             [['cert_pem', 'key_pem'], 'string'],
             [['name'], 'string', 'max' => 45],

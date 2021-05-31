@@ -18,6 +18,7 @@ use app\models\BaseModel;
 use app\models\Favorite;
 use app\models\Goods;
 use app\models\GoodsCollect;
+use app\models\Mall;
 use app\models\MemberLevel;
 use app\models\Order;
 use app\models\ScoreLog;
@@ -200,7 +201,7 @@ class UserForm extends BaseModel
      * @Time: 17:33
      * @return array
      */
-    public function getBasicInfo()
+    public function getBasicInfo($stands_mall_id)
     {
         $result = $this->getUserInfo();
 
@@ -211,6 +212,26 @@ class UserForm extends BaseModel
         if ($couponList && count($couponList) > 0) {
             $result['register'] = ['coupon_list' => $couponList];
             \Yii::$app->cache->delete($cacheKey);
+        }
+
+        $result['mall_user_mobile']['mobile'] = '';
+        //获取独立公众号绑定用户手机号
+        if ($stands_mall_id && $stands_mall_id != 5) {
+            $mall_user_id = Mall::find()->where([
+                'id'   => $stands_mall_id,
+                'is_delete' => 0,
+                'is_recycle' => 0,
+                'is_disable' => 0
+            ])->select('user_id')->one();
+            if ($mall_user_id) {
+                $result['mall_user_mobile'] = User::find()->where([
+                    'id'   => $mall_user_id->user_id,
+                    'is_delete' => 0,
+                ])->select('mobile')->one();
+                if (!$result['mall_user_mobile']) {
+                    $result['mall_user_mobile']['mobile'] = '';
+                }
+            }
         }
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"ok",$result);
     }

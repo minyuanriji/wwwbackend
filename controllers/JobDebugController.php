@@ -25,7 +25,7 @@ class JobDebugController extends Controller{
 
             WebSocketRequestForm::add(new WebSocketRequestForm([
                 'action' => 'MchPaidNotify',
-                'notify_mobile' => '13422078495',
+                'notify_mobile' => '18818802855',
                 'notify_data' => "PAID:" . json_encode($data)
             ]));
         }

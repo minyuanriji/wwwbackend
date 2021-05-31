@@ -7,6 +7,7 @@ use app\forms\api\identity\SmsForm;
 use app\helpers\sms\Sms;
 use app\models\Admin;
 use app\models\BaseModel;
+use app\models\User;
 use app\plugins\mch\models\Mch;
 
 class BindDeviceForm extends BaseModel{
@@ -73,14 +74,26 @@ class BindDeviceForm extends BaseModel{
                 throw new \Exception("账号保存失败");
             }
 
+            $user = User::findOne($mch->user_id);
+            if(!$user || $user->is_delete){
+                throw new \Exception("无法获取到商户所属小程序账号");
+            }
+
+            $user->auth_key = \Yii::$app->security->generateRandomString();
+            $user->access_token = \Yii::$app->security->generateRandomString();
+            if(!$user->save()){
+                throw new \Exception("小程序账号信息保存失败");
+            }
+
             //Sms::updateCodeStatus($this->mobile, $this->verify_code);
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg'  => '登陆成功',
                 'data' => [
-                    'auth_key' => $admin->auth_key,
-                    'mobile'   => $this->mobile
+                    'auth_key'     => $user->auth_key,
+                    'mobile'       => $this->mobile,
+                    'access_token' => $user->access_token
                 ]
             ];
 

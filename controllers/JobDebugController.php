@@ -1,16 +1,13 @@
 <?php
 namespace app\controllers;
 
-use app\mch\events\CheckoutOrderPaidEvent;
-use app\models\PaymentOrder;
-use app\plugins\mch\models\MchCheckoutOrder;
 use yii\web\Controller;
 
 class JobDebugController extends Controller{
 
     public function actionIndex(){
 
-        try {
+/*        try {
             $paymentOrder = PaymentOrder::findOne([
                 "order_no" => "MS202105191329222619372952"
             ]);
@@ -31,7 +28,7 @@ class JobDebugController extends Controller{
             \Yii::$app->trigger(MchCheckoutOrder::EVENT_PAYED, $event);
         }catch (\Exception $e){
             echo $e->getMessage();
-        }
+        }*/
 
 
 

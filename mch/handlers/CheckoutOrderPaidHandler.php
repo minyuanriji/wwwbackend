@@ -71,7 +71,7 @@ class CheckoutOrderPaidHandler {
 
                 $t->commit();
 
-                static::voiceNotify($mch->mobile, "商家" . $store_name->name . "收到{$amount}元");
+                static::voiceNotify($mch->mobile, "使用红包支付{$amount}元");
             }catch (\Exception $e){
                 $t->rollBack();
                 throw new \Exception($e->getMessage());
@@ -81,6 +81,7 @@ class CheckoutOrderPaidHandler {
 
     public static function voiceNotify($mobile, $text){
         $base64Data = TencentCloudAudioHelper::request($text);
+
         if(!empty($base64Data)){
             $data = [
                 "text"       => $text,

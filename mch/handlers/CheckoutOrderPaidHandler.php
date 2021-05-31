@@ -80,7 +80,7 @@ class CheckoutOrderPaidHandler {
     }
 
     public static function voiceNotify($mobile, $text){
-        $base64Data = TencentCloudAudioHelper::requestAudio($text);
+        $base64Data = TencentCloudAudioHelper::request($text);
         if(!empty($base64Data)){
             $data = [
                 "text"       => $text,

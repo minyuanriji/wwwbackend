@@ -227,7 +227,10 @@ class UserForm extends BaseModel
                 $result['mall_user_mobile'] = User::find()->where([
                     'id'   => $mall_user_id->user_id,
                     'is_delete' => 0,
-                ])->select('mobile')->one()->toArray();
+                ])->select('mobile')->one();
+                if (!$result['mall_user_mobile']) {
+                    $result['mall_user_mobile']['mobile'] = '';
+                }
             }
         }
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"ok",$result);

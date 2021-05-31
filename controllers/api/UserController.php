@@ -47,7 +47,9 @@ class UserController extends ApiController
     public function actionUserInfo()
     {
         $form = new UserForm();
-        return $form->getBasicInfo();
+        $headers = \Yii::$app->request->headers;
+        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 0;
+        return $form->getBasicInfo($stands_mall_id);
     }
 
     /**

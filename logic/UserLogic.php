@@ -91,11 +91,11 @@ class UserLogic
                         $user = $userInfos->user;
                     }
                 }
-                if (isset($userData["mobile"])) {
-                    $user->mobile = $userData["mobile"];
-                }
                 if(empty($user)){
                     $user = new User();
+                    if (isset($userData["mobile"]) && $userData["mobile"]) {
+                        $user->mobile = $userData["mobile"];
+                    }
                     $user->username         = isset($userData["username"]) ? $userData["username"] : "wechat_user";
 //                    $user->mobile           = isset($userData["mobile"]) ? $userData["mobile"] : "";
                     $user->mall_id          = \Yii::$app->mall->id;

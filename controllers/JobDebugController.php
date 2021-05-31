@@ -1,68 +1,40 @@
 <?php
 namespace app\controllers;
 
-use app\forms\common\WebSocketRequestForm;
-use TencentCloud\Common\Credential;
-use TencentCloud\Common\Exception\TencentCloudSDKException;
-use TencentCloud\Common\Profile\ClientProfile;
-use TencentCloud\Common\Profile\HttpProfile;
-use TencentCloud\Tts\V20190823\Models\TextToVoiceRequest;
-use TencentCloud\Tts\V20190823\TtsClient;
+use app\mch\events\CheckoutOrderPaidEvent;
+use app\models\PaymentOrder;
+use app\plugins\mch\models\MchCheckoutOrder;
 use yii\web\Controller;
 
 class JobDebugController extends Controller{
 
     public function actionIndex(){
 
-        $voiceText = "今天下雨记得带伞";
-        $base64Data = $this->requestAudio($voiceText);
-        if(!empty($base64Data)){
-            $data = [
-                "text"       => $voiceText,
-                "base64Data" => $base64Data,
-                "url"        => ""
-            ];
-
-            WebSocketRequestForm::add(new WebSocketRequestForm([
-                'action' => 'MchPaidNotify',
-                'notify_mobile' => '18818802855',
-                'notify_data' => "PAID:" . json_encode($data)
-            ]));
-        }
-    }
-
-    public function requestAudio($text){
-
-        $secretId = "AKIDB8RUWHdxrXv95InwKRIsABPN5Wg4i1a4";
-        $secretKey = "OilWBj11i94g1sTx9E3aqonWy93FBpBS";
-
         try {
+            $paymentOrder = PaymentOrder::findOne([
+                "order_no" => "MS202105191329222619372952"
+            ]);
 
-            $cred = new Credential($secretId, $secretKey);
-            $httpProfile = new HttpProfile();
-            $httpProfile->setEndpoint("tts.tencentcloudapi.com");
+            //获取到结账单
+            $checkoutOrder = MchCheckoutOrder::findOne([
+                'order_no'  => $paymentOrder->order_no,
+                'is_delete' => 0
+            ]);
+            if(!$checkoutOrder){
+                throw new \Exception("无法获取到结帐单");
+            }
 
-            $clientProfile = new ClientProfile();
-            $clientProfile->setHttpProfile($httpProfile);
-            $client = new TtsClient($cred, "ap-guangzhou", $clientProfile);
-
-            $req = new TextToVoiceRequest();
-
-            $params = array(
-                "Text"      => $text,
-                "SessionId" => md5(uniqid()),
-                "ModelType" => 1,
-                "VoiceType" => 4
-            );
-            $req->fromJsonString(json_encode($params));
-
-            $resp = $client->TextToVoice($req);
-
-            return isset($resp->Audio) ? $resp->Audio : null;
-        } catch(TencentCloudSDKException $e) {
-
+            $event = new CheckoutOrderPaidEvent();
+            $event->checkoutOrder = $checkoutOrder;
+            $event->amount        = $paymentOrder->amount;
+            $event->sender        = $this;
+            \Yii::$app->trigger(MchCheckoutOrder::EVENT_PAYED, $event);
+        }catch (\Exception $e){
+            echo $e->getMessage();
         }
 
-        return null;
+
+
     }
+
 }

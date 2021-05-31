@@ -218,7 +218,7 @@ Yii::$app->loadComponentView('com-rich-text');
                 this.$forceUpdate();
             },
             deleteComponent(index) {
-                this.components.splice(index, 1);
+                this.components.splice(index, 1,[]);
                 this.refreshComponents();
             },
             copyComponent(index) {
@@ -281,7 +281,6 @@ Yii::$app->loadComponentView('com-rich-text');
                     //  this.submitLoading = false;
                     if (response.data.code === 0) {
 						console.log(postComponents);
-						console.log(888888888888);
                         this.$message.success(response.data.msg);
                     } else {
                         this.$message.error(response.data.msg);

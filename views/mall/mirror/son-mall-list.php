@@ -99,7 +99,7 @@
                         <el-button v-else type="text" :disabled="true">{{scope.row.name}}</el-button>-->
                         <el-button type="text" :disabled="true" style="background-color: RGB(49,49,49)">商城名称：{{scope.row.name}}</el-button>
                         <div>
-                            <span>归属人：{{scope.row.admin.username}}</span>
+                            <span>归属账号：{{scope.row.admin.username}}</span>
                         </div>
 
                         <div>

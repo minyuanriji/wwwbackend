@@ -298,7 +298,7 @@ class UserController extends ApiController
             $WeChatCode = $flag;
         }
         $config = array(
-            'bg_url' => \Yii::$app->basePath . '/web/statics' . '/bg/redpack.png',//背景图片路径
+            'bg_url' => \Yii::$app->basePath . '/web/statics/bg/redpack.png',//背景图片路径
             'text' => array(
 //                array(
 //                    'text' => '初夏',//文本内容
@@ -327,7 +327,7 @@ class UserController extends ApiController
 //                    'angle' => -50,
 //                ),
                 array(
-                    'text' => '扫码领红包',
+                    'text' => '',//扫码领红包
                     'left' => 116,
                     'top' => 280,
                     'width' => 300,
@@ -367,12 +367,12 @@ class UserController extends ApiController
                     'name' => '二维码', //图片名称，用于出错时定位
                     'url' => $WeChatCode,
                     'stream' => $qrCodeData,
-                    'left' => 118,
-                    'top' => 300,
+                    'left' => 190,
+                    'top' => 390,
                     'right' => 0,
                     'bottom' => 0,
-                    'width' => 90,
-                    'height' => 90,
+                    'width' => 380,
+                    'height' => 380,
                     'radius' => 0,
                     'opacity' => 100
                 ),

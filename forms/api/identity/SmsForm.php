@@ -67,11 +67,13 @@ class SmsForm extends BaseModel
         } catch (\Exception $exception) {
             if($exception instanceof NoGatewayAvailableException) {
                 //$exception = $exception->results['aliyun']['exception'];
-                $msg = '验证码配置错误';
+//                $msg = '验证码配置错误';
+                $msg = '短信发送已达上限';
             } else {
                 $msg = $exception->getMessage();
             }
-            return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($exception,$msg));
+//            return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($exception,$msg));
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,$msg);
         }
     }
 

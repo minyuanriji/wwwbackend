@@ -327,7 +327,7 @@ class UserController extends ApiController
 //                    'angle' => -50,
 //                ),
                 array(
-                    'text' => '扫码领红包',
+                    'text' => '',//扫码领红包
                     'left' => 116,
                     'top' => 280,
                     'width' => 300,

@@ -3,11 +3,14 @@ namespace app\mch\handlers;
 
 
 use app\core\ApiCode;
+use app\forms\common\WebSocketRequestForm;
+use app\helpers\TencentCloudAudioHelper;
 use app\mch\events\CheckoutOrderPaidEvent;
 use app\mch\forms\order\CheckoutOrderDeductIntegralForm;
 use app\models\Mall;
 use app\forms\efps\distribute\EfpsDistributeForm;
 use app\models\Store;
+use app\plugins\mch\models\Mch;
 
 class CheckoutOrderPaidHandler {
 
@@ -43,6 +46,8 @@ class CheckoutOrderPaidHandler {
                     'is_delete'     => 0,
                 ])->one();
 
+                //获取商户信息
+                $mch = Mch::findOne($store_name->mch_id);
 
                 //红包券抵扣
                 if($checkoutOrder->integral_deduction_price > 0){
@@ -65,6 +70,8 @@ class CheckoutOrderPaidHandler {
                 }
 
                 $t->commit();
+
+                static::voiceNotify($mch->mobile, "补商汇到账" . $checkoutOrder->order_price . "元");
             }catch (\Exception $e){
                 $t->rollBack();
                 throw new \Exception($e->getMessage());
@@ -72,4 +79,21 @@ class CheckoutOrderPaidHandler {
         }
     }
 
+    public static function voiceNotify($mobile, $text){
+        $base64Data = TencentCloudAudioHelper::request($text);
+
+        if(!empty($base64Data)){
+            $data = [
+                "text"       => $text,
+                "base64Data" => $base64Data,
+                "url"        => ""
+            ];
+
+            WebSocketRequestForm::add(new WebSocketRequestForm([
+                'action'        => 'MchPaidNotify',
+                'notify_mobile' => $mobile,
+                'notify_data'   => "PAID:" . json_encode($data)
+            ]));
+        }
+    }
 }

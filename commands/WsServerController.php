@@ -51,7 +51,7 @@ class WsServerController extends BaseCommandController {
                 return;
             }
 
-            $action = !empty($request->get['action']) ? "requestAction" . $request->get['action'] : "invalidAction";
+            $action = !empty($request->post['action']) ? "requestAction" . $request->post['action'] : "invalidAction";
 
             if($this->hasMethod($action)){
                 $this->$action([
@@ -71,18 +71,17 @@ class WsServerController extends BaseCommandController {
      */
     public function requestActionMchPaidNotify($param){
 
-        $text = !empty($param['request']->get['notify_data']) ? $param['request']->get['notify_data'] : "";
-        $cacheKey = self::CLIENT_REL_MOBILE_CACHE_KEY_PREFIX . $param['request']->get['notify_mobile'];
+        $text = !empty($param['request']->post['notify_data']) ? $param['request']->post['notify_data'] : "";
+        $cacheKey = self::CLIENT_REL_MOBILE_CACHE_KEY_PREFIX . $param['request']->post['notify_mobile'];
         $cache = \Yii::$app->getCache();
         $fd = $cache->get($cacheKey);
-
-        if(empty($fd)){
-            $this->commandOut("无法找到客户端");
-        }elseif(!$param['ws']->isEstablished($fd)){
-            $this->commandOut("客户端：" . $fd . "已断开");
+        if(empty($fd) || !$param['ws']->isEstablished($fd)){
+            $this->commandOut("通知商户已付款失败！客户端已断开");
+            $param['response']->end("ERROR");
         }else{
-            $this->commandOut("通知商户已付款：" . $text);
+            $this->commandOut("通知商户已付款成功");
             $param['ws']->push($fd, $text);
+            $param['response']->end("SUCCESS");
         }
     }
 

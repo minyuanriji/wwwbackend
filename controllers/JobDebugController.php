@@ -1,24 +1,37 @@
 <?php
 namespace app\controllers;
 
-
-use app\component\jobs\CheckoutOrderDistributionIncomeJob;
-use app\component\jobs\EfpsPayQueryJob;
-use app\component\jobs\EfpsTransferJob;
-use app\component\jobs\OrderDistributionIncomeJob;
-use app\models\Integral;
 use yii\web\Controller;
 
 class JobDebugController extends Controller{
 
-    public function actionExecute(){
+    public function actionIndex(){
 
-        (new EfpsPayQueryJob())->execute(null);
-        (new OrderDistributionIncomeJob())->execute(null);
-        (new CheckoutOrderDistributionIncomeJob())->execute(null);
-        (new EfpsTransferJob())->execute(null);
+/*        try {
+            $paymentOrder = PaymentOrder::findOne([
+                "order_no" => "MS202105191329222619372952"
+            ]);
 
-        Integral::sendIntegral();
+            //获取到结账单
+            $checkoutOrder = MchCheckoutOrder::findOne([
+                'order_no'  => $paymentOrder->order_no,
+                'is_delete' => 0
+            ]);
+            if(!$checkoutOrder){
+                throw new \Exception("无法获取到结帐单");
+            }
+
+            $event = new CheckoutOrderPaidEvent();
+            $event->checkoutOrder = $checkoutOrder;
+            $event->amount        = $paymentOrder->amount;
+            $event->sender        = $this;
+            \Yii::$app->trigger(MchCheckoutOrder::EVENT_PAYED, $event);
+        }catch (\Exception $e){
+            echo $e->getMessage();
+        }*/
+
+
 
     }
+
 }

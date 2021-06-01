@@ -124,7 +124,7 @@ class OrderListCommon extends BaseModel
         }
 
         $this->query->andWhere(['!=', 'o.sign', 'group_buy']);
-        $this->query->andWhere(['send_type' => 0]);
+        //$this->query->andWhere(['send_type' => 0]);
 
         if($this->only_offline_order){ //只显示核销订单
             $this->query->andWhere(["IN", "o.order_type", ["offline_baopin", "offline_normal"]]);
@@ -138,9 +138,7 @@ class OrderListCommon extends BaseModel
             }else{
                 $this->query->andWhere("(o.is_send=1 OR o.sale_status <> '".Order::SALE_STATUS_NO."' OR o.status <> '".Order::STATUS_WAIT_DELIVER."')");
             }
-        }
-
-        if($this->only_express_order){ //只显示寄送订单
+        }else{ //只显示寄送订单
             $this->query->andWhere(["IN", "o.order_type", ["express_baopin", "express_normal"]]);
         }
 

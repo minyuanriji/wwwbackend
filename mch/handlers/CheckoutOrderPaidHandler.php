@@ -71,7 +71,7 @@ class CheckoutOrderPaidHandler {
 
                 $t->commit();
 
-                static::voiceNotify($mch->mobile, "使用红包支付{$amount}元");
+                static::voiceNotify($mch->mobile, "补商汇到账" . $checkoutOrder->order_price . "元");
             }catch (\Exception $e){
                 $t->rollBack();
                 throw new \Exception($e->getMessage());

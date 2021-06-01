@@ -17,6 +17,38 @@ class UserIncomeForm extends BaseModel{
     const TYPE_SUB      = 2;
 
     /**
+     * 股东分红
+     * @param User $user
+     * @param $price
+     * @param string $remark
+     * @return void
+     */
+    public static function bossAdd(User $user, $price, $source_id, $desc = ""){
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+
+            if(empty($desc)){
+                $desc = "来自股东分红[ID:{$source_id}]";
+            }
+
+            static::change($user, $price, self::TYPE_ADD, self::FLAG_INCOME, "boss", time(), $desc);
+
+            $t->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '操作成功'
+            ];
+        }catch (\Exception $e){
+            $t->rollBack();
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+    }
+
+        /**
      * 管理员充值
      * @param User $user
      * @param $price

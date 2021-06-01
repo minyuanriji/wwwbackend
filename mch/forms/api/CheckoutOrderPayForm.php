@@ -8,11 +8,11 @@ use app\helpers\ArrayHelper;
 use app\logic\AppConfigLogic;
 use app\logic\OrderLogic;
 use app\mch\events\CheckoutOrderPaidEvent;
-use app\mch\payment\CheckoutOrderPayNotify;
 use app\models\BaseModel;
 use app\models\Order;
 use app\models\Store;
 use app\models\User;
+use app\notify_class\mch\CheckoutOrderPayNotify;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
 

@@ -32,7 +32,7 @@ class TencentCloudAudioHelper
                 "Text"      => $text,
                 "SessionId" => md5(uniqid()),
                 "ModelType" => 1,
-                "VoiceType" => 4
+                "Volume"    => 10
             );
             $req->fromJsonString(json_encode($params));
 

@@ -44,10 +44,6 @@ class BindDeviceForm extends BaseModel{
                 throw new \Exception("无法获取到商户信息");
             }
 
-            if($mch->review_status != Mch::REVIEW_STATUS_CHECKED){
-                throw new \Exception("商户仍在审核中");
-            }
-
             $security = \Yii::$app->getSecurity();
 
             $admin = Admin::findOne(["mch_id" => $mch->id]);

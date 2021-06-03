@@ -918,7 +918,22 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         </el-input>
 
                                     </el-form-item>
-								
+
+
+
+                                    <el-form-item label="下单升级会员" prop="enable_upgrade_user_role">
+                                        <el-switch v-model="ruleForm.enable_upgrade_user_role" :active-value="1" :inactive-value="0" active-text="开启" inactive-text="关闭">
+                                        </el-switch>
+                                        <div v-if="ruleForm.enable_upgrade_user_role == 1">
+                                            <el-select v-model="ruleForm.upgrade_user_role_type">
+                                                <el-option :label="'店主'" :value="'store'"></el-option>
+                                                <el-option :label="'合伙人'" :value="'partner'"></el-option>
+                                                <el-option :label="'分公司'" :value="'branch_office'"></el-option>
+                                            </el-select>
+                                        </div>
+
+                                    </el-form-item>
+
 								</el-col>
                             </el-row>
 
@@ -1282,7 +1297,9 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 full_relief_price: 0,
                 fulfil_price: 0,
                 cannotrefund:["1","2","3"],
-                profit_price: 0  //商品利润
+                profit_price: 0,  //商品利润
+                enable_upgrade_user_role:0, //下单后升级会员店主、合伙人或分公司
+                upgrade_user_role_type: ''
             };
             let rules = {
                 cats: [{

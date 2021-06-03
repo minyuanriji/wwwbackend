@@ -86,6 +86,8 @@ abstract class BaseGoodsEdit extends BaseModel
     public $cannotrefund;
     public $goods_brand;
     public $goods_supplier;
+    public $enable_upgrade_user_role;
+    public $upgrade_user_role_type;
 
     //分销
     public $individual_share;
@@ -131,7 +133,8 @@ abstract class BaseGoodsEdit extends BaseModel
             [['goods_no', 'rebate', 'app_share_title', 'app_share_pic', 'attr_default_name'], 'string'],
             [['forehead', 'id','fulfil_price','full_relief_price','max_deduct_integral','enable_integral','enable_score','is_order_paid', 'is_order_sales'], 'number'],
             [['cats', 'mchCats', 'services', 'cards', 'attr', 'attrGroups', 'member_price',
-                'select_attr_groups', 'labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund'], 'safe'],
+                'select_attr_groups', 'labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund',
+                'upgrade_user_role_type'], 'safe'],
             [['virtual_sales', 'freight_id', 'is_level', 'is_level_alone', 'forehead', 'forehead_score',
                 'give_score', 'individual_share', 'is_level_alone', 'pieces', 'share_type', 'accumulative',
                 'attr_setting_type', 'goods_weight', 'is_area_limit', 'form_id'], 'default', 'value' => 0],
@@ -143,7 +146,7 @@ abstract class BaseGoodsEdit extends BaseModel
                 'is_default_services'], 'default', 'value' => 1],
             [['price', 'forehead_score', 'profit_price'], 'number', 'min' => 0],
             [['price', 'profit_price'], 'number', 'max' => 9999999],
-            [['is_on_site_consumption'], 'number'],
+            [['is_on_site_consumption', 'enable_upgrade_user_role'], 'number'],
             [['fulfil_price','full_relief_price'],'default','value'=>0],
             [['integral_fee_rate'], 'integer', 'min' => 0, 'max' => 100]
         ];
@@ -430,6 +433,12 @@ abstract class BaseGoodsEdit extends BaseModel
         //自定义价格显示
         if (!empty($this->price_display)) {
             $goods->price_display = json_encode($this->price_display);
+        }
+
+        //下单后升级会员店主、合伙人或分公司
+        $goods->enable_upgrade_user_role = (int)$this->enable_upgrade_user_role;
+        if(!empty($this->upgrade_user_role_type)){
+            $goods->upgrade_user_role_type = $this->upgrade_user_role_type;
         }
 
         $res = $goods->save();

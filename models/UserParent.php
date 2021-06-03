@@ -96,7 +96,7 @@ class UserParent extends BaseActiveRecord
      * @param integer $level
      * @return array
      */
-    public static function getParentsIdsByUser(int $user_id,int $level=0){
+    public static function getParentsIdsByUser($user_id, $level=0){
         $query = self::find()->select('parent_id')
         ->where(array('user_id'=>$user_id,'is_delete'=>0,'mall_id'=>Yii::$app->mall->id));
         if($level > 0) $query->andWhere(array('<=','level',$level));

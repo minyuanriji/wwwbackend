@@ -22,19 +22,19 @@ class DistrictController extends BaseController
     public function actionTree()
     {
         $district = DistrictData::getTerritorial();
-        return $this->asJson([
+        return [
             'code' => 0,
             'msg' => '',
             'data' => [
                 'district' => $district
             ]
-        ]);
+        ];
     }
 
     public function actionCommon()
     {
         $form = new UserAddressForm();
-        return $this->asJson($form->autoAddressInfo());
+        return $form->autoAddressInfo();
     }
 
     public function actionIndex()
@@ -62,18 +62,18 @@ class DistrictController extends BaseController
             }
             $list = DistrictData::getArr();
             $district = DistrictData::getList($list, $level);
-            return $this->asJson([
+            return [
                 'code' => 0,
                 'msg' => '',
                 'data' => [
                     'district' => $district
                 ]
-            ]);
+            ];
         }
-        return $this->asJson([
+        return [
             'code' => 1,
             'msg' => '返回错误'
-        ]);
+        ];
     }
 
     public function actionTownList()
@@ -114,11 +114,11 @@ class DistrictController extends BaseController
             }
             $town_list = Town::find()->where(['district_id' => $district_id])->asArray()->all();
         }
-        return $this->asJson([
+        return [
             'code' => 0,
             'msg' => '',
             'list' => $town_list
-        ]);
+        ];
 
     }
 

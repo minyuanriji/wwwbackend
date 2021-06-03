@@ -38,10 +38,5 @@ class EfpsMerchantMccController extends BaseController{
                 ]
             ]);
         }
-
-        return $this->asJson([
-            'code' => 1,
-            'msg' => '返回错误'
-        ]);
     }
 }

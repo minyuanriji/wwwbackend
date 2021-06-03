@@ -156,6 +156,9 @@ $indSetting = \app\logic\OptionLogic::get(\app\models\Option::NAME_IND_SETTING);
         </div>
     </div>
 </div>
+<div style="position:absolute;left:0px;bottom:0px;width:100%;text-align:center;padding:10px 0px;">
+    <a target="blank" href="http://beian.miit.gov.cn" style="color:white;">粤ICP备19145623号</a>
+</div>
 <script>
     const app = new Vue({
         el: '#app',

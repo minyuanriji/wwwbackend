@@ -60,7 +60,6 @@ class BindDeviceForm extends BaseModel{
                     'created_at'   => time(),
                     'updated_at'   => time()
                 ]);
-
             }
 
             $admin->auth_key = \Yii::$app->security->generateRandomString();

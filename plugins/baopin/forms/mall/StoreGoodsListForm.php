@@ -43,7 +43,10 @@ class StoreGoodsListForm extends BaseModel{
             $query->innerJoin(["g" => Goods::tableName()], "g.id=bmg.goods_id");
             $query->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");
 
-            $query->andWhere(["bmg.store_id" => $this->store_id]);
+            $query->andWhere([
+                "bmg.store_id"  => $this->store_id,
+                "bmg.is_delete" => 0
+            ]);
 
             if (!empty($this->keyword)) {
                 $query->andWhere([

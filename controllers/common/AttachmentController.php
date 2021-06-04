@@ -112,12 +112,12 @@ class AttachmentController extends BaseController
         is_null($type) || $query->andWhere(['type' => $type === 'video' ? 1 : 0]);
         is_null($is_recycle) || $query->andWhere(['is_recycle' => $is_recycle]);
 
-        return $this->asJson([
+        return [
             'code' => ApiCode::CODE_SUCCESS,
             'data' => [
                 'list' => $query->all(),
             ],
-        ]);
+        ];
     }
 
     /**
@@ -143,7 +143,7 @@ class AttachmentController extends BaseController
         $form->mall_id = $mall->id;
         $form->type = \Yii::$app->request->post('type') == 'video' ? 1 : 0;
         $form->mch_id = $this->getMchId() ? $this->getMchId() : 0;
-        return $this->asJson($form->save());
+        return $form->save();
     }
 
     /**
@@ -200,10 +200,10 @@ class AttachmentController extends BaseController
             'mall_id' => $mall->id,
             'mch_id' => $this->getMchId() ? $this->getMchId() : 0,
         ]);
-        return $this->asJson([
+        return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '操作成功。',
-        ]);
+        ];
     }
 
     /**
@@ -290,10 +290,10 @@ class AttachmentController extends BaseController
             'mall_id' => $mall->id,
             'mch_id' => $this->getMchId() ? $this->getMchId() : 0,
         ]);
-        return $this->asJson([
+        return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '操作成功。',
-        ]);
+        ];
 
     }
 
@@ -324,10 +324,10 @@ class AttachmentController extends BaseController
         }
         $attachment->name = $post['name'];
         $attachment->save();
-        return $this->asJson([
+        return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '保存成功'
-        ]);
+        ];
     }
 
     /**
@@ -366,9 +366,9 @@ class AttachmentController extends BaseController
             'id' => $ids,
             'mall_id' => $mall->id,
         ]);
-        return $this->asJson([
+        return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '操作成功。',
-        ]);
+        ];
     }
 }

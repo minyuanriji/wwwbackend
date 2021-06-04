@@ -30,18 +30,18 @@ class EfpsMerchantMccController extends BaseController{
 
             $mcc = array_values($mcc);
 
-            return $this->asJson([
+            return [
                 'code' => 0,
                 'msg' => '',
                 'data' => [
                     'mcc' => $mcc
                 ]
-            ]);
+            ];
         }
 
-        return $this->asJson([
+        return [
             'code' => 1,
             'msg' => '返回错误'
-        ]);
+        ];
     }
 }

@@ -35,4 +35,14 @@ class StoreController extends Controller{
             return $this->render('goods_list');
         }
     }
+
+    /**
+     * 修改门店爆品库存
+     * @return string|yii\web\Response
+     */
+    public function actionSaveStock(){
+        $form = new StoreGoodsStockEditForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
+    }
 }

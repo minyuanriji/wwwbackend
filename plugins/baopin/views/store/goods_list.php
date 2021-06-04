@@ -46,10 +46,18 @@
                     </el-table-column>
                     <el-table-column label="库存（件）">
                         <template scope="scope">
-                            <el-input :disabled="scope.row.id != edit_id"  placeholder="请输入内容" v-model="scope.row.stock_num" >
-                                <el-button onclick="editStock(scope.row)" v-if="scope.row.id != edit_id" slot="append" icon="el-icon-edit-outline"></el-button>
-                                <el-button v-else slot="append" icon="el-icon-check"></el-button>
-                            </el-input>
+                            <el-row>
+                                <el-col :span="scope.row.id != edit_id ? 24 : 16">
+                                    <el-input type="number" :disabled="scope.row.id != edit_id"  placeholder="请输入内容" v-model="scope.row.stock_num" >
+                                        <el-button @click="editStock(scope.row)" v-if="scope.row.id != edit_id" slot="append" icon="el-icon-edit-outline"></el-button>
+                                    </el-input>
+                                </el-col>
+                                <el-col :span="8" v-if="scope.row.id == edit_id">
+                                    <el-button type="text" @click="saveStore(scope.row)"><img src="statics/img/mall/pass.png" alt=""></el-button>
+                                    <el-button type="text" @click="edit_id=0"><img src="statics/img/mall/nopass.png" alt=""></el-button>
+                                 </el-col>
+                            </el-row>
+
                         </template>
                     </el-table-column>
                     <el-table-column label="操作">
@@ -114,6 +122,32 @@
 
             editStock(row){
                 this.edit_id = row.id;
+            },
+
+            saveStore(row){
+                if(row.stock_num < 0){
+                    this.$message.error("库存不能小于0");
+                    return;
+                }
+                this.loading = true;
+                var self = this;
+                request({
+                    params: {
+                        r: 'plugin/baopin/mall/store/save-stock',
+                        goods_id: row.id,
+                        store_id: getQuery("store_id"),
+                        stock_num: row.stock_num
+                    }
+                }).then(e => {
+                    self.loading = false;
+                    if (e.data.code == 0) {
+                        self.edit_id = 0;
+                    }else{
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.$message.error('request fail');
+                });
             },
 
             sortReload(column){

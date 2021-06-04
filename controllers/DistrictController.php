@@ -33,6 +33,7 @@ class DistrictController extends BaseController
 
     public function actionCommon()
     {
+
         $form = new UserAddressForm();
         return $form->autoAddressInfo();
     }

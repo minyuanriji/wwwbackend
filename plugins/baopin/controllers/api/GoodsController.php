@@ -1,6 +1,7 @@
 <?php
 namespace app\plugins\baopin\controllers\api;
 
+use app\helpers\CacheHelper;
 use app\plugins\ApiController;
 use app\plugins\baopin\forms\api\SearchForm;
 
@@ -11,9 +12,12 @@ class GoodsController extends ApiController{
      * @return \yii\web\Response
      */
     public function actionSearch(){
-        $form = new SearchForm();
-        $form->attributes = $this->requestData;
-        return $this->asJson($form->search());
+        $search = CacheHelper::get(CacheHelper::PLUGIN_BAOPIN_API_GOODS_SEARCH, function($helper){
+            $form = new SearchForm();
+            $form->attributes = $this->requestData;
+            return $helper($form->search());
+        });
+        return $this->asJson($search);
     }
 
 }

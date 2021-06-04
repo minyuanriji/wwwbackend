@@ -15,6 +15,7 @@ use app\forms\api\goods\GoodsListForm;
 use app\forms\api\goods\RecommendForm;
 use app\forms\api\poster\GoodsPosterForm;
 use app\forms\api\poster\PosterForm;
+use app\helpers\CacheHelper;
 
 class GoodsController extends ApiController
 {
@@ -27,9 +28,13 @@ class GoodsController extends ApiController
 //     *
     public function actionDetail()
     {
-        $form = new GoodsForm();
-        $form->attributes =$this->requestData;
-        return $this->asJson($form->getDetail());
+        $detail = CacheHelper::get(CacheHelper::API_GOODS_DETAIL, function($helper){
+            $form = new GoodsForm();
+            $form->attributes =$this->requestData;
+            return $helper($form->getDetail());
+        });
+
+        return $this->asJson($detail);
     }
 
     /**
@@ -56,9 +61,14 @@ class GoodsController extends ApiController
      */
     public function actionRecommend()
     {
-        $form = new RecommendForm();
-        $form->attributes =$this->requestData;
-        return $this->asJson($form->getNewList());
+        $recommand = CacheHelper::get(CacheHelper::API_GOODS_RRECOMMAND, function ($helper){
+            $form = new RecommendForm();
+            $form->attributes = $this->requestData;
+            $recommand = $form->getNewList();
+            return $helper($recommand);
+        });
+
+        return $this->asJson($recommand);
     }
 
     /**
@@ -70,9 +80,13 @@ class GoodsController extends ApiController
      */
     public function actionList()
     {
-        $form = new GoodsListForm();
-        $form->attributes = $this->requestData;
-        return $this->asJson($form->getList());
+        $list = CacheHelper::get(CacheHelper::API_GOODS_LIST, function($helper){
+            $form = new GoodsListForm();
+            $form->attributes = $this->requestData;
+            return $helper($form->getList());
+        });
+
+        return $this->asJson($list);
     }
 
     /**

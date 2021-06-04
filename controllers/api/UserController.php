@@ -292,7 +292,7 @@ class UserController extends ApiController
         $qrCodeData = '';
         $WeChatCode = '';
         if(empty($flag)){
-            $code = \Yii::$app->request->hostInfo . '/h5/#/pages/public/login?user_id='. \Yii::$app->user->identity ->id;
+            $code = \Yii::$app->request->hostInfo . '/h5/#/pages/index/index?user_id='. \Yii::$app->user->identity ->id . '&pid=' . \Yii::$app->user->identity ->id;
             $qrCodeData = QRcode::pngData($code,13);
         }else{
             $WeChatCode = $flag;

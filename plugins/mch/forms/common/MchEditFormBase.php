@@ -45,12 +45,12 @@ abstract class MchEditFormBase extends BaseModel
     public function rules()
     {
         return [
-            [['mch_common_cat_id',  'mobile', 'service_mobile', 'realname', 'name'], 'required'],
+            [['mch_common_cat_id',  'mobile', 'realname', 'name'], 'required'],
             [['user_id', 'mch_common_cat_id', 'transfer_rate', 'sort', 'id', 'status', 'is_recommend',
                 'province_id', 'city_id', 'district_id', 'integral_fee_rate'], 'integer'],
             [['mobile', 'address', 'logo', 'service_mobile', 'password'], 'string', 'max' => 255],
             [['username', 'realname', 'wechat', 'name', 'username', 'password'], 'string', 'max' => 65],
-            [['bg_pic_url'], 'safe']
+            [['bg_pic_url', 'service_mobile'], 'safe']
         ];
     }
 

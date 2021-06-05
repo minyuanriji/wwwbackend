@@ -3,7 +3,7 @@ namespace app\helpers;
 
 use app\core\ApiCode;
 
-class CacheHelper{
+class APICacheHelper{
 
     //获取商城设置接口
     const API_MALL_CONFIG                = "api_mall_config";
@@ -20,7 +20,7 @@ class CacheHelper{
     const MCH_API_GET_MCH_GOODS          = "mch/api/get-mch-goods";
     const MCH_API_GET_MCH_STORE          = "mch/api/get-mch-store";
 
-    private static function setting($key){
+    public static function setting(){
         $params[self::MCH_API_GET_MCH_STORE] = [
             'expire'  => 24 * 3600,
             'headers' => [],
@@ -99,7 +99,14 @@ class CacheHelper{
             'gets'    => [],
             'posts'   => []
         ];
-        return isset($params[$key]) ? $params[$key] : [];
+        return $params;
+    }
+
+    /**
+     * 无感更新
+     */
+    public static function silentUpdate(){
+
     }
 
     /**
@@ -110,7 +117,8 @@ class CacheHelper{
     public static function get($key, \Closure $callable){
         $headers = \Yii::$app->request->headers;
 
-        $setting = static::setting($key);
+        $settings = static::setting();
+        $setting = isset($settings[$key]) ? $settings[$key] : null;
 
         //头部
         $paramsKey = array_merge(isset($setting['headers']) ? $setting['headers'] : [], [

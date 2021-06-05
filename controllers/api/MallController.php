@@ -12,7 +12,7 @@ namespace app\controllers\api;
 
 use app\core\ApiCode;
 use app\forms\api\user\UserForm;
-use app\helpers\CacheHelper;
+use app\helpers\APICacheHelper;
 use app\logic\AppConfigLogic;
 use app\logic\OptionLogic;
 use app\models\Mall;
@@ -35,7 +35,7 @@ class MallController extends ApiController
      */
     public function actionMallConfig()
     {
-        $data = CacheHelper::get(CacheHelper::API_MALL_CONFIG, function($helper){
+        $data = APICacheHelper::get(APICacheHelper::API_MALL_CONFIG, function($helper){
             $mall_setting = \Yii::$app->mall->getMallSetting();
             $mall_setting['setting']["name"] = $mall_setting["name"];
             $setting['setting'] = $mall_setting['setting'];

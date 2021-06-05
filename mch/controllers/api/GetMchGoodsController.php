@@ -2,6 +2,7 @@
 namespace app\mch\controllers\api;
 
 use app\controllers\api\ApiController;
+use app\helpers\APICacheHelper;
 use app\mch\forms\api\GoodsListForm;
 
 class GetMchGoodsController extends ApiController{
@@ -12,8 +13,12 @@ class GetMchGoodsController extends ApiController{
      */
     public function actionIndex()
     {
-        $form = new GoodsListForm();
-        $form->attributes = $this->requestData;
-        return $this->asJson($form->getList());
+        $list = APICacheHelper::get(APICacheHelper::MCH_API_GET_MCH_GOODS, function($helper){
+            $form = new GoodsListForm();
+            $form->attributes = $this->requestData;
+            return $helper($form->getList());
+        });
+
+        return $this->asJson($list);
     }
 }

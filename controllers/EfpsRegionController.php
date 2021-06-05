@@ -49,17 +49,17 @@ class EfpsRegionController extends BaseController {
 
             $regions = array_values($regions);
 
-            return $this->asJson([
+            return [
                 'code' => 0,
                 'msg' => '',
                 'data' => [
                     'regions' => $regions
                 ]
-            ]);
+            ];
         }
-        return $this->asJson([
+        return [
             'code' => 1,
             'msg' => '返回错误'
-        ]);
+        ];
     }
 }

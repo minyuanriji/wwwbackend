@@ -16,7 +16,6 @@ use app\logic\OptionLogic;
 use app\models\Option;
 use app\models\Wechat;
 use app\plugins\mpwx\models\MpwxConfig;
-use yii\web\Controller;
 use yii\web\Response;
 
 /**
@@ -24,7 +23,7 @@ use yii\web\Response;
  * @package app\controllers
  * @Notes 基础控制器负责获取一些常用的变量，例如mall_id
  */
-class BaseController extends Controller
+class BaseController extends \yii\web\Controller
 {
     public $enableCsrfValidation = false;
     public $mall_id;//商城id

@@ -12,6 +12,7 @@ namespace app\controllers\api;
 
 use app\forms\api\IndexForm;
 use app\forms\mall\data_statistics\TimingStatisticsForm;
+use app\helpers\APICacheHelper;
 use app\models\User;
 use app\models\UserInfo;
 use function EasyWeChat\Kernel\Support\get_client_ip;
@@ -23,9 +24,13 @@ class IndexController extends ApiController
 {
     public function actionIndex()
     {
-        $form = new IndexForm();
-        $form->attributes = $this->requestData;
-        return $this->asJson($form->getIndex());
+        $data = APICacheHelper::get(APICacheHelper::API_INDEX_INDEX, function ($helper){
+            $form = new IndexForm();
+            $form->attributes = $this->requestData;
+            return $helper($form->getIndex());
+        });
+
+        return $this->asJson($data);
     }
 
 

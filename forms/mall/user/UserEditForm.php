@@ -13,6 +13,7 @@ namespace app\forms\mall\user;
 use app\core\ApiCode;
 use app\events\RelationChangeEvent;
 use app\events\UserInfoEvent;
+use app\forms\common\UserRoleTypeEditForm;
 use app\handlers\RelationHandler;
 use app\handlers\UserRelationChangeHandler;
 use app\logic\UserLogic;
@@ -110,7 +111,19 @@ class UserEditForm extends BaseModel
         $form->parent_id = $this->parent_id;
         $form->junior_at = time();
         $form->level = $this->member_level;
-        $form->role_type = $this->role_type;
+
+        //用户角色类型修改
+        if($form->role_type != $this->role_type){
+            $userRoleTypeEditForm = new UserRoleTypeEditForm([
+                "id"          => $form->id,
+                "role_type"   => $this->role_type,
+                "action"      => UserRoleTypeEditForm::ACTION_FORCE,
+                "source_type" => "admin",
+                "source_id"   => \Yii::$app->admin->id,
+                "content"     => "管理员操作"
+            ]);
+            $userRoleTypeEditForm->save();
+        }
 
         //推广资格被选中
         if ($this->is_inviter && $form->is_inviter == User::IS_INVITER_NO) {

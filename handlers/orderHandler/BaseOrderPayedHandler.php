@@ -9,6 +9,7 @@
  */
 
 namespace app\handlers\orderHandler;
+use app\forms\common\UserRoleTypeEditForm;
 use app\helpers\SerializeHelper;
 use app\core\mail\SendMail;
 use app\forms\api\order\CommonOrderForm;
@@ -97,15 +98,51 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
         // 发放红包券
         // echo '支付后发放红包券'.PHP_EOL;
         IntegralLogic::shopSendIntegral($this->order,'paid');
+
         // 消费升级会员等级
-        //echo '消费升级会员等级'.PHP_EOL;
-        //$this->upLevel();
+        $this->upLevel();
 
         //分账
         EfpsDistributeForm::goodsOrder($this->order);
 
         //多商户订单结算
         //GoodsOrderAutoSettleForm::settle($this->order);
+    }
+
+    /**
+     * 消费升级会员等级
+     * @return void
+     */
+    protected function upLevel(){
+        $details = $this->order->detail;
+        $roleTypes = [];
+        foreach($details as $detail){
+            $goods = $detail->goods;
+            if($goods && $goods->enable_upgrade_user_role
+                && $goods->upgrade_user_role_type){
+                $roleTypes[] = $goods->upgrade_user_role_type;
+            }
+        }
+        $roleType = null;
+        if(in_array("branch_office", $roleTypes)){
+            $roleType = "branch_office";
+        }elseif(in_array("partner", $roleTypes)){
+            $roleType = "partner";
+        }elseif(in_array("store", $roleTypes)){
+            $roleType = "store";
+        }
+
+        if(!empty($roleType)){
+            $form = new UserRoleTypeEditForm([
+                "id"          => $this->order->user_id,
+                "role_type"   => $roleType,
+                "action"      => UserRoleTypeEditForm::ACTION_UPGRADE,
+                "source_type" => "order",
+                "source_id"   => $this->order->id,
+                "content"     => "消费升级，订单[ID:".$this->order->id."]"
+            ]);
+            $form->save();
+        }
     }
 
     /**

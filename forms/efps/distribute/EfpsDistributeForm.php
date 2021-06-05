@@ -15,6 +15,7 @@ class EfpsDistributeForm extends BaseModel{
 
     public $order_sn;
     public $order_type;
+    public $pay_user_id;
 
     public function rules(){
         return [
@@ -143,7 +144,8 @@ class EfpsDistributeForm extends BaseModel{
     public static function checkoutOrder(MchCheckoutOrder $checkoutOrder){
         return (new EfpsDistributeForm([
             "order_sn"   => $checkoutOrder->order_no,
-            "order_type" => "mch_checkout_order"
+            "order_type" => "mch_checkout_order",
+            "pay_user_id" => $checkoutOrder->pay_user_id
         ]))->save();
     }
 }

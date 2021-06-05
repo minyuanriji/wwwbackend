@@ -102,7 +102,11 @@ abstract class MchEditFormBase extends BaseModel
 
         $mch->user_id = $this->user_id ?: 0;
         $mch->realname = $this->realname;
-        $mch->mobile = $this->mobile;
+
+        if(!empty($this->mobile)){
+            $mch->mobile = $this->mobile;
+        }
+
         $mch->mch_common_cat_id = $this->mch_common_cat_id;
         $mch->wechat = $this->wechat ?: '';
         $mch->transfer_rate = $this->transfer_rate ?: 0;
@@ -158,7 +162,10 @@ abstract class MchEditFormBase extends BaseModel
             $store->pic_url = \Yii::$app->serializer->encode([]);
         }
 
-        $store->mobile = $this->service_mobile;
+        if(!empty($this->service_mobile)){
+            $store->mobile = $this->service_mobile;
+        }
+
         $store->province_id = $this->province_id;
         $store->city_id = $this->city_id;
         $store->district_id = $this->district_id;

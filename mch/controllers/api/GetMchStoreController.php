@@ -3,7 +3,7 @@ namespace app\mch\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\core\ApiCode;
-use app\helpers\CacheHelper;
+use app\helpers\APICacheHelper;
 use app\mch\forms\api\GetMchStoreForm;
 use app\models\DistrictArr;
 use app\plugins\mch\models\Mch;
@@ -16,7 +16,7 @@ class GetMchStoreController extends ApiController {
      * @return \yii\web\Response
      */
     public function actionIndex(){
-        $detail = CacheHelper::get(CacheHelper::MCH_API_GET_MCH_STORE, function($helper){
+        $detail = APICacheHelper::get(APICacheHelper::MCH_API_GET_MCH_STORE, function($helper){
             $form = new GetMchStoreForm();
             $form->attributes = $this->requestData;
             return $helper($form->getDetail());

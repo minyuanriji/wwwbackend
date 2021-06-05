@@ -2,7 +2,7 @@
 namespace app\mch\controllers\api;
 
 use app\controllers\api\ApiController;
-use app\helpers\CacheHelper;
+use app\helpers\APICacheHelper;
 use app\mch\forms\common\CommonMchForm;
 
 class GetMchsController extends ApiController {
@@ -13,7 +13,7 @@ class GetMchsController extends ApiController {
      */
     public function actionIndex(){
 
-        $list = CacheHelper::get(CacheHelper::MCH_API_GET_MCHS, function($helper){
+        $list = APICacheHelper::get(APICacheHelper::MCH_API_GET_MCHS, function($helper){
             $form = new CommonMchForm();
             $form->attributes = $this->requestData;
             return $helper($form->getList());

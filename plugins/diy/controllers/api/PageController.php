@@ -12,7 +12,7 @@ namespace app\plugins\diy\controllers\api;
 use app\controllers\api\ApiController;
 use app\controllers\behaviors\LoginFilter;
 use app\core\ApiCode;
-use app\helpers\CacheHelper;
+use app\helpers\APICacheHelper;
 use app\helpers\SerializeHelper;
 use app\plugins\diy\models\DiyPage;
 use app\plugins\diy\forms\api\InfoForm;
@@ -33,7 +33,7 @@ class PageController extends ApiController
 
     public function actionDetail($id)
     {
-        $page = CacheHelper::get(CacheHelper::PLUGIN_DIY_API_PAGE_DETAIL, function ($helper) use($id){
+        $page = APICacheHelper::get(APICacheHelper::PLUGIN_DIY_API_PAGE_DETAIL, function ($helper) use($id){
             $page = DiyPage::find()->select('id,title,show_navs')
                 ->where([
                     'id' => $id,

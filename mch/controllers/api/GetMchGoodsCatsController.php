@@ -3,7 +3,7 @@ namespace app\mch\controllers\api;
 
 
 use app\controllers\api\ApiController;
-use app\helpers\CacheHelper;
+use app\helpers\APICacheHelper;
 use app\mch\forms\api\CatListForm;
 
 class GetMchGoodsCatsController extends ApiController{
@@ -13,7 +13,7 @@ class GetMchGoodsCatsController extends ApiController{
      * @return \yii\web\Response
      */
     public function actionIndex(){
-        $search = CacheHelper::get(CacheHelper::MCH_API_GET_MCH_GOODS_CATS, function($helper){
+        $search = APICacheHelper::get(APICacheHelper::MCH_API_GET_MCH_GOODS_CATS, function($helper){
             $form = new CatListForm();
             $form->attributes = $this->requestData;
             return $helper($form->search());

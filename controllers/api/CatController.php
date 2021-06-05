@@ -12,7 +12,7 @@ namespace app\controllers\api;
 
 
 use app\forms\api\cat\CatListForm;
-use app\helpers\CacheHelper;
+use app\helpers\APICacheHelper;
 
 class CatController extends ApiController
 {
@@ -24,7 +24,7 @@ class CatController extends ApiController
      */
     public function actionList()
     {
-        $search = CacheHelper::get(CacheHelper::API_CAT_LIST, function($helper){
+        $search = APICacheHelper::get(APICacheHelper::API_CAT_LIST, function($helper){
             $form = new CatListForm();
             $form->attributes = $this->requestData;
             return $helper($form->search());

@@ -7,6 +7,7 @@ use app\mch\forms\mch\MchAccountWithdraw;
 use app\models\BaseModel;
 use app\models\EfpsMchReviewInfo;
 use app\models\Order;
+use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
 
@@ -67,7 +68,18 @@ class EfpsDistributeForm extends BaseModel{
                     ]);
                 }
                 $amount = $checkoutOrder->order_price;
-                $desc   = "来自结账订单[".$this->order_sn."]的收入";
+                if ($this->pay_user_id) {
+                    $user = User::findOne([
+                        "id" => $this->pay_user_id,
+                    ]);
+                    if ($user) {
+                        $desc   = "来自结账订单[".$user->nickname."]的收入";
+                    } else {
+                        $desc   = "来自结账订单[".$this->order_sn."]的收入";
+                    }
+                } else {
+                    $desc   = "来自结账订单[".$this->order_sn."]的收入";
+                }
             }
 
             if(!$mch){

@@ -14,11 +14,11 @@ class BaopinImportForm extends BaseModel{
     public $goods_id_str;
 
     public function rules(){
-        return array_merge(parent::rules(), [
+        return [
             [['mch_id', 'goods_id_str'], 'required'],
             [['mch_id'], 'integer'],
             [['goods_id_str'], 'string']
-        ]);
+        ];
     }
 
     public function import(){

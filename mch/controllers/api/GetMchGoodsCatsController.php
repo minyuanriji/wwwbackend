@@ -13,11 +13,8 @@ class GetMchGoodsCatsController extends ApiController{
      * @return \yii\web\Response
      */
     public function actionIndex(){
-        $search = APICacheHelper::get(APICacheHelper::MCH_API_GET_MCH_GOODS_CATS, function($helper){
-            $form = new CatListForm();
-            $form->attributes = $this->requestData;
-            return $helper($form->search());
-        });
-        return $search;
+        $form = new CatListForm();
+        $form->attributes = $this->requestData;
+        return $form->search();
     }
 }

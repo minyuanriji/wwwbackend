@@ -45,12 +45,12 @@ abstract class MchEditFormBase extends BaseModel
     public function rules()
     {
         return [
-            [['mch_common_cat_id',  'mobile', 'service_mobile', 'realname', 'name'], 'required'],
+            [['mch_common_cat_id',  'mobile', 'realname', 'name'], 'required'],
             [['user_id', 'mch_common_cat_id', 'transfer_rate', 'sort', 'id', 'status', 'is_recommend',
                 'province_id', 'city_id', 'district_id', 'integral_fee_rate'], 'integer'],
             [['mobile', 'address', 'logo', 'service_mobile', 'password'], 'string', 'max' => 255],
             [['username', 'realname', 'wechat', 'name', 'username', 'password'], 'string', 'max' => 65],
-            [['bg_pic_url'], 'safe']
+            [['bg_pic_url', 'service_mobile'], 'safe']
         ];
     }
 
@@ -102,7 +102,11 @@ abstract class MchEditFormBase extends BaseModel
 
         $mch->user_id = $this->user_id ?: 0;
         $mch->realname = $this->realname;
-        $mch->mobile = $this->mobile;
+
+        if(!empty($this->mobile)){
+            $mch->mobile = $this->mobile;
+        }
+
         $mch->mch_common_cat_id = $this->mch_common_cat_id;
         $mch->wechat = $this->wechat ?: '';
         $mch->transfer_rate = $this->transfer_rate ?: 0;
@@ -158,7 +162,10 @@ abstract class MchEditFormBase extends BaseModel
             $store->pic_url = \Yii::$app->serializer->encode([]);
         }
 
-        $store->mobile = $this->service_mobile;
+        if(!empty($this->service_mobile)){
+            $store->mobile = $this->service_mobile;
+        }
+
         $store->province_id = $this->province_id;
         $store->city_id = $this->city_id;
         $store->district_id = $this->district_id;

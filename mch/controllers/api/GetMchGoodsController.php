@@ -13,12 +13,8 @@ class GetMchGoodsController extends ApiController{
      */
     public function actionIndex()
     {
-        $list = APICacheHelper::get(APICacheHelper::MCH_API_GET_MCH_GOODS, function($helper){
-            $form = new GoodsListForm();
-            $form->attributes = $this->requestData;
-            return $helper($form->getList());
-        });
-
-        return $this->asJson($list);
+        $form = new GoodsListForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->getList());
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace app\helpers;
+namespace app\helpers\tencent_cloud;
 
 use app\forms\common\WebSocketRequestForm;
 use TencentCloud\Common\Credential;
@@ -13,8 +13,8 @@ class TencentCloudAudioHelper
 {
     public static function request($text){
 
-        $secretId = "AKIDB8RUWHdxrXv95InwKRIsABPN5Wg4i1a4";
-        $secretKey = "OilWBj11i94g1sTx9E3aqonWy93FBpBS";
+        $secretId  = \Yii::$app->params['tencentCloud']['secret_id'];
+        $secretKey = \Yii::$app->params['tencentCloud']['secret_key'];
 
         try {
 

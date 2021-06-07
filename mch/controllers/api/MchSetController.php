@@ -8,6 +8,7 @@ use app\mch\forms\api\mch_set\SetPicsForm;
 
 class MchSetController extends MchMApiController{
 
+
     /**
      * 设置账号信息
      * @return \yii\web\Response

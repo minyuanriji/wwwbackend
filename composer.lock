@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c7fddee7dd1402449bf081bd581003a3",
+    "content-hash": "fedd75c7b3b104078b34c8403c71c2e2",
     "packages": [
         {
             "name": "2amigos/yii2-qrcode-helper",
@@ -4100,17 +4100,17 @@
             "time": "2021-05-19T17:31:22+00:00"
         },
         {
-            "name": "tencentcloud/common",
-            "version": "3.0.401",
+            "name": "tencentcloud/tencentcloud-sdk-php",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/tencentcloud-sdk-php/common.git",
-                "reference": "8c2a10b64d9b09eab0f0ad40eca61931554ba1d4"
+                "url": "https://github.com/TencentCloud/tencentcloud-sdk-php.git",
+                "reference": "4c2af1fa5a4c360a81abe0daff1b87e625b1b423"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tencentcloud-sdk-php/common/zipball/8c2a10b64d9b09eab0f0ad40eca61931554ba1d4",
-                "reference": "8c2a10b64d9b09eab0f0ad40eca61931554ba1d4",
+                "url": "https://api.github.com/repos/TencentCloud/tencentcloud-sdk-php/zipball/4c2af1fa5a4c360a81abe0daff1b87e625b1b423",
+                "reference": "4c2af1fa5a4c360a81abe0daff1b87e625b1b423",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4120,12 +4120,16 @@
                 ]
             },
             "require": {
-                "guzzlehttp/guzzle": "^6.3||^7.0",
+                "guzzlehttp/guzzle": "^6.3 || ^7.0.1",
                 "guzzlehttp/psr7": "^1.4",
                 "php": ">=5.6.0"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
+                "classmap": [
+                    "src/QcloudApi/QcloudApi.php"
+                ],
                 "psr-4": {
                     "TencentCloud\\": "./src/TencentCloud"
                 }
@@ -4136,61 +4140,15 @@
             ],
             "authors": [
                 {
-                    "name": "tencentcloudapi",
+                    "name": "coolli",
                     "email": "tencentcloudapi@tencent.com",
                     "homepage": "https://cloud.tencent.com/document/sdk/PHP",
                     "role": "Developer"
                 }
             ],
             "description": "TencentCloudApi php sdk",
-            "homepage": "https://github.com/tencentcloud-sdk-php/common",
-            "time": "2021-05-28T14:08:58+00:00"
-        },
-        {
-            "name": "tencentcloud/tts",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tencentcloud-sdk-php/tts.git",
-                "reference": "02b127331052ef9c87ea712f170985d65236041a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/tencentcloud-sdk-php/tts/zipball/02b127331052ef9c87ea712f170985d65236041a",
-                "reference": "02b127331052ef9c87ea712f170985d65236041a",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://mirrors.cloud.tencent.com/composer/dists/%package%/%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
-            },
-            "require": {
-                "tencentcloud/common": "3.0.401"
-            },
-            "default-branch": true,
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "TencentCloud\\": "./src/TencentCloud"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "tencentcloudapi",
-                    "email": "tencentcloudapi@tencent.com",
-                    "homepage": "https://github.com/tencentcloud-sdk-php/tts",
-                    "role": "Developer"
-                }
-            ],
-            "description": "TencentCloudApi php sdk tts",
-            "homepage": "https://github.com/tencentcloud-sdk-php/tts",
-            "time": "2021-05-28T14:23:32+00:00"
+            "homepage": "https://github.com/TencentCloud/tencentcloud-sdk-php",
+            "time": "2021-06-04T00:45:57+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -8401,7 +8359,7 @@
         "flex/express": 20,
         "curl/curl": 20,
         "workerman/workerman": 20,
-        "tencentcloud/tts": 20
+        "tencentcloud/tencentcloud-sdk-php": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

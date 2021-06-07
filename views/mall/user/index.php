@@ -64,6 +64,20 @@
                 </el-table-column>
                 <el-table-column prop="mobile" label="手机号" width="120">
                 </el-table-column>
+                <el-table-column label="推广" width="200">
+                    <template scope="row">
+                        <div style="font-size:12px;">
+                            <div>推荐人昵称：XXXX</div>
+                            <div>推荐人等级：分公司</div>
+                            <div>推荐人手机：134550039</div>
+                            <div>
+                                <el-link @click="$navigate({r: 'mall/user/recommand-info', id:scope.row.user_id})"  type="primary">
+                                    用户下级：100人（查看）
+                                </el-link>
+                            </div>
+                        </div>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="role_type" label="会员类型" width="120">
                     <template slot-scope="scope">
                         <div v-if="scope.row.role_type == 'branch_office'">分公司</div>
@@ -251,6 +265,9 @@
             };
         },
         methods: {
+            toRecommandInfo(){
+
+            },
             openId(index) {
                 let item = this.form;
                 item[index].is_open_id = !item[index].is_open_id;

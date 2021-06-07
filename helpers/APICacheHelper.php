@@ -2,6 +2,7 @@
 namespace app\helpers;
 
 use app\core\ApiCode;
+use app\logic\CommonLogic;
 
 class APICacheHelper{
 
@@ -143,13 +144,18 @@ class APICacheHelper{
         }
 
         //POST参数
+        $paramsData = @file_get_contents('php://input');
+        $jsonData = [];
+        if (!empty($paramsData)) {
+            $jsonData = json_decode($paramsData, true);
+        }
+        $_POST = array_merge(is_array($jsonData) ? $jsonData : [],
+                                !empty($_POST) ? $_POST : []);
         $postKeys = isset($setting['posts']) && is_array($setting['posts']) ? $setting['posts'] : [];
-        if(!empty($_POST)){
-            $POST = array_change_key_case($_POST, CASE_LOWER);
-            foreach($postKeys as $postKey){
-                if(isset($POST[$postKey])){
-                    $params[$postKey] = $POST[$postKey];
-                }
+        $POST = array_change_key_case($_POST, CASE_LOWER);
+        foreach($postKeys as $postKey){
+            if(isset($POST[$postKey])){
+                $params[$postKey] = $POST[$postKey];
             }
         }
 

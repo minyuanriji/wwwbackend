@@ -257,7 +257,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                         </template>
                     </el-table-column>
                     <el-table-column prop="virtual_sales" width="110" label="虚拟销量" sortable="false"></el-table-column>
-                    <el-table-column prop="real_sales" width="110" label="真实销量" sortable="false"></el-table-column>
+                    <el-table-column prop="real_sales" width="110" label="真实销量" ></el-table-column>
                     <el-table-column label="状态" width="100">
                         <template slot-scope="scope">
                             <template v-if="!is_mch || mchMallSetting.is_goods_audit == 0">

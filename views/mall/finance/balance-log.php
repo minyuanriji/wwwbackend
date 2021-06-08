@@ -88,7 +88,7 @@
                     end_date: '',
                 },
                 date: '',
-                keyword: '',
+                keyword: getQuery("user_id"),
                 form: [],
                 pageCount: 0,
                 listLoading: false,

@@ -5,6 +5,7 @@ namespace app\plugins\mch\forms\mall;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\Store;
+use app\models\User;
 use app\plugins\mch\models\Mch;
 
 class MchReviewForm extends BaseModel
@@ -25,19 +26,25 @@ class MchReviewForm extends BaseModel
 
     public function getList()
     {
-        $query = Mch::find()->where([
-            'mall_id' => \Yii::$app->mall->id,
-            'is_delete' => 0,
-            'review_status' => $this->review_status
+        $query = Mch::find()->alias("m")->where([
+            'm.mall_id' => \Yii::$app->mall->id,
+            'm.is_delete' => 0,
+            'm.review_status' => $this->review_status
         ]);
+        $query->leftJoin(["u" => User::tableName()], "u.id=m.user_id");
+        $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
 
         if ($this->keyword) {
-            $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
-            $query->andWhere(['id' => $mchIds]);
+            $mchIds = Store::find()->where(['like', 'm.name', $this->keyword])->select('m.mch_id');
+            $query->andWhere(['m.id' => $mchIds]);
         }
 
-        $list = $query->with('user.userInfo', 'store')
-            ->orderBy(['created_at' => SORT_DESC])
+        $list = $query->select([
+            "m.*",
+            "p.id as parent_id", "p.nickname as parent_nickname",
+            "p.mobile as parent_mobile", "p.role_type as parent_role_type"
+        ])->with('user.userInfo', 'store')
+            ->orderBy(['m.created_at' => SORT_DESC])
             ->page($pagination)->asArray()->all();
 
         return [

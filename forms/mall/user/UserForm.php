@@ -240,8 +240,9 @@ class UserForm extends BaseModel
         $mall_members = MemberLevel::findAll(['mall_id' => $mall_id, 'status' => 1, 'is_delete' => 0]);
 
         $list = $query
-            ->select(['u.id', 'u.role_type', 'u.total_income', 'u.static_integral', 'u.id as user_id', 'u.role_type', 'u.avatar_url', 'u.nickname', 'u.mobile', 'u.balance', 'u.level', 'u.score', 'u.static_score',
+            ->select(['u.id', 'u.role_type', 'u.static_integral', 'u.id as user_id', 'u.role_type', 'u.avatar_url', 'u.nickname', 'u.mobile', 'u.balance', 'u.level', 'u.score', 'u.static_score',
                 'u.created_at', 'u.parent_id', 'p.nickname as parent_nickname', 'p.role_type as parent_role_type', 'p.mobile as parent_mobile',
+                '(u.income + u.income_frozen) as total_income',
                 'coupon_count' => $couponQuery,
                 'order_count' => $orderQuery,
                 'order_sum' => $orderSum,

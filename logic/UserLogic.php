@@ -96,9 +96,9 @@ class UserLogic
                 if(empty($user)){
                     //生成用户的ID
                     $startNum = (int)date("ymd");
-                    $stepH    = (int)date("H");
-                    $stepM    = (int)date("i");
                     $stepS    = (int)date("s");
+                    $stepM    = (int)date("i") + $stepS;
+                    $stepH    = (int)date("H") + $stepM;
                     $randUid  = $startNum + $stepH + $stepM + $stepS;
                     while(User::findOne($randUid)){
                         $randUid += rand(0, 5);

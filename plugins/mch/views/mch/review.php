@@ -102,8 +102,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column
-                        label="用户" width="200">
+                <el-table-column label="用户" width="200">
                     <template slot-scope="scope">
                         <div flex="dir:left cross:center" v-if="scope.row.user">
                             <com-image width="25" height="25" :src="scope.row.user.avatar"></com-image>
@@ -112,8 +111,19 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column
-                        label="联系人" width='200'>
+                <el-table-column label="推荐人" width='200'>
+                    <template slot-scope="scope">
+                        <div>{{scope.row.parent_nickname}}</div>
+                        <div>手机：{{scope.row.parent_mobile}}</DIV>
+                        <div>等级：
+                            <span v-if="scope.row.parent_role_type == 'branch_office'">分公司</span>
+                            <span v-if="scope.row.parent_role_type == 'partner'">合伙人</span>
+                            <span v-if="scope.row.parent_role_type == 'store'">店主</span>
+                            <span v-if="scope.row.parent_role_type == 'user'">普通用户</span>
+                        </DIV>
+                    </template>
+                </el-table-column>
+                <el-table-column label="联系人" width='200'>
                     <template slot-scope="scope">
                         <div>
                             <com-ellipsis style="margin-left: 10px;" :line="1">{{scope.row.realname}}

@@ -63,8 +63,7 @@
                         <div v-if="scope.row.is_open_id">{{scope.row.platform_user_id}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="mobile" label="手机号" width="120">
-                </el-table-column>
+                <el-table-column prop="mobile" label="手机号" width="120"></el-table-column>
                 <el-table-column label="推广" width="260">
                     <template slot-scope="scope">
                         <div style="font-size:12px;">
@@ -81,9 +80,15 @@
                                     用户推荐：{{scope.row.child_sum}}人（查看）
                                 </el-link>
                             </div>
+                            <div>
+                                <el-link target="_blank" @click="$navigate({r: 'mall/finance/income-log', user_id:scope.row.user_id})" type="primary" style="font-size:12px;">
+                                    用户收益：{{scope.row.total_income}}人（查看）
+                                </el-link>
+                            </div>
                         </div>
                     </template>
                 </el-table-column>
+
                 <el-table-column prop="role_type" label="会员类型" width="120">
                     <template slot-scope="scope">
                         <div v-if="scope.row.role_type == 'branch_office'">分公司</div>

@@ -33,12 +33,13 @@
                 <el-option key="mp-tt" label="抖音/头条" value="ttapp"></el-option>
                 <el-option key="mp-bd" label="百度" value="bdapp"></el-option>
             </el-select>
-            <div class="input-item">
+            <div class="input-item" style="width:300px;">
                 <el-input @keyup.enter.native="search" size="small" placeholder="请输入ID/昵称/手机号" v-model="keyword"
                           clearable @clear="search">
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
+
             <el-table class="table-info" :data="form" border style="width: 100%" v-loading="listLoading">
                 <el-table-column prop="user_id" label="ID" width="100"></el-table-column>
                 <el-table-column label="头像" width="280">
@@ -64,15 +65,15 @@
                 </el-table-column>
                 <el-table-column prop="mobile" label="手机号" width="120">
                 </el-table-column>
-                <el-table-column label="推广" width="200">
-                    <template scope="row">
+                <el-table-column label="推广" width="260">
+                    <template slot-scope="scope">
                         <div style="font-size:12px;">
-                            <div>推荐人昵称：XXXX</div>
-                            <div>推荐人等级：分公司</div>
-                            <div>推荐人手机：134550039</div>
+                            <div>上级名称：[ID:{{scope.row.parent_id}}]{{scope.row.parent_nickname}}</div>
+                            <div>上级身份：{{scope.row.parent_role_type}}</div>
+                            <div>上级手机：{{scope.row.parent_mobile}}</div>
                             <div>
-                                <el-link @click="$navigate({r: 'mall/user/recommand-info', id:scope.row.user_id})"  type="primary">
-                                    用户下级：100人（查看）
+                                <el-link @click="childDialog(scope.row)"  type="primary" style="font-size:12px;">
+                                    用户推荐：{{scope.row.child_sum}}人（查看）
                                 </el-link>
                             </div>
                         </div>
@@ -202,6 +203,48 @@
                 <el-button :loading="btnLoading" type="primary" @click="balanceSubmit">充值</el-button>
             </div>
         </el-dialog>
+
+        <!-- 用户推荐列表 -->
+        <el-dialog :title="'用户'+recommandData.nickname+'[ID:'+recommandData.id+']的推荐列表'" :visible.sync="dialogChildren" width="50%">
+            <div class="input-item" style="width:300px;">
+                <el-input @keyup.enter.native="childSearch" size="small" placeholder="请输入ID/昵称/手机号" v-model="recommandData.keyword"
+                          clearable @clear="childSearch">
+                    <el-button slot="append" icon="el-icon-search" @click="childSearch"></el-button>
+                </el-input>
+            </div>
+            <el-table v-loading="childDataLoading"  :data="childData" style="width: 100%">
+                <el-table-column prop="id" label="ID" width="70"></el-table-column>
+                <el-table-column label="头像" >
+                    <template slot-scope="scope">
+                        <com-image mode="aspectFill" style="float: left;margin-right: 8px"
+                                   :src="scope.row.avatar_url"></com-image>
+                        <div>{{scope.row.nickname}}</div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="等级" width="110">
+                    <template slot-scope="scope">
+                        <div v-if="scope.row.role_type == 'branch_office'">分公司</div>
+                        <div v-if="scope.row.role_type == 'partner'">合伙人</div>
+                        <div v-if="scope.row.role_type == 'store'">店主</div>
+                        <div v-if="scope.row.role_type == 'user'">普通用户</div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="mobile" label="手机" width="110"></el-table-column>
+                <el-table-column label="日期">
+                    <template slot-scope="scope">
+                        {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div style="text-align: right;margin: 20px 0;">
+                <el-pagination @current-change="childPagination" background
+                               layout="prev, pager, next"
+                               :page-count="recommandData.pageCount"
+                               :current-page="recommandData.currentPage">
+                </el-pagination>
+            </div>
+        </el-dialog>
+
     </el-card>
 </div>
 <script>
@@ -262,11 +305,62 @@
                         {required: true, message: '金额不能为空', trigger: 'blur'},
                     ],
                 },
-            };
+
+                //用户推荐
+                dialogChildren: false,
+                childDataLoading: false,
+                recommandData: {
+                    id: 0,
+                    nickname: '',
+                    keyword: '',
+                    page: 1,
+                    pageCount: 0,
+                    currentPage: 0
+                },
+                childData: []
+            }
         },
         methods: {
-            toRecommandInfo(){
-
+            childDialog(row){
+                this.dialogChildren = true;
+                if(row.id != this.recommandData.id){
+                    this.recommandData.id = row.id;
+                    this.recommandData.nickname = row.nickname;
+                    this.page = 1;
+                    this.keyword = '';
+                    this.getChildData();
+                }
+            },
+            childSearch(){
+                this.page = 1;
+                this.getChildData();
+            },
+            childPagination(currentPage) {
+                this.recommandData.page = currentPage;
+                this.getChildData();
+            },
+            getChildData(){
+                var self = this;
+                self.childDataLoading = true;
+                request({
+                    params: {
+                        r: 'mall/user/get-child',
+                        page: self.recommandData.page,
+                        parent_id: self.recommandData.id,
+                        keyword: self.recommandData.keyword,
+                    },
+                }).then(e => {
+                    if (e.data.code === 0) {
+                        self.childData = e.data.data.list;
+                        self.recommandData.pageCount = e.data.data.pagination.page_count;
+                        self.recommandData.currentPage = e.data.data.pagination.current_page;
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                    self.childDataLoading = false;
+                }).catch(e => {
+                    self.childDataLoading = false;
+                });
             },
             openId(index) {
                 let item = this.form;

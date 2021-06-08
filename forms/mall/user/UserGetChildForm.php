@@ -11,11 +11,15 @@ class UserGetChildForm extends BaseModel{
     public $page;
     public $parent_id;
     public $keyword;
+    public $role_type;
+    public $start_date;
+    public $end_date;
 
     public function rules(){
         return [
             [['parent_id'], 'required'],
-            [['page', 'keyword'], 'safe']
+            [['keyword', 'start_date', 'end_date', 'role_type'], 'trim'],
+            [['page'], 'safe']
         ];
     }
 
@@ -49,6 +53,15 @@ class UserGetChildForm extends BaseModel{
                 ['like', 'u.mobile', $this->keyword],
                 ['like', 'u.id', $this->keyword],
             ]);
+
+            if ($this->start_date && $this->end_date) {
+                $query->andWhere(['<', 'u.created_at', strtotime($this->end_date)])
+                    ->andWhere(['>', 'u.created_at', strtotime($this->start_date)]);
+            }
+
+            if($this->role_type){
+                $query->andWhere(["u.role_type" => $this->role_type]);
+            }
 
             $list = $query->select(['u.id', 'u.role_type',  'u.avatar_url', 'u.nickname', 'u.mobile', 'u.created_at'])
                         ->page($pagination, 20, $this->page)

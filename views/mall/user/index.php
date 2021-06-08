@@ -69,7 +69,12 @@
                     <template slot-scope="scope">
                         <div style="font-size:12px;">
                             <div>上级名称：[ID:{{scope.row.parent_id}}]{{scope.row.parent_nickname}}</div>
-                            <div>上级身份：{{scope.row.parent_role_type}}</div>
+                            <div>上级身份：
+                                <span v-if="scope.row.parent_role_type == 'branch_office'">分公司</span>
+                                <span v-if="scope.row.parent_role_type == 'partner'">合伙人</span>
+                                <span v-if="scope.row.parent_role_type == 'store'">店主</span>
+                                <span v-if="scope.row.parent_role_type == 'user'">普通用户</span>
+                            </div>
                             <div>上级手机：{{scope.row.parent_mobile}}</div>
                             <div>
                                 <el-link @click="childDialog(scope.row)"  type="primary" style="font-size:12px;">
@@ -206,12 +211,28 @@
 
         <!-- 用户推荐列表 -->
         <el-dialog :title="'用户'+recommandData.nickname+'[ID:'+recommandData.id+']的推荐列表'" :visible.sync="dialogChildren" width="50%">
-            <div class="input-item" style="width:300px;">
+            <el-select size="small" v-model="recommandData.role_type" @change='childSearch' class="select">
+                <el-option key="" label="全部用户" value=""></el-option>
+                <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
+                <el-option key="partner" label="合伙人" value="partner"></el-option>
+                <el-option key="store" label="店主" value="store"></el-option>
+                <el-option key="user" label="普通用户" value="user"></el-option>
+            </el-select>
+            <el-date-picker size="small" v-model="recommandData.date" type="datetimerange"
+                style="float: left"
+                value-format="yyyy-MM-dd"
+                range-separator="至" start-placeholder="开始日期"
+                @change="selectDateTime"
+                end-placeholder="结束日期">
+            </el-date-picker>
+
+            <div class="input-item" style="margin-top:10px;width: 300px;">
                 <el-input @keyup.enter.native="childSearch" size="small" placeholder="请输入ID/昵称/手机号" v-model="recommandData.keyword"
                           clearable @clear="childSearch">
                     <el-button slot="append" icon="el-icon-search" @click="childSearch"></el-button>
                 </el-input>
             </div>
+
             <el-table v-loading="childDataLoading"  :data="childData" style="width: 100%">
                 <el-table-column prop="id" label="ID" width="70"></el-table-column>
                 <el-table-column label="头像" >
@@ -313,6 +334,9 @@
                     id: 0,
                     nickname: '',
                     keyword: '',
+                    role_type: '',
+                    start_date: '',
+                    end_date: '',
                     page: 1,
                     pageCount: 0,
                     currentPage: 0
@@ -321,6 +345,16 @@
             }
         },
         methods: {
+            selectDateTime(e) {
+                if (e != null) {
+                    this.recommandData.start_date = e[0];
+                    this.recommandData.end_date = e[1];
+                } else {
+                    this.recommandData.start_date = '';
+                    this.recommandData.end_date = '';
+                }
+                this.getChildData();
+            },
             childDialog(row){
                 this.dialogChildren = true;
                 if(row.id != this.recommandData.id){
@@ -348,6 +382,9 @@
                         page: self.recommandData.page,
                         parent_id: self.recommandData.id,
                         keyword: self.recommandData.keyword,
+                        role_type: self.recommandData.role_type,
+                        start_date: self.recommandData.start_date,
+                        end_date: self.recommandData.end_date
                     },
                 }).then(e => {
                     if (e.data.code === 0) {

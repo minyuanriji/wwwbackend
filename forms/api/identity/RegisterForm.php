@@ -191,7 +191,7 @@ class RegisterForm extends BaseModel
 
             //生成用户的ID
             $startNum = (int)date("ymd");
-            $stepH    = (int)date("h");
+            $stepH    = (int)date("H");
             $stepM    = (int)date("i");
             $stepS    = (int)date("s");
             $randUid  = $startNum + $stepH + $stepM + $stepS;

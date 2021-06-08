@@ -27,6 +27,7 @@ use app\models\UserCard;
 use app\models\UserChildren;
 use app\models\UserCoupon;
 use app\models\UserInfo;
+use app\models\UserRelationshipLink;
 use yii\helpers\ArrayHelper;
 
 class UserForm extends BaseModel
@@ -188,6 +189,8 @@ class UserForm extends BaseModel
             'u.is_delete' => 0,
             'u.mall_id' => $mall_id,
         ]);
+        $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
+        $query->leftJoin(["url" => UserRelationshipLink::tableName()], "url.user_id=u.id");
         $query->keyword($this->member_level, ['u.level' => $this->member_level]);
         if($this->platform){
             $query->leftJoin(['i' => UserInfo::tableName()], 'i.user_id = u.id');
@@ -228,15 +231,24 @@ class UserForm extends BaseModel
             ->andWhere(['re.type' => 1, 're.status' => 2])
             ->andWhere('o.user_id = u.id')
             ->select(['COALESCE(SUM(`refund_price`),0)']);
+
+        //用户下级数量
+        $childSum = UserRelationshipLink::find()->alias("c_url")
+            ->andWhere("c_url.left > url.left AND c_url.right < url.right")
+            ->select('count(1)');
+
         $mall_members = MemberLevel::findAll(['mall_id' => $mall_id, 'status' => 1, 'is_delete' => 0]);
 
         $list = $query
-            ->select(['u.id', 'u.role_type', 'u.total_income', 'u.static_integral', 'u.id as user_id', 'u.role_type', 'u.avatar_url', 'u.nickname', 'u.mobile', 'u.balance', 'u.level', 'u.score', 'u.static_score', 'coupon_count' => $couponQuery,
+            ->select(['u.id', 'u.role_type', 'u.total_income', 'u.static_integral', 'u.id as user_id', 'u.role_type', 'u.avatar_url', 'u.nickname', 'u.mobile', 'u.balance', 'u.level', 'u.score', 'u.static_score',
+                'u.created_at', 'u.parent_id', 'p.nickname as parent_nickname', 'p.role_type as parent_role_type', 'p.mobile as parent_mobile',
+                'coupon_count' => $couponQuery,
                 'order_count' => $orderQuery,
                 'order_sum' => $orderSum,
+                'child_sum' => $childSum,
                 'order_sum_cancel' => $orderSumCancel,
                 'order_sum_refund' => $orderSumRefund,
-                'card_count' => $cardQuery, 'u.created_at'])
+                'card_count' => $cardQuery])
             ->page($pagination, $this->page_size)
             ->orderBy('u.id DESC')
             ->asArray()

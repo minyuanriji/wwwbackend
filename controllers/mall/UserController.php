@@ -21,6 +21,7 @@ use app\forms\mall\user\ScoreForm;
 use app\forms\mall\user\UserCardForm;
 use app\forms\mall\user\UserEditForm;
 use app\forms\mall\user\UserForm;
+use app\forms\mall\user\UserGetChildForm;
 use app\models\RelationSetting;
 
 class UserController extends UserManagerController
@@ -379,4 +380,13 @@ class UserController extends UserManagerController
         return $this->asJson($res);
     }
 
+    /**
+     * 获取下级列表
+     * @return \yii\web\Response
+     */
+    public function actionGetChild(){
+        $form = new UserGetChildForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->getList());
+    }
 }

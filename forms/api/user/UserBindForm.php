@@ -51,7 +51,7 @@ class UserBindForm extends BaseModel
         $smsForm->captcha = $this->captcha;
         $result = $smsForm->checkCode();
         if (!$result) {
-            //return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
         }
         try {
             $userInfo = \Yii::$app->cache->get($this->key);
@@ -112,14 +112,14 @@ class UserBindForm extends BaseModel
                     $userInfo["mobile"] = $this->mobile;
                     $userResult = UserLogic::userRegister($userInfo,[],$parent_id,$stands_mall_id);
                     if($userResult === false){
-                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'绑定失败');
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL,UserLogic::$error);
                     }
                 }else{
                     $userResult = User::findOne(\Yii::$app->user->id);
                     $userResult->mobile = trim($this->mobile);
                     $res = $userResult->save();
                     if($res === false){
-                        throw new \Exception("绑定失败！");
+                        throw new \Exception($this->responseErrorMsg($userResult));
                     }
                 }
             }

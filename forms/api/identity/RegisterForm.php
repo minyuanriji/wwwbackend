@@ -190,9 +190,13 @@ class RegisterForm extends BaseModel
             }
 
             //生成用户的ID
-            $randUid = 100000 + rand(0, 999999);
+            $startNum = (int)date("ymd");
+            $stepH    = (int)date("H");
+            $stepM    = (int)date("i");
+            $stepS    = (int)date("s");
+            $randUid  = $startNum + $stepH + $stepM + $stepS;
             while(User::findOne($randUid)){
-                $randUid = 100000 + rand(0, 999999);
+                $randUid += rand(0, 5);
             }
 
             $user = new User();

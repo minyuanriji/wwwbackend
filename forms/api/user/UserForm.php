@@ -25,6 +25,7 @@ use app\models\ScoreLog;
 use app\models\User;
 use app\models\UserCard;
 use app\models\UserCoupon;
+use app\plugins\boss\models\Boss;
 use app\plugins\mch\models\Mch;
 
 class UserForm extends BaseModel
@@ -294,6 +295,22 @@ class UserForm extends BaseModel
                 "open_type" => "navigate"
             ];
         }
+
+        //分红股东显示
+        //TODO
+        $isBoss = Boss::find()->where([
+            'user_id'   => \Yii::$app->user->id,
+            'is_delete' => 0
+        ])->exists();
+        if($isBoss) {
+            $userCenter['menus'][] = [
+                "icon_url"  => "https://dev.mingyuanriji.cn/web/static/bonus.png",
+                "name"      => "奖金分红",
+                "link_url"  => "pages/user/bonus/bonus",
+                "open_type" => "navigate"
+            ];
+        }
+
         $res = [
             'config' => [
                     'title_bar' => [

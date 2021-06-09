@@ -56,26 +56,10 @@ class UserRelationshipLinkForm extends BaseModel{
      * @return array
      */
     public static function rebuild(){
-
         try {
-            $cache = \Yii::$app->getCache();
-
-            $cacheData = $cache->get(self::REBUILD_JOB_CACHE_KEY);
-
-            if(!empty($cacheData) && $cacheData['status'] != self::REBUILD_JOB_STATUS_FINISHED){
-                throw new \Exception("上一个重建队列还未完成，请勿重复操作！");
-            }
-
-            $cacheData['start']  = time();
-            $cacheData['error']  = "";
-            $cacheData['status'] = self::REBUILD_JOB_STATUS_WAITTING;
-
-            $cache->set(self::REBUILD_JOB_CACHE_KEY, $cacheData, 60);
-
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg'  => '操作成功',
-                'data' => $cacheData
+                'msg'  => '操作成功'
             ];
         }catch (\Exception $e){
             return [

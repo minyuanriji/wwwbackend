@@ -13,12 +13,12 @@ class GetMchsController extends ApiController {
      */
     public function actionIndex(){
 
-        //$list = APICacheHelper::get(APICacheHelper::MCH_API_GET_MCHS, function($helper){
+        $list = APICacheHelper::get(APICacheHelper::MCH_API_GET_MCHS, function($helper){
             $form = new CommonMchForm();
             $form->attributes = $this->requestData;
-            //return $helper($form->getList());
-        //});
+            return $helper($form->getList());
+        });
 
-        return $this->asJson($form->getList());
+        return $this->asJson($list);
     }
 }

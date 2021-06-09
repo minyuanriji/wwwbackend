@@ -27,6 +27,8 @@ use app\models\mysql\{UserParent as UserParentModel,UserChildren as UserChildren
 class UserLogic
 {
 
+    public static $error = "";
+
     /**
      * 搜索用户
      * @param $keyword
@@ -92,7 +94,18 @@ class UserLogic
                     }
                 }
                 if(empty($user)){
+                    //生成用户的ID
+                    $startNum = (int)date("ymd");
+                    $stepH    = (int)date("H");
+                    $stepM    = (int)date("i");
+                    $stepS    = (int)date("s");
+                    $randUid  = $startNum + $stepH + $stepM + $stepS;
+                    while(User::findOne($randUid)){
+                        $randUid += rand(0, 5);
+                    }
+
                     $user = new User();
+                    $user->id = $randUid;
                     if (isset($userData["mobile"]) && $userData["mobile"]) {
                         $user->mobile = $userData["mobile"];
                     }
@@ -140,6 +153,7 @@ class UserLogic
             $message = CommonLogic::getExceptionMessage($ex);
             \Yii::error("userRegister error ".$message);
             $transaction->rollBack();
+            static::$error = $ex->getMessage();
             return false;
         }
     }
@@ -483,3 +497,4 @@ class UserLogic
     }
 
 }
+

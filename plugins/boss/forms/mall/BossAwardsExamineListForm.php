@@ -117,7 +117,7 @@ class BossAwardsExamineListForm extends BaseModel
                 }
 
                 //修改用户金额
-                $user = User::findOne((int)$this->user_id);
+                $user = User::findOne((int)$sent->user_id);
                 if(!$user || $user->is_delete){
                     $t->rollBack();
                     throw new \Exception("用户不存在");
@@ -193,7 +193,7 @@ class BossAwardsExamineListForm extends BaseModel
         if (\Yii::$app->admin->id != 148) {
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg' => '请联系夏文充值！'
+                'msg' => '请联系财务充值！'
             ];
         }
         if (!isset($params['id']) || !$params['id']) {

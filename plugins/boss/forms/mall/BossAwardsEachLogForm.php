@@ -17,7 +17,7 @@ class BossAwardsEachLogForm extends BaseModel
                 if (!$each_res) {
                     throw new \Exception($this->responseErrorMsg($each_res));
                 }
-                $each_res->attributes = $data;
+                $each_res->actual_money = $data['actual_money'];
             } else {
                 $each_res = new BossAwardEachLog();
                 $each_res->awards_cycle   = $data['awards_cycle'];
@@ -25,11 +25,10 @@ class BossAwardsEachLogForm extends BaseModel
                 $each_res->money          = $data['money'];
                 $each_res->people_num     = $data['people_num'];
                 $each_res->money_front    = $data['money_front'];
-                $each_res->money_after    = $data['money_after'];
                 $each_res->rate           = $data['rate'];
                 $each_res->sent_time      = $data['sent_time'];
             }
-
+            $each_res->money_after    = $data['money_after'];
             if (!$each_res->save()) {
                 throw new \Exception($this->responseErrorMsg($each_res));
             } else {

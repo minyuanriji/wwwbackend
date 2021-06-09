@@ -20,6 +20,9 @@ use app\models\BaseActiveRecord;
  * @property int $updated_at
  * @property int $is_delete
  * @property int $deleted_at
+ * @property int $last_send_time
+ * @property int $next_send_time
+ * @property int $up_period_time
  */
 class BossAwards extends BaseActiveRecord
 {
@@ -37,7 +40,7 @@ class BossAwards extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mall_id','name','award_sn'], 'required'],
+            [['mall_id'], 'required'],
             [['mall_id','created_at', 'updated_at', 'is_delete','status','deleted_at','period'], 'integer'],
             [['award_sn','period_unit'], 'string'],
             [['money'], 'number'],

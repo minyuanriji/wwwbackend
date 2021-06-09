@@ -72,9 +72,10 @@ class BossListForm extends BaseModel
                 'is_delete' => 0
             ])->one();
             if (!$bossLevel) {
-                throw new \Exception('无效的分销商等级');
+                $newItem['level_name'] = '';
+            } else {
+                $newItem['level_name'] = $bossLevel->name;
             }
-            $newItem['level_name'] = $bossLevel->name;
             $newList[] = $newItem;
         }
         return [

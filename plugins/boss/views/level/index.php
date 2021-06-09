@@ -41,17 +41,18 @@
                         label="ID"
                         width="80">
                 </el-table-column>
-                <el-table-column prop="level" label="等级" width="80">
+                <!--<el-table-column prop="level" label="等级" width="80">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">等级{{scope.row.level}}</com-ellipsis>
                     </template>
-                </el-table-column>
-                <el-table-column label="股东等级名称">
+                </el-table-column>-->
+                <el-table-column label="股东等级名称" width="200">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">{{scope.row.name}}</com-ellipsis>
                     </template>
                 </el-table-column>
-                <el-table-column label="股东佣金">
+
+<!--                <el-table-column label="股东佣金">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1" v-if="scope.row.price >= 0">{{scope.row.price}}%</com-ellipsis>
                         <template v-else>-</template>
@@ -90,23 +91,23 @@
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">{{scope.row.extra_limit_price}}</com-ellipsis>
                     </template>
-                </el-table-column>
-                <el-table-column
+                </el-table-column>-->
+
+                <!--<el-table-column
                         label="启用状态"
                         width="120"
                         >
                     <template slot-scope="scope">
                         <el-switch
-                                disabled
                                 :active-value="1"
                                 :inactive-value="0"
                                 @change="switchStatus(scope.row)"
                                 v-model="scope.row.is_enable">
                         </el-switch>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
 
-                <el-table-column
+                <!--<el-table-column
                         label="购物升级"
                         width="120"
                         >
@@ -132,7 +133,7 @@
                                 v-model="scope.row.upgrade_type_condition">
                         </el-switch>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
 
                 <el-table-column
                         label="操作"
@@ -172,17 +173,17 @@
                 keyword: '',
                 listLoading: false,
                 page: 1,
-                level: 1,
+                // level: 1,
                 pageCount: 0,
-                condition_type_list: {
-                    1: '下线用户数',
-                    2: '累计佣金',
-                    3: '已提现佣金'
-                },
-                price_type_list: {
-                    1: '%',
-                    2: '元'
-                }
+                // condition_type_list: {
+                //     1: '下线用户数',
+                //     2: '累计佣金',
+                //     3: '已提现佣金'
+                // },
+                // price_type_list: {
+                //     1: '%',
+                //     2: '元'
+                // }
             };
         },
         mounted: function () {

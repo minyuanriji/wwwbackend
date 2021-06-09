@@ -15,11 +15,18 @@
                         <el-option
                                 v-for="item in level_list"
                                 :label="item.name"
-                                :value="item.level">
+                                :value="item.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
+            <!--<el-form  size="small" label-width="150px">
+                <el-form-item label="股东比例">
+                    <el-input  type="number" placeholder="请选择股东比例" v-model="rate" >
+                        <template slot="append">%</template>
+                    </el-input>
+                </el-form-item>
+            </el-form>-->
         </div>
         <span slot="footer" class="dialog-footer">
             <el-button @click="editCancel" type="default" size="small">取消</el-button>
@@ -47,7 +54,8 @@
                     btnLoading: false,
                 },
                 level_list: [],
-                level: 0
+                level: '',
+                // rate: 0.00,
             }
         },
         watch: {
@@ -60,8 +68,7 @@
                     this.edit.keyword = '';
                     this.edit.visible = false;
                 }
-            }
-            ,
+            },
             'edit.visible'() {
                 if (!this.edit.visible) {
                     this.editCancel();
@@ -128,7 +135,8 @@
                     method: 'post',
                     data: {
                         id: this.edit.id,
-                        level: this.level
+                        level: this.level,
+                        // rate: this.rate
                     }
                 }).then(response => {
                     this.edit.btnLoading = false;

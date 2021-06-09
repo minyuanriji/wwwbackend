@@ -202,5 +202,20 @@ class BossController extends Controller
         }
     }
 
+    /**
+     * @Note:分红明细
+     */
+    public function actionBonusList()
+    {
+        if (\Yii::$app->request->isAjax) {
+            if (\Yii::$app->request->isGet) {
+                $form = new IncomeListForm();
+                $form->attributes = \Yii::$app->request->get();
+                return $this->asJson($form->getList());
+            }
+        }
+        return $this->render('bonus-list');
+    }
+
 
 }

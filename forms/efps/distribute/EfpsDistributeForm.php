@@ -74,7 +74,7 @@ class EfpsDistributeForm extends BaseModel{
                         "id" => $this->pay_user_id,
                     ]);
                     if ($user) {
-                        $desc   = "来自结账订单[".$user->nickname."]的收入";
+                        $desc   = "来自结账订单[".$user->nickname."]的付款";
                     } else {
                         $desc   = "来自结账订单[".$this->order_sn."]的收入";
                     }

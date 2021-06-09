@@ -43,7 +43,7 @@ class BossUserEditForm extends BaseModel
         }
         $list = User::find()->alias('u')
             ->where(['u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id,])
-            ->andWhere(['u.is_inviter' => 1])
+//            ->andWhere(['u.is_inviter' => 1])
             ->keyword($this->keyword !== '', ['like', 'u.nickname', $this->keyword])
             ->apiPage(20)->select('u.id,u.nickname')->all();
         return [
@@ -78,7 +78,8 @@ class BossUserEditForm extends BaseModel
             }
             $t = \Yii::$app->db->beginTransaction();
             try {
-                $boss->level=$this->level;
+//                $boss->level=$this->level;
+                $boss->level_id=$this->level;
                 $boss->is_delete = 0;
                 if ($boss->save()) {
                     if (!$user->is_inviter) {

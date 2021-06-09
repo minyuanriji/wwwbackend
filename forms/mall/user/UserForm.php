@@ -28,6 +28,8 @@ use app\models\UserChildren;
 use app\models\UserCoupon;
 use app\models\UserInfo;
 use app\models\UserRelationshipLink;
+use app\plugins\boss\models\Boss;
+use app\plugins\boss\models\BossAwardMember;
 use yii\helpers\ArrayHelper;
 
 class UserForm extends BaseModel
@@ -37,6 +39,7 @@ class UserForm extends BaseModel
     public $role_type;
     public $page_size;
     public $keyword;
+    public $type;
     public $platform;
     public $user_id;
     public $status;
@@ -46,14 +49,15 @@ class UserForm extends BaseModel
     public $is_admin;
     public $flag;
     public $fields;
+    public $award_id;
     public $is_change_name = 0;
 
     public function rules()
     {
         return [
             [['date', 'flag',], 'trim'],
-            [['start_date', 'end_date', 'keyword', 'platform'], 'string'],
-            [['id', 'member_level', 'user_id', 'status', 'is_admin'], 'integer'],
+            [['start_date', 'end_date', 'keyword', 'platform','type'], 'string'],
+            [['id', 'member_level', 'user_id', 'award_id', 'status', 'is_admin'], 'integer'],
             [['keyword'], 'string', 'max' => 255],
             [['page_size'], 'default', 'value' => 10],
             [['fields'], 'safe'],
@@ -431,9 +435,6 @@ class UserForm extends BaseModel
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-04-20
-     * @Time: 11:22
      * @Note:积分记录
      * @return array|bool
      */
@@ -478,6 +479,62 @@ class UserForm extends BaseModel
             'data' => [
                 'list' => $list,
                 'export_list' => (new ScoreExport())->fieldsList(),
+                'pagination' => $pagination,
+            ]
+        ];
+    }
+
+    //获取股东用户
+    public function getPlatformList()
+    {
+        if (!$this->validate()) {
+            return $this->responseErrorInfo();
+        }
+        if ($this->type == 'add') {
+            $query = Boss::find()->where([
+                'is_delete' => 0,
+                'mall_id' => \Yii::$app->mall->id,
+            ]);
+        } elseif ($this->type == 'show') {
+            $query = BossAwardMember::find()->where([
+                'award_id' => $this->award_id,
+                'mall_id' => \Yii::$app->mall->id,
+            ]);
+        } else {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => '请传入参数'
+            ];
+        }
+
+        $query->with(['user' => function ($query) {
+            $query->select('id,nickname')
+                ->keyword($this->keyword, [
+                    'OR',
+                    ['like', 'nickname', $this->keyword],
+                    ['like', 'id', $this->keyword],
+                ]);
+        }]);
+
+        $list = $query
+            ->select('id,user_id')
+            ->page($pagination)
+            ->orderBy('id DESC')
+            ->asArray()
+            ->all();
+        if ($list) {
+            foreach ($list as $key => $value) {
+                if (isset($value['user'])) {
+                    $list[$key]['nickname'] = $value['user'][0]['nickname'];
+                    unset($list[$key]['user']);
+                }
+            }
+        }
+
+        return [
+            'code' => ApiCode::CODE_SUCCESS,
+            'data' => [
+                'list' => $list,
                 'pagination' => $pagination,
             ]
         ];

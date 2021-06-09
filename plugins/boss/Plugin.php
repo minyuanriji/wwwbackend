@@ -47,12 +47,12 @@ class Plugin extends \app\plugins\Plugin
                 'icon' => 'el-icon-setting',
 
             ],
-            [
+            /*[
                 'name' => '基础配置',
                 'route' => 'plugin/boss/mall/boss/setting',
                 'icon' => 'el-icon-setting',
 
-            ],
+            ],*/
             [
                 'name' => '股东等级',
                 'route' => 'plugin/boss/mall/level/index',
@@ -64,9 +64,20 @@ class Plugin extends \app\plugins\Plugin
                     ],
                 ]
             ],
-            [
+            /*[
                 'name' => '提成明细',
                 'route' => 'plugin/boss/mall/boss/income-list',
+                'icon' => 'el-icon-setting',
+                'action' => [
+                    [
+                        'name' => '详情(S|U)',
+                        'route' => 'plugin/boss/mall/boss/income-detail',
+                    ],
+                ]
+            ],*/
+            [
+                'name' => '分红明细',
+                'route' => 'plugin/boss/mall/boss/bonus-list',
                 'icon' => 'el-icon-setting',
                 'action' => [
                     [
@@ -77,7 +88,15 @@ class Plugin extends \app\plugins\Plugin
             ],
             [
                 'name' => '奖金池',
-                'route' => 'plugin/boss/mall/Prize/index',
+                'route' => 'plugin/boss/mall/prize/index',
+                'icon' => '',
+                'action' => [
+                    [],
+                ]
+            ],
+            [
+                'name' => '审核',
+                'route' => 'plugin/boss/mall/examine-prize/index',
                 'icon' => '',
                 'action' => [
                     [],

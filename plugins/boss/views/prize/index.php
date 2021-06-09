@@ -15,8 +15,8 @@
             <div>
                 <span>奖金池</span>
                 <div style="float: right; margin: -5px 0">
-                    <el-button type="primary" @click="$navigate({r: 'plugin/boss/mall/level/edit'})" size="small">
-                        添加股东等级
+                    <el-button type="primary" @click="$navigate({r: 'plugin/boss/mall/prize/edit'})" size="small">
+                        添加奖金池
                     </el-button>
                 </div>
             </div>
@@ -24,7 +24,7 @@
         <div class="table-body">
             <div class="input-item">
                 <el-input @keyup.enter.native="search" size="small"
-                          placeholder="请输入等级名称或等级进行搜索"
+                          placeholder="请输入名称或编号进行搜索"
                           v-model="keyword"
                           clearable
                           @clear="search">
@@ -36,120 +36,112 @@
                     :data="list"
                     border
                     style="width: 100%">
+
                 <el-table-column
                         prop="id"
                         label="ID"
                         width="80">
                 </el-table-column>
-                <el-table-column prop="level" label="等级" width="80">
+
+                <el-table-column prop="award_sn" label="编号" width="180">
                     <template slot-scope="scope">
-                        <com-ellipsis :line="1">等级{{scope.row.level}}</com-ellipsis>
+                        <com-ellipsis :line="1">{{scope.row.award_sn}}</com-ellipsis>
                     </template>
                 </el-table-column>
-                <el-table-column label="股东等级名称">
+
+                <el-table-column label="奖池名称">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">{{scope.row.name}}</com-ellipsis>
                     </template>
                 </el-table-column>
-                <el-table-column label="股东佣金">
+
+                <el-table-column label="状态">
                     <template slot-scope="scope">
-                        <com-ellipsis :line="1" v-if="scope.row.price >= 0">{{scope.row.price}}%</com-ellipsis>
-                        <template v-else>-</template>
-                    </template>
-                </el-table-column>
-                <el-table-column label="额外奖励状态">
-                    <template slot-scope="scope">
-                        <el-switch
-                                :active-value="1"
-                                :inactive-value="0"
-                                v-model="scope.row.is_extra">
-                        </el-switch>
+                        <span v-if="scope.row.status==0" style="color: red;">未开始</span>
+                        <span v-if="scope.row.status==1" style="color: green;">奖金发放中</span>
+                        <span v-if="scope.row.status==2" style="color: blue;">已结束</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="额外奖励存在条件">
+                <el-table-column label="周期">
                     <template slot-scope="scope">
-                        <span v-if="scope.row.extra_type==1">购物升级</span>
-                        <span v-if="scope.row.extra_type==2">条件升级</span>
-                        <span v-if="scope.row.extra_type==3">该等级均存在</span>
+                        <com-ellipsis :line="1">{{scope.row.period}}{{scope.row.period_unit}}</com-ellipsis>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="额外奖励佣金">
+                <el-table-column label="奖金池金额">
                     <template slot-scope="scope">
-                        <com-ellipsis :line="1">{{scope.row.extra_price}}%</com-ellipsis>
-                    </template>
-                </el-table-column>
-                <el-table-column label="额外奖励是否存在上限">
-                    <template slot-scope="scope">
-                        <com-ellipsis :line="1">{{scope.row.extra_is_limit==1?'是':'否'}}</com-ellipsis>
+                        <com-ellipsis :line="1">{{scope.row.money}}</com-ellipsis>
                     </template>
                 </el-table-column>
 
-                <el-table-column label="额外奖励上限金额">
+                <el-table-column label="比例">
                     <template slot-scope="scope">
-                        <com-ellipsis :line="1">{{scope.row.extra_limit_price}}</com-ellipsis>
-                    </template>
-                </el-table-column>
-                <el-table-column
-                        label="启用状态"
-                        width="120"
-                        >
-                    <template slot-scope="scope">
-                        <el-switch
-                                disabled
-                                :active-value="1"
-                                :inactive-value="0"
-                                @change="switchStatus(scope.row)"
-                                v-model="scope.row.is_enable">
-                        </el-switch>
+                        <com-ellipsis :line="1">{{scope.row.rate}}%</com-ellipsis>
                     </template>
                 </el-table-column>
 
-                <el-table-column
-                        label="购物升级"
-                        width="120"
-                        >
+                <!--<el-table-column label="审核状态">
                     <template slot-scope="scope">
-                        <el-switch
-                                disabled
-                                :active-value="1"
-                                :inactive-value="0"
-                                @change="switchStatus(scope.row)"
-                                v-model="scope.row.upgrade_type_goods">
-                        </el-switch>
+                        <span v-if="scope.row.is_examine==1" style="color: red;">待审核</span>
+                        <span v-if="scope.row.is_examine==2" style="color: green;">审核通过</span>
+                        <span v-if="scope.row.is_examine==3" style="color: blue;">审核失败</span>
                     </template>
-                </el-table-column>
-                <el-table-column
-                        label="条件升级"
-                        width="120">
+                </el-table-column>-->
+
+                <el-table-column label="创建时间" width="170">
                     <template slot-scope="scope">
-                        <el-switch
-                                disabled
-                                :active-value="1"
-                                :inactive-value="0"
-                                @change="switchStatus(scope.row)"
-                                v-model="scope.row.upgrade_type_condition">
-                        </el-switch>
+                        <com-ellipsis :line="1">{{scope.row.created_at}}</com-ellipsis>
                     </template>
                 </el-table-column>
 
                 <el-table-column
                         label="操作"
-                        width="180">
+                        width="350">
                     <template slot-scope="scope">
+
                         <el-button circle size="mini" type="text" @click="edit(scope.row.id)">
                             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                                 <img src="statics/img/mall/edit.png" alt="">
                             </el-tooltip>
                         </el-button>
-                        <el-button circle size="mini" type="text" @click="levelDelete(scope.row, scope.$index)">
+
+                        <!--<el-button circle size="mini" type="text" @click="edit(scope.row.id)">
+                            <el-tooltip class="item" effect="dark" content="审核" placement="top">
+                                <img src="statics/img/mall/order/detail.png" alt="">
+                            </el-tooltip>
+                        </el-button>-->
+
+                        <el-button circle size="mini" type="text" @click="prizeDelete(scope.row, scope.$index)">
                             <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                 <img src="statics/img/mall/del.png" alt="">
                             </el-tooltip>
                         </el-button>
+
+                        <el-button type="text" size="mini" circle plain style="margin-left: 10px;margin-top: 10px"
+                                   @click="addChangeOwnerDialog(scope.row)">
+                            <el-tooltip class="item" effect="dark" content="添加用户" placement="top">
+                                <img src="statics/img/mall/addUser.png" alt="">
+                            </el-tooltip>
+                        </el-button>
+
+
+                        <el-button circle size="mini" type="text" @click="showChangeOwnerDialog(scope.row)">
+                            <el-tooltip class="item" effect="dark" content="查看用户" placement="top">
+                                <img src="statics/img/mall/showUser.png" alt="">
+                            </el-tooltip>
+                        </el-button>
+
+                        <el-button type="text" size="mini" circle style="margin-left: 10px;margin-top: 10px"
+                                   @click.native="remarks(scope.row.id)">
+                            <el-tooltip class="item" effect="dark" content="充值" placement="top">
+                                <img src="statics/img/mall/pay.png" alt="">
+                            </el-tooltip>
+                        </el-button>
+
                     </template>
                 </el-table-column>
+
             </el-table>
 
             <div style="text-align: right;margin: 20px 0;">
@@ -162,6 +154,85 @@
             </div>
         </div>
     </el-card>
+
+    <el-dialog title="充值" :visible.sync="dialogContent">
+        <el-form :model="remarksForm">
+            <el-form-item label="金额">
+                <el-input v-model="remarksForm.money" type="number" placeholder="请输入金额" style="width: 220px"></el-input>
+                <el-input style="display: none" :readonly="true" v-model="remarksForm.id"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogContent = false">取 消</el-button>
+            <el-button type="primary" @click="remarksSubmit" :loading="remarksLoading">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <!-- 添加用户 -->
+    <el-dialog title="添加用户" :visible.sync="changeOwnerDialogVisible" width="30%">
+        <div class="input-item">
+            <el-input size="small" placeholder="请输入搜索内容" type="text" clearable  v-model="keyword">
+                <el-button slot="append" @click="loadBossList('add')" icon="el-icon-search"></el-button>
+            </el-input>
+        </div>
+        <div>
+<!--            <el-button @click="upDown(1)" size="mini">批量添加</el-button>-->
+        </div>
+        <el-table v-loading="adminListLoading" :data="adminList" style="margin-bottom: 20px;">
+            <el-table-column align='center' type="selection" width="60"></el-table-column>
+            <el-table-column align="center" prop="id" label="id"></el-table-column>
+            <el-table-column align="center" prop="nickname" label="用户名"></el-table-column>
+            <el-table-column align="center" label="操作">
+                <template slot-scope="scope">
+                    <el-button :loading="scope.row.loading" plain size="mini" type="primary"
+                               @click="changeToOwner(scope.row)">选择
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination
+                v-if="adminListPagination"
+                style="text-align: center"
+                background
+                @current-change="adminListPageChange"
+                layout="prev, pager, next"
+                :page-count="adminListPagination.page_count">
+        </el-pagination>
+    </el-dialog>
+
+    <!-- 查看股东 -->
+    <el-dialog title="查看股东" :visible.sync="showConsumerList" width="30%">
+        <div class="input-item">
+            <el-input size="small" placeholder="请输入搜索内容" type="text" clearable v-model="keyword">
+                <el-button slot="append" @click="loadAdminList('show')" icon="el-icon-search"></el-button>
+            </el-input>
+        </div>
+        <div>
+            <!--            <el-button @click="upDown(1)" size="mini">批量添加</el-button>-->
+        </div>
+        <el-table v-loading="adminListLoading" :data="consumerList" style="margin-bottom: 20px;">
+            <el-table-column align='center' type="selection" width="60"></el-table-column>
+            <el-table-column align="center" prop="id" label="id"></el-table-column>
+            <el-table-column align="center" prop="user_id" label="用户ID"></el-table-column>
+            <el-table-column align="center" prop="nickname" label="用户名"></el-table-column>
+            <el-table-column align="center" label="操作">
+                <template slot-scope="scope">
+                    <el-button :loading="scope.row.loading" plain size="mini" type="primary"
+                               @click="remove(scope.row)">移除
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination
+                v-if="adminListPagination"
+                style="text-align: center"
+                background
+                @current-change="adminListPageChange"
+                layout="prev, pager, next"
+                :page-count="adminListPagination.page_count">
+        </el-pagination>
+    </el-dialog>
+
 </div>
 <script>
     const app = new Vue({
@@ -172,23 +243,199 @@
                 keyword: '',
                 listLoading: false,
                 page: 1,
-                level: 1,
                 pageCount: 0,
-                condition_type_list: {
-                    1: '下线用户数',
-                    2: '累计佣金',
-                    3: '已提现佣金'
+                remarksForm: {
+                    id: '',
+                    money: ''
                 },
-                price_type_list: {
-                    1: '%',
-                    2: '元'
-                }
+                remarksLoading: false,
+                dialogContent: false,
+                currentChangeOwnerMall: {
+                    name: ''
+                },
+                changeOwnerDialogVisible: false,
+                adminList: null,
+                adminListLoading: false,
+                adminListForm: {
+                    page: 0,
+                },
+                userIds: {
+                    type: Array,
+                    default: function () {
+                        return [];
+                    }
+                },
+                consumer: {
+                    name: ''
+                },
+                showConsumerList: false,
+                consumerList: null,
             };
         },
         mounted: function () {
             this.getList();
         },
         methods: {
+            //充值
+            remarksSubmit() {
+                this.remarksLoading = true;
+                request({
+                    params: {
+                        r: 'plugin/boss/mall/prize/recharge',
+                    },
+                    method: 'post',
+                    data:{
+                        money: this.remarksForm.money,
+                        id: this.remarksForm.id
+                    }
+                }).then(e => {
+                    this.remarksLoading = false;
+                    if (e.data.code == 0) {
+                        this.dialogContent = false;
+                        this.search();
+                        this.$message.success(e.data.msg);
+                    } else {
+                        this.dialogContent = false;
+                        this.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    this.remarksLoading = false;
+                    this.dialogContent = false;
+                    this.$message.error(e.data.msg);
+                });
+            },
+
+            remarks(id) {
+                this.dialogContent = true;
+                this.remarksForm = {
+                    id: id,
+                    money: ''
+                }
+            },
+
+            showChangeOwnerDialog(row) {
+                console.log(row);
+                this.consumer = row;
+                this.showConsumerList = true;
+                this.loadAdminList('show');
+            },
+
+            addChangeOwnerDialog(row) {
+                console.log(row);
+                this.currentChangeOwnerMall = row;
+                this.changeOwnerDialogVisible = true;
+                this.loadBossList('add');
+            },
+
+            //添加用户
+            changeToOwner(row) {
+                console.log(row);
+                const content = '确认将`' + row.nickname + '`添加至`' + this.currentChangeOwnerMall.name + '`奖池下?';
+                this.$confirm(content, '提示').then(e => {
+                    row.loading = true;
+                    this.$request({
+                        params: {
+                            r: "plugin/boss/mall/prize/user-edit",
+                        },
+                        method: 'post',
+                        data:{
+                            user_ids: [row.user_id],
+                            award_id: this.currentChangeOwnerMall.id,
+                        }
+                    }).then(e => {
+                        row.loading = false;
+                        if (e.data.code === 0) {
+                            this.changeOwnerDialogVisible = false;
+                            this.$message.success(e.data.msg);
+                            this.loadBossList('add');
+                        } else {
+                            this.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                    });
+                }).catch(e => {
+                });
+            },
+
+            //移除用户
+            remove(row) {
+                console.log(row);
+                const content = '确认将`' + row.nickname + '`从`' + this.currentChangeOwnerMall.name + '`奖池移除?';
+                this.$confirm(content, '提示').then(e => {
+                    row.loading = true;
+                    this.$request({
+                        params: {
+                            r: "plugin/boss/mall/prize/user-edit",
+                        },
+                        method: 'post',
+                        data:{
+                            user_ids: [row.user_id],
+                            award_id: this.currentChangeOwnerMall.id,
+                            ids: [row.id],
+                        }
+                    }).then(e => {
+                        row.loading = false;
+                        if (e.data.code === 0) {
+                            this.changeOwnerDialogVisible = false;
+                            this.$message.success(e.data.msg);
+                            this.loadAdminList('show');
+                        } else {
+                            this.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                    });
+                }).catch(e => {
+                });
+            },
+
+            loadAdminList(type) {
+                this.adminListLoading = true;
+                this.$request({
+                    params: {
+                        r: 'plugin/boss/mall/prize/platform-users',
+                        page: this.adminListForm.page,
+                        keyword: this.keyword,
+                        award_id: this.consumer.id,
+                        type: type,
+                    }
+                }).then(e => {
+                    this.adminListLoading = false;
+                    if (e.data.code === 0) {
+                        for (let i in e.data.data.list) {
+                            e.data.data.list[i].loading = false;
+                        }
+                        this.consumerList = e.data.data.list;
+                        this.adminListPagination = e.data.data.pagination;
+                    } else {
+                    }
+                }).catch(e => {
+                });
+            },
+
+            loadBossList(type) {
+                this.adminListLoading = true;
+                this.$request({
+                    params: {
+                        r: 'plugin/boss/mall/prize/platform-users',
+                        page: this.adminListForm.page,
+                        keyword: this.keyword,
+                        award_id: this.consumer.id,
+                        type: type,
+                    }
+                }).then(e => {
+                    this.adminListLoading = false;
+                    if (e.data.code === 0) {
+                        for (let i in e.data.data.list) {
+                            e.data.data.list[i].loading = false;
+                        }
+                        this.adminList = e.data.data.list;
+                        this.adminListPagination = e.data.data.pagination;
+                    } else {
+                    }
+                }).catch(e => {
+                });
+            },
+
             search() {
                 this.page = 1;
                 this.getList();
@@ -203,7 +450,7 @@
                 self.listLoading = true;
                 request({
                     params: {
-                        r: 'plugin/boss/mall/level/index',
+                        r: 'plugin/boss/mall/prize/index',
                         page: self.page,
                         keyword: this.keyword
                     },
@@ -211,7 +458,6 @@
                 }).then(e => {
                     self.listLoading = false;
                     self.list = e.data.data.list;
-                    self.level = e.data.data.level;
                     self.pageCount = e.data.data.pagination.page_count;
                 }).catch(e => {
                     console.log(e);
@@ -220,12 +466,12 @@
             edit(id) {
                 if (id) {
                     navigateTo({
-                        r: 'plugin/boss/mall/level/edit',
+                        r: 'plugin/boss/mall/prize/edit',
                         id: id,
                     });
                 } else {
                     navigateTo({
-                        r: 'plugin/boss/mall/level/edit',
+                        r: 'plugin/boss/mall/prize/edit',
                     });
                 }
             },
@@ -234,7 +480,7 @@
                 self.listLoading = true;
                 request({
                     params: {
-                        r: 'plugin/boss/mall/level/switch-status',
+                        r: 'plugin/boss/mall/prize/switch-status',
                     },
                     method: 'post',
                     data: {
@@ -253,12 +499,13 @@
                 });
             },
             demo(row) {
-
                 console.log("测试")
             },
-            levelDelete(row, index) {
+
+            //删除奖池
+            prizeDelete(row, index) {
                 let self = this;
-                self.$confirm('删除该股东等级, 是否继续?', '提示', {
+                self.$confirm('删除该奖池, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
@@ -266,7 +513,7 @@
                     self.listLoading = true;
                     request({
                         params: {
-                            r: 'plugin/boss/mall/level/delete',
+                            r: 'plugin/boss/mall/prize/delete',
                         },
                         method: 'post',
                         data: {

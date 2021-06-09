@@ -5,6 +5,9 @@ namespace app\models;
 use app\core\cloud\Cloud;
 use app\events\UserInfoEvent;
 use app\handlers\RelationHandler;
+use app\plugins\boss\models\Boss;
+use app\plugins\boss\models\BossAwardMember;
+use app\plugins\boss\models\BossAwardSentLog;
 use app\services\wechat\WechatTemplateService;
 use Yii;
 
@@ -355,6 +358,21 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
     public function getUserSetting()
     {
         return $this->hasOne(UserSetting::className(), ['user_id' => 'id']);
+    }
+
+    public function getBossAwardSentLog()
+    {
+        return $this->hasOne(BossAwardSentLog::className(), ['user_id' => 'id']);
+    }
+
+    public function getBoss()
+    {
+        return $this->hasOne(Boss::className(), ['user_id' => 'id']);
+    }
+
+    public function getBossAwardMember()
+    {
+        return $this->hasOne(BossAwardMember::className(), ['user_id' => 'id']);
     }
 
 

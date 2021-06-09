@@ -183,15 +183,14 @@ class BossLevelCommon extends BaseModel
 
     public function getList()
     {
-        $levelList = [];
         $levelList = BossLevel::find()->where([
-            'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, 'is_enable' => 1,
+            'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, //'is_enable' => 1,
         ])->select(['id', 'level', 'name'])->orderBy(['level' => SORT_ASC])->all();
-        array_unshift($levelList, [
+        /*array_unshift($levelList, [
             'id' => 0,
             'level' => 0,
             'name' => '默认等级'
-        ]);
+        ]);*/
         return $levelList;
     }
 
@@ -199,14 +198,14 @@ class BossLevelCommon extends BaseModel
     public static function getEnableLevelList()
     {
         $levelList = BossLevel::find()->where([
-            'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, 'is_enable' => 1,
+            'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, //'is_enable' => 1,
         ])->select(['id', 'level', 'name'])->orderBy(['level' => SORT_ASC])->all();
 
-        array_unshift($levelList, [
+        /*array_unshift($levelList, [
             'id' => 0,
             'level' => 0,
             'name' => '默认等级'
-        ]);
+        ]);*/
         return $levelList;
     }
 

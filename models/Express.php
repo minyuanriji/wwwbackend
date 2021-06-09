@@ -755,6 +755,11 @@ class Express
                 'name' => '壹米滴答',
                 'code' => 'YMDD',
             ],
+            [
+                'id' => 1024,
+                'name' => '极兔速递',
+                'code' => 'JITU',
+            ],
         ];
     }
 

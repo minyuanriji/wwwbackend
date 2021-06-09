@@ -26,6 +26,7 @@ use Yii;
  * @property int $upgrade_status 1条件升级  2 购买指定商品升级   3手动升级
  * @property int $level 经销商等级
  * @property float $extra_price 额外分红金额
+ * @property float $level_id 经销商等级id
  * @property User  $user;
  */
 class Boss extends BaseActiveRecord
@@ -51,7 +52,7 @@ class Boss extends BaseActiveRecord
     {
         return [
             [['mall_id', 'user_id'], 'required'],
-            [['mall_id', 'user_id', 'is_delete', 'created_at', 'deleted_at', 'updated_at', 'upgrade_level_at', 'upgrade_status', 'level'], 'integer'],
+            [['mall_id', 'user_id', 'is_delete', 'created_at', 'deleted_at', 'updated_at', 'upgrade_level_at', 'upgrade_status', 'level','level_id'], 'integer'],
             [['remarks', 'delete_reason'], 'string'],
             [['total_price', 'frozen_price', 'extra_price'], 'number'],
         ];
@@ -79,12 +80,13 @@ class Boss extends BaseActiveRecord
             'upgrade_status' => '1条件升级  2 购买指定商品升级   3手动升级',
             'level' => '经销商等级',
             'extra_price' => '额外分红金额',
+            'level_id' => '经销商等级ID',
         ];
     }
 
     public function getUser()
     {
-        return $this->hasOne(User::class, ['id' => 'user_id']);
+        return $this->hasMany(User::class, ['id' => 'user_id']);
     }
 
 

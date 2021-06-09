@@ -1,20 +1,10 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-08
- * Time: 17:53
- */
-
 namespace app\plugins\boss\forms\mall;
 
 use app\core\ApiCode;
 use app\helpers\SerializeHelper;
 use app\models\BaseModel;
 use app\plugins\boss\forms\common\BossLevelCommon;
-use app\plugins\boss\models\Boss;
 use app\plugins\boss\models\BossLevel;
 
 class BossLevelEditForm extends BaseModel
@@ -53,7 +43,7 @@ class BossLevelEditForm extends BaseModel
     public function rules()
     {
         return [
-            [['level', 'name', 'is_enable'], 'required'],
+            [['name'], 'required'],//'level',
             [['level', 'name', 'checked_condition_keys', 'checked_condition_values', 'equal_price_type', 'is_enable', 'detail', 'goods_warehouse_ids', 'goods_list'], 'trim'],
             [['level','is_extra','extra_type', 'is_enable', 'id', 'is_auto_upgrade', 'condition_type', 'upgrade_type_condition', 'upgrade_type_goods', 'goods_type', 'buy_goods_type','extra_is_limit'], 'integer'],
             [['name'], 'string'],
@@ -95,7 +85,7 @@ class BossLevelEditForm extends BaseModel
             return $this->responseErrorInfo();
         }
         try {
-            if ($this->equal_price_type == 1) {
+            /*if ($this->equal_price_type == 1) {
                 if ($this->price > 100) {
                     throw new \Exception('平级奖佣金百分比不能大于100%');
                 }
@@ -120,17 +110,18 @@ class BossLevelEditForm extends BaseModel
                         ];
                     }
                 }
-            }
+            }*/
+            $level = BossLevel::findOne(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'id' => $this->id]);
             if (!$level) {
                 $level = new BossLevel();
                 $level->is_delete = 0;
                 $level->mall_id = \Yii::$app->mall->id;
             }
             $level->attributes = $this->attributes;
-            $level->checked_condition_keys = SerializeHelper::encode($this->checked_condition_keys);
+            /*$level->checked_condition_keys = SerializeHelper::encode($this->checked_condition_keys);
             $level->checked_condition_values = SerializeHelper::encode($this->checked_condition_values);
             $level->goods_list = SerializeHelper::encode($this->goods_list);
-            $level->goods_warehouse_ids = SerializeHelper::encode($this->goods_warehouse_ids);
+            $level->goods_warehouse_ids = SerializeHelper::encode($this->goods_warehouse_ids);*/
             if (!$level->save()) {
                 throw new \Exception($this->responseErrorMsg($level));
             } else {

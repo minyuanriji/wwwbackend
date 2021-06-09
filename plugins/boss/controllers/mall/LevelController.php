@@ -1,15 +1,6 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-08
- * Time: 16:10
- */
 
 namespace app\plugins\boss\controllers\mall;
-
 
 use app\core\ApiCode;
 use app\plugins\Controller;
@@ -22,55 +13,23 @@ use app\plugins\boss\forms\mall\BossLevelListForm;
 
 use app\plugins\boss\models\BossLevel;
 
-
 class LevelController extends Controller
 {
-
-
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-12
-     * @Time: 9:52
-     * @Note:等级列表
      * @return string|\yii\web\Response
      */
     public function actionIndex()
     {
         if (\Yii::$app->request->isAjax) {
-            if (\Yii::$app->request->isPost) {
-
-            } elseif (\Yii::$app->request->isGet) {
+            if (\Yii::$app->request->isGet) {
                 $form = new BossLevelListForm();
                 $form->attributes = \Yii::$app->request->get();
                 return $this->asJson($form->search());
             }
-
         }
 
         return $this->render('index');
     }
-
-    /**
-     * @Author: 广东七件事 ganxiaohao
-     * Date: 2020-05-10
-     * Time: 22:26
-     * @Note:已经启用的等级
-     */
-    public function actionEnableList()
-    {
-        if (\Yii::$app->request->isAjax) {
-
-            if (\Yii::$app->request->isPost) {
-
-            } elseif (\Yii::$app->request->isGet) {
-                $form = new BossLevelEnableListForm();
-                return $this->asJson($form->getList());
-            }
-
-        }
-
-    }
-
 
     /**
      * @Author: 广东七件事 ganxiaohao
@@ -96,11 +55,24 @@ class LevelController extends Controller
 
     }
 
+    /**
+     * @Note:已经启用的等级
+     */
+    public function actionEnableList()
+    {
+        if (\Yii::$app->request->isAjax) {
+
+            if (\Yii::$app->request->isPost) {
+
+            } elseif (\Yii::$app->request->isGet) {
+                $form = new BossLevelEnableListForm();
+                return $this->asJson($form->getList());
+            }
+        }
+
+    }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-12
-     * @Time: 9:52
      * @Note:等级状态变更
      * @return \yii\web\Response
      */
@@ -134,9 +106,6 @@ class LevelController extends Controller
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-12
-     * @Time: 9:52
      * @Note:删除
      * @return \yii\web\Response
      */
@@ -155,9 +124,6 @@ class LevelController extends Controller
 
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-12
-     * @Time: 9:47
      * @Note:获取分销配置以及权重
      * @return \yii\web\Response
      */

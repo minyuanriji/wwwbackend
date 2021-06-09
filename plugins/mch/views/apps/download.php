@@ -15,7 +15,7 @@
         <div class="ok-btn"><img src="/web/static/fillShop.png" alt=""></div>
     </div>
     <div class="download">
-        <h3 class="entry-hd">商家APP</h3>
+        <h3 class="entry-hd">商家APP下载</h3>
         <p class="entry-con">加入补商汇，消费全免费</p>
         <div class="download-btn">
             <a href="#">

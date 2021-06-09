@@ -19,21 +19,21 @@ Yii::$app->loadPluginComponentView('boss-level');
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <span>股东列表</span>
-            <el-form size="small" :inline="true" :model="search" style="float: right;margin-top: -5px;">
+            <!--<el-form size="small" :inline="true" :model="search" style="float: right;margin-top: -5px;">
                 <el-form-item>
                     <com-export-dialog :field_list='exportList' :params="search" @selected="confirmSubmit">
                     </com-export-dialog>
                 </el-form-item>
-            </el-form>
+            </el-form>-->
         </div>
         <div class="table-body">
-            <el-select size="small" v-model="search.platform" @change='toSearch' class="select">
+            <!--<el-select size="small" v-model="search.platform" @change='toSearch' class="select">
                 <el-option key="all" label="全部平台" value=""></el-option>
                 <el-option key="wxapp" label="微信" value="wxapp"></el-option>
                 <el-option key="aliapp" label="支付宝" value="aliapp"></el-option>
                 <el-option key="ttapp" label="抖音/头条" value="ttapp"></el-option>
                 <el-option key="bdapp" label="百度" value="bdapp"></el-option>
-            </el-select>
+            </el-select>-->
             <el-select size="small" v-model="search.level" @change='toSearch' class="select">
                 <el-option key="all" label="全部等级" value=""></el-option>
                 <el-option :key="index" :label="item.name" :value="item.level"
@@ -45,10 +45,10 @@ Yii::$app->loadPluginComponentView('boss-level');
                     <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
                 </el-input>
             </div>
-            <div class="batch">
+            <!--<div class="batch">
                 <boss-batch :choose-list="choose_list" :boss-level-list="bossLevelList"
                            @to-search="loadData"></boss-batch>
-            </div>
+            </div>-->
             <div style="float: right">
                 <el-button type="primary" size="small" style="padding: 9px 15px !important;" @click="editClick">添加股东
                 </el-button>
@@ -75,17 +75,22 @@ Yii::$app->loadPluginComponentView('boss-level');
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="手机号" prop="mobile">
+                    <el-table-column label="手机号" prop="mobile" width="150">
                         <template slot-scope="scope">
                             <div>{{scope.row.userInfo.mobile}}</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="累计佣金" prop="total_price">
+                    <el-table-column label="累计佣金" prop="total_price" width="100">
                         <template slot-scope="scope">
                             <div>{{scope.row.total_price}}</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="推荐人" prop="parent_name"></el-table-column>
+                    <!--<el-table-column label="佣金比列" prop="rate" width="100">
+                        <template slot-scope="scope">
+                            <div>{{scope.row.rate}}%</div>
+                        </template>
+                    </el-table-column>-->
+                    <!--<el-table-column label="推荐人" prop="parent_name"></el-table-column>
                     <el-table-column width='200' label="下级用户">
                         <template slot-scope="scope">
                             <template v-for="(item, key, index) in share_name" v-if="scope.row[key] !== undefined">
@@ -95,8 +100,8 @@ Yii::$app->loadPluginComponentView('boss-level');
                                 <br>
                             </template>
                         </template>
-                    </el-table-column>
-                    <el-table-column label="股东等级" width="120" prop="level">
+                    </el-table-column>-->
+                    <el-table-column label="股东等级" width="150" prop="level">
                         <template slot-scope="scope">
                             <el-tag size="small" type="info" v-if="scope.row.level == 0">默认等级</el-tag>
                             <el-tag size="small" v-else>{{scope.row.level_name}}</el-tag>

@@ -1,12 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-08
- * Time: 17:50
- */
 Yii::$app->loadComponentView('com-dialog-select');
 Yii::$app->loadComponentView('com-select-cat');
 ?>
@@ -28,7 +20,7 @@ Yii::$app->loadComponentView('com-select-cat');
             <el-form :model="ruleForm" :rules="rules" size="small" ref="ruleForm" label-width="150px">
                 <el-row>
                     <el-col :span="24">
-                        <el-form-item label="股东等级权重" prop="level">
+                        <!--<el-form-item label="股东等级权重" prop="level">
                             <el-select style="width: 100%" v-model="ruleForm.level" placeholder="请选择">
                                 <el-option
                                         v-for="item in weights"
@@ -38,13 +30,12 @@ Yii::$app->loadComponentView('com-select-cat');
                                         :disabled="item.disabled">
                                 </el-option>
                             </el-select>
-                        </el-form-item>
+                        </el-form-item>-->
                         <el-form-item label="股东等级名称" prop="name">
                             <el-input v-model="ruleForm.name" placeholder="请输入股东等级名称"></el-input>
                         </el-form-item>
 
-                  
-
+<!--
                         <el-form-item label="永久分红">
                             <el-input v-model.number="ruleForm.price" type="number">
                                 <template slot="append">%</template>
@@ -262,14 +253,14 @@ Yii::$app->loadComponentView('com-select-cat');
                                     </div>
                                 </template>
                             </el-form-item>
-                        </template>
-                        <el-form-item label="是否启用" prop="is_enable">
+                        </template>-->
+                        <!--<el-form-item label="是否启用" prop="is_enable">
                             <el-switch
                                     v-model="ruleForm.is_enable"
                                     :active-value="1"
                                     :inactive-value="0">
                             </el-switch>
-                        </el-form-item>
+                        </el-form-item>-->
                         <el-form-item label="等级说明" prop="detail">
                             <el-input type="textboss" :rows="3" placeholder="请输入等级说明"
                                       v-model="ruleForm.detail" maxlength="80" show-word-limit></el-input>
@@ -289,7 +280,7 @@ Yii::$app->loadComponentView('com-select-cat');
         data() {
             return {
                 msg: 1,
-                options: [],//会员等级列表
+/*                options: [],//会员等级列表
                 level: 0,
                 form: {
                     type: [],
@@ -330,11 +321,11 @@ Yii::$app->loadComponentView('com-select-cat');
                 checked_condition_keys: [],
                 showConditionMsg: false,
                 conditionMsg: '',
-                weights: [],
+                weights: [],*/
                 ruleForm: {
-                    level: '',
+                    // level: '',
                     name: '',
-                    condition_type: 1,
+/*                    condition_type: 1,
                     price: 0,
                     is_extra:0,
                     extra_price:0,
@@ -382,12 +373,12 @@ Yii::$app->loadComponentView('com-select-cat');
                     ],
                     goods_warehouse_ids: [],
                     checked_condition_keys: [],
-                    goods_list: [],
+                    goods_list: [],*/
                 },
                 rules: {
-                    level: [
+                    /*level: [
                         {required: true, message: '请选择股东等级', trigger: 'change'},
-                    ],
+                    ],*/
                     name: [
                         {required: true, message: '请输入股东等级名称', trigger: 'change'},
                     ],

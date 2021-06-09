@@ -1,23 +1,9 @@
-<?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-08
- * Time: 15:48
- */
-
-?>
-
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <span>提成明细</span>
-
         </div>
         <div class="table-body">
-
 
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-table :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;">

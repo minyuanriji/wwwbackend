@@ -90,7 +90,7 @@ class LoginForm extends BaseModel
             setcookie('__admin_login_route', '/admin/admin/login');
             if ($adminType == Admin::ADMIN_TYPE_SUPER || $adminType == Admin::ADMIN_TYPE_ADMIN) {
                 // 管理员
-                $route = 'admin/index/index';
+                $route = 'admin/mall/index';
                 setcookie('__admin_login_role', 'admin');
             } else {
                 // 操作员

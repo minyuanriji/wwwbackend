@@ -241,3 +241,4 @@ class RegisterForm extends BaseModel
         }
     }
 }
+

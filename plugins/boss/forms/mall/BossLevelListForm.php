@@ -34,14 +34,13 @@ class BossLevelListForm extends BaseModel
 
     public function search()
     {
-
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
         $list = BossLevel::find()->where([
             'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0
         ])->keyword($this->keyword, ['or',['like', 'name', $this->keyword],['like', 'level', $this->keyword]])
-            ->page($pagination, 20, $this->page)->orderBy(['level' => SORT_ASC])->all();
+            ->page($pagination, 20, $this->page)->orderBy(['id' => SORT_DESC])->all();
 
         return [
             'code' => ApiCode::CODE_SUCCESS,

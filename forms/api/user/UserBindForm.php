@@ -133,3 +133,4 @@ class UserBindForm extends BaseModel
         }
     }
 }
+

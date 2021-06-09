@@ -38,6 +38,12 @@ class Plugin extends \app\plugins\Plugin
                 'icon' => 'el-icon-star-on',
             ],
             [
+                'name' => 'APP管理',
+                'route' => 'plugin/mch/mall/apps/index',
+                'icon' => 'el-icon-star-on',
+                'action' => []
+            ],
+            [
                 'name' => '消息通知',
                 'route' => 'plugin/mch/mall/setting/template',
                 'icon' => 'el-icon-star-on',

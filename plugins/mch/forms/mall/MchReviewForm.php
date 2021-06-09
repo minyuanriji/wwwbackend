@@ -35,7 +35,7 @@ class MchReviewForm extends BaseModel
         $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
 
         if ($this->keyword) {
-            $mchIds = Store::find()->where(['like', 'm.name', $this->keyword])->select('m.mch_id');
+            $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
             $query->andWhere(['m.id' => $mchIds]);
         }
 

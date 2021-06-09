@@ -12,7 +12,7 @@
 <body class="success">
 <div class="page-wrap">
     <div class="info">
-        <div class="ok-btn"><img src="/web/static/fillShop.png" alt=""></div>
+        <div class="ok-btn"><img src="/web/static/app/icon.png" alt=""></div>
     </div>
     <div class="download">
         <h3 class="entry-hd">商家APP下载</h3>

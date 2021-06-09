@@ -41,7 +41,7 @@
     "jiguang/jmessage": "~1.1",
     "php-ffmpeg/php-ffmpeg": "v0.16",
     "workerman/workerman": "dev-master",
-    "tencentcloud/tts": "dev-master"
+	"tencentcloud/tencentcloud-sdk-php": "dev-master"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",

@@ -35,6 +35,7 @@ class MallController extends ApiController
      */
     public function actionMallConfig()
     {
+        $startTime = microtime(true);
         $data = APICacheHelper::get(APICacheHelper::API_MALL_CONFIG, function($helper){
             $mall_setting = \Yii::$app->mall->getMallSetting();
             $mall_setting['setting']["name"] = $mall_setting["name"];
@@ -94,6 +95,7 @@ class MallController extends ApiController
         });
 
         return $this->asJson([
+            'time' => microtime(true) - $startTime,
             'code' => 0,
             'data' => $data,
         ]);
@@ -171,3 +173,4 @@ class MallController extends ApiController
 
 
 }
+

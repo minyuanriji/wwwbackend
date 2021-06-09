@@ -4,7 +4,7 @@ namespace app\mch\handlers;
 
 use app\core\ApiCode;
 use app\forms\common\WebSocketRequestForm;
-use app\helpers\TencentCloudAudioHelper;
+use app\helpers\tencent_cloud\TencentCloudAudioHelper;
 use app\mch\events\CheckoutOrderPaidEvent;
 use app\mch\forms\order\CheckoutOrderDeductIntegralForm;
 use app\models\Mall;

@@ -76,15 +76,16 @@
                 this.$emit('input', false);
             },
             editSave() {
+                console.log(this.boss);
                 this.edit.btnLoading = true;
                 request({
                     params: {
-                        r: 'plugin/boss/mall/boss/level-change',
+                        r: 'plugin/boss/mall/boss/save-level',
                     },
                     method: 'post',
                     data: {
                         level: this.edit.level,
-                        id: this.boss.user_id
+                        id: this.boss.id
                     }
                 }).then(response => {
                     this.edit.btnLoading = false;

@@ -91,4 +91,9 @@ class BossLevel extends BaseActiveRecord
             'extra_is_limit' => '额外奖励是否存在上限',
         ];
     }
+
+    public function getBoss()
+    {
+        return $this->hasOne(Boss::class, ['level_id' => 'id']);
+    }
 }

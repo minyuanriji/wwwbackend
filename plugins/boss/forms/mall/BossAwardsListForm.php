@@ -90,7 +90,7 @@ class BossAwardsListForm extends BaseModel
                 }
             }
             $top_sn = substr(date('Y', time()), -2) . date('md', time()) . $new_max_id;
-            if (isset($post_data['id'])) {
+            if (isset($post_data['id']) && $post_data['id']) {
                 $level = BossAwards::findOne(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'id' => $post_data['id']]);
                 if (!$level) {
                     return [

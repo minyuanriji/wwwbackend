@@ -8,8 +8,7 @@ Yii::$app->loadComponentView('com-select-cat');
         <div slot="header">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <span style="color: #409EFF;cursor: pointer"
-                          @click="$navigate({r:'mall/boss/level'})">
+                    <span style="color: #409EFF;cursor: pointer">
                         股东等级
                     </span>
                 </el-breadcrumb-item>

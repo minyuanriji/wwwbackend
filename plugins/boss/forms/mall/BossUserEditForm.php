@@ -146,6 +146,35 @@ class BossUserEditForm extends BaseModel
         }
     }
 
+    public function saveLevel()
+    {
+        if (!$this->validate()) {
+            return $this->responseErrorInfo();
+        }
+        try {
+            $list = Boss::find()->where([
+                'id' => $this->id,
+                'is_delete' => 0
+            ])->one();
+            if (!$list) {
+                throw new \Exception('股东不存在',1);
+            }
+            $list->level_id = $this->level;
+            if (!$list->save()) {
+                throw new \Exception($this->responseErrorMsg($list),1);
+            }
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '修改成功'
+            ];
+
+        } catch (\Exception $exception) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => $exception->getMessage()
+            ];
+        }
+    }
 
     public function batchLevel()
     {

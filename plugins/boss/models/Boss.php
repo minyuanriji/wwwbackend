@@ -89,6 +89,11 @@ class Boss extends BaseActiveRecord
         return $this->hasMany(User::class, ['id' => 'user_id']);
     }
 
+    public function getBossLevel()
+    {
+        return $this->hasMany(BossLevel::class, ['id' => 'level_id']);
+    }
+
 
     public function afterSave($insert, $changedAttributes)
     {

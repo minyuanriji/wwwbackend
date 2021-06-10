@@ -56,6 +56,21 @@ class PrizeController extends Controller
     }
 
     /**
+     * @Note:奖金池编辑
+     * @return string|\yii\web\Response
+     */
+    public function actionIsEnable()
+    {
+        if (\Yii::$app->request->isAjax) {
+            if (\Yii::$app->request->isPost) {
+                $form = new BossAwardsListForm();
+                $post_data = \Yii::$app->request->post();
+                return $this->asJson($form->isEnable($post_data));
+            }
+        }
+    }
+
+    /**
      * @Note::奖金池删除
      * @return \yii\web\Response
      */

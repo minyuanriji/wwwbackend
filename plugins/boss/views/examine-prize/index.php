@@ -33,7 +33,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column label="用户昵称">
+                <el-table-column label="用户昵称" width="250">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">{{scope.row.nickname}}</com-ellipsis>
                     </template>
@@ -67,12 +67,12 @@
 
                 <el-table-column
                         label="操作"
-                        width="350">
+                        width="180">
                     <template slot-scope="scope">
 
                         <el-button circle size="mini" type="text" @click="examine(scope.row.id)">
                             <el-tooltip class="item" effect="dark" content="审核" placement="top">
-                                <img src="statics/img/mall/payment.png" alt="">
+                                <img v-if="scope.row.status!=1" src="statics/img/mall/payment.png" alt="">
                             </el-tooltip>
                         </el-button>
 

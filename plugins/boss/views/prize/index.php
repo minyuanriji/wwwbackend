@@ -55,11 +55,15 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column label="状态">
+                <el-table-column label="是否启用" >
                     <template slot-scope="scope">
-                        <span v-if="scope.row.status==0" style="color: red;">未开始</span>
-                        <span v-if="scope.row.status==1" style="color: green;">奖金发放中</span>
-                        <span v-if="scope.row.status==2" style="color: blue;">已结束</span>
+                        <el-switch v-model="scope.row.status"
+                                   @change="switchChange(scope.row)"
+                                   active-color="#13ce66"
+                                   inactive-color="#ff4949"
+                                   :active-value="1"
+                                   :inactive-value="0">
+                        </el-switch>
                     </template>
                 </el-table-column>
 
@@ -80,14 +84,6 @@
                         <com-ellipsis :line="1">{{scope.row.rate}}%</com-ellipsis>
                     </template>
                 </el-table-column>
-
-                <!--<el-table-column label="审核状态">
-                    <template slot-scope="scope">
-                        <span v-if="scope.row.is_examine==1" style="color: red;">待审核</span>
-                        <span v-if="scope.row.is_examine==2" style="color: green;">审核通过</span>
-                        <span v-if="scope.row.is_examine==3" style="color: blue;">审核失败</span>
-                    </template>
-                </el-table-column>-->
 
                 <el-table-column label="创建时间" width="170">
                     <template slot-scope="scope">
@@ -244,6 +240,7 @@
                 listLoading: false,
                 page: 1,
                 pageCount: 0,
+                status : true,
                 remarksForm: {
                     id: '',
                     money: ''
@@ -268,6 +265,11 @@
                 consumer: {
                     name: ''
                 },
+                scope: {
+                    row: {
+                        status : true
+                    }
+                },
                 showConsumerList: false,
                 consumerList: null,
             };
@@ -276,6 +278,29 @@
             this.getList();
         },
         methods: {
+            switchChange(e) {
+                console.log(e);
+                let self = this;
+                request({
+                    params: {
+                        r: 'plugin/boss/mall/prize/is-enable',
+                    },
+                    method: 'post',
+                    data: {
+                        id : e.id,
+                        status : e.status,
+                    }
+                }).then(e => {
+                    if (e.data.code == 0) {
+                        self.$message.success(e.data.msg);
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    console.log(e);
+                });
+            },
+
             //充值
             remarksSubmit() {
                 this.remarksLoading = true;

@@ -93,11 +93,12 @@ class BossAwardsListForm extends BaseModel
             if (isset($post_data['id'])) {
                 $level = BossAwards::findOne(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'id' => $post_data['id']]);
                 if (!$level) {
-                    $level = new BossAwards();
-                    $level->mall_id = \Yii::$app->mall->id;
-                    $level->award_sn = 'BSH' . $top_sn;
+                    return [
+                        'code' => ApiCode::CODE_FAIL,
+                        'msg' => '奖池不存在'
+                    ];
                 } else {
-                    if ($level->status == 1 && $post_data['status'] != 2) {
+                    if ($level->status == 1) {
                         return [
                             'code' => ApiCode::CODE_FAIL,
                             'msg' => '请先关闭奖池在修改'
@@ -154,12 +155,18 @@ class BossAwardsListForm extends BaseModel
     {
         if (!$id) {
             return [
-                'code' => ApiCode::CODE_SUCCESS,
+                'code' => ApiCode::CODE_FAIL,
                 'msg' => '请传入id'
             ];
         }
         $level = BossAwards::findOne(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'id' => $id]);
         if ($level) {
+            if ($level->status == 1) {
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '奖池正在进行中，请关闭后删除！'
+                ];
+            }
             $level->is_delete = 1;
             if (!$level->save()) {
                 throw new \Exception($this->responseErrorMsg($level));
@@ -177,7 +184,7 @@ class BossAwardsListForm extends BaseModel
         if (\Yii::$app->admin->id != 148) {
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg' => '请联系夏文充值！'
+                'msg' => '请联系财务充值！'
             ];
         }
         if (!isset($params['id']) || !$params['id']) {
@@ -279,6 +286,58 @@ class BossAwardsListForm extends BaseModel
             $add
         )->execute();
 
+    }
+
+    //添加/修改用户
+    public function isEnable ($params)
+    {
+        if (isset($params['id']) && $params['id']) {
+            $boss_awards = BossAwards::findOne(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'id' => $params['id']]);
+            if (!$boss_awards) {
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '该奖池不存在'
+                ];
+            }
+            $boss_awards->status = $params['status'];
+            $boss_awards->next_send_time = strtotime(date('Y-m-d')) + ($boss_awards->period * $this->computingTime($boss_awards->period_unit));
+
+            if (!$boss_awards->save()) {
+                throw new \Exception($this->responseErrorMsg($boss_awards));
+            } else {
+                return [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'msg' => '保存成功'
+                ];
+            }
+        } else {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => '请传入ID'
+            ];
+        }
+    }
+
+    public function computingTime($type){
+        switch ($type)
+        {
+            case 'day':
+                $second = 24 * 60 * 60;
+                break;
+            case 'week':
+                $second = 7 * 24 * 60 * 60;
+                break;
+            case 'month':
+                $second = date("t") * 24 * 60 * 60;
+                break;
+            case 'year':
+                $second = 365 * 24 * 60 * 60;
+                break;
+            default:
+                $second = 0;
+                break;
+        }
+        return $second;
     }
 
 }

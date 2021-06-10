@@ -34,9 +34,9 @@ Yii::$app->loadPluginComponentView('boss-level');
                 <el-option key="ttapp" label="抖音/头条" value="ttapp"></el-option>
                 <el-option key="bdapp" label="百度" value="bdapp"></el-option>
             </el-select>-->
-            <el-select size="small" v-model="search.level" @change='toSearch' class="select">
-                <el-option key="all" label="全部等级" value=""></el-option>
-                <el-option :key="index" :label="item.name" :value="item.level"
+            <el-select size="small" v-model="search.level_id" @change='toSearch' class="select">
+                <el-option key="all" label="全部等级" value="0"></el-option>
+                <el-option :key="index" :label="item.name" :value="item.id"
                            v-for="(item, index) in bossLevelList"></el-option>
             </el-select>
             <div class="input-item">
@@ -77,7 +77,7 @@ Yii::$app->loadPluginComponentView('boss-level');
 
                     <el-table-column label="手机号" prop="mobile" width="150">
                         <template slot-scope="scope">
-                            <div>{{scope.row.userInfo.mobile}}</div>
+                            <div>{{scope.row.mobile}}</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="累计佣金" prop="total_price" width="100">
@@ -103,8 +103,7 @@ Yii::$app->loadPluginComponentView('boss-level');
                     </el-table-column>-->
                     <el-table-column label="股东等级" width="150" prop="level">
                         <template slot-scope="scope">
-                            <el-tag size="small" type="info" v-if="scope.row.level == 0">默认等级</el-tag>
-                            <el-tag size="small" v-else>{{scope.row.level_name}}</el-tag>
+                            <el-tag size="small">{{scope.row.level_name}}</el-tag>
                         </template>
                     </el-table-column>
                     </el-table-column>
@@ -117,7 +116,7 @@ Yii::$app->loadPluginComponentView('boss-level');
                     <el-table-column label="备注信息" prop="remarks"></el-table-column>
                     <el-table-column label="操作" width="300px">
                         <template slot-scope="scope">
-                            <el-button type="text" size="mini" circle style="margin-top: 10px"
+                            <!--<el-button type="text" size="mini" circle style="margin-top: 10px"
                                        @click.native="order(scope.row.user_id)">
                                 <el-tooltip class="item" effect="dark" content="查看订单" placement="top">
                                     <img src="statics/img/mall/boss/order.png" alt="">
@@ -128,7 +127,7 @@ Yii::$app->loadPluginComponentView('boss-level');
                                 <el-tooltip class="item" effect="dark" content="提现详情" placement="top">
                                     <img src="statics/img/mall/boss/detail.png" alt="">
                                 </el-tooltip>
-                            </el-button>
+                            </el-button>-->
                             <el-button type="text" size="mini" circle style="margin-left: 10px;margin-top: 10px"
                                        @click.native="remarks(scope.row)">
                                 <el-tooltip class="item" effect="dark" content="添加备注" placement="top">
@@ -221,7 +220,8 @@ Yii::$app->loadPluginComponentView('boss-level');
                 status: -1,
                 page: 1,
                 platform: '',
-                level: ''
+                level: '',
+                level_id: '',
             },
             loading: false,
             activeName: '-1',
@@ -308,6 +308,7 @@ Yii::$app->loadPluginComponentView('boss-level');
                     r: 'plugin/boss/mall/boss/index'
                 };
                 params = Object.assign(params, this.search);
+                console.log(params);
                 request({
                     params: params,
                     method: 'get',

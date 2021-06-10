@@ -155,12 +155,18 @@ class BossAwardsListForm extends BaseModel
     {
         if (!$id) {
             return [
-                'code' => ApiCode::CODE_SUCCESS,
+                'code' => ApiCode::CODE_FAIL,
                 'msg' => '请传入id'
             ];
         }
         $level = BossAwards::findOne(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'id' => $id]);
         if ($level) {
+            if ($level->status == 1) {
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '奖池正在进行中，请关闭后删除！'
+                ];
+            }
             $level->is_delete = 1;
             if (!$level->save()) {
                 throw new \Exception($this->responseErrorMsg($level));

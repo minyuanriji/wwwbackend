@@ -185,7 +185,7 @@ class BossLevelCommon extends BaseModel
     {
         $levelList = BossLevel::find()->where([
             'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, //'is_enable' => 1,
-        ])->select(['id', 'level', 'name'])->orderBy(['level' => SORT_ASC])->all();
+        ])->select(['id', 'level', 'name'])->orderBy(['id' => SORT_ASC])->all();
         /*array_unshift($levelList, [
             'id' => 0,
             'level' => 0,

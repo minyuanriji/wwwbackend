@@ -6,7 +6,8 @@
                     <el-autocomplete size="small" v-model="edit.nickname" value-key="nickname"
                                      @keyup.enter.native="keyUp"
                                      :fetch-suggestions="querySearchAsync" placeholder="请输入用户昵称"
-                                     @select="bossClick"></el-autocomplete>
+                                     @select="bossClick">
+                    </el-autocomplete>
                 </el-form-item>
             </el-form>
             <el-form @submit.native.prevent size="small" label-width="150px">

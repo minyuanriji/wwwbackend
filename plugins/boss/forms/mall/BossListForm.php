@@ -18,7 +18,7 @@ class BossListForm extends BaseModel
     public $limit = 10;
     public $page = 1;
     public $sort;
-    public $level;
+    public $level_id;
     public $fields;
     public $flag;
 
@@ -27,7 +27,7 @@ class BossListForm extends BaseModel
         return [
             [['keyword', 'platform'], 'trim'],
             [['keyword', 'platform', 'flag'], 'string'],
-            [['limit', 'page', 'level'], 'integer'],
+            [['limit', 'page', 'level_id'], 'integer'],
             [['fields'], 'safe'],
             [['sort'], 'default', 'value' => ['d.created_at' => SORT_DESC]],
         ];
@@ -47,11 +47,11 @@ class BossListForm extends BaseModel
             $query->andWhere([
                 'or',
                 ['like', 'u.username', $this->keyword],
-                ['like', 'u.nickname', $this->keyword]
+                ['like', 'u.mobile', $this->keyword]
             ]);
         }
-        if ($this->level) {
-            $query->andWhere(['d.level' => $this->level]);
+        if ($this->level_id) {
+            $query->andWhere(['d.level_id' => $this->level_id]);
         }
         $list = $query->page($pagination, $this->limit, $this->page)
             ->orderBy($this->sort)->all();
@@ -62,9 +62,10 @@ class BossListForm extends BaseModel
             /* @var User $user */
             $user = $item->user;
             $newItem = array_merge($newItem, [
-                'nickname' => $user['nickname'],
-                'avatar_url' => $user['avatar_url'],
-                'parent_name' => $user['parent'] ? $user['parent']['nickname'] : '平台',
+                'nickname' => $user[0]->nickname,
+                'avatar_url' => $user[0]->avatar_url,
+                'mobile' => $user[0]->mobile,
+//                'parent_name' => $user[0]->parent ? $user['parent']['nickname'] : '平台',
             ]);
             $newItem['userInfo'] = ArrayHelper::toArray($item->user);
             $bossLevel = BossLevel::find()->where([

@@ -306,7 +306,7 @@ class UserForm extends BaseModel
             $userCenter['menus'][] = [
                 "icon_url"  => "https://dev.mingyuanriji.cn/web/static/bonus.png",
                 "name"      => "奖金分红",
-                "link_url"  => "pages/user/bonus/bonus",
+                "link_url"  => "/pages/user/bonus/bonus",
                 "open_type" => "navigate"
             ];
         }

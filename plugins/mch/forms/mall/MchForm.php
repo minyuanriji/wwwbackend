@@ -5,16 +5,12 @@ namespace app\plugins\mch\forms\mall;
 use app\core\ApiCode;
 use app\helpers\ArrayHelper;
 use app\models\Admin;
-use app\models\ClerkUser;
-use app\models\ClerkUserStoreRelation;
 use app\models\DistrictArr;
 use app\models\BaseModel;
 use app\models\EfpsMerchantMcc;
 use app\models\EfpsMchReviewInfo;
-use app\models\Order;
 use app\models\User;
 use app\plugins\mch\forms\common\CommonMchForm;
-use app\plugins\mch\models\Goods;
 use app\plugins\mch\models\Mch;
 
 class MchForm extends BaseModel
@@ -162,43 +158,26 @@ class MchForm extends BaseModel
                 throw new \Exception('商户不存在');
             }
 
-            $model->is_delete   = 1;
-            $model->user_id     = 0;
-            $res = $model->save();
-            if (!$res) {
+            $model->is_delete = 1;
+            $model->user_id   = 0;
+            if (!$model->save()) {
                 throw new \Exception($this->responseErrorMsg($model));
             }
 
             //删除后台登陆账号
             $admin = Admin::find()->where(['mch_id' => $model->id])->one();
-            if($admin){
-                $admin->is_delete = 1;
-                if (!$admin->save()) {
-                    throw new \Exception($this->responseErrorMsg($admin));
-                }
-            }
+            $admin && $admin->delete();
 
             /** @var User $user */
             $user = User::find()->where(['mch_id' => $model->id])->one();
             if (!$user) {
                 throw new \Exception('商户账号不存在');
             }
-            $user->is_delete = 1;
-            $user->mch_id    = 0;
-            $res = $user->save();
-            if (!$res) {
+
+            $user->mch_id = 0;
+            if (!$user->save()) {
                 throw new \Exception($this->responseErrorMsg($user));
             }
-
-            Goods::updateAll(['is_delete' => 1], ['mch_id' => $model->id]);
-            Order::updateAll(['is_delete' => 1], ['mch_id' => $model->id]);
-            $clerkUsers = ClerkUser::find()->where(['mch_id' => $model->id, 'is_delete' => 0])->select('id')->all();
-            $ids = [];
-            foreach ($clerkUsers as $clerkUser) {
-                $ids[] = $clerkUser->id;
-            }
-            ClerkUserStoreRelation::updateAll(['is_delete' => 1], ['clerk_user_id' => $ids]);
-            ClerkUser::updateAll(['is_delete' => 1], ['mch_id' => $model->id, 'is_delete' => 0]);
 
             $transaction->commit();
             return [

@@ -60,7 +60,7 @@ class MchApplyForm extends BaseModel {
     public function save(){
 
         if (!$this->validate()) {
-            return $this->responseErrorMsg();
+            return $this->responseErrorInfo();
         }
 
         $transaction = \Yii::$app->db->beginTransaction();
@@ -81,9 +81,20 @@ class MchApplyForm extends BaseModel {
                     throw new \Exception('您的商家入驻申请已通过！');
                 }
             }else{
-                $mchModel = new Mch();
-                $mchModel->mall_id    = \Yii::$app->mall->id;
-                $mchModel->created_at = time();
+                $mchModel = Mch::findOne([
+                    'mobile'  => $this->mobile,
+                    'mall_id' => \Yii::$app->mall->id
+                ]);
+                if($mchModel){
+                    if(!$mchModel->is_delete){
+                        throw new \Exception('手机“'.$this->mobile.'”已被注册！');
+                    }
+                    $mchModel->is_delete = 0;
+                }else{
+                    $mchModel = new Mch();
+                    $mchModel->mall_id = \Yii::$app->mall->id;
+                    $mchModel->created_at = time();
+                }
             }
 
             $mchModel->review_status      = Mch::REVIEW_STATUS_UNCHECKED;

@@ -7,7 +7,6 @@ class JobDebugController extends Controller{
 
     public function actionIndex(){
 
-        
 
     }
 

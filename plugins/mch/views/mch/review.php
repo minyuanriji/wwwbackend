@@ -63,6 +63,20 @@
     .el-alert .el-button {
         margin-left: 20px;
     }
+
+    .export-dialog .el-dialog {
+        min-width: 350px;
+    }
+
+    .export-dialog .el-dialog__body {
+        padding: 20px 20px;
+    }
+
+    .export-dialog .el-button--submit {
+        color: #FFF;
+        background-color: #409EFF;
+        border-color: #409EFF;
+    }
 </style>
 
 <div id="app" v-cloak>
@@ -70,6 +84,9 @@
         <div slot="header">
             <div>
                 <span>商户审核列表</span>
+                <div style="float: right;margin-top: -5px">
+                    <el-button @click="exportRecord" type="primary" size="small">数据导出</el-button>
+                </div>
             </div>
         </div>
         <div class="table-body">
@@ -87,7 +104,8 @@
                     v-loading="listLoading"
                     :data="list"
                     border
-                    style="width: 100%">
+                    style="width: 100%"
+                    @selection-change="handleSelectionChange">
                 <el-table-column
                         prop="id"
                         label="ID"
@@ -180,6 +198,35 @@
                 </el-pagination>
             </div>
         </div>
+
+
+        <el-dialog flex="cross:center" class="export-dialog" :title="exportParams.is_show_download ? '下载' : '提示'" :visible.sync="exportDialogVisible" width="20%">
+            <template v-if="!exportParams.is_show_download">
+                <div flex="cross:center"><i style="color: #E6A23C;font-size: 20px;margin-right: 5px" class="el-icon-warning"></i>
+                    <span>选中{{choose_list.length == 0 ? '全部，共计'+ exportParams.record_count +'条' : choose_list.length + '个'}}记录，是否确认导出</span>
+                </div>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="exportDialogVisible = false" size="small">取 消</el-button>
+                    <el-button @click="exportRecordData" size="small" type="primary">确定</el-button>
+                </span>
+            </template>
+            <template v-else>
+                <el-progress :text-inside="true" :stroke-width="18" :percentage="exportParams.percentage"></el-progress>
+                <span slot="footer" class="dialog-footer">
+                    <form target="_blank" :action="exportParams.action_url" method="post">
+                        <div class="modal-body">
+                            <input name="_csrf" type="hidden" id="_csrf" value="<?= Yii::$app->request->csrfToken ?>">
+                            <input name="flag" value="EXPORT" type="hidden">
+                            <input name="is_download" :value="exportParams.is_download" type="hidden">
+                        </div>
+                        <div flex="dir:right" style="margin-top: 20px;">
+                            <button v-if="exportParams.percentage == 100" type="submit" class="el-button el-button--primary el-button--small">点击下载</button>
+                        </div>
+                    </form>
+                </span>
+            </template>
+        </el-dialog>
+
     </el-card>
 </div>
 <script>
@@ -193,10 +240,82 @@
                 pageCount: 0,
                 activeName: 'first',
                 review_status: 0,
-                keyword: null
+                keyword: null,
+
+                // 导出参数
+                choose_list: [],
+                exportDialogVisible: false,
+                exportParams: {
+                    page: 1,
+                    is_show_download: false,
+                    is_download: 0,
+                    percentage: 0,
+                    action_url: '<?= Yii::$app->urlManager->createUrl('plugin/mch/mall/mch/export-list') ?>',
+                    record_count: 0,//记录总数
+                }
             };
         },
         methods: {
+
+            //记录导出
+            exportRecord(){
+                this.exportDialogVisible = true;
+                this.exportParams = {
+                    page: 1,
+                    is_show_download: false,
+                    is_download: 0,
+                    percentage: 0,
+                    action_url: '<?= Yii::$app->urlManager->createUrl('plugin/mch/mall/mch/export-list') ?>',
+                    record_count: 0,//记录总数
+                }
+            },
+            exportRecordData(){
+                let self = this;
+                self.exportParams.is_show_download = true;
+                var review_status;
+                if(self.activeName == "first"){
+                    review_status = 0;
+                }else if(self.activeName == "second"){
+                    review_status = 1;
+                }else{
+                    review_status = 2;
+                }
+
+                request({
+                    params: {
+                        r: 'plugin/mch/mall/mch/export-list',
+                    },
+                    data: {
+                        page          : self.exportParams.page,
+                        search        : JSON.stringify(self.search),
+                        choose_list   : self.choose_list,
+                        review_status : review_status,
+                        _csrf         : '<?= Yii::$app->request->csrfToken ?>',
+                        is_download   : self.exportParams.is_download
+                    },
+                    method: 'post'
+                }).then(e => {
+                    let data = e.data.data;
+                    if (e.data.code === 0) {
+                        self.exportParams.increase = 100 / data.pagination.page_count;
+                        self.exportParams.percentage += self.exportParams.increase;
+                        self.exportParams.percentage = parseFloat(self.exportParams.percentage.toFixed(2));
+                        if (data.pagination.current_page == data.pagination.page_count) {
+                            self.exportParams.percentage = 100;
+                            self.exportParams.is_download += data.export_data.is_download;
+                        }
+                        if (data.pagination.current_page < data.pagination.page_count) {
+                            self.exportParams.page += 1;
+                            self.exportRecordData();
+                        }
+                    }else{
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    console.log(e);
+                });
+            },
+
             searchList() {
                 this.page = 1;
                 this.getList();
@@ -291,7 +410,15 @@
             handleClick(tab, event) {
                 this.review_status = tab.index;
                 this.getList();
-            }
+            },
+            // 全选单前页
+            handleSelectionChange(val) {
+                let self = this;
+                self.choose_list = [];
+                val.forEach(function (item) {
+                    self.choose_list.push(item.id);
+                })
+            },
         },
         mounted: function () {
             this.getList();

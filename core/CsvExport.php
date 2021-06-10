@@ -128,11 +128,11 @@ class CsvExport extends Component
      * @headlist 第一行,列名
      * @fileName 输出Excel文件名
      */
-    public function ajaxExport($data = array(), $headlist = array(), $fileName)
+    public function ajaxExport($data = array(), $headlist = array(), $fileName, $dirPath = null)
     {
         try {
             $fileName = $fileName . '.csv';
-            $newFilePath = \Yii::$app->basePath . \Yii::$app->urlManager->baseUrl . '/temp/goods/';
+            $newFilePath = \Yii::$app->basePath . \Yii::$app->urlManager->baseUrl . (!empty($dirPath) ? rtrim("/" . ltrim($dirPath, "/"), "/") . "/" : '/temp/goods/');
 
             if (!file_exists($newFilePath . $fileName)) {
                 if (!is_dir($newFilePath)) {

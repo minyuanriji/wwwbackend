@@ -21,7 +21,7 @@
             <a href="#">
                 <img src="/web/statics/img/ios-btn.png" alt="敬请期待">
             </a>
-            <a href="<?php echo $app->download_link; ?>" class="android-btn" id="J_weixin">
+            <a href="<?php echo preg_replace("/^https?:/i", "", $app->download_link); ?>" class="android-btn" id="J_weixin">
                 <img src="/web/statics/img/android-btn.png" alt="安卓版下载">
             </a>
         </div>

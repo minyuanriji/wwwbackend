@@ -5,6 +5,7 @@ namespace app\plugins\mch\controllers\mall;
 use app\plugins\Controller;
 use app\plugins\mch\forms\mall\MchEditForm;
 use app\plugins\mch\forms\mall\MchForm;
+use app\plugins\mch\forms\mall\MchListExportForm;
 use app\plugins\mch\forms\mall\MchMallSettingEditForm;
 use app\plugins\mch\forms\mall\MchMallSettingForm;
 use app\plugins\mch\forms\mall\MchReviewForm;
@@ -89,6 +90,17 @@ class MchController extends Controller
         } else {
             return $this->render('review');
         }
+    }
+
+    /**
+     * 导出记录
+     * @return \yii\web\Response
+     */
+    public function actionExportList()
+    {
+        $form = new MchListExportForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->export());
     }
 
     /**

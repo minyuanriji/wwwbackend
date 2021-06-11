@@ -96,6 +96,7 @@ class GoodsForm extends BaseModel
                 $info['collect']['collect_id'] = $goods_collect->id;
             }
             $info['name'] = $wareHouse->name;
+            $info['product'] = $wareHouse->product;
             $info['original_price'] = $wareHouse->original_price;
             $info['cover_pic'] = $wareHouse->cover_pic;
             $info['video_url'] = $wareHouse->video_url;

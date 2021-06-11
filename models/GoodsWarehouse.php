@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property int $mall_id
  * @property string $name 商品名称
+ * @property string $product 商品描述
  * @property string $original_price 原价
  * @property string $cost_price 成本价
  * @property string $detail 商品详情，图文
@@ -61,6 +62,7 @@ class GoodsWarehouse extends BaseActiveRecord
             'id' => 'ID',
             'mall_id' => 'Mall ID',
             'name' => '商品名称',
+            'product' => '商品描述',
             'original_price' => '原价',
             'cost_price' => '成本价',
             'detail' => '商品详情，图文',

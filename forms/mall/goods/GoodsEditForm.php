@@ -34,6 +34,7 @@ class GoodsEditForm extends BaseGoodsEdit
 {
     // 商品库商品字段
     public $name;
+    public $product;
     public $original_price;
     public $cost_price;
     public $detail;
@@ -53,7 +54,7 @@ class GoodsEditForm extends BaseGoodsEdit
         return array_merge(parent::rules(), [
             [['name', 'original_price', 'cost_price', 'detail', 'unit',], 'required'],
             [['is_sell_well', 'is_negotiable', 'is_show_sales', 'use_virtual_sales'], 'integer'],
-            [['video_url'], 'string'],
+            [['video_url','product'], 'string'],
             [['original_price', 'cost_price'], 'number', 'min' => 0],
             [['pic_url','labels'], 'safe'],
             [['is_sell_well', 'is_negotiable',], 'default', 'value' => 0],
@@ -214,6 +215,7 @@ class GoodsEditForm extends BaseGoodsEdit
             $goodsWarehouse->is_delete = 0;
         }
         $goodsWarehouse->name = $this->name;
+        $goodsWarehouse->product = $this->product;
         $goodsWarehouse->original_price = $this->original_price;
         $goodsWarehouse->cost_price = $this->cost_price;
         $goodsWarehouse->detail = $this->detail;

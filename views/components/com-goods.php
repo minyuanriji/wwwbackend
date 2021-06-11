@@ -241,6 +241,10 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                             <el-input v-model="ruleForm.name" maxlength="100" show-word-limit></el-input>
                                         </el-form-item>
 
+                                        <el-form-item label="商品描述" prop="product">
+                                            <el-input v-model="ruleForm.product" maxlength="100" show-word-limit></el-input>
+                                        </el-form-item>
+
                                         <el-form-item label="商品标签">
                                             <el-select v-model="ruleForm.labels" multiple placeholder="请选择标签">
                                                 <el-option v-for="item in label_list" :key="item.title" :label="item.title" :value="item.title">
@@ -1299,7 +1303,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 cannotrefund:["1","2","3"],
                 profit_price: 0,  //商品利润
                 enable_upgrade_user_role:0, //下单后升级会员店主、合伙人或分公司
-                upgrade_user_role_type: ''
+                upgrade_user_role_type: '',
+                product: ''
             };
             let rules = {
                 cats: [{

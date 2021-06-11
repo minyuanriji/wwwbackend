@@ -3,12 +3,18 @@ namespace app\mch\forms\api;
 
 
 use app\core\ApiCode;
+use app\forms\api\APICacheDataForm;
+use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\plugins\mch\models\MchCommonCat;
 
-class CommonCatForm extends BaseModel{
+class CommonCatForm extends BaseModel implements ICacheForm {
 
-    public function getAll(){
+    public function getCacheKey() {
+        return [];
+    }
+
+    public function getSourceDataForm(){
 
         try {
             $list = MchCommonCat::find()->select(["id", "mall_id", "name", "pic_url"])->where([
@@ -20,13 +26,15 @@ class CommonCatForm extends BaseModel{
 
             }
 
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '请求成功',
-                'data' => [
-                    'list' => $list
+            return new APICacheDataForm([
+                "sourceData" => [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'msg' => '请求成功',
+                    'data' => [
+                        'list' => $list
+                    ]
                 ]
-            ];
+            ]);
         } catch (\Exception $e) {
             return [
                 'code' => ApiCode::CODE_FAIL,
@@ -37,5 +45,6 @@ class CommonCatForm extends BaseModel{
             ];
         }
     }
+
 
 }

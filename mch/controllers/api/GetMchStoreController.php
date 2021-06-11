@@ -16,12 +16,11 @@ class GetMchStoreController extends ApiController {
      * @return \yii\web\Response
      */
     public function actionIndex(){
-        $detail = APICacheHelper::get(APICacheHelper::MCH_API_GET_MCH_STORE, function($helper){
-            $form = new GetMchStoreForm();
-            $form->attributes = $this->requestData;
-            return $helper($form->getDetail());
-        });
-        return $this->asJson($detail);
+        $form = new GetMchStoreForm();
+        $form->attributes = $this->requestData;
+        $form->is_login   = !\Yii::$app->user->isGuest;
+        $form->login_uid  = $form->is_login ? \Yii::$app->user->id : 0;
+        return $this->asJson(APICacheHelper::get($form));
     }
 
     //添加浏览记录

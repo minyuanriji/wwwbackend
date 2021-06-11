@@ -5,7 +5,7 @@ set PROJECT_PATH=%~dp0
 
 ::==================================================================
 ::队列监听程序
-::start yii queue/listen -v
+start yii queue/listen -v
 
 ::==================================================================
 ::队列守候程序
@@ -33,10 +33,10 @@ set PROJECT_PATH=%~dp0
 
 ::==================================================================
 ::WebSocket监听程序
-start yii ws-server/listen
+::start yii ws-server/listen
 
 ::==================================================================
-::cd shell
-::start entry wdsp -s start
-::start entry wtask -s start
-::start entry wtimer -s start
+cd shell
+start entry wdsp -s start
+start entry wtask -s start
+start entry wtimer -s start

@@ -2,10 +2,12 @@
 namespace app\plugins\baopin\forms\api;
 
 use app\core\ApiCode;
+use app\forms\api\APICacheDataForm;
+use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\plugins\baopin\models\BaopinGoods;
 
-class SearchForm extends BaseModel{
+class SearchForm extends BaseModel implements ICacheForm {
 
     public $mch_id;
     public $filter_mch_id;
@@ -22,7 +24,17 @@ class SearchForm extends BaseModel{
         ]);
     }
 
-    public function search(){
+
+    public function getCacheKey() {
+        return [
+            (int)$this->page, (int)$this->limit, (int)$this->mch_id,
+            (int)$this->filter_mch_id, $this->keyword, $this->sort_prop,
+            $this->sort_type
+        ];
+    }
+
+
+    public function getSourceDataForm(){
 
         if(!$this->validate()){
             return $this->responseErrorInfo();
@@ -80,19 +92,24 @@ class SearchForm extends BaseModel{
             $limit = 10;
         }
 
-        $select = ["bg.id", "bmg.id as mch_baopin_id", "bg.goods_id", "gw.name", "gw.cover_pic",
+        $select = ["bg.id", "bg.goods_id", "gw.name", "gw.cover_pic",
             "g.goods_stock", "g.virtual_sales", "bg.created_at", "bg.updated_at",
             "g.price", "gw.original_price"];
+        if(!empty($this->mch_id)){
+            $select[] = "bmg.id as mch_baopin_id";
+        }
+
         $list = $query->select($select)->asArray()->page($pagination, $limit, max(1, (int)$this->page))->all();
 
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'msg' => '请求成功',
-            'data' => [
-                'list' => $list ? $list : [],
-                'pagination' => $pagination,
+        return new APICacheDataForm([
+            "sourceData" => [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '请求成功',
+                'data' => [
+                    'list' => $list ? $list : [],
+                    'pagination' => $pagination,
+                ]
             ]
-        ];
+        ]);
     }
-
 }

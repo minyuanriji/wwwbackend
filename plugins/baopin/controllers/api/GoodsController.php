@@ -12,12 +12,12 @@ class GoodsController extends ApiController{
      * @return \yii\web\Response
      */
     public function actionSearch(){
-        $search = APICacheHelper::get(APICacheHelper::PLUGIN_BAOPIN_API_GOODS_SEARCH, function($helper){
-            $form = new SearchForm();
-            $form->attributes = $this->requestData;
-            return $helper($form->search());
-        });
-        return $this->asJson($search);
+        $form = new SearchForm();
+        $form->attributes = $this->requestData;
+        $form->is_login   = !\Yii::$app->user->isGuest;
+        $form->login_uid  = $form->is_login ? \Yii::$app->user->id : 0;
+
+        return $this->asJson(APICacheHelper::get($form));
     }
 
 }

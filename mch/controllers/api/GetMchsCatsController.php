@@ -9,12 +9,11 @@ use app\mch\forms\api\CommonCatForm;
 class GetMchsCatsController extends ApiController {
 
     public function actionIndex(){
-        $data = APICacheHelper::get(APICacheHelper::MCH_API_GET_MCHS_CATAS, function($helper){
-            $form = new CommonCatForm();
-            $form->attributes = \Yii::$app->request->get();
-            return $helper($form->getAll());
-        });
-       return $this->asJson($data);
+        $form = new CommonCatForm();
+        $form->attributes = \Yii::$app->request->get();
+        $form->is_login   = !\Yii::$app->user->isGuest;
+        $form->login_uid  = $form->is_login ? \Yii::$app->user->id : 0;
+        return $this->asJson(APICacheHelper::get($form));
     }
 
 }

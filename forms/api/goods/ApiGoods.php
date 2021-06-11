@@ -140,7 +140,10 @@ class ApiGoods extends BaseModel
      */
     protected function getGoodsMember()
     {
-        return GoodsMember::getCommon()->getGoodsMemberPrice($this->goods);
+        $goodsMember = GoodsMember::getCommon();
+        $goodsMember->is_login = $this->is_login;
+        $goodsMember->login_uid = $this->login_uid;
+        return $goodsMember->getGoodsMemberPrice($this->goods);
     }
 
     /**

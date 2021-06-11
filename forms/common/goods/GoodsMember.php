@@ -66,10 +66,10 @@ class GoodsMember extends BaseModel
      */
     public function setLevel()
     {
-        if (!\Yii::$app->user->isGuest) {
+        if ($this->is_login) {
             /* @var User $user */
-            $user = \Yii::$app->user->identity;
-            $level = $user->level;
+            $user = User::findOne($this->login_uid);
+            $level = $user ? $user->level : 0;
             if ($level <= 0) {
                 $level = $this->getMinMember();
             } else {

@@ -7,8 +7,6 @@ use app\forms\common\goods\CommonGoodsStatistic;
 use app\forms\common\order\CommonOrderStatistic;
 use app\models\BaseModel;
 use app\models\DistrictData;
-use app\models\Store;
-use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchVisitLog;
 use app\plugins\mch\Plugin;
@@ -31,6 +29,8 @@ class CommonMchForm extends BaseModel{
             [['effect'], 'safe'],
         ];
     }
+
+
 
     /*
      *  string  effect  功能   {nearby附近:获取最近5km的数据  intelligence智能排序:根据用户点击次数排序  screen 筛选}

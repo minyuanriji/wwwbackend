@@ -13,26 +13,30 @@ namespace app\forms\api\cat;
 
 use app\core\ApiCode;
 use app\events\StatisticsEvent;
+use app\forms\api\APICacheDataForm;
+use app\forms\api\ICacheForm;
 use app\logic\AppConfigLogic;
 use app\models\BaseModel;
 use app\models\GoodsCats;
 use app\models\StatisticsBrowseLog;
 use app\plugins\mch\models\Mch;
 
-class CatListForm extends BaseModel
+class CatListForm extends BaseModel implements ICacheForm
 {
     public $cat_id;
     public $mch_id;
     public $select_cat_id;
+    public $mall_id;
+
     public function rules()
     {
         return [
-            [['cat_id', 'mch_id', 'select_cat_id'], 'integer'],
+            [['cat_id', 'mch_id', 'select_cat_id', 'mall_id'], 'integer'],
             [['cat_id', 'mch_id', 'select_cat_id'], 'default', 'value' => 0],
         ];
     }
 
-    public function search()
+    public function getSourceDataForm()
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
@@ -58,7 +62,7 @@ class CatListForm extends BaseModel
             }
             /**********end*************/
             $list = GoodsCats::find()->where([
-                'mall_id' => \Yii::$app->mall->id,
+                'mall_id' => $this->mall_id,
                 'parent_id' => $this->cat_id,
                 'is_delete' => 0,
                 'mch_id' => $this->mch_id,
@@ -111,15 +115,17 @@ class CatListForm extends BaseModel
                 }
                 $sentinel && $list[0]['active'] = $sentinel;
             }
-            \Yii::$app->trigger(StatisticsBrowseLog::EVEN_STATISTICS_LOG, new StatisticsEvent(['mall_id'=>\Yii::$app->mall->id,'browse_type'=>1,'user_id'=>\Yii::$app->user->id,'user_ip'=>$_SERVER['REMOTE_ADDR']]) );
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '请求成功',
-                'data' => [
-                    'list' => $list,
-                    'cat_style' => $cat_style,
+
+            return new APICacheDataForm([
+                "sourceData" => [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'msg'  => '请求成功',
+                    'data' => [
+                        'list'      => $list,
+                        'cat_style' => $cat_style,
+                    ]
                 ]
-            ];
+            ]);
         } catch (\Exception $e) {
             return [
                 'code' => ApiCode::CODE_FAIL,
@@ -128,4 +134,11 @@ class CatListForm extends BaseModel
         }
     }
 
+
+    public function getCacheKey(){
+        $keys[] = intval($this->cat_id);
+        $keys[] = intval($this->mch_id);
+        $keys[] = intval($this->select_cat_id);
+        return $keys;
+    }
 }

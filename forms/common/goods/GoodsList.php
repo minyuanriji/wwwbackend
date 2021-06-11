@@ -460,6 +460,8 @@ class GoodsList extends BaseModel
     {
         $apiGoods = ApiGoods::getCommon();
         $apiGoods->goods = $goods;
+        $apiGoods->is_login = $this->is_login;
+        $apiGoods->login_uid = $this->login_uid;
         return $apiGoods->getDetail();
     }
 

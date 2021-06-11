@@ -13,6 +13,8 @@ namespace app\forms\api\goods;
 
 use app\core\ApiCode;
 use app\core\BasePagination;
+use app\forms\api\APICacheDataForm;
+use app\forms\api\ICacheForm;
 use app\forms\common\CommonAppConfig;
 use app\forms\common\goods\GoodsList;
 use app\forms\common\goods\RecommendSettingForm;
@@ -26,16 +28,18 @@ use app\models\Mall;
  * @var BasePagination $pagination
  * @property Mall $mall
  */
-class RecommendForm extends BaseModel
+class RecommendForm extends BaseModel implements ICacheForm
 {
     public $mall;
     public $goods_id;
     public $type;
     public $pagination;
+    public $page;
+
     public function rules()
     {
         return [
-            ['goods_id', 'integer'],
+            [['goods_id', 'page'], 'integer'],
             [['type'], 'string'],
             [['type'], 'default', 'value' => 'goods']
         ];
@@ -76,6 +80,25 @@ class RecommendForm extends BaseModel
         $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['list' => $goodsList]);
     }
 
+    public function getSourceDataForm(){
+        $res = $this->getNewList();
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            return new APICacheDataForm([
+                "sourceData" => $res
+            ]);
+        }
+        return $res;
+    }
+
+    public function getCacheKey(){
+        $keys[] = (int)$this->page;
+        $keys[] = (int)\Yii::$app->mall->id;
+        $keys[] = (int)$this->goods_id;
+        $keys[] = (int)$this->login_uid;
+        $keys[] = !empty($this->type) ? $this->type : "";
+        return $keys;
+    }
+
     public function getNewList()
     {
         if (!$this->validate()) {
@@ -104,6 +127,8 @@ class RecommendForm extends BaseModel
 
         $goodsIds = [];
         $form = new GoodsList();
+        $form->is_login = $this->is_login;
+        $form->login_uid = $this->login_uid;
         if ($key == 'goods') {
             /** @var Goods $goods */
             $goods = Goods::find()->with('goodsWarehouse.cats')->where([
@@ -131,6 +156,7 @@ class RecommendForm extends BaseModel
                 $form->sort = 1;
             }
         }
+
 
         $form->status = 1;
         $form->sign = ['mch', ''];

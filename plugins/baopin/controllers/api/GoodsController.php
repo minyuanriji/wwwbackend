@@ -1,6 +1,7 @@
 <?php
 namespace app\plugins\baopin\controllers\api;
 
+use app\core\ApiCode;
 use app\helpers\APICacheHelper;
 use app\plugins\ApiController;
 use app\plugins\baopin\forms\api\SearchForm;
@@ -17,7 +18,12 @@ class GoodsController extends ApiController{
         $form->is_login   = !\Yii::$app->user->isGuest;
         $form->login_uid  = $form->is_login ? \Yii::$app->user->id : 0;
 
-        return $this->asJson(APICacheHelper::get($form));
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
     }
 
 }

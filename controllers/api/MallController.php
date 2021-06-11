@@ -49,11 +49,16 @@ class MallController extends ApiController
             $top_pic_url = $userCenter["top_pic_url"];
         }
 
-        return $this->asJson(array_merge(APICacheHelper::get($form), [
-            "page_title"  => AppConfigLogic::getPageTitleConfig(),
-            "navbar"      => AppConfigLogic::getNavbar(),
-            'top_pic_url' => $top_pic_url
-        ]));
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res['data'] = array_merge($res['data'], [
+                "page_title"  => AppConfigLogic::getPageTitleConfig(),
+                "navbar"      => AppConfigLogic::getNavbar(),
+                'top_pic_url' => $top_pic_url
+            ]);
+        }
+
+        return $this->asJson($res);
     }
 
 

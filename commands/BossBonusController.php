@@ -129,11 +129,11 @@ die;
 
                 $awards_member_data = array_merge_recursive($awards_member_data, $boss_data);
 
-                $user_ids = array_unique(array_column($awards_member_data, 'user_id'));
+                $user_ids[$awards_key] = array_unique(array_column($awards_member_data, 'user_id'));
 
                 $price[$awards_key] = $awards_value['money'] * ($awards_value['rate'] * 0.01);//计算分红金额
 
-                $count_user[$awards_key] = count($user_ids);//分红总人数
+                $count_user[$awards_key] = count($user_ids[$awards_key]);//分红总人数
 
                 $per_person[$awards_key] = $price[$awards_key] / $count_user[$awards_key];//每人分的钱
 
@@ -172,11 +172,11 @@ die;
                     }
 
                     //添加每人每期发放记录
-                    foreach ($awards_member_data as $sent_key => $sent_val)
+                    foreach ($user_ids[$awards_key] as $sent_key => $sent_val)
                     {
                         $sent_log_data = [
                             "each_id"       => $each_res['data'],
-                            "user_id"       => $sent_val['user_id'],
+                            "user_id"       => $sent_val,
                             "money"         => $per_person[$awards_key],
                             "award_set"     => json_encode([
                                     'money'         => $price[$awards_key],
@@ -193,31 +193,31 @@ die;
 
                         if (!isset($sent_res['code']) || $sent_res['code']) {
                             $trans->rollBack();
-                            $this->commandOut($awards_value['name'] . "奖金池". $sent_val['user_id'] ."用户添加记录失败");
+                            $this->commandOut($awards_value['name'] . "奖金池". $sent_val ."用户添加记录失败");
                             continue;
                         }
 
                         if ($awards_value['automatic_audit']) {
                             //修改用户金额
-                            $user = User::findOne((int)$sent_val['user_id']);
+                            $user = User::findOne((int)$sent_val);
                             if (!$user || $user->is_delete) {
                                 $trans->rollBack();
-                                $this->commandOut($awards_value['name'] . "奖金池" . $sent_val['user_id'] . "用户添加记录失败");
+                                $this->commandOut($awards_value['name'] . "奖金池" . $sent_val . "用户添加记录失败");
                                 continue;
                             }
                             UserIncomeForm::bossAdd($user, $per_person[$awards_key], $sent_res['data'],'来自股东分红' . $awards_value['name'] . "第" . $next_time[$awards_key] . '期');
 
                             //修改股东总分红记录
-                            $boss = Boss::findOne(['user_id' => $sent_val['user_id'], 'is_delete' => 0]);
+                            $boss = Boss::findOne(['user_id' => $sent_val, 'is_delete' => 0]);
                             if(!$boss){
                                 $trans->rollBack();
-                                $this->commandOut($sent_val['user_id'].'股东不存在');
+                                $this->commandOut($sent_val.'股东不存在');
                                 continue;
                             }
                             $boss->total_price = $boss->total_price + $per_person[$awards_key];
                             if (!$boss->save()) {
                                 $trans->rollBack();
-                                $this->commandOut($awards_value['name'] . "奖金池" . $sent_val['user_id'] . "修改股东总分红记录失败");
+                                $this->commandOut($awards_value['name'] . "奖金池" . $sent_val . "修改股东总分红记录失败");
                                 continue;
                             }
                         }

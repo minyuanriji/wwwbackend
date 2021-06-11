@@ -7,7 +7,7 @@ use app\plugins\boss\models\BossAwardEachLog;
 use app\plugins\boss\models\BossAwardMember;
 use app\plugins\boss\models\BossAwards;
 
-class BossBonusController extends BaseCommandController{
+class BossBonusController extends BaseCommandController {
 
     public function actionMaintantJob()
     {
@@ -97,7 +97,6 @@ die;
                     continue;
                 }
 
-
                 if ($awards_value['money'] <= 0) {
                     $this->commandOut($awards_value['name'] . "奖金池金额不足：" . date("Y-m-d H:i:s", $time));
                     continue;
@@ -151,9 +150,9 @@ die;
                             "user_id"       => $sent_val['user_id'],
                             "money"         => $per_person[$awards_key],
                             "award_set"     => json_encode([
-                                    '分红金额'    => $price[$awards_key],
-                                    '分红比例'    => $awards_value['rate'],
-                                    '分红人数'    => $count_user[$awards_key],
+                                    'money'         => $price[$awards_key],
+                                    'rate'          => $awards_value['rate'],
+                                    'people_number' => $count_user[$awards_key],
                             ]),
                             "send_date"     => $next_time[$awards_key],
                         ];
@@ -171,14 +170,14 @@ die;
                         'next_send_time' => $awards_value['next_send_time'] + ($awards_value['period'] * $this->computingTime($awards_value['period_unit']))
                     ],
                         'id = ' . $awards_value['id']);
-
+                    $this->commandOut($awards_value['name'] . "奖金池发放完成");
                 } catch (\Exception $e){
                     $trans->rollBack();
                     $this->commandOut($e->getMessage());
                 }
             }
             $trans->commit();
-            $this->commandOut(date('Y-m-d H:i:s', time()) . " 发放完成");
+            $this->commandOut(date('Y-m-d H:i:s', time()) . " 分红结束");
             return true;
         } catch (\Exception $e){
             $this->commandOut($e->getMessage());

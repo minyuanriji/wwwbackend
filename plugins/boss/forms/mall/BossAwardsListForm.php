@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\boss\models\Boss;
 use app\plugins\boss\models\BossAwardMember;
+use app\plugins\boss\models\BossAwardRechargeLog;
 use app\plugins\boss\models\BossAwards;
 
 class BossAwardsListForm extends BaseModel
@@ -35,12 +36,12 @@ class BossAwardsListForm extends BaseModel
     }
 
     //查看
-    public function search()
+    public function search($select = '*')
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-        $list = BossAwards::find()->where([
+        $list = BossAwards::find()->select($select)->where([
             'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0
         ])->keyword($this->keyword, ['or',['like', 'name', $this->keyword],['like', 'award_sn', $this->keyword]])
             ->page($pagination, 20, $this->page)->orderBy(['id' => SORT_DESC])->all();
@@ -199,17 +200,44 @@ class BossAwardsListForm extends BaseModel
                 'msg' => '请填写充值金额'
             ];
         }
-        $level = BossAwards::findOne(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'id' => $params['id']]);
-        if ($level) {
-            $level->money = $params['money'];
-            if (!$level->save()) {
-                throw new \Exception($this->responseErrorMsg($level));
+        $awards = BossAwards::findOne(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'id' => $params['id']]);
+        if ($awards) {
+            $transaction = \Yii::$app->db->beginTransaction();
+            try {
+                $recharge_model = new BossAwardRechargeLog();
+                $recharge_model->mall_id = \Yii::$app->mall->id;
+                $recharge_model->award_id = $params['id'];
+                $recharge_model->money = $params['money'];
+                $recharge_model->money_front = $awards->money;
+                $recharge_model->money_after = $awards->money + $params['money'];
+                $recharge_model->source_id = \Yii::$app->admin->id;
+                if (!$recharge_model->save()) {
+                    $transaction->rollBack();
+                    throw new \Exception($this->responseErrorMsg($awards));
+                }
+
+                $awards->money = $params['money'];
+                if (!$awards->save()) {
+                    $transaction->rollBack();
+                    throw new \Exception($this->responseErrorMsg($awards));
+                }
+
+                $transaction->commit();
+                return [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'msg' => '充值成功'
+                ];
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => $e->getMessage(),
+                    'error' => [
+                        'line' => $e->getLine()
+                    ]
+                ];
             }
 
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '充值成功'
-            ];
         }
         return [
             'code' => ApiCode::CODE_FAIL,
@@ -288,7 +316,7 @@ class BossAwardsListForm extends BaseModel
 
     }
 
-    //添加/修改用户
+    //是否启用
     public function isEnable ($params)
     {
         if (isset($params['id']) && $params['id']) {
@@ -297,6 +325,13 @@ class BossAwardsListForm extends BaseModel
                 return [
                     'code' => ApiCode::CODE_FAIL,
                     'msg' => '该奖池不存在'
+                ];
+            }
+            $member_count = BossAwardMember::find()->where(['award_id' => $params['id'], 'mall_id' => \Yii::$app->mall->id])->count();
+            if ($member_count <= 0) {
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '请先添加股东！'
                 ];
             }
             $boss_awards->status = $params['status'];

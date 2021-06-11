@@ -116,14 +116,14 @@
 
                         <el-button type="text" size="mini" circle plain style="margin-left: 10px;margin-top: 10px"
                                    @click="addChangeOwnerDialog(scope.row)">
-                            <el-tooltip class="item" effect="dark" content="添加用户" placement="top">
+                            <el-tooltip class="item" effect="dark" content="添加股东" placement="top">
                                 <img src="statics/img/mall/addUser.png" alt="">
                             </el-tooltip>
                         </el-button>
 
 
                         <el-button circle size="mini" type="text" @click="showChangeOwnerDialog(scope.row)">
-                            <el-tooltip class="item" effect="dark" content="查看用户" placement="top">
+                            <el-tooltip class="item" effect="dark" content="查看股东" placement="top">
                                 <img src="statics/img/mall/showUser.png" alt="">
                             </el-tooltip>
                         </el-button>
@@ -165,7 +165,7 @@
     </el-dialog>
 
     <!-- 添加用户 -->
-    <el-dialog title="添加用户" :visible.sync="changeOwnerDialogVisible" width="30%">
+    <el-dialog title="添加股东" :visible.sync="changeOwnerDialogVisible" width="30%">
         <div class="input-item">
             <el-input size="small" placeholder="请输入搜索内容" type="text" clearable  v-model="keyword">
                 <el-button slot="append" @click="loadBossList('add')" icon="el-icon-search"></el-button>
@@ -177,6 +177,7 @@
         <el-table v-loading="adminListLoading" :data="adminList" style="margin-bottom: 20px;">
             <el-table-column align='center' type="selection" width="60"></el-table-column>
             <el-table-column align="center" prop="id" label="id"></el-table-column>
+            <el-table-column align="center" prop="user_id" label="用户ID"></el-table-column>
             <el-table-column align="center" prop="nickname" label="用户名"></el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
@@ -295,6 +296,7 @@
                         self.$message.success(e.data.msg);
                     } else {
                         self.$message.error(e.data.msg);
+                        this.search();
                     }
                 }).catch(e => {
                     console.log(e);

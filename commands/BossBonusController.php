@@ -1,9 +1,7 @@
 <?php
 namespace app\commands;
 
-use app\core\ApiCode;
 use app\forms\common\UserIncomeForm;
-use app\models\BaseModel;
 use app\models\User;
 use app\plugins\boss\forms\mall\BossAwardsEachLogForm;
 use app\plugins\boss\forms\mall\BossAwardsSentLogForm;
@@ -11,7 +9,6 @@ use app\plugins\boss\models\Boss;
 use app\plugins\boss\models\BossAwardEachLog;
 use app\plugins\boss\models\BossAwardMember;
 use app\plugins\boss\models\BossAwards;
-
 
 class BossBonusController extends BaseCommandController
 {

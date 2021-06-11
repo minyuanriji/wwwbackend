@@ -219,11 +219,7 @@ class BossAwardsListForm extends BaseModel
                     throw new \Exception($this->responseErrorMsg($awards));
                 }
 
-<<<<<<< HEAD
-                $awards->money = $params['money'];
-=======
                 $awards->money = $awards->money + $params['money'];
->>>>>>> fe71e631e0b324baa9458bcf770f0324b6671ed2
                 if (!$awards->save()) {
                     $transaction->rollBack();
                     throw new \Exception($this->responseErrorMsg($awards));
@@ -335,11 +331,8 @@ class BossAwardsListForm extends BaseModel
                 ];
             }
             $member_count = BossAwardMember::find()->where(['award_id' => $params['id'], 'mall_id' => \Yii::$app->mall->id])->count();
-<<<<<<< HEAD
-            if ($member_count <= 0) {
-=======
+
             if ($member_count <= 0 && !$boss_awards->level_id) {
->>>>>>> fe71e631e0b324baa9458bcf770f0324b6671ed2
                 return [
                     'code' => ApiCode::CODE_FAIL,
                     'msg' => '请先添加股东！'

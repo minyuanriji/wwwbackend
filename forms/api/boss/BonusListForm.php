@@ -2,19 +2,11 @@
 
 namespace app\forms\api\boss;
 
-use app\component\efps\Efps;
 use app\core\ApiCode;
-use app\core\payment\PaymentOrder;
-use app\logic\AppConfigLogic;
 use app\models\BaseModel;
-use app\models\EfpsPaymentOrder;
-use app\models\PaymentOrderUnion;
-use app\models\User;
-use app\models\UserInfo;
 use app\plugins\boss\forms\mall\BossAwardsListForm;
 use app\plugins\boss\models\Boss;
 use app\plugins\boss\models\BossAwardSentLog;
-use app\plugins\mch\models\MchCheckoutOrder;
 
 class BonusListForm extends BaseModel
 {

@@ -31,7 +31,7 @@
 
                         <el-form-item prop="period_unit" label="结算周期类型">
                             <el-col :span="8">
-                                <el-radio-group  v-model="ruleForm.period_unit" size="small">
+                                <el-radio-group v-model="ruleForm.period_unit" size="small">
                                     <el-radio :label="0" border>天</el-radio>
                                     <el-radio :label="1" border>周</el-radio>
                                     <el-radio :label="2" border>月</el-radio>
@@ -40,12 +40,30 @@
                             </el-col>
                         </el-form-item>
 
+                        <el-form-item prop="automatic_audit" label="自动审核">
+                            <el-col :span="8">
+                                <el-radio-group v-model="ruleForm.automatic_audit" size="small">
+                                    <el-radio :label="0" border>否</el-radio>
+                                    <el-radio :label="1" border>是</el-radio>
+                                </el-radio-group>
+                            </el-col>
+                        </el-form-item>
+
                         <el-form-item label="比例" prop="rate">
-                            <el-input v-model="ruleForm.rate" style="width: 220px"></el-input>%
+                            <el-input v-model="ruleForm.rate" style="width: 220px"></el-input>
+                            %
                         </el-form-item>
 
                         <el-form-item label="奖金池总金额" prop="money">
-                            <el-input v-model="ruleForm.money" :disabled="true" style="width: 220px"></el-input>元
+                            <el-input v-model="ruleForm.money" :disabled="true" style="width: 220px"></el-input>
+                            元
+                        </el-form-item>
+
+                        <el-form-item label="等级" prop="money">
+                            <el-select size="small" v-model="ruleForm.level_id" @change='toSearch' class="select">
+                                <el-option :key="index" :label="item.name" :value="item.id"
+                                           v-for="(item, index) in bossLevelList"></el-option>
+                            </el-select>
                         </el-form-item>
 
                     </el-col>
@@ -66,9 +84,11 @@
                     name: '',
                     status: 0,
                     award_sn: '',
-                    rate:'',//比例
-                    period:1,//结算周期时间
-                    period_unit:'',//结算周期类型
+                    rate: '',//比例
+                    period: 1,//结算周期时间
+                    period_unit: '',//结算周期类型
+                    automatic_audit: 0,//是否自动审核
+                    level_id: '',//等级ID
                 },
                 rules: {
                     name: [
@@ -84,19 +104,23 @@
                         {required: true, message: '请输入比例', trigger: 'change'},
                     ],
                 },
+                bossLevelList : [],
             };
+        },
+        created () {
+            this.getLevelList();
         },
         mounted() {
             if (getQuery('id')) {
                 this.loadData();
             }
-            this.getSetting();
         },
         methods: {
             close(e) {
                 this.visible = false;
             },
             submitForm(formName) {
+                console.log(formName);
                 let self = this;
                 let period_type;
                 switch (self.ruleForm.period_unit) {
@@ -113,35 +137,37 @@
                         period_type = 'year';
                         break;
                 }
-                console.log(period_type);
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         self.btnLoading = true;
+                        if (!self.ruleForm.level_id) {
+                            self.ruleForm.level_id = 0;
+                        }
                         request({
                             params: {
                                 r: 'plugin/boss/mall/prize/edit'
                             },
                             method: 'post',
                             data: {
-                                id : getQuery('id'),
+                                id: getQuery('id'),
                                 name: self.ruleForm.name,
                                 period: self.ruleForm.period,
                                 period_unit: period_type,
                                 status: self.ruleForm.status,
                                 rate: self.ruleForm.rate,
+                                automatic_audit: self.ruleForm.automatic_audit,
+                                level_id: self.ruleForm.level_id,
                             }
                         }).then(e => {
                             self.btnLoading = false;
                             if (e.data.code == 0) {
-                                navigateTo({
-                                    r: 'plugin/boss/mall/prize/index'
-                                })
+                                self.$message.success(e.data.msg);
                             } else {
                                 self.$message.error(e.data.msg);
-                                navigateTo({
-                                    r: 'plugin/boss/mall/prize/index'
-                                })
                             }
+                            navigateTo({
+                                r: 'plugin/boss/mall/prize/index'
+                            })
                         }).catch(e => {
                             self.$message.error(e.data.msg);
                             self.btnLoading = false;
@@ -176,30 +202,19 @@
                     console.log(e);
                 });
             },
-            deleteGoods(index) {
-                this.ruleForm.goods_list.splice(index, 1);
-                this.ruleForm.goods_warehouse_ids.splice(index, 1);
-            },
-            getSetting() {
-                this.cardLoading = true;
+            getLevelList() {
+                let self = this;
                 request({
                     params: {
-                        r: 'plugin/boss/mall/level/setting',
+                        r: 'plugin/boss/mall/level/index',
                     },
                     method: 'get',
-                }).then(res => {
-                    this.cardLoading = false;
-                    if (res.data.code == 0) {
-                        this.weights = res.data.data.weights;
-                        this.level = res.data.data.level
-                    } else {
-                        this.$message.error(e.data.msg);
-                    }
+                }).then(e => {
+                    self.bossLevelList = e.data.data.list;
                 }).catch(e => {
-                    this.cardLoading = false;
                     console.log(e);
                 });
-            }
+            },
         }
     });
 </script>

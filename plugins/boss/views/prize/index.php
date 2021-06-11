@@ -178,6 +178,7 @@
             <el-table-column align='center' type="selection" width="60"></el-table-column>
             <el-table-column align="center" prop="id" label="id"></el-table-column>
             <el-table-column align="center" prop="user_id" label="用户ID"></el-table-column>
+            <el-table-column align="center" prop="level_name" label="等级名称"></el-table-column>
             <el-table-column align="center" prop="nickname" label="用户名"></el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">

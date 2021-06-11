@@ -22,7 +22,8 @@ use app\models\BaseActiveRecord;
  * @property int $deleted_at
  * @property int $last_send_time
  * @property int $next_send_time
- * @property int $up_period_time
+ * @property int $automatic_audit
+ * @property int $level_id
  */
 class BossAwards extends BaseActiveRecord
 {
@@ -41,7 +42,7 @@ class BossAwards extends BaseActiveRecord
     {
         return [
             [['mall_id'], 'required'],
-            [['mall_id','created_at', 'updated_at', 'is_delete','status','deleted_at','period'], 'integer'],
+            [['mall_id','created_at', 'updated_at', 'is_delete','status','deleted_at','period','automatic_audit','level_id'], 'integer'],
             [['award_sn','period_unit'], 'string'],
             [['money'], 'number'],
             [['name'], 'string', 'max' => 45],
@@ -67,6 +68,8 @@ class BossAwards extends BaseActiveRecord
             'updated_at' => 'Updated At',
             'is_delete' => 'Is Delete',
             'deleted_at' => '删除时间',
+            'automatic_audit' => '自动审核',
+            'level_id' => '等级ID',
         ];
     }
 }

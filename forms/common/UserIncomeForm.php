@@ -31,7 +31,7 @@ class UserIncomeForm extends BaseModel{
                 $desc = "来自股东分红[ID:{$source_id}]";
             }
 
-            static::change($user, $price, self::TYPE_ADD, self::FLAG_INCOME, "boss", time(), $desc);
+            static::change($user, $price, self::TYPE_ADD, self::FLAG_INCOME, "boss", $source_id, $desc);
 
             $t->commit();
 

@@ -25,6 +25,7 @@ class BossAwardsListForm extends BaseModel
         'month',
         'year',
     ];
+    public $recharge = [1,148];
 
     public function rules()
     {
@@ -81,16 +82,6 @@ class BossAwardsListForm extends BaseModel
             return $this->responseErrorInfo();
         }
         try {
-            $new_max_id = sprintf("%04d", 1);
-            $max_id = BossAwards::find()->select('id')->orderBy(['id' => SORT_DESC])->one();
-            if ($max_id) {
-                if ($max_id->id > 9999) {
-                    $new_max_id = $max_id->id + 1;
-                } else {
-                    $new_max_id = sprintf("%04d", $max_id->id+ 1);
-                }
-            }
-            $top_sn = substr(date('Y', time()), -2) . date('md', time()) . $new_max_id;
             if (isset($post_data['id']) && $post_data['id']) {
                 $level = BossAwards::findOne(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'id' => $post_data['id']]);
                 if (!$level) {
@@ -107,6 +98,16 @@ class BossAwardsListForm extends BaseModel
                     }
                 }
             } else {
+                $new_max_id = sprintf("%04d", 1);
+                $max_id = BossAwards::find()->select('id')->orderBy(['id' => SORT_DESC])->one();
+                if ($max_id) {
+                    if ($max_id->id > 9999) {
+                        $new_max_id = $max_id->id + 1;
+                    } else {
+                        $new_max_id = sprintf("%04d", $max_id->id+ 1);
+                    }
+                }
+                $top_sn = substr(date('Y', time()), -2) . date('md', time()) . $new_max_id;
                 $level = new BossAwards();
                 $level->mall_id = \Yii::$app->mall->id;
                 $level->award_sn = 'BSH' . $top_sn;
@@ -116,6 +117,8 @@ class BossAwardsListForm extends BaseModel
             $level->period = $post_data['period'];
             $level->period_unit = $post_data['period_unit'];
             $level->rate = $post_data['rate'];
+            $level->automatic_audit = $post_data['automatic_audit'];
+            $level->level_id = $post_data['level_id'];
             if (!$level->save()) {
                 throw new \Exception($this->responseErrorMsg($level));
             } else {
@@ -182,10 +185,10 @@ class BossAwardsListForm extends BaseModel
     //充值
     public function recharge ($params)
     {
-        if (\Yii::$app->admin->id != 148) {
+        if (!in_array(\Yii::$app->admin->id,$this->recharge)) {
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg' => '请联系财务充值！'
+                'msg' => '请联系财务或主账号充值！'
             ];
         }
         if (!isset($params['id']) || !$params['id']) {
@@ -216,7 +219,11 @@ class BossAwardsListForm extends BaseModel
                     throw new \Exception($this->responseErrorMsg($awards));
                 }
 
+<<<<<<< HEAD
                 $awards->money = $params['money'];
+=======
+                $awards->money = $awards->money + $params['money'];
+>>>>>>> fe71e631e0b324baa9458bcf770f0324b6671ed2
                 if (!$awards->save()) {
                     $transaction->rollBack();
                     throw new \Exception($this->responseErrorMsg($awards));
@@ -328,7 +335,11 @@ class BossAwardsListForm extends BaseModel
                 ];
             }
             $member_count = BossAwardMember::find()->where(['award_id' => $params['id'], 'mall_id' => \Yii::$app->mall->id])->count();
+<<<<<<< HEAD
             if ($member_count <= 0) {
+=======
+            if ($member_count <= 0 && !$boss_awards->level_id) {
+>>>>>>> fe71e631e0b324baa9458bcf770f0324b6671ed2
                 return [
                     'code' => ApiCode::CODE_FAIL,
                     'msg' => '请先添加股东！'

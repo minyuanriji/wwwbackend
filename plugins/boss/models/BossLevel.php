@@ -4,7 +4,6 @@ namespace app\plugins\boss\models;
 
 use app\models\BaseActiveRecord;
 
-use Yii;
 /**
  * This is the model class for table "{{%plugin_boss_level}}".
  *

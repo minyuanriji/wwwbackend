@@ -204,6 +204,7 @@ class GoodsList extends BaseModel
         $this->getQuery();
         return $this->query->page($this->pagination, $this->limit, $this->page)
             ->groupBy($this->group_by_name)
+            ->orderBy('id DESC')
             ->asArray($this->is_array)
             ->all();
     }

@@ -496,11 +496,16 @@ class UserForm extends BaseModel
                 'is_delete' => 0,
                 'mall_id' => \Yii::$app->mall->id,
             ]);
+            $query->with(['bossLevel' => function ($query) {
+                $query->select('id,name');
+            }]);
+            $select = "id,user_id,level_id";
         } elseif ($this->type == 'show') {
             $query = BossAwardMember::find()->where([
                 'award_id' => $this->award_id,
                 'mall_id' => \Yii::$app->mall->id,
             ]);
+            $select = "id,user_id";
         } else {
             return [
                 'code' => ApiCode::CODE_FAIL,
@@ -518,7 +523,7 @@ class UserForm extends BaseModel
         }]);
 
         $list = $query
-            ->select('id,user_id')
+            ->select($select)
             ->page($pagination)
             ->orderBy('id DESC')
             ->asArray()
@@ -528,6 +533,10 @@ class UserForm extends BaseModel
                 if (isset($value['user'])) {
                     $list[$key]['nickname'] = $value['user'][0]['nickname'];
                     unset($list[$key]['user']);
+                }
+                if (isset($value['bossLevel'])) {
+                    $list[$key]['level_name'] = $value['bossLevel'][0]['name'];
+                    unset($list[$key]['bossLevel']);
                 }
             }
         }

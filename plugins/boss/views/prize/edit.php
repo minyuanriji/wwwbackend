@@ -138,6 +138,9 @@
                                 })
                             } else {
                                 self.$message.error(e.data.msg);
+                                navigateTo({
+                                    r: 'plugin/boss/mall/prize/index'
+                                })
                             }
                         }).catch(e => {
                             self.$message.error(e.data.msg);

@@ -44,7 +44,7 @@ class BonusListForm extends BaseModel
             $return_data = [];
             //获取奖金池
             $awards_form = new BossAwardsListForm();
-            $awards_res = $awards_form->search();
+            $awards_res = $awards_form->search('id,created_at,money,name');
             if (!isset($awards_res['code']) || $awards_res['code']) {
                 throw new \Exception(isset($awards_res['msg']) ? $awards_res['msg'] : '异常错误');
             }

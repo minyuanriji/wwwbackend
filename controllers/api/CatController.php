@@ -11,6 +11,7 @@
 namespace app\controllers\api;
 
 
+use app\core\ApiCode;
 use app\events\StatisticsEvent;
 use app\forms\api\cat\CatListForm;
 use app\helpers\APICacheHelper;
@@ -39,6 +40,11 @@ class CatController extends ApiController
             ])
         );
 
-        return $this->asJson(APICacheHelper::get($form));
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
     }
 }

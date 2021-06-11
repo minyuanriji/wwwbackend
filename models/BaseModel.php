@@ -26,6 +26,11 @@ class BaseModel extends \yii\base\Model
 
     public $result = [];
 
+    public $is_login     = 0;
+    public $login_uid    = 0;
+    public $base_mall_id = 0;
+    public $is_front     = 0; //是否前端调用
+
     /**
      * 返回错误数据数组
      * @param array $model

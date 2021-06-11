@@ -11,6 +11,7 @@
 namespace app\controllers\api;
 
 use app\core\ApiCode;
+use app\forms\api\mall\CacheMallConfigForm;
 use app\forms\api\user\UserForm;
 use app\helpers\APICacheHelper;
 use app\logic\AppConfigLogic;
@@ -35,71 +36,24 @@ class MallController extends ApiController
      */
     public function actionMallConfig()
     {
-        $startTime = microtime(true);
-        $data = APICacheHelper::get(APICacheHelper::API_MALL_CONFIG, function($helper){
-            $mall_setting = \Yii::$app->mall->getMallSetting();
-            $mall_setting['setting']["name"] = $mall_setting["name"];
-            $setting['setting'] = $mall_setting['setting'];
-            $pageTitle = AppConfigLogic::getPageTitleConfig();
-            $navbar = AppConfigLogic::getNavbar();
-            /*$navbar = json_decode(json_encode($navbar),true);
-            if (is_array($navbar) && $navbar && isset($navbar['navs'][2]))
-                $navbar['navs'][2]['url'] = $navbar['navs'][2]['url'] ? '/pages/enter/enter' : '';
-    */
+        $form = new CacheMallConfigForm();
+        $form->attributes     = $this->requestData;
+        $form->stands_mall_id = isset($headers['x-stands-mall-id']) ? $headers['x-stands-mall-id'] : 0;
+        $form->http_type      = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
+        $form->http_host      = $_SERVER['HTTP_HOST'];
+        $form->base_url       = \Yii::$app->request->baseUrl;
 
-            $userCenter = AppConfigLogic::getUserCenter(1);
+        $userCenter = AppConfigLogic::getUserCenter(1);
+        $top_pic_url = $form->http_type . $form->http_host . "/web/statics/img/app/top_background_pic.jpg";
+        if(!empty($userCenter) && isset($userCenter["top_pic_url"])){
+            $top_pic_url = $userCenter["top_pic_url"];
+        }
 
-            $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-            $top_pic_url = $http_type.$_SERVER['HTTP_HOST']."/web/statics/img/app/top_background_pic.jpg";
-            if(!empty($userCenter) && isset($userCenter["top_pic_url"])){
-                $top_pic_url = $userCenter["top_pic_url"];
-            }
-
-            //获取红包券开启状态
-            $optionCache = OptionLogic::get(
-                Option::NAME_PAYMENT,
-                \Yii::$app->mall->id,
-                Option::GROUP_APP,
-                '',
-                0
-            );
-
-            $integral_enable = isset($optionCache->integral_status) ? $optionCache->integral_status : 0;
-
-            //获取当前logo
-            $mall_logo = '';
-            $headers = \Yii::$app->request->headers;
-            if (isset($headers['x-stands-mall-id']) && $headers['x-stands-mall-id'] && $headers['x-stands-mall-id'] != 5) {
-                $mal_res = Mall::findOne(['id' => $headers['x-stands-mall-id'], 'is_delete' => 0, 'is_recycle' => 0, 'is_disable' => 0]);
-                if (!$mal_res) {
-                    return [
-                        'code' => ApiCode::CODE_FAIL,
-                        'msg' => '此商城不存在，请联系客服！',
-                    ];
-                }
-                $mall_logo = $mal_res->logo;
-            }
-
-            return $helper([
-                'mall_setting'    => $setting,
-                'navbar'          => $navbar,
-                'copyright'       => AppConfigLogic::getCoryRight(),
-                'cat_style'       => AppConfigLogic::getAppCatStyle(),
-                'page_title'      => $pageTitle,
-                'global_color'    => AppConfigLogic::getColor(),
-                'top_pic_url'     => $top_pic_url,
-                'register_agree'  => AppConfigLogic::getRegisterAgree(),
-                'integral_enable' => $integral_enable,
-                'mall_log'        => $mall_logo
-            ]);
-        });
-
-        return $this->asJson([
-            'time' => microtime(true) - $startTime,
-            'code' => 0,
-            'data' => $data,
-        ]);
-
+        return $this->asJson(array_merge(APICacheHelper::get($form), [
+            "page_title"  => AppConfigLogic::getPageTitleConfig(),
+            "navbar"      => AppConfigLogic::getNavbar(),
+            'top_pic_url' => $top_pic_url
+        ]));
     }
 
 

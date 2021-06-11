@@ -14,6 +14,8 @@ namespace app\forms\api\goods;
 
 use app\core\ApiCode;
 use app\core\BasePagination;
+use app\forms\api\APICacheDataForm;
+use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\models\Goods;
 use app\models\GoodsCatRelation;
@@ -24,7 +26,7 @@ use app\models\Option;
 use app\models\mysql\GoodsCatRelation as GoodsCatRelationModel;
 use function Webmozart\Assert\Tests\StaticAnalysis\false;
 
-class GoodsListForm extends BaseModel
+class GoodsListForm extends BaseModel implements ICacheForm
 {
     public $page;
     public $limit;
@@ -42,8 +44,14 @@ class GoodsListForm extends BaseModel
         ];
     }
 
-    public function getList()
-    {
+    public function getCacheKey(){
+        return [
+            (int)$this->page, (int)$this->limit, (int)$this->cat_id,
+            (int)$this->limit, $this->keyword, $this->label
+        ];
+    }
+
+    public function getSourceDataForm(){
         if (!$this->validate()) {
             return $this->returnApiResultData();
         }
@@ -128,16 +136,19 @@ class GoodsListForm extends BaseModel
                 $newList = array_merge($newList);
             }
 
-
-
-            return $this->returnApiResultData(
+            $sourceData = $this->returnApiResultData(
                 ApiCode::CODE_SUCCESS,
                 '',
                 [
                     'list' => $newList,
                     'page_count' => $pagination->page_count,
                     'total_count' => $pagination->total_count
-                ]);
+                ]
+            );
+
+            return new APICacheDataForm([
+                "sourceData" => $sourceData
+            ]);
         } catch (\Exception $exception) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $exception->getMessage());
 
@@ -159,5 +170,4 @@ class GoodsListForm extends BaseModel
         }
         return false;
     }
-
 }

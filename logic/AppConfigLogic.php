@@ -486,7 +486,7 @@ class AppConfigLogic
      * @Note:获取页面标题配置
      * @return array
      */
-    public static function getPageTitleConfig()
+    public static function getPageTitleConfig($http_host = null, $base_url = null)
     {
         $option = OptionLogic::get(Option::NAME_PAGE_TITLE, \Yii::$app->mall->id, Option::GROUP_APP);
 
@@ -497,7 +497,15 @@ class AppConfigLogic
             }
         }
 
-        $default = PickLinkForm::getCommon()->getTitle();
+        $pickLinkForm = PickLinkForm::getCommon();
+        if(!empty($http_host)){
+            $pickLinkForm->req_http_host = $http_host;
+        }
+        if(!empty($base_url)){
+            $pickLinkForm->req_base_url = $base_url;
+        }
+
+        $default = $pickLinkForm->getTitle();
         foreach ($default as $key => $item) {
             if ($item['value'] == '/pages/index/index') {
                 unset($default[$key]);

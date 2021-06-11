@@ -29,6 +29,9 @@ class PickLinkForm extends BaseModel
 
     public $ignore;
 
+    public $req_http_host = null;
+    public $req_base_url = null;
+
     /**
      * 小程序菜单跳转链接
      * @param $links
@@ -83,12 +86,10 @@ class PickLinkForm extends BaseModel
      */
     private function links()
     {
-        $iconUrlPrefix = \Yii::$app->request->hostInfo . \Yii::$app->request->baseUrl .
-            '/statics/img/mall/pick-link/';
+        $httpHost = !empty($this->req_http_host) ? $this->req_http_host : \Yii::$app->request->hostInfo;
+        $baseUrl = !empty($this->req_base_url) ? $this->req_base_url : \Yii::$app->request->baseUrl;
 
-
-
-
+        $iconUrlPrefix = $httpHost . $baseUrl . '/statics/img/mall/pick-link/';
 
         $list = [
             [
@@ -545,6 +546,7 @@ class PickLinkForm extends BaseModel
 
         $newList = [];
         try {
+
             foreach ($list as $item) {
                 if (\Yii::$app->role->checkLink($item)) {
                     $newList[] = $item;
@@ -590,7 +592,10 @@ class PickLinkForm extends BaseModel
     public function appPage()
     {
         $list = $this->links();
-        $baseUrl=\Yii::$app->request->hostInfo.'/h5/?mall_id='.\Yii::$app->mall->id.'#';
+
+        $httpHost = !empty($this->req_http_host) ? $this->req_http_host : \Yii::$app->request->hostInfo;
+
+        $baseUrl= $httpHost . '/h5/?mall_id='.\Yii::$app->mall->id.'#';
         foreach ($list as $index => $item) {
             if (!($item['open_type'] == '' || $item['open_type'] == 'navigate' || $item['open_type'] == 'redirect')) {
                 unset($list[$index]);

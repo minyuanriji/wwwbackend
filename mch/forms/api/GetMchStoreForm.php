@@ -5,12 +5,14 @@ namespace app\mch\forms\api;
 
 
 use app\core\ApiCode;
+use app\forms\api\APICacheDataForm;
+use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\models\DistrictArr;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchVisitLog;
 
-class GetMchStoreForm extends BaseModel {
+class GetMchStoreForm extends BaseModel implements ICacheForm {
 
     public $mch_id;
 
@@ -20,7 +22,11 @@ class GetMchStoreForm extends BaseModel {
         ];
     }
 
-    public function getDetail(){
+    public function getCacheKey(){
+        return [(int)$this->mch_id];
+    }
+
+    public function getSourceDataForm(){
 
         if(!$this->validate()){
             return $this->responseErrorInfo();
@@ -76,14 +82,16 @@ class GetMchStoreForm extends BaseModel {
                 $store['districts'] = '';
             }
 
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '请求成功',
-                'data' => [
-                    'store'      => $store,
-                    'category'   => $category
+            return new APICacheDataForm([
+                "sourceData" => [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'msg' => '请求成功',
+                    'data' => [
+                        'store'      => $store,
+                        'category'   => $category
+                    ]
                 ]
-            ];
+            ]);
         } catch (\Exception $e) {
             return [
                 'code' => ApiCode::CODE_FAIL,
@@ -91,5 +99,4 @@ class GetMchStoreForm extends BaseModel {
             ];
         }
     }
-
 }

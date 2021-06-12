@@ -238,12 +238,14 @@ class ApiController extends BaseController
     {
         $wechatModel = \Yii::$app->wechat;
 
-        if(true || ($wechatModel->isWechat && $this->user)){
-            $cacheObject = \Yii::$app->getCache();
+        $cacheObject = \Yii::$app->getCache();
 
-            $cacheKey = "user_wechat_subscript:" . $this->user->id;
+        $cacheKey = "user_wechat_subscript:" . $this->user->id;
 
-            $isSubscribe = (int)$cacheObject->get($cacheKey);
+        $isSubscribe = (int)$cacheObject->get($cacheKey);
+
+
+        if(($wechatModel->isWechat && $this->user)){
 
             if(!$isSubscribe){
                 $userInfo = UserInfo::findOne([
@@ -268,8 +270,13 @@ class ApiController extends BaseController
                 }
             }
 
-            static::$commonData['wechat_subscribe'] = $isSubscribe;
         }
+
+        if($isSubscribe){
+            $cacheObject->set($cacheKey, 1, 3600);
+        }
+
+        static::$commonData['wechat_subscribe'] = $isSubscribe;
 
         return $this;
     }
@@ -336,7 +343,6 @@ class ApiController extends BaseController
                 \Yii::$app->user->login($user);
             }
 
-            //判断是否已关注
 
         } else {
             \Yii::$app->user->logout();

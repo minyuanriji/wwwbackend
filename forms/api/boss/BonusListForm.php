@@ -70,7 +70,7 @@ class BonusListForm extends BaseModel
                 ->with(['bossAwardEachLog' => function ($query) {
                     $query->select('id,awards_cycle');
                 }])
-                ->andWhere(['status' => 1])
+                ->andWhere(['status' => 1, 'user_id' => $user->id])
                 ->asArray()
                 ->page($pagination, $this->limit, $this->page)
                 ->orderBy(['id' => SORT_DESC])

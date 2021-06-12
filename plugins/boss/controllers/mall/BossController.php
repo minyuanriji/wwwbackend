@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\plugins\boss\forms\mall\BossSettingForm;
 use app\plugins\boss\forms\mall\IncomeListForm;
 use app\plugins\boss\models\Boss;
+use app\plugins\boss\models\BossAwardMember;
 use app\plugins\Controller;
 use app\plugins\boss\forms\mall\BossListForm;
 use app\plugins\boss\forms\mall\BossRemarksForm;
@@ -157,14 +158,21 @@ class BossController extends Controller
 
                 $id = \Yii::$app->request->post('id');
 
+                $transaction = \Yii::$app->db->beginTransaction();
                 $agent = Boss::findOne(['id' => $id, 'is_delete' => 0]);
                 if (!$agent) {
+                    $transaction->rollBack();
                     return $this->asJson(['code' => ApiCode::CODE_FAIL, 'msg' => '该股东不存在或者已被删除！']);
                 }
+                $condition = 'id = ' . $agent->user_id;
+                BossAwardMember::deleteAll($condition);
+
                 $agent->is_delete=1;
                 if(!$agent->save()){
+                    $transaction->rollBack();
                     return $this->asJson(['code' => ApiCode::CODE_FAIL, 'msg' => '删除失败！','error'=>$agent->getErrors()]);
                 }
+                $transaction->commit();
                 return $this->asJson(['code' => ApiCode::CODE_SUCCESS, 'msg' => '删除成功！']);
             }
         }

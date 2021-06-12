@@ -40,8 +40,8 @@ class CommonMchForm extends BaseModel{
         $cityId = \Yii::$app->request->headers->get("x-city-id");
         $districtData = intval($cityId) > 0 ? DistrictData::getDistrict((int)$cityId) : null;
 
-        $longitude = ApiController::$cityData['longitude'];
-        $latitude = ApiController::$cityData['latitude'];
+        $longitude = ApiController::$commonData['city_data']['longitude'];
+        $latitude = ApiController::$commonData['city_data']['latitude'];
 
 
         $query = Mch::find()->where([

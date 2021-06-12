@@ -122,7 +122,8 @@ die;
                     ->andWhere(['award_id' => $awards_value['id']])
                     ->asArray()
                     ->all();
-                if (!$awards_member_data && !$awards_value['level_id']) {
+
+                if (!$awards_member_data && !$boss_data) {
                     $this->commandOut($awards_value['name'] . "奖金池暂无分红股东");
                     continue;
                 }
@@ -236,7 +237,7 @@ die;
                     $this->commandOut($e->getMessage());
                 }
             }
-
+die;
             $trans->commit();
             $this->commandOut(date('Y-m-d H:i:s', time()) . " 分红结束...");
             return true;

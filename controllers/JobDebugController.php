@@ -9,8 +9,8 @@ class JobDebugController extends BaseController {
     public function actionIndex(){
         $this->setWechatParmas(5);
         $wechatModel = \Yii::$app->wechat;
-        if($wechatModel->isWechat){
-            $info = $wechatModel->app->user->get("oHQr7wg8Hf45__91vpq5VksCSK_U");
+        if(true || $wechatModel->isWechat){
+            $info = $wechatModel->app->user->get("oHQr7wo605JwVNvyT4lJrQceokIM");
             if(isset($info['subscribe']) && $info['subscribe'] == 1){ //已关注
 
             }else{ //未关注

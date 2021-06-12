@@ -8,6 +8,7 @@ use app\forms\common\mptemplate\MpTplMsgSend;
 use app\forms\common\version\Compatible;
 use app\models\BaseModel;
 use app\models\DistrictData;
+use app\models\EfpsMchReviewInfo;
 use app\models\Option;
 use app\models\Store;
 use app\models\User;
@@ -113,6 +114,14 @@ class MchApplyForm extends BaseModel {
             $this->setMallMchSetting($mchModel);
             $this->setMchSetting($mchModel);
             $this->setUser($mchModel);
+
+            $relatEfps = EfpsMchReviewInfo::findOne(["mch_id" => $mchModel->id]);
+            if($relatEfps){
+                $relatEfps->status = 0;
+                if(!$relatEfps->save()){
+                    throw new \Exception($this->responseErrorMsg($relatEfps));
+                }
+            }
 
             $transaction->commit();
 

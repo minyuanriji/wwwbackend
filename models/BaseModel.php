@@ -102,7 +102,7 @@ class BaseModel extends \yii\base\Model
             $this->result = $this->responseErrorInfo($data);
         }
 
-        $this->result['city_data'] = ApiController::$cityData;
+        $this->result = array_merge($this->result, ApiController::$commonData);
 
         return $this->result;
     }

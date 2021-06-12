@@ -266,14 +266,14 @@ class ApiController extends BaseController
                         }else{ //未关注
                             $isSubscribe = 0;
                         }
+
+                        if($isSubscribe){
+                            $cacheObject->set($cacheKey, 1, 3600);
+                        }
                     }
                 }
             }
 
-        }
-
-        if($isSubscribe){
-            $cacheObject->set($cacheKey, 1, 3600);
         }
 
         static::$commonData['wechat_subscribe'] = $isSubscribe;

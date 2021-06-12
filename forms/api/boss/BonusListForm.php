@@ -51,47 +51,48 @@ class BonusListForm extends BaseModel
                 }])
                 ->asArray()
                 ->one();
-            if (!$boss_res) {
-                throw new \Exception('股东账户不存在');
-            }
-            if (isset($boss_res['bossLevel']) && $boss_res['bossLevel']) {
-                $boss_res['level_name'] = $boss_res['bossLevel'][0]['name'];
-                unset($boss_res['bossLevel']);
-            } else {
-                $boss_res['level_name'] = '';
-            }
-            $boss_res['avatar_url'] = $user->avatar_url;
-            $return_data['user_bonus'] = $boss_res;
-            unset($boss_res);
-
-            //个人分红
-            $boss_sent_log = BossAwardSentLog::find()
-                ->select('id,each_id,money,payment_time')
-                ->with(['bossAwardEachLog' => function ($query) {
-                    $query->select('id,awards_cycle');
-                }])
-                ->andWhere(['status' => 1, 'user_id' => $user->id])
-                ->asArray()
-                ->page($pagination, $this->limit, $this->page)
-                ->orderBy(['id' => SORT_DESC])
-                ->all();
-
-            if ($boss_sent_log) {
-                foreach ($boss_sent_log as $key => $value) {
-                    if (isset($value['bossAwardEachLog']) && $value['bossAwardEachLog']) {
-                        $boss_sent_log[$key]['awards_cycle'] = $value['bossAwardEachLog'][0]['awards_cycle'];
-                    } else {
-                        $boss_sent_log[$key]['awards_cycle'] = '';
-                    }
-                    unset($boss_sent_log[$key]['bossAwardEachLog']);
-                    $boss_sent_log[$key]['payment_time'] = date('Y-m-d H:i:s', $value['payment_time']);
+            if ($boss_res) {
+                if (isset($boss_res['bossLevel']) && $boss_res['bossLevel']) {
+                    $boss_res['level_name'] = $boss_res['bossLevel'][0]['name'];
+                    unset($boss_res['bossLevel']);
+                } else {
+                    $boss_res['level_name'] = '';
                 }
-                $return_data['bonus_log'] = $boss_sent_log;
-                unset($boss_sent_log);
+                $boss_res['avatar_url'] = $user->avatar_url;
+                $return_data['user_bonus'] = $boss_res;
+                unset($boss_res);
+                //个人分红
+                $boss_sent_log = BossAwardSentLog::find()
+                    ->select('id,each_id,money,payment_time')
+                    ->with(['bossAwardEachLog' => function ($query) {
+                        $query->select('id,awards_cycle');
+                    }])
+                    ->andWhere(['status' => 1, 'user_id' => $user->id])
+                    ->asArray()
+                    ->page($pagination, $this->limit, $this->page)
+                    ->orderBy(['id' => SORT_DESC])
+                    ->all();
+
+                if ($boss_sent_log) {
+                    foreach ($boss_sent_log as $key => $value) {
+                        if (isset($value['bossAwardEachLog']) && $value['bossAwardEachLog']) {
+                            $boss_sent_log[$key]['awards_cycle'] = $value['bossAwardEachLog'][0]['awards_cycle'];
+                        } else {
+                            $boss_sent_log[$key]['awards_cycle'] = '';
+                        }
+                        unset($boss_sent_log[$key]['bossAwardEachLog']);
+                        $boss_sent_log[$key]['payment_time'] = date('Y-m-d H:i:s', $value['payment_time']);
+                    }
+                    $return_data['bonus_log'] = $boss_sent_log;
+                    unset($boss_sent_log);
+                } else {
+                    $return_data['bonus_log'] = [];
+                }
             } else {
                 $return_data['bonus_log'] = [];
+                $return_data['user_bonus'] = [];
             }
-
+            
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '',

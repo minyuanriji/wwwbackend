@@ -253,23 +253,14 @@ class ApiController extends BaseController
                     "platform" => "wechat"
                 ]);
                 if($userInfo){
-                    $platformData = @json_decode($userInfo->platform_data, true);
-                    if(isset($platformData['subscribe']) && $platformData['subscribe'] == 1){
+                    $info = $wechatModel->app->user->get($userInfo->openid);
+                    if(isset($info['subscribe']) && $info['subscribe'] == 1){ //
                         $isSubscribe = 1;
-                    }else{
-                        $info = $wechatModel->app->user->get("oHQr7wg8Hf45__91vpq5VksCSK_U");
-                        if(isset($info['subscribe']) && $info['subscribe'] == 1){ //已关注
-                            $platformData['subscribe'] = 1;
-                            $userInfo->platform_data = json_encode($platformData);
-                            $userInfo->save();
-                            $isSubscribe = 1;
-                        }else{ //未关注
-                            $isSubscribe = 0;
-                        }
-
-                        if($isSubscribe){
-                            $cacheObject->set($cacheKey, 1, 3600);
-                        }
+                    }else{ //未关注
+                        $isSubscribe = 0;
+                    }
+                    if($isSubscribe){
+                        $cacheObject->set($cacheKey, 1, 3600 * 2);
                     }
                 }
             }

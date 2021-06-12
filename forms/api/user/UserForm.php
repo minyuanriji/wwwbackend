@@ -302,7 +302,11 @@ class UserForm extends BaseModel
             'user_id'   => \Yii::$app->user->id,
             'is_delete' => 0
         ])->exists();
-        if($isBoss) {
+        $isUserRole = User::find()->where([
+            'id'   => \Yii::$app->user->id,
+            'is_delete' => 0
+        ])->andWhere(['or',['role_type' => 'partner'],['role_type' => 'branch_office']])->exists();
+        if($isBoss || $isUserRole) {
             $userCenter['menus'][] = [
                 "icon_url"  => "https://dev.mingyuanriji.cn/web/static/bonus.png",
                 "name"      => "奖金分红",

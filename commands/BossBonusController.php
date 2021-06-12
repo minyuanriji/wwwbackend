@@ -237,7 +237,7 @@ die;
                     $this->commandOut($e->getMessage());
                 }
             }
-die;
+
             $trans->commit();
             $this->commandOut(date('Y-m-d H:i:s', time()) . " 分红结束...");
             return true;

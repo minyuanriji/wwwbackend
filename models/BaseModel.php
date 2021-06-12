@@ -31,6 +31,12 @@ class BaseModel extends \yii\base\Model
     public $base_mall_id = 0;
     public $is_front     = 0; //是否前端调用
 
+    public function rules(){
+        return [
+            //[['is_login', 'login_uid', 'base_mall_id', 'is_front'], 'safe']
+        ];
+    }
+
     /**
      * 返回错误数据数组
      * @param array $model

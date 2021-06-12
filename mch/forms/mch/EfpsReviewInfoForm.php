@@ -104,17 +104,19 @@ class EfpsReviewInfoForm extends BaseModel {
 
         try {
             $model = EfpsMchReviewInfo::findOne(["mch_id" => $this->mch_id]);
+
             if(!$model){
                 $model = new EfpsMchReviewInfo();
                 $model->mch_id     = $this->mch_id;
                 $model->created_at = time();
                 $model->updated_at = time();
             }
-
+            $validAttributes = $model->attributes;
             foreach($this->attributes as $field => $value){
-                if(!is_numeric($value) && empty($value))
+                if((!is_numeric($value) && empty($value))
+                        || !in_array($field, $validAttributes, true))
                     continue;
-                $model->$field  = $value;
+                $model->$field = $value;
             }
             if(!$model->save()){
                 return [

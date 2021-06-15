@@ -3,6 +3,8 @@ namespace app\mch\forms\api\apply;
 
 use app\core\ApiCode;
 use app\mch\forms\mch\EfpsReviewInfoForm;
+use app\models\EfpsMchReviewInfo;
+use app\plugins\mch\models\Mch;
 
 class LawyerInfoForm extends EfpsReviewInfoForm{
 
@@ -11,7 +13,18 @@ class LawyerInfoForm extends EfpsReviewInfoForm{
 
             $this->checkData();
 
-            return parent::save();
+            $res = parent::save();
+
+            if($res['code'] == ApiCode::CODE_SUCCESS){
+                EfpsMchReviewInfo::updateAll([
+                    "status" => 1
+                ], ["mch_id" => $this->mch_id]);
+                Mch::updateAll([
+                    "review_status" => Mch::REVIEW_STATUS_UNCHECKED
+                ], ["id" => $this->mch_id]);
+            }
+
+            return $res;
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,

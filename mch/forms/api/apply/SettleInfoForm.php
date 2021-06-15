@@ -14,14 +14,6 @@ class SettleInfoForm extends EfpsReviewInfoForm{
             $this->checkData();
 
             $res = parent::save();
-            if($res['code'] == ApiCode::CODE_SUCCESS){
-                EfpsMchReviewInfo::updateAll([
-                    "status" => 1
-                ], ["mch_id" => $this->mch_id]);
-                Mch::updateAll([
-                    "review_status" => Mch::REVIEW_STATUS_UNCHECKED
-                ], ["id" => $this->mch_id]);
-            }
 
             return $res;
         }catch (\Exception $e){

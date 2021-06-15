@@ -11,14 +11,13 @@ use app\plugins\mch\models\Mch;
 class MchApplyPassedNotification{
 
     public static function send(Mch $mch){
-        /*\Yii::$app->queue->delay(10)->push(new MchApplyPassedNotificationWeTplJob([
+        \Yii::$app->queue->delay(10)->push(new MchApplyPassedNotificationWeTplJob([
             "mch" => $mch
-        ]));*/
-        static::sendWechatTemplate($mch);
+        ]));
     }
 
     public static function sendWechatTemplate(Mch $mch){
-        echo 'here';exit;
+
         $store = Store::findOne(["mch_id" => $mch->id]);
         if(!$store) return;
 

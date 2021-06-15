@@ -27,15 +27,14 @@ class MchApplyPassedWeTplMsg extends WechatTemplateMessage
             'template_id' => 'P7xEjRG_Mmo-daLn2WVT7VBS8KXEJ1p3Np7nu26v_IQ',//发送的模板id
             //'url' => 'https://', //发送后用户点击跳转的链接
             'data' => [
-                'first'    => '店铺审核已通过',
+                'first'    => '您申请的店铺审核已通过',
                 'keyword1' => $this->name,
                 'keyword2' => $this->nickname . "[".$this->user_id."]",
                 'keyword3' => date("Y-m-d H:i", $this->updated_at),
                 'remark'   => '如有疑问请联系020-31923526'
             ],
         ]);
-        print_r($res);
-        echo "\n";
+
         return $res;
     }
 }

@@ -164,11 +164,9 @@ class BossController extends Controller
                     $transaction->rollBack();
                     return $this->asJson(['code' => ApiCode::CODE_FAIL, 'msg' => '该股东不存在或者已被删除！']);
                 }
-                $boss_member = BossAwardMember::deleteAll(['user_id' => $agent->user_id]);
-                if (!$boss_member) {
-                    $transaction->rollBack();
-                    return $this->asJson(['code' => ApiCode::CODE_FAIL, 'msg' => '删除失败！']);
-                }
+
+                BossAwardMember::deleteAll(['user_id' => $agent->user_id]);
+
                 $agent->is_delete=1;
                 if(!$agent->save()){
                     $transaction->rollBack();

@@ -10,12 +10,11 @@
 
 namespace app\controllers\api;
 
-use app\forms\api\IndexForm;
-use app\forms\mall\data_statistics\TimingStatisticsForm;
+use app\core\ApiCode;
+use app\events\StatisticsEvent;
+use app\forms\api\CacheIndexForm;
 use app\helpers\APICacheHelper;
-use app\models\User;
-use app\models\UserInfo;
-use function EasyWeChat\Kernel\Support\get_client_ip;
+use app\models\StatisticsBrowseLog;
 
 use app\component\aiBaidu\lib\AipSpeech;
 
@@ -24,13 +23,27 @@ class IndexController extends ApiController
 {
     public function actionIndex()
     {
-        $data = APICacheHelper::get(APICacheHelper::API_INDEX_INDEX, function ($helper){
-            $form = new IndexForm();
-            $form->attributes = $this->requestData;
-            return $helper($form->getIndex());
-        });
+        $form = new CacheIndexForm();
+        $form->attributes = $this->requestData;
+        $form->mall_id = \Yii::$app->mall->id;
+        $form->is_login = !\Yii::$app->user->isGuest;
+        $form->login_uid = $form->is_login ? \Yii::$app->user->id : 0;
 
-        return $this->asJson($data);
+        \Yii::$app->trigger(StatisticsBrowseLog::EVEN_STATISTICS_LOG,
+            new StatisticsEvent([
+                'mall_id'     => \Yii::$app->mall->id,
+                'browse_type' => 0,
+                'user_id'     => \Yii::$app->user->id,
+                'user_ip'     => $_SERVER['REMOTE_ADDR']
+            ])
+        );
+
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
     }
 
 

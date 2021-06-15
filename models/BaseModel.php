@@ -26,6 +26,17 @@ class BaseModel extends \yii\base\Model
 
     public $result = [];
 
+    public $is_login     = 0;
+    public $login_uid    = 0;
+    public $base_mall_id = 0;
+    public $is_front     = 0; //是否前端调用
+
+    public function rules(){
+        return [
+            //[['is_login', 'login_uid', 'base_mall_id', 'is_front'], 'safe']
+        ];
+    }
+
     /**
      * 返回错误数据数组
      * @param array $model
@@ -91,7 +102,7 @@ class BaseModel extends \yii\base\Model
             $this->result = $this->responseErrorInfo($data);
         }
 
-        $this->result['city_data'] = ApiController::$cityData;
+        $this->result = array_merge($this->result, ApiController::$commonData);
 
         return $this->result;
     }

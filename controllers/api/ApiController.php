@@ -26,6 +26,7 @@ use app\models\DistrictData;
 use app\models\Formid;
 use app\models\Mall;
 use app\models\User;
+use app\models\UserInfo;
 use Exception;
 use yii\web\NotFoundHttpException;
 
@@ -39,7 +40,9 @@ class ApiController extends BaseController
      */
     private $user;
 
-    public static $cityData = [];
+    public static $wechatIsSubscribe = 0; //是否已关注微信
+
+    public static $commonData = [];
 
     public function beforeAction($action)
     {
@@ -49,7 +52,7 @@ class ApiController extends BaseController
     public function asJson($data)
     {
         if(is_array($data)){
-            $data['city_data'] = static::$cityData;
+            $data = array_merge($data, static::$commonData);
         }
         return parent::asJson($data);
     }
@@ -81,7 +84,8 @@ class ApiController extends BaseController
         \Yii::$app->user->enableAutoLogin = false;
         $this->enableCsrfValidation = false;
         $headers = \Yii::$app->request->headers;
-        $this->getParamsData()->setMall($headers)->setCity($headers)->login($headers)->saveFormIdList($headers)->bindParent($headers)->checkInviter();
+
+        $this->getParamsData()->setMall($headers)->setCity($headers)->login($headers)->wechatSubscribe()->saveFormIdList($headers)->bindParent($headers)->checkInviter();
 
     }
 
@@ -221,7 +225,49 @@ class ApiController extends BaseController
             $cityData['sel_city'] = $cityData['city'];
         }
 
-        static::$cityData = $cityData;
+        static::$commonData['city_data'] = $cityData;
+
+        return $this;
+    }
+
+    /**
+     * 微信关注
+     * @return $this
+     */
+    private function wechatSubscribe()
+    {
+        $wechatModel = \Yii::$app->wechat;
+
+        $cacheObject = \Yii::$app->getCache();
+
+        $cacheKey = "user_wechat_subscript:" . $this->user->id;
+
+        $isSubscribe = (int)$cacheObject->get($cacheKey);
+
+
+        if(($wechatModel->isWechat && $this->user)){
+
+            if(!$isSubscribe){
+                $userInfo = UserInfo::findOne([
+                    "user_id"  => $this->user->id,
+                    "platform" => "wechat"
+                ]);
+                if($userInfo){
+                    $info = $wechatModel->app->user->get($userInfo->openid);
+                    if(isset($info['subscribe']) && $info['subscribe'] == 1){ //
+                        $isSubscribe = 1;
+                    }else{ //未关注
+                        $isSubscribe = 0;
+                    }
+                    if($isSubscribe){
+                        $cacheObject->set($cacheKey, 1, 3600 * 2);
+                    }
+                }
+            }
+
+        }
+
+        static::$commonData['wechat_subscribe'] = $isSubscribe;
 
         return $this;
     }
@@ -287,6 +333,8 @@ class ApiController extends BaseController
             if (\Yii::$app->user->isGuest || \Yii::$app->user->id != $user->id) {
                 \Yii::$app->user->login($user);
             }
+
+
         } else {
             \Yii::$app->user->logout();
         }

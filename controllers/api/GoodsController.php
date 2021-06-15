@@ -9,13 +9,15 @@
  */
 namespace app\controllers\api;
 
+use app\core\ApiCode;
+use app\events\StatisticsEvent;
+use app\forms\api\goods\CacheGoodsDetailForm;
 use app\forms\api\goods\CommentForm;
-use app\forms\api\goods\GoodsForm;
 use app\forms\api\goods\GoodsListForm;
 use app\forms\api\goods\RecommendForm;
-use app\forms\api\poster\GoodsPosterForm;
 use app\forms\api\poster\PosterForm;
 use app\helpers\APICacheHelper;
+use app\models\StatisticsBrowseLog;
 
 class GoodsController extends ApiController
 {
@@ -28,13 +30,26 @@ class GoodsController extends ApiController
 //     *
     public function actionDetail()
     {
-        $detail = APICacheHelper::get(APICacheHelper::API_GOODS_DETAIL, function($helper){
-            $form = new GoodsForm();
-            $form->attributes =$this->requestData;
-            return $helper($form->getDetail());
-        });
+        $form = new CacheGoodsDetailForm();
+        $form->attributes = $this->requestData;
+        $form->user_id = !\Yii::$app->user->isGuest ? \Yii::$app->user->id : 0;
+        $form->mall_id = \Yii::$app->mall->id;
 
-        return $this->asJson($detail);
+        \Yii::$app->trigger(StatisticsBrowseLog::EVEN_STATISTICS_LOG,
+            new StatisticsEvent([
+                'mall_id'     => \Yii::$app->mall->id,
+                'browse_type' => 2,
+                'user_id'     => !\Yii::$app->user->isGuest ? \Yii::$app->user->id : 0,
+                'user_ip'     => $_SERVER['REMOTE_ADDR']
+            ])
+        );
+
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
     }
 
     /**
@@ -61,14 +76,17 @@ class GoodsController extends ApiController
      */
     public function actionRecommend()
     {
-        $recommand = APICacheHelper::get(APICacheHelper::API_GOODS_RRECOMMAND, function ($helper){
-            $form = new RecommendForm();
-            $form->attributes = $this->requestData;
-            $recommand = $form->getNewList();
-            return $helper($recommand);
-        });
+        $form = new RecommendForm();
+        $form->attributes = $this->requestData;
+        $form->is_login = !\Yii::$app->user->isGuest;
+        $form->login_uid = $form->is_login ? \Yii::$app->user->id : 0;
 
-        return $this->asJson($recommand);
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
     }
 
     /**
@@ -80,13 +98,17 @@ class GoodsController extends ApiController
      */
     public function actionList()
     {
-        $list = APICacheHelper::get(APICacheHelper::API_GOODS_LIST, function($helper){
-            $form = new GoodsListForm();
-            $form->attributes = $this->requestData;
-            return $helper($form->getList());
-        });
+        $form = new GoodsListForm();
+        $form->attributes = $this->requestData;
+        $form->is_login   = !\Yii::$app->user->isGuest;
+        $form->login_uid  = $form->is_login ? \Yii::$app->user->id : 0;
 
-        return $this->asJson($list);
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
     }
 
     /**

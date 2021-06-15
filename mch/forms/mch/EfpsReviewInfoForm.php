@@ -102,8 +102,31 @@ class EfpsReviewInfoForm extends BaseModel {
             ];
         }
 
+        $validAttributes = [
+            "mch_id","status","register_type","acqMerId","merchantName","acceptOrder",
+            "openAccount","paper_merchantType","paper_businessLicenseCode",
+            "paper_businessLicenseName","paper_businessLicensePhoto",
+            "paper_businessLicenseTo","paper_shortName","paper_isCc",
+            "paper_lawyerName","paper_businessScope","paper_registerAddress",
+            "paper_organizationCode","paper_organizationCodePhoto",
+            "paper_organizationCodeFrom","paper_organizationCodeTo",
+            "paper_businessAddress","paper_province","paper_city","paper_mcc",
+            "paper_unionShortName","paper_storeHeadPhoto","paper_storeHallPhoto",
+            "paper_lawyerCertType","paper_lawyerCertNo","paper_lawyerCertPhotoFront",
+            "paper_lawyerCertPhotoBack","paper_certificateName","paper_certificateTo",
+            "paper_contactPerson","paper_contactPhone","paper_serviceTel",
+            "paper_email","paper_licenceAccount","paper_licenceAccountNo",
+            "paper_licenceOpenBank","paper_licenceOpenSubBank",
+            "paper_openingLicenseAccountPhoto","paper_settleAccountType",
+            "paper_settleAccountNo","paper_settleAccount","paper_settleTarget",
+            "paper_settleAttachment","paper_openBank","paper_openSubBank",
+            "paper_openBankCode","paper_businessCode","paper_settleCycle",
+            "paper_stage_feeRate","paper_stage_feePer","paper_stage_amountFrom"
+        ];
+
         try {
             $model = EfpsMchReviewInfo::findOne(["mch_id" => $this->mch_id]);
+
             if(!$model){
                 $model = new EfpsMchReviewInfo();
                 $model->mch_id     = $this->mch_id;
@@ -112,9 +135,9 @@ class EfpsReviewInfoForm extends BaseModel {
             }
 
             foreach($this->attributes as $field => $value){
-                if(!is_numeric($value) && empty($value))
+                if((!is_numeric($value) && empty($value)) || !in_array($field, $validAttributes))
                     continue;
-                $model->$field  = $value;
+                $model->$field = $value;
             }
             if(!$model->save()){
                 return [

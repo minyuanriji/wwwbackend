@@ -1,18 +1,9 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-04-27
- * Time: 15:06
- */
-
 namespace app\forms\api;
+
 
 use app\core\ApiCode;
 use app\core\BasePagination;
-use app\events\StatisticsEvent;
 use app\forms\api\goods\ApiGoods;
 use app\forms\common\goods\GoodsMember;
 use app\helpers\SerializeHelper;
@@ -21,27 +12,25 @@ use app\models\BaseModel;
 use app\models\Goods;
 use app\models\GoodsWarehouse;
 use app\models\HomePage;
-use app\models\MallSetting;
-use app\models\StatisticsBrowseLog;
 
-class IndexForm extends BaseModel
-{
-    public $page_id;
-    public $is_call_cat = 0;
-    public function rules()
-    {
+class CacheIndexForm extends BaseModel implements ICacheForm{
+
+    public $mall_id;
+
+    public function rules(){
         return [
-            [['page_id'], 'integer']
+            [['mall_id'], 'integer']
         ];
     }
 
-    public function getIndex()
-    {
-        $homePgae = HomePage::findOne(['mall_id' => \Yii::$app->mall->id, 'is_delete' => 0]);
+    public function getSourceDataForm(){
+
+        $homePgae = HomePage::findOne(['mall_id' => $this->mall_id, 'is_delete' => 0]);
 
         if (!$homePgae) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL, '请在后台装修首页');
         }
+
         $component_list = SerializeHelper::decode($homePgae->page_data);
         foreach ($component_list as $i => $component) {
             if ($component['id'] == 'label-bar') {
@@ -50,7 +39,7 @@ class IndexForm extends BaseModel
                     $query = Goods::find()
                         ->alias('g')
                         ->with(['goodsWarehouse', 'attr'])
-                        ->where(['g.is_delete' => 0, 'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => \Yii::$app->mall->id,])
+                        ->where(['g.is_delete' => 0, 'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => $this->mall_id,])
                         ->leftJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
 
                     if ($label['title']) {
@@ -119,13 +108,16 @@ class IndexForm extends BaseModel
         $data["app_share_title"] = $app_share_title;
         $data["app_share_pic"] = $app_share_pic;
         $data["app_share_desc"] = $app_share_desc;
-        \Yii::$app->trigger(StatisticsBrowseLog::EVEN_STATISTICS_LOG, new StatisticsEvent(['mall_id'=>\Yii::$app->mall->id,'browse_type'=>0,'user_id'=>\Yii::$app->user->id,'user_ip'=>$_SERVER['REMOTE_ADDR']]) );
-        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '请求成功', ['page_data' => $component_list,"share_data" => $data]);
+
+        $sourceData = $this->returnApiResultData(ApiCode::CODE_SUCCESS, '请求成功', ['page_data' => $component_list,"share_data" => $data]);
+
+        return new APICacheDataForm([
+            "sourceData" => $sourceData
+        ]);
     }
 
-
-    public function getGoodsDetail($id)
-    {
-
+    public function getCacheKey(){
+        $keys[] = (int)$this->mall_id;
+        return $keys;
     }
 }

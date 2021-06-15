@@ -11,8 +11,11 @@
 namespace app\controllers\api;
 
 
+use app\core\ApiCode;
+use app\events\StatisticsEvent;
 use app\forms\api\cat\CatListForm;
 use app\helpers\APICacheHelper;
+use app\models\StatisticsBrowseLog;
 
 class CatController extends ApiController
 {
@@ -24,12 +27,24 @@ class CatController extends ApiController
      */
     public function actionList()
     {
-        $search = APICacheHelper::get(APICacheHelper::API_CAT_LIST, function($helper){
-            $form = new CatListForm();
-            $form->attributes = $this->requestData;
-            return $helper($form->search());
-        });
+        $form = new CatListForm();
+        $form->attributes = $this->requestData;
+        $form->mall_id = \Yii::$app->mall->id;
 
-        return $search;
+        \Yii::$app->trigger(StatisticsBrowseLog::EVEN_STATISTICS_LOG,
+            new StatisticsEvent([
+                'mall_id'     => \Yii::$app->mall->id,
+                'browse_type' => 1,
+                'user_id'     => \Yii::$app->user->id,
+                'user_ip'     => $_SERVER['REMOTE_ADDR']
+            ])
+        );
+
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
     }
 }

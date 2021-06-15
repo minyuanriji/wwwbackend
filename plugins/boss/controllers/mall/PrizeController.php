@@ -84,6 +84,19 @@ class PrizeController extends Controller
     }
 
     /**
+     * @Note::奖金池发放
+     * @return \yii\web\Response
+     */
+    public function actionDistribution()
+    {
+        if (\Yii::$app->request->isPost) {
+            $form = new BossAwardsListForm();
+            $id = \Yii::$app->request->post('id');
+            return $this->asJson($form->distribution($id));
+        }
+    }
+
+    /**
      * @Note:奖池充值
      * @return \yii\web\Response
      */

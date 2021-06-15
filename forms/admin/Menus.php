@@ -577,6 +577,10 @@ class Menus
                         'name' => '核销记录',
                         'route' => 'mall/order-clerk/store',
                         'action' => [
+                            [
+                                'name' => '补货管理',
+                                'route' => 'mall/order-clerk/index',
+                            ]
                         ]
                     ],
                 ],

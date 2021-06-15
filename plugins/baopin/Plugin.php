@@ -38,7 +38,16 @@ class Plugin extends \app\plugins\Plugin{
                 'route' => 'plugin/baopin/mall/store/list',
                 'icon' => 'el-icon-setting',
                 'action' => [
-
+                    [
+                        'name' => '爆品管理',
+                        'route' => 'plugin/baopin/mall/store/goods-list',
+                        'action' => [
+                            [
+                                'name' => '核销记录',
+                                'route' => 'plugin/baopin/mall/store/clerk-logs-list',
+                            ]
+                        ]
+                    ]
                 ]
             ],
         ];

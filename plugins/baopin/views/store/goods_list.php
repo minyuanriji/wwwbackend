@@ -63,11 +63,18 @@
                     <el-table-column label="操作">
                         <template slot-scope="scope">
                             <el-button type="text" size="mini" circle style="margin-left: 10px;margin-top: 10px"
-                                       @click.native="editLink(scope.row)">
-                                <el-tooltip class="item" effect="dark" content="管理" placement="top">
+                                       @click.native="clerkLogsLink(scope.row)">
+                                <el-tooltip class="item" effect="dark" content="核销记录" placement="top">
+                                    <img src="statics/img/mall/icon-show.png" alt="">
+                                </el-tooltip>
+                            </el-button>
+                            <el-button type="text" size="mini" circle style="margin-left: 10px;margin-top: 10px"
+                                       @click.native="deleteGoods(scope.row)">
+                                <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                     <img src="statics/img/mall/del.png" alt="">
                                 </el-tooltip>
                             </el-button>
+
                         </template>
                     </el-table-column>
                 </el-table>
@@ -120,8 +127,48 @@
         },
         methods: {
 
+            clerkLogsLink(row){
+                navigateTo({
+                    r: 'plugin/baopin/mall/store/clerk-logs-list',
+                    goods_id: row.id,
+                    store_id: getQuery("store_id")
+                })
+            },
+
             editStock(row){
                 this.edit_id = row.id;
+            },
+
+            deleteGoods(row){
+                var self = this;
+                this.$confirm('你确定要删除商户爆品吗？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.loading = true;
+                    request({
+                        params: {
+                            r: "plugin/baopin/mall/store/delete-goods"
+                        },
+                        method: 'post',
+                        data: {
+                            goods_id: row.id,
+                            store_id: getQuery("store_id"),
+                        }
+                    }).then(e => {
+                        self.loading = false;
+                        if (e.data.code === 0) {
+                            self.loadData();
+                            self.$message.success(e.data.msg);
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        self.loading = false;
+                        self.$message.error("request fail");
+                    });
+                });
             },
 
             saveStore(row){
@@ -133,11 +180,14 @@
                 var self = this;
                 request({
                     params: {
-                        r: 'plugin/baopin/mall/store/save-stock',
+                        r: 'plugin/baopin/mall/store/save-stock'
+                    },
+                    data: {
                         goods_id: row.id,
                         store_id: getQuery("store_id"),
                         stock_num: row.stock_num
-                    }
+                    },
+                    method: 'post',
                 }).then(e => {
                     self.loading = false;
                     if (e.data.code == 0) {

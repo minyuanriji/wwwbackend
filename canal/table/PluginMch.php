@@ -18,7 +18,6 @@ class PluginMch{
             $update = $mixData['update'];
             if(isset($update['review_status'])){
                 if($update['review_status'] == Mch::REVIEW_STATUS_CHECKED){
-
                     $mch = Mch::find()->where($condition)->one();
                     $mch && MchApplyPassedNotification::send($mch);
 

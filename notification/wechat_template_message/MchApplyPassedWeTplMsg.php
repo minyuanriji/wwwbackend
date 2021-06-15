@@ -34,7 +34,8 @@ class MchApplyPassedWeTplMsg extends WechatTemplateMessage
                 'remark'   => '如有疑问请联系020-31923526'
             ],
         ]);
-
+        print_r($res);
+        echo "\n";
         return $res;
     }
 }

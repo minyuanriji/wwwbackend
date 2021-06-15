@@ -25,7 +25,13 @@ class CanalController extends Controller
 
             $client->connect("81.71.7.222", 11111);
             $client->checkValid();
-            $client->subscribe("1001", "example", "dev_myrj.*");
+
+            if(defined("ENV") && ENV == "pro"){
+                $client->subscribe("1001", "example", "myrj.*");
+            }else{
+                $client->subscribe("1001", "example", "dev_myrj.*");
+            }
+
             # $client->subscribe("1001", "example", "db_name.tb_name"); # 设置过滤
 
             while (true) {

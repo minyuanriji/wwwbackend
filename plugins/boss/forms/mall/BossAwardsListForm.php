@@ -37,12 +37,16 @@ class BossAwardsListForm extends BaseModel
     }
 
     //查看
-    public function search($select = '*')
+    public function search($where = [],$select = '*')
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-        $list = BossAwards::find()->select($select)->where([
+        $query = BossAwards::find()->select($select);
+        if ($where) {
+            $query->andWhere($where);
+        }
+        $list = $query->andWhere([
             'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0
         ])->keyword($this->keyword, ['or',['like', 'name', $this->keyword],['like', 'award_sn', $this->keyword]])
             ->page($pagination, 20, $this->page)->orderBy(['id' => SORT_DESC])->all();

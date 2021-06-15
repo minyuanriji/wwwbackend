@@ -19,7 +19,7 @@ class BossBonusController extends BaseCommandController
         echo date("Y-m-d H:i:s") . " 分红开始...\n";
 
         $this->bonus();
-die;
+
         while(true){
             $this->sleep(1);
             try {

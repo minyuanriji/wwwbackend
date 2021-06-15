@@ -103,7 +103,7 @@ class EfpsReviewInfoForm extends BaseModel {
         }
 
         $validAttributes = [
-            "mch_id","status","register_type","acqMerId","merchantName","acceptOrder",
+            "mch_id","register_type","acqMerId","merchantName","acceptOrder",
             "openAccount","paper_merchantType","paper_businessLicenseCode",
             "paper_businessLicenseName","paper_businessLicensePhoto",
             "paper_businessLicenseTo","paper_shortName","paper_isCc",

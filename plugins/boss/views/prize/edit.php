@@ -60,10 +60,15 @@
                         </el-form-item>
 
                         <el-form-item label="等级" prop="money">
-                            <el-select size="small" v-model="ruleForm.level_id" @change='toSearch' class="select">
+                            <!--<el-select size="small" v-model="ruleForm.level_id" @change='toSearch' class="select">
                                 <el-option :key="index" :label="item.name" :value="item.id"
                                            v-for="(item, index) in bossLevelList"></el-option>
-                            </el-select>
+                            </el-select>-->
+
+                            <el-checkbox :checked="item.checked ? true : false"  v-for="item in bossLevelList" :label="item.name"
+                                         :key="item.id" @change="pickerChange(item)">
+                            </el-checkbox>
+
                         </el-form-item>
 
                     </el-col>
@@ -88,7 +93,6 @@
                     period: 1,//结算周期时间
                     period_unit: '',//结算周期类型
                     automatic_audit: 0,//是否自动审核
-                    level_id: '',//等级ID
                 },
                 rules: {
                     name: [
@@ -105,19 +109,36 @@
                     ],
                 },
                 bossLevelList : [],
+                checked : false,
+                add_level_id : [],
             };
-        },
-        created () {
-            this.getLevelList();
         },
         mounted() {
             if (getQuery('id')) {
                 this.loadData();
             }
+            setTimeout(()=>{
+                this.getLevelList();
+            },500);
         },
         methods: {
             close(e) {
                 this.visible = false;
+            },
+            pickerChange (item) {
+                if (item.checked) {
+                    item.checked = false;
+                    if (this.add_level_id) {
+                        for (var i = 0; i < this.add_level_id.length; i++) {
+                            if (this.add_level_id[i] == item.id) {
+                                this.add_level_id.splice([i], 1);
+                            }
+                        }
+                    }
+                } else {
+                    item.checked = true;
+                    this.add_level_id.push(item.id);
+                }
             },
             submitForm(formName) {
                 console.log(formName);
@@ -156,7 +177,7 @@
                                 status: self.ruleForm.status,
                                 rate: self.ruleForm.rate,
                                 automatic_audit: self.ruleForm.automatic_audit,
-                                level_id: self.ruleForm.level_id,
+                                level_ids: self.add_level_id,
                             }
                         }).then(e => {
                             self.btnLoading = false;
@@ -164,9 +185,6 @@
                                 self.$message.success(e.data.msg);
                             } else {
                                 self.$message.error(e.data.msg);
-                                navigateTo({
-                                    r: 'plugin/boss/mall/prize/index'
-                                })
                             }
                             navigateTo({
                                 r: 'plugin/boss/mall/prize/index'
@@ -198,9 +216,6 @@
                     } else {
                         this.$message.error(e.data.msg);
                     }
-
-                    console.log(this.ruleForm);
-
                 }).catch(e => {
                     console.log(e);
                 });
@@ -214,6 +229,20 @@
                     method: 'get',
                 }).then(e => {
                     self.bossLevelList = e.data.data.list;
+                    for (var i = 0; i< self.bossLevelList.length; i++) {
+                        self.bossLevelList[i].checked = false;
+                        if (self.ruleForm.level_id.length > 0) {
+                            for (var m = 0; m < self.ruleForm.level_id.length; m++) {
+                                console.log(self.ruleForm.level_id[m]);
+                                if (self.bossLevelList[i].id == self.ruleForm.level_id[m]) {
+                                    self.bossLevelList[i].checked = true;
+                                    self.add_level_id.push(self.bossLevelList[i].id);
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                    console.log(self.bossLevelList);
                 }).catch(e => {
                     console.log(e);
                 });

@@ -85,6 +85,14 @@
                     </template>
                 </el-table-column>
 
+                <el-table-column label="包含等级名称">
+                    <template slot-scope="scope">
+                        <com-ellipsis :line="1" v-if="scope.row.level_name" v-for="item in scope.row.level_name">
+                            <div>{{ item.name }}</div>
+                        </com-ellipsis>
+                    </template>
+                </el-table-column>
+
                 <el-table-column label="创建时间" width="170">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">{{scope.row.created_at}}</com-ellipsis>
@@ -111,6 +119,12 @@
                         <el-button circle size="mini" type="text" @click="prizeDelete(scope.row, scope.$index)">
                             <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                 <img src="statics/img/mall/del.png" alt="">
+                            </el-tooltip>
+                        </el-button>
+
+                        <el-button circle size="mini" type="text" @click="startDistribution(scope.row, scope.$index)">
+                            <el-tooltip class="item" effect="dark" content="开始发放" placement="top">
+                                <img src="statics/img/mall/start-distribution.png" alt="">
                             </el-tooltip>
                         </el-button>
 
@@ -178,10 +192,7 @@
             <el-table-column align='center' type="selection" width="60"></el-table-column>
             <el-table-column align="center" prop="id" label="id"></el-table-column>
             <el-table-column align="center" prop="user_id" label="用户ID"></el-table-column>
-<<<<<<< HEAD
-=======
             <el-table-column align="center" prop="level_name" label="等级名称"></el-table-column>
->>>>>>> fe71e631e0b324baa9458bcf770f0324b6671ed2
             <el-table-column align="center" prop="nickname" label="用户名"></el-table-column>
             <el-table-column align="center" label="操作">
                 <template slot-scope="scope">
@@ -563,6 +574,38 @@
                     });
                 }).catch(() => {
                     self.$message.info('已取消删除')
+                });
+            },
+
+            //开始发放
+            startDistribution(row, index) {
+                let self = this;
+                self.$confirm('确定开始发放？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.listLoading = true;
+                    request({
+                        params: {
+                            r: 'plugin/boss/mall/prize/distribution',
+                        },
+                        method: 'post',
+                        data: {
+                            id: row.id,
+                        }
+                    }).then(e => {
+                        self.listLoading = false;
+                        if (e.data.code === 0) {
+                            self.$message.success(e.data.msg);
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                    });
+                }).catch(() => {
+                    self.$message.info('已取消发放')
                 });
             },
         }

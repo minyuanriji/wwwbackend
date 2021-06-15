@@ -109,10 +109,11 @@ die;
 
                 //查询当前奖池需要发放人员
                 $boss_data = [];
-                if ($awards_value['level_id']) {
+                if ($awards_value['level_id'] && is_string($awards_value['level_id'])) {
+                    $level_ids = json_decode($awards_value['level_id'],true);
                     $boss_data = Boss::find()
                         ->select('id,user_id,level_id')
-                        ->andWhere(['level_id' => $awards_value['level_id'], 'is_delete' => 0])
+                        ->andWhere(['and', ['in','level_id',$level_ids], ['is_delete' => 0]])
                         ->asArray()
                         ->all();
                 }

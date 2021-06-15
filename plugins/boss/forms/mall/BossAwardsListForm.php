@@ -3,11 +3,15 @@
 namespace app\plugins\boss\forms\mall;
 
 use app\core\ApiCode;
+use app\forms\common\UserIncomeForm;
 use app\models\BaseModel;
+use app\models\User;
 use app\plugins\boss\models\Boss;
+use app\plugins\boss\models\BossAwardEachLog;
 use app\plugins\boss\models\BossAwardMember;
 use app\plugins\boss\models\BossAwardRechargeLog;
 use app\plugins\boss\models\BossAwards;
+use app\plugins\boss\models\BossLevel;
 
 class BossAwardsListForm extends BaseModel
 {
@@ -37,7 +41,7 @@ class BossAwardsListForm extends BaseModel
     }
 
     //查看
-    public function search($where = [],$select = '*')
+    public function search($where = [],$select = '*', $order = 'id desc')
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
@@ -49,7 +53,7 @@ class BossAwardsListForm extends BaseModel
         $list = $query->andWhere([
             'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0
         ])->keyword($this->keyword, ['or',['like', 'name', $this->keyword],['like', 'award_sn', $this->keyword]])
-            ->page($pagination, 20, $this->page)->orderBy(['id' => SORT_DESC])->all();
+            ->page($pagination, 20, $this->page)->orderBy($order)->all();
 
         $new_value = [];
         $new_list = [];
@@ -64,11 +68,26 @@ class BossAwardsListForm extends BaseModel
                 $new_value['period_unit'] = $this->period_type[$value->period_unit];
                 $new_value['money'] = $value->money;
                 $new_value['rate'] = $value->rate;
+                $new_value['level_id'] = ($value->level_id && is_string($value->level_id)) ? json_decode($value->level_id,true) : [];
+                if ($new_value['level_id']) {
+                    $boss_data = BossLevel::find()
+                        ->select('id,name')
+                        ->andWhere(['and', ['in','id',$new_value['level_id']], ['is_delete' => 0]])
+                        ->asArray()
+                        ->all();
+                    if ($boss_data) {
+                        $new_value['level_name'] = $boss_data;
+                    } else {
+                        $new_value['level_name'] = [];
+                    }
+                } else {
+                    $new_value['level_name'] = [];
+                }
                 $new_value['created_at'] = date('Y-m-d H:i:s', $value->created_at);
+                unset($new_value['level_id']);
                 $new_list[] = $new_value;
             }
         }
-        unset($new_value);
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '',
@@ -88,19 +107,18 @@ class BossAwardsListForm extends BaseModel
         try {
             if (isset($post_data['id']) && $post_data['id']) {
                 $level = BossAwards::findOne(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'id' => $post_data['id']]);
-                if (!$level) {
+                if (!$level)
                     return [
                         'code' => ApiCode::CODE_FAIL,
                         'msg' => '奖池不存在'
                     ];
-                } else {
-                    if ($level->status == 1) {
-                        return [
-                            'code' => ApiCode::CODE_FAIL,
-                            'msg' => '请先关闭奖池在修改'
-                        ];
-                    }
-                }
+
+                if ($level->status == 1)
+                    return [
+                        'code' => ApiCode::CODE_FAIL,
+                        'msg' => '请先关闭奖池在修改'
+                    ];
+
             } else {
                 $new_max_id = sprintf("%04d", 1);
                 $max_id = BossAwards::find()->select('id')->orderBy(['id' => SORT_DESC])->one();
@@ -116,13 +134,15 @@ class BossAwardsListForm extends BaseModel
                 $level->mall_id = \Yii::$app->mall->id;
                 $level->award_sn = 'BSH' . $top_sn;
             }
+            if (isset($post_data['level_ids'])) {
+                $level->level_id = json_encode($post_data['level_ids']);
+            }
             $level->name = $post_data['name'];
             $level->status = $post_data['status'];
             $level->period = $post_data['period'];
             $level->period_unit = $post_data['period_unit'];
             $level->rate = $post_data['rate'];
             $level->automatic_audit = $post_data['automatic_audit'];
-            $level->level_id = $post_data['level_id'];
             if (!$level->save()) {
                 throw new \Exception($this->responseErrorMsg($level));
             } else {
@@ -145,6 +165,7 @@ class BossAwardsListForm extends BaseModel
         $level = BossAwards::findOne(['id' => $id, 'is_delete' => 0]);
         if ($level) {
             $level->period_unit = array_search($level->period_unit,$this->period_type_change);
+            $level->level_id = json_decode($level->level_id, true);
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '',
@@ -383,4 +404,204 @@ class BossAwardsListForm extends BaseModel
         return $second;
     }
 
+    //发放
+    public function distribution ($id)
+    {
+        try {
+            //查看奖金池
+            $query = BossAwards::find();
+            $query->andWhere([
+                "AND",
+                ["id" => $id],
+                ["is_delete" => 0],
+            ]);
+            $boss_awards_data = $query->asArray()->one();
+            if(!$boss_awards_data){
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '该奖金池不存在，请联系技术人员！'
+                ];
+            }
+            if(!$boss_awards_data['status']){
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '奖金池未开启，请先开启。'
+                ];
+            }
+
+            $each_log_form = new BossAwardsEachLogForm();
+            $sent_log_form = new BossAwardsSentLogForm();
+            $boss_awards_model = new BossAwards();
+            $time = time();
+            $each_log_data = [];
+
+            if ($boss_awards_data['money'] <= 0) {
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => $boss_awards_data['name'] . "奖金池金额不足：" . date("Y-m-d H:i:s", $time)
+                ];
+            }
+
+            //查询当前奖池需要发放人员
+            $boss_data = [];
+            if ($boss_awards_data['level_id'] && is_string($boss_awards_data['level_id'])) {
+                $level_ids = json_decode($boss_awards_data['level_id'],true);
+                $boss_data = Boss::find()
+                    ->select('id,user_id,level_id')
+                    ->andWhere(['and', ['in','level_id',$level_ids], ['is_delete' => 0]])
+                    ->asArray()
+                    ->all();
+            }
+
+            $awards_member_data = BossAwardMember::find()
+                ->select('user_id')
+                ->andWhere(['award_id' => $boss_awards_data['id']])
+                ->asArray()
+                ->all();
+
+            if (!$awards_member_data && !$boss_data) {
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => $boss_awards_data['name'] . "奖金池暂无分红股东" . date("Y-m-d H:i:s", $time)
+                ];
+            }
+
+            $awards_member_data = array_merge_recursive($awards_member_data, $boss_data);
+
+            $user_ids = array_unique(array_column($awards_member_data, 'user_id'));
+
+            $price = $boss_awards_data['money'] * ($boss_awards_data['rate'] * 0.01);//计算分红金额
+
+            $count_user = count($user_ids);//分红总人数
+
+            $per_person = $price / $count_user;//每人分的钱
+
+            $trans = \Yii::$app->db->beginTransaction();
+
+            $next_time = date('Ymd', $boss_awards_data['next_send_time']);
+
+            try {
+                //查看是否是自动分红
+                if ($boss_awards_data['automatic_audit']) {
+                    //修改奖池金额
+                    $award_res = $boss_awards_model->updateAll(['money' => $boss_awards_data['money'] - $price],['id' => $boss_awards_data['id']]);
+                    if (!$award_res) {
+                        $trans->rollBack();
+                        return [
+                            'code' => ApiCode::CODE_FAIL,
+                            'msg' => $boss_awards_data['name'] . "修改奖池金额失败" . date("Y-m-d H:i:s", $time)
+                        ];
+                    }
+
+                    $each_log_data['actual_money'] = $price;
+                    $each_log_data['money_after'] = $boss_awards_data['money'] - $price;
+                } else {
+                    $each_log_data['actual_money'] = 0;
+                    $each_log_data['money_after'] = $boss_awards_data['money'];
+                }
+                //添加每期奖池记录
+                $each_log_data = array_merge($each_log_data,[
+                    "awards_cycle"      => $boss_awards_data['name'] . "第" . $next_time . '期',
+                    "awards_id"         => $boss_awards_data['id'],
+                    "money"             => $price,
+                    "people_num"        => $count_user,
+                    "money_front"       => $boss_awards_data['money'],
+                    "rate"              => $boss_awards_data['rate'],
+                    "sent_time"         => $next_time,
+                ]);
+                $each_res = $each_log_form->save($each_log_data);
+                if (!isset($each_res['code']) || $each_res['code']) {
+                    $trans->rollBack();
+                    return [
+                        'code' => ApiCode::CODE_FAIL,
+                        'msg' => $boss_awards_data['name'] . "奖金池添加每期记录失败" . date("Y-m-d H:i:s", $time)
+                    ];
+                }
+
+                //添加每人每期发放记录
+                foreach ($user_ids as $sent_key => $sent_val)
+                {
+                    $sent_log_data = [
+                        "each_id"       => $each_res['data'],
+                        "user_id"       => $sent_val,
+                        "money"         => $per_person,
+                        "award_set"     => json_encode([
+                            'money'         => $price,
+                            'rate'          => $boss_awards_data['rate'],
+                            'people_number' => $count_user,
+                        ]),
+                        "send_date"     => $next_time,
+                    ];
+                    if ($boss_awards_data['automatic_audit']) {
+                        $sent_log_data['status'] = 1;
+                        $sent_log_data['payment_time'] = $time;
+                    }
+                    $sent_res = $sent_log_form->save($sent_log_data);
+
+                    if (!isset($sent_res['code']) || $sent_res['code']) {
+                        $trans->rollBack();
+                        return [
+                            'code' => ApiCode::CODE_FAIL,
+                            'msg' => $boss_awards_data['name'] . "奖金池". $sent_val ."用户添加记录失败" . date("Y-m-d H:i:s", $time)
+                        ];
+                    }
+
+                    if ($boss_awards_data['automatic_audit']) {
+                        //修改用户金额
+                        $user = User::findOne((int)$sent_val);
+                        if (!$user || $user->is_delete) {
+                            $trans->rollBack();
+                            return [
+                                'code' => ApiCode::CODE_FAIL,
+                                'msg' => $boss_awards_data['name'] . "奖金池". $sent_val ."用户添加记录失败" . date("Y-m-d H:i:s", $time)
+                            ];
+                        }
+                        UserIncomeForm::bossAdd($user, $per_person, $sent_res['data'],'来自股东分红' . $boss_awards_data['name'] . "第" . $next_time . '期');
+
+                        //修改股东总分红记录
+                        $boss = Boss::findOne(['user_id' => $sent_val, 'is_delete' => 0]);
+                        if(!$boss){
+                            $trans->rollBack();
+                            return [
+                                'code' => ApiCode::CODE_FAIL,
+                                'msg' => $boss_awards_data['name'] . "股东不存在"
+                            ];
+                        }
+                        $boss->total_price = $boss->total_price + $per_person;
+                        if (!$boss->save()) {
+                            $trans->rollBack();
+                            return [
+                                'code' => ApiCode::CODE_FAIL,
+                                'msg' => $boss_awards_data['name'] . "奖金池" . $sent_val . "修改股东总分红记录失败"
+                            ];
+                        }
+                    }
+                }
+
+                //修改当前奖池日期
+                BossAwards::updateAll([
+                    'last_send_time' => $boss_awards_data['next_send_time'],
+                    'next_send_time' => $boss_awards_data['next_send_time'] + ($boss_awards_data['period'] * $this->computingTime($boss_awards_data['period_unit']))
+                ],
+                    'id = ' . $boss_awards_data['id']);
+
+            } catch (\Exception $e){
+                $trans->rollBack();
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => $e->getMessage()
+                ];
+            }
+            $trans->commit();
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => "成功"
+            ];
+        } catch (\Exception $e){
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => $e->getMessage()
+            ];
+        }
+    }
 }

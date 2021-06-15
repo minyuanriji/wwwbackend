@@ -169,7 +169,8 @@ class CommissionController extends BaseCommandController{
      * 二维码收款订单，新增分佣记录----店铺二维码收款上级推荐人分佣
      * @return boolean
      */
-    private function storeOrderNew(){
+    private function storeOrderNew ()
+    {
         $query = MchCheckoutOrder::find()->alias("mco");
         $query->innerJoin("{{%store}} s", "s.id=mco.store_id");
         $query->innerJoin("{{%plugin_mch}} m", "m.id=s.mch_id");
@@ -184,20 +185,20 @@ class CommissionController extends BaseCommandController{
         if(!$checkoutOrders){
             return false;
         }
-
-        foreach($checkoutOrders as $checkoutOrder)
+        foreach ($checkoutOrders as $checkoutOrder)
         {
             try {
                 //获取店铺用户信息及上级用户
                 $user = User::findOne($checkoutOrder['user_id']);
-                if(!$user){
+                if (!$user)
                     throw new \Exception("商铺用户[ID:".($user ? $user->id : 0)."]不存在");
-                }
 
                 $parent_user = User::findOne($user->parent_id);
-                if(!$parent_user){
+                if (!$parent_user)
                     throw new \Exception("商铺上级用户[ID:".($parent_user ? $parent_user->id : 0)."]不存在");
-                }
+
+                if ($parent_user->role_type == 'user')
+                    throw new \Exception("普通用户不分佣");
 
                 //获取当前店铺分佣规则
                 $query = CommissionRules::find()->alias("cr");

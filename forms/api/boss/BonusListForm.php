@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\boss\forms\mall\BossAwardsListForm;
 use app\plugins\boss\models\Boss;
+use app\plugins\boss\models\BossAwardRechargeLog;
 use app\plugins\boss\models\BossAwardSentLog;
 
 class BonusListForm extends BaseModel
@@ -92,7 +93,15 @@ class BonusListForm extends BaseModel
                 $return_data['bonus_log'] = [];
                 $return_data['user_bonus'] = [];
             }
-            
+
+            $return_data['money_count'] = BossAwardRechargeLog::find()
+                                            ->andWhere([
+                                                'and',
+                                                ['mall_id' => \Yii::$app->mall->id],
+                                                ['>','money',0]
+                                            ])
+                                            ->sum('money');
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '',

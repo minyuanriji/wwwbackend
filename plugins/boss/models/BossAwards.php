@@ -42,8 +42,8 @@ class BossAwards extends BaseActiveRecord
     {
         return [
             [['mall_id'], 'required'],
-            [['mall_id','created_at', 'updated_at', 'is_delete','status','deleted_at','period','automatic_audit','level_id'], 'integer'],
-            [['award_sn','period_unit'], 'string'],
+            [['mall_id','created_at', 'updated_at', 'is_delete','status','deleted_at','period','automatic_audit'], 'integer'],
+            [['award_sn','period_unit','level_id'], 'string'],
             [['money'], 'number'],
             [['name'], 'string', 'max' => 45],
         ];

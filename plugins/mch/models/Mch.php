@@ -28,6 +28,9 @@ use Yii;
  * @property string $account_money 账户余额
  * @property int $sort 店铺排序|升序
  * @property int $form_data 自定义表单
+ * @property int $is_special 是否特殊申请折扣 默认：0  0否 1是
+ * @property int $special_rate 特殊折扣
+ * @property int $special_rate_remark 特殊折扣申请说明
  * @property string $created_at
  * @property string $updated_at
  * @property string $deleted_at
@@ -59,7 +62,7 @@ class Mch extends BaseActiveRecord
         return [
             [['mall_id', 'user_id', 'mch_common_cat_id', 'created_at', 'updated_at', 'deleted_at'], 'required'],
             [['mall_id', 'user_id', 'status', 'is_recommend', 'review_status', 'mch_common_cat_id', 'transfer_rate',
-                'sort', 'is_delete', 'distribution_detail_set', 'distribution_share_type'], 'integer'],
+                'sort', 'is_delete', 'distribution_detail_set', 'distribution_share_type','is_special','special_rate'], 'integer'],
             [['review_time', 'created_at', 'updated_at', 'deleted_at', 'form_data', 'withdraw_pwd'], 'safe'],
             [['account_money', 'integral_fee_rate'], 'number'],
             [['review_remark', 'mobile'], 'string', 'max' => 255],
@@ -93,6 +96,9 @@ class Mch extends BaseActiveRecord
             'updated_at' => 'Updated At',
             'deleted_at' => 'Deleted At',
             'is_delete' => 'Is Delete',
+            'is_special' => 'Is Special',
+            'special_rate' => '特殊折扣',
+            'special_rate_remark' => '特殊折扣申请说明',
         ];
     }
 

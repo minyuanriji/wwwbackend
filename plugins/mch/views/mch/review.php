@@ -99,6 +99,7 @@
                 <el-tab-pane label="待审核" name="first"></el-tab-pane>
                 <el-tab-pane label="通过" name="second"></el-tab-pane>
                 <el-tab-pane label="未通过" name="third"></el-tab-pane>
+                <el-tab-pane label="特殊折扣申请" name="four"></el-tab-pane>
             </el-tabs>
             <el-table
                     v-loading="listLoading"
@@ -151,6 +152,13 @@
                         </div>
                     </template>
                 </el-table-column>
+                <el-table-column label="特殊申请折扣" width='200' v-if="is_special == '1'">
+                    <template slot-scope="scope">
+                        <div>折扣：{{scope.row.special_rate}}%</div>
+                        <div>说明：{{scope.row.special_rate_remark}}</DIV>
+                    </template>
+                </el-table-column>
+
                 <el-table-column
                         v-if="activeName == 'second'"
                         label="入驻时间"
@@ -240,6 +248,7 @@
                 pageCount: 0,
                 activeName: 'first',
                 review_status: 0,
+                is_special: 0,
                 keyword: null,
 
                 // 导出参数
@@ -273,12 +282,16 @@
                 let self = this;
                 self.exportParams.is_show_download = true;
                 var review_status;
+                var is_special = 0;
                 if(self.activeName == "first"){
                     review_status = 0;
                 }else if(self.activeName == "second"){
                     review_status = 1;
-                }else{
+                }else if(self.activeName == "third"){
                     review_status = 2;
+                }else if (self.activeName == "four") {
+                    review_status = 0;
+                    is_special = 1;
                 }
 
                 request({
@@ -290,6 +303,7 @@
                         search        : JSON.stringify(self.search),
                         choose_list   : self.choose_list,
                         review_status : review_status,
+                        is_special    : is_special,
                         _csrf         : '<?= Yii::$app->request->csrfToken ?>',
                         is_download   : self.exportParams.is_download
                     },
@@ -333,6 +347,7 @@
                         r: 'plugin/mch/mall/mch/review',
                         page: self.page,
                         review_status: self.review_status,
+                        is_special: self.is_special,
                         keyword: self.keyword,
                     },
                     method: 'get',
@@ -408,7 +423,14 @@
                 });
             },
             handleClick(tab, event) {
-                this.review_status = tab.index;
+                console.log(tab.index);
+                if (tab.index == 3) {
+                    this.is_special = 1;
+                    this.review_status = 0;
+                } else {
+                    this.is_special = 0;
+                    this.review_status = tab.index;
+                }
                 this.getList();
             },
             // 全选单前页

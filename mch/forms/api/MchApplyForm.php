@@ -3,6 +3,7 @@ namespace app\mch\forms\api;
 
 
 use app\core\ApiCode;
+use app\forms\api\identity\SmsForm;
 use app\forms\common\mptemplate\MpTplMsgCSend;
 use app\forms\common\mptemplate\MpTplMsgSend;
 use app\forms\common\version\Compatible;
@@ -32,10 +33,11 @@ class MchApplyForm extends BaseModel {
     public $district_id;            //区
     public $longitude;              //经度
     public $latitude;               //纬度
+    public $code;                   //验证码
 
     public function rules(){
         return array_merge(parent::rules(), [
-            [['user_id', 'mobile', 'realname', 'cat_id', 'name', 'address', 'longitude', 'latitude', 'province_id', 'city_id', 'district_id'], 'safe']
+            [['user_id','code', 'mobile', 'realname', 'cat_id', 'name', 'address', 'longitude', 'latitude', 'province_id', 'city_id', 'district_id'], 'safe']
         ]);
     }
 
@@ -54,14 +56,26 @@ class MchApplyForm extends BaseModel {
             'city_id'               => '所在城市',
             'district_id'           => '所在地区',
             'longitude'             => '经度',
-            'latitude'              => '纬度'
+            'latitude'              => '纬度',
+            'code'                  => '验证码'
         ];
     }
 
-    public function save(){
-
+    public function save ()
+    {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
+        }
+
+        if(empty($this->code)){
+            throw new \Exception('验证码不为空');
+        }
+
+        $smsForm = new SmsForm();
+        $smsForm->captcha = $this->code;
+        $smsForm->mobile = $this->mobile;
+        if(!$smsForm->checkCode()){
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
         }
 
         $transaction = \Yii::$app->db->beginTransaction();

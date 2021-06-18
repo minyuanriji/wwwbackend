@@ -321,7 +321,7 @@ class UserForm extends BaseModel
                 $userCenter['menus'][] = [
                     "icon_url"  => "https://dev.mingyuanriji.cn/web/static/examine.png",
                     "name"      => "审核店铺",
-                    "link_url"  => "/pages/user/bonus/examine",
+                    "link_url"  => "/pages/user/examine/examine",
                     "open_type" => "navigate"
                 ];
             }

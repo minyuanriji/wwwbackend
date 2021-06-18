@@ -318,6 +318,7 @@ class UserForm extends BaseModel
             'member_level' => (int)$user->level,
             'created_at' => date("Y-m-d H:i:s", $user->created_at),
             'parent_id' => $user->parent_id,
+            'is_examine' => $user->is_examine,
         ];
 
         $mall_members = MemberLevel::findAll(['mall_id' => \Yii::$app->mall->id, 'status' => 1, 'is_delete' => 0]);

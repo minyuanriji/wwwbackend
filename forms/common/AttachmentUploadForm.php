@@ -243,7 +243,7 @@ class AttachmentUploadForm extends Model
                 $url = $this->baseWebUrl.$filePath;
                 \Yii::warning("attachmentUploadForm save saveViedoImg=".$saveViedoImg);
                 //截取视频图片，并上传到第三方图片存储平台
-                VideoLogic::getVideoImage($res['url'],$saveViedoImg);
+                VideoLogic::getVideoImage(trim($res['url']),trim($saveViedoImg));
                 $imgUrl = CommonLogic::uploadImgToCloudStorage($saveViedoImg,$filePath,$url);
                 $res['thumb_url'] = $imgUrl;
             }

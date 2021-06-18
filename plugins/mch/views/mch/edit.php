@@ -98,6 +98,12 @@
                             </el-input>
                         </el-form-item>
 
+                        <el-form-item label="特殊折扣" prop="special_rate" v-if="ruleForm.is_special == '1'">
+                            <label slot="label" style="color: red">特殊折扣申请理由</label>
+                            <el-input disabled type="text" v-model.number="ruleForm.special_rate_remark">
+                            </el-input>
+                        </el-form-item>
+
                         <el-form-item label="提现手续费" prop="transfer_rate">
                             <label slot="label">服务费
                                 <el-tooltip class="item" effect="dark"

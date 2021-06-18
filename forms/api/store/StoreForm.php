@@ -284,7 +284,7 @@ class StoreForm extends BaseModel
 
         if (isset($data['is_special']) && $data['is_special']) {
             $mch_exist->is_special          = $data['is_special'];
-            $mch_exist->special_rate        = isset($data['special_rate']) ? $data['special_rate'] : 0;
+            $mch_exist->special_rate        = isset($data['special_rate']) ? (10 - $data['special_rate']) * 10 : 0;
             $mch_exist->special_rate_remark = isset($data['special_rate_remark']) ? $data['special_rate_remark'] : '';
             if (!$mch_exist->save()) {
                 return [
@@ -312,10 +312,6 @@ class StoreForm extends BaseModel
                     ]);
                 }
                 $transaction->commit();
-                return [
-                    'code' => ApiCode::CODE_SUCCESS,
-                    'msg' => '保存成功'
-                ];
             } catch (\Exception $e) {
                 $transaction->rollBack();
                 return [
@@ -327,5 +323,9 @@ class StoreForm extends BaseModel
                 ];
             }
         }
+        return [
+            'code' => ApiCode::CODE_SUCCESS,
+            'msg' => '保存成功'
+        ];
     }
 }

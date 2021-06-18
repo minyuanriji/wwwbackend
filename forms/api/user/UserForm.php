@@ -287,6 +287,16 @@ class UserForm extends BaseModel
                 "open_type" => "navigate"
             ];
         }
+
+        //酒店订单
+        $userCenter['menus'][] = [
+            "icon_url"  => "https://dev.mingyuanriji.cn/web/static/hotel-orders.png",
+            "name"      => "酒店",
+            "link_url"  => "/pages/hotel/orderList/orderList",
+            "open_type" => "navigate"
+        ];
+
+        //商家入驻
         if (YII_WEIXIN_APPLETS == 'true') {
             $userCenter['menus'][] = [
                 "icon_url"  => "https://dev.mingyuanriji.cn/web/static/shopSettle.png",

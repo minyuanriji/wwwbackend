@@ -459,7 +459,7 @@ class CommissionController extends BaseCommandController{
             ["od.is_delete" => 0],
             ["od.commission_status" => 0]
         ]);
-        $query->select(["od.id as order_detail_id", "od.is_refund", "od.refund_status", "od.created_at", "od.updated_at", "o.mall_id", "o.user_id", "od.order_id", "od.goods_id", "od.total_original_price", "od.total_price", "g.profit_price", "gw.name"]);
+        $query->select(["od.id as order_detail_id", "od.num", "od.is_refund", "od.refund_status", "od.created_at", "od.updated_at", "o.mall_id", "o.user_id", "od.order_id", "od.goods_id", "od.total_original_price", "od.total_price", "g.profit_price", "gw.name"]);
         $orderDetailData = $query->asArray()->one();
         if(!$orderDetailData){
             return false;
@@ -488,6 +488,8 @@ class CommissionController extends BaseCommandController{
                 }else{ //按固定值
                     $price = (float)$ruleData['commisson_value'];
                 }
+
+                $price = $price * intval($orderDetailData['num']);
 
                 //生成分佣记录
                 if($price > 0){

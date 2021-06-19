@@ -55,7 +55,9 @@ class HotelImportForm extends BaseModel{
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg'  => $e->getMessage()
+                'msg'  => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
             ];
         }
 

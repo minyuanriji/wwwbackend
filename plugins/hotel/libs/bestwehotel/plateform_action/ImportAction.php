@@ -115,7 +115,7 @@ class ImportAction extends BaseObject {
         }catch (HotelException $e){
             $trans->rollBack();
             $result->code = ImportResult::IMPORT_FAIL;
-            $result->message = $e->getMessage();
+            $result->message = $e->getMessage() . ";file=" . $e->getFile() . ";line=" . $e->getLine();
         }
 
         return $result;

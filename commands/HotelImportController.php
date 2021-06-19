@@ -19,7 +19,7 @@ class HotelImportController extends BaseCommandController
         while (true){
             $form = new HotelImportForm();
             $form->page = $page;
-            $form->size = 1;
+            $form->size = 5;
             $form->plateform_class = "app\\plugins\\hotel\\libs\\bestwehotel\\PlateForm";
             $res = $form->import();
             if($res['code'] != ApiCode::CODE_SUCCESS){

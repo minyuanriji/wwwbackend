@@ -221,6 +221,8 @@ class ImportAction extends BaseObject {
                     $map->type = "tx";
                 }elseif($mapInfo['mapType'] == 3){
                     $map->type = "gd";
+                }else{
+                    $map->type = "un";
                 }
                 if(!$map->save()){
                     throw new HotelException(json_encode($map->getErrors()));

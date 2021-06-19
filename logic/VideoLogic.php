@@ -26,11 +26,7 @@ class VideoLogic
     public static function getVideoImage($saveFile,$saveViedoImg,$duration = 1)
     {
         try {
-            $config = isset(\Yii::$app->params["videoConfig"]) ? \Yii::$app->params["videoConfig"] : [];
-            $config = [
-                'ffmpeg.binaries'  => '/usr/local/ffmpeg/bin/ffmpeg',
-                'ffprobe.binaries' =>  '/usr/local/ffmpeg/bin/ffprobe'
-            ];
+            $config = isset(\Yii::$app->params["ffmpeg_params"]) ? \Yii::$app->params["ffmpeg_params"] : [];
             $ffmpeg = FFMpeg::create($config);
             \Yii::error("ffmpeg——result:".json_encode($ffmpeg));
             $video = $ffmpeg->open($saveFile);

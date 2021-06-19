@@ -74,9 +74,11 @@ class StoreForm extends BaseModel
             }
 
             $list = $query->select([
-                        "m.id", "m.realname", "m.mobile", "DATE_FORMAT(FROM_UNIXTIME(m.created_at),'%Y-%m-%d %H:%i:%s') as created_at", "m.user_id",
+                        "m.id", "m.realname", "m.mobile",
+                        "DATE_FORMAT(FROM_UNIXTIME(m.created_at),'%Y-%m-%d %H:%i:%s') as created_at", "m.user_id",
                         "p.id as parent_id", "p.nickname as parent_nickname",
-                        "p.mobile as parent_mobile", "( CASE p.role_type WHEN 'store' THEN '门店' WHEN 'partner' THEN '合伙人' WHEN 'branch_office' THEN '分公司' WHEN 'user' THEN '普通用户' END ) AS 'parent_role_type'"
+                        "p.mobile as parent_mobile",
+                        "( CASE p.role_type WHEN 'store' THEN '店主' WHEN 'partner' THEN '合伙人' WHEN 'branch_office' THEN '分公司' WHEN 'user' THEN '普通用户' END ) AS 'parent_role_type'"
                     ])
                     ->with([
                         'user' => function ($query) {

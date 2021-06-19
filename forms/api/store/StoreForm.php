@@ -69,13 +69,14 @@ class StoreForm extends BaseModel
 
             if ($this->keyword) {
                 $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
-                $query->andWhere(['m.id' => $mchIds]);
+                $query->andWhere(['m.id' => $mchIds])
+                      ->orWhere(['like', 'm.mobile', $this->keyword]);
             }
 
             $list = $query->select([
-                        "m.id", "m.realname", "m.mobile", "m.created_at", "m.user_id",
+                        "m.id", "m.realname", "m.mobile", "DATE_FORMAT(FROM_UNIXTIME(m.created_at),'%Y-%m-%d %H:%i:%s') as created_at", "m.user_id",
                         "p.id as parent_id", "p.nickname as parent_nickname",
-                        "p.mobile as parent_mobile", "p.role_type as parent_role_type"
+                        "p.mobile as parent_mobile", "( CASE p.role_type WHEN 'store' THEN '门店' WHEN 'partner' THEN '合伙人' WHEN 'branch_office' THEN '分公司' WHEN 'user' THEN '普通用户' END ) AS 'parent_role_type'"
                     ])
                     ->with([
                         'user' => function ($query) {
@@ -86,7 +87,7 @@ class StoreForm extends BaseModel
                         }
                     ])
                     ->orderBy(['m.created_at' => SORT_DESC])
-                    ->page($pagination)
+                    ->page($pagination,10)
                     ->asArray()
                     ->all();
         }

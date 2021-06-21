@@ -212,6 +212,8 @@ class StoreForm extends BaseModel
 
             $detail['nickname'] = $detail['user']['nickname'];
 
+            $detail['transfer_rate'] = $detail['transfer_rate'] > 0 ? (100 - $detail['transfer_rate']) / 10 : $detail['transfer_rate'];
+
             $relatEfps = EfpsMchReviewInfo::find()
                 ->select("id,openAccount,paper_merchantType,paper_settleAccountType,paper_settleAccountNo,paper_settleAccount,paper_settleTarget,paper_openBank,paper_lawyerCertType,paper_lawyerCertNo,paper_certificateName,paper_openBankCode")
                 ->where(["mch_id" => $this->id])
@@ -298,12 +300,12 @@ class StoreForm extends BaseModel
             $mch_exist->is_special          = $data['is_special'];
             $mch_exist->special_rate        = isset($data['special_rate']) ? (10 - $data['special_rate']) * 10 : 0;
             $mch_exist->special_rate_remark = isset($data['special_rate_remark']) ? $data['special_rate_remark'] : '';
-            if (!$mch_exist->save()) {
+            if (!$mch_exist->save())
                 return [
                     'code' => ApiCode::CODE_FAIL,
                     'msg' => '保存失败'
                 ];
-            }
+
         } else {
             $transaction = \Yii::$app->db->beginTransaction();
             try {
@@ -314,12 +316,23 @@ class StoreForm extends BaseModel
                         "review_remark" => $data['review_remark']
                     ], ["id" => $data['id']]);
                 } elseif($data['review_status'] == Mch::REVIEW_STATUS_CHECKED) { //审核通过
+                    if (isset($data['transfer_rate']) && $data['transfer_rate']) {
+                        if ($data['transfer_rate'] > 8 || $data['transfer_rate'] < 0)
+                            return [
+                                'code' => ApiCode::CODE_FAIL,
+                                'msg' => '折扣不能超过8折或低于0折，请移步特殊折扣申请！'
+                            ];
+
+                        $transfer_rate = (10 - $data['transfer_rate']) * 10;
+                    } else {
+                        $transfer_rate = 20;
+                    }
                     $reviewData = EfpsMchReviewInfo::find()->where(["mch_id" => $data['id']])->asArray()->one();
                     if(!$reviewData){
                         throw new \Exception("无法获取审核信息");
                     }
                     EfpsMchReviewInfo::updateAll(['status' => 2], ["mch_id" => $data['id']]);
-                    Mch::updateAll(["review_status" => Mch::REVIEW_STATUS_CHECKED], [
+                    Mch::updateAll(["review_status" => Mch::REVIEW_STATUS_CHECKED, 'transfer_rate' => $transfer_rate], [
                         "id" => $data['id']
                     ]);
                 }

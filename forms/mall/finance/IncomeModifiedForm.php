@@ -12,11 +12,12 @@ class IncomeModifiedForm extends BaseModel{
     public $user_id;
     public $price;
     public $remark;
+    public $is_manual;
 
     public function rules(){
         return [
             [['type', 'user_id', 'price'], 'required'],
-            [['remark'], 'safe']
+            [['remark','is_manual'], 'safe']
         ];
     }
 
@@ -39,9 +40,9 @@ class IncomeModifiedForm extends BaseModel{
             $sourceId = \Yii::$app->admin->id;
 
             if($this->type == 1){ //充值
-                $res = UserIncomeForm::adminAdd($user, $this->price, $sourceId, $this->remark);
+                $res = UserIncomeForm::adminAdd($user, $this->price, $sourceId, $this->remark, $this->is_manual);
             }else{ //扣减
-                $res = UserIncomeForm::adminSub($user, $this->price, $sourceId, $this->remark);
+                $res = UserIncomeForm::adminSub($user, $this->price, $sourceId, $this->remark, $this->is_manual);
             }
 
             if($res['code'] != ApiCode::CODE_SUCCESS){

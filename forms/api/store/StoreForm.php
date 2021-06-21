@@ -12,6 +12,7 @@ use app\models\Store;
 use app\models\User;
 use app\models\UserRelationshipLink;
 use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchCommonCat;
 
 class StoreForm extends BaseModel
 {
@@ -212,7 +213,7 @@ class StoreForm extends BaseModel
             $detail['nickname'] = $detail['user']['nickname'];
 
             $relatEfps = EfpsMchReviewInfo::find()
-                ->select("id,openAccount,paper_merchantType,paper_settleAccountType,paper_settleAccountNo,paper_settleAccount,paper_settleTarget,paper_openBank,paper_lawyerCertType,paper_lawyerCertNo,paper_certificateName")
+                ->select("id,openAccount,paper_merchantType,paper_settleAccountType,paper_settleAccountNo,paper_settleAccount,paper_settleTarget,paper_openBank,paper_lawyerCertType,paper_lawyerCertNo,paper_certificateName,paper_openBankCode")
                 ->where(["mch_id" => $this->id])
                 ->one();
             if(!$relatEfps){
@@ -241,6 +242,14 @@ class StoreForm extends BaseModel
                 $detail['user'],
             );
 
+            $mch_common_cat_name = MchCommonCat::find()->where([
+                'is_delete' => 0,
+                'mall_id' => \Yii::$app->mall->id,
+                'id' => $detail['mch_common_cat_id'],
+            ])->asArray()->one();
+
+            $detail['mch_common_cat_name'] = $mch_common_cat_name ? $mch_common_cat_name['name'] : '';
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
@@ -259,7 +268,7 @@ class StoreForm extends BaseModel
 
     public function save($data)
     {
-        if (!isset($data['id']) || $data['id'])
+        if (!isset($data['id']) || !$data['id'])
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => '请传入参数ID'

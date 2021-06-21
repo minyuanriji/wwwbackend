@@ -12,6 +12,13 @@ Yii::$app->loadComponentView('com-dialog-select');
             </div>
         </div>
         <div class="table-body">
+            筛选
+                <el-select style="width: 120px;" size="small" v-model="is_manual" @change='search'>
+                    <el-option key="all" label="全部" value=""></el-option>
+                    <el-option key="1" label="管理员操作" value="1"></el-option>
+                    <el-option key="0" label="系统操作" value="0"></el-option>
+                </el-select>
+
             <el-date-picker size="small" v-model="date" type="datetimerange"
                             style="float: left"
                             value-format="yyyy-MM-dd HH:mm:ss"
@@ -112,7 +119,8 @@ Yii::$app->loadComponentView('com-dialog-select');
                     user_id: '',
                     price: 0.00,
                     nickname: '',
-                    remark: ''
+                    remark: '',
+                    is_manual: '',
                 },
                 forDlgSelect:{
                     visible: false,
@@ -144,6 +152,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     date: '',
                     start_date: '',
                     end_at: '',
+                    is_manual: '',
                 },
                 date: '',
                 keyword: '',
@@ -151,6 +160,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                 pagination: null,
                 listLoading: false,
                 dialogIntegral: false,
+                is_manual: '',
             };
         },
         methods: {
@@ -225,6 +235,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     date: this.date,
                     user_id: getQuery('user_id'),
                     keyword: this.keyword,
+                    is_manual: this.is_manual,
                 };
                 if (this.date) {
                     Object.assign(params, {

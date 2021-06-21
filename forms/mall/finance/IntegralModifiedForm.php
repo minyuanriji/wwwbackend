@@ -12,11 +12,12 @@ class IntegralModifiedForm extends BaseModel{
     public $user_id;
     public $price;
     public $remark;
+    public $is_manual;
 
     public function rules(){
         return [
             [['type', 'user_id', 'price'], 'required'],
-            [['remark'], 'safe']
+            [['remark','is_manual'], 'safe']
         ];
     }
 
@@ -39,9 +40,9 @@ class IntegralModifiedForm extends BaseModel{
             $adminId = \Yii::$app->admin->id;
 
             if($this->type == 1){ //充值
-                $res = UserIntegralForm::adminAdd($user, $this->price, $adminId, $this->remark);
+                $res = UserIntegralForm::adminAdd($user, $this->price, $adminId, $this->remark, $this->is_manual);
             }else{ //扣减
-                $res = UserIntegralForm::adminSub($user, $this->price, $adminId, $this->remark);
+                $res = UserIntegralForm::adminSub($user, $this->price, $adminId, $this->remark, $this->is_manual);
             }
 
             if($res['code'] != ApiCode::CODE_SUCCESS){

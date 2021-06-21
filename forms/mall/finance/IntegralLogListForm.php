@@ -15,11 +15,13 @@ class IntegralLogListForm extends BaseModel{
     public $end_date;
     public $keyword;
     public $user_id;
+    public $is_manual;
 
     public function rules(){
         return [
             [['page', 'limit', 'user_id'], 'integer'],
             [['keyword', 'start_date', 'end_date'], 'trim'],
+            [['is_manual',], 'safe'],
         ];
     }
     public function getList(){
@@ -42,6 +44,10 @@ class IntegralLogListForm extends BaseModel{
                 "OR",
                 "u.nickname LIKE '%".$this->keyword."%'"
             ]);
+        }
+
+        if ($this->is_manual != '') {
+            $query->andWhere(['il.is_manual' => $this->is_manual]);
         }
 
         if ($this->start_date && $this->end_date) {

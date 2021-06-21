@@ -538,6 +538,7 @@
 
 
                             </el-tab-pane>
+
                             <el-tab-pane label="业务信息" name="tab_review_business">
                                 <el-form-item v-if="review.register_type != 'separate_account'" label="业务代码" prop="paper_businessCode">
                                     <el-input v-model="review.paper_businessCode"></el-input>

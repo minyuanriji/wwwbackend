@@ -18,7 +18,7 @@ class IntegralLog extends BaseActiveRecord
         return [
             [['mall_id', 'user_id', 'type', 'integral', 'current_integral',
               'desc', 'created_at', 'source_type'], 'required'],
-            [['source_id'], 'safe']
+            [['source_id', 'is_manual'], 'safe']
         ];
     }
 }

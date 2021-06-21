@@ -55,12 +55,12 @@ class UserIncomeForm extends BaseModel{
      * @param string $remark
      * @return void
      */
-    public static function adminAdd(User $user, $price, $source_id, $remark = ""){
+    public static function adminAdd(User $user, $price, $source_id, $remark = "", $is_manual = 0){
         $t = \Yii::$app->db->beginTransaction();
         try {
 
             $desc = "管理员[ID:{$source_id}]充值：" . $remark;
-            static::change($user, $price, self::TYPE_ADD, self::FLAG_INCOME, "admin", time(), $desc);
+            static::change($user, $price, self::TYPE_ADD, self::FLAG_INCOME, "admin", time(), $desc, $is_manual);
 
             $t->commit();
 
@@ -84,13 +84,13 @@ class UserIncomeForm extends BaseModel{
      * @param string $remark
      * @return void
      */
-    public static function adminSub(User $user, $price, $source_id, $remark = ""){
+    public static function adminSub(User $user, $price, $source_id, $remark = "", $is_manual = 0){
         $t = \Yii::$app->db->beginTransaction();
         try {
 
             $desc = "管理员[ID:{$source_id}]扣减：" . $remark;
 
-            static::change($user, $price, self::TYPE_SUB, self::FLAG_INCOME, "admin", time(), $desc);
+            static::change($user, $price, self::TYPE_SUB, self::FLAG_INCOME, "admin", time(), $desc, $is_manual);
 
             $t->commit();
 
@@ -166,7 +166,7 @@ class UserIncomeForm extends BaseModel{
 
     }
 
-    private static function change(User $user, $price, $type, $flag, $source_type, $source_id, $desc = null){
+    private static function change(User $user, $price, $type, $flag, $source_type, $source_id, $desc = null, $is_manual = 0){
 
         $totalIncome = floatval($user->total_income);
 
@@ -213,7 +213,8 @@ class UserIncomeForm extends BaseModel{
             "source_id"   => $source_id,
             "source_type" => $source_type,
             "created_at"  => time(),
-            "updated_at"  => time()
+            "updated_at"  => time(),
+            "is_manual"   => $is_manual
         ]);
         if(!$incomeLog->save()){
             throw new \Exception(json_encode($incomeLog->getErrors()));

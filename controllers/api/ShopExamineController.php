@@ -33,7 +33,7 @@ class ShopExamineController extends ApiController
     {
         if (\Yii::$app->request->isPost) {
             $form = new StoreForm();
-            $data = \Yii::$app->request->post();
+            $data = $this->requestData;
             return $this->asJson($form->save($data));
         } else {
             $form = new StoreForm();

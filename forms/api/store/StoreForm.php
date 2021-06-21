@@ -216,6 +216,8 @@ class StoreForm extends BaseModel
 
             $detail['transfer_rate'] = $detail['transfer_rate'] > 0 ? (100 - $detail['transfer_rate']) / 10 : $detail['transfer_rate'];
 
+            $detail['special_rate'] = $detail['special_rate'] > 0 ? (100 - $detail['special_rate']) / 10 : $detail['special_rate'];
+
             $relatEfps = EfpsMchReviewInfo::find()
                 ->select("id,openAccount,paper_merchantType,paper_settleAccountType,paper_settleAccountNo,paper_settleAccount,paper_settleTarget,paper_openBank,paper_lawyerCertType,paper_lawyerCertNo,paper_certificateName,paper_openBankCode")
                 ->where(["mch_id" => $this->id])

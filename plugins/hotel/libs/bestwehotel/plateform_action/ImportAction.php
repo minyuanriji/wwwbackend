@@ -185,6 +185,8 @@ class ImportAction extends BaseObject {
 
         $this->setCity($hotel, $info['cityCode']); //设置城市
 
+        $this->setHotelType($hotel, $info['innType']); //设置酒店类型
+
         $this->setHotelThumb($hotel, $info['images']); //设置缩略图
 
         if(!$hotel->save()){
@@ -240,7 +242,13 @@ class ImportAction extends BaseObject {
 
         foreach($info['rooms'] as $roomType){
 
-            $room = $hotel->getRoomByCode($roomType['sCode'], $this->plateform_class);
+            $plateform = HotelPlateforms::findOne([
+                'type'            => 'room',
+                'mall_id'         => $hotel->mall_id,
+                'plateform_code'  => $roomType['sCode'],
+                'plateform_class' => $this->plateform_class
+            ]);
+            $room = $hotel->getRoomByPlateform($plateform);
             if(!$room){
 
                 $productCode = date("ymdhis") . rand(100, 999);
@@ -264,7 +272,6 @@ class ImportAction extends BaseObject {
                     'created_at'   => time(),
                     'updated_at'   => time()
                 ]);
-
             }
 
             $plateform->plateform_json_data = json_encode($roomType);
@@ -359,6 +366,23 @@ class ImportAction extends BaseObject {
                     throw new HotelException(json_encode($pic->getErrors()));
                 }
             }
+        }
+    }
+
+
+    /**
+     * 设置酒店类型
+     * @param Hotels $hotel
+     * @param $innType 酒店类别(100经济型酒店 101 精品商务酒店102 景区度假酒店 103 主题特色酒店 104 民族风情酒店)
+     */
+    private function setHotelType(Hotels $hotel, $innType){
+
+        if(in_array($innType, [103, 104])){ //豪华型
+            $hotel->type = "luxe";
+        }elseif(in_array($innType, [102, 102])){
+            $hotel->type = "comfort";
+        }else{
+            $hotel->type = "eco";
         }
     }
 

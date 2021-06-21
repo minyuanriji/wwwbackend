@@ -25,15 +25,14 @@ class Hotels extends BaseActiveRecord
         ];
     }
 
-    public function getRoomByCode($plateform_code, $plateform_class){
-        $plateform = HotelPlateforms::findOne([
-            'type'            => 'room',
-            'mall_id'         => $this->mall_id,
-            'plateform_code'  => $plateform_code,
-            'plateform_class' => $plateform_class
-        ]);
+    /**
+     * 获取房型信息
+     * @param $plateform
+     * @return array|\yii\db\ActiveRecord|null
+     */
+    public function getRoomByPlateform($plateform){
         $room = null;
-        if($plateform){
+        if($plateform && $plateform->type == "room"){
             $room = HotelRoom::find()->where([
                 "hotel_id"     => $this->id,
                 "product_code" => $plateform->source_code

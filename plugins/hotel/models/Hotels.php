@@ -24,4 +24,30 @@ class Hotels extends BaseActiveRecord
               'json_service_facilitys', 'province_id', 'city_id', 'district_id'], 'safe']
         ];
     }
+
+    public function getRoomByCode($plateform_code, $plateform_class){
+        $plateform = HotelPlateforms::findOne([
+            'type'            => 'room',
+            'mall_id'         => $this->mall_id,
+            'plateform_code'  => $plateform_code,
+            'plateform_class' => $plateform_class
+        ]);
+        $room = null;
+        if($plateform){
+            $room = HotelRoom::find()->where([
+                "hotel_id"     => $this->id,
+                "product_code" => $plateform->source_code
+            ])->one();
+        }
+        return $room;
+    }
+
+    public function getPlateform($plateform_class){
+        return HotelPlateforms::find()->where([
+            'type'            => 'hotel',
+            'source_code'     => $this->id,
+            'plateform_class' => $plateform_class,
+            'mall_id'         => $this->mall_id
+        ])->one();
+    }
 }

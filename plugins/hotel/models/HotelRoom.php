@@ -23,6 +23,7 @@ class HotelRoom extends BaseActiveRecord
               'policy_breakfast', 'json_service_facilitys', 'max_room'], 'safe']
         ];
     }
+
 }
 
 

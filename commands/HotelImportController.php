@@ -15,6 +15,8 @@ class HotelImportController extends BaseCommandController
 
         \Yii::$app->mall = Mall::findOne(5);
 
+        file_put_contents(__DIR__ . "/HotelImportController.update.log", "");
+
         $page = 1;
         while (true){
             $form = new HotelImportForm();
@@ -23,11 +25,16 @@ class HotelImportController extends BaseCommandController
             $form->plateform_class = "app\\plugins\\hotel\\libs\\bestwehotel\\PlateForm";
             $res = $form->import();
             if($res['code'] != ApiCode::CODE_SUCCESS){
-                $this->commandOut($res['msg']);
-                exit;
+                $this->commandOut("error:{$page} for " . $res['msg']);
+                @file_put_contents(__DIR__ . "/HotelImportController.update.log", "error:{$page} for " . $res['msg'] . "\n", FILE_APPEND);
+            }else{
+                if($res['data']['next_page'] <= 0){
+                    $this->commandOut("finished!");
+                    exit;
+                }
+                $prograss = round(100 * (($page)/$res['data']['total_pages']), 2);
+                $this->commandOut("Prograss:{$prograss}%");
             }
-            $prograss = round(100 * (($page)/$res['data']['total_pages']), 2);
-            $this->commandOut("Prograss:{$prograss}%");
             $page += 1;
         }
 

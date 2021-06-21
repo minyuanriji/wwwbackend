@@ -239,35 +239,22 @@ class ImportAction extends BaseObject {
     private function saveRooms(Hotels $hotel, $info){
 
         foreach($info['rooms'] as $roomType){
-            $plateform = HotelPlateforms::findOne([
-                'type'            => 'room',
-                'mall_id'         => \Yii::$app->mall->id,
-                'plateform_code'  => $roomType['sCode'],
-                'plateform_class' => $this->plateform_class
-            ]);
-            if($plateform){
-                $room = HotelRoom::findOne([
-                    "product_code" => $plateform->source_code
-                ]);
-            }else{
-                $plateform = new HotelPlateforms([
-                    'mall_id'             => \Yii::$app->mall->id,
-                    'type'                => 'room',
-                    'plateform_code'      => $roomType['sCode'],
-                    'plateform_class'     => $this->plateform_class
-                ]);
-                $room = null;
-            }
+
+            $room = $hotel->getRoomByCode($roomType['sCode'], $this->plateform_class);
             if(!$room){
-                if(!empty($plateform->source_code)){
-                    $productCode = $plateform->source_code;
-                }else{ //新增唯一房型码
+
+                $productCode = date("ymdhis") . rand(100, 999);
+                while(HotelRoom::findOne(["product_code" => $productCode])){
                     $productCode = date("ymdhis") . rand(100, 999);
-                    while(HotelRoom::findOne(["product_code" => $productCode])){
-                        $productCode = date("ymdhis") . rand(100, 999);
-                    }
-                    $plateform->source_code = $productCode;
                 }
+
+                $plateform = new HotelPlateforms([
+                    'mall_id'         => \Yii::$app->mall->id,
+                    'type'            => 'room',
+                    'source_code'     => $productCode,
+                    'plateform_code'  => $roomType['sCode'],
+                    'plateform_class' => $this->plateform_class
+                ]);
 
                 $room = new HotelRoom([
                     'mall_id'      => \Yii::$app->mall->id,
@@ -277,6 +264,7 @@ class ImportAction extends BaseObject {
                     'created_at'   => time(),
                     'updated_at'   => time()
                 ]);
+
             }
 
             $plateform->plateform_json_data = json_encode($roomType);

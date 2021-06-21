@@ -62,8 +62,10 @@ class StoreForm extends BaseModel
                 'm.mall_id' => \Yii::$app->mall->id,
                 'm.is_delete' => 0,
                 'm.review_status' => $this->review_status,
-                'm.is_special' => 0
             ]);
+            if ($this->review_status == 0) {
+                $query->andWhere(['m.is_special' => 0]);
+            }
             $query->leftJoin(["u" => User::tableName()], "u.id=m.user_id");
             $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
             $query->andWhere(['in','m.user_id',$new_user_ids]);
@@ -178,9 +180,9 @@ class StoreForm extends BaseModel
                         'category'
                     ])
                     ->asArray()->one();
-            if (!$detail) {
+            if (!$detail)
                 throw new \Exception('商户不存在');
-            }
+
 
             $detail['latitude_longitude'] = $detail['store']['longitude'] && $detail['store']['latitude'] ?
                 $detail['store']['latitude'] . ',' . $detail['store']['longitude'] : '';

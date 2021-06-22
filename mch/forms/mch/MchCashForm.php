@@ -13,9 +13,9 @@ class MchCashForm extends BaseModel
     {
         try {
             $mch = Mch::findOne(\Yii::$app->mchAdmin->identity->mch_id);
-            if(!$mch || $mch->review_status != Mch::REVIEW_STATUS_CHECKED || $mch->is_delete){
+            if(!$mch || $mch->review_status != Mch::REVIEW_STATUS_CHECKED || $mch->is_delete)
                 throw new \Exception("商户不存在");
-            }
+
 
             $mch_cash_list = MchCash::find()
                 ->select([
@@ -26,18 +26,28 @@ class MchCashForm extends BaseModel
                     "fact_price",
                     "status",
                     "transfer_status",
-                    "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at",
+                    "created_at",
                 ])
                 ->where([
                     'id'        => \Yii::$app->mchAdmin->identity->mch_id,
                     'mall_id'   => $mch->mall_id,
                     'is_delete' => 0,
                 ])
+                ->page($pagination)
                 ->asArray()->all();
+
+            if ($mch_cash_list) {
+                foreach ($mch_cash_list as $key => $value) {
+                    $mch_cash_list[$key]['created_at'] = date('Y-m-d H:i:s', $value['created_at']);
+                }
+            }
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
-                'data' =>$mch_cash_list
+                'data' => [
+                    'list' => $mch_cash_list,
+                    'pagination' => $pagination
+                ]
             ];
         } catch (\Exception $e) {
             return [

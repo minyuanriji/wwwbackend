@@ -18,26 +18,20 @@ class MchCashForm extends BaseModel
 
 
             $mch_cash_list = MchCash::find()
-                ->select([
-                    "id",
-                    "mall_id",
-                    "mch_id",
-                    "content",
-                    "fact_price",
-                    "status",
-                    "transfer_status",
-                    "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at",
-                ])
+                ->select(["id", "mall_id", "mch_id", "money", "content", "fact_price", "status", "transfer_status", "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at"])
                 ->where([
                     'mch_id'    => $mch_id,
                     'mall_id'   => $mch->mall_id,
                     'is_delete' => 0,
-                    'status' => 1,
-                    'transfer_status' => 1,
                 ])
                 ->page($pagination)
                 ->asArray()->all();
 
+            if ($mch_cash_list) {
+                foreach ($mch_cash_list as &$value) {
+                    $value['service_charge'] = $value['money'] - $value['fact_price'];
+                }
+            }
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',

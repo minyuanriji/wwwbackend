@@ -9,7 +9,6 @@ class WithdrawalDetailsController extends BaseController
     public function actionMchAllList ()
     {
         $form = new MchCashForm();
-        $form->attributes = \Yii::$app->request->get();
         return $this->asJson($form->getList());
     }
 }

@@ -267,6 +267,10 @@ class ImportAction extends BaseObject {
                 }
             }
         }
+
+        if(!$hotel->save()){
+            throw new HotelException(json_encode($hotel->getErrors()));
+        }
     }
 
     /**

@@ -27,6 +27,7 @@ class MchCashForm extends BaseModel
                     'is_delete' => 0,
                 ])
                 ->page($pagination, $this->limit)
+                ->orderBy('created_at desc')
                 ->asArray()->all();
 
             if ($mch_cash_list) {

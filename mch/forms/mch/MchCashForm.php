@@ -9,10 +9,10 @@ use app\plugins\mch\models\MchCash;
 
 class MchCashForm extends BaseModel
 {
-    public function getList ()
+    public function getList ($mch_id)
     {
         try {
-            $mch = Mch::findOne(\Yii::$app->mchAdmin->identity->mch_id);
+            $mch = Mch::findOne($mch_id);
             if(!$mch || $mch->review_status != Mch::REVIEW_STATUS_CHECKED || $mch->is_delete)
                 throw new \Exception("商户不存在");
 
@@ -29,7 +29,7 @@ class MchCashForm extends BaseModel
                     "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at",
                 ])
                 ->where([
-                    'id'        => \Yii::$app->mchAdmin->identity->mch_id,
+                    'id'        => $mch_id,
                     'mall_id'   => $mch->mall_id,
                     'is_delete' => 0,
                 ])

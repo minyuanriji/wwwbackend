@@ -321,10 +321,10 @@ class StoreForm extends BaseModel
                     ], ["id" => $data['id']]);
                 } elseif($data['review_status'] == Mch::REVIEW_STATUS_CHECKED) { //审核通过
                     if (isset($data['transfer_rate']) && $data['transfer_rate']) {
-                        if ($data['transfer_rate'] > 8 || $data['transfer_rate'] < 0)
+                        if ($data['transfer_rate'] > 8.5 || $data['transfer_rate'] < 0)
                             return [
                                 'code' => ApiCode::CODE_FAIL,
-                                'msg' => '折扣不能超过8折或低于0折，请移步特殊折扣申请！'
+                                'msg' => '折扣不能超过8.5折或低于0折，请移步特殊折扣申请！'
                             ];
 
                         $transfer_rate = (10 - $data['transfer_rate']) * 10;

@@ -32,7 +32,7 @@ class MchCashForm extends BaseModel
 
             if ($mch_cash_list) {
                 foreach ($mch_cash_list as &$value) {
-                    $value['service_charge'] = $value['money'] - $value['fact_price'];
+                    $value['service_charge'] = round($value['money'] - $value['fact_price'],2);
                 }
             }
             return [

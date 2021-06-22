@@ -32,6 +32,8 @@ class MchCashForm extends BaseModel
                     'mch_id'    => $mch_id,
                     'mall_id'   => $mch->mall_id,
                     'is_delete' => 0,
+                    'status' => 1,
+                    'transfer_status' => 1,
                 ])
                 ->page($pagination)
                 ->asArray()->all();

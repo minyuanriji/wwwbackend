@@ -29,7 +29,7 @@ class MchCashForm extends BaseModel
                     "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at",
                 ])
                 ->where([
-                    'id'        => $mch_id,
+                    'mch_id'    => $mch_id,
                     'mall_id'   => $mch->mall_id,
                     'is_delete' => 0,
                 ])

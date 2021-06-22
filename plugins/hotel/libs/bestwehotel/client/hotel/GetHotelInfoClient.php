@@ -26,8 +26,4 @@ class GetHotelInfoClient extends BaseClient implements IClient {
         }
         return $responseModel;
     }
-
-    public function getUri(){
-        return "/hotel/getHotelInfo";
-    }
 }

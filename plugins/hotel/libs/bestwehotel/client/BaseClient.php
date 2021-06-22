@@ -14,6 +14,10 @@ abstract class BaseClient{
         $this->requestModel = $requestModel;
     }
 
+    public function getUri(){
+        return $this->requestModel->getUri();
+    }
+
     public function getDataJSONString(){
         if(!$this->requestModel->build()){
             throw new \Exception($this->requestModel->getError());
@@ -39,7 +43,10 @@ abstract class BaseClient{
             }
         }
 
+
+
         $responseModel = $this->parseResponseModel($parseArray);
+
         $responseModel->msgCode = BaseReponseModel::MSG_CODE_SUCC;
 
         return $responseModel;

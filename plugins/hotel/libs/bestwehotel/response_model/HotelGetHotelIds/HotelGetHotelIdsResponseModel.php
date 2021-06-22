@@ -19,4 +19,11 @@ class HotelGetHotelIdsResponseModel extends BaseReponseModel
     public $total;
     public $pages;
     public $list = [];
+
+    public function setList($items){
+        $this->list = [];
+        foreach($items as $item){
+            $this->list[] = HotelGetHotelIdsListItemModel::create($item);
+        }
+    }
 }

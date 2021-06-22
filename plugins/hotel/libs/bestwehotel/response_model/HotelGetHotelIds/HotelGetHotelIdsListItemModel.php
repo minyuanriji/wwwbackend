@@ -2,7 +2,7 @@
 namespace app\plugins\hotel\libs\bestwehotel\response_model\HotelGetHotelIds;
 
 
-use yii\base\Model;
+use app\plugins\hotel\libs\bestwehotel\response_model\BaseReponseModel;
 
 /***
  * Class HotelGetHotelIdsListItemModel
@@ -10,7 +10,7 @@ use yii\base\Model;
  * @property int $innId 酒店唯一编号
  * @property int $brandCode
  */
-class HotelGetHotelIdsListItemModel extends Model
+class HotelGetHotelIdsListItemModel extends BaseReponseModel
 {
     public $innId;
     public $brandCode;

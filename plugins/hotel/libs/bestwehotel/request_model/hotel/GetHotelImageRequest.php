@@ -11,4 +11,8 @@ use app\plugins\hotel\libs\bestwehotel\request_model\BaseRequest;
  */
 class GetHotelImageRequest extends BaseRequest {
     public $innId;
+
+    public function getUri(){
+        return "/hotel/getHotelImage";
+    }
 }

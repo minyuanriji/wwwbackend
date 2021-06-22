@@ -18,10 +18,15 @@ abstract class BaseReponseModel extends Model{
 
     public static function create($data){
         $responseModel = new static();
-        $keys =  array_keys($responseModel->getAttributes());
+        $keys = array_keys($responseModel->getAttributes());
         foreach($keys as $key){
             if(isset($data[$key])){
-                $responseModel->$key = $data[$key];
+                $method = "set" . ucfirst($key);
+                if(method_exists($responseModel, $method)){
+                    $responseModel->$method($data[$key]);
+                }else{
+                    $responseModel->$key = $data[$key];
+                }
             }
         }
         return $responseModel;

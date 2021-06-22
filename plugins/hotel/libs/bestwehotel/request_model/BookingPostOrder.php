@@ -55,4 +55,8 @@ class BookingPostOrder extends BaseRequest {
         }
         return $passengers;
     }
+
+    public function getUri(){
+        return "/booking/postOrder";
+    }
 }

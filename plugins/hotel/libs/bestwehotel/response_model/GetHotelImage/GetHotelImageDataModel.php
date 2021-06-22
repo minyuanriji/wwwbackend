@@ -15,7 +15,7 @@ use app\plugins\hotel\libs\bestwehotel\response_model\BaseReponseModel;
  * @property string $roomTypeCode 房型
  * @property string $imageDes 图片说明
  */
-class GetHotelImageDataModel  extends BaseReponseModel
+class GetHotelImageDataModel extends BaseReponseModel
 {
     public $imageType;
     public $uploadFileName;

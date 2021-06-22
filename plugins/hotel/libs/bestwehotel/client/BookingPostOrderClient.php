@@ -8,10 +8,6 @@ use app\plugins\hotel\libs\bestwehotel\response_model\BaseReponseModel;
 
 class BookingPostOrderClient extends BaseClient implements IClient{
 
-    public function getUri(){
-        return "/booking/postOrder";
-    }
-
     public function parseResponseModel($parseArray)
     {
         // TODO: Implement parseResponseModel() method.

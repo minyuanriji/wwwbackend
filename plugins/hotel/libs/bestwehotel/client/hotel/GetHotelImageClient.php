@@ -20,8 +20,4 @@ class GetHotelImageClient extends BaseClient implements IClient {
         }
         return $responseModel;
     }
-
-    public function getUri(){
-        return "/hotel/getHotelImage";
-    }
 }

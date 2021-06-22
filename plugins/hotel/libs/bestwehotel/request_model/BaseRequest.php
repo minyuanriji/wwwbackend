@@ -55,4 +55,5 @@ abstract class BaseRequest extends Model {
         return $this->error;
     }
 
+    abstract public function getUri();
 }

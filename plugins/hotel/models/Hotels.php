@@ -17,7 +17,7 @@ class Hotels extends BaseActiveRecord
     {
         return [
             [['mall_id', 'thumb_url', 'name', 'type', 'created_at', 'updated_at'], 'required'],
-            [['is_delete', 'open_time', 'building_time', 'descript', 'price',
+            [['tx_lat', 'tx_lng', 'is_delete', 'is_open', 'is_booking', 'open_time', 'building_time', 'descript', 'price',
               'tag', 'cmt_grade', 'cmt_text1', 'cmt_text2', 'cmt_num', 'contact_phone',
               'contact_mobile', 'address', 'near_subway', 'policy_into_time',
               'policy_out_time', 'policy_add_bed', 'policy_pets', 'policy_breakfast',

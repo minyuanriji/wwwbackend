@@ -15,4 +15,8 @@ class GetHotelIdsRequest extends BaseRequest {
     public $pageSize;
     public $Status = 1;
     public $flagbook = 1;
+
+    public function getUri(){
+        return "/hotel/getHotelIds";
+    }
 }

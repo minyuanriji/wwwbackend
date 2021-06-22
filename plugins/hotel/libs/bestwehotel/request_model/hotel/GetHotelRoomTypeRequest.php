@@ -12,4 +12,7 @@ class GetHotelRoomTypeRequest extends BaseRequest {
 
     public $innId;
 
+    public function getUri(){
+        return "/hotel/getHotelRoomType";
+    }
 }

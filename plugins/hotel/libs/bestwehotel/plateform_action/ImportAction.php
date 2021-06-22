@@ -206,6 +206,25 @@ class ImportAction extends BaseObject {
      * @param $info
      */
     private function saveMaps(Hotels $hotel, $info){
+
+        /**
+         * 百度地图BD09坐标---->中国正常GCJ02坐标
+         * 腾讯地图用的也是GCJ02坐标
+         * @param double $lat 纬度
+         * @param double $lng 经度
+         * @return array();
+         */
+        $Convert_BD09_To_GCJ02 = function($lat, $lng){
+            $x_pi = 3.14159265358979324 * 3000.0 / 180.0;
+            $x = $lng - 0.0065;
+            $y = $lat - 0.006;
+            $z = sqrt($x * $x + $y * $y) - 0.00002 * sin($y * $x_pi);
+            $theta = atan2($y, $x) - 0.000003 * cos($x * $x_pi);
+            $lng = $z * cos($theta);
+            $lat = $z * sin($theta);
+            return ['lng'=>$lng, 'lat'=>$lat];
+        };
+
         HotelMap::deleteAll([
             "hotel_id" => $hotel->id
         ]);
@@ -219,12 +238,29 @@ class ImportAction extends BaseObject {
                 ]);
                 if($mapInfo['mapType'] == 0){
                     $map->type = "bd";
+                    if(empty($hotel->tx_lat) || empty($hotel->tx_lng)){
+                        $gcj02 = $Convert_BD09_To_GCJ02($mapInfo['lag'], $mapInfo['lng']);
+                        $hotel->tx_lat = $gcj02['lat'];
+                        $hotel->tx_lng = $gcj02['lng'];
+                    }
                 }elseif($mapInfo['mapType'] == 2){
                     $map->type = "tx";
+                    if(empty($hotel->tx_lat) || empty($hotel->tx_lng)){
+                        $hotel->tx_lat = $mapInfo['lag'];
+                        $hotel->tx_lng = $mapInfo['lng'];
+                    }
                 }elseif($mapInfo['mapType'] == 3){
                     $map->type = "gd";
+                    if(empty($hotel->tx_lat) || empty($hotel->tx_lng)){
+                        $hotel->tx_lat = $mapInfo['lag'];
+                        $hotel->tx_lng = $mapInfo['lng'];
+                    }
                 }else{
                     $map->type = "un";
+                    if(empty($hotel->tx_lat) || empty($hotel->tx_lng)){
+                        $hotel->tx_lat = $mapInfo['lag'];
+                        $hotel->tx_lng = $mapInfo['lng'];
+                    }
                 }
                 if(!$map->save()){
                     throw new HotelException(json_encode($map->getErrors()));

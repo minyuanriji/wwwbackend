@@ -9,6 +9,8 @@ use app\plugins\mch\models\MchCash;
 
 class MchCashForm extends BaseModel
 {
+    public $limit = 10;
+
     public function getList ($mch_id)
     {
         try {
@@ -24,7 +26,7 @@ class MchCashForm extends BaseModel
                     'mall_id'   => $mch->mall_id,
                     'is_delete' => 0,
                 ])
-                ->page($pagination)
+                ->page($pagination, $this->limit)
                 ->asArray()->all();
 
             if ($mch_cash_list) {

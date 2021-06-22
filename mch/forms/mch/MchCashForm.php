@@ -26,7 +26,7 @@ class MchCashForm extends BaseModel
                     "fact_price",
                     "status",
                     "transfer_status",
-                    "created_at",
+                    "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at",
                 ])
                 ->where([
                     'id'        => \Yii::$app->mchAdmin->identity->mch_id,
@@ -36,11 +36,6 @@ class MchCashForm extends BaseModel
                 ->page($pagination)
                 ->asArray()->all();
 
-            if ($mch_cash_list) {
-                foreach ($mch_cash_list as $key => $value) {
-                    $mch_cash_list[$key]['created_at'] = date('Y-m-d H:i:s', $value['created_at']);
-                }
-            }
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',

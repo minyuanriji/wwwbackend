@@ -9,6 +9,6 @@ class WithdrawalDetailsController extends BaseController
     public function actionMchAllList ()
     {
         $form = new MchCashForm();
-        return $this->asJson($form->getList());
+        return $form->getList();
     }
 }

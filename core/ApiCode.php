@@ -27,6 +27,10 @@ class ApiCode
      */
     const CODE_FAIL = 1;
     /**
+     * 黑名单错误码
+     */
+    const BLACKLIST_CODE_FAIL = 999;
+    /**
      * 未登录
      *
      */

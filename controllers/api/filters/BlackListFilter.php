@@ -17,7 +17,8 @@ use yii\base\ActionFilter;
 class BlackListFilter extends ActionFilter
 {
     private $routeList = [
-        'api/order/preview'
+        'api/order/preview',
+        'api/index/index',
     ];
 
     public function beforeAction($action)
@@ -25,6 +26,11 @@ class BlackListFilter extends ActionFilter
         /** @var User $user */
         $user = User::findOne(['id' => \Yii::$app->user->id]);
         if ($user && $user->is_blacklist) {
+            \Yii::$app->response->data = [
+                'code' => ApiCode::BLACKLIST_CODE_FAIL,
+                'msg' => '您已被限制任何操作，如有疑问请联系客服！',
+            ];
+            return false;
             $plugins = \Yii::$app->plugin->list;
             foreach ($plugins as $plugin) {
                 $PluginClass = 'app\\plugins\\' . $plugin->name . '\\Plugin';

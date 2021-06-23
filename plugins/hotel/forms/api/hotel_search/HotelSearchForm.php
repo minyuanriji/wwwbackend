@@ -41,18 +41,19 @@ class HotelSearchForm extends BaseModel{
         $cache = \Yii::$app->getCache();
         $foundData = $this->getFoundData($searchId);
         $hotelIds = [];
-        foreach($foundData as $prepareId => $tmpIds){
-            if(empty($hotelIds)){
-                $hotelIds = $tmpIds;
-            }elseif(!$cache->get($this->prepareCacheKey($prepareId))){
-                unset($foundData[$prepareId]);
-            }else{
-                $hotelIds = array_intersect($hotelIds, $tmpIds);
+        if($foundData){
+            foreach($foundData as $prepareId => $tmpIds){
+                if(empty($hotelIds)){
+                    $hotelIds = $tmpIds;
+                }elseif(!$cache->get($this->prepareCacheKey($prepareId))){
+                    unset($foundData[$prepareId]);
+                }else{
+                    $hotelIds = array_intersect($hotelIds, $tmpIds);
+                }
             }
+            $cache->set($searchId, $foundData, 3600);
         }
-
-        $cache->set($searchId, $foundData, 3600);
-
+        
         return $hotelIds;
     }
 

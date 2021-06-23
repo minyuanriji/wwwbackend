@@ -3,6 +3,7 @@ namespace app\plugins\hotel\forms\api;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\plugins\hotel\forms\api\hotel_search\HotelSearchForm;
 use app\plugins\hotel\models\Hotels;
 
 class HotelSimpleListForm extends BaseModel{
@@ -10,11 +11,12 @@ class HotelSimpleListForm extends BaseModel{
     public $page;
     public $lng;
     public $lat;
+    public $search_id;
 
     public function rules(){
         return [
             [['page'], 'integer'],
-            [['lng', 'lat'], 'string']
+            [['lng', 'lat', 'search_id'], 'string']
         ];
     }
 
@@ -34,6 +36,12 @@ class HotelSimpleListForm extends BaseModel{
             ]);
 
             $selects = ["ho.id", "ho.thumb_url", "ho.name", "ho.type", "ho.cmt_grade", "ho.cmt_num", "ho.price"];
+
+            if(!empty($this->search_id)){
+                $form = new HotelSearchForm();
+                $foundHotelIds = $form->getFoundHotelIds($this->search_id);
+                $query->andWhere(["IN", "id", $foundHotelIds ? $foundHotelIds : []]);
+            }
 
             $rows = $query->select($selects)->page($pagination, 10, max(1, (int)$this->page))
                           ->asArray()->all();

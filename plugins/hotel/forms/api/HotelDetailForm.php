@@ -18,7 +18,7 @@ class HotelDetailForm extends BaseModel{
     public function rules(){
         return [
             [['hotel_id', 'start_date', 'days'], 'required'],
-            [['hotel_id', 'days'], 'integer']
+            [['hotel_id', 'days'], 'integer', 'min' => 1]
         ];
     }
 
@@ -28,6 +28,14 @@ class HotelDetailForm extends BaseModel{
         }
 
         try {
+
+            $todayStartTime = strtotime(date("Y-m-d") . " 00:00:00");
+            $startTime = strtotime($this->start_date);
+
+            if($startTime < $todayStartTime){
+                throw new \Exception("起始日期不正确");
+            }
+
             $hotel = Hotels::findOne($this->hotel_id);
             if(!$hotel || $hotel->is_delete){
                 throw new \Exception("酒店不存在");

@@ -2,6 +2,7 @@
 namespace app\plugins\hotel\libs\bestwehotel\plateform_action;
 
 
+use app\helpers\ArrayHelper;
 use app\plugins\hotel\libs\bestwehotel\client\hotel\GetHotelRoomStatusClient;
 use app\plugins\hotel\libs\bestwehotel\Request;
 use app\plugins\hotel\libs\bestwehotel\request_model\hotel\GetHotelRoomStatusRequest;
@@ -41,7 +42,6 @@ class GetBookingListAction extends BaseObject {
             }
 
             list($rooms, $rows, $pics) = $this->prepareData($result);
-
             foreach($result->responseModel->roomTypeList as $item){
                 if(!$item->productList || !isset($rows[$item->roomTypeCode]))
                     continue;
@@ -49,15 +49,18 @@ class GetBookingListAction extends BaseObject {
                 $room = $rooms[$productCode];
                 $bookingItem = new BookingListItemModel();
                 $bookingItem->product_thumb = isset($pics[$productCode]) ? $pics[$productCode] : "";
-                $bookingItem->product_code = $rows[$item->roomTypeCode];
-                $bookingItem->product_name = $item->roomTypeName;
+                $bookingItem->product_code  = $rows[$item->roomTypeCode];
+                $bookingItem->product_name  = $item->roomTypeName;
                 foreach($item->productList as $product){
-                    $bookingItem->product_num = $product->quota;
+                    $uniqueId = $this->hotel->id . ":" . $this->hotelPlateform->id . ":" . $product->productCode;
+                    $bookingItem->unique_id     = $uniqueId;
+                    $bookingItem->product_num   = $product->quota;
                     $bookingItem->product_price = $product->advanceRate;
-                    $bookingItem->is_breakfast = $product->advanceBreakfastCount ? 1 : 0;
-                    $bookingItem->ban_smoking = $room['policy_ban_smoking'] ? 1 : 0;
-                    $bookingItem->window = $room['window'];
-                    $bookingItem->bed_type = $room['bed_type'];
+                    $bookingItem->is_breakfast  = $product->advanceBreakfastCount ? 1 : 0;
+                    $bookingItem->ban_smoking   = $room['policy_ban_smoking'] ? 1 : 0;
+                    $bookingItem->window        = $room['window'];
+                    $bookingItem->bed_type      = $room['bed_type'];
+                    $bookingItem->origin_data   = ArrayHelper::toArray($product);
                     $bookingListResult->addItem($bookingItem);
                 }
             }

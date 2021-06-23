@@ -58,7 +58,7 @@ class UserBindForm extends BaseModel
             if(empty($userInfo)){
                 return [
                     'code' => ApiCode::CODE_NOT_LOGIN,
-                    'msg' => '数据不存在',
+                    'msg' => '授权信息已过期，请重新登陆！',
                 ];
             }
             \Yii::warning("userBindForm start mobile = ".$this->mobile);

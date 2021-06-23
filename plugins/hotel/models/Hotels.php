@@ -41,6 +41,11 @@ class Hotels extends BaseActiveRecord
         return $room;
     }
 
+    /**
+     * 获取合作平台
+     * @param $plateform_class
+     * @return array|\yii\db\ActiveRecord|null
+     */
     public function getPlateform($plateform_class){
         return HotelPlateforms::find()->where([
             'type'            => 'hotel',
@@ -48,5 +53,17 @@ class Hotels extends BaseActiveRecord
             'plateform_class' => $plateform_class,
             'mall_id'         => $this->mall_id
         ])->one();
+    }
+
+    /**
+     * 获取所有合作平台
+     * @return HotelPlateforms[]
+     */
+    public function getPlateforms(){
+        return HotelPlateforms::find()->where([
+            'type'        => 'hotel',
+            'source_code' => $this->id,
+            'mall_id'     => $this->mall_id
+        ])->all();
     }
 }

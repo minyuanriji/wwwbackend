@@ -2,6 +2,9 @@
 namespace app\plugins\hotel\libs;
 
 
+use app\plugins\hotel\models\HotelPlateforms;
+use app\plugins\hotel\models\Hotels;
+
 interface IPlateform
 {
     /**
@@ -12,4 +15,14 @@ interface IPlateform
      * @return ImportResult
      */
     public function import($page, $size);
+
+    /**
+     * 获取酒店可预订的房间列表
+     * @param Hotels $hotel
+     * @param $startDate
+     * @param $days
+     * @throws HotelException
+     * @return BookingListResult
+     */
+    public function getBookingList(Hotels $hotel, HotelPlateforms $hotelPlateform, $startDate, $days);
 }

@@ -8,11 +8,13 @@ use app\plugins\hotel\models\Hotels;
 class HotelSimpleListForm extends BaseModel{
 
     public $page;
+    public $lng;
+    public $lat;
 
     public function rules(){
         return [
             [['page'], 'integer'],
-            [['start_date', 'end_date'], 'string']
+            [['lng', 'lat'], 'string']
         ];
     }
 
@@ -36,6 +38,10 @@ class HotelSimpleListForm extends BaseModel{
             $rows = $query->select($selects)->page($pagination, 10, max(1, (int)$this->page))
                           ->asArray()->all();
 
+            foreach($rows as &$row){
+                $row['type_text'] = static::getTypeText($row['type']);
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
@@ -50,5 +56,10 @@ class HotelSimpleListForm extends BaseModel{
                 'msg'  => $e->getMessage()
             ];
         }
+    }
+
+    private static function getTypeText($type){
+        $typeTexts = ['luxe' => '豪华型', 'comfort' => '舒适型', 'eco' => '经济型'];
+        return isset($typeTexts[$type]) ? $typeTexts[$type] : "";
     }
 }

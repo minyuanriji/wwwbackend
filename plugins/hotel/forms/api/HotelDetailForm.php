@@ -17,7 +17,8 @@ class HotelDetailForm extends BaseModel{
 
     public function rules(){
         return [
-            [['hotel_id', 'start_date', 'days'], 'required']
+            [['hotel_id', 'start_date', 'days'], 'required'],
+            [['hotel_id', 'days'], 'integer']
         ];
     }
 
@@ -70,7 +71,9 @@ class HotelDetailForm extends BaseModel{
         }
         $bookingList = [];
         foreach($bookingListItems as $bookingListItem){
-            $bookingList[] = ArrayHelper::toArray($bookingListItem);
+            $arr = ArrayHelper::toArray($bookingListItem);
+            $arr['product_thumb'] = !empty($arr['product_thumb']) ? $arr['product_thumb'] : $hotel->thumb_url;
+            $bookingList[] = $arr;
         }
 
         return $bookingList;

@@ -3,12 +3,10 @@ namespace app\helpers;
 
 class TencentMapHelper{
 
-    public static function toPoi($lng, $lat){
+    public static function toPoi($hostInfo, $lng, $lat){
         $key = \Yii::$app->params['qqMapApiKey'];
 
         $url = "https://apis.map.qq.com/ws/geocoder/v1/?location=".$lat.",".$lng."&key={$key}&get_poi=1";
-        $hostInfo = \Yii::$app->getRequest()->getHostInfo();
-        $hostInfo = "http://dev.mingyuanriji.cn";
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);

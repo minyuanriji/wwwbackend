@@ -16,15 +16,13 @@ class SearchController extends ApiController{
     public function actionPrepare(){
         $form = new HotelSearchPrepareForm();
         $form->attributes = $this->requestData;
+        $form->host_info  = \Yii::$app->getRequest()->getHostInfo();
 
-        /*\Yii::$app->cache->flush();
-        \Yii::$app->queue->delay(0)->push(new HotelSearchPrepareJob([
-            "mall_id" => \Yii::$app->mall->id,
-            "form"    => $form
-        ]));
-        exit;*/
-
-        if($form->hasData()){
+        if((defined('ENV') && ENV == "pro") && $form->hasData()){
+            \Yii::$app->queue->delay(0)->push(new HotelSearchPrepareJob([
+                "mall_id" => \Yii::$app->mall->id,
+                "form"    => $form
+            ]));
             return $this->asJson($form->history());
         }
 

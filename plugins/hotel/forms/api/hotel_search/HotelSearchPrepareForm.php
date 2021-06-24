@@ -21,6 +21,7 @@ class HotelSearchPrepareForm extends HotelSearchForm {
     public $lng;        //经度
     public $lat;        //纬度
 
+
     public function rules(){
         return [
             [['city_id', 'type', 'start_date', 'days'], 'required'],
@@ -61,7 +62,7 @@ class HotelSearchPrepareForm extends HotelSearchForm {
 
         try {
             if($this->city_id <= 0 && !empty($this->lng) && !empty($this->lat)){
-                $poi = TencentMapHelper::toPoi($this->lng, $this->lat);
+                $poi = TencentMapHelper::toPoi($this->host_info, $this->lng, $this->lat);
                 $citySearch = CityHelper::likeSearch($poi['province'], $poi['city'], $poi['district']);
                 $cityId = isset($citySearch['city_id']) ? $citySearch['city_id'] : 0;
                 $provinceId = isset($citySearch['province_id']) ? $citySearch['province_id'] : 0;

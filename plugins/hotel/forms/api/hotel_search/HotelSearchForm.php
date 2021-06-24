@@ -17,7 +17,7 @@ class HotelSearchForm extends BaseModel{
     }
 
     /**
-     * 把查询到的酒店写入到缓存中
+     * 把查询到的酒店写入到临时缓存中
      * @param string $searchId
      * @param string $prepareId
      * @param array $founds
@@ -33,28 +33,27 @@ class HotelSearchForm extends BaseModel{
     }
 
     /**
+     * 更新查询到的酒店
+     * @param string $searchId
+     * @param string $prepareId
+     */
+    public function updateFound($searchId, $prepareId){
+        $cache = \Yii::$app->getCache();
+        $foundData = $this->getFoundData($searchId);
+        $hotelIds = isset($foundData[$prepareId]) && is_array($foundData[$prepareId]) ? $foundData[$prepareId] : [];
+        $foundData['hotel_ids'] = array_unique($hotelIds);
+        $cache->set($searchId, $foundData, 3600);
+    }
+
+    /**
      * 获取查询到的酒店ID
      * @param string $searchId
      * @return array
      */
     public function getFoundHotelIds($searchId){
-        $cache = \Yii::$app->getCache();
         $foundData = $this->getFoundData($searchId);
-        $hotelIds = [];
-        if($foundData){
-            foreach($foundData as $prepareId => $tmpIds){
-                if(empty($hotelIds)){
-                    $hotelIds = $tmpIds;
-                }elseif(!$cache->get($this->prepareCacheKey($prepareId))){
-                    unset($foundData[$prepareId]);
-                }else{
-                    $hotelIds = array_intersect($hotelIds, $tmpIds);
-                }
-            }
-            $cache->set($searchId, $foundData, 3600);
-        }
-        
-        return $hotelIds;
+        $hotelIds = isset($foundData["hotel_ids"]) && is_array($foundData["hotel_ids"]) ? $foundData["hotel_ids"] : [];
+        return !empty($hotelIds) && is_array($hotelIds) ? $hotelIds : [];
     }
 
     /**

@@ -73,6 +73,10 @@ class HotelSearchFilterForm extends HotelSearchForm{
                 $filterResult['founds'] = count($founds);
             }
 
+            if($filterResult['finished']){
+                $this->updateFound($searchId, $this->prepare_id);
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => $filterResult

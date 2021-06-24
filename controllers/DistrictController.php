@@ -11,6 +11,7 @@
 namespace app\controllers;
 
 
+use app\forms\api\DistrictLikeSearchForm;
 use app\forms\api\user\UserAddressForm;
 use app\models\DistrictData;
 use app\models\Town;
@@ -18,6 +19,12 @@ use Curl\Curl;
 
 class DistrictController extends BaseController
 {
+
+    public function actionLikeSearch(){
+        $form = new DistrictLikeSearchForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $form->search();
+    }
 
     public function actionTree()
     {

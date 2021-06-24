@@ -16,12 +16,14 @@ class HotelSearchPrepareForm extends HotelSearchForm {
     public $s_price;    //起步价
     public $e_price;    //截止价
     public $level;      //星级1-10
+    public $lng;        //经度
+    public $lat;        //纬度
 
     public function rules(){
         return [
             [['city_id', 'type', 'start_date', 'days'], 'required'],
             [['city_id', 'days'], 'integer', 'min' => 1],
-            [['keyword', 's_price', 'e_price', 'level'], 'safe']
+            [['lng', 'lat', 'keyword', 's_price', 'e_price', 'level'], 'safe']
         ];
     }
 

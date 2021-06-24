@@ -17,7 +17,7 @@ class SearchController extends ApiController{
         $form->attributes = $this->requestData;
 
         if($form->hasData()){
-            //return $this->asJson($form->history());
+            return $this->asJson($form->history());
         }
 
         return $this->asJson($form->prepare());

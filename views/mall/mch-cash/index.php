@@ -69,7 +69,7 @@
                                 </el-tooltip>
                             </el-button>
 
-                            <el-button @click="apply(scope.row, 'refuse')" v-if="scope.row.status == 0" size="mini" circle style="margin-left: 10px;margin-top: 10px">
+                            <el-button @click="apply(scope.row, 'refuse')" v-if="scope.row.status != 1 || scope.row.transfer_status != 1" size="mini" circle style="margin-left: 10px;margin-top: 10px">
                                 <el-tooltip class="item" effect="dark" content="拒绝" placement="top">
                                     <img src="statics/img/mall/nopass.png" alt="">
                                 </el-tooltip>

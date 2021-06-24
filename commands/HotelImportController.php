@@ -15,8 +15,6 @@ class HotelImportController extends BaseCommandController
 
         \Yii::$app->mall = Mall::findOne(5);
 
-        file_put_contents(__DIR__ . "/HotelImportController.update.log", "");
-
         $page = 1;
         while (true){
             $form = new HotelImportForm();
@@ -26,7 +24,6 @@ class HotelImportController extends BaseCommandController
             $res = $form->import();
             if($res['code'] != ApiCode::CODE_SUCCESS){
                 $this->commandOut("error:{$page} for " . $res['msg']);
-                @file_put_contents(__DIR__ . "/HotelImportController.update.log", "error:{$page} for " . $res['msg'] . "\n", FILE_APPEND);
             }else{
                 if($res['data']['next_page'] <= 0){
                     $this->commandOut("finished!");

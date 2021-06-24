@@ -15,9 +15,13 @@ class HotelSearchController extends BaseCommandController {
                 $cache = \Yii::$app->getCache();
                 $cacheKey = "HotelSearchTask";
                 $taskData = $cache->get($cacheKey);
-                print_r($taskData);
-                echo "\n";
-                sleep(3);
+                if(!empty($taskData)){
+                    $prepareId = array_shift($taskData);
+                    $form = new HotelSearchFilterForm([
+                        "prepare_id" => $prepareId
+                    ]);
+                }
+                sleep(1);
             }
         });
         $pool->on('WorkerStop', function (\Swoole\Process\Pool $pool, $workerId) {

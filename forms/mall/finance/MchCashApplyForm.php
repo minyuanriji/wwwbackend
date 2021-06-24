@@ -2,6 +2,7 @@
 namespace app\forms\mall\finance;
 
 
+use app\component\efps\Efps;
 use app\core\ApiCode;
 use app\forms\efps\EfpsMchCashTransfer;
 use app\mch\forms\mch\MchAccountModifyForm;
@@ -57,6 +58,18 @@ class MchCashApplyForm  extends BaseModel{
             }elseif($this->act == "return"){ //退还账户余额
                 if ($mchCash->status != 2 || $mchCash->transfer_status != 0) {
                     throw new \Exception("无法退还账户余额操作");
+                }
+
+                //再次查询易票联是否打款成功
+                $res = \Yii::$app->efps->payQuery([
+                    "customerCode" => \Yii::$app->efps->getCustomerCode(),
+                    "outTradeNo"   => $mchCash->order_no
+                ]);
+                if($res['code'] == Efps::CODE_SUCCESS && $res['data']['payState'] == "00"){
+                    return [
+                        'code' => ApiCode::CODE_FAIL,
+                        'msg'  => "已经成功打款，无需退还！"
+                    ];
                 }
 
                 $mchCash->transfer_status = 2;

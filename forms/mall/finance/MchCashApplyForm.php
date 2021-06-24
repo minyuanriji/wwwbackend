@@ -61,7 +61,7 @@ class MchCashApplyForm  extends BaseModel{
                 }
 
                 //再次查询易票联是否打款成功
-                $res = \Yii::$app->efps->payQuery([
+                $res = \Yii::$app->efps->withdrawalToCardQuery([
                     "customerCode" => \Yii::$app->efps->getCustomerCode(),
                     "outTradeNo"   => $mchCash->order_no
                 ]);

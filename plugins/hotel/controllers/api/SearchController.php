@@ -40,9 +40,6 @@ class SearchController extends ApiController{
         $form->attributes = $this->requestData;
 
         $res = $form->filter();
-        if($res['code'] == ApiCode::CODE_SUCCESS && !$res['data']['finished']){
-
-        }
 
         return $this->asJson($res);
     }

@@ -75,6 +75,8 @@ class HotelSearchFilterForm extends HotelSearchForm{
 
             if($filterResult['finished']){
                 $this->updateFound($searchId, $this->prepare_id);
+            }else{
+                $this->addSearchTask($searchId, $this->prepare_id);
             }
 
             return [

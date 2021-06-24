@@ -5,6 +5,7 @@ namespace app\plugins\hotel\controllers\api;
 use app\plugins\ApiController;
 use app\plugins\hotel\forms\api\hotel_search\HotelSearchFilterForm;
 use app\plugins\hotel\forms\api\hotel_search\HotelSearchPrepareForm;
+use app\plugins\hotel\jobs\HotelSearchPrepareJob;
 
 class SearchController extends ApiController{
 
@@ -15,6 +16,13 @@ class SearchController extends ApiController{
     public function actionPrepare(){
         $form = new HotelSearchPrepareForm();
         $form->attributes = $this->requestData;
+
+        /*\Yii::$app->cache->flush();
+        \Yii::$app->queue->delay(0)->push(new HotelSearchPrepareJob([
+            "mall_id" => \Yii::$app->mall->id,
+            "form"    => $form
+        ]));
+        exit;*/
 
         if($form->hasData()){
             return $this->asJson($form->history());

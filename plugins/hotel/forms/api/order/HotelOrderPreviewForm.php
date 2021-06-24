@@ -1,26 +1,27 @@
 <?php
-namespace app\plugins\hotel\forms\api;
-
+namespace app\plugins\hotel\forms\api\order;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\hotel\helpers\ApiHotelHelper;
+use app\plugins\hotel\models\HotelRoom;
 use app\plugins\hotel\models\Hotels;
 
-class HotelDetailForm extends BaseModel{
+class HotelOrderPreviewForm extends BaseModel{
 
-    public $hotel_id;
+    public $unique_id;
+    public $product_code;
     public $start_date;
     public $days;
 
     public function rules(){
         return [
-            [['hotel_id', 'start_date', 'days'], 'required'],
-            [['hotel_id', 'days'], 'integer', 'min' => 1]
+            [['unique_id', 'product_code', 'start_date', 'days'], 'required'],
+            [['days'], 'integer', 'min' => 1]
         ];
     }
 
-    public function getDetail(){
+    public function preview(){
         if(!$this->validate()){
             return $this->responseErrorInfo();
         }
@@ -34,7 +35,17 @@ class HotelDetailForm extends BaseModel{
                 throw new \Exception("起始日期不正确");
             }
 
-            $hotel = Hotels::findOne($this->hotel_id);
+            //获取房型信息
+            $room = HotelRoom::find()->where([
+                "product_code" => $this->product_code,
+                "is_delete" => 0
+            ])->one();
+            if(!$room){
+                throw new \Exception("房型信息不存在");
+            }
+
+            //获取酒店信息
+            $hotel = Hotels::findOne($room->hotel_id);
             if(!$hotel || $hotel->is_delete){
                 throw new \Exception("酒店不存在");
             }
@@ -42,8 +53,7 @@ class HotelDetailForm extends BaseModel{
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'hotel_info'   => ApiHotelHelper::format($hotel),
-                    'booking_list' => ApiHotelHelper::bookingList($hotel, $this->start_date, $this->days)
+                    'hotel_info' => ApiHotelHelper::format($hotel),
                 ]
             ];
         }catch (\Exception $e){
@@ -53,4 +63,5 @@ class HotelDetailForm extends BaseModel{
             ];
         }
     }
+
 }

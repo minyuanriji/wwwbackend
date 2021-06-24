@@ -3,6 +3,8 @@ namespace app\plugins\hotel\forms\api\hotel_search;
 
 
 use app\core\ApiCode;
+use app\helpers\CityHelper;
+use app\helpers\TencentMapHelper;
 use app\models\DistrictData;
 use app\plugins\hotel\models\Hotels;
 
@@ -22,7 +24,8 @@ class HotelSearchPrepareForm extends HotelSearchForm {
     public function rules(){
         return [
             [['city_id', 'type', 'start_date', 'days'], 'required'],
-            [['city_id', 'days'], 'integer', 'min' => 1],
+            [['days'], 'integer', 'min' => 1],
+            [['city_id'], 'integer'],
             [['lng', 'lat', 'keyword', 's_price', 'e_price', 'level'], 'safe']
         ];
     }
@@ -57,11 +60,19 @@ class HotelSearchPrepareForm extends HotelSearchForm {
         }
 
         try {
-
-            $districtArr = DistrictData::getArr();
-            $city = isset($districtArr[$this->city_id]) ? $districtArr[$this->city_id] : null;
-            if(!$city || $city['level'] != "city"){
-                throw new \Exception("城市信息选择错误");
+            if($this->city_id <= 0 && !empty($this->lng) && !empty($this->lat)){
+                $poi = TencentMapHelper::toPoi($this->lng, $this->lat);
+                $citySearch = CityHelper::likeSearch($poi['province'], $poi['city'], $poi['district']);
+                $cityId = isset($citySearch['city_id']) ? $citySearch['city_id'] : 0;
+                $provinceId = isset($citySearch['province_id']) ? $citySearch['province_id'] : 0;
+            }else{
+                $districtArr = DistrictData::getArr();
+                $city = isset($districtArr[$this->city_id]) ? $districtArr[$this->city_id] : null;
+                if(!$city || $city['level'] != "city"){
+                    throw new \Exception("城市信息选择错误");
+                }
+                $cityId = $city['id'];
+                $provinceId = $city['parent_id'];
             }
 
             $todayStartTime = strtotime(date("Y-m-d") . " 00:00:00");
@@ -75,8 +86,8 @@ class HotelSearchPrepareForm extends HotelSearchForm {
                 "is_open"     => 1,
                 "is_booking"  => 1,
                 "is_delete"   => 0,
-                "city_id"     => $city['id'],
-                "province_id" => $city['parent_id']
+                "city_id"     => $cityId,
+                "province_id" => $provinceId
             ]);
 
             if(!empty($this->keyword)){
@@ -118,9 +129,5 @@ class HotelSearchPrepareForm extends HotelSearchForm {
                 'msg'  => $e->getMessage()
             ];
         }
-    }
-
-    public function handle(){
-
     }
 }

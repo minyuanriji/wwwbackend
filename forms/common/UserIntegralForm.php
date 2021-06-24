@@ -115,13 +115,13 @@ class UserIntegralForm extends BaseModel{
      * @param string $remark
      * @return void
      */
-    public static function adminAdd(User $user, $price, $admin_id, $remark = ""){
+    public static function adminAdd(User $user, $price, $admin_id, $remark = "", $is_manual = 0){
         $t = \Yii::$app->db->beginTransaction();
         try {
 
             $desc = "管理员[ID:{$admin_id}]充值：" . $remark;
 
-            static::change($user, $price, self::TYPE_ADD, "admin", null, $desc);
+            static::change($user, $price, self::TYPE_ADD, "admin", null, $desc, $is_manual);
 
             $t->commit();
 
@@ -145,13 +145,13 @@ class UserIntegralForm extends BaseModel{
      * @param string $remark
      * @return void
      */
-    public static function adminSub(User $user, $price, $admin_id, $remark = ""){
+    public static function adminSub(User $user, $price, $admin_id, $remark = "", $is_manual = 0){
         $t = \Yii::$app->db->beginTransaction();
         try {
 
             $desc = "管理员[ID:{$admin_id}]扣减：" . $remark;
 
-            static::change($user, $price, self::TYPE_SUB, "admin", null, $desc);
+            static::change($user, $price, self::TYPE_SUB, "admin", null, $desc, $is_manual);
 
             $t->commit();
 
@@ -168,7 +168,7 @@ class UserIntegralForm extends BaseModel{
         }
     }
 
-    private static function change(User $user, $price, $type, $source_type, $source_id, $desc = null){
+    private static function change(User $user, $price, $type, $source_type, $source_id, $desc = null, $is_manual = 0){
 
         $staticIntegral = floatval($user->static_integral);
 
@@ -195,7 +195,8 @@ class UserIntegralForm extends BaseModel{
             "desc"             => $desc,
             "source_id"        => $source_id,
             "source_type"      => $source_type,
-            "created_at"       => time()
+            "created_at"       => time(),
+            "is_manual"       => $is_manual
         ]);
         if(!$integralLog->save()){
             throw new \Exception(json_encode($integralLog->getErrors()));

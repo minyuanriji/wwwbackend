@@ -242,8 +242,13 @@ class AttachmentUploadForm extends Model
                 $saveViedoImg = $path.$fileName;
                 $url = $this->baseWebUrl.$filePath;
                 \Yii::warning("attachmentUploadForm save saveViedoImg=".$saveViedoImg);
+
+                $set_result = $this->mkdirs($path);
+                if (!$set_result) {
+                    return ['code' => ApiCode::CODE_FAIL, 'msg' => '创建文件夹失败'];
+                }
                 //截取视频图片，并上传到第三方图片存储平台
-                VideoLogic::getVideoImage($res['url'],$saveViedoImg);
+                VideoLogic::getVideoImage(trim($res['url']),trim($saveViedoImg));
                 $imgUrl = CommonLogic::uploadImgToCloudStorage($saveViedoImg,$filePath,$url);
                 $res['thumb_url'] = $imgUrl;
             }
@@ -486,5 +491,13 @@ class AttachmentUploadForm extends Model
             'error' => 0,
             'size' => $size,
         ]);
+    }
+
+    public function  mkdirs( $dir ,  $mode  = 0777)
+    {
+        if  ( is_dir ( $dir ) || @ mkdir ( $dir ,  $mode ))  return  TRUE;
+        if  (!$this->mkdirs(dirname( $dir ),  $mode ))  return  FALSE;
+
+        return  @ mkdir ( $dir ,  $mode );
     }
 }

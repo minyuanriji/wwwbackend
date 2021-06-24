@@ -168,7 +168,7 @@ class IdentityController extends ApiController
         $smsForm->attributes = $this->requestData;
         $recommend_id = !empty($this->requestData['recommend_id']) ? $this->requestData['recommend_id'] : 0;
         $headers = \Yii::$app->request->headers;
-        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 0;
+        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 5;
         return $smsForm->bind($recommend_id,$stands_mall_id);
     }
 
@@ -182,7 +182,7 @@ class IdentityController extends ApiController
         $parent_user_id = !empty($this->requestData['parent_user_id']) ? $this->requestData['parent_user_id'] : 0;
         $parent_source = !empty($this->requestData['parent_source']) ? $this->requestData['parent_source'] : null;
         $headers = \Yii::$app->request->headers;
-        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 0;
+        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 5;
         $result = $wechatForm->miniAuthorized($parent_user_id,$parent_source,$stands_mall_id);
         return $result;
     }

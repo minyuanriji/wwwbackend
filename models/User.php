@@ -49,6 +49,7 @@ use Yii;
  * @property int $is_distributor 是否为分销商
  * @property int $inviter_at 推荐资格升级时间
  * @property int $source 用户来源
+ * @property int $is_examine 是否有审核资格
  * @property User $parent
  * @property User $secondParent
  * @property User $thirdParent
@@ -119,7 +120,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
         return [
             [['username', 'password'], 'required'],
             [['mall_id', 'mch_id', 'parent_id', 'second_parent_id', 'third_parent_id', 'is_delete', 'is_blacklist',
-                 'created_at', 'last_login_at', 'junior_at', 'level', 'birthday', 'is_inviter', 'inviter_at','source','upgrade_status'], 'integer'],
+                 'created_at', 'last_login_at', 'junior_at', 'level', 'birthday', 'is_inviter', 'inviter_at','source','upgrade_status', 'is_examine'], 'integer'],
             [['password', 'auth_key', 'access_token', 'avatar_url', 'platform', 'login_ip', 'transaction_password', 'role_type'], 'string'],
             [['balance', 'total_balance', 'total_income', 'income','income_frozen','total_score','score'], 'number'],
             [['username'], 'string', 'max' => 64],
@@ -168,7 +169,8 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
             'level' => '会员等级',
             'is_inviter' => '邀请者',
             'inviter_at' => '推荐资格升级时间',
-            'source' => '来源'
+            'source' => '来源',
+            'is_examine' => '是否有审核资格'
         ];
     }
 

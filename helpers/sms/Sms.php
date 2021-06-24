@@ -87,16 +87,28 @@ class Sms
 
         try {
             $captcha = (string)mt_rand(100000, 999999);
-            $message = new CaptchaMessage($captcha, $this->smsConfig['captcha']);
-            $results = $this->easySms->send($mobile, $message);
-
-            $ValidateCode = new ValidateCode();
-            $ValidateCode->target = $mobile;
-            $ValidateCode->code = $captcha;
-            $res = $ValidateCode->save();
-
-            $this->saveValidateCodeLog($mobile, $message->getContent() . $captcha);
-            return true;
+            if (isset(\Yii::$app->params['sms_phone_list']) && \Yii::$app->params['sms_phone_list']) {
+                $sms_phone_list = \Yii::$app->params['sms_phone_list'];
+            } else {
+                $sms_phone_list = [];
+            }
+            if (!in_array($mobile, $sms_phone_list)) {
+                $message = new CaptchaMessage($captcha, $this->smsConfig['captcha']);
+                $results = $this->easySms->send($mobile, $message);
+                $ValidateCode = new ValidateCode();
+                $ValidateCode->target = $mobile;
+                $ValidateCode->code = $captcha;
+                $res = $ValidateCode->save();
+                $this->saveValidateCodeLog($mobile, $message->getContent() . $captcha);
+                return true;
+            } else {
+                $ValidateCode = new ValidateCode();
+                $ValidateCode->target = $mobile;
+                $ValidateCode->code = $captcha;
+                $res = $ValidateCode->save();
+                $this->saveValidateCodeLog($mobile, '测试手机号：'.$mobile . '验证码:' . $captcha . '不发送短信！');
+                throw new \Exception($captcha);
+            }
         } catch (NoGatewayAvailableException $e) {
             \Yii::error('短信发送失败:' . $e->getMessage());
             throw $e;

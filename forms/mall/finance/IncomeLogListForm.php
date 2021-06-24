@@ -23,6 +23,7 @@ class IncomeLogListForm extends BaseModel
     public $start_date;
     public $end_date;
     public $keyword;
+    public $is_manual;
 
     public $user_id;
 
@@ -31,6 +32,7 @@ class IncomeLogListForm extends BaseModel
         return [
             [['page', 'limit', 'user_id'], 'integer'],
             [['keyword', 'start_date', 'end_date'], 'trim'],
+            [['is_manual',], 'safe'],
         ];
     }
 
@@ -48,6 +50,9 @@ class IncomeLogListForm extends BaseModel
         }])->orderBy('id desc');
         if ($this->user_id) {
             $query->andWhere(['b.user_id' => $this->user_id]);
+        }
+        if ($this->is_manual != '') {
+            $query->andWhere(['b.is_manual' => $this->is_manual]);
         }
         if ($this->start_date && $this->end_date) {
             $query->andWhere(['<', 'b.created_at', strtotime($this->end_date)])

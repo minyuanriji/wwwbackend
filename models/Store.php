@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\plugins\mch\models\Mch;
 use Yii;
 
 /**
@@ -83,5 +84,10 @@ class Store extends BaseActiveRecord
             'deleted_at' => 'Deleted Time',
             'is_delete' => 'Is Delete',
         ];
+    }
+
+    public function getMch ()
+    {
+        return $this->hasMany(Mch::className(), ['id' => 'each_id']);
     }
 }

@@ -56,7 +56,10 @@ class UserBindForm extends BaseModel
         try {
             $userInfo = \Yii::$app->cache->get($this->key);
             if(empty($userInfo)){
-                throw new \Exception("数据不存在");
+                return [
+                    'code' => ApiCode::CODE_NOT_LOGIN,
+                    'msg' => '授权信息已过期，请重新登陆！',
+                ];
             }
             \Yii::warning("userBindForm start mobile = ".$this->mobile);
             //手机号是否已绑定

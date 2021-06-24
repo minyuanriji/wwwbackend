@@ -19,6 +19,7 @@ use Yii;
  * @property string $mall_id
  * @property int $deleted_at 删除时间
  * @property int $is_delete 是否删除
+ * @property int $is_manual 是否是后台手动充值
  * @property User $user
  * @property OrderDetail $orderDetail
  */
@@ -50,7 +51,7 @@ class IncomeLog extends BaseActiveRecord
     {
         return [
             [['user_id', 'mall_id', 'type', 'money','income', 'desc', 'created_at'], 'required'],
-            [['user_id', 'mall_id', 'type','flag','deleted_at','is_delete'], 'integer'],
+            [['user_id', 'mall_id', 'type','flag','deleted_at','is_delete','is_manual'], 'integer'],
             [['money','income', 'source_id'], 'number'],
             [['desc', 'source_type'], 'string'],
             [['created_at','updated_at'], 'safe'],
@@ -74,7 +75,8 @@ class IncomeLog extends BaseActiveRecord
             'created_at' => 'Created At',
             'updated_at' => 'updated_at',
             'deleted_at'=>'deleted_at',
-            'is_delete'=>'is_delete'
+            'is_delete'=>'is_delete',
+            'is_manual'=>'是否是后台手动充值'
         ];
     }
 

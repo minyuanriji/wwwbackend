@@ -26,8 +26,9 @@ class VideoLogic
     public static function getVideoImage($saveFile,$saveViedoImg,$duration = 1)
     {
         try {
-            $config = isset(\Yii::$app->params["videoConfig"]) ? \Yii::$app->params["videoConfig"] : "";
+            $config = isset(\Yii::$app->params["ffmpeg_params"]) ? \Yii::$app->params["ffmpeg_params"] : [];
             $ffmpeg = FFMpeg::create($config);
+            \Yii::error("ffmpeg——result:".json_encode($ffmpeg));
             $video = $ffmpeg->open($saveFile);
             $video->filters()
                 ->resize(new Dimension(1320, 1240))

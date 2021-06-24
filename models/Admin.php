@@ -10,6 +10,7 @@
 
 namespace app\models;
 
+use app\plugins\mch\models\Mch;
 use Yii;
 use yii\web\IdentityInterface;
 use yii\base\Model;
@@ -165,6 +166,11 @@ class Admin extends BaseActiveRecord implements IdentityInterface
     public function getMall()
     {
         return $this->hasMany(Mall::className(), ['admin_id' => 'id']);
+    }
+
+    public function getMch()
+    {
+        return $this->hasMany(Mch::className(), ['id' => 'mch_id']);
     }
 
     /**

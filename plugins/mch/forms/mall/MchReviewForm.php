@@ -14,11 +14,12 @@ class MchReviewForm extends BaseModel
     public $id;
     public $review_status;
     public $keyword;
+    public $is_special;
 
     public function rules()
     {
         return [
-            [['id', 'review_status'], 'integer'],
+            [['id', 'review_status', 'is_special'], 'integer'],
             [['keyword'], 'string'],
             [['page'], 'default', 'value' => 1],
         ];
@@ -38,12 +39,23 @@ class MchReviewForm extends BaseModel
             $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
             $query->andWhere(['m.id' => $mchIds]);
         }
+        if ($this->is_special) {
+            $query->andWhere(['m.is_special' => $this->is_special]);
+        }
 
         $list = $query->select([
-            "m.*",
+            "m.id", "m.realname", "m.mobile", "m.created_at", "m.user_id", "m.is_special", "m.special_rate", "m.special_rate_remark",
             "p.id as parent_id", "p.nickname as parent_nickname",
             "p.mobile as parent_mobile", "p.role_type as parent_role_type"
-        ])->with('user.userInfo', 'store')
+        ])
+            ->with([
+                'user' => function ($query) {
+                    $query->select('id, nickname, avatar_url,');
+                },
+                'store' => function ($query) {
+                    $query->select('id, mch_id, cover_url, name');
+                }
+            ])
             ->orderBy(['m.created_at' => SORT_DESC])
             ->page($pagination)->asArray()->all();
 

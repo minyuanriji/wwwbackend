@@ -72,6 +72,11 @@
                     <span class="tip">开启推广资格之后用户拥有绑定下级的权力</span>
                 </el-form-item>
 
+                <el-form-item label="审核店铺资格" prop="is_examine">
+                    <el-switch v-model="form.is_examine" :active-value="1" :inactive-value="0"></el-switch>
+                    <span class="tip">开启审核店铺资格之后用户拥有审核下级门店的权力</span>
+                </el-form-item>
+
                 <el-form-item v-if="form.share" label="累计佣金" prop="total_balance">
                     <div>{{form.share.total_balance}}</div>
                 </el-form-item>
@@ -110,6 +115,7 @@
                 btnLoading: false,
                 FormRules: {
                     is_inviter: 0,
+                    is_examine: 0,
                     level: [
                         {required: true, message: '等级不能为空', trigger: 'blur'},
                     ],

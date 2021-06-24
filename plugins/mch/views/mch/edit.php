@@ -90,6 +90,20 @@
                                     inactive-value="0">
                             </el-switch>
                         </el-form-item>
+
+                        <el-form-item label="特殊折扣" prop="special_rate" v-if="ruleForm.is_special == '1'">
+                            <label slot="label" style="color: red">特殊折扣</label>
+                            <el-input disabled type="number" v-model.number="ruleForm.special_rate">
+                                <template slot="append">%</template>
+                            </el-input>
+                        </el-form-item>
+
+                        <el-form-item label="特殊折扣" prop="special_rate" v-if="ruleForm.is_special == '1'">
+                            <label slot="label" style="color: red">特殊折扣申请理由</label>
+                            <el-input disabled type="text" v-model.number="ruleForm.special_rate_remark">
+                            </el-input>
+                        </el-form-item>
+
                         <el-form-item label="提现手续费" prop="transfer_rate">
                             <label slot="label">服务费
                                 <el-tooltip class="item" effect="dark"
@@ -524,6 +538,7 @@
 
 
                             </el-tab-pane>
+
                             <el-tab-pane label="业务信息" name="tab_review_business">
                                 <el-form-item v-if="review.register_type != 'separate_account'" label="业务代码" prop="paper_businessCode">
                                     <el-input v-model="review.paper_businessCode"></el-input>

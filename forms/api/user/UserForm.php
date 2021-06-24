@@ -287,6 +287,16 @@ class UserForm extends BaseModel
                 "open_type" => "navigate"
             ];
         }
+
+        //酒店订单
+        /*$userCenter['menus'][] = [
+            "icon_url"  => "https://dev.mingyuanriji.cn/web/static/hotel-orders.png",
+            "name"      => "酒店",
+            "link_url"  => "/pages/hotel/orderList/orderList",
+            "open_type" => "navigate"
+        ];*/
+
+        //商家入驻
         if (YII_WEIXIN_APPLETS == 'true') {
             $userCenter['menus'][] = [
                 "icon_url"  => "https://dev.mingyuanriji.cn/web/static/shopSettle.png",
@@ -297,7 +307,6 @@ class UserForm extends BaseModel
         }
 
         //分红股东显示
-        //TODO
         $isBoss = Boss::find()->where([
             'user_id'   => \Yii::$app->user->id,
             'is_delete' => 0
@@ -313,6 +322,19 @@ class UserForm extends BaseModel
                 "link_url"  => "/pages/user/bonus/bonus",
                 "open_type" => "navigate"
             ];
+        }
+
+        //店铺审核显示
+        $user_res = user::findOne(\Yii::$app->user->id);
+        if ($user_res) {
+            if ($user_res->is_examine) {
+                $userCenter['menus'][] = [
+                    "icon_url"  => "https://dev.mingyuanriji.cn/web/static/examine.png",
+                    "name"      => "审核店铺",
+                    "link_url"  => "/pages/user/examine/examine",
+                    "open_type" => "navigate"
+                ];
+            }
         }
 
         $res = [

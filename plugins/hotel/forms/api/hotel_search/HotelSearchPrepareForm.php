@@ -76,6 +76,10 @@ class HotelSearchPrepareForm extends HotelSearchForm {
                 $provinceId = $city['parent_id'];
             }
 
+            if(!$provinceId || !$cityId){
+                throw new \Exception("城市信息选择错误");
+            }
+
             $todayStartTime = strtotime(date("Y-m-d") . " 00:00:00");
             $startTime = strtotime($this->start_date);
 

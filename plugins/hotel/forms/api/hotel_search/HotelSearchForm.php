@@ -89,6 +89,7 @@ class HotelSearchForm extends BaseModel{
             ], 1800);
             $foundData = $this->getFoundData($searchId);
             $foundData[$prepareId] = [];
+            $foundData['newest_prepare_id'] = $prepareId;
             $cache->set($searchId, $foundData, 3600);
         }
 

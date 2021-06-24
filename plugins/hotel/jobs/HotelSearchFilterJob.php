@@ -26,17 +26,21 @@ class HotelSearchFilterJob extends BaseObject implements JobInterface{
             if($res['code'] != ApiCode::CODE_SUCCESS){
                 throw new \Exception($res['msg']);
             }
-            if($res['data']['finished'] != 1){
-                echo "CONTINUE:" . $res['data']['prepare_id'] . "\n";
-                $form = new HotelSearchFilterForm([
-                    "prepare_id" => $res['data']['prepare_id']
-                ]);
-                \Yii::$app->queue->delay(0)->push(new HotelSearchFilterJob([
-                    "mall_id" => \Yii::$app->mall->id,
-                    "form"    => $form
-                ]));
-            }else{
-                echo "FINISHED:" . $res['data']['prepare_id'] . "\n";
+            //只有最新的一次相同查询作为有效热点查询
+            $foundData = $this->form->getFoundData($res['data']['search_id']);
+            if($foundData['newest_prepare_id'] == $res['data']['prepare_id']) {
+                if ($res['data']['finished'] != 1) {
+                    echo "CONTINUE:" . $res['data']['prepare_id'] . "\n";
+                    $form = new HotelSearchFilterForm([
+                        "prepare_id" => $res['data']['prepare_id']
+                    ]);
+                    \Yii::$app->queue->delay(0)->push(new HotelSearchFilterJob([
+                        "mall_id" => \Yii::$app->mall->id,
+                        "form" => $form
+                    ]));
+                } else {
+                    echo "FINISHED:" . $res['data']['prepare_id'] . "\n";
+                }
             }
         }catch (\Exception $e){
             echo $e->getMessage() . "\n";

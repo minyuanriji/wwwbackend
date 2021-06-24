@@ -35,6 +35,8 @@ class HotelOrderPreviewForm extends BaseModel{
                 throw new \Exception("起始日期不正确");
             }
 
+            $this->start_date = date("Y-m-d", $startTime);
+
             //获取房型信息
             $room = HotelRoom::find()->where([
                 "product_code" => $this->product_code,
@@ -50,10 +52,28 @@ class HotelOrderPreviewForm extends BaseModel{
                 throw new \Exception("酒店不存在");
             }
 
+            $bookingList = ApiHotelHelper::bookingList($hotel, $this->start_date, $this->days);
+            $bookingItem = null;
+            foreach($bookingList as $item){
+                if($item['unique_id'] == $this->unique_id){
+                    $bookingItem = $item;
+                    break;
+                }
+            }
+            if(!$bookingItem){
+                throw new \Exception("无法查询到酒店预订信息");
+            }
+
+            $endDay = date("Y-m-d", strtotime($this->start_date) + $this->days * 3600 * 24);
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'hotel_info' => ApiHotelHelper::format($hotel),
+                    'start_day'    => $this->start_date,
+                    'end_day'      => $endDay,
+                    'days'         => (int)$this->days,
+                    'hotel_info'   => ApiHotelHelper::format($hotel),
+                    'booking_item' => $bookingItem
                 ]
             ];
         }catch (\Exception $e){

@@ -7,11 +7,41 @@ use app\models\BaseModel;
 use app\models\IntegralLog;
 use app\models\IntegralRecord;
 use app\models\User;
+use app\plugins\hotel\models\HotelOrder;
 
 class UserIntegralForm extends BaseModel{
 
     const TYPE_ADD      = 1;
     const TYPE_SUB      = 2;
+
+    /**
+     * 支付酒店预订订单
+     * @param HotelOrder $order
+     * @param User $user
+     * @param $price
+     * @return array
+     */
+    public static function hotelOrderPaySub(HotelOrder $order, User $user, $price){
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+            $desc = "支付酒店预订订单“".$order->order_no."”";
+
+            static::change($user, $price, self::TYPE_SUB, "hotel_order", $order->id, $desc);
+
+            $t->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '扣取成功'
+            ];
+        }catch (\Exception $e){
+            $t->rollBack();
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+    }
 
     /**
      * 记录

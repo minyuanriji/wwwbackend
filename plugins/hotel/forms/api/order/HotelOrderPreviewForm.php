@@ -5,6 +5,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\User;
 use app\plugins\hotel\helpers\ApiHotelHelper;
+use app\plugins\hotel\helpers\OrderHelper;
 use app\plugins\hotel\models\HotelRoom;
 use app\plugins\hotel\models\Hotels;
 
@@ -32,7 +33,7 @@ class HotelOrderPreviewForm extends BaseModel{
 
             $this->validateStartDate();
 
-            //用户红包
+            //用户
             $user = User::findOne(\Yii::$app->user->id);
             if(!$user || $user->is_delete){
                 throw new \Exception("无法获取用户信息");
@@ -52,7 +53,7 @@ class HotelOrderPreviewForm extends BaseModel{
             $orderPrice = $this->num * $bookingItem['product_price'];
 
             //用红包抵扣需要的数量
-            $integralPrice = $orderPrice;
+            $integralPrice = OrderHelper::getIntegralPrice($orderPrice);
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
@@ -129,12 +130,15 @@ class HotelOrderPreviewForm extends BaseModel{
     protected function getBookingItem(Hotels $hotel){
         $bookingList = ApiHotelHelper::bookingList($hotel, $this->start_date, $this->days);
         $bookingItem = null;
-        foreach($bookingList as $item){
-            if($item['unique_id'] == $this->unique_id){
-                $bookingItem = $item;
-                break;
+        if($bookingList){
+            foreach($bookingList as $item){
+                if($item['unique_id'] == $this->unique_id){
+                    $bookingItem = $item;
+                    break;
+                }
             }
         }
+
         if(!$bookingItem){
             throw new \Exception("无法查询到酒店预订信息");
         }

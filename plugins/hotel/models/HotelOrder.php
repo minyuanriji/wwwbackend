@@ -24,4 +24,15 @@ class HotelOrder extends BaseActiveRecord
         ];
     }
 
+    /**
+     * 获取平台信息
+     * @return HotelPlateforms|null
+     */
+    public function getPlateform(){
+        $plateform = HotelPlateforms::findOne([
+            "source_code" => $this->order_no,
+            "type"        => "order"
+        ]);
+        return $plateform;
+    }
 }

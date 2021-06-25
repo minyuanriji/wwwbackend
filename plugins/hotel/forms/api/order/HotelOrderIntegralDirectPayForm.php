@@ -3,7 +3,10 @@ namespace app\plugins\hotel\forms\api\order;
 
 
 use app\core\ApiCode;
+use app\forms\common\UserIntegralForm;
 use app\models\BaseModel;
+use app\models\User;
+use app\plugins\hotel\helpers\OrderHelper;
 use app\plugins\hotel\models\HotelOrder;
 
 class HotelOrderIntegralDirectPayForm extends BaseModel{
@@ -29,9 +32,36 @@ class HotelOrderIntegralDirectPayForm extends BaseModel{
                 throw new \Exception("订单不存在");
             }
 
-            if($hotelOrder->order_status){
-
+            if(!OrderHelper::isPayable($hotelOrder)){
+                throw new \Exception("订单不可支付");
             }
+
+            //用红包抵扣需要的数量
+            $integralPrice = OrderHelper::getIntegralPrice($hotelOrder->order_price);
+
+            //用户
+            $user = User::findOne(\Yii::$app->user->id);
+            if(!$user || $user->is_delete){
+                throw new \Exception("无法获取用户信息");
+            }
+
+            if($user->static_integral < $integralPrice){
+                throw new \Exception("红包数量不足");
+            }
+
+            //扣取红包
+            $res = UserIntegralForm::hotelOrderPaySub($hotelOrder, $user, $integralPrice);
+            if($res['code'] != ApiCode::CODE_SUCCESS){
+                throw new \Exception("红包扣取失败：" . $res['msg']);
+            }
+
+            //平台下单
+            $plateform = $hotelOrder->getPlateform();
+            if(!$plateform){
+                throw new \Exception("无法获取平台信息");
+            }
+
+            OrderHelper::submitPlateformOrder($hotelOrder, $plateform);
 
             $trans->commit();
         }catch (\Exception $e){

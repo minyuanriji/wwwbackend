@@ -7,6 +7,8 @@ use app\plugins\hotel\models\Hotels;
 
 interface IPlateform
 {
+   public function submitOrder();
+
     /**
      * 导入第三方数据到平台
      * @param $page

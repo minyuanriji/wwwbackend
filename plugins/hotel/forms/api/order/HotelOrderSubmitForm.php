@@ -9,18 +9,12 @@ use app\plugins\hotel\models\HotelPlateforms;
 
 class HotelOrderSubmitForm extends HotelOrderPreviewForm {
 
-    public $product_code;
-    public $unique_id;
-    public $start_date;
-    public $days;
     public $arrive_date;
-    public $num;
     public $passengers;
 
     public function rules(){
         return array_merge(parent::rules(), [
-            [['arrive_date', 'num', 'passengers'], 'required'],
-            [['num'], 'integer', 'min' => 1]
+            [['arrive_date', 'passengers'], 'required'],
         ]);
     }
 
@@ -98,7 +92,7 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg'  => [
                     "order_no"    => $order->order_no,
-                    "order_price" => $order->order_price
+                    "order_price" => round($order->order_price, 2)
                 ]
             ];
         }catch (\Exception $e){
@@ -115,8 +109,8 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
      * @throws \Exception
      */
     private function validatePassengers(){
-        $passengers = @json_decode($this->passengers);
-        if(empty($passengers)){
+        $passengers = @json_decode($this->passengers, true);
+        if(empty($passengers) || !is_array($passengers)){
             throw new \Exception("入住信息信息参数内容JSON格式错误");
         }
         foreach($passengers as $passenger){

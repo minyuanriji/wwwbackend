@@ -38,7 +38,6 @@ class CanalController extends Controller
                 $message = $client->get(100);
                 if ($entries = $message->getEntries()) {
                     foreach ($entries as $entry) {
-
                         $rowChange = new RowChange();
                         $rowChange->mergeFromString($entry->getStoreValue());
                         $evenType = $rowChange->getEventType();

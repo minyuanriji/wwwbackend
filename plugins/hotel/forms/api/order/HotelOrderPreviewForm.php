@@ -3,6 +3,7 @@ namespace app\plugins\hotel\forms\api\order;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\models\User;
 use app\plugins\hotel\helpers\ApiHotelHelper;
 use app\plugins\hotel\models\HotelRoom;
 use app\plugins\hotel\models\Hotels;
@@ -13,11 +14,12 @@ class HotelOrderPreviewForm extends BaseModel{
     public $product_code;
     public $start_date;
     public $days;
+    public $num;
 
     public function rules(){
         return [
-            [['unique_id', 'product_code', 'start_date', 'days'], 'required'],
-            [['days'], 'integer', 'min' => 1]
+            [['unique_id', 'num', 'product_code', 'start_date', 'days'], 'required'],
+            [['days', 'num'], 'integer', 'min' => 1]
         ];
     }
 
@@ -30,6 +32,12 @@ class HotelOrderPreviewForm extends BaseModel{
 
             $this->validateStartDate();
 
+            //用户红包
+            $user = User::findOne(\Yii::$app->user->id);
+            if(!$user || $user->is_delete){
+                throw new \Exception("无法获取用户信息");
+            }
+
             //获取房型信息
             $room = $this->getRoom();
 
@@ -40,14 +48,24 @@ class HotelOrderPreviewForm extends BaseModel{
 
             $endDay = date("Y-m-d", strtotime($this->start_date) + $this->days * 3600 * 24);
 
+            //计算订单价格
+            $orderPrice = $this->num * $bookingItem['product_price'];
+
+            //用红包抵扣需要的数量
+            $integralPrice = $orderPrice;
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'start_day'    => $this->start_date,
-                    'end_day'      => $endDay,
-                    'days'         => (int)$this->days,
-                    'hotel_info'   => ApiHotelHelper::format($hotel),
-                    'booking_item' => $bookingItem
+                    'order_price'    => floatval($orderPrice),
+                    'integral_price' => floatval($integralPrice),
+                    'user_integral'  => floatval($user->static_integral),
+                    'num'            => intval($this->num),
+                    'start_day'      => $this->start_date,
+                    'end_day'        => $endDay,
+                    'days'           => (int)$this->days,
+                    'hotel_info'     => ApiHotelHelper::format($hotel),
+                    'booking_item'   => $bookingItem
                 ]
             ];
         }catch (\Exception $e){

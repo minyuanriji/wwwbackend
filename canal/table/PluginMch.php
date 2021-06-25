@@ -12,7 +12,6 @@ class PluginMch{
     }
 
     public function update($mixDatas){
-
         foreach($mixDatas as $mixData){
             $condition = $mixData['condition'];
             $update = $mixData['update'];

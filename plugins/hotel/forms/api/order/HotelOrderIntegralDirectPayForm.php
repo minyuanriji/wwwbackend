@@ -61,7 +61,12 @@ class HotelOrderIntegralDirectPayForm extends BaseModel{
                 throw new \Exception("无法获取平台信息");
             }
 
-            OrderHelper::submitPlateformOrder($hotelOrder, $plateform);
+            $res = OrderHelper::submitPlateformOrder($hotelOrder, $plateform);
+            if($res['code'] != ApiCode::CODE_SUCCESS){
+                throw new \Exception($res['msg']);
+            }
+            echo "success";
+            exit;
 
             $trans->commit();
         }catch (\Exception $e){

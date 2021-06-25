@@ -1,12 +1,13 @@
 <?php
-namespace app\plugins\hotel\libs\bestwehotel\request_model;
+namespace app\plugins\hotel\libs\bestwehotel\request_model\booking;
 
-use app\models\BaseModel;
-use yii\base\BaseObject;
+
+use app\helpers\ArrayHelper;
+use app\plugins\hotel\libs\bestwehotel\request_model\BaseRequest;
 
 /***
  * Class BookingPostOrder
- * @package app\plugins\hotel\libs\bestwehotel\request_model
+ * @package app\plugins\hotel\libs\bestwehotel\request_model\booking
  * @property string $innId          酒店ID
  * @property string $roomTypeId     房型编号
  * @property int    $roomCount      房间数量
@@ -23,7 +24,7 @@ use yii\base\BaseObject;
  * @property float  $feeRate        可选-订单其他费用，如果需要额外收费这个字段必填
  * @property array<Passenger> $passengers 入住人信息。入住人信息数量与房间数量原则上一致
  */
-class BookingPostOrder extends BaseRequest {
+class PostOrderRequest extends BaseRequest{
 
     public $innId;
     public $roomTypeId;
@@ -45,18 +46,27 @@ class BookingPostOrder extends BaseRequest {
     public $feeRate;
 
 
-
-    public function buildPassengers($models){
-        $passengers = [];
-        if(is_array($models)){
-            foreach($models as $model){
-                $passengers[] = $model->getAttributes();
-            }
-        }
-        return $passengers;
-    }
-
     public function getUri(){
         return "/booking/postOrder";
+    }
+
+    public function buildPassengers($passengers){
+        $newPassengers = [];
+        if(is_array($passengers)){
+            foreach($passengers as $passenger){
+                if($passenger instanceof Passenger){
+                    $newPassengers[] = ArrayHelper::toArray($passenger);
+                }
+            }
+        }
+        return $newPassengers;
+    }
+
+    public function addPassenger(Passenger $passenger){
+        $this->passengers[] = $passenger;
+    }
+
+    public function getPassengers(){
+        return $this->passengers;
     }
 }

@@ -2,12 +2,19 @@
 namespace app\plugins\hotel\libs;
 
 
+use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelPlateforms;
 use app\plugins\hotel\models\Hotels;
 
 interface IPlateform
 {
-   public function submitOrder();
+    /**
+     * 提交订单
+     * @param HotelOrder $order
+     * @throws HotelException
+     * @return
+     */
+    public function submitOrder(HotelOrder $order);
 
     /**
      * 导入第三方数据到平台

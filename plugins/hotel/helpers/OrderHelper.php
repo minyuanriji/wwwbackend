@@ -14,7 +14,8 @@ class OrderHelper{
      * @param HotelOrder $order
      * @param HotelPlateforms $plateform
      */
-    public static function submitPlateformOrder(HotelOrder $order, HotelPlateforms $plateform){
+    public static function submitPlateformOrder(HotelOrder $order,
+                                HotelPlateforms $plateform){
         try {
             $className = $plateform->plateform_class;
             if(empty($className) || !class_exists($className)){

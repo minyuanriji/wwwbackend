@@ -67,7 +67,8 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
                 "booking_arrive_date" => date("Y-m-d H:i:s", strtotime($this->arrive_date)),
                 "created_at"          => time(),
                 "updated_at"          => time(),
-                "pay_status"          => "unpaid"
+                "pay_status"          => "unpaid",
+                "origin_booking_data" => json_encode($bookingItem['origin_data'])
             ]);
             if(!$order->save()){
                 throw new \Exception($this->responseErrorMsg($order));
@@ -90,7 +91,7 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg'  => [
+                'data'  => [
                     "order_no"    => $order->order_no,
                     "order_price" => round($order->order_price, 2)
                 ]

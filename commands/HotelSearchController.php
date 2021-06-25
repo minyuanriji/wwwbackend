@@ -2,7 +2,9 @@
 namespace app\commands;
 
 
+use app\models\Mall;
 use app\plugins\hotel\forms\api\hotel_search\HotelSearchFilterForm;
+use app\plugins\hotel\jobs\HotelSearchFilterJob;
 
 class HotelSearchController extends BaseCommandController {
 
@@ -10,6 +12,9 @@ class HotelSearchController extends BaseCommandController {
         $pool = new \Swoole\Process\Pool(10);
         $pool->set(['enable_coroutine' => true]);
         $pool->on('WorkerStart', function (\Swoole\Process\Pool $pool, $workerId) {
+            $mall = Mall::findOne(5);
+            print_r($mall);
+            exit;
             echo("[Worker #{$workerId}] WorkerStart, pid: " . posix_getpid() . "\n");
             while(true){
                 $cache = \Yii::$app->getCache();
@@ -20,6 +25,13 @@ class HotelSearchController extends BaseCommandController {
                     $form = new HotelSearchFilterForm([
                         "prepare_id" => $prepareId
                     ]);
+                    $mall = Mall::findOne(5);
+                    print_r($mall);
+
+                    /*(new HotelSearchFilterJob([
+                        "mall_id" => 5,
+                        "form"    => $form
+                    ]))->execute(null);*/
                 }
                 sleep(1);
             }

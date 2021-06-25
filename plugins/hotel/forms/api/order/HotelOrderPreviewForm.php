@@ -28,41 +28,15 @@ class HotelOrderPreviewForm extends BaseModel{
 
         try {
 
-            $todayStartTime = strtotime(date("Y-m-d") . " 00:00:00");
-            $startTime = strtotime($this->start_date);
-
-            if($startTime < $todayStartTime){
-                throw new \Exception("起始日期不正确");
-            }
-
-            $this->start_date = date("Y-m-d", $startTime);
+            $this->validateStartDate();
 
             //获取房型信息
-            $room = HotelRoom::find()->where([
-                "product_code" => $this->product_code,
-                "is_delete" => 0
-            ])->one();
-            if(!$room){
-                throw new \Exception("房型信息不存在");
-            }
+            $room = $this->getRoom();
 
             //获取酒店信息
-            $hotel = Hotels::findOne($room->hotel_id);
-            if(!$hotel || $hotel->is_delete){
-                throw new \Exception("酒店不存在");
-            }
+            $hotel = $this->getHotel($room);
 
-            $bookingList = ApiHotelHelper::bookingList($hotel, $this->start_date, $this->days);
-            $bookingItem = null;
-            foreach($bookingList as $item){
-                if($item['unique_id'] == $this->unique_id){
-                    $bookingItem = $item;
-                    break;
-                }
-            }
-            if(!$bookingItem){
-                throw new \Exception("无法查询到酒店预订信息");
-            }
+            $bookingItem = $this->getBookingItem($hotel);
 
             $endDay = date("Y-m-d", strtotime($this->start_date) + $this->days * 3600 * 24);
 
@@ -84,4 +58,68 @@ class HotelOrderPreviewForm extends BaseModel{
         }
     }
 
+    /**
+     * 检查起始日期
+     * @throws \Exception
+     */
+    protected function validateStartDate(){
+        $todayStartTime = strtotime(date("Y-m-d") . " 00:00:00");
+        $startTime = strtotime($this->start_date);
+
+        if($startTime < $todayStartTime){
+            throw new \Exception("起始日期不正确");
+        }
+
+        $this->start_date = date("Y-m-d", $startTime);
+    }
+
+    /**
+     * 获取房型信息
+     * @return array|\yii\db\ActiveRecord
+     * @throws \Exception
+     */
+    protected function getRoom(){
+        $room = HotelRoom::find()->where([
+            "product_code" => $this->product_code,
+            "is_delete"    => 0
+        ])->one();
+        if(!$room){
+            throw new \Exception("房型信息不存在");
+        }
+        return $room;
+    }
+
+    /**
+     * 获取酒店信息
+     * @return Hotels
+     * @throws \Exception
+     */
+    protected function getHotel(HotelRoom $room){
+        $hotel = Hotels::findOne($room->hotel_id);
+        if(!$hotel || $hotel->is_delete){
+            throw new \Exception("酒店不存在");
+        }
+        return $hotel;
+    }
+
+    /**
+     * 获取产品信息
+     * @param Hotels $hotel
+     * @return mixed
+     * @throws \Exception
+     */
+    protected function getBookingItem(Hotels $hotel){
+        $bookingList = ApiHotelHelper::bookingList($hotel, $this->start_date, $this->days);
+        $bookingItem = null;
+        foreach($bookingList as $item){
+            if($item['unique_id'] == $this->unique_id){
+                $bookingItem = $item;
+                break;
+            }
+        }
+        if(!$bookingItem){
+            throw new \Exception("无法查询到酒店预订信息");
+        }
+        return $bookingItem;
+    }
 }

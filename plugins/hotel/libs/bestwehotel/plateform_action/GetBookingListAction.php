@@ -48,6 +48,7 @@ class GetBookingListAction extends BaseObject {
                 $productCode = $rows[$item->roomTypeCode];
                 $room = $rooms[$productCode];
                 $bookingItem = new BookingListItemModel();
+                $bookingItem->hotel_plateform_id = $this->hotelPlateform->id;
                 $bookingItem->product_thumb = isset($pics[$productCode]) ? $pics[$productCode] : "";
                 $bookingItem->product_code  = $rows[$item->roomTypeCode];
                 $bookingItem->product_name  = $item->roomTypeName;

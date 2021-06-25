@@ -97,7 +97,8 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg'  => [
-                    "order_no" => $order->order_no
+                    "order_no"    => $order->order_no,
+                    "order_price" => $order->order_price
                 ]
             ];
         }catch (\Exception $e){

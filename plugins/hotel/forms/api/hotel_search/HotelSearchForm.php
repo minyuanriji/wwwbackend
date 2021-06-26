@@ -142,7 +142,7 @@ class HotelSearchForm extends BaseModel{
 
         if(!empty($hotelIds)){
             $count = count($hotelIds);
-            $length = $count <= 10 ? $count : 10;
+            $length = $count <= 5 ? $count : 5;
             $popIds = array_slice($hotelIds, 0, $length);
             $hotelIds = array_slice($hotelIds, $length);
             sort($hotelIds);

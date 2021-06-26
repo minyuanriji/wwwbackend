@@ -9,13 +9,15 @@ use app\plugins\hotel\jobs\HotelSearchFilterJob;
 class HotelSearchController extends BaseCommandController {
 
     public function actionFilterTask(){
-        $pool = new \Swoole\Process\Pool(10);
+        $pool = new \Swoole\Process\Pool(50);
         $pool->set(['enable_coroutine' => true]);
-        $pool->on('WorkerStart', function (\Swoole\Process\Pool $pool, $workerId) {
-            $mall = Mall::findOne(5);
-            print_r($mall);
-            exit;
+        $pool->on('WorkerStart', function (\Swoole\Process\Pool $pool, $workerId){
             echo("[Worker #{$workerId}] WorkerStart, pid: " . posix_getpid() . "\n");
+            if(!defined("Yii")){
+                require_once(__DIR__ . '/../vendor/autoload.php');
+                require_once __DIR__ . '/../config/const.php';
+                $application = new \app\core\ConsoleApplication();
+            }
             while(true){
                 $cache = \Yii::$app->getCache();
                 $cacheKey = "HotelSearchTask";
@@ -25,13 +27,12 @@ class HotelSearchController extends BaseCommandController {
                     $form = new HotelSearchFilterForm([
                         "prepare_id" => $prepareId
                     ]);
-                    $mall = Mall::findOne(5);
-                    print_r($mall);
-
-                    /*(new HotelSearchFilterJob([
+                    echo "HotelSearchFilter task start:{$prepareId}\n";
+                    (new HotelSearchFilterJob([
                         "mall_id" => 5,
                         "form"    => $form
-                    ]))->execute(null);*/
+                    ]))->execute(null);
+                    echo "HotelSearchFilter task end\n";
                 }
                 sleep(1);
             }

@@ -11,7 +11,8 @@ use app\models\UserInfo;
 use app\notification\jobs\OrderPaymentSuccessNotificationWeTplJob;
 use app\notification\wechat_template_message\OrderPaymentSuccessNotificationWeTplMsg;
 
-class OrderPaymentSuccessNotification{
+class OrderPaymentSuccessNotification
+{
 
     public static function send(Order $order)
     {
@@ -42,7 +43,7 @@ class OrderPaymentSuccessNotification{
 
         $goods = Goods::find()->with('goodsWarehouse')->where([
             'id'        => $order_detail->goods_id,
-            'mall_id'   => \Yii::$app->mall->id,
+            'mall_id'   => $order->mall_id,
             'status'    => 1,
             'is_delete' => 0,
         ])->one();

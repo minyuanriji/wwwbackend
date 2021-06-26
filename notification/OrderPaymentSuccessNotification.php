@@ -16,16 +16,17 @@ class OrderPaymentSuccessNotification
 
     public static function send(Order $order)
     {
-        \Yii::$app->queue->delay(0)->push(new OrderPaymentSuccessNotificationWeTplJob([
+        (new OrderPaymentSuccessNotificationWeTplJob([
             "order" => $order
-        ]));
+        ]))->execute(null);
+
+        /*\Yii::$app->queue->delay(0)->push(new OrderPaymentSuccessNotificationWeTplJob([
+            "order" => $order
+        ]));*/
     }
 
     public static function sendWechatTemplate(Order $order)
     {
-        $efps_order = EfpsPaymentOrder::findOne(["payment_order_union_id" => $order->id]);
-        if(!$efps_order || !$efps_order->is_pay) return;
-
         if ($order->mch_id) {
             $store = Store::findOne(["mch_id" => $order->mch_id]);
             if(!$store) return;
@@ -56,6 +57,7 @@ class OrderPaymentSuccessNotification
         if(!$userInfo) return;
 
         (new OrderPaymentSuccessNotificationWeTplMsg([
+            "mall_id"           => $order->mall_id,
             "title"             => '您好，您在'. $store_name .'下单成功了',
             "openid"            => $userInfo->openid,
             "order_no"          => $order->order_no,

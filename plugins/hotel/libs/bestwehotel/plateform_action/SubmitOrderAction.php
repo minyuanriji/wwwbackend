@@ -36,7 +36,7 @@ class SubmitOrderAction extends BaseObject {
                 throw new HotelException("无法获取ROOM PRODUCT CODE ".$this->hotelOrder->product_code." 平台信息");
             }
 
-            $endDay = date("Y-m-d", strtotime($this->hotelOrder->booking_start_date) + $this->hotelOrder->booking_num * 3600 * 24);
+            $endDay = date("Y-m-d", strtotime($this->hotelOrder->booking_start_date) + $this->hotelOrder->booking_days * 3600 * 24);
             $bookingData = @json_decode($this->hotelOrder->origin_booking_data, true);
 
             $requestModel = new PostOrderRequest([

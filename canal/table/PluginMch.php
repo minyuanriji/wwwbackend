@@ -19,7 +19,6 @@ class PluginMch{
                 if($update['review_status'] == Mch::REVIEW_STATUS_CHECKED){
                     $mch = Mch::find()->where($condition)->one();
                     $mch && MchApplyPassedNotification::send($mch);
-
                 }
             }
         }

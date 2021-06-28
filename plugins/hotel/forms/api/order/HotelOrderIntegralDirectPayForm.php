@@ -40,7 +40,7 @@ class HotelOrderIntegralDirectPayForm extends BaseModel{
             $integralPrice = OrderHelper::getIntegralPrice($hotelOrder->order_price);
 
             //用户
-            $user = User::findOne(\Yii::$app->user->id);
+            $user = User::findOne($hotelOrder->user_id);
             if(!$user || $user->is_delete){
                 throw new \Exception("无法获取用户信息");
             }

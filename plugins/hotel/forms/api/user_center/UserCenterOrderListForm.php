@@ -66,6 +66,7 @@ class UserCenterOrderListForm extends BaseModel {
                 unset($row['order_status']);
                 unset($row['pay_status']);
                 $row['created_at'] = date("Y-m-d H:i", $row['created_at']);
+                $row['end_date'] = date("Y-m-d", strtotime($row['booking_start_date']) +$row['booking_days'] * 3600 * 24);
             }
 
             return [

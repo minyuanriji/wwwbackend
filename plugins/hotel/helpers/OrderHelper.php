@@ -23,35 +23,35 @@ class OrderHelper{
      */
     public static function getOrderRealStatus($order_status, $pay_status, $created_at, $start_date, $days){
         $endTime = strtotime($start_date) + $days * 3600 * 24;
-        $texts = ["finished" => "已结束", "refunding" => "退款中", "confirmed" => "已确认", "cancel" => "已取消", "expired" => "已失效", "unpaid" => "未支付", "unconfirmed" => "待确认"];
+        $texts = ["finished" => "已结束", "refund" => "已退款", "refunding" => "退款中", "confirmed" => "已确认", "cancel" => "已取消", "expired" => "已失效", "unpaid" => "未支付", "unconfirmed" => "待确认"];
         $info = ['text' => '', 'status' => 'none'];
-        if($order_status == "unpaid" || $pay_status == "unpaid") { //未支付
-            //如果下单日期超过15分钟未支付，设为失效订单
-            if((time() - $created_at) > 60 * 15){
+        if($pay_status == "paid"){ //已支付
+            if($order_status == "unconfirmed"){ //未确认
+                $info['status'] = $order_status;
+            }elseif($order_status == "success"){  //预订成功
+                if($endTime < time()){ //已结束
+                    $info['status'] = "finished";
+                }else{ //已确认
+                    $info['status'] = "confirmed";
+                }
+            }
+        }elseif($pay_status == "refunding"){ //退款中
+            $info['status'] = $pay_status;
+        }elseif($pay_status == "refund"){ //已退款
+            $info['status'] = $pay_status;
+        }else{
+            if($order_status == "cancel"){ //已取消
+                $info['status'] = $order_status;
+            }elseif((time() - $created_at) > 60 * 15){
+                //如果下单日期超过15分钟未支付，设为失效订单
                 $info['status'] = "expired";
-            }else{
+            }else{ //未支付
                 $info['status'] = "unpaid";
             }
-        }elseif($order_status == "cancel"){ //已取消
-            $info['status'] = $order_status;
-        }else{ //已支付、未取消情况
-            if($pay_status == "paid"){ //已支付
-                if($order_status == "unconfirmed"){ //未确认
-                    $info['status'] = $order_status;
-                }elseif($order_status == "success"){  //预订成功
-                    if($endTime < time()){ //已结束
-                        $info['status'] = "finished";
-                    }else{ //已确认
-                        $info['status'] = "confirmed";
-                    }
-                }
-            }elseif($pay_status == "refunding"){ //退款中
-                $info['status'] = $pay_status;
-            }elseif($pay_status == "refund"){ //已退款
-                $info['status'] = $pay_status;
-            }
         }
+
         $info['text'] = isset($texts[$info['status']]) ? $texts[$info['status']] : "";
+
         return $info;
     }
 

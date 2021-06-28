@@ -9,6 +9,7 @@ use app\plugins\hotel\helpers\OrderHelper;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelRoom;
 use app\plugins\hotel\models\Hotels;
+use yii\db\ActiveQuery;
 
 class UserCenterOrderListForm extends BaseModel {
 
@@ -34,6 +35,8 @@ class UserCenterOrderListForm extends BaseModel {
             $query->innerJoin(["h" => Hotels::tableName()], "h.id=o.hotel_id");
             $query->innerJoin(["r" => HotelRoom::tableName()], "r.hotel_id=h.id AND r.product_code=o.product_code");
 
+            $this->statusFilter($query);
+
             $selects = [
                 "h.thumb_url", "h.name as hotel_name", "h.tx_lat", "h.tx_lng", "h.contact_phone",
                 "h.contact_mobile", "h.address", "h.province_id", "h.city_id",
@@ -47,7 +50,6 @@ class UserCenterOrderListForm extends BaseModel {
             ];
 
             $query->select($selects)->orderBy("o.id DESC");
-
 
             $rows = $query->page($pagination, 10, max(1, (int)$this->page))
                           ->asArray()->all();
@@ -91,4 +93,47 @@ class UserCenterOrderListForm extends BaseModel {
         }
     }
 
+    private function statusFilter(ActiveQuery $query){
+        $nowTime = time();
+        if($this->status == "finished"){ //已结束
+            $query->andWhere(["o.pay_status" => "paid"]);
+            $where = "o.order_status = 'finished' OR ";
+            $where .= "(o.order_status IN('unconfirmed', 'success') AND (unix_timestamp(o.booking_start_date) + o.booking_days * 3600 * 24) < '{$nowTime}')";
+            $query->andWhere($where);
+        }
+        if($this->status == "refund"){ //售后
+            $query->andWhere(["IN", "o.pay_status", ["refunding", "refund"]]);
+        }
+        if($this->status == "cancel"){ //已取消
+            $query->andWhere(["o.pay_status" => "unpaid"]);
+            $query->andWhere([
+                "OR",
+                ["o.order_status" => "cancel"],
+                "o.created_at < '".($nowTime - 60 * 15)."'"
+            ]);
+        }
+        if($this->status == "confirmed"){ //已确认
+            $query->andWhere([
+                "AND",
+                ["o.pay_status" => "paid"],
+                ["o.order_status" => "success"],
+                "(unix_timestamp(o.booking_start_date) + o.booking_days * 3600 * 24) > '{$nowTime}'"
+            ]);
+        }
+        if($this->status == "unpaid"){ //待付款
+            $query->andWhere([
+                "AND",
+                ["o.order_status" => "unpaid"],
+                ["o.pay_status" => "unpaid"],
+                "o.created_at > '".($nowTime - 60 * 15)."'"
+            ]);
+        }
+        if($this->status == "unconfirmed"){ //待确认
+            $query->andWhere([
+                "AND",
+                ["o.order_status" => "unconfirmed"],
+                ["o.pay_status" => "paid"]
+            ]);
+        }
+    }
 }

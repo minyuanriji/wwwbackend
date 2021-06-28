@@ -6,6 +6,7 @@ use app\controllers\api\filters\LoginFilter;
 use app\plugins\ApiController;
 use app\plugins\hotel\forms\api\order\HotelOrderIntegralDirectPayForm;
 use app\plugins\hotel\forms\api\order\HotelOrderPreviewForm;
+use app\plugins\hotel\forms\api\order\HotelOrderQueryStatusForm;
 use app\plugins\hotel\forms\api\order\HotelOrderSubmitForm;
 
 class OrderController extends ApiController{
@@ -46,5 +47,15 @@ class OrderController extends ApiController{
         $form = new HotelOrderIntegralDirectPayForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->pay());
+    }
+
+    /**
+     * 查询状态
+     * @return \yii\web\Response
+     */
+    public function actionQueryStatus(){
+        $form = new HotelOrderQueryStatusForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->get());
     }
 }

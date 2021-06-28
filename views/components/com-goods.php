@@ -1836,6 +1836,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 
             store(formName) {
                 let self = this;
+                let url = null;
                 try {
                     self.cForm.attr.map(item => {
                         if (item.price < 0 || item.price === '') {
@@ -1904,16 +1905,14 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             if (e.data.code === 0) {
                                 //保存成功
                                 self.$message.success(e.data.msg);
-                                /*  if (typeof this.referrer === 'object') {
-                                      navigateTo(this.referrer)
-                                  } else {
-                                      navigateTo({
-                                          r: this.referrer,
-                                      })
-                                  }*/
-                                navigateTo({
-                                    r: this.referrer,
-                                })
+                                navigateTo
+                                if (this.referrer.page > 1) {
+                                    url = Qs.stringify(this.referrer);
+                                } else {
+                                    url = 'r=mall/goods/index';
+                                }
+                                console.log(url);
+                                window.location.href = '/index.php?' + url;
                             } else {
                                 self.$message.error(e.data.msg);
                             }

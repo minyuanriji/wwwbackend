@@ -42,7 +42,9 @@ class HotelOrderQueryStatusForm extends BaseModel{
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'order_state' => $res['data']['order_state']
+                    'order_state' => $res['data']['order_state'],
+                    'order_id'    => $hotelOrder->id,
+                    'order_no'    => $hotelOrder->order_no
                 ]
             ];
         }catch (\Exception $e){

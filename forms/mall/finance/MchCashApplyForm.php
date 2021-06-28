@@ -48,7 +48,7 @@ class MchCashApplyForm  extends BaseModel{
                     throw new \Exception($this->responseErrorMsg($mchCash));
                 }
             }elseif($this->act == "refuse") { //拒绝
-                if ($mchCash->status != 2) {
+                if ($mchCash->status == 2 || ($mchCash->status == 1 && $mchCash->transfer_status == 1)) {
                     throw new \Exception("无法拒绝操作");
                 }
                 $mchCash->status = 2;

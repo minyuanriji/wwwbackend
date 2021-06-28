@@ -54,8 +54,8 @@ class UserCenterOrderListForm extends BaseModel {
             $districtArr = DistrictData::getArr();
             foreach($rows as &$row){
 
-                $row['is_payable']    = OrderHelper::isPayable2($row['order_status'], $row['pay_status'], $row['created_at'], $row['booking_start_date'], $row['booking_days']);
-                $row['is_cancelable'] = OrderHelper::isCancelable($row['order_status'], $row['pay_status'], $row['created_at'], $row['booking_start_date'], $row['booking_days']);
+                $row['is_payable']    = OrderHelper::isPayable2($row['order_status'], $row['pay_status'], $row['created_at'], $row['booking_start_date'], $row['booking_days']) ? 1 : 0;
+                $row['is_cancelable'] = OrderHelper::isCancelable($row['order_status'], $row['pay_status'], $row['created_at'], $row['booking_start_date'], $row['booking_days']) ? 1 : 0;
                 $row['is_refundable'] = 0;
 
                 $statusInfo = OrderHelper::getOrderRealStatus($row['order_status'], $row['pay_status'], $row['created_at'], $row['booking_start_date'], $row['booking_days']);

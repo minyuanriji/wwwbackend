@@ -13,7 +13,6 @@ class SubmitOrderResult
     public $message;
 
     public $plateform_order_no = null; //平台订单号
-    public $is_success = false;  //是否预订成功
 
     public $originData = null;
 }

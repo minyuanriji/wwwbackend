@@ -10,6 +10,7 @@ class HotelResponse extends BaseObject
 
     public $code;
     public $error;
+    public $result_content;
 
     public $responseModel;
 }

@@ -61,15 +61,32 @@ class HotelOrderIntegralDirectPayForm extends BaseModel{
                 throw new \Exception("无法获取平台信息");
             }
 
-            $res = OrderHelper::submitPlateformOrder($hotelOrder, $plateform);
-            if($res['code'] != ApiCode::CODE_SUCCESS){
-                throw new \Exception($res['msg']);
+            //第一次调用第三方平台下单接口
+            if($plateform->source_code == $plateform->plateform_code){
+                $res = OrderHelper::submitPlateformOrder($hotelOrder, $plateform);
+                if($res['code'] != ApiCode::CODE_SUCCESS){
+                    throw new \Exception($res['msg']);
+                }
+                $plateform->plateform_code = $res['data']['plateform_order_no'];
+                if(!$plateform->save()){
+                    throw new \Exception($this->responseErrorMsg($plateform));
+                }
             }
 
-            print_r($res);
-            exit;
+            //更新订单状态为已支付
+            $hotelOrder->pay_status               = "paid";
+            $hotelOrder->pay_at                   = date("Y-m-d H:i:s");
+            $hotelOrder->integral_deduction_price = $integralPrice;
+            if(!$hotelOrder->save()){
+                throw new \Exception($this->responseErrorMsg($hotelOrder));
+            }
 
             $trans->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '支付成功'
+            ];
         }catch (\Exception $e){
             $trans->rollBack();
             return [

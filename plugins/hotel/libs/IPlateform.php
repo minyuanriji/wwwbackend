@@ -9,12 +9,20 @@ use app\plugins\hotel\models\Hotels;
 interface IPlateform
 {
     /**
-     * TODO 提交订单
+     * 提交订单
      * @param HotelOrder $order
      * @throws HotelException
-     * @return
+     * @return SubmitOrderResult
      */
     public function submitOrder(HotelOrder $order);
+
+    /**
+     * 查询订单
+     * @param HotelOrder $order
+     * @throws HotelException
+     * @return QueryOrderResult
+     */
+    public function queryOrder(HotelOrder $order);
 
     /**
      * 判断订单是否可以退款

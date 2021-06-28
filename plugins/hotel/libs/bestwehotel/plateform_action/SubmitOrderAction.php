@@ -4,9 +4,11 @@ namespace app\plugins\hotel\libs\bestwehotel\plateform_action;
 
 use app\helpers\ArrayHelper;
 use app\plugins\hotel\libs\bestwehotel\client\booking\PostOrderClient;
+use app\plugins\hotel\libs\bestwehotel\client\booking\QueryOrderClient;
 use app\plugins\hotel\libs\bestwehotel\Request;
 use app\plugins\hotel\libs\bestwehotel\request_model\booking\Passenger;
 use app\plugins\hotel\libs\bestwehotel\request_model\booking\PostOrderRequest;
+use app\plugins\hotel\libs\bestwehotel\request_model\booking\QueryOrderRequest;
 use app\plugins\hotel\libs\HotelException;
 use app\plugins\hotel\libs\HotelResponse;
 use app\plugins\hotel\libs\plateform\SubmitOrderResult;
@@ -70,18 +72,31 @@ class SubmitOrderAction extends BaseObject {
             }
 
             if($response->code != HotelResponse::CODE_SUCC){
-                throw new HotelException($response->error);
-            }
-
-            if($response->responseModel->orderState == 1){ //预订成功
-                $submitOrderResult->is_success = true;
+                $resultData = @json_decode($response->result_content, true);
+                if(isset($resultData['msgCode']) && $resultData['msgCode'] == -10224){ //重复下单 改查询
+                    //查询订单
+                    $requestModel = new QueryOrderRequest([
+                        "externalId" => $this->hotelOrder->order_no
+                    ]);
+                    $response = Request::execute(new QueryOrderClient($requestModel));
+                    if(!$response instanceof HotelResponse){
+                        throw new HotelException("结果对象返回类型[HotelResponse]错误");
+                    }
+                    $responseModel = $response->responseModel;
+                    $orderNo = $responseModel->orderCode;
+                    $originData = ArrayHelper::toArray($responseModel);
+                }else{
+                    throw new HotelException($response->error);
+                }
             }else{
-                $submitOrderResult->is_success = false;
+                $responseModel = $response->responseModel;
+                $orderNo = $responseModel->orderCode;
+                $originData = ArrayHelper::toArray($responseModel);
             }
 
-            $submitOrderResult->plateform_order_no = $response->responseModel->orderCode;
-            $submitOrderResult->originData = ArrayHelper::toArray($response->responseModel);
-            $submitOrderResult->code = SubmitOrderResult::CODE_SUCC;
+            $submitOrderResult->plateform_order_no = $orderNo;
+            $submitOrderResult->originData         = $originData;
+            $submitOrderResult->code               = SubmitOrderResult::CODE_SUCC;
 
         }catch (HotelException $e){
             $submitOrderResult->code = SubmitOrderResult::CODE_FAIL;

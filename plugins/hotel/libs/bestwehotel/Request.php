@@ -12,6 +12,7 @@ class Request{
 
     public static function execute(BaseClient $client){
 
+        $result = null;
         try {
 
             $timestamp = time() * 1000;
@@ -49,8 +50,9 @@ class Request{
             ]);
         }catch (HotelException $e){
             return new HotelResponse([
-                'code'  => HotelResponse::CODE_FAIL,
-                'error' => $e->getMessage()
+                'code'           => HotelResponse::CODE_FAIL,
+                'error'          => $e->getMessage(),
+                'result_content' => $result
             ]);
         }
 

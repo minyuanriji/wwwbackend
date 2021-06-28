@@ -46,7 +46,8 @@ class UserCenterOrderListForm extends BaseModel {
                 "o.integral_fee_rate"
             ];
 
-            $query->select($selects);
+            $query->select($selects)->orderBy("o.id DESC");
+
 
             $rows = $query->page($pagination, 10, max(1, (int)$this->page))
                           ->asArray()->all();

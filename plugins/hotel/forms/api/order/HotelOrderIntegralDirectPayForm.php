@@ -74,6 +74,7 @@ class HotelOrderIntegralDirectPayForm extends BaseModel{
             }
 
             //更新订单状态为已支付
+            $hotelOrder->order_status             = "unconfirmed";
             $hotelOrder->pay_status               = "paid";
             $hotelOrder->pay_at                   = date("Y-m-d H:i:s");
             $hotelOrder->integral_deduction_price = $integralPrice;

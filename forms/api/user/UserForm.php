@@ -296,6 +296,8 @@ class UserForm extends BaseModel
             "open_type" => "navigate"
         ];
 
+
+
         //商家入驻
         if (YII_WEIXIN_APPLETS == 'true') {
             $userCenter['menus'][] = [

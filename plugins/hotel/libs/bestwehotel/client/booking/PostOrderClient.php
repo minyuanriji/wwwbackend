@@ -4,20 +4,19 @@ namespace app\plugins\hotel\libs\bestwehotel\client\booking;
 
 use app\plugins\hotel\libs\bestwehotel\client\BaseClient;
 use app\plugins\hotel\libs\bestwehotel\client\IClient;
+use app\plugins\hotel\libs\bestwehotel\response_model\PostOrder;
+use app\plugins\hotel\libs\HotelException;
 
 class PostOrderClient extends BaseClient implements IClient {
 
-    public function getDataJSONString(){
-        $json = parent::getDataJSONString();
-        //echo $json;
-        //exit;
-        return $json;
-    }
-
     public function parseResponseModel($parseArray){
 
-        print_r($parseArray);
-        exit;
+        if(!isset($parseArray['result'])){
+            throw new HotelException("[PostOrderClient::parseResponseModel]解析数据错误");
+        }
 
+        $responseModel = PostOrder::create($parseArray['result']);
+
+        return $responseModel;
     }
 }

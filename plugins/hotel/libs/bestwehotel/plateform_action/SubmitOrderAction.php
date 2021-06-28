@@ -2,11 +2,14 @@
 namespace app\plugins\hotel\libs\bestwehotel\plateform_action;
 
 
+use app\helpers\ArrayHelper;
 use app\plugins\hotel\libs\bestwehotel\client\booking\PostOrderClient;
 use app\plugins\hotel\libs\bestwehotel\Request;
 use app\plugins\hotel\libs\bestwehotel\request_model\booking\Passenger;
 use app\plugins\hotel\libs\bestwehotel\request_model\booking\PostOrderRequest;
 use app\plugins\hotel\libs\HotelException;
+use app\plugins\hotel\libs\HotelResponse;
+use app\plugins\hotel\libs\plateform\SubmitOrderResult;
 use app\plugins\hotel\models\HotelPlateforms;
 use yii\base\BaseObject;
 
@@ -16,6 +19,8 @@ class SubmitOrderAction extends BaseObject {
     public $plateform_class;
 
     public function run(){
+
+        $submitOrderResult = new SubmitOrderResult();
 
         try {
             $hotelPlateformInfo = HotelPlateforms::find()->where([
@@ -59,13 +64,30 @@ class SubmitOrderAction extends BaseObject {
                 ]));
             }
 
-            $res = Request::execute(new PostOrderClient($requestModel));
-            print_r($res);
-            exit;
+            $response = Request::execute(new PostOrderClient($requestModel));
+            if(!$response instanceof HotelResponse){
+                throw new HotelException("结果对象返回类型[HotelResponse]错误");
+            }
+
+            if($response->code != HotelResponse::CODE_SUCC){
+                throw new HotelException($response->error);
+            }
+
+            if($response->responseModel->orderState == 1){ //预订成功
+                $submitOrderResult->is_success = true;
+            }else{
+                $submitOrderResult->is_success = false;
+            }
+
+            $submitOrderResult->plateform_order_no = $response->responseModel->orderCode;
+            $submitOrderResult->originData = ArrayHelper::toArray($response->responseModel);
+            $submitOrderResult->code = SubmitOrderResult::CODE_SUCC;
+
         }catch (HotelException $e){
-            echo $e->getMessage();
-            exit;
+            $submitOrderResult->code = SubmitOrderResult::CODE_FAIL;
+            $submitOrderResult->message = $e->getMessage();
         }
 
+        return $submitOrderResult;
     }
 }

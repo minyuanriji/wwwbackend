@@ -65,7 +65,8 @@ class HotelOrderIntegralDirectPayForm extends BaseModel{
             if($res['code'] != ApiCode::CODE_SUCCESS){
                 throw new \Exception($res['msg']);
             }
-            echo "success";
+
+            print_r($res);
             exit;
 
             $trans->commit();

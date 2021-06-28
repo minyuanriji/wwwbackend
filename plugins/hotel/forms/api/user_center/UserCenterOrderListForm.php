@@ -40,7 +40,7 @@ class UserCenterOrderListForm extends BaseModel {
                 "h.district_id", "h.type as hotel_type",
                 "r.bed_type", "r.name as room_name", "r.bed_width", "r.floor", "r.window",
                 "r.policy_ban_smoking", "r.policy_add_bed",
-                "o.hotel_id", "o.order_status", "o.order_no", "o.order_price", "o.booking_num",
+                "o.id as order_id", "o.hotel_id", "o.order_status", "o.order_no", "o.order_price", "o.booking_num",
                 "o.booking_start_date", "o.booking_days", "o.booking_arrive_date",
                 "o.created_at", "o.pay_status", "o.pay_at", "o.pay_price", "o.integral_deduction_price",
                 "o.integral_fee_rate"

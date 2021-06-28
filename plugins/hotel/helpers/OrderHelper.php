@@ -4,6 +4,7 @@ namespace app\plugins\hotel\helpers;
 
 use app\core\ApiCode;
 use app\plugins\hotel\libs\IPlateform;
+use app\plugins\hotel\libs\plateform\SubmitOrderResult;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelPlateforms;
 
@@ -70,8 +71,21 @@ class OrderHelper{
                 throw new \Exception("平台类文件未实现IPlateform接口");
             }
 
-            $classObject->submitOrder($order);
+            $result = $classObject->submitOrder($order);
+            if(!$result instanceof SubmitOrderResult){
+                throw new \Exception("结果对象返回类型[SubmitOrderResult]错误");
+            }
 
+            if($result->code != SubmitOrderResult::CODE_SUCC){
+                throw new \Exception($result->message);
+            }
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'data' => [
+                    'plateform_order_no' => $result->plateform_order_no
+                ]
+            ];
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,

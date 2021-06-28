@@ -53,7 +53,7 @@ class GetBookingListAction extends BaseObject {
                 $bookingItem->product_code  = $rows[$item->roomTypeCode];
                 $bookingItem->product_name  = $item->roomTypeName;
                 foreach($item->productList as $product){
-                    $uniqueId = $this->hotel->id . ":" . $this->hotelPlateform->id . ":" . $product->productCode;
+                    $uniqueId = $this->hotel->id . ":" . $item->roomTypeCode . ":" . $product->productCode;
                     $bookingItem->unique_id     = $uniqueId;
                     $bookingItem->product_num   = $product->quota;
                     $bookingItem->product_price = $product->advanceRate;

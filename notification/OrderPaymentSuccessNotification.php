@@ -16,13 +16,13 @@ class OrderPaymentSuccessNotification
 
     public static function send(Order $order)
     {
-        (new OrderPaymentSuccessNotificationWeTplJob([
+        /*(new OrderPaymentSuccessNotificationWeTplJob([
             "order" => $order
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new OrderPaymentSuccessNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new OrderPaymentSuccessNotificationWeTplJob([
             "order" => $order
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate(Order $order)
@@ -62,7 +62,7 @@ class OrderPaymentSuccessNotification
             "openid"            => $userInfo->openid,
             "order_no"          => $order->order_no,
             "goods_name"        => $goods->goodsWarehouse->name,
-            "total_pay_price"   => $order->total_pay_price,
+            "total_goods_original_price"   => $order->total_goods_original_price,
             "store"             => $store_name,
             "pay_at"            => $order->pay_at
         ]))->send();

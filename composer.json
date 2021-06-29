@@ -42,7 +42,8 @@
     "php-ffmpeg/php-ffmpeg": "v0.16",
     "workerman/workerman": "dev-master",
 	"tencentcloud/tencentcloud-sdk-php": "dev-master",
-	"xingwenge/canal_php": "dev-master"
+	"xingwenge/canal_php": "dev-master",
+    "phpoffice/phpspreadsheet": "dev-master"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",

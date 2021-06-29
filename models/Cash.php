@@ -26,6 +26,18 @@ use Yii;
  */
 class Cash extends BaseActiveRecord
 {
+    //提现状态 申请
+    const STATUS_APPLY = 0;
+
+    //提现状态 同意
+    const STATUS_AGREE = 1;
+
+    //提现状态 已打款
+    const STATUS_PAID = 2;
+
+    //提现状态 驳回
+    const STATUS_REJECT = 3;
+
     /**
      * {@inheritdoc}
      */

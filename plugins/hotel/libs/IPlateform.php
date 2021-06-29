@@ -2,12 +2,22 @@
 namespace app\plugins\hotel\libs;
 
 
+use app\plugins\hotel\libs\plateform\OrderRefundResult;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelPlateforms;
 use app\plugins\hotel\models\Hotels;
 
 interface IPlateform
 {
+
+    /**
+     * 订单退款
+     * @param HotelOrder $order
+     * @throws HotelException
+     * @return OrderRefundResult
+     */
+    public function orderRefund(HotelOrder $order);
+
     /**
      * 提交订单
      * @param HotelOrder $order

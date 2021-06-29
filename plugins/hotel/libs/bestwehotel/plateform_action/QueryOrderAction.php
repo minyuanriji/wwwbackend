@@ -29,6 +29,10 @@ class QueryOrderAction extends BaseObject {
                 throw new HotelException("结果对象返回类型[HotelResponse]错误");
             }
 
+            if($response->code != HotelResponse::CODE_SUCC){
+                throw new HotelException($response->error);
+            }
+
             $responseModel = $response->responseModel;
 
             $queryOrderResult->code = QueryOrderResult::CODE_SUCC;

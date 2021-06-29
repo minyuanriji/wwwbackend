@@ -30,6 +30,8 @@ class QueryAction extends Action{
                         throw new \Exception($res['msg']);
                     }
 
+                    $oldOrderStatus = $hotelOrder->order_status;
+
                     //预订成功：1预订成功/3预订未到/4已入住/5已完成
                     if(in_array($res['data']['order_state'], [1, 3, 4, 5])){
                         $hotelOrder->order_status = "success";
@@ -49,7 +51,9 @@ class QueryAction extends Action{
                         throw new \Exception(@json_encode($hotelOrder->getErrors()));
                     }
 
-                    echo "Hotel Order [ID:". $hotelOrder->id . "] Status Sync Successfully\n";
+                    if($oldOrderStatus != $hotelOrder->order_status){
+                        echo "Hotel Order [ID:". $hotelOrder->id . "] Status Sync Successfully\n";
+                    }
                 }
             }catch (\Exception $e){
                 echo $e->getMessage() . "\n";

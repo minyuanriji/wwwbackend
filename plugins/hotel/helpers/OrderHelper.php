@@ -4,6 +4,7 @@ namespace app\plugins\hotel\helpers;
 
 use app\core\ApiCode;
 use app\plugins\hotel\libs\IPlateform;
+use app\plugins\hotel\libs\plateform\OrderRefundResult;
 use app\plugins\hotel\libs\plateform\QueryOrderResult;
 use app\plugins\hotel\libs\plateform\SubmitOrderResult;
 use app\plugins\hotel\models\HotelOrder;
@@ -11,6 +12,46 @@ use app\plugins\hotel\models\HotelPlateforms;
 
 class OrderHelper{
 
+    public static function orderRefund(){
+
+    }
+
+    /**
+     * 第三方平台订单退款
+     * @param HotelOrder $order
+     * @param HotelPlateforms $plateform
+     */
+    public static function plateformOrderRefundApply(HotelOrder $order, HotelPlateforms $plateform){
+        try {
+            $className = $plateform->plateform_class;
+            if(empty($className) || !class_exists($className)){
+                throw new \Exception("缺失平台类文件");
+            }
+            $classObject = new $className();
+            if(!$classObject instanceof IPlateform){
+                throw new \Exception("平台类文件未实现IPlateform接口");
+            }
+
+            $result = $classObject->orderRefund($order);
+            if(!$result instanceof OrderRefundResult){
+                throw new \Exception("结果对象返回类型[OrderRefundResult]错误");
+            }
+
+            if($result->code != OrderRefundResult::CODE_SUCC){
+                throw new \Exception($result->message);
+            }
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'data' => []
+            ];
+        }catch (\Exception $e){
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+    }
 
     /**
      * 判断订单状态

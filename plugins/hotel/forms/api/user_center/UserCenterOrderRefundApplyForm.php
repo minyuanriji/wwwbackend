@@ -25,7 +25,7 @@ class UserCenterOrderRefundApplyForm extends BaseModel {
         try {
             //获取订单详情
             $hotelOrder = HotelOrder::findOne($this->hotel_order_id);
-            if(!$hotelOrder){
+            if(!$hotelOrder || $hotelOrder->user_id != \Yii::$app->user->id){
                 throw new \Exception("订单不存在");
             }
 
@@ -34,9 +34,21 @@ class UserCenterOrderRefundApplyForm extends BaseModel {
                 throw new \Exception("订单无法退款");
             }
 
+            $plateform = $hotelOrder->getPlateform();
+            if(!$plateform){
+                throw new \Exception("无法获取平台信息");
+            }
+
+            $res = OrderHelper::plateformOrderRefundApply($hotelOrder, $plateform);
+            if($res['code'] != ApiCode::CODE_SUCCESS){
+                throw new \Exception($res['msg']);
+            }
+
+            //TODO 开始退款+退还红包、余额
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg'  => '操作成功'
+                'msg'  => '退款成功'
             ];
         }catch (\Exception $e){
             return [

@@ -50,7 +50,7 @@ class HotelOrderPreviewForm extends BaseModel{
             $endDay = date("Y-m-d", strtotime($this->start_date) + $this->days * 3600 * 24);
 
             //计算订单价格
-            $orderPrice = $this->num * $bookingItem['product_price'];
+            $orderPrice = $this->days * $this->num * $bookingItem['product_price'];
 
             //用红包抵扣需要的数量
             $integralPrice = OrderHelper::getIntegralPrice($orderPrice);

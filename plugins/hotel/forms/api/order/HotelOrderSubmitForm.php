@@ -48,7 +48,7 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
             }
 
             //计算订单价格
-            $orderPrice = $this->num * $bookingItem['product_price'];
+            $orderPrice = $this->days * $this->num * $bookingItem['product_price'];
 
             //生成订单
             $order = new HotelOrder([

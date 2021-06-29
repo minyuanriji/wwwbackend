@@ -4,6 +4,7 @@ namespace app\plugins\hotel\forms\api\user_center;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\plugins\hotel\forms\common\HotelOrderRefundActionForm;
 use app\plugins\hotel\helpers\OrderHelper;
 use app\plugins\hotel\models\HotelOrder;
 
@@ -44,7 +45,15 @@ class UserCenterOrderRefundApplyForm extends BaseModel {
                 throw new \Exception($res['msg']);
             }
 
-            //TODO 开始退款+退还红包、余额
+            //开始退款+退还红包、余额
+            $refundForm = new HotelOrderRefundActionForm([
+                "order_id" => $hotelOrder->id,
+                "mall_id"  => \Yii::$app->mall->id
+            ]);
+            $res = $refundForm->paid();
+            if($res['code'] != ApiCode::CODE_SUCCESS){
+                throw new \Exception($res['msg']);
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

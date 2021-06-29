@@ -230,7 +230,7 @@ class OrderHelper{
     public static function isRefundable(HotelOrder $hotelOrder){
         $statusInfo = static::getOrderRealStatus($hotelOrder->order_status, $hotelOrder->pay_status, $hotelOrder->created_at, $hotelOrder->booking_start_date, $hotelOrder->booking_days);
         $isRefundable = false;
-        if(in_array($statusInfo['status'], ["unconfirmed"])){
+        if(in_array($statusInfo['status'], ["confirmed", "unconfirmed"])){
             try {
                 $plateform = HotelPlateforms::findOne([
                     "type" => "order",

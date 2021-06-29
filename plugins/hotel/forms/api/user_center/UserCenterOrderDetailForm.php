@@ -32,6 +32,9 @@ class UserCenterOrderDetailForm extends BaseModel {
                 throw new \Exception("订单不存在");
             }
 
+            $isPayable = OrderHelper::isPayable2($orderDetail['order_status'], $orderDetail['pay_status'], $orderDetail['created_at'], $orderDetail['booking_start_date'], $orderDetail['booking_days']);
+            $isCancelable = OrderHelper::isCancelable($orderDetail['order_status'], $orderDetail['pay_status'], $orderDetail['created_at'], $orderDetail['booking_start_date'], $orderDetail['booking_days']);
+
             $statusInfo = OrderHelper::getOrderRealStatus($orderDetail['order_status'], $orderDetail['pay_status'], $orderDetail['created_at'], $orderDetail['booking_start_date'], $orderDetail['booking_days']);
             $orderDetail['status_text'] = $statusInfo['text'];
             $orderDetail['real_status'] = $statusInfo['status'];
@@ -77,8 +80,6 @@ class UserCenterOrderDetailForm extends BaseModel {
                 throw new \Exception("无法获取房型信息");
             }
 
-            $isPayable = OrderHelper::isPayable2($orderDetail['order_status'], $orderDetail['pay_status'], $orderDetail['created_at'], $orderDetail['booking_start_date'], $orderDetail['booking_days']);
-            $isCancelable = OrderHelper::isCancelable($orderDetail['order_status'], $orderDetail['pay_status'], $orderDetail['created_at'], $orderDetail['booking_start_date'], $orderDetail['booking_days']);
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

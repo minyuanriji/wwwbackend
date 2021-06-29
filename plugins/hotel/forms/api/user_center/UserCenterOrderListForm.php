@@ -38,7 +38,7 @@ class UserCenterOrderListForm extends BaseModel {
             $this->statusFilter($query);
 
             $query->andWhere(["o.user_id" => \Yii::$app->user->id]);
-            
+
             $selects = [
                 "h.thumb_url", "h.name as hotel_name", "h.tx_lat", "h.tx_lng", "h.contact_phone",
                 "h.contact_mobile", "h.address", "h.province_id", "h.city_id",

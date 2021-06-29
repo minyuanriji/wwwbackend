@@ -1905,7 +1905,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             if (e.data.code === 0) {
                                 //保存成功
                                 self.$message.success(e.data.msg);
-                                navigateTo
                                 if (this.referrer.page > 1) {
                                     url = Qs.stringify(this.referrer);
                                 } else {

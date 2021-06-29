@@ -14,7 +14,8 @@ class HotelTaskController extends BaseCommandController {
 
     public function actions(){
         return [
-            'query' => 'app\hotel_task_action\QueryAction'
+            "query" => "app\\commands\\hotel_task_action\\QueryAction",
+            "search" => "app\\commands\\hotel_task_action\\SearchAction"
         ];
     }
 
@@ -23,11 +24,17 @@ class HotelTaskController extends BaseCommandController {
         foreach($this->tasks as $task){
             for($i=0; $i < $task['num']; $i++){
                 $pm->add(function (\Swoole\Process\Pool $pool, int $workerId) use($task) {
+                    $taskName = $task['name'];
+                    $this->commandOut("[Worker #{$workerId}] WorkerStart, Task:{$taskName}, pid: " . posix_getpid());
+                    if(!defined("Yii")){
+                        require_once(__DIR__ . '/../vendor/autoload.php');
+                        require_once __DIR__ . '/../config/const.php';
+                        new \app\core\ConsoleApplication();
+                    }
                     try {
                         $this->runAction($task['action']);
-                        $this->commandOut($task['name'] . " task start successfully,worker:{$workerId}");
                     }catch (InvalidRouteException $e){
-                        $this->commandOut($e->getMessage());
+                        $this->commandOut("[Worker #{$workerId}] Task:{$taskName}, " . $e->getMessage());
                         while(true){}
                     }
                 });

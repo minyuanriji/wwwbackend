@@ -82,6 +82,11 @@ class OrderHelper{
                 throw new \Exception($result->message);
             }
 
+            $orderState = 0;
+            if(in_array($result->order_state, [0, 1, 2, 3, 4, 5, 6])){
+                $orderState = (int)$result->order_state;
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [

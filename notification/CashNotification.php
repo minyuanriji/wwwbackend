@@ -14,13 +14,13 @@ class CashNotification
 
     public static function send(Cash $cash)
     {
-        /*(new CashNotificationWeTplJob([
+        (new CashNotificationWeTplJob([
             "cash" => $cash
-        ]))->execute(null);*/
+        ]))->execute(null);
 
-        \Yii::$app->queue->delay(0)->push(new CashNotificationWeTplJob([
+        /*\Yii::$app->queue->delay(0)->push(new CashNotificationWeTplJob([
             "cash" => $cash
-        ]));
+        ]));*/
     }
 
     public static function sendWechatTemplate(Cash $cash)

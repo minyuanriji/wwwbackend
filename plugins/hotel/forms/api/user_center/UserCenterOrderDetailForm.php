@@ -91,7 +91,7 @@ class UserCenterOrderDetailForm extends BaseModel {
                         'is_payable'      => $isPayable ? 1 : 0,
                         'is_cancelable'   => $isCancelable ? 1 : 0,
                         'is_refundable'   => 0,
-                        'pay_last_Second' => $payLastSecond,
+                        'pay_last_second' => $payLastSecond,
                         'pay_end_time'    => $payEndTime
                     ],
                     'order' => $orderDetail,

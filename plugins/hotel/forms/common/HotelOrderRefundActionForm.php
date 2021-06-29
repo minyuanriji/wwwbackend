@@ -121,6 +121,9 @@ class HotelOrderRefundActionForm extends BaseModel {
                 "created_at" => time(),
                 "updated_at" => time()
             ]);
+            if(!$applyOrder->save()){
+                throw new \Exception($this->responseErrorMsg($applyOrder));
+            }
         }
         return $applyOrder;
     }

@@ -8,11 +8,41 @@ use app\models\IntegralLog;
 use app\models\IntegralRecord;
 use app\models\User;
 use app\plugins\hotel\models\HotelOrder;
+use app\plugins\hotel\models\HotelRefundApplyOrder;
 
 class UserIntegralForm extends BaseModel{
 
     const TYPE_ADD      = 1;
     const TYPE_SUB      = 2;
+
+    /**
+     * 酒店预订订单退款
+     * @param HotelOrder $order
+     * @param User $user
+     * @param $price
+     * @return array
+     */
+    public static function hotelOrderRefundAdd(HotelRefundApplyOrder $refundApplyOrder, User $user){
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+            $desc = "酒店预订单[".$refundApplyOrder->order_id."]取消，返还红包";
+
+            static::change($user, $refundApplyOrder->refund_price, self::TYPE_ADD, "hotel_order_refund", $refundApplyOrder->id, $desc);
+
+            $t->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '扣取成功'
+            ];
+        }catch (\Exception $e){
+            $t->rollBack();
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+    }
 
     /**
      * 支付酒店预订订单

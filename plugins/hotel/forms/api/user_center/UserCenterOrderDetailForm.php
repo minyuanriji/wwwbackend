@@ -35,6 +35,9 @@ class UserCenterOrderDetailForm extends BaseModel {
             $isPayable = OrderHelper::isPayable2($orderDetail['order_status'], $orderDetail['pay_status'], $orderDetail['created_at'], $orderDetail['booking_start_date'], $orderDetail['booking_days']);
             $isCancelable = OrderHelper::isCancelable($orderDetail['order_status'], $orderDetail['pay_status'], $orderDetail['created_at'], $orderDetail['booking_start_date'], $orderDetail['booking_days']);
 
+            $payLastSecond = max(0, ($orderDetail['created_at'] + 15 * 60) - time());
+            $payEndTime = date("Y-m-d H:i:s", $orderDetail['created_at'] + 15 * 60);
+
             $statusInfo = OrderHelper::getOrderRealStatus($orderDetail['order_status'], $orderDetail['pay_status'], $orderDetail['created_at'], $orderDetail['booking_start_date'], $orderDetail['booking_days']);
             $orderDetail['status_text'] = $statusInfo['text'];
             $orderDetail['real_status'] = $statusInfo['status'];
@@ -85,9 +88,11 @@ class UserCenterOrderDetailForm extends BaseModel {
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'action' => [
-                        'is_payable'    => $isPayable ? 1 : 0,
-                        'is_cancelable' => $isCancelable ? 1 : 0,
-                        'is_refundable' => 0,
+                        'is_payable'      => $isPayable ? 1 : 0,
+                        'is_cancelable'   => $isCancelable ? 1 : 0,
+                        'is_refundable'   => 0,
+                        'pay_last_Second' => $payLastSecond,
+                        'pay_end_time'    => $payEndTime
                     ],
                     'order' => $orderDetail,
                     'hotel' => $hotelDetail,

@@ -45,6 +45,7 @@ class UserCenterOrderDetailForm extends BaseModel {
             $orderDetail['updated_at'] = date("Y-m-d H:i", $orderDetail['updated_at']);
             $orderDetail['booking_passengers'] = @json_decode($orderDetail['booking_passengers'], true);
             $orderDetail['origin_booking_data'] = @json_decode($orderDetail['origin_booking_data'], true);
+            $orderDetail['end_date'] = date("Y-m-d", strtotime($orderDetail['booking_start_date']) + $orderDetail['booking_days'] * 3600 * 24);
 
             //酒店信息
             $selects = [

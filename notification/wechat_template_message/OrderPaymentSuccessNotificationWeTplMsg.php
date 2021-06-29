@@ -22,7 +22,7 @@ class OrderPaymentSuccessNotificationWeTplMsg extends WechatTemplateMessage
     public $openid;
     public $order_no;
     public $goods_name;
-    public $total_pay_price;
+    public $total_goods_original_price;
     public $store;
     public $pay_at;
 
@@ -37,7 +37,7 @@ class OrderPaymentSuccessNotificationWeTplMsg extends WechatTemplateMessage
                 'keyword1' => $this->store,
                 'keyword2' => $this->order_no,
                 'keyword3' => $this->goods_name,
-                'keyword4' => $this->total_pay_price,
+                'keyword4' => $this->total_goods_original_price,
                 'keyword5' => date("Y-m-d H:i", $this->pay_at),
                 'remark'   => '如有疑问请联系020-31923526'
             ],

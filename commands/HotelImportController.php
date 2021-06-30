@@ -1,9 +1,22 @@
 <?php
 namespace app\commands;
 
+use app\commands\hotel_import_action\InsertAction;
 use app\models\Mall;
 
 class HotelImportController extends BaseCommandController{
+
+    public function actions(){
+        return [
+            "insert" => "app\\commands\\hotel_import_action\\InsertAction"
+        ];
+    }
+
+    public function actionTest(){
+        \Yii::$app->mall = Mall::findOne(5);
+        $this->runAction("insert", [3000, 5, "app\\plugins\\hotel\\libs\\bestwehotel\\PlateForm"]);
+        exit;
+    }
 
     /**
      * 酒店数据同步
@@ -39,7 +52,11 @@ class HotelImportController extends BaseCommandController{
                 while(true){
                     if(!empty($tasks)){
                         $task = array_shift($tasks);
-                        $this->commandOut("task:" . $task['page']);
+                        $this->runAction("insert", [
+                            $task['page'] ,
+                            $task['size'],
+                            $task['plateform_class']
+                        ]);
                     }
                 }
             });

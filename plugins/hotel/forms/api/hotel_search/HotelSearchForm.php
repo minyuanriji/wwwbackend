@@ -73,8 +73,7 @@ class HotelSearchForm extends BaseModel{
 
     /**
      * 移除搜索任务
-     * @param $searchId
-     * @param $prepareId
+     * @param string $searchId
      */
     public static function removeSearchTask($searchId){
         $cache = \Yii::$app->getCache();
@@ -84,6 +83,19 @@ class HotelSearchForm extends BaseModel{
             unset($taskData[$searchId]);
         }
         $cache->set($cacheKey, $taskData);
+    }
+
+    /**
+     * 通过prepareId移除搜索任务
+     * @param string $prepareId
+     */
+    public static function removeSearchTaskByPrepareId($prepareId){
+        $taskData = static::getAllSearchTaskDatas();
+        $taskData = array_flip($taskData);
+        if(isset($taskData[$prepareId])){
+            $searchId = $taskData[$prepareId];
+            static::removeSearchTask($searchId);
+        }
     }
 
     /**

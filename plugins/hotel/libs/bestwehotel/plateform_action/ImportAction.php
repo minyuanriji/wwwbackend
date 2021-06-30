@@ -115,7 +115,7 @@ class ImportAction extends BaseObject {
             if($this->page >= $result->totalPages){
                 $result->finished = 1;
             }
-        }catch (HotelException $e){
+        }catch (\Exception $e){
             $trans->rollBack();
             $result->code = ImportResult::IMPORT_FAIL;
             $result->message = $e->getMessage() . ";file=" . $e->getFile() . ";line=" . $e->getLine();
@@ -296,7 +296,7 @@ class ImportAction extends BaseObject {
             $room = $hotel->getRoomByPlateform($plateform);
             if(!$room){
 
-                $productCode = date("ymdhis") . rand(100, 999);
+                $productCode = date("ymdhis") . rand(1000, 9999);
                 while(HotelRoom::findOne(["product_code" => $productCode])){
                     $productCode = date("ymdhis") . rand(100, 999);
                 }

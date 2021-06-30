@@ -209,9 +209,9 @@
                     merchant_remark: [
                         {required: true, message: '商家留言不能为空', trigger: 'change'},
                     ],
-                    customer_name: [
+                    /*customer_name: [
                         {required: true, message: '商家编码不能为空', trigger: 'change'},
-                    ],
+                    ],*/
                     express_content: [
                         {required: true, message: '物流内容不能为空', trigger: 'change'},
                     ]

@@ -32,6 +32,7 @@ class HotelSearchFilterForm extends HotelSearchForm{
             $searchId = isset($data['search_id']) ? $data['search_id'] : "";
 
             if(empty($searchId)){
+                static::removeSearchTask($searchId);
                 throw new \Exception("搜索异常");
             }
 

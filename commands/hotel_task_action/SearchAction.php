@@ -3,6 +3,7 @@ namespace app\commands\hotel_task_action;
 
 
 use app\plugins\hotel\forms\api\hotel_search\HotelSearchFilterForm;
+use app\plugins\hotel\forms\api\hotel_search\HotelSearchForm;
 use app\plugins\hotel\jobs\HotelSearchFilterJob;
 use yii\base\Action;
 
@@ -13,9 +14,7 @@ class SearchAction extends Action{
 
     public function run(){
         while(true){
-            $cache = \Yii::$app->getCache();
-            $cacheKey = "HotelSearchTask";
-            $taskData = $cache->get($cacheKey);
+            $taskData = HotelSearchForm::getAllSearchTaskDatas();
             if(!empty($taskData)){
                 $prepareId = array_shift($taskData);
                 $form = new HotelSearchFilterForm([

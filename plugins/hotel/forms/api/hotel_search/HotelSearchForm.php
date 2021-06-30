@@ -43,7 +43,7 @@ class HotelSearchForm extends BaseModel{
         $hotelIds = isset($foundData[$prepareId]) && is_array($foundData[$prepareId]) ? $foundData[$prepareId] : [];
         $foundData['hotel_ids'] = array_unique($hotelIds);
         $cache->set($searchId, $foundData, 3600);
-        $this->removeSearchTask($searchId);
+        static::removeSearchTask($searchId);
     }
 
     /**
@@ -61,11 +61,22 @@ class HotelSearchForm extends BaseModel{
     }
 
     /**
+     * 获取所有搜索任务数据
+     * @return array|mixed
+     */
+    public static function getAllSearchTaskDatas(){
+        $cache = \Yii::$app->getCache();
+        $cacheKey = "HotelSearchTask";
+        $taskData = $cache->get($cacheKey);
+        return !empty($taskData) && is_array($taskData) ? $taskData : [];
+    }
+
+    /**
      * 移除搜索任务
      * @param $searchId
      * @param $prepareId
      */
-    public function removeSearchTask($searchId){
+    public static function removeSearchTask($searchId){
         $cache = \Yii::$app->getCache();
         $cacheKey = "HotelSearchTask";
         $taskData = $cache->get($cacheKey);

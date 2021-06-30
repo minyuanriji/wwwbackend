@@ -484,9 +484,9 @@ class OrderRefundForm extends BaseModel
      */
     private function confirm($orderRefund)
     {
-        if (substr_count($this->express, '京东') && empty($this->customer_name)) {
+        /*if (substr_count($this->express, '京东') && empty($this->customer_name)) {
             throw new \Exception('京东物流必须填写京东商家编码');
-        }
+        }*/
         // 用户已发货|商家确认收货
         $orderRefund->is_confirm = 1;
         $orderRefund->confirm_at = time();

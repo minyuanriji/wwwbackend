@@ -74,9 +74,9 @@ class OrderSendForm extends BaseModel
         $transaction = \Yii::$app->db->beginTransaction();
         try {
             $this->checkData();
-            if (substr_count($this->express, '京东') && empty($this->customer_name)) {
+            /*if (substr_count($this->express, '京东') && empty($this->customer_name)) {
                 throw new \Exception('京东物流必须填写京东商家编码');
-            }
+            }*/
             $order = Order::findOne([
                 'id' => $this->order_id,
                 'is_delete' => 0,

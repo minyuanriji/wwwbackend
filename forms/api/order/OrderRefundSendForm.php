@@ -37,9 +37,9 @@ class OrderRefundSendForm extends BaseModel
             return $this->returnApiResultData(ApiCode::CODE_FAIL,"缺少参数");
         }
         try {
-            if (substr_count($this->express, '京东') && empty($this->customer_name)) {
+            /*if (substr_count($this->express, '京东') && empty($this->customer_name)) {
                 throw new \Exception('京东物流必须填写京东商家编码');
-            }
+            }*/
             /** @var OrderRefund $orderRefund */
             $orderRefund = OrderRefund::find()->where([
                 'id' => $this->id,

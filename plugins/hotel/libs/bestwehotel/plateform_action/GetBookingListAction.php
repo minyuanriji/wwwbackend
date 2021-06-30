@@ -3,8 +3,10 @@ namespace app\plugins\hotel\libs\bestwehotel\plateform_action;
 
 
 use app\helpers\ArrayHelper;
+use app\plugins\hotel\libs\bestwehotel\client\hotel\GetHotelImageClient;
 use app\plugins\hotel\libs\bestwehotel\client\hotel\GetHotelRoomStatusClient;
 use app\plugins\hotel\libs\bestwehotel\Request;
+use app\plugins\hotel\libs\bestwehotel\request_model\hotel\GetHotelImageRequest;
 use app\plugins\hotel\libs\bestwehotel\request_model\hotel\GetHotelRoomStatusRequest;
 use app\plugins\hotel\libs\HotelException;
 use app\plugins\hotel\libs\HotelResponse;
@@ -94,7 +96,7 @@ class GetBookingListAction extends BaseObject {
             }
         }
 
-        $pics = HotelPics::find()->andWhere([
+        /*$pics = HotelPics::find()->andWhere([
             "AND",
             ["hotel_id" => $this->hotel->id],
             ["IN", "room_product_code", $productCodes]
@@ -105,7 +107,7 @@ class GetBookingListAction extends BaseObject {
             foreach($tmpPics as $pic){
                 $pics[$pic['room_product_code']] = $pic['pic_url'];
             }
-        }
+        }*/
 
         $roomTypeCodes = [];
         foreach($result->responseModel->roomTypeList as $item){
@@ -123,6 +125,29 @@ class GetBookingListAction extends BaseObject {
             $rows = [];
             foreach($tmpRows as $row){
                 $rows[$row['plateform_code']] = $row['source_code'];
+            }
+        }
+
+        //获取图片
+        $requestModel = new GetHotelImageRequest([
+            "innId" => $this->hotelPlateform->plateform_code,
+        ]);
+        $imageResponse = Request::execute(new GetHotelImageClient($requestModel));
+        $pics = [];
+        if($imageResponse instanceof HotelResponse){
+            $tmpPics = [];
+            foreach($imageResponse->responseModel->datas as $item){
+                if(!empty($item->roomTypeCode)){
+                    $tmpPics[$item->sizeType][$item->roomTypeCode] = $item->imageUrl;
+                }
+            }
+            ksort($tmpPics);
+            foreach($tmpPics as $arr){
+                foreach($arr as $plateformCode => $imageUrl){
+                    if(isset($rows[$plateformCode]) && !isset($pics[$rows[$plateformCode]])){
+                        $pics[$rows[$plateformCode]] = $imageUrl;
+                    }
+                }
             }
         }
 

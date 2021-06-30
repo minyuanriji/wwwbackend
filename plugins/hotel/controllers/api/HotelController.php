@@ -15,6 +15,12 @@ class HotelController extends ApiController{
     public function actionSimpleList(){
         $form = new HotelSimpleListForm();
         $form->attributes = $this->requestData;
+
+        if(empty($form->lng) || empty($form->lat)){
+            $form->lng = static::$commonData['city_data']['longitude'];
+            $form->lat = static::$commonData['city_data']['latitude'];
+        }
+
         return $this->asJson($form->getList());
 
     }

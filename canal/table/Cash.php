@@ -9,7 +9,7 @@ class Cash{
 
     public function update($mixDatas)
     {
-        foreach($mixDatas as $mixData){
+        /*foreach($mixDatas as $mixData){
             $condition = $mixData['condition'];
             $update = $mixData['update'];
             if(isset($update['status']) && $update['status'] > \app\models\Cash::STATUS_APPLY){
@@ -18,6 +18,6 @@ class Cash{
                     $cash && CashNotification::send($cash);
                 }
             }
-        }
+        }*/
     }
 }

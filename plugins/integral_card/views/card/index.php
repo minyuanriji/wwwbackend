@@ -447,7 +447,7 @@
                     }).then(res => {
                         if(res.data.code == 1){
                             this.$message.success(res.data.msg);
-                            window.location.href = "http://www.mingyuanriji.cn/web/index.php?r=plugin%2Fintegral_card%2Fadmin%2Fcard%2Fexport-data&start_export_data="+this.start_export_data+"&end_export_data="+this.end_export_data+"";
+                            window.location.href = _baseUrl + "/index.php?r=plugin%2Fintegral_card%2Fadmin%2Fcard%2Fexport-data&start_export_data="+this.start_export_data+"&end_export_data="+this.end_export_data+"";
                         }
                     }).catch(error => {
                         console.log(error);

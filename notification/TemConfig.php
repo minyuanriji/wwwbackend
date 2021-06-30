@@ -324,4 +324,23 @@ class TemConfig
 
      * */
     const OrderPlacedSuccess = '3QF_3DnhIB1M8PaYpHxL5Mr-WTrkbTNpPzTS20xnQ6k';
+
+    /*  @todo 提现失败通知
+
+        您的提现申请失败，资金已原路退回。
+        提现金额：350元
+        提现时间：2017-6-29 17:34:41
+        提现状态：已退回
+        失败原因：银行卡状态异常
+        感谢您的使用。
+
+        {{first.DATA}}
+        提现金额：{{keyword1.DATA}}
+        提现时间：{{keyword2.DATA}}
+        提现状态：{{keyword3.DATA}}
+        失败原因：{{keyword4.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const WithdrawalFailure = 'Xl0JqzbwEMtiCBOGNhFoV2GyZvbi5DTJupZ4CcZ7AD8';
 }

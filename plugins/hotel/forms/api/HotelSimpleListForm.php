@@ -36,6 +36,7 @@ class HotelSimpleListForm extends BaseModel{
             ]);
 
             $selects = ["ho.id", "ho.thumb_url", "ho.name", "ho.type", "ho.cmt_grade", "ho.cmt_num", "ho.price"];
+            $selects[] = "ST_Distance_sphere(point(ho.tx_lng, ho.tx_lat), point(".$this->lng.", ".$this->lat.")) as distance_mi";
 
             if(!empty($this->search_id)){
                 $form = new HotelSearchForm();
@@ -48,6 +49,19 @@ class HotelSimpleListForm extends BaseModel{
 
             foreach($rows as &$row){
                 $row['type_text'] = static::getTypeText($row['type']);
+
+                $row['distance']      = "N";
+                $row['distance_unit'] = "N";
+
+                if($row['distance_mi'] < 1000){
+                    $row['distance'] = intval($row['distance_mi']);
+                    $row['distance_unit'] = "m";
+                }else if($row['distance_mi'] >= 1000){
+                    $row['distance'] = round(($row['distance_mi']/1000), 1);
+                    $row['distance_unit'] = "km";
+                }
+
+                unset($row['distance_mi']);
             }
 
             return [

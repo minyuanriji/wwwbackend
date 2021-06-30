@@ -44,6 +44,8 @@ class HotelSimpleListForm extends BaseModel{
                 $query->andWhere(["IN", "id", $foundHotelIds ? $foundHotelIds : []]);
             }
 
+            $query->orderBy("distance_mi ASC");
+
             $rows = $query->select($selects)->page($pagination, 10, max(1, (int)$this->page))
                           ->asArray()->all();
 

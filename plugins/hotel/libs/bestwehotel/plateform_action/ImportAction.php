@@ -23,6 +23,9 @@ use app\plugins\hotel\models\HotelPlateforms;
 use app\plugins\hotel\models\HotelRoom;
 use app\plugins\hotel\models\Hotels;
 use yii\base\BaseObject;
+use app\plugins\hotel\libs\bestwehotel\client\hotel\GetHotelRoomStatusClient;
+use app\plugins\hotel\libs\bestwehotel\request_model\hotel\GetHotelRoomStatusRequest;
+
 
 class ImportAction extends BaseObject {
 
@@ -188,6 +191,8 @@ class ImportAction extends BaseObject {
         $this->setHotelType($hotel, $info['innType']); //设置酒店类型
 
         $this->setHotelThumb($hotel, $info['images']); //设置缩略图
+
+        $this->setHotelPrice($hotel, $info); //设置酒店价格
 
         if(!$hotel->save()){
             throw new HotelException(json_encode($hotel->getErrors()));
@@ -423,6 +428,39 @@ class ImportAction extends BaseObject {
             $hotel->type = "comfort";
         }else{
             $hotel->type = "eco";
+        }
+    }
+
+    /**
+     * 设置酒店价格
+     * @param Hotels $hotel
+     * @param array $info
+     */
+    private function setHotelPrice(Hotels $hotel, $info){
+        $requestModel = new GetHotelRoomStatusRequest([
+            "innId"    => $info['innId'],
+            "endOfDay" => date("Y-m-d"),
+            "days"     => 1
+        ]);
+        $client = new GetHotelRoomStatusClient($requestModel);
+        $result = Request::execute($client);
+        if($result instanceof HotelResponse){
+            $minPrice = 0;
+            if($result->responseModel->roomTypeList){
+                foreach($result->responseModel->roomTypeList as $roomTypeList){
+                    if($roomTypeList->productList){
+                        foreach($roomTypeList->productList as $productData){
+                            if(!$minPrice){
+                                $minPrice = $productData->advanceRate;
+                            }elseif($productData->advanceRate){
+                                $minPrice = min($minPrice, $productData->advanceRate);
+                            }
+                        }
+                    }
+                }
+            }
+
+            $hotel->price = $minPrice;
         }
     }
 

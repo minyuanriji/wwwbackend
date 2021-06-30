@@ -1,5 +1,5 @@
 <?php
-namespace app\commands;
+namespace app\commands\hotel_import_action;
 
 use app\core\ApiCode;
 use app\plugins\hotel\forms\mall\HotelImportForm;
@@ -7,20 +7,16 @@ use yii\base\Action;
 
 class InsertAction extends Action{
 
-    public $page;
-    public $size;
-    public $plateform_class;
-
-    public function run(){
+    public function run($page, $size, $plateform_class){
         $form = new HotelImportForm();
-        $form->page = $this->page;
-        $form->plateform_class = $this->plateform_class;
-        $form->size = $this->size;
+        $form->page            = $page;
+        $form->plateform_class = $plateform_class;
+        $form->size            = $size;
         $res = $form->import();
         if($res['code'] != ApiCode::CODE_SUCCESS){
-            echo "[".$this->plateform_class."] Page:" . $this->page . " Failed. ".$res['msg'] ."\n";
+            echo "[{$plateform_class}] Page:{$page} Failed. ".$res['msg'] ."\n";
         }else{
-            echo "[".$this->plateform_class."] Page:" . $this->page . " Finished\n";
+            echo "[{$plateform_class}] Page:{$page} Finished\n";
         }
     }
 

@@ -26,7 +26,7 @@ class ApiHotelHelper{
         $info['type_text'] = $typeTexts[$info['type']];
 
         //距离
-        $info['distance'] = static::getDistance($hotel);
+        $info['dist_info'] = static::getDistance($hotel);
 
         return $info;
     }

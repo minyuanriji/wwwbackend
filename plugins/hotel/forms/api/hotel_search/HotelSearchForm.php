@@ -42,7 +42,6 @@ class HotelSearchForm extends BaseModel{
         if(empty($searchId))
             return;
 
-        $cache = \Yii::$app->getCache();
         $foundData = $this->getFoundData($searchId);
         $hotelIds = isset($foundData[$prepareId]) && is_array($foundData[$prepareId]) ? $foundData[$prepareId] : [];
 
@@ -64,7 +63,7 @@ class HotelSearchForm extends BaseModel{
         }
 
         $oldHotelIds = !empty($search->content) ? (array)json_decode($search->content, true) : [];
-        $search->content = array_unique(array_merge($oldHotelIds, $hotelIds));
+        $search->content = json_encode(array_unique(array_merge($oldHotelIds, $hotelIds)));
         $search->updated_at = time();
         $search->save();
 
@@ -134,7 +133,7 @@ class HotelSearchForm extends BaseModel{
         ]);
         $hotelIds = [];
         if($search && !empty($search->content)){
-            $hotelIds = json_decode($search->content, true);
+            $hotelIds = @json_decode($search->content, true);
         }
         return $hotelIds;
     }

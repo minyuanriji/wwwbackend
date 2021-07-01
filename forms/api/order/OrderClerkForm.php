@@ -74,13 +74,11 @@ class OrderClerkForm extends BaseModel
         /*if (!$this->validate()) {
             return $this->responseErrorInfo();
         }*/
-        if (empty($this->id)) {
-            if (empty($this->clerk_code)) {
-                return [
-                    'code' => ApiCode::CODE_FAIL,
-                    'msg' => '缺少参数'
-                ];
-            }
+        if (empty($this->id) && empty($this->clerk_code)) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => '缺少参数'
+            ];
         }
 
         try {

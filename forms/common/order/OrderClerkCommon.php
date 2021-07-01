@@ -185,7 +185,12 @@ class OrderClerkCommon extends BaseModel
                             $hasPermission = false;
                             break;
                         }
-                        $baopinMchGoodsList[] = $baopinMchGoods;
+                        //判断是否有库存
+                        if($baopinMchGoods->stock_num < $detail->num){
+                            $hasPermission = false;
+                            break;
+                        }
+                        $baopinMchGoodsList[] = [$detail->num, $baopinMchGoods];
                     }
                 }
             }elseif($order->order_type == "offline_normal"){
@@ -232,7 +237,7 @@ class OrderClerkCommon extends BaseModel
             }
 
             if($baopinMchGoodsList){
-                foreach($baopinMchGoodsList as $item){
+                foreach($baopinMchGoodsList as list($num, $item)){
                     $baopinMchClerkOrder = new BaopinMchClerkOrder([
                         "mall_id"    => $item->mall_id,
                         "order_id"   => $order->id,
@@ -244,6 +249,12 @@ class OrderClerkCommon extends BaseModel
                     ]);
                     if(!$baopinMchClerkOrder->save()){
                         throw new \Exception($this->responseErrorMsg($baopinMchClerkOrder));
+                    }
+
+                    $item->stock_num -= $num;
+                    $item->updated_at = time();
+                    if(!$item->save()){
+                        throw new \Exception($this->responseErrorMsg($item));
                     }
                 }
             }

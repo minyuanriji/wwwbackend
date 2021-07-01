@@ -278,10 +278,12 @@ class MchForm extends BaseModel
     public function searchUser()
     {
         $keyword = trim($this->keyword);
-        $query = User::find()->alias('u')->select('u.id,u.nickname,u.avatar_url as avatar')->where([
-            'AND',
-            ['or', ['LIKE', 'u.nickname', $keyword], ['u.id' => $keyword]],
-            ['u.mall_id' => \Yii::$app->mall->id],
+        $query = User::find()->alias('u')->select('u.id,u.nickname,u.avatar_url as avatar');
+        $query->andWhere(['u.mall_id' => \Yii::$app->mall->id]);
+        $query->andWhere([
+            "OR",
+            ['LIKE', 'u.nickname', $keyword],
+            ['u.id' => $keyword]
         ]);
         
         $list = $query->InnerJoinwith('userInfo')->orderBy('nickname')->limit(10)->asArray()->all();

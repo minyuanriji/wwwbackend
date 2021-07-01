@@ -17,7 +17,7 @@ class OrderAutoSaleController extends BaseCommandController {
 
         echo date("Y-m-d H:i:s") . " 订单自动结束守护程序启动...完成\n";
 
-        $orderAutoSaleTime = 10 * 24 * 3600;
+        $orderAutoSaleTime = 7 * 24 * 3600;
 
         while (true){
             $this->sleep(1);
@@ -32,7 +32,8 @@ class OrderAutoSaleController extends BaseCommandController {
             ])->andWhere(["IN", "status", [Order::STATUS_WAIT_RECEIVE]]);
             $query->andWhere("created_at <= '{$offset}'");
             $query->andWhere("pay_type <> '".Order::PAY_TYPE_GOODS_PAY."'");
-
+            echo $query->createCommand()->getRawSql();
+            exit;
             $order = $query->orderBy("id ASC")->one();
             if(!$order) continue;
 

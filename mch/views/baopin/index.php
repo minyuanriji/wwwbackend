@@ -21,7 +21,7 @@
                 <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           @selection-change="handleSelectionChange">
                     <el-table-column align='center' type="selection" width="60"></el-table-column>
-                    <el-table-column sortable="custom" prop="goods_id" width="60" label="商品ID"></el-table-column>
+                    <el-table-column sortable="custom" prop="goods_id" width="110" label="商品ID"></el-table-column>
                     <el-table-column v-loading="btnLoading" sortable="custom" prop="sort" :width="130" label="排序">
                         <template slot-scope="scope">
                             <div v-if="sort_id != scope.row.id" flex="dir:left cross:center">
@@ -63,6 +63,7 @@
                             </div>
                         </template>
                     </el-table-column>
+                    <el-table-column prop="stock_num" width="100" label="库存"> </el-table-column>
                     <el-table-column prop="scope" width="100" label="添加时间">
                         <template slot-scope="scope">
                             {{scope.row.created_at|dateTimeFormat('Y-m-d')}}
@@ -134,7 +135,9 @@
                 </template>
             </el-table-column>
             <el-table-column sortable="custom" property="virtual_sales" label="销量" width="100"></el-table-column>
+            <!--
             <el-table-column sortable="custom" property="goods_stock" label="库存" width="100"></el-table-column>
+            -->
         </el-table>
 
         <el-pagination

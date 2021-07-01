@@ -32,12 +32,15 @@ class OrderClerkStoreForm extends BaseModel{
         $query->innerJoin(["m" => Mch::tableName()], "m.id=s.mch_id");
         $query->innerJoin(["u" => User::tableName()], "u.mch_id=m.id");
         $query->leftJoin(["emri" => EfpsMchReviewInfo::tableName()], "emri.mch_id=m.id");
-        $query->leftJoin(["o" => Order::tableName()], "o.clerk_id=u.id");
-        $query->leftJoin(["oc" => OrderClerk::tableName()], "oc.order_id=o.id");
-        $query->groupBy("s.id");
 
-        $query->select(["s.mch_id", "s.name", "s.id as store_id", "s.mobile", "count(oc.id) as num",
-            "emri.paper_registerAddress as address"
+        $subSql = "(select count(*) from {{%order_detail}} od 
+	                inner join {{%order}} o on o.id=od.order_id 
+                    inner join {{%order_clerk}} oc on oc.order_id=o.id 
+	                left join {{%order_clerk_express}} oce on oce.express_detail_id=od.id 
+	                where oc.is_delete=0 AND o.store_id=s.id and oce.id  is null) as num";
+
+        $query->select(["s.mch_id", "s.name", "s.id as store_id", "s.mobile",
+            "emri.paper_registerAddress as address", $subSql
         ]);
 
         if (!empty($this->keyword)) {

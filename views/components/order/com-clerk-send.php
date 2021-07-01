@@ -63,7 +63,7 @@
                 type: Boolean,
                 default: true,
             },
-            clerkId: Array
+            orderDetailIds: Array
         },
         watch: {
             isShow: function (newVal) {
@@ -114,8 +114,8 @@
                 };
                 request({
                     params: {
-                        r: 'mall/order-clerk/detail',
-                        id: self.clerkId.join(","),
+                        r: 'mall/order-clerk/send-detail-list',
+                        id: self.orderDetailIds.join(","),
                     }
                 }).then(e => {
                     self.orderDetailLoading = false;
@@ -189,7 +189,7 @@
                     if (valid) {
                         self.sendLoading = true;
                         e.send_type = self.express.is_express == 1 ? 1 : 2;
-                        e['clerk_id'] = self.clerkId.join(",");
+                        e['details_id'] = self.orderDetailIds.join(",");
                         request({
                             params: {
                                 r: 'mall/order-clerk/send',

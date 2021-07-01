@@ -30,6 +30,7 @@ class BaseModel extends \yii\base\Model
     public $login_uid    = 0;
     public $base_mall_id = 0;
     public $is_front     = 0; //是否前端调用
+    public $host_info    = '';
 
     public function rules(){
         return [

@@ -3,9 +3,9 @@ namespace app\controllers\mall;
 
 use app\forms\mall\order\OrderClerkDetailForm;
 use app\forms\mall\order\OrderClerkListForm;
+use app\forms\mall\order\OrderClerkSendDetailListForm;
 use app\forms\mall\order\OrderClerkSendForm;
 use app\forms\mall\order\OrderClerkStoreForm;
-use app\forms\mall\order\OrderClerkUpdateExpressStatusForm;
 
 class OrderClerkController extends MallController{
 
@@ -46,6 +46,16 @@ class OrderClerkController extends MallController{
     }
 
     /**
+     * 待补货记录列表
+     * @return string|\yii\web\Response
+     */
+    public function actionSendDetailList(){
+        $form = new OrderClerkSendDetailListForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->getList());
+    }
+
+    /**
      * 补货
      * @return \yii\web\Response
      */
@@ -55,10 +65,4 @@ class OrderClerkController extends MallController{
         return $this->asJson($form->send());
     }
 
-
-    public function actionUpdateExpressStatus(){
-        $form = new OrderClerkUpdateExpressStatusForm();
-        $form->attributes = \Yii::$app->request->post();
-        return $this->asJson($form->update());
-    }
 }

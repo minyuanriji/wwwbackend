@@ -15,7 +15,7 @@ class StoreGoodsStockEditForm extends BaseModel{
     public function rules(){
         return [
             [['goods_id', 'store_id'], 'required'],
-            [['stock_num'], 'min' => 0, 'number']
+            [['stock_num'], 'number', 'min' => 0]
         ];
     }
 

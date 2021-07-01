@@ -36,7 +36,7 @@ class OrderClerk extends BaseActiveRecord
         return [
             [['mall_id', 'order_id', 'created_at', 'updated_at', 'deleted_at'], 'required'],
             [['affirm_pay_type', 'clerk_type', 'mall_id', 'order_id', 'is_delete'], 'integer'],
-            [['created_at', 'updated_at', 'deleted_at', 'express_status'], 'safe'],
+            [['created_at', 'updated_at', 'deleted_at'], 'safe'],
             [['clerk_remark'], 'string', 'max' => 255],
         ];
     }

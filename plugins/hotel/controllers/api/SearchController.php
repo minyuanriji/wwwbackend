@@ -23,15 +23,15 @@ class SearchController extends ApiController{
         $form->host_info  = \Yii::$app->getRequest()->getHostInfo();
 
         if((defined('ENV') && ENV == "pro")){
-            $data = $form->history();
-            if($data['history'] == 1){
-                if($data['is_expired']){
+            $history = $form->history();
+            if($history['data']['history'] == 1){
+                if($history['data']['is_expired']){
                     \Yii::$app->queue->delay(0)->push(new HotelSearchPrepareJob([
                         "mall_id" => \Yii::$app->mall->id,
                         "form"    => $form
                     ]));
                 }
-                return $this->asJson($data);
+                return $this->asJson($history);
             }
         }
 

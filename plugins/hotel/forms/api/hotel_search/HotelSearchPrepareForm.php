@@ -7,6 +7,7 @@ use app\helpers\CityHelper;
 use app\helpers\TencentMapHelper;
 use app\models\DistrictData;
 use app\plugins\hotel\models\Hotels;
+use app\plugins\hotel\models\HotelSearch;
 
 class HotelSearchPrepareForm extends HotelSearchForm {
 
@@ -32,25 +33,27 @@ class HotelSearchPrepareForm extends HotelSearchForm {
     }
 
     /**
-     * 判断是否有历史查询数据
-     * @return boolean
-     */
-    public function hasData(){
-        $searchId = $this->generateSearchId();
-        $hotelIds = $this->getFoundHotelIds($searchId);
-        return !empty($hotelIds);
-    }
-
-    /**
-     * 返回历史数据
+     * 历史查询数据
      * @return array
      */
     public function history(){
+
+        $searchId = $this->generateSearchId();
+        $search = HotelSearch::findOne([
+            "search_id" => $searchId
+        ]);
+
+        $isExpired = 0;
+        if(!$search || (time() - $search->updated_at) > 3600){
+            $isExpired = 1;
+        }
+
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'data' => [
-                'history'   => 1,
-                'search_id' => $this->generateSearchId()
+                'history'    => $search ? 1 : 0,
+                'is_expired' => $isExpired,
+                'search_id'  => $search ? $search->search_id : $searchId
             ]
         ];
     }

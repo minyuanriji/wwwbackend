@@ -18,16 +18,6 @@ class MchApplyPassedNotification
             "mch" => $mch
         ]))->execute(null);
 
-<<<<<<< HEAD
-    public static function send(Mch $mch){
-        \Yii::$app->queue->delay(10)->push(new MchApplyPassedNotificationWeTplJob([
-            "mch" => $mch
-        ]));
-    }
-
-    public static function sendWechatTemplate(Mch $mch){
-
-=======
         /*\Yii::$app->queue->delay(0)->push(new MchApplyPassedNotificationWeTplJob([
             "mch" => $mch
         ]));*/
@@ -35,7 +25,6 @@ class MchApplyPassedNotification
 
     public static function sendWechatTemplate(Mch $mch)
     {
->>>>>>> 5f84071819a097f8f1ffaa3c50a6b111850baabe
         $store = Store::findOne(["mch_id" => $mch->id]);
         if (!$store) return;
 

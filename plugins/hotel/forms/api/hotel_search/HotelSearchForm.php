@@ -3,6 +3,7 @@ namespace app\plugins\hotel\forms\api\hotel_search;
 
 
 use app\models\BaseModel;
+use app\plugins\hotel\models\HotelSearch;
 
 class HotelSearchForm extends BaseModel{
 
@@ -38,11 +39,35 @@ class HotelSearchForm extends BaseModel{
      * @param string $prepareId
      */
     public function updateFound($searchId, $prepareId){
+        if(empty($searchId))
+            return;
+
         $cache = \Yii::$app->getCache();
         $foundData = $this->getFoundData($searchId);
         $hotelIds = isset($foundData[$prepareId]) && is_array($foundData[$prepareId]) ? $foundData[$prepareId] : [];
-        $foundData['hotel_ids'] = array_unique($hotelIds);
-        $cache->set($searchId, $foundData, 3600);
+
+        $search = HotelSearch::findone([
+            "search_id" => $searchId
+        ]);
+        if(!$search){
+            $search = new HotelSearch([
+                'mall_id' => \Yii::$app->mall->id,
+                'search_id' => $searchId,
+                'created_at' => time(),
+                'updated_at' => time()
+            ]);
+        }
+
+        //如果上一次查询距离本次日期超过1小时
+        if((time() - $search->updated_at) > 3600 * 6){
+            $search->content = "";
+        }
+
+        $oldHotelIds = !empty($search->content) ? (array)json_decode($search->content, true) : [];
+        $search->content = array_unique(array_merge($oldHotelIds, $hotelIds));
+        $search->updated_at = time();
+        $search->save();
+
         static::removeSearchTask($searchId);
     }
 
@@ -104,9 +129,14 @@ class HotelSearchForm extends BaseModel{
      * @return array
      */
     public function getFoundHotelIds($searchId){
-        $foundData = $this->getFoundData($searchId);
-        $hotelIds = isset($foundData["hotel_ids"]) && is_array($foundData["hotel_ids"]) ? $foundData["hotel_ids"] : [];
-        return !empty($hotelIds) && is_array($hotelIds) ? $hotelIds : [];
+        $search = HotelSearch::findOne([
+            "search_id" => $searchId
+        ]);
+        $hotelIds = [];
+        if($search && !empty($search->content)){
+            $hotelIds = json_decode($search->content, true);
+        }
+        return $hotelIds;
     }
 
     /**

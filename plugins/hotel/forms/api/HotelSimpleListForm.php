@@ -71,7 +71,7 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
     }
 
     private function getQuery(){
-        return $query = Hotels::find()->alias("ho")->where([
+        $query = Hotels::find()->alias("ho")->where([
             "ho.is_delete"  => 0,
             "ho.is_open"    => 1,
             "ho.is_booking" => 1,
@@ -104,6 +104,7 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
     public function getCacheKey(){
         $rawSql = $this->getQuery()->createCommand()->getRawSql();
         $keys[] = md5(strtolower($rawSql));
+        $keys[] = $this->page;
         return $keys;
     }
 }

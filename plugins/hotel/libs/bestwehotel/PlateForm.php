@@ -8,6 +8,8 @@ use app\plugins\hotel\libs\bestwehotel\plateform_action\OrderRefundAction;
 use app\plugins\hotel\libs\bestwehotel\plateform_action\QueryOrderAction;
 use app\plugins\hotel\libs\bestwehotel\plateform_action\RefundableAction;
 use app\plugins\hotel\libs\bestwehotel\plateform_action\SubmitOrderAction;
+use app\plugins\hotel\libs\bestwehotel\plateform_action\UpdateAction;
+use app\plugins\hotel\libs\HotelException;
 use app\plugins\hotel\libs\IPlateform;
 use app\plugins\hotel\libs\QueryOrderResult;
 use app\plugins\hotel\models\HotelOrder;
@@ -63,4 +65,10 @@ class PlateForm implements IPlateform{
     }
 
 
+    public function update(Hotels $hotel, HotelPlateforms $hotelPlateform){
+        return (new UpdateAction([
+            'hotel'          => $hotel,
+            'hotelPlateform' => $hotelPlateform
+        ]))->run();
+    }
 }

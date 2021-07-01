@@ -7,16 +7,16 @@ use yii\base\Action;
 
 class InsertAction extends Action{
 
-    public function run($page, $size, $plateform_class){
+    public function run($task){
         $form = new HotelImportForm();
-        $form->page            = $page;
-        $form->plateform_class = $plateform_class;
-        $form->size            = $size;
+        $form->page            = $task['page'];
+        $form->plateform_class = $task['plateform_class'];
+        $form->size            = $task['size'];
         $res = $form->import();
         if($res['code'] != ApiCode::CODE_SUCCESS){
-            echo "[{$plateform_class}] Page:{$page} Failed. ".$res['msg'] ."\n";
+            echo "[". $form->plateform_class."] Page:".$form->page." Failed. ".$res['msg'] ."\n";
         }else{
-            echo "[{$plateform_class}] Page:{$page} Finished\n";
+            echo "[".$form->plateform_class."] Page:".$form->page." Finished\n";
         }
     }
 

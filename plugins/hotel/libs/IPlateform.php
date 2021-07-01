@@ -52,10 +52,20 @@ interface IPlateform
     public function import($page, $size);
 
     /**
+     * 同步酒店数据
+     * @param Hotels $hotel
+     * @param HotelPlateforms $hotelPlateform
+     * @throws HotelException
+     * @return void
+     */
+    public function update(Hotels $hotel, HotelPlateforms $hotelPlateform);
+
+    /**
      * 获取酒店可预订的房间列表
      * @param Hotels $hotel
-     * @param $startDate
-     * @param $days
+     * @param HotelPlateforms $hotelPlateform
+     * @param string $startDate
+     * @param integer $days
      * @throws HotelException
      * @return BookingListResult
      */

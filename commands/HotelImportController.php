@@ -92,7 +92,7 @@ class HotelImportController extends BaseCommandController{
                     }
 
                     if(!empty($task)){
-                        $this->runAction("insert", [$task]);
+                        $this->runAction($task['action'], [$task]);
                     }
                 }
             });

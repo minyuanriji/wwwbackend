@@ -60,6 +60,7 @@ class APICacheHelper{
      * @return string
      */
     public static function generateCacheKey(ICacheForm $cacheForm){
+
         $keyArray[] = get_class($cacheForm);
         if($cacheForm instanceof BaseModel){
             $keyArray[] = $cacheForm->base_mall_id;

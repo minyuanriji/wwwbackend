@@ -13,6 +13,7 @@ class TencentMapHelper{
             $url = "https://apis.map.qq.com/ws/geocoder/v1/?location=".$lat.",".$lng."&key={$key}&get_poi=1";
 
             $ch = curl_init();
+            //$hostInfo = "https://dev.mingyuanriji.cn";
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_REFERER, $hostInfo);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -22,6 +23,7 @@ class TencentMapHelper{
             $info = null;
             try {
                 $result = @curl_exec($ch);
+
                 $result = @json_decode($result);
                 if(isset($result->status) && $result->status == 0){
                     $address_component = $result->result->address_component;

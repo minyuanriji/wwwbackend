@@ -78,7 +78,7 @@ class HotelSearchForm extends BaseModel{
      */
     public function addSearchTask($searchId){
         $cache = \Yii::$app->getCache();
-        $cacheKey = "HotelSearchTask";
+        $cacheKey = (defined('ENV') && ENV == "pro") ? "HotelSearchTask" : "HotelSearchTaskDev";
         $foundData = $this->getFoundData($searchId);
         $taskData = $cache->get($cacheKey);
         $taskData[$searchId] = $foundData['newest_prepare_id'];
@@ -91,7 +91,7 @@ class HotelSearchForm extends BaseModel{
      */
     public static function getAllSearchTaskDatas(){
         $cache = \Yii::$app->getCache();
-        $cacheKey = "HotelSearchTask";
+        $cacheKey = (defined('ENV') && ENV == "pro") ? "HotelSearchTask" : "HotelSearchTaskDev";
         $taskData = $cache->get($cacheKey);
         return !empty($taskData) && is_array($taskData) ? $taskData : [];
     }
@@ -102,7 +102,7 @@ class HotelSearchForm extends BaseModel{
      */
     public static function removeSearchTask($searchId){
         $cache = \Yii::$app->getCache();
-        $cacheKey = "HotelSearchTask";
+        $cacheKey = (defined('ENV') && ENV == "pro") ? "HotelSearchTask" : "HotelSearchTaskDev";
         $taskData = $cache->get($cacheKey);
         if(isset($taskData[$searchId])){
             unset($taskData[$searchId]);

@@ -29,7 +29,7 @@ class OrderRefundRefuseNotificationWeTplMsg extends WechatTemplateMessage
         $wechatModel = \Yii::$app->wechat;
         $res = $wechatModel->app->template_message->send([
             'touser'        => $this->openid,
-            'template_id'   => TemConfig::OrderRefundSuccess,
+            'template_id'   => TemConfig::OrderRefundRefuse,
             'data'          => [
                 'first'     => $this->first,
                 'keyword1'  => $this->order_no,

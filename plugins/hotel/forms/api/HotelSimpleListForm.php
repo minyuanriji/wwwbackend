@@ -1,6 +1,7 @@
 <?php
 namespace app\plugins\hotel\forms\api;
 
+use app\controllers\api\ApiController;
 use app\core\ApiCode;
 use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
@@ -29,6 +30,12 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
         }
 
         try {
+
+            if(empty($this->lat) || empty($this->lng)){
+                $this->lng = ApiController::$commonData['city_data']['longitude'];
+                $this->lat = ApiController::$commonData['city_data']['latitude'];
+            }
+
 
             $query = $this->getQuery();
 
@@ -105,6 +112,8 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
         $rawSql = $this->getQuery()->createCommand()->getRawSql();
         $keys[] = md5(strtolower($rawSql));
         $keys[] = $this->page;
+        $keys[] = $this->lat;
+        $keys[] = $this->lng;
         return $keys;
     }
 }

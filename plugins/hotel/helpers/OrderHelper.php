@@ -75,6 +75,8 @@ class OrderHelper{
                 }else{ //已确认
                     $info['status'] = "confirmed";
                 }
+            }elseif($order_status == "finished"){ //已结束
+                $info['status'] = $order_status;
             }elseif($order_status == "fail"){ //预订失败
                 $info['status'] = $order_status;
             }

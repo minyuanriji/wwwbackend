@@ -1,10 +1,12 @@
 <?php
 namespace app\plugins\hotel\forms\api;
 
+use app\controllers\api\ApiController;
 use app\core\ApiCode;
 use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
 use app\models\BaseModel;
+use app\models\DistrictData;
 use app\plugins\hotel\forms\api\hotel_search\HotelSearchForm;
 use app\plugins\hotel\models\Hotels;
 
@@ -14,10 +16,11 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
     public $lng;
     public $lat;
     public $search_id;
+    public $city_id;
 
     public function rules(){
         return [
-            [['page'], 'integer'],
+            [['page', 'city_id'], 'integer'],
             [['lng', 'lat', 'search_id'], 'string']
         ];
     }
@@ -29,6 +32,22 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
         }
 
         try {
+
+            if(empty($this->lat) || empty($this->lng)){
+                $this->lng = ApiController::$commonData['city_data']['longitude'];
+                $this->lat = ApiController::$commonData['city_data']['latitude'];
+            }
+
+            if(empty($this->city_id) || intval($this->city_id) <= 0){
+                $this->city_id = ApiController::$commonData['city_data']['city_id'];
+            }
+
+            if($this->city_id > 0){
+                $districtArr = DistrictData::getArr();
+                if(!isset($districtArr[$this->city_id])){
+                    throw new \Exception("所在城市定位异常");
+                }
+            }
 
             $query = $this->getQuery();
 
@@ -78,6 +97,12 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
             "ho.mall_id"    => \Yii::$app->mall->id
         ]);
 
+        if($this->city_id){
+            $query->andWhere([
+                "city_id" => $this->city_id
+            ]);
+        }
+
         $selects = ["ho.id", "ho.thumb_url", "ho.name", "ho.type", "ho.cmt_grade", "ho.cmt_num", "ho.price"];
         $selects[] = "ST_Distance_sphere(point(ho.tx_lng, ho.tx_lat), point(".$this->lng.", ".$this->lat.")) as distance_mi";
 
@@ -105,6 +130,8 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
         $rawSql = $this->getQuery()->createCommand()->getRawSql();
         $keys[] = md5(strtolower($rawSql));
         $keys[] = $this->page;
+        $keys[] = $this->lat;
+        $keys[] = $this->lng;
         return $keys;
     }
 }

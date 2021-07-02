@@ -97,20 +97,20 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
             "ho.mall_id"    => \Yii::$app->mall->id
         ]);
 
-        if($this->city_id){
-            $query->andWhere([
-                "city_id" => $this->city_id
-            ]);
-        }
-
-        $selects = ["ho.id", "ho.thumb_url", "ho.name", "ho.type", "ho.cmt_grade", "ho.cmt_num", "ho.price"];
-        $selects[] = "ST_Distance_sphere(point(ho.tx_lng, ho.tx_lat), point(".$this->lng.", ".$this->lat.")) as distance_mi";
-
         if(!empty($this->search_id)){
             $form = new HotelSearchForm();
             $foundHotelIds = $form->getFoundHotelIds($this->search_id);
             $query->andWhere(["IN", "id", $foundHotelIds ? $foundHotelIds : []]);
+        }else{
+            if($this->city_id){
+                $query->andWhere([
+                    "city_id" => $this->city_id
+                ]);
+            }
         }
+
+        $selects = ["ho.id", "ho.thumb_url", "ho.name", "ho.type", "ho.cmt_grade", "ho.cmt_num", "ho.price"];
+        $selects[] = "ST_Distance_sphere(point(ho.tx_lng, ho.tx_lat), point(".$this->lng.", ".$this->lat.")) as distance_mi";
 
         $query->orderBy("distance_mi ASC");
         $query->select($selects);;

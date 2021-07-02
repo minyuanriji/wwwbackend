@@ -75,7 +75,6 @@ class HotelSearchForm extends BaseModel{
     /**
      * 添加搜索任务
      * @param $searchId
-     * @param $prepareId
      */
     public function addSearchTask($searchId){
         $cache = \Yii::$app->getCache();

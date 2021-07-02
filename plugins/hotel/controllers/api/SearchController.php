@@ -35,7 +35,12 @@ class SearchController extends ApiController{
             }
         }
 
-        return $this->asJson($form->prepare());
+        $res = $form->prepare();
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $form->addSearchTask($form->generateSearchId());
+        }
+
+        return $this->asJson($res);
     }
 
     /**

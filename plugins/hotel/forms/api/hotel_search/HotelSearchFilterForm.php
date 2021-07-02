@@ -69,9 +69,9 @@ class HotelSearchFilterForm extends HotelSearchForm{
                     }
                 }
 
-                $this->pushFound($searchId, $this->prepare_id, $founds);
+                $totalFounds = $this->pushFound($searchId, $this->prepare_id, $founds);
 
-                $filterResult['founds'] = count($founds);
+                $filterResult['founds'] = $totalFounds;
             }
 
             if($filterResult['finished']){

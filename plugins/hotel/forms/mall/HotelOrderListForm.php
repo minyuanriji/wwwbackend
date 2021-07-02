@@ -29,18 +29,19 @@ class HotelOrderListForm extends BaseModel{
 
             $selects = [
                 "u.id as user_id", "u.nickname", "ho.name as hotel_name",
-                "o.order_status", "o.pay_status", "o.booking_num",
+                "o.order_status", "o.pay_status", "o.booking_num", "o.integral_deduction_price",
                 "o.booking_start_date", "o.order_no", "o.order_price", "o.booking_days",
-                "o.pay_at", "o.booking_arrive_date", "o.created_at", "o.updated_at"];
+                "o.pay_at", "o.pay_price",  "o.booking_arrive_date", "o.created_at", "o.updated_at"];
 
             $list = $query->select($selects)->page($pagination, 20)->asArray()->all();
             foreach($list as &$row){
-                $realStatus = OrderHelper::getOrderRealStatus(
+                $statusInfo = OrderHelper::getOrderRealStatus(
                     $row['order_status'], $row['pay_status'], $row['created_at'],
                     $row['booking_start_date'], $row['booking_days']
                 );
-                print_r($realStatus);
-                exit;
+                $row['real_status'] = $statusInfo['status'];
+                $row['status_text'] = $statusInfo['text'];
+                $row['end_date']    = date("Y-m-d", strtotime($row['booking_start_date']) + $row['booking_days'] * 3600 * 24);
             }
 
             return [

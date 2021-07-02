@@ -22,29 +22,38 @@
                             <div>订单单号：{{scope.row.booking_arrive_date}}</div>
                             <div>订单金额：{{scope.row.order_price}}元</div>
                             <div>下单用户：{{scope.row.nickname}}[ID:{{scope.row.user_id}}]</div>
-                            <div>支付金额：{{scope.row.pay_price}}元</div>
-                            <div>红包抵扣：{{scope.row.integral_deduction_price}}元</div>
+                            <template v-if="scope.row.pay_status != 'unpaid'">
+                                <div>支付金额：{{scope.row.pay_price}}元</div>
+                                <div>红包抵扣：{{scope.row.integral_deduction_price}}元</div>
+                            </template>
                         </template>
                     </el-table-column>
                     <el-table-column label="预订信息" width="230">
                         <template slot-scope="scope">
                             <div>酒店名称：{{scope.row.hotel_name}}</div>
                             <div>入住时间：{{scope.row.booking_start_date}}</div>
-                            <div>离店时间：2021/07/03</div>
+                            <div>离店时间：{{scope.row.end_date}}</div>
                             <div>到店时间：{{scope.row.booking_arrive_date}}</div>
                             <div>房间数量：{{scope.row.booking_num}}间</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="订单状态" width="150">
                         <template slot-scope="scope">
-                            <div>待付款</div>
+                            <div v-if="scope.row.real_status == 'unpaid'">待付款</div>
+                            <div v-if="scope.row.real_status == 'finished'" style="color:gray;">已结束</div>
+                            <div v-if="scope.row.real_status == 'fail'" style="color:#cc3311;">预订失败</div>
+                            <div v-if="scope.row.real_status == 'refund'" style="color:gray;">已退款</div>
+                            <div v-if="scope.row.real_status == 'refunding'" style="color:#cc3311;">退款中</div>
+                            <div v-if="scope.row.real_status == 'confirmed'" style="color:#007a14;">已确认</div>
+                            <div v-if="scope.row.real_status == 'expired' || scope.row.real_status == 'cancel'" style="color:gray;">已取消/已失效</div>
+                            <div v-if="scope.row.real_status == 'unconfirmed'" style="color:#0071ff;">待确认</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="时间" width="200">
                         <template slot-scope="scope">
                             <div>下单时间:{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
                             <div>更新时间:{{scope.row.updated_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
-                            <div>支付时间:{{scope.row.pay_at}}</div>
+                            <div v-if="scope.row.pay_status != 'unpaid'">支付时间:{{scope.row.pay_at}}</div>
                         </template>
                     </el-table-column>
 

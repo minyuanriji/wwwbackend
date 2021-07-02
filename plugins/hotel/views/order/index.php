@@ -11,20 +11,20 @@
             <el-tab-pane label="已取消" name="cancel"></el-tab-pane>
             <div class="table-body">
                 <div class="input-item" style="width:300px;margin-bottom:20px;">
-                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="search.keyword" clearable @clear="search">
-                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                    <el-input @keyup.enter.native="toSearch" size="small" placeholder="昵称/ID/手机号/订单号/酒店" v-model="search.keyword" clearable @clear="toSearch">
+                        <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
                     </el-input>
                 </div>
 
                 <el-table :data="list" size="small" border v-loading="loading" style="margin-bottom: 15px">
                     <el-table-column label="订单信息" width="230">
                         <template slot-scope="scope">
-                            <div>订单单号：{{scope.row.booking_arrive_date}}</div>
+                            <div>订单单号：{{scope.row.order_no}}</div>
                             <div>订单金额：{{scope.row.order_price}}元</div>
                             <div>下单用户：{{scope.row.nickname}}[ID:{{scope.row.user_id}}]</div>
                             <template v-if="scope.row.pay_status != 'unpaid'">
-                                <div>支付金额：{{scope.row.pay_price}}元</div>
-                                <div>红包抵扣：{{scope.row.integral_deduction_price}}元</div>
+                                <div>支付金额：<b style="color:#077a00">{{scope.row.pay_price}}元</b></div>
+                                <div>红包抵扣：<b style="color:#cc3311">{{scope.row.integral_deduction_price}}元</b></div>
                             </template>
                         </template>
                     </el-table-column>
@@ -35,6 +35,7 @@
                             <div>离店时间：{{scope.row.end_date}}</div>
                             <div>到店时间：{{scope.row.booking_arrive_date}}</div>
                             <div>房间数量：{{scope.row.booking_num}}间</div>
+                            <div>更多信息：<el-link @click="showPassengers(scope.row)" type="primary" style="font-size:11px;"><i class="el-icon-view"></i> 查看</el-link></div>
                         </template>
                     </el-table-column>
                     <el-table-column label="订单状态" width="150">
@@ -75,12 +76,22 @@
             </div>
         </el-tabs>
     </el-card>
+
+    <el-dialog title="房客信息" :visible.sync="passengersDialogVisible">
+        <el-table :data="passengersData">
+            <el-table-column property="name" label="姓名" width="150"></el-table-column>
+            <el-table-column property="mobile" label="手机" ></el-table-column>
+        </el-table>
+    </el-dialog>
+
 </div>
 <script>
     const app = new Vue({
         el: '#app',
         data() {
             return {
+                passengersDialogVisible: false,
+                passengersData: [],
                 search: {
                     keyword: '',
                     status: 'all',
@@ -119,9 +130,14 @@
                     this.loading = false;
                 });
             },
-            search() {
+            toSearch() {
                 this.page = 1;
                 this.loadData(this.activeName);
+            },
+            showPassengers(row){
+                this.passengersData = row.passengers;
+                this.passengersDialogVisible = true;
+                console.log(this.passengersData);
             },
             pageChange(page) {
                 this.loadData(this.activeName, page);

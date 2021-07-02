@@ -59,7 +59,7 @@ class ApiHotelHelper{
                 $distance['di'] = round($long/1000, 1);
                 $distance['unit'] = "km";
             }else{
-                $distance['di'] = $long;
+                $distance['di'] = (int)$long;
             }
 
             return $distance;

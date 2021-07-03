@@ -20,17 +20,24 @@ class HotelSearchWaitForm extends HotelSearchForm{
         }
 
         try {
+            sleep(3);
             $search = static::getSearchByPrepareId($this->prepare_id);
             if(!$search){
                 throw new \Exception("搜索异常，请重新搜索");
             }
 
             $content = !empty($search->content) ? json_decode($search->content, true) : [];
+            $isFinished = 0;
+            if(empty($content['hotel_ids'])){
+                if(!$search->is_running){
+                    $isFinished = 1;
+                }
+            }
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     "founds"    => count($content['found_ids']),
-                    "finished"  => empty($content['hotel_ids'])  ? 1 : 0,
+                    "finished"  => $isFinished,
                     "search_id" => $search->search_id
                 ]
             ];

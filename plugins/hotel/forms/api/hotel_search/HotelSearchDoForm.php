@@ -129,5 +129,27 @@ class HotelSearchDoForm extends HotelSearchForm{
         }
     }
 
+    public function jobListCacheKey(){
+        return "HotelSearchJobList:" . $this->search_id;;
+    }
 
+    public function addJob(){
+        $cache = \Yii::$app->getCache();
+        $jobList = $cache->get($this->jobListCacheKey());
+        if(!empty($jobList) && is_array($jobList)){
+            $jobList[] = posix_getpid();
+        }else{
+            $jobList = [posix_getpid()];
+        }
+        $cache->set($this->jobListCacheKey(), $jobList);
+    }
+
+    public function removeJob(){
+        $cache = \Yii::$app->getCache();
+        $jobList = $cache->get($this->jobListCacheKey());
+        if(!empty($jobList) && is_array($jobList)){
+            $jobList = array_diff($jobList, [posix_getpid()]);
+            $cache->set($this->jobListCacheKey(), $jobList);
+        }
+    }
 }

@@ -55,7 +55,6 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
 
             $rows = $query->page($pagination, 10, max(1, (int)$this->page))
                           ->asArray()->all();
-
             foreach($rows as &$row){
                 $row['type_text'] = static::getTypeText($row['type']);
 
@@ -130,7 +129,7 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
 
         $query->orderBy("distance_mi ASC");
         $query->select($selects);;
-
+ 
         return $query;
     }
 

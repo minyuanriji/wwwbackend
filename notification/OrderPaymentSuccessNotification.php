@@ -15,13 +15,13 @@ class OrderPaymentSuccessNotification
 
     public static function send(Order $order)
     {
-        /*(new OrderPaymentSuccessNotificationWeTplJob([
+        (new OrderPaymentSuccessNotificationWeTplJob([
             "order" => $order
-        ]))->execute(null);*/
+        ]))->execute(null);
 
-        \Yii::$app->queue->delay(0)->push(new OrderPaymentSuccessNotificationWeTplJob([
+        /*\Yii::$app->queue->delay(0)->push(new OrderPaymentSuccessNotificationWeTplJob([
             "order" => $order
-        ]));
+        ]));*/
     }
 
     public static function sendWechatTemplate(Order $order)

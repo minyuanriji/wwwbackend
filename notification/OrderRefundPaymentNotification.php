@@ -15,13 +15,13 @@ class OrderRefundPaymentNotification
 
     public static function send(OrderRefund $order_refund)
     {
-        (new OrderRefundPaymentNotificationWeTplJob([
+        /*(new OrderRefundPaymentNotificationWeTplJob([
             "order_refund" => $order_refund
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new OrderRefundPaymentNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new OrderRefundPaymentNotificationWeTplJob([
             "order_refund" => $order_refund
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate(OrderRefund $order_refund)

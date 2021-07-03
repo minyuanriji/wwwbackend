@@ -15,13 +15,13 @@ class MchCashAgreeNotification
 
     public static function send(MchCash $mch_cash)
     {
-        (new MchCashAgreeNotificationWeTplJob([
+        /*(new MchCashAgreeNotificationWeTplJob([
             "mch_cash" => $mch_cash
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new MchCashAgreeNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new MchCashAgreeNotificationWeTplJob([
             "mch_cash" => $mch_cash
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate(MchCash $mch_cash)

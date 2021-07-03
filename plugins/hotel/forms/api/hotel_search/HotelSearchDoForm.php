@@ -44,6 +44,7 @@ class HotelSearchDoForm extends HotelSearchForm{
                 $content['hotel_ids'] = $hotelIds;
                 static::updateSearchTaskData($search, $content);
             }
+            usleep(50);
             $lock->unlock($lock_name);
 
             if($search && $search->is_running){

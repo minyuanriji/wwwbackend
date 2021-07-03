@@ -28,6 +28,7 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
 
     public function getSourceDataForm(){
 
+
         if(!$this->validate()){
             return $this->responseErrorInfo();
         }
@@ -111,6 +112,11 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
                 $foundHotelIds = $content['found_ids'];
             }
             $query->andWhere(["IN", "id", $foundHotelIds]);
+            $attrs = isset($content['attrs']) ? $content['attrs'] : [];
+            if(!empty($attrs['lng']) && !empty($attrs['lat'])){
+                $this->lng = (string)$attrs['lng'];
+                $this->lat = (string)$attrs['lat'];
+            }
         }else{
             if($this->city_id){
                 $query->andWhere([

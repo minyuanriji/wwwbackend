@@ -17,6 +17,14 @@ class HotelSearchForm extends BaseModel{
     }
 
     /**
+     * @param string $searchId
+     * @return string
+     */
+    public static function jobListCacheKey($searchId){
+        return "HotelSearchJobList:" . $searchId;
+    }
+
+    /**
      * 第一步-写入预查询酒店ID数据
      * @param array $hotelIds
      * @param array $attrs

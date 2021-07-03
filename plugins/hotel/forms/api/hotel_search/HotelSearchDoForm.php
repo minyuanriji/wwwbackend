@@ -19,17 +19,19 @@ class HotelSearchDoForm extends HotelSearchForm{
         ];
     }
 
-    public function run(){
+    public function run($lock = null){
         if(!$this->validate()){
             return $this->responseErrorInfo();
         }
 
-        $lock = new LockTools();
         $lock_name = 'LOCK:HotelSearchTaskDo';
         try {
 
             //为防止多任务重复执行相同数据，加入锁操作
-            $lock->lock($lock_name);
+            if($lock != null){
+                $lock->lock($lock_name);
+            }
+
             $searchData = static::getSearchData($this->search_id);
             $search = HotelSearch::findOne(["search_id" => $this->search_id]);;
             $doHotelIds = [];
@@ -43,14 +45,17 @@ class HotelSearchDoForm extends HotelSearchForm{
                 $hotelIds   = array_slice($hotelIds, $length);
                 sort($hotelIds);
                 $content['hotel_ids'] = $hotelIds;
+                $search->content = "";
                 static::updateSearchTaskData($search, $content);
             }
 
             if($searchData && $searchData['is_running'] && empty($doHotelIds)){
                 static::finish($search); //无可执行数据，结束任务
             }
-
-            $lock->unlock($lock_name);
+            echo posix_getpid() . " " . implode(",", $doHotelIds) . "\n";
+            if($lock != null) {
+                //$lock->unlock($lock_name);
+            }
 
             if($searchData && $searchData['is_running'] && !empty($doHotelIds)){
                 $hotels = Hotels::find()->andWhere([
@@ -81,15 +86,18 @@ class HotelSearchDoForm extends HotelSearchForm{
                             }
                         }
                     }
-
-                    $lock->lock($lock_name);
+                    if($lock != null) {
+                        $lock->lock($lock_name);
+                    }
                     $searchData = static::getSearchData($this->search_id);
                     if($searchData){
                         $content = !empty($searchData['content']) ? json_decode($searchData['content'], true) : [];
                         $content['found_ids'] = array_unique(array_merge($content['found_ids'], $founds));
                         static::updateSearchTaskData($search, $content);
                     }
-                    $lock->unlock($lock_name);
+                    if($lock != null) {
+                        $lock->unlock($lock_name);
+                    }
                 }
 
             }

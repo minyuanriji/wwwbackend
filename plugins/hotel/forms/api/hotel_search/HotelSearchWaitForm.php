@@ -30,7 +30,7 @@ class HotelSearchWaitForm extends HotelSearchForm{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     "founds"    => count($content['found_ids']),
-                    "finished"  => !$search->is_running ? 1 : 0,
+                    "finished"  => empty($content['hotel_ids'])  ? 1 : 0,
                     "search_id" => $search->search_id
                 ]
             ];

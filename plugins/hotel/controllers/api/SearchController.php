@@ -49,10 +49,4 @@ class SearchController extends ApiController{
         return $this->asJson($form->waitTask());
     }
 
-    public function actionDebug(){
-        $form = new HotelSearchDoForm();
-        $form->attributes = $this->requestData;
-        return $this->asJson($form->run());
-    }
-
 }

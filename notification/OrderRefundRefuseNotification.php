@@ -20,13 +20,13 @@ class OrderRefundRefuseNotification
 
     public static function send(OrderRefund $order_refund)
     {
-       /* (new OrderRefundRefuseNotificationWeTplJob([
+        (new OrderRefundRefuseNotificationWeTplJob([
             "order_refund" => $order_refund
-        ]))->execute(null);*/
+        ]))->execute(null);
 
-        \Yii::$app->queue->delay(0)->push(new OrderRefundRefuseNotificationWeTplJob([
+        /*\Yii::$app->queue->delay(0)->push(new OrderRefundRefuseNotificationWeTplJob([
             "order_refund" => $order_refund
-        ]));
+        ]));*/
     }
 
     public static function sendWechatTemplate(OrderRefund $order_refund)

@@ -33,7 +33,14 @@ class Plugin extends \app\plugins\Plugin{
 
                 ]
             ],
+            [
+                'name' => '售后管理',
+                'route' => 'plugin/hotel/mall/order/refund',
+                'icon' => 'el-icon-setting',
+                'action' => [
 
+                ]
+            ],
         ];
     }
 

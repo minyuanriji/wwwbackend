@@ -1,6 +1,7 @@
 <?php
 namespace app\plugins\hotel\helpers;
 
+use app\controllers\api\ApiController;
 use app\helpers\ArrayHelper;
 use app\plugins\hotel\jobs\HotelFetchBookingListJob;
 use app\plugins\hotel\libs\IPlateform;
@@ -24,7 +25,46 @@ class ApiHotelHelper{
         $typeTexts = ['luxe' => '豪华型', 'comfort' => '舒适型', 'eco' => '经济型'];
         $info['type_text'] = $typeTexts[$info['type']];
 
+        //距离
+        $info['dist_info'] = static::getDistance($hotel);
+
         return $info;
+    }
+    
+    public static function getDistance(Hotels $hotel){
+
+        //经度1
+        $lng1 = isset(ApiController::$commonData['city_data']['longitude']) ? ApiController::$commonData['city_data']['longitude'] : null;
+        //纬度1
+        $lat1 = isset(ApiController::$commonData['city_data']['latitude']) ? ApiController::$commonData['city_data']['latitude'] : null;
+
+        $lng2 = $hotel->tx_lng; //经度2
+        $lat2 = $hotel->tx_lat;  //纬度2
+
+        $distance = ['di' => -1, 'unit' => 'm'];
+        if(empty($lng1) || empty($lat1) || empty($lng2) || empty($lat2)){
+            return $distance;
+        }else{
+            $EARTH_RADIUS = 6378137;   //地球半径
+            $RAD = pi() / 180.0;
+
+            $radLat1 = $lat1 * $RAD;
+            $radLat2 = $lat2 * $RAD;
+            $a = $radLat1 - $radLat2;    // 两点纬度差
+            $b = ($lng1 - $lng2) * $RAD;  // 两点经度差
+            $s = 2 * asin(sqrt(pow(sin($a / 2), 2) + cos($radLat1) * cos($radLat2) * pow(sin($b / 2), 2)));
+
+            $long = ((($s * $EARTH_RADIUS) * 10000) / 10000);
+            if($long > 1000){
+                $distance['di'] = round($long/1000, 1);
+                $distance['unit'] = "km";
+            }else{
+                $distance['di'] = (int)$long;
+            }
+
+            return $distance;
+        }
+
     }
 
     /**

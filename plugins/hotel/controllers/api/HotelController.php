@@ -1,6 +1,8 @@
 <?php
 namespace app\plugins\hotel\controllers\api;
 
+use app\core\ApiCode;
+use app\helpers\APICacheHelper;
 use app\plugins\ApiController;
 use app\plugins\hotel\forms\api\HotelDetailForm;
 use app\plugins\hotel\forms\api\HotelSearchPrepareForm;
@@ -21,7 +23,12 @@ class HotelController extends ApiController{
             $form->lat = static::$commonData['city_data']['latitude'];
         }
 
-        return $this->asJson($form->getList());
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
 
     }
 

@@ -1,26 +1,31 @@
 <?php
 namespace app\plugins\hotel\forms\api;
 
+use app\controllers\api\ApiController;
 use app\core\ApiCode;
+use app\forms\api\APICacheDataForm;
+use app\forms\api\ICacheForm;
 use app\models\BaseModel;
+use app\models\DistrictData;
 use app\plugins\hotel\forms\api\hotel_search\HotelSearchForm;
 use app\plugins\hotel\models\Hotels;
 
-class HotelSimpleListForm extends BaseModel{
+class HotelSimpleListForm extends BaseModel implements ICacheForm {
 
     public $page;
     public $lng;
     public $lat;
     public $search_id;
+    public $city_id;
 
     public function rules(){
         return [
-            [['page'], 'integer'],
+            [['page', 'city_id'], 'integer'],
             [['lng', 'lat', 'search_id'], 'string']
         ];
     }
 
-    public function getList(){
+    public function getSourceDataForm(){
 
         if(!$this->validate()){
             return $this->responseErrorInfo();
@@ -28,25 +33,25 @@ class HotelSimpleListForm extends BaseModel{
 
         try {
 
-            $query = Hotels::find()->alias("ho")->where([
-                "ho.is_delete"  => 0,
-                "ho.is_open"    => 1,
-                "ho.is_booking" => 1,
-                "ho.mall_id"    => \Yii::$app->mall->id
-            ]);
-
-            $selects = ["ho.id", "ho.thumb_url", "ho.name", "ho.type", "ho.cmt_grade", "ho.cmt_num", "ho.price"];
-            $selects[] = "ST_Distance_sphere(point(ho.tx_lng, ho.tx_lat), point(".$this->lng.", ".$this->lat.")) as distance_mi";
-
-            if(!empty($this->search_id)){
-                $form = new HotelSearchForm();
-                $foundHotelIds = $form->getFoundHotelIds($this->search_id);
-                $query->andWhere(["IN", "id", $foundHotelIds ? $foundHotelIds : []]);
+            if(empty($this->lat) || empty($this->lng)){
+                $this->lng = ApiController::$commonData['city_data']['longitude'];
+                $this->lat = ApiController::$commonData['city_data']['latitude'];
             }
 
-            $query->orderBy("distance_mi ASC");
+            if(empty($this->city_id) || intval($this->city_id) <= 0){
+                $this->city_id = ApiController::$commonData['city_data']['city_id'];
+            }
 
-            $rows = $query->select($selects)->page($pagination, 10, max(1, (int)$this->page))
+            if($this->city_id > 0){
+                $districtArr = DistrictData::getArr();
+                if(!isset($districtArr[$this->city_id])){
+                    throw new \Exception("所在城市定位异常");
+                }
+            }
+
+            $query = $this->getQuery();
+
+            $rows = $query->page($pagination, 10, max(1, (int)$this->page))
                           ->asArray()->all();
 
             foreach($rows as &$row){
@@ -66,13 +71,15 @@ class HotelSimpleListForm extends BaseModel{
                 unset($row['distance_mi']);
             }
 
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'data' => [
-                    'list'       => $rows ? $rows : [],
-                    'pagination' => $pagination
+            return new APICacheDataForm([
+                "sourceData" => [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'data' => [
+                        'list'       => $rows ? $rows : [],
+                        'pagination' => $pagination
+                    ]
                 ]
-            ];
+            ]);
 
         }catch (\Exception $e){
             return [
@@ -82,8 +89,49 @@ class HotelSimpleListForm extends BaseModel{
         }
     }
 
+    private function getQuery(){
+        $query = Hotels::find()->alias("ho")->where([
+            "ho.is_delete"  => 0,
+            "ho.is_open"    => 1,
+            "ho.is_booking" => 1,
+            "ho.mall_id"    => \Yii::$app->mall->id
+        ]);
+
+        if(!empty($this->search_id)){
+            $form = new HotelSearchForm();
+            $foundHotelIds = $form->getFoundHotelIds($this->search_id);
+            $query->andWhere(["IN", "id", $foundHotelIds ? $foundHotelIds : []]);
+        }else{
+            if($this->city_id){
+                $query->andWhere([
+                    "city_id" => $this->city_id
+                ]);
+            }
+        }
+
+        $selects = ["ho.id", "ho.thumb_url", "ho.name", "ho.type", "ho.cmt_grade", "ho.cmt_num", "ho.price"];
+        $selects[] = "ST_Distance_sphere(point(ho.tx_lng, ho.tx_lat), point(".$this->lng.", ".$this->lat.")) as distance_mi";
+
+        $query->orderBy("distance_mi ASC");
+        $query->select($selects);;
+
+        return $query;
+    }
+
     private static function getTypeText($type){
         $typeTexts = ['luxe' => '豪华型', 'comfort' => '舒适型', 'eco' => '经济型'];
         return isset($typeTexts[$type]) ? $typeTexts[$type] : "";
+    }
+
+    /**
+     * @return string
+     */
+    public function getCacheKey(){
+        $rawSql = $this->getQuery()->createCommand()->getRawSql();
+        $keys[] = md5(strtolower($rawSql));
+        $keys[] = $this->page;
+        $keys[] = $this->lat;
+        $keys[] = $this->lng;
+        return $keys;
     }
 }

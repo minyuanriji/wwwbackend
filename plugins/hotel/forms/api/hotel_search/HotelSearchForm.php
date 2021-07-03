@@ -3,6 +3,7 @@ namespace app\plugins\hotel\forms\api\hotel_search;
 
 
 use app\models\BaseModel;
+use app\plugins\hotel\models\HotelSearch;
 
 class HotelSearchForm extends BaseModel{
 
@@ -21,6 +22,7 @@ class HotelSearchForm extends BaseModel{
      * @param string $searchId
      * @param string $prepareId
      * @param array $founds
+     * @return integer
      */
     public function pushFound($searchId, $prepareId, $founds){
         $cache = \Yii::$app->getCache();
@@ -29,7 +31,8 @@ class HotelSearchForm extends BaseModel{
             $foundData[$prepareId] = [];
         }
         $foundData[$prepareId] = array_merge($foundData[$prepareId], $founds);
-        $cache->set($searchId, $foundData, 3600);
+        $cache->set($searchId, $foundData, 3600 * 24);
+        return count($foundData[$prepareId]);
     }
 
     /**
@@ -38,22 +41,44 @@ class HotelSearchForm extends BaseModel{
      * @param string $prepareId
      */
     public function updateFound($searchId, $prepareId){
-        $cache = \Yii::$app->getCache();
+        if(empty($searchId))
+            return;
+
         $foundData = $this->getFoundData($searchId);
         $hotelIds = isset($foundData[$prepareId]) && is_array($foundData[$prepareId]) ? $foundData[$prepareId] : [];
-        $foundData['hotel_ids'] = array_unique($hotelIds);
-        $cache->set($searchId, $foundData, 3600);
+
+        $search = HotelSearch::findone([
+            "search_id" => $searchId
+        ]);
+        if(!$search){
+            $search = new HotelSearch([
+                'mall_id' => \Yii::$app->mall->id,
+                'search_id' => $searchId,
+                'created_at' => time(),
+                'updated_at' => time()
+            ]);
+        }
+
+        //如果上一次查询距离本次日期超过1小时
+        if((time() - $search->updated_at) > 3600 * 6){
+            $search->content = "";
+        }
+
+        $oldHotelIds = !empty($search->content) ? (array)json_decode($search->content, true) : [];
+        $search->content = json_encode(array_unique(array_merge($oldHotelIds, $hotelIds)));
+        $search->updated_at = time();
+        $search->save();
+
         static::removeSearchTask($searchId);
     }
 
     /**
      * 添加搜索任务
      * @param $searchId
-     * @param $prepareId
      */
     public function addSearchTask($searchId){
         $cache = \Yii::$app->getCache();
-        $cacheKey = "HotelSearchTask";
+        $cacheKey = (defined('ENV') && ENV == "pro") ? "HotelSearchTask" : "HotelSearchTaskDev";
         $foundData = $this->getFoundData($searchId);
         $taskData = $cache->get($cacheKey);
         $taskData[$searchId] = $foundData['newest_prepare_id'];
@@ -66,7 +91,7 @@ class HotelSearchForm extends BaseModel{
      */
     public static function getAllSearchTaskDatas(){
         $cache = \Yii::$app->getCache();
-        $cacheKey = "HotelSearchTask";
+        $cacheKey = (defined('ENV') && ENV == "pro") ? "HotelSearchTask" : "HotelSearchTaskDev";
         $taskData = $cache->get($cacheKey);
         return !empty($taskData) && is_array($taskData) ? $taskData : [];
     }
@@ -77,7 +102,7 @@ class HotelSearchForm extends BaseModel{
      */
     public static function removeSearchTask($searchId){
         $cache = \Yii::$app->getCache();
-        $cacheKey = "HotelSearchTask";
+        $cacheKey = (defined('ENV') && ENV == "pro") ? "HotelSearchTask" : "HotelSearchTaskDev";
         $taskData = $cache->get($cacheKey);
         if(isset($taskData[$searchId])){
             unset($taskData[$searchId]);
@@ -104,9 +129,14 @@ class HotelSearchForm extends BaseModel{
      * @return array
      */
     public function getFoundHotelIds($searchId){
-        $foundData = $this->getFoundData($searchId);
-        $hotelIds = isset($foundData["hotel_ids"]) && is_array($foundData["hotel_ids"]) ? $foundData["hotel_ids"] : [];
-        return !empty($hotelIds) && is_array($hotelIds) ? $hotelIds : [];
+        $search = HotelSearch::findOne([
+            "search_id" => $searchId
+        ]);
+        $hotelIds = [];
+        if($search && !empty($search->content)){
+            $hotelIds = @json_decode($search->content, true);
+        }
+        return $hotelIds;
     }
 
     /**
@@ -130,7 +160,7 @@ class HotelSearchForm extends BaseModel{
         if(!empty($prepareId)){
             $data = $cache->get($this->prepareCacheKey($prepareId));
             $data['hotel_ids'] = $hotelIds;
-            $cache->set($this->prepareCacheKey($prepareId), $data, 3600);
+            $cache->set($this->prepareCacheKey($prepareId), $data, 3600 * 24);
         }else{
             $prepareId = uniqid();
             $searchId = $this->generateSearchId();
@@ -142,7 +172,7 @@ class HotelSearchForm extends BaseModel{
             $foundData = $this->getFoundData($searchId);
             $foundData[$prepareId] = [];
             $foundData['newest_prepare_id'] = $prepareId;
-            $cache->set($searchId, $foundData, 3600);
+            $cache->set($searchId, $foundData, 3600 * 24);
         }
 
         return $prepareId;
@@ -159,7 +189,7 @@ class HotelSearchForm extends BaseModel{
         $data = $cache->get($this->prepareCacheKey($prepareId));
         $hotelIds = isset($data['hotel_ids']) ? $data['hotel_ids'] : [];
         $attrs    = isset($data['init_attrs']) ? $data['init_attrs'] : [];
-        $searchId    = isset($data['search_id']) ? $data['search_id'] : "";
+        $searchId = isset($data['search_id']) ? $data['search_id'] : "";
 
         $popIds = [];
 

@@ -4,18 +4,25 @@ namespace app\commands;
 use app\commands\hotel_import_action\InsertAction;
 use app\component\lib\LockTools;
 use app\models\Mall;
+use app\plugins\hotel\models\HotelPlateforms;
+use app\plugins\hotel\models\Hotels;
 
 class HotelImportController extends BaseCommandController{
 
     public function actions(){
         return [
-            "insert" => "app\\commands\\hotel_import_action\\InsertAction"
+            "insert" => "app\\commands\\hotel_import_action\\InsertAction",
+            "update" => "app\\commands\\hotel_import_action\\UpdateAction",
         ];
     }
 
     public function actionTest(){
         \Yii::$app->mall = Mall::findOne(5);
-        $this->runAction("insert", [3000, 5, "app\\plugins\\hotel\\libs\\bestwehotel\\PlateForm"]);
+        $this->runAction("update", [[
+            "hotel_id"        => 121436,
+            "plateform_code"  => "JJ61383",
+            "plateform_class" => "app\\plugins\\hotel\\libs\\bestwehotel\\PlateForm"
+        ]]);
         exit;
     }
 
@@ -25,7 +32,9 @@ class HotelImportController extends BaseCommandController{
     public function actionStart(){
         $this->mutiKill(); //只能只有一个维护服务
 
-        $demoData = [
+        $tasks = [];
+
+        /*$demoData = [
             "page_num" => 5000,
             "page_size" => 5,
             "plateform_class" => "app\\plugins\\hotel\\libs\\bestwehotel\\PlateForm"
@@ -34,10 +43,20 @@ class HotelImportController extends BaseCommandController{
         $tasks = [];
         for($i=1; $i <= $demoData['page_num']; $i++){
             $tasks[] = [
-                'page' => $i,
-                'size' => $demoData['page_size'],
+                'action'          => 'insert',
+                'page'            => $i,
+                'size'            => $demoData['page_size'],
                 'plateform_class' => $demoData['plateform_class']
             ];
+        }*/
+
+
+        $rows = Hotels::find()->alias("ho")
+            ->innerJoin(["p" => HotelPlateforms::tableName()], "p.source_code=ho.id AND p.type='hotel'")
+            ->asArray()->where(["ho.price" => 0])->select(["ho.id as hotel_id", "p.plateform_code", "p.plateform_class"])->all();
+        foreach($rows as $row){
+            $row['action'] = "update";
+            $tasks[] = $row;
         }
 
         $cacheKey = "HotelImportTasks";
@@ -73,11 +92,7 @@ class HotelImportController extends BaseCommandController{
                     }
 
                     if(!empty($task)){
-                        $this->runAction("insert", [
-                            $task['page'] ,
-                            $task['size'],
-                            $task['plateform_class']
-                        ]);
+                        $this->runAction($task['action'], [$task]);
                     }
                 }
             });

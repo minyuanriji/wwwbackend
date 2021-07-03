@@ -20,25 +20,35 @@ class HotelSearchWaitForm extends HotelSearchForm{
         }
 
         try {
-            sleep(3);
-            $search = static::getSearchByPrepareId($this->prepare_id);
-            if(!$search){
+            sleep(1);
+
+            $searchData = static::getSearchDataByPrepareId($this->prepare_id);
+            if(!$searchData){
                 throw new \Exception("搜索异常，请重新搜索");
             }
 
-            $content = !empty($search->content) ? json_decode($search->content, true) : [];
+            $content = !empty($searchData['content']) ? json_decode($searchData['content'], true) : [];
             $isFinished = 0;
-            if(!$search->is_running){
-                $jobList = \Yii::$app->getCache()->get(static::jobListCacheKey($search->search_id));
-                print_r($jobList);
-                exit;
+            if(!$searchData['is_running'] || empty($content['hotel_ids'])){
+                $jobList = \Yii::$app->getCache()->get(static::jobListCacheKey($searchData['search_id']));
+                if(!empty($jobList)){
+                    $nowTime = time();
+                    foreach($jobList as $pid => $time){
+                        if(($nowTime - $time) > 10){ //10秒超时
+                            unset($jobList[$pid]);
+                        }
+                    }
+                }
+                $isFinished = empty($jobList) ? 1 : 0;
+            }else{
+
             }
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     "founds"    => count($content['found_ids']),
                     "finished"  => $isFinished,
-                    "search_id" => $search->search_id
+                    "search_id" => $searchData['search_id']
                 ]
             ];
         }catch (\Exception $e){

@@ -134,7 +134,7 @@ class HotelSearchDoForm extends HotelSearchForm{
     public function addJob(){
         $cache = \Yii::$app->getCache();
         $jobList = $cache->get(static::jobListCacheKey($this->search_id));
-        $jobList[posix_getpid()] = 1;
+        $jobList[posix_getpid()] = time();
         $cache->set(static::jobListCacheKey($this->search_id), $jobList);
     }
 

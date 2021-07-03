@@ -32,12 +32,17 @@ class SearchAction extends Action{
                 ]);
                 echo "HotelSearch task:{$searchId} start\n";
                 $form->addJob();
-                $res = $form->run($lock);
-                if($res['code'] != ApiCode::CODE_SUCCESS){
-                    echo $res['msg'] . "\n";
-                }else{
-                    echo "HotelSearch task:{$searchId} finished. founds ".$res['data']['founds'].". ids ".implode(",", $res['data']['do_hotel_ids'])."\n";
+                try {
+                    $res = $form->run($lock);
+                    if($res['code'] != ApiCode::CODE_SUCCESS){
+                        echo $res['msg'] . "\n";
+                    }else{
+                        echo "HotelSearch task:{$searchId} finished. founds ".$res['data']['founds'] . "\n";
+                    }
+                }catch (\Exception $e){
+                    echo $e->getMessage() . "\n";
                 }
+
                 $form->removeJob();
             }
             sleep(1);

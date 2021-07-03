@@ -16,7 +16,7 @@ use yii\base\Action;
  */
 class SearchAction extends Action{
 
-    public function run(){
+    public function run($lock){
         \Yii::$app->mall = Mall::findOne(5);
 
         while(true){
@@ -31,7 +31,7 @@ class SearchAction extends Action{
                     "search_id" => $searchId
                 ]);
                 echo "HotelSearch task:{$searchId} start\n";
-                $res = $form->run();
+                $res = $form->run($lock);
                 if($res['code'] != ApiCode::CODE_SUCCESS){
                     echo $res['msg'] . "\n";
                 }else{

@@ -6,7 +6,7 @@ use app\models\Store;
 use app\models\User;
 use app\models\UserInfo;
 use app\notification\jobs\MchApplyPassedNotificationWeTplJob;
-use app\notification\wechat_template_message\MchApplyPassedWeTplMsg;
+use app\notification\wechat_template_message\MchApplyWeTplMsg;
 use app\plugins\mch\models\Mch;
 
 class MchApplyPassedNotification
@@ -59,7 +59,7 @@ class MchApplyPassedNotification
                 'remark' => '请完善后再次提交',
             ];
         }
-        (new MchApplyPassedWeTplMsg([
+        (new MchApplyWeTplMsg([
             "mall_id" => $mch->mall_id,
             "openid" => $userInfo->openid,
             "template_id" => $template_id,

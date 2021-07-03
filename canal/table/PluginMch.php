@@ -2,16 +2,15 @@
 
 namespace app\canal\table;
 
-use app\notification\MchApplyPassedNotification;
+use app\notification\MchApplyAdoptNotification;
+use app\notification\MchApplyNoPassNotification;
 use app\plugins\mch\models\Mch;
-use Yii;
 
 class PluginMch
 {
 
     public function insert($rows)
     {
-
     }
 
     public function update($mixDatas)
@@ -20,9 +19,13 @@ class PluginMch
             $condition = $mixData['condition'];
             $update = $mixData['update'];
             if (isset($update['review_status'])) {
-                if ($update['review_status'] > Mch::REVIEW_STATUS_UNCHECKED) {
-                    $mch = Mch::find()->where($condition)->one();
-                    $mch && MchApplyPassedNotification::send($mch);
+                $mch = Mch::find()->where($condition)->one();
+                if ($mch) {
+                    if ($update['review_status'] == Mch::REVIEW_STATUS_CHECKED) {
+                        MchApplyAdoptNotification::send($mch);
+                    } elseif ($update['review_status'] == Mch::REVIEW_STATUS_NOTPASS) {
+                        MchApplyNoPassNotification::send($mch);
+                    }
                 }
             }
         }

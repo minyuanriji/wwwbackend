@@ -2,14 +2,14 @@
 namespace app\notification\wechat_template_message;
 
 /***
- * 商家申请通过微信公众号通知
- * Class MchApplyPassedWeTplMsg
+ * 商家申请微信公众号通知
+ * Class MchApplyWeTplMsg
  * @package app\notification\wechat_template_message
  * @property string $openid
  * @property string $data
  * @property string $template_id
  */
-class MchApplyPassedWeTplMsg extends WechatTemplateMessage
+class MchApplyWeTplMsg extends WechatTemplateMessage
 {
     public $openid;
     public $template_id;

@@ -4,8 +4,9 @@ namespace app\plugins\hotel\controllers\api;
 
 use app\core\ApiCode;
 use app\plugins\ApiController;
-use app\plugins\hotel\forms\api\hotel_search\HotelSearchFilterForm;
+use app\plugins\hotel\forms\api\hotel_search\HotelSearchDoForm;
 use app\plugins\hotel\forms\api\hotel_search\HotelSearchPrepareForm;
+use app\plugins\hotel\forms\api\hotel_search\HotelSearchWaitForm;
 use app\plugins\hotel\jobs\HotelSearchPrepareJob;
 
 class SearchController extends ApiController{
@@ -22,7 +23,7 @@ class SearchController extends ApiController{
         $form->attributes = $this->requestData;
         $form->host_info  = \Yii::$app->getRequest()->getHostInfo();
 
-        if((defined('ENV') && ENV == "pro")){
+        if(true || (defined('ENV') && ENV == "pro")){
             $history = $form->history();
             if($history['data']['history'] == 1){
                 if($history['data']['is_expired']){
@@ -35,12 +36,7 @@ class SearchController extends ApiController{
             }
         }
 
-        $res = $form->prepare();
-        if($res['code'] == ApiCode::CODE_SUCCESS){
-            $form->addSearchTask($form->generateSearchId());
-        }
-
-        return $this->asJson($res);
+        return $this->asJson($form->prepare());
     }
 
     /**
@@ -48,12 +44,15 @@ class SearchController extends ApiController{
      * @return \yii\web\Response
      */
     public function actionFilter(){
-        $form = new HotelSearchFilterForm();
+        $form = new HotelSearchWaitForm();
         $form->attributes = $this->requestData;
+        return $this->asJson($form->waitTask());
+    }
 
-        $res = $form->filter();
-
-        return $this->asJson($res);
+    public function actionDebug(){
+        $form = new HotelSearchDoForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->run());
     }
 
 }

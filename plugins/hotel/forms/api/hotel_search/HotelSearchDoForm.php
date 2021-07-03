@@ -1,0 +1,111 @@
+<?php
+namespace app\plugins\hotel\forms\api\hotel_search;
+
+
+use app\component\lib\LockTools;
+use app\core\ApiCode;
+use app\plugins\hotel\libs\IPlateform;
+use app\plugins\hotel\libs\plateform\BookingListResult;
+use app\plugins\hotel\models\Hotels;
+use app\plugins\hotel\models\HotelSearch;
+
+class HotelSearchDoForm extends HotelSearchForm{
+
+    public $search_id;
+
+    public function rules(){
+        return [
+            [['search_id'], 'required']
+        ];
+    }
+
+    public function run(){
+        if(!$this->validate()){
+            return $this->responseErrorInfo();
+        }
+
+
+        try {
+
+            //为防止多任务重复执行相同数据，加入锁操作
+            $lock = new LockTools();
+            $lock_name = 'LOCK:HotelSearchTaskDo';
+            $lock->lock($lock_name);
+            $search = HotelSearch::findOne(["search_id" => $this->search_id]);
+            $doHotelIds = [];
+            $content = [];
+            if($search && $search->is_running){
+                $content    = !empty($search->content) ? json_decode($search->content, true) : [];
+                $hotelIds   = isset($content['hotel_ids']) ? $content['hotel_ids'] : [];
+                $count      = count($hotelIds);
+                $length     = $count <= 5 ? $count : 5;
+                $doHotelIds = array_slice($hotelIds, 0, $length);
+                $hotelIds   = array_slice($hotelIds, $length);
+                sort($hotelIds);
+                $content['hotel_ids'] = $hotelIds;
+                static::updateSearchTaskData($search, $content);
+            }
+            $lock->unlock($lock_name);
+
+            if($search && $search->is_running){
+                if(empty($doHotelIds)){ //无可执行数据，结束任务
+                    static::finish($search);
+                }else{
+                    $hotels = Hotels::find()->andWhere([
+                        "AND",
+                        ["is_open"    => 1],
+                        ["is_booking" => 1],
+                        ["is_delete"  => 0],
+                        ["IN", "id", $doHotelIds]
+                    ])->all();
+                    if(!empty($hotels)){
+                        $founds = [];
+                        foreach($hotels as $hotel){
+                            $hotelPlateforms = $hotel->getPlateforms();
+                            foreach($hotelPlateforms as $hotelPlateform){
+                                $className = $hotelPlateform->plateform_class;
+                                if(empty($className) || !class_exists($className)) continue;
+                                $classObject = new $className();
+                                if(!$classObject instanceof IPlateform) continue;
+                                $result = $classObject->getBookingList($hotel, $hotelPlateform, $content['attrs']['start_date'], $content['attrs']['days']);
+                                if(!$result instanceof BookingListResult)
+                                    continue;
+                                if($result->code != BookingListResult::CODE_SUCC)
+                                    continue;
+                                $bookings = $result->getAll();
+                                if($bookings && count($bookings) > 0){
+                                    $founds[] = $hotel->id;
+                                    break;
+                                }
+                            }
+                        }
+                        $content['found_ids'] = array_unique(array_merge($content['found_ids'], $founds));
+                        static::updateSearchTaskData($search, $content);
+                    }
+                }
+            }
+
+            $data['search_id'] = null;
+            $data['finished']  = 0;
+            $data['founds']    = 0;
+            if($search){
+                $content = !empty($search->content) ? json_decode($search->content, true) : [];
+                $data['search_id'] = $search->search_id;
+                $data['finished']  = $search->is_running ? 0 : 1;
+                $data['founds']    = isset($content['found_ids']) ? count($content['found_ids']) : 0;
+            }
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'data' => $data
+            ];
+        }catch (\Exception $e){
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+    }
+
+
+}

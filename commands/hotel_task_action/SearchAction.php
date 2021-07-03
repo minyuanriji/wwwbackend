@@ -2,9 +2,12 @@
 namespace app\commands\hotel_task_action;
 
 
-use app\plugins\hotel\forms\api\hotel_search\HotelSearchFilterForm;
+use app\core\ApiCode;
+use app\models\Mall;
+use app\plugins\hotel\forms\api\hotel_search\HotelSearchDoForm;
 use app\plugins\hotel\forms\api\hotel_search\HotelSearchForm;
 use app\plugins\hotel\jobs\HotelSearchFilterJob;
+use app\plugins\hotel\models\HotelSearch;
 use yii\base\Action;
 
 /**
@@ -13,19 +16,23 @@ use yii\base\Action;
 class SearchAction extends Action{
 
     public function run(){
+        \Yii::$app->mall = Mall::findOne(5);
         while(true){
-            $taskData = HotelSearchForm::getAllSearchTaskDatas();
-            if(!empty($taskData)){
-                $prepareId = array_shift($taskData);
-                $form = new HotelSearchFilterForm([
-                    "prepare_id" => $prepareId
+            $row = HotelSearch::find()->where([
+                "is_running" => 1
+            ])->select(["search_id"])->orderBy("updated_at ASC")->one();
+            if($row){
+                $searchId = $row['search_id'];
+                $form = new HotelSearchDoForm([
+                    "search_id" => $searchId
                 ]);
-                echo "HotelSearch task:{$prepareId} start\n";
-                (new HotelSearchFilterJob([
-                    "mall_id" => 5,
-                    "form"    => $form
-                ]))->execute(null);
-                echo "HotelSearch task:{$prepareId} finished\n";
+                echo "HotelSearch task:{$searchId} start\n";
+                $res = $form->run();
+                if($res['code'] != ApiCode::CODE_SUCCESS){
+                    echo $res['msg'] . "\n";
+                }else{
+                    echo "HotelSearch task:{$searchId} finished. founds ".$res['data']['founds']."\n";
+                }
             }
             sleep(1);
         }

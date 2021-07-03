@@ -105,7 +105,7 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
             if(!$search){
                 throw new \Exception("搜索异常，请重新搜索");
             }
-            $content = !empty($search->content) ? json_decode($search->content) : [];
+            $content = !empty($search->content) ? json_decode($search->content, true) : [];
             $foundHotelIds = [];
             if(isset($content['found_ids'])){
                 $foundHotelIds = $content['found_ids'];

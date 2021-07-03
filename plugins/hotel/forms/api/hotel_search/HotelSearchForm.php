@@ -98,9 +98,31 @@ class HotelSearchForm extends BaseModel{
         $content = array_merge($content, $taskData);
         $search->updated_at = time();
         $search->content    = json_encode($content);
+
+        //先写入缓存再保存数据库
+        \Yii::$app->getCache()->set($search->search_id, $search->getAttributes());
+
         if(!$search->save()){
             throw new \Exception(json_encode($search->getErrors()));
         }
+    }
+
+    /**
+     * 获取搜索任务数据
+     * @param string $searchId
+     * @return array|null
+     */
+    protected static function getSearchData($searchId){
+        $cache = \Yii::$app->getCache();
+        $searchData = $cache->get($searchId);
+        if(!$searchData){
+            $search = HotelSearch::findOne(["search_id" => $searchId]);
+            if($search){
+                $searchData = $search->getAttributes();
+                $cache->set($searchId, $searchData);
+            }
+        }
+        return $searchData ? $searchData : null;
     }
 
     /**
@@ -110,6 +132,8 @@ class HotelSearchForm extends BaseModel{
      */
     protected static function finish(HotelSearch $search){
         $search->is_running = 0;
-        static::updateSearchTaskData($search, []);
+        $searchData = static::getSearchData($search->search_id);
+        $content = !empty($searchData['content']) ? json_decode($searchData['content'], true) : [];
+        static::updateSearchTaskData($search, $content);
     }
 }

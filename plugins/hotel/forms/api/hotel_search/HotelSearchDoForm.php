@@ -30,11 +30,12 @@ class HotelSearchDoForm extends HotelSearchForm{
 
             //为防止多任务重复执行相同数据，加入锁操作
             $lock->lock($lock_name);
-            $search = HotelSearch::findOne(["search_id" => $this->search_id]);
+            $searchData = static::getSearchData($this->search_id);
+            $search = HotelSearch::findOne(["search_id" => $this->search_id]);;
             $doHotelIds = [];
             $content = [];
-            if($search && $search->is_running){
-                $content    = !empty($search->content) ? json_decode($search->content, true) : [];
+            if($searchData && $searchData['is_running']){
+                $content    = !empty($searchData['content']) ? json_decode($searchData['content'], true) : [];
                 $hotelIds   = isset($content['hotel_ids']) ? $content['hotel_ids'] : [];
                 $count      = count($hotelIds);
                 $length     = $count <= 5 ? $count : 5;
@@ -44,62 +45,64 @@ class HotelSearchDoForm extends HotelSearchForm{
                 $content['hotel_ids'] = $hotelIds;
                 static::updateSearchTaskData($search, $content);
             }
-            usleep(50);
-            $lock->unlock($lock_name);
 
-            if($search && $search->is_running){
-                if(empty($doHotelIds)){ //无可执行数据，结束任务
-                    static::finish($search);
-                }else{
-                    $hotels = Hotels::find()->andWhere([
-                        "AND",
-                        ["is_open"    => 1],
-                        ["is_booking" => 1],
-                        ["is_delete"  => 0],
-                        ["IN", "id", $doHotelIds]
-                    ])->all();
-                    if(!empty($hotels)){
-                        $founds = [];
-                        foreach($hotels as $hotel){
-                            $hotelPlateforms = $hotel->getPlateforms();
-                            foreach($hotelPlateforms as $hotelPlateform){
-                                $className = $hotelPlateform->plateform_class;
-                                if(empty($className) || !class_exists($className)) continue;
-                                $classObject = new $className();
-                                if(!$classObject instanceof IPlateform) continue;
-                                $result = $classObject->getBookingList($hotel, $hotelPlateform, $content['attrs']['start_date'], $content['attrs']['days']);
-                                if(!$result instanceof BookingListResult)
-                                    continue;
-                                if($result->code != BookingListResult::CODE_SUCC)
-                                    continue;
-                                $bookings = $result->getAll();
-                                if($bookings && count($bookings) > 0){
-                                    $founds[] = $hotel->id;
-                                    break;
-                                }
-                            }
-                        }
-
-                        $lock->lock($lock_name);
-                        $search = HotelSearch::findOne(["search_id" => $this->search_id]);
-                        if($search){
-                            $content = !empty($search->content) ? json_decode($search->content, true) : [];
-                            $content['found_ids'] = array_unique(array_merge($content['found_ids'], $founds));
-                            static::updateSearchTaskData($search, $content);
-                        }
-                        $lock->unlock($lock_name);
-                    }
-                }
+            if($searchData && $searchData['is_running'] && empty($doHotelIds)){
+                static::finish($search); //无可执行数据，结束任务
             }
 
+            $lock->unlock($lock_name);
+
+            if($searchData && $searchData['is_running'] && !empty($doHotelIds)){
+                $hotels = Hotels::find()->andWhere([
+                    "AND",
+                    ["is_open"    => 1],
+                    ["is_booking" => 1],
+                    ["is_delete"  => 0],
+                    ["IN", "id", $doHotelIds]
+                ])->all();
+                if(!empty($hotels)){
+                    $founds = [];
+                    foreach($hotels as $hotel){
+                        $hotelPlateforms = $hotel->getPlateforms();
+                        foreach($hotelPlateforms as $hotelPlateform){
+                            $className = $hotelPlateform->plateform_class;
+                            if(empty($className) || !class_exists($className)) continue;
+                            $classObject = new $className();
+                            if(!$classObject instanceof IPlateform) continue;
+                            $result = $classObject->getBookingList($hotel, $hotelPlateform, $content['attrs']['start_date'], $content['attrs']['days']);
+                            if(!$result instanceof BookingListResult)
+                                continue;
+                            if($result->code != BookingListResult::CODE_SUCC)
+                                continue;
+                            $bookings = $result->getAll();
+                            if($bookings && count($bookings) > 0){
+                                $founds[] = $hotel->id;
+                                break;
+                            }
+                        }
+                    }
+
+                    $lock->lock($lock_name);
+                    $searchData = static::getSearchData($this->search_id);
+                    if($searchData){
+                        $content = !empty($searchData['content']) ? json_decode($searchData['content'], true) : [];
+                        $content['found_ids'] = array_unique(array_merge($content['found_ids'], $founds));
+                        static::updateSearchTaskData($search, $content);
+                    }
+                    $lock->unlock($lock_name);
+                }
+
+            }
+
+            $searchData = static::getSearchData($this->search_id);
             $data['search_id']    = null;
             $data['finished']     = 0;
             $data['founds']       = 0;
             $data['do_hotel_ids'] = $doHotelIds;
             if($search){
-                $content = !empty($search->content) ? json_decode($search->content, true) : [];
-                $data['search_id'] = $search->search_id;
-                $data['finished']  = $search->is_running ? 0 : 1;
+                $content = !empty($searchData['content']) ? json_decode($searchData['content'], true) : [];
+                $data['search_id'] = $searchData['search_id'];
+                $data['finished']  = $searchData['is_running'] ? 0 : 1;
                 $data['founds']    = isset($content['found_ids']) ? count($content['found_ids']) : 0;
             }
 

@@ -29,7 +29,9 @@ class HotelSearchDoForm extends HotelSearchForm{
 
             //为防止多任务重复执行相同数据，加入锁操作
             if($lock != null){
-                $lock->lock($lock_name);
+                while(!$lock->lock($lock_name)){
+                   usleep(10);
+                }
             }
 
             $searchData = static::getSearchData($this->search_id);
@@ -52,9 +54,8 @@ class HotelSearchDoForm extends HotelSearchForm{
             if($searchData && $searchData['is_running'] && empty($doHotelIds)){
                 static::finish($search); //无可执行数据，结束任务
             }
-            echo posix_getpid() . " " . implode(",", $doHotelIds) . "\n";
             if($lock != null) {
-                //$lock->unlock($lock_name);
+                $lock->unlock($lock_name);
             }
 
             if($searchData && $searchData['is_running'] && !empty($doHotelIds)){
@@ -87,7 +88,9 @@ class HotelSearchDoForm extends HotelSearchForm{
                         }
                     }
                     if($lock != null) {
-                        $lock->lock($lock_name);
+                        while(!$lock->lock($lock_name)){
+                            usleep(10);
+                        }
                     }
                     $searchData = static::getSearchData($this->search_id);
                     if($searchData){

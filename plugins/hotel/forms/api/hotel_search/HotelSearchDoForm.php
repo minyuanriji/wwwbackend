@@ -134,20 +134,16 @@ class HotelSearchDoForm extends HotelSearchForm{
     public function addJob(){
         $cache = \Yii::$app->getCache();
         $jobList = $cache->get(static::jobListCacheKey($this->search_id));
-        if(!empty($jobList) && is_array($jobList)){
-            $jobList[] = posix_getpid();
-        }else{
-            $jobList = [posix_getpid()];
-        }
+        $jobList[posix_getpid()] = 1;
         $cache->set(static::jobListCacheKey($this->search_id), $jobList);
     }
 
     public function removeJob(){
         $cache = \Yii::$app->getCache();
         $jobList = $cache->get(static::jobListCacheKey($this->search_id));
-        if(!empty($jobList) && is_array($jobList)){
-            $jobList = array_diff($jobList, [posix_getpid()]);
-            $cache->set(static::jobListCacheKey($this->search_id), $jobList);
+        if(isset($jobList[posix_getpid()])){
+            unset($jobList[posix_getpid()]);
         }
+        $cache->set(static::jobListCacheKey($this->search_id), $jobList);
     }
 }

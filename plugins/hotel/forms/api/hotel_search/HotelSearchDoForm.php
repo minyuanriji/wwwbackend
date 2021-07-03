@@ -24,12 +24,11 @@ class HotelSearchDoForm extends HotelSearchForm{
             return $this->responseErrorInfo();
         }
 
-
+        $lock = new LockTools();
+        $lock_name = 'LOCK:HotelSearchTaskDo';
         try {
 
             //为防止多任务重复执行相同数据，加入锁操作
-            $lock = new LockTools();
-            $lock_name = 'LOCK:HotelSearchTaskDo';
             $lock->lock($lock_name);
             $search = HotelSearch::findOne(["search_id" => $this->search_id]);
             $doHotelIds = [];
@@ -79,8 +78,15 @@ class HotelSearchDoForm extends HotelSearchForm{
                                 }
                             }
                         }
-                        $content['found_ids'] = array_unique(array_merge($content['found_ids'], $founds));
-                        static::updateSearchTaskData($search, $content);
+
+                        $lock->lock($lock_name);
+                        $search = HotelSearch::findOne(["search_id" => $this->search_id]);
+                        if($search){
+                            $content = !empty($search->content) ? json_decode($search->content, true) : [];
+                            $content['found_ids'] = array_unique(array_merge($content['found_ids'], $founds));
+                            static::updateSearchTaskData($search, $content);
+                        }
+                        $lock->unlock($lock_name);
                     }
                 }
             }

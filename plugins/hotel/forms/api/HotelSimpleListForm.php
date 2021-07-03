@@ -9,6 +9,7 @@ use app\models\BaseModel;
 use app\models\DistrictData;
 use app\plugins\hotel\forms\api\hotel_search\HotelSearchForm;
 use app\plugins\hotel\models\Hotels;
+use app\plugins\hotel\models\HotelSearch;
 
 class HotelSimpleListForm extends BaseModel implements ICacheForm {
 
@@ -98,9 +99,18 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
         ]);
 
         if(!empty($this->search_id)){
-            $form = new HotelSearchForm();
-            $foundHotelIds = $form->getFoundHotelIds($this->search_id);
-            $query->andWhere(["IN", "id", $foundHotelIds ? $foundHotelIds : []]);
+            $search = HotelSearch::findOne([
+                "search_id" => $this->search_id
+            ]);
+            if(!$search){
+                throw new \Exception("搜索异常，请重新搜索");
+            }
+            $content = !empty($search->content) ? json_decode($search->content) : [];
+            $foundHotelIds = [];
+            if(isset($content['found_ids'])){
+                $foundHotelIds = $content['found_ids'];
+            }
+            $query->andWhere(["IN", "id", $foundHotelIds]);
         }else{
             if($this->city_id){
                 $query->andWhere([

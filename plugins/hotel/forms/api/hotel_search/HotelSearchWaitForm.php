@@ -28,10 +28,10 @@ class HotelSearchWaitForm extends HotelSearchForm{
 
             $content = !empty($search->content) ? json_decode($search->content, true) : [];
             $isFinished = 0;
-            if(empty($content['hotel_ids'])){
-                if(!$search->is_running){
-                    $isFinished = 1;
-                }
+            if(!$search->is_running){
+                $jobList = \Yii::$app->getCache()->get(static::jobListCacheKey($search->search_id));
+                print_r($jobList);
+                exit;
             }
             return [
                 'code' => ApiCode::CODE_SUCCESS,

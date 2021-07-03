@@ -91,9 +91,10 @@ class HotelSearchDoForm extends HotelSearchForm{
                 }
             }
 
-            $data['search_id'] = null;
-            $data['finished']  = 0;
-            $data['founds']    = 0;
+            $data['search_id']    = null;
+            $data['finished']     = 0;
+            $data['founds']       = 0;
+            $data['do_hotel_ids'] = $doHotelIds;
             if($search){
                 $content = !empty($search->content) ? json_decode($search->content, true) : [];
                 $data['search_id'] = $search->search_id;

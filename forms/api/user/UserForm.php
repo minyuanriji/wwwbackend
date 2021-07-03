@@ -289,13 +289,14 @@ class UserForm extends BaseModel
         }
 
         //酒店订单
-        /*$userCenter['menus'][] = [
-            "icon_url"  => "https://dev.mingyuanriji.cn/web/static/hotel-orders.png",
-            "name"      => "酒店",
-            "link_url"  => "/pages/hotel/orderList/orderList",
-            "open_type" => "navigate"
-        ];*/
-
+        if (IS_SHOW == 'true') {
+            $userCenter['menus'][] = [
+                "icon_url"  => "https://dev.mingyuanriji.cn/web/static/hotel-orders.png",
+                "name"      => "酒店",
+                "link_url"  => "/pages/hotel/orderList/orderList",
+                "open_type" => "navigate"
+            ];
+        }
 
 
         //商家入驻

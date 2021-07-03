@@ -41,6 +41,7 @@ use Yii;
  * @property string $merchant_express_content
  * @property int $is_delete
  * @property int $is_refund
+ * @property int $integral_deduction_price
  * @property Order $order
  * @property User $user
  * @property OrderDetail $detail

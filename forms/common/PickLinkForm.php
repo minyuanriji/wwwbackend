@@ -455,7 +455,7 @@ class PickLinkForm extends BaseModel
                 'name' => '门店列表',
                 'open_type' => '',
                 'icon' => $iconUrlPrefix . 'icon-store.png',
-                'value' => '/pages/store/store',
+                'value' => '/pages/shop/shop',
             ],
             [
                 'type' => 'marketing',

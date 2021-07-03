@@ -343,4 +343,55 @@ class TemConfig
 
      * */
     const WithdrawalFailure = 'Xl0JqzbwEMtiCBOGNhFoV2GyZvbi5DTJupZ4CcZ7AD8';
+
+    /*  @todo 售后订单退款申请通过
+
+        商家已同意您的退款申请
+        退款金额：599元
+        商品详情：正品手串
+        订单编号：129344
+        为了保证您的利益，请您尽快发货给卖家
+
+        {{first.DATA}}
+        退款金额：{{keyword1.DATA}}
+        商品详情：{{keyword2.DATA}}
+        订单编号：{{keyword3.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const OrderRefundSuccess = 'QTHvp5-rsV1l1RFvn94jQXoLw8XqLZozl2Bw19IChNg';
+ 
+    /*  @todo 售后订单退款拒绝通知
+
+        您好，商家暂时拒绝您的退款申请
+        订单编码：NO123456789
+        售后编码：SH123456789
+        拒绝理由：退款理由不充分
+        您可联系商家后再发起退款申请。
+
+        {{first.DATA}}
+        订单编码：{{keyword1.DATA}}
+        售后编码：{{keyword2.DATA}}
+        拒绝理由：{{keyword3.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const OrderRefundRefuse = 'ITBJ6oyHMPDyhS5Fp7dIMEiU6L4oSpPcFnjHJT2fcXM';
+
+    /*  @todo 退款成功通知
+
+        您订单号为1001768的零库已退款成功
+        退款金额：￥1000.00
+        退款账户：原路退回
+        到账时间：因需要授权，具体到账时间以收到时间为准
+        若部分退款或特殊退款要求则以工作人员确认的为准 若有疑问请拨打400--820-7193
+
+        {{first.DATA}}
+        退款金额：{{keyword1.DATA}}
+        退款账户：{{keyword2.DATA}}
+        到账时间：{{keyword3.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const RefundSuccessNotification = '-GT9J-mTgeYPlQdmOPvtZ0NuZHLHQJ0zc409CPcJg-o';
 }

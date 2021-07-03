@@ -52,3 +52,5 @@ web/uploads/images/*
 签到sql.txt
 /mirror
 /app
+
+composer.lock

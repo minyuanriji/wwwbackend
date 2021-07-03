@@ -1,7 +1,6 @@
 <?php
 namespace app\notification;
 
-use app\models\EfpsPaymentOrder;
 use app\models\Goods;
 use app\models\OrderDetail;
 use app\models\Store;

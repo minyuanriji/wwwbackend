@@ -41,11 +41,11 @@ class OrderExpressForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-        if ($this->customer_name === 'undefined') $this->customer_name = null;
+//        if ($this->customer_name === 'undefined') $this->customer_name = null;
         try {
-            if (substr_count($this->express, '京东') && empty($this->customer_name)) {
+            /*if (substr_count($this->express, '京东') && empty($this->customer_name)) {
                 throw new \Exception('京东物流必须填写京东商家编码');
-            }
+            }*/
             $expressData = $this->getExpressData();
             return [
                 'code' => ApiCode::CODE_SUCCESS,

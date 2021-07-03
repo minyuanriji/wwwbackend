@@ -21,12 +21,25 @@ use Yii;
  * @property string $created_at
  * @property string $updated_at
  * @property string $deleted_at
+ * @property string $fact_price  实际到账
  * @property int $is_delete
  * @property string $content
  * @property Mch $mch
  */
 class MchCash extends BaseActiveRecord
 {
+    //状态  拒绝
+    const STATUS_TWO = 2;
+
+    //提现状态  待转账
+    const TRANSFER_STATUS_ZERO = 0;
+
+    //提现状态 已转账
+    const TRANSFER_STATUS_ONE = 1;
+
+    //提现状态 拒绝转账
+    const TRANSFER_STATUS_TWO = 2;
+
     /**
      * {@inheritdoc}
      */

@@ -3,26 +3,24 @@
 namespace app\notification;
 
 use app\models\IncomeLog;
-use app\models\Order;
 use app\models\User;
 use app\models\UserInfo;
 use app\notification\jobs\BillAccountCommissionNotificationWeTplJob;
 use app\notification\wechat_template_message\CommissionWeTplMsg;
 use app\plugins\commission\models\CommissionCheckoutPriceLog;
-use app\plugins\commission\models\CommissionGoodsPriceLog;
 use app\plugins\mch\models\MchCheckoutOrder;
 
 class BillAccountCommissionNotification
 {
     public static function send(IncomeLog $income_log)
     {
-        (new BillAccountCommissionNotificationWeTplJob([
+        /*(new BillAccountCommissionNotificationWeTplJob([
             "income_log" => $income_log
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new BillAccountCommissionNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new BillAccountCommissionNotificationWeTplJob([
             "income_log" => $income_log
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate(IncomeLog $income_log)

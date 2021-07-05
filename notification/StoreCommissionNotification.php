@@ -3,13 +3,10 @@
 namespace app\notification;
 
 use app\models\IncomeLog;
-use app\models\Order;
 use app\models\User;
 use app\models\UserInfo;
 use app\notification\jobs\StoreCommissionNotificationWeTplJob;
 use app\notification\wechat_template_message\CommissionWeTplMsg;
-use app\plugins\commission\models\CommissionCheckoutPriceLog;
-use app\plugins\commission\models\CommissionGoodsPriceLog;
 use app\plugins\commission\models\CommissionStorePriceLog;
 use app\plugins\mch\models\MchCheckoutOrder;
 
@@ -47,7 +44,7 @@ class StoreCommissionNotification
         if(!$order_user) return;
 
         $data = [
-            'first'     => '您的下级成功支付订单，您获得一笔分润哟',
+            'first'     => '您的下级门店有新的支付订单，您获得一笔分润哟！',
             'keyword1'  => $order_user->nickname,
             'keyword2'  => $checkout_order->order_no,
             'keyword3'  => $checkout_order->order_price,

@@ -46,10 +46,10 @@ class MchCashAgreeNotification
         } else {
             $template_id = TemConfig::WithdrawalFailure;
             $data = [
-                'first'     => '您的提现申请失败，资金已原路退回！',
+                'first'     => '您的提现申请失败！',
                 'keyword1'  => $mch_cash->money,
                 'keyword2'  => date('Y-m-d H:i:s', $mch_cash->updated_at),
-                'keyword3'  => '已退回',
+                'keyword3'  => '待审核',
                 'keyword4'  => $mch_cash->content,
                 'remark'    => '感谢您的使用！如有疑问请联系客服020-31923526',
             ];

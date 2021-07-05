@@ -20,6 +20,7 @@ use Yii;
  * @property int $deleted_at 删除时间
  * @property int $is_delete 是否删除
  * @property int $is_manual 是否是后台手动充值
+ * @property int $source_type 'admin管理员操作，cash提现，checkout结账单收入，store推荐门店分佣，migrate旧商城迁移，boss股东分红，goods商品分佣'
  * @property User $user
  * @property OrderDetail $orderDetail
  */

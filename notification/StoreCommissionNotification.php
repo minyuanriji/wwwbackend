@@ -14,13 +14,13 @@ class StoreCommissionNotification
 {
     public static function send(IncomeLog $income_log)
     {
-        (new StoreCommissionNotificationWeTplJob([
+        /*(new StoreCommissionNotificationWeTplJob([
             "income_log" => $income_log
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new StoreCommissionNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new StoreCommissionNotificationWeTplJob([
             "income_log" => $income_log
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate(IncomeLog $income_log)

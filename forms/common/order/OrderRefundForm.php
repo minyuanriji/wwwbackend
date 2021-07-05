@@ -325,13 +325,16 @@ class OrderRefundForm extends BaseModel
                     );
                 }
             }
-            if ($this->refund_price <= 0) {
+
+            $orderRefund->reality_refund_price = $this->refund_price;
+
+            /*if ($this->refund_price <= 0) {
                 throw new \Exception('退款金额需大于零');
             }
             //卖家自定义退款金额
             if ($this->refund_price) {
                 $orderRefund->reality_refund_price = $this->refund_price;
-            }
+            }*/
             if (!$orderRefund->save()) {
                 throw new \Exception($this->responseErrorMsg($orderRefund));
             }

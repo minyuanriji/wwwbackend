@@ -21,7 +21,7 @@ class MchCashTransferCommitAction extends Action{
                 //同意未提交
                 $query = MchCash::find()->alias("mc");
                 $query->leftJoin(["eto" => EfpsTransferOrder::tableName()], "eto.outTradeNo=mc.order_no");
-                $query->select(["mc.id"]);
+                $query->select(["mc.id as mch_cash_id"]);
                 $query->andWhere([
                     "AND",
                     ["mc.type" => "efps_bank"],
@@ -30,14 +30,14 @@ class MchCashTransferCommitAction extends Action{
                     ["mc.transfer_status" => 0],
                     "eto.id IS NULL OR `eto`.`status` = 0"
                 ]);
+                $data = $query->asArray()->orderBy("mc.updated_at ASC")->limit(1)->one();
 
-                $data = $query->orderBy("mc.updated_at ASC")->one();
                 if(!$data){
                     sleep(30);
                     continue;
                 }
 
-                $mchCash = MchCash::findOne($data['id']);
+                $mchCash = MchCash::findOne($data['mch_cash_id']);
                 $mchCash->updated_at = time();
                 if(!$mchCash->save()){
                     throw new \Exception(json_encode($mchCash->getErrors()));
@@ -56,7 +56,7 @@ class MchCashTransferCommitAction extends Action{
                 $message[] = "Line:" . $e->getLine();
                 echo (implode(" ", $message) . "\n");
             }
-
+            sleep(1);
         }
     }
 }

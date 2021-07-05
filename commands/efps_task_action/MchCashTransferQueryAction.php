@@ -28,6 +28,7 @@ class MchCashTransferQueryAction extends Action{
                 ]);
 
                 $data = $query->asArray()->orderBy("mc.updated_at ASC")->one();
+
                 if(!$data){
                     sleep(30);
                     continue;
@@ -57,6 +58,7 @@ class MchCashTransferQueryAction extends Action{
                 $message[] = "Line:" . $e->getLine();
                 echo (implode(" ", $message) . "\n");
             }
+            sleep(1);
         }
     }
 

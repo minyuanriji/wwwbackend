@@ -15,13 +15,12 @@ class IncomeLog
         {
             if (isset($row['flag']) && $row['flag']) {
                 if (isset($row['source_type'])) {
-                    if ($row['source_type'] == 'checkout') {
+                    if ($row['source_type'] == 3) {
                         BillAccountCommissionNotification::send($row);
-                    } elseif ($row['source_type'] == 'store') {
+                    } elseif ($row['source_type'] == 4) {
                         StoreCommissionNotification::send($row);
                     }
                 }
-
             }
         }
     }

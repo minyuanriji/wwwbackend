@@ -21,12 +21,19 @@ class IncomeLog
             if (isset($update['flag']) && $update['flag']) {
                 $income_log = \app\models\IncomeLog::findOne($condition);
                 if ($income_log) {
-                    if ($income_log->source_type == 'checkout') {
-                        BillAccountCommissionNotification::send($income_log);
-                    } elseif ($income_log->source_type == 'store') {
-                        StoreCommissionNotification::send($income_log);
-                    } elseif ($income_log->source_type == 'goods') {
-                        GoodsCommissionNotification::send($income_log);
+                    switch ($income_log->source_type)
+                    {
+                        case 'checkout';
+                            BillAccountCommissionNotification::send($income_log);
+                            break;
+                        case 'store';
+                            StoreCommissionNotification::send($income_log);
+                            break;
+                        case 'goods';
+                            GoodsCommissionNotification::send($income_log);
+                            break;
+                        default:
+                            return;
                     }
                 }
             }

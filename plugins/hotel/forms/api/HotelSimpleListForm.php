@@ -129,7 +129,7 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
 
         $query->orderBy("distance_mi ASC");
         $query->select($selects);;
- 
+
         return $query;
     }
 

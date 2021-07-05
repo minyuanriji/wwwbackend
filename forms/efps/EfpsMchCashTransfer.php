@@ -7,12 +7,11 @@ use app\plugins\mch\models\MchCash;
 class EfpsMchCashTransfer extends BaseModel{
 
     /**
-     * 商家提现转账
+     * 商家提现提交易票联进行打款处理
      * @param MchCash $mchCash
      * @return array
      */
-    public static function transfer(MchCash $mchCash){
-
+    public static function commit(MchCash $mchCash){
         $typeData = (array)@json_decode($mchCash->type_data, true);
 
         $transferData = new EfpsTransferData([
@@ -25,6 +24,7 @@ class EfpsMchCashTransfer extends BaseModel{
             'bankAccountType' => !empty($typeData['bankAccountType']) ? $typeData['bankAccountType'] : ""
         ]);
 
-        return EfpsTransfer::execute($transferData);
+        return EfpsTransfer::commit($transferData);
     }
+
 }

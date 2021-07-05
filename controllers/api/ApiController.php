@@ -20,6 +20,7 @@ use app\events\UserInfoEvent;
 use app\forms\api\LoginForm;
 use app\handlers\HandlerRegister;
 use app\handlers\RelationHandler;
+use app\helpers\TencentMapHelper;
 use app\logic\CommonLogic;
 use app\logic\RelationLogic;
 use app\models\DistrictData;
@@ -87,6 +88,11 @@ class ApiController extends BaseController
 
         $this->getParamsData()->setMall($headers)->setCity($headers)->login($headers)->wechatSubscribe()->saveFormIdList($headers)->bindParent($headers)->checkInviter();
 
+        /*$lng = "113.1172052002";
+        $lat = "23.017962033827";
+        $info = TencentMapHelper::toPoi("https://dev.mingyuanriji.cn", $lng, $lat);
+        print_r($info);
+        exit;*/
     }
 
     /**

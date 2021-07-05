@@ -56,6 +56,7 @@ class HotelSearchForm extends BaseModel{
                 'attrs'      => $attrs
             ];
             $search->is_running = 1;
+            \Yii::$app->getCache()->set(static::jobListCacheKey($searchId), null);
             static::updateSearchTaskData($search, $taskData);
         }
 
@@ -88,12 +89,9 @@ class HotelSearchForm extends BaseModel{
      * @param string $prepareId
      * @return HotelSearch|null
      */
-    protected static function getSearchByPrepareId($prepareId){
+    protected static function getSearchDataByPrepareId($prepareId){
         $searchId = static::getBindSearchIdByPrepareId($prepareId);
-        $search = HotelSearch::findone([
-            "search_id" => $searchId
-        ]);
-        return $search ? $search : null;
+        return static::getSearchData($searchId);
     }
 
     /**

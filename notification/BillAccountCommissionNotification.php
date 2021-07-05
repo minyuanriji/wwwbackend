@@ -2,7 +2,6 @@
 
 namespace app\notification;
 
-use app\models\IncomeLog;
 use app\models\User;
 use app\models\UserInfo;
 use app\notification\jobs\BillAccountCommissionNotificationWeTplJob;
@@ -14,13 +13,13 @@ class BillAccountCommissionNotification
 {
     public static function send($income_log)
     {
-        (new BillAccountCommissionNotificationWeTplJob([
+        /*(new BillAccountCommissionNotificationWeTplJob([
             "income_log" => $income_log
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new BillAccountCommissionNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new BillAccountCommissionNotificationWeTplJob([
             "income_log" => $income_log
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate($income_log)

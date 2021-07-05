@@ -213,7 +213,7 @@ Yii::$app->loadComponentView('order/com-send');
                 }
             },
             refundOver() {
-                if (this.para.refund_price > 0) {
+                // if (this.para.refund_price > 0) {
                     this.submitLoading = true;
                     let para = this.para;
                     request({
@@ -239,12 +239,12 @@ Yii::$app->loadComponentView('order/com-send');
                         }
                     }).catch(e => {
                     });
-                } else {
-                    this.$message({
-                        message: '退款金额需大于零',
-                        type: 'warning'
-                    });
-                }
+                // } else {
+                //     this.$message({
+                //         message: '退款金额需大于零',
+                //         type: 'warning'
+                //     });
+                // }
             },
             dialogClose() {
                 this.sendVisible = false;

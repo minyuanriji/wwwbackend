@@ -394,4 +394,25 @@ class TemConfig
 
      * */
     const RefundSuccessNotification = '-GT9J-mTgeYPlQdmOPvtZ0NuZHLHQJ0zc409CPcJg-o';
+
+    /*  @todo 付款成功通知
+
+        您的下级成功支付订单，您获得一笔分润哟
+        下级昵称：下级昵称
+        订单编号：201802199837
+        订单金额：100元
+        佣金金额：0.3元
+        时间：2014年7月21日 18:36
+        感谢你的使用。
+
+        {{first.DATA}}
+        下级昵称：{{keyword1.DATA}}
+        订单编号：{{keyword2.DATA}}
+        订单金额：{{keyword3.DATA}}
+        佣金金额：{{keyword4.DATA}}
+        时间：{{keyword5.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const SubOrderSubCommission = 'F6dhQneZVsWxMEBFIoDq82rROQruWvLN0eTMXmQo1IY';
 }

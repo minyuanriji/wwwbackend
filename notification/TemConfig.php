@@ -415,4 +415,46 @@ class TemConfig
 
      * */
     const SubOrderSubCommission = 'F6dhQneZVsWxMEBFIoDq82rROQruWvLN0eTMXmQo1IY';
+
+    /*  @todo 预订成功通知
+
+        您已完成支付，预订成功。
+        酒店名称：香格里拉
+        预订房型：豪华房
+        入住日期：2017年05月02日
+        预订房数：1
+        订单金额：800
+        点击这里查看预订详情
+
+        {{first.DATA}}
+        酒店名称：{{keyword1.DATA}}
+        预订房型：{{keyword2.DATA}}
+        入住日期：{{keyword3.DATA}}
+        预订房数：{{keyword4.DATA}}
+        订单金额：{{keyword5.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const HotelReservationSuccessful = 'NucwFyosk892dUIijadXgOtXfoTys9xMtC_d-V8EGhY';
+
+    /*  @todo 订单取消失败通知
+
+        抱歉，您的订单取消失败
+        订单编号：1000029920
+        酒店名称：丽思卡尔顿
+        预订房型：豪华大床房
+        房间数量：1间（2晚）
+        入住时间：2018年3月21
+        如有疑问请及时联系我们的客服小妹。（点击查看更多详情）
+
+        {{first.DATA}}
+        订单编号：{{keyword1.DATA}}
+        酒店名称：{{keyword2.DATA}}
+        预订房型：{{keyword3.DATA}}
+        房间数量：{{keyword4.DATA}}
+        入住时间：{{keyword5.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const OrderCancellationFailed = '9Etr9bc8p-rgOEmG6RiPdZMz9oZKBjArR-mh4gtQVEQ';
 }

@@ -6,6 +6,7 @@ use app\models\BaseActiveRecord;
 
 class HotelOrder extends BaseActiveRecord
 {
+    const PAY_STATUS_PAID = 'paid';  //已支付
     /**
      * {@inheritdoc}
      */

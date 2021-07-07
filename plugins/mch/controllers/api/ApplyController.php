@@ -7,6 +7,7 @@ use app\controllers\api\filters\LoginFilter;
 use app\plugins\mch\forms\common\apply\MchApplyBasicForm;
 use app\plugins\mch\forms\common\apply\MchApplyInfoForm;
 use app\plugins\mch\forms\common\apply\MchApplyLicenseForm;
+use app\plugins\mch\forms\common\apply\MchApplyResetForm;
 
 class ApplyController extends ApiController{
 
@@ -49,5 +50,16 @@ class ApplyController extends ApiController{
         $form->attributes = $this->requestData;
         $form->user_id = \Yii::$app->user->id;
         return $this->asJson($form->get());
+    }
+
+    /**
+     * 重置申请状态
+     * @return \yii\web\Response
+     */
+    public function actionReset(){
+        $form = new MchApplyResetForm();
+        $form->attributes = $this->requestData;
+        $form->user_id = \Yii::$app->user->id;
+        return $this->asJson($form->reset());
     }
 }

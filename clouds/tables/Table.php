@@ -91,4 +91,9 @@ class Table extends BaseObject
         $table = new Table($class::find());
         return $table;
     }
+
+    public static function findOne($class, $condition)
+    {
+        return $class::findOne($condition);
+    }
 }

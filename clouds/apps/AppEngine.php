@@ -8,6 +8,7 @@
  */
 namespace app\clouds\apps;
 
+use app\clouds\action\Action;
 use app\clouds\CloudApplication;
 use app\clouds\errors\NotFound404;
 use app\clouds\route\Route;
@@ -29,6 +30,16 @@ class AppEngine extends BaseObject
         {
             throw new NotFound404("无法获取”".$route->host."“应用信息");
         }
+
+        //获取用户操作对象
+        $action = Action::find($userApp, $route);
+
+        //设置操作命名空间
+        $namespaceDir = $action->getNamespaceDir();
+        $cloudApp->controllerNamespace = "app\\clouds\\apps\\{$namespaceDir}";
+
+        //强制指向到自定义路由
+        $cloudApp->catchAll[0] = $action->getCloudAction()->controllerID . "/" . $action->getCloudAction()->actionID;
     }
 
 }

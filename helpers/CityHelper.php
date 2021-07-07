@@ -46,6 +46,40 @@ class CityHelper{
         ];
     }
 
+    /**
+     * 通过区、市、省ID获取区、市、省数据
+     * @param int $district_id
+     * @param int $city_id
+     * @param int $province_id
+     * @return array|null
+     */
+    public static function reverseData($district_id = 0, $city_id = 0, $province_id = 0){
+        $arrs = DistrictData::getArr();
+        $district = $city = $province = null;
+        if(isset($arrs[$district_id])){
+            $district = $arrs[$district_id];
+            if(isset($arrs[$district['parent_id']])){
+                $city = $arrs[$district['parent_id']];
+                if(isset($arrs[$city['parent_id']])){
+                    $province = $arrs[$city['parent_id']];
+                }
+            }
+        }elseif(isset($arrs[$city_id])){
+            $city = $arrs[$city_id];
+            if(isset($arrs[$city['parent_id']])){
+                $province = $arrs[$city['parent_id']];
+            }
+        }elseif(isset($arrs[$province_id])){
+            $province = $arrs[$province_id];
+        }
+
+        return [
+            'province' => $province,
+            'city'     => $city,
+            'district' => $district
+        ];
+    }
+
     private static function setProvince($name){
 
         if(empty($name))

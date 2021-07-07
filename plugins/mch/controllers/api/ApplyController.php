@@ -1,0 +1,30 @@
+<?php
+namespace app\plugins\mch\controllers\api;
+
+
+use app\controllers\api\ApiController;
+use app\controllers\api\filters\LoginFilter;
+use app\plugins\mch\forms\common\apply\MchApplyBasicForm;
+
+class ApplyController extends ApiController{
+
+    public function behaviors(){
+        return array_merge(parent::behaviors(), [
+            'login' => [
+                'class' => LoginFilter::class,
+            ]
+        ]);
+    }
+
+    /**
+     * 店铺入驻申请第一步 - 填写基本信息
+     * @return \yii\web\Response
+     */
+    public function actionBasic(){
+        $form = new MchApplyBasicForm();
+        $form->attributes = $this->requestData;
+        $form->user_id = \Yii::$app->user->id;
+        return $this->asJson($form->save());
+    }
+
+}

@@ -52,7 +52,7 @@ class MchApplyBasicForm extends BaseModel{
             $smsForm->captcha = $this->captcha;
             $smsForm->mobile  = $this->mobile;
             if(!$smsForm->checkCode()){
-                //throw new \Exception("手机验证码不正确");
+                throw new \Exception("手机验证码不正确");
             }
 
             $user = User::findOne($this->user_id);
@@ -80,7 +80,7 @@ class MchApplyBasicForm extends BaseModel{
             }
 
             if($applyModel->status != "applying"){
-                throw new \Exception("您已有一个申请操作还未结束");
+                throw new \Exception("申请操作还未结束，请耐心等待");
             }
 
             $applyModel->updated_at = time();
@@ -100,7 +100,7 @@ class MchApplyBasicForm extends BaseModel{
             }
 
 
-            //Sms::updateCodeStatus($this->mobile, $this->captcha);
+            Sms::updateCodeStatus($this->mobile, $this->captcha);
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

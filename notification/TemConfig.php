@@ -246,28 +246,6 @@ class TemConfig
      * */
     const StorePassedAudit = 'hhs7TFHl-xcYstR79gp4LO0qwnES-vn3yjWHF7_ZceQ';
 
-    /*  @todo 售后服务处理进度提醒
-
-        您好，您的售后单2905928有新的客服回复：
-
-        服务类型：换货
-        处理状态：待处理
-        提交时间：2013-12-23 14:48:24
-        当前进度：您好，订单是第三方物流配送，无法直接取消，已登物流人员拦截，若拦截不成功，您请直接拒收哦，货款已有客服…
-
-        点击“详情”查看详细处理结果，如有疑问可回复KF联系
-
-        {{first.DATA}}
-
-        服务类型：{{HandleType.DATA}}
-        处理状态：{{Status.DATA}}
-        提交时间：{{RowCreateDate.DATA}}
-        当前进度：{{LogType.DATA}}
-        {{remark.DATA}}
-
-     * */
-    const AfterSalesServiceProgressReminder = 'kYfE2Vvpj3rBO-xGop4rgWzRSmTIqWFiGMJikVpUqGk';
-
     /*  @todo 店铺审核通知
 
         您的店铺已通过审核
@@ -457,4 +435,21 @@ class TemConfig
 
      * */
     const OrderCancellationFailed = '9Etr9bc8p-rgOEmG6RiPdZMz9oZKBjArR-mh4gtQVEQ';
+
+    /*  @todo 下线加入通知
+
+        欢迎您的加入
+        会员号：123
+        加入时间：2017.8.16
+        下线代理昵称：add
+        欢迎您的加入
+
+        {{first.DATA}}
+        会员号：{{keyword1.DATA}}
+        加入时间：{{keyword2.DATA}}
+        下线代理昵称：{{keyword3.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const OfflineJoinNotice = 'XnHCHU_uTBZb6yRxWpU27a5_Quuk0O4j3AU4omNa4JU';
 }

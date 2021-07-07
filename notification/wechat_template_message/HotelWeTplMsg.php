@@ -2,14 +2,14 @@
 namespace app\notification\wechat_template_message;
 
 /***
- * 商家申请微信公众号通知
- * Class ReservationSuccessWeTplMsg
+ * 酒店预订成功通知
+ * Class HotelWeTplMsg
  * @package app\notification\wechat_template_message
  * @property string $openid
  * @property string $data
  * @property string $template_id
  */
-class ReservationSuccessWeTplMsg extends WechatTemplateMessage
+class HotelWeTplMsg extends WechatTemplateMessage
 {
     public $openid;
     public $template_id;

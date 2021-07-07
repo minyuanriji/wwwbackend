@@ -7,6 +7,8 @@ use app\models\BaseActiveRecord;
 class HotelRefundApplyOrder extends BaseActiveRecord
 {
 
+    const STATUS_REFUSED    = 'refused';  //拒绝
+    const STATUS_PAID       = 'paid';     //已退款
     /**
      * {@inheritdoc}
      */

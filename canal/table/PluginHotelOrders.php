@@ -17,10 +17,10 @@ class PluginHotelOrders
         foreach ($mixDatas as $mixData) {
             $condition = $mixData['condition'];
             $update = $mixData['update'];
-
-            if ((isset($update['pay_status']) && $update['pay_status'] == HotelOrder::PAY_STATUS_PAID)) {
+            if ((isset($update['order_status']) && $update['order_status'] == HotelOrder::ORDER_STATUS_SUCCESS)) {
                 $hotel_order = HotelOrder::findone($condition);
-                if ($hotel_order && $hotel_order->order_status == 'success') {
+
+                if ($hotel_order && $hotel_order->pay_status == HotelOrder::PAY_STATUS_PAID) {
                     ReservationSuccessNotification::send($hotel_order);
                 }
             }

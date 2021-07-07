@@ -5,6 +5,7 @@ namespace app\plugins\mch\controllers\api;
 use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
 use app\plugins\mch\forms\common\apply\MchApplyBasicForm;
+use app\plugins\mch\forms\common\apply\MchApplyInfoForm;
 use app\plugins\mch\forms\common\apply\MchApplyLicenseForm;
 
 class ApplyController extends ApiController{
@@ -37,5 +38,16 @@ class ApplyController extends ApiController{
         $form->attributes = $this->requestData;
         $form->user_id = \Yii::$app->user->id;
         return $this->asJson($form->save());
+    }
+
+    /**
+     * 获取申请信息
+     * @return \yii\web\Response
+     */
+    public function actionInfo(){
+        $form = new MchApplyInfoForm();
+        $form->attributes = $this->requestData;
+        $form->user_id = \Yii::$app->user->id;
+        return $this->asJson($form->get());
     }
 }

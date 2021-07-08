@@ -21,7 +21,7 @@ class MchApply extends BaseActiveRecord
     {
         return [
             [['mall_id', 'realname', 'mobile', 'user_id', 'status', 'created_at', 'updated_at', 'json_apply_data'], 'required'],
-            [['remark'], 'safe']
+            [['remark', 'is_special_discount'], 'safe']
         ];
     }
 }

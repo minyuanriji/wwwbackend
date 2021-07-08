@@ -69,7 +69,7 @@ class Plugin extends \app\plugins\Plugin
                 'icon' => 'el-icon-star-on',
             ],
             [
-                'name' => '入驻审核',
+                'name' => '入驻申请',
                 'route' => 'plugin/mch/mall/mch/review',
                 'icon' => 'el-icon-star-on',
             ],

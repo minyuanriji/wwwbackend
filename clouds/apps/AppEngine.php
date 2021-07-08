@@ -10,6 +10,8 @@ namespace app\clouds\apps;
 
 use app\clouds\action\Action;
 use app\clouds\CloudApplication;
+use app\clouds\consts\Code;
+use app\clouds\errors\CloudException;
 use app\clouds\errors\NotFound404;
 use app\clouds\route\Route;
 use app\clouds\tables\CloudUserApp;
@@ -28,11 +30,17 @@ class AppEngine extends BaseObject
         ])->one();
         if(!$userApp)
         {
-            throw new NotFound404("无法获取”".$route->host."“应用信息");
+            throw new CloudException("无法获取”".$route->host."“应用信息");
         }
 
         //获取用户操作对象
         $action = Action::find($userApp, $route);
+
+        //访问权限判断
+        if(!$action->allowAccess())
+        {
+            throw new CloudException("无权限访问", Code::ACTION_NOT_ALLOW_ACCESS);
+        }
 
         //设置操作命名空间
         $namespaceDir = $action->getNamespaceDir();

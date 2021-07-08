@@ -150,6 +150,21 @@ class StoreForm extends BaseModel
 
             $apply_data = SerializeHelper::decode($detail->json_apply_data);
 
+            $mch_common_cat_name = MchCommonCat::find()->where([
+                'is_delete' => 0,
+                'mall_id' => \Yii::$app->mall->id,
+                'id' => $apply_data['store_mch_common_cat_id'],
+            ])->asArray()->one();
+            $apply_data['store_mch_common_cat_name'] = $mch_common_cat_name ? $mch_common_cat_name['name'] : '';
+
+            try {
+                $apply_data['districts'] = DistrictArr::getDistrict((int)$apply_data['store_province_id'])['name'] .
+                    DistrictArr::getDistrict((int)$apply_data['store_city_id'])['name'] .
+                    DistrictArr::getDistrict((int)$apply_data['store_district_id'])['name'];
+            } catch (\Exception $e) {
+                $apply_data['districts'] = '';
+            }
+
             unset($detail->json_apply_data);
             return [
                 'code' => ApiCode::CODE_SUCCESS,

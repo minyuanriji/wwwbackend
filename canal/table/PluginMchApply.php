@@ -19,11 +19,11 @@ class PluginMchApply
             $condition = $mixData['condition'];
             $update = $mixData['update'];
             if (isset($update['status'])) {
-                $mch_apply = MchApply::find()->where($condition)->one();
+                $mch_apply = MchApply::findOne($condition);
                 if ($mch_apply) {
-                    if ($update['status'] == MchApply::STATUS_PASSED) {
+                    if ($update['status'] == 2) {
                         MchApplyAdoptNotification::send($mch_apply);
-                    } elseif ($update['status'] == MchApply::STATUS_REFUSED) {
+                    } elseif ($update['status'] == 1) {
                         MchApplyNoPassNotification::send($mch_apply);
                     }
                 }

@@ -27,9 +27,6 @@ class MchApplyInfoForm extends BaseModel{
             $applyModel = MchApply::findOne([
                 "user_id" => $this->user_id
             ]);
-            
-            
-
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
@@ -82,7 +79,7 @@ class MchApplyInfoForm extends BaseModel{
         $info['settle_realname'] = isset($info['settle_realname']) ? $info['settle_realname'] : "";
         $info['is_special_discount'] = isset($info['is_special_discount']) ? $info['is_special_discount'] : 0;
         $info['settle_special_rate_remark'] = isset($info['settle_special_rate_remark']) ? $info['settle_special_rate_remark'] : "";
-        $info['settle_discount'] = isset($info['settle_discount']) ? $info['settle_discount'] : "";
+        $info['settle_discount'] = isset($info['settle_discount']) ? (float)$info['settle_discount'] : "";
 
         return $info;
     }

@@ -4,6 +4,7 @@ namespace app\forms\api\store;
 
 use app\core\ApiCode;
 use app\helpers\ArrayHelper;
+use app\helpers\SerializeHelper;
 use app\models\BaseModel;
 use app\models\DistrictArr;
 use app\models\EfpsMchReviewInfo;
@@ -12,19 +13,20 @@ use app\models\Store;
 use app\models\User;
 use app\models\UserRelationshipLink;
 use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchApply;
 use app\plugins\mch\models\MchCommonCat;
 
 class StoreForm extends BaseModel
 {
     public $page;
     public $id;
-    public $review_status;
+    public $status;
     public $keyword;
 
     public function rules()
     {
         return [
-            [['id', 'review_status'], 'integer'],
+            [['id', 'status'], 'integer'],
             [['keyword'], 'string'],
             [['page'], 'default', 'value' => 1],
         ];
@@ -40,17 +42,17 @@ class StoreForm extends BaseModel
             ];
         }
         $user_link = UserRelationshipLink::findOne(['user_id' => \Yii::$app->user->id, 'is_delete' => 0]);
-        if (!$user_link) {
+        /*if (!$user_link) {
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => '关系链异常，请联系客服！'
             ];
-        }
+        }*/
         $user_ids = UserRelationshipLink::find()
             ->select('user_id')
             ->andWhere([
                 "AND",
-                "`left` > '{$user_link->left}' AND `right` < '{$user_link->right}'"
+                "`left` > '$user_link->left' AND `right` < '$user_link->right'"
             ])
             ->asArray()
             ->all();
@@ -58,43 +60,43 @@ class StoreForm extends BaseModel
         $pagination = null;
         if ($user_ids) {
             $new_user_ids = array_column($user_ids,'user_id');
-            $query = Mch::find()->alias("m")->where([
-                'm.mall_id' => \Yii::$app->mall->id,
-                'm.is_delete' => 0,
-                'm.review_status' => $this->review_status,
+            $query = MchApply::find()->alias("ma")->where([
+                'ma.mall_id' => \Yii::$app->mall->id,
+                'ma.status' => $this->status,
             ]);
-            if ($this->review_status == 0) {
-                $query->andWhere(['m.is_special' => 0]);
+
+            if ($this->status == 'verifying') {
+                $query->andWhere(['ma.is_special_discount' => 0]);
             }
-            $query->leftJoin(["u" => User::tableName()], "u.id=m.user_id");
+            $query->leftJoin(["u" => User::tableName()], "u.id=ma.user_id");
             $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
-            $query->andWhere(['in','m.user_id',$new_user_ids]);
+            $query->andWhere(['in','ma.user_id',$new_user_ids]);
 
             if ($this->keyword) {
-                $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
-                $query->andWhere(['m.id' => $mchIds])
-                      ->orWhere(['like', 'm.mobile', $this->keyword]);
+                $query->where(['like', 'ma.mobile', $this->keyword]);
+                $query->orWhere(['like', 'ma.json_apply_data', $this->keyword]);
             }
 
             $list = $query->select([
-                        "m.id", "m.realname", "m.mobile",
-                        "DATE_FORMAT(FROM_UNIXTIME(m.created_at),'%Y-%m-%d %H:%i:%s') as created_at", "m.user_id",
+                        "ma.*",
+                        "DATE_FORMAT(FROM_UNIXTIME(ma.created_at),'%Y-%m-%d %H:%i:%s') as created_at",
                         "p.id as parent_id", "p.nickname as parent_nickname",
                         "p.mobile as parent_mobile",
                         "( CASE p.role_type WHEN 'store' THEN '店主' WHEN 'partner' THEN '合伙人' WHEN 'branch_office' THEN '分公司' WHEN 'user' THEN '普通用户' END ) AS 'parent_role_type'"
                     ])
-                    ->with([
-                        'user' => function ($query) {
-                            $query->select('id, nickname');
-                        },
-                        'store' => function ($query) {
-                            $query->select('id, mch_id, cover_url, name');
-                        }
-                    ])
-                    ->orderBy(['m.created_at' => SORT_DESC])
+                    ->orderBy(['ma.created_at' => SORT_DESC])
                     ->page($pagination,10)
                     ->asArray()
                     ->all();
+        }
+        if ($list) {
+            foreach ($list as &$item) {
+                $apply_data = SerializeHelper::decode($item['json_apply_data']);
+                $item['store_name'] = $apply_data['store_name'];
+                $item['realname']   = $apply_data['realname'];
+                $item['store_logo'] = '';
+                unset($item['json_apply_data'],$apply_data);
+            }
         }
         return [
             'code' => ApiCode::CODE_SUCCESS,

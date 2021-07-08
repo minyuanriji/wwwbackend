@@ -73,7 +73,7 @@ class MchApplyBasicForm extends BaseModel{
                     "mall_id"    => \Yii::$app->mall->id,
                     "user_id"    => $this->user_id,
                     "realname"   => $this->realname,
-                    "mobile"     => "mobile",
+                    "mobile"     => $this->mobile,
                     "status"     => "applying",
                     "created_at" => time()
                 ]);

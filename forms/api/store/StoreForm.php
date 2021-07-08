@@ -319,15 +319,17 @@ class StoreForm extends BaseModel
 
         $apply_data = SerializeHelper::decode($mch_exist->json_apply_data);
 
+        $special_rate = isset($data['special_rate']) ? $data['special_rate'] : MchApply::DEFAULT_DISCOUNT;
+
         if (isset($data['is_special_discount']) && $data['is_special_discount']) {
-            if ($data['special_rate'] > 10)
+            if ($special_rate > 10)
                 return [
                     'code' => ApiCode::CODE_FAIL,
-                    'msg' => '折扣不能大于10'
+                    'msg' => '折扣不能大于10折'
                 ];
 
             $mch_exist->is_special_discount             = $data['is_special_discount'];
-            $apply_data['settle_discount']              = $data['special_rate'];
+            $apply_data['settle_discount']              = $special_rate;
             $apply_data['settle_special_rate_remark']   = $data['settle_special_rate_remark'];
             $mch_exist->json_apply_data = SerializeHelper::encode($apply_data);
         } else {
@@ -335,8 +337,17 @@ class StoreForm extends BaseModel
             if ($data['status'] == MchApply::STATUS_REFUSED) { //审核不通过
                 $mch_exist->remark = isset($data['remark']) ? $data['remark'] : '审核不通过';
             } elseif($data['status'] == MchApply::STATUS_PASSED) { //审核通过
-                $apply_data['settle_discount'] = isset($data['special_rate']) ? $data['special_rate'] : MchApply::DEFAULT_DISCOUNT;
+                if ($special_rate > 8.5)
+                    return [
+                        'code'  => ApiCode::CODE_FAIL,
+                        'msg'   => '折扣不能大于8.5折'
+                    ];
+
+                $apply_data['settle_discount'] = $special_rate;
                 $mch_exist->json_apply_data = SerializeHelper::encode($apply_data);
+                $mch_exist->remark = '审核通过';
+            } else {
+                throw new \Exception('审核状态错误，请联系客服！');
             }
         }
         if (!$mch_exist->save())

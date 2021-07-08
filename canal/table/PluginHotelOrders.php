@@ -14,6 +14,7 @@ class PluginHotelOrders
 
     public function update($mixDatas)
     {
+        echo 1;die;
         foreach ($mixDatas as $mixData) {
             $condition = $mixData['condition'];
             $update = $mixData['update'];

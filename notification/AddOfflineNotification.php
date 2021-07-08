@@ -64,13 +64,6 @@ class AddOfflineNotification
         }
 
         foreach ($open_id_array as $open_id) {
-            print_r([
-                'first'     => '您有新的成员加入！',
-                'keyword1'  => $open_id['id'],
-                'keyword2'  => date('Y-m-d H:i:s', $user->junior_at),
-                'keyword3'  => $user->nickname,
-                'remark'    => '',
-            ]);die;
             (new UserWeTplMsg([
                 "mall_id"           => $user->mall_id,
                 "openid"            => $open_id['open_id'],

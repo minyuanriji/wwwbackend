@@ -72,8 +72,6 @@ class MchApplyBasicForm extends BaseModel{
                 $applyModel = new MchApply([
                     "mall_id"    => \Yii::$app->mall->id,
                     "user_id"    => $this->user_id,
-                    "realname"   => $this->realname,
-                    "mobile"     => $this->mobile,
                     "status"     => "applying",
                     "created_at" => time()
                 ]);
@@ -83,6 +81,8 @@ class MchApplyBasicForm extends BaseModel{
                 throw new \Exception("申请操作还未结束，请耐心等待");
             }
 
+            $applyModel->mobile = $this->mobile;
+            $applyModel->realname = $this->realname;
             $applyModel->updated_at = time();
             $applyModel->json_apply_data = json_encode([
                 "store_name"              => $this->store_name,

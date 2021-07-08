@@ -20,6 +20,7 @@ use app\events\UserInfoEvent;
 use app\forms\api\LoginForm;
 use app\handlers\HandlerRegister;
 use app\handlers\RelationHandler;
+use app\helpers\TencentMapHelper;
 use app\logic\CommonLogic;
 use app\logic\RelationLogic;
 use app\models\DistrictData;
@@ -87,6 +88,11 @@ class ApiController extends BaseController
 
         $this->getParamsData()->setMall($headers)->setCity($headers)->login($headers)->wechatSubscribe()->saveFormIdList($headers)->bindParent($headers)->checkInviter();
 
+        /*$lng = "113.1172052002";
+        $lat = "23.017962033827";
+        $info = TencentMapHelper::toPoi("https://dev.mingyuanriji.cn", $lng, $lat);
+        print_r($info);
+        exit;*/
     }
 
     /**
@@ -236,35 +242,35 @@ class ApiController extends BaseController
      */
     private function wechatSubscribe()
     {
-        $wechatModel = \Yii::$app->wechat;
 
-        $cacheObject = \Yii::$app->getCache();
+        $isSubscribe = 0;
 
-        $cacheKey = "user_wechat_subscript:" . $this->user->id;
+        if($this->user){
+            $cacheObject = \Yii::$app->getCache();
+            $cacheKey = "user_wechat_subscript:" . $this->user->id;
+            $isSubscribe = (int)$cacheObject->get($cacheKey);
+            $wechatModel = \Yii::$app->wechat;
+            if(($wechatModel->isWechat)){
 
-        $isSubscribe = (int)$cacheObject->get($cacheKey);
-
-
-        if(($wechatModel->isWechat && $this->user)){
-
-            if(!$isSubscribe){
-                $userInfo = UserInfo::findOne([
-                    "user_id"  => $this->user->id,
-                    "platform" => "wechat"
-                ]);
-                if($userInfo){
-                    $info = $wechatModel->app->user->get($userInfo->openid);
-                    if(isset($info['subscribe']) && $info['subscribe'] == 1){ //
-                        $isSubscribe = 1;
-                    }else{ //未关注
-                        $isSubscribe = 0;
-                    }
-                    if($isSubscribe){
-                        $cacheObject->set($cacheKey, 1, 3600 * 2);
+                if(!$isSubscribe){
+                    $userInfo = UserInfo::findOne([
+                        "user_id"  => $this->user->id,
+                        "platform" => "wechat"
+                    ]);
+                    if($userInfo){
+                        $info = $wechatModel->app->user->get($userInfo->openid);
+                        if(isset($info['subscribe']) && $info['subscribe'] == 1){ //
+                            $isSubscribe = 1;
+                        }else{ //未关注
+                            $isSubscribe = 0;
+                        }
+                        if($isSubscribe){
+                            $cacheObject->set($cacheKey, 1, 3600 * 2);
+                        }
                     }
                 }
-            }
 
+            }
         }
 
         static::$commonData['wechat_subscribe'] = $isSubscribe;

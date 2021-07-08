@@ -24,7 +24,7 @@ class HotelOrderRefundActionForm extends BaseModel {
     }
 
     /**
-     * 打款操作
+     * 执行操作
      * @return array
      */
     public function refund($order = null){
@@ -69,7 +69,6 @@ class HotelOrderRefundActionForm extends BaseModel {
             //确认操作
             if(in_array($this->action, ["confirm", "refuse", "paid"])){
                 $this->confirm($applyOrder);
-
             }
 
             //拒绝操作
@@ -112,7 +111,9 @@ class HotelOrderRefundActionForm extends BaseModel {
      * @return array
      */
     private function apply(){
-        $applyOrder = HotelRefundApplyOrder::findOne($this->order_id);
+        $applyOrder = HotelRefundApplyOrder::findOne([
+            "order_id" => $this->order_id
+        ]);
         if(!$applyOrder){
             $applyOrder = new HotelRefundApplyOrder([
                 "mall_id"    => $this->mall_id,
@@ -133,7 +134,7 @@ class HotelOrderRefundActionForm extends BaseModel {
      * @return array
      */
     private function confirm(HotelRefundApplyOrder $applyOrder){
-        if($applyOrder->status != "unconfirmed"){
+        if($this->action == "confirmed" && $applyOrder->status != "unconfirmed"){
             throw new \Exception("非申请状态无法执行确认操作");
         }
         $applyOrder->status = "confirmed";
@@ -144,7 +145,7 @@ class HotelOrderRefundActionForm extends BaseModel {
      * @return array
      */
     private function refuse(HotelRefundApplyOrder $applyOrder, HotelOrder $order){
-        if($applyOrder->status != "confirmed"){
+        if($this->action == "refused" && $applyOrder->status != "confirmed"){
             throw new \Exception("非确认状态无法执行拒绝操作");
         }
         $applyOrder->status = "refused";
@@ -156,7 +157,7 @@ class HotelOrderRefundActionForm extends BaseModel {
      * @return array
      */
     private function paid(HotelRefundApplyOrder $applyOrder, HotelOrder $order){
-        if($applyOrder->status != "confirmed"){
+        if($this->action == "paid" && $applyOrder->status != "confirmed"){
             throw new \Exception("非确认状态无法执行打款操作");
         }
 

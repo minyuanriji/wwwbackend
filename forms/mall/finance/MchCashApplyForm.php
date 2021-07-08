@@ -94,15 +94,9 @@ class MchCashApplyForm  extends BaseModel{
                     throw new \Exception("无法打款操作");
                 }
 
-                $res = EfpsMchCashTransfer::transfer($mchCash);
-
-                if($res['code'] == ApiCode::CODE_SUCCESS){ //打款成功
-                    $mchCash->status = 1;
-                    $mchCash->transfer_status = 1;
-                    if (!$mchCash->save()) {
-                        throw new \Exception(json_encode($mchCash->getErrors()));
-                    }
-                }else{
+                //提交易票联打款
+                $res = EfpsMchCashTransfer::commit($mchCash);
+                if($res['code'] != ApiCode::CODE_SUCCESS){
                     throw new \Exception($res['msg']);
                 }
             }

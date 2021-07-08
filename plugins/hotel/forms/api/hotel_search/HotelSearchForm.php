@@ -6,209 +6,140 @@ use app\models\BaseModel;
 use app\plugins\hotel\models\HotelSearch;
 
 class HotelSearchForm extends BaseModel{
-
     /**
      * 生成本次搜索批次ID
+     * @params array $attrs
      * @return string
      */
-    public function generateSearchId(){
-        $attrs = $this->getAttributes();
+    public static function generateSearchId($attrs){
         ksort($attrs);
         return "HotelSearch:" . strtolower(md5(json_encode($attrs)));
     }
 
     /**
-     * 把查询到的酒店写入到临时缓存中
      * @param string $searchId
-     * @param string $prepareId
-     * @param array $founds
-     * @return integer
+     * @return string
      */
-    public function pushFound($searchId, $prepareId, $founds){
-        $cache = \Yii::$app->getCache();
-        $foundData = $this->getFoundData($searchId);
-        if(!$foundData || !isset($foundData[$prepareId])){
-            $foundData[$prepareId] = [];
-        }
-        $foundData[$prepareId] = array_merge($foundData[$prepareId], $founds);
-        $cache->set($searchId, $foundData, 3600 * 24);
-        return count($foundData[$prepareId]);
+    public static function jobListCacheKey($searchId){
+        return "HotelSearchJobList:" . $searchId;
     }
 
     /**
-     * 更新查询到的酒店
-     * @param string $searchId
-     * @param string $prepareId
+     * 第一步-写入预查询酒店ID数据
+     * @param array $hotelIds
+     * @param array $attrs
+     * @return string
      */
-    public function updateFound($searchId, $prepareId){
-        if(empty($searchId))
-            return;
+    protected function start($hotelIds, $attrs){
+        $prepareId = uniqid();
+        $searchId = static::generateSearchId($attrs);
 
-        $foundData = $this->getFoundData($searchId);
-        $hotelIds = isset($foundData[$prepareId]) && is_array($foundData[$prepareId]) ? $foundData[$prepareId] : [];
+        static::prepareBindSearch($prepareId, $searchId);
 
         $search = HotelSearch::findone([
             "search_id" => $searchId
         ]);
-        if(!$search){
-            $search = new HotelSearch([
-                'mall_id' => \Yii::$app->mall->id,
-                'search_id' => $searchId,
-                'created_at' => time(),
-                'updated_at' => time()
-            ]);
+
+        //只能有一个客户端搜索任务在执行
+        if (!$search || !$search->is_running) {
+            if (!$search) {
+                $search = new HotelSearch([
+                    'mall_id'    => \Yii::$app->mall->id,
+                    'search_id'  => $searchId,
+                    'created_at' => time()
+                ]);
+            }
+
+            $taskData = [
+                'found_ids'  => [],
+                'hotel_ids'  => $hotelIds,
+                'attrs'      => $attrs
+            ];
+            $search->is_running = 1;
+            \Yii::$app->getCache()->set(static::jobListCacheKey($searchId), null);
+            static::updateSearchTaskData($search, $taskData);
         }
 
-        //如果上一次查询距离本次日期超过1小时
-        if((time() - $search->updated_at) > 3600 * 6){
-            $search->content = "";
-        }
-
-        $oldHotelIds = !empty($search->content) ? (array)json_decode($search->content, true) : [];
-        $search->content = json_encode(array_unique(array_merge($oldHotelIds, $hotelIds)));
-        $search->updated_at = time();
-        $search->save();
-
-        static::removeSearchTask($searchId);
+        return [$prepareId, $searchId];
     }
 
     /**
-     * 添加搜索任务
-     * @param $searchId
-     */
-    public function addSearchTask($searchId){
-        $cache = \Yii::$app->getCache();
-        $cacheKey = (defined('ENV') && ENV == "pro") ? "HotelSearchTask" : "HotelSearchTaskDev";
-        $foundData = $this->getFoundData($searchId);
-        $taskData = $cache->get($cacheKey);
-        $taskData[$searchId] = $foundData['newest_prepare_id'];
-        $cache->set($cacheKey, $taskData);
-    }
-
-    /**
-     * 获取所有搜索任务数据
-     * @return array|mixed
-     */
-    public static function getAllSearchTaskDatas(){
-        $cache = \Yii::$app->getCache();
-        $cacheKey = (defined('ENV') && ENV == "pro") ? "HotelSearchTask" : "HotelSearchTaskDev";
-        $taskData = $cache->get($cacheKey);
-        return !empty($taskData) && is_array($taskData) ? $taskData : [];
-    }
-
-    /**
-     * 移除搜索任务
-     * @param string $searchId
-     */
-    public static function removeSearchTask($searchId){
-        $cache = \Yii::$app->getCache();
-        $cacheKey = (defined('ENV') && ENV == "pro") ? "HotelSearchTask" : "HotelSearchTaskDev";
-        $taskData = $cache->get($cacheKey);
-        if(isset($taskData[$searchId])){
-            unset($taskData[$searchId]);
-        }
-        $cache->set($cacheKey, $taskData);
-    }
-
-    /**
-     * 通过prepareId移除搜索任务
+     * 客户端预查询ID绑定查询号
      * @param string $prepareId
-     */
-    public static function removeSearchTaskByPrepareId($prepareId){
-        $taskData = static::getAllSearchTaskDatas();
-        $taskData = array_flip($taskData);
-        if(isset($taskData[$prepareId])){
-            $searchId = $taskData[$prepareId];
-            static::removeSearchTask($searchId);
-        }
-    }
-
-    /**
-     * 获取查询到的酒店ID
      * @param string $searchId
-     * @return array
+     * @return void
      */
-    public function getFoundHotelIds($searchId){
-        $search = HotelSearch::findOne([
-            "search_id" => $searchId
-        ]);
-        $hotelIds = [];
-        if($search && !empty($search->content)){
-            $hotelIds = @json_decode($search->content, true);
-        }
-        return $hotelIds;
+    private static function prepareBindSearch($prepareId, $searchId){
+        $cacheKey = "HotelSearchPrepare:" . $prepareId;
+        \Yii::$app->getCache()->set($cacheKey, $searchId);
     }
 
     /**
-     * 获取查询到酒店ID数据
-     * @param $searchId
-     * @return array
-     */
-    public function getFoundData($searchId){
-        $cache = \Yii::$app->getCache();
-        return $cache->get($searchId);
-    }
-
-    /**
-     * 写入预查询酒店ID数据
-     * @param $hotelIds
-     * @param null $prepareId
+     * 通过客户端预查询ID获取查询号
+     * @param $prepareId
      * @return string|null
      */
-    protected function writePrepareData($hotelIds, $prepareId = null){
-        $cache = \Yii::$app->getCache();
-        if(!empty($prepareId)){
-            $data = $cache->get($this->prepareCacheKey($prepareId));
-            $data['hotel_ids'] = $hotelIds;
-            $cache->set($this->prepareCacheKey($prepareId), $data, 3600 * 24);
-        }else{
-            $prepareId = uniqid();
-            $searchId = $this->generateSearchId();
-            $cache->set($this->prepareCacheKey($prepareId), [
-                "hotel_ids"  => $hotelIds,
-                "init_attrs" => $this->getAttributes(),
-                "search_id"  => $searchId
-            ], 1800);
-            $foundData = $this->getFoundData($searchId);
-            $foundData[$prepareId] = [];
-            $foundData['newest_prepare_id'] = $prepareId;
-            $cache->set($searchId, $foundData, 3600 * 24);
-        }
-
-        return $prepareId;
+    private static function getBindSearchIdByPrepareId($prepareId){
+        $cacheKey = "HotelSearchPrepare:" . $prepareId;
+        return \Yii::$app->getCache()->get($cacheKey);
     }
 
     /**
-     * 弹出部分预查询酒店ID数据
-     * @param $prepareId
-     * @return array
+     * 通过客户端预查询ID获取执行中的任务数据
+     * @param string $prepareId
+     * @return HotelSearch|null
      */
-    public function popPrepareData($prepareId){
-        $cache = \Yii::$app->getCache();
-
-        $data = $cache->get($this->prepareCacheKey($prepareId));
-        $hotelIds = isset($data['hotel_ids']) ? $data['hotel_ids'] : [];
-        $attrs    = isset($data['init_attrs']) ? $data['init_attrs'] : [];
-        $searchId = isset($data['search_id']) ? $data['search_id'] : "";
-
-        $popIds = [];
-
-        if(!empty($hotelIds)){
-            $count = count($hotelIds);
-            $length = $count <= 5 ? $count : 5;
-            $popIds = array_slice($hotelIds, 0, $length);
-            $hotelIds = array_slice($hotelIds, $length);
-            sort($hotelIds);
-            $this->writePrepareData($hotelIds, $prepareId);
-        }
-        return [
-            "hotel_ids" => $popIds,
-            "attrs"     => $attrs,
-            "search_id" => $searchId
-        ];
+    protected static function getSearchDataByPrepareId($prepareId){
+        $searchId = static::getBindSearchIdByPrepareId($prepareId);
+        return static::getSearchData($searchId);
     }
 
-    private function prepareCacheKey($prepareId){
-        return "HotelSearchPrepare:" . $prepareId;
+    /**
+     * 更新搜索任务数据
+     * @param HotelSearch $search
+     * @param array $taskData
+     */
+    protected static function updateSearchTaskData(HotelSearch $search, $taskData){
+        $content = !empty($search->content) ? json_decode($search->content, true) : [];
+        $content = array_merge($content, $taskData);
+        $search->updated_at = time();
+        $search->content    = json_encode($content);
+
+        //先写入缓存再保存数据库
+        \Yii::$app->getCache()->set($search->search_id, $search->getAttributes());
+
+        if(!$search->save()){
+            throw new \Exception(json_encode($search->getErrors()));
+        }
+    }
+
+    /**
+     * 获取搜索任务数据
+     * @param string $searchId
+     * @return array|null
+     */
+    protected static function getSearchData($searchId){
+        $cache = \Yii::$app->getCache();
+        $searchData = $cache->get($searchId);
+        if(!$searchData){
+            $search = HotelSearch::findOne(["search_id" => $searchId]);
+            if($search){
+                $searchData = $search->getAttributes();
+                $cache->set($searchId, $searchData);
+            }
+        }
+        return $searchData ? $searchData : null;
+    }
+
+    /**
+     * 查询结束
+     * @param string $searchId
+     * @return void
+     */
+    protected static function finish(HotelSearch $search){
+        $search->is_running = 0;
+        $searchData = static::getSearchData($search->search_id);
+        $content = !empty($searchData['content']) ? json_decode($searchData['content'], true) : [];
+        static::updateSearchTaskData($search, $content);
     }
 }

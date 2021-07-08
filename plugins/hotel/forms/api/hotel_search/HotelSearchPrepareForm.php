@@ -38,7 +38,7 @@ class HotelSearchPrepareForm extends HotelSearchForm {
      */
     public function history(){
 
-        $searchId = $this->generateSearchId();
+        $searchId = static::generateSearchId($this->attributes);
         $search = HotelSearch::findOne([
             "search_id" => $searchId
         ]);
@@ -48,10 +48,18 @@ class HotelSearchPrepareForm extends HotelSearchForm {
             $isExpired = 1;
         }
 
+        $history = 0;
+        if($search){
+            $content = !empty($search->content) ? json_decode($search->content, true) : [];
+            if(isset($content['found_ids']) && !empty($content['found_ids'])){
+                $history = 1;
+            }
+        }
+
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'data' => [
-                'history'    => $search ? 1 : 0,
+                'history'    => $history,
                 'is_expired' => $isExpired,
                 'search_id'  => $search ? $search->search_id : $searchId
             ]
@@ -122,13 +130,14 @@ class HotelSearchPrepareForm extends HotelSearchForm {
                 $hotelIds[] = $row['id'];
             }
 
-            $prepareId = $this->writePrepareData($hotelIds);
+            list($prepareId, $searchId) = static::start($hotelIds, $this->attributes);
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'history'    => 0,
-                    'prepare_id' => $prepareId
+                    'prepare_id' => $prepareId,
+                    'search_id'  => $searchId
                 ]
             ];
         }catch (\Exception $e){

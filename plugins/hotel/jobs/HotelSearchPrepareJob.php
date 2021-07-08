@@ -24,19 +24,10 @@ class HotelSearchPrepareJob extends BaseObject implements JobInterface{
         \Yii::$app->mall = Mall::findOne($this->mall_id);
 
         try {
-
             $res = $this->form->prepare();
             if($res['code'] != ApiCode::CODE_SUCCESS){
                 throw new \Exception($res['msg']);
             }
-
-            $form = new HotelSearchFilterForm([
-                "prepare_id" => $res['data']['prepare_id']
-            ]);
-            \Yii::$app->queue->delay(0)->push(new HotelSearchFilterJob([
-                "mall_id" => \Yii::$app->mall->id,
-                "form"    => $form
-            ]));
         }catch (\Exception $e){
             echo $e->getMessage() . "\n";
         }

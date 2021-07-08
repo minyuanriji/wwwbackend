@@ -7,6 +7,7 @@ use app\models\BaseModel;
 use app\models\User;
 use app\plugins\hotel\helpers\OrderHelper;
 use app\plugins\hotel\models\HotelOrder;
+use app\plugins\hotel\models\HotelRefundApplyOrder;
 use app\plugins\hotel\models\HotelRoom;
 use app\plugins\hotel\models\Hotels;
 use yii\db\ActiveQuery;
@@ -33,6 +34,7 @@ class HotelOrderListForm extends BaseModel{
             $query->innerJoin(["ho" => Hotels::tableName()], "ho.id=o.hotel_id");
             $query->innerJoin(["r" => HotelRoom::tableName()], "r.product_code=o.product_code");
             $query->innerJoin(["u" => User::tableName()], "u.id=o.user_id");
+            $query->leftJoin(["rfo" => HotelRefundApplyOrder::tableName()], "rfo.order_id=o.id");
 
             if(!empty($this->keyword)){
                 $query->andWhere([
@@ -54,7 +56,8 @@ class HotelOrderListForm extends BaseModel{
                 "o.order_status", "o.pay_status", "o.booking_num", "o.integral_deduction_price",
                 "o.booking_start_date", "o.order_no", "o.order_price", "o.booking_days",
                 "o.pay_at", "o.pay_price",  "o.booking_arrive_date", "o.created_at", "o.updated_at",
-                "o.booking_passengers"];
+                "o.booking_passengers",
+                "rfo.status as refund_status", "rfo.refund_price", "rfo.remark as refund_remark"];
 
             $list = $query->select($selects)->page($pagination, 20)->asArray()->all();
             foreach($list as &$row){
@@ -62,10 +65,11 @@ class HotelOrderListForm extends BaseModel{
                     $row['order_status'], $row['pay_status'], $row['created_at'],
                     $row['booking_start_date'], $row['booking_days']
                 );
-                $row['real_status'] = $statusInfo['status'];
-                $row['status_text'] = $statusInfo['text'];
-                $row['passengers']  = !empty($row['booking_passengers']) ? json_decode($row['booking_passengers']) : [];
-                $row['end_date']    = date("Y-m-d", strtotime($row['booking_start_date']) + $row['booking_days'] * 3600 * 24);
+                $row['refund_status'] = !empty($row['refund_status']) ? $row['refund_status'] : "unconfirmed";
+                $row['real_status']   = $statusInfo['status'];
+                $row['status_text']   = $statusInfo['text'];
+                $row['passengers']    = !empty($row['booking_passengers']) ? json_decode($row['booking_passengers']) : [];
+                $row['end_date']      = date("Y-m-d", strtotime($row['booking_start_date']) + $row['booking_days'] * 3600 * 24);
             }
 
             return [
@@ -88,13 +92,31 @@ class HotelOrderListForm extends BaseModel{
      * @param ActiveQuery $query
      * @return void
      */
-    private function statusFilter(ActiveQuery $query){
+    protected function statusFilter(ActiveQuery $query){
         if(!empty($this->status)){
             $method = "statusFor" . ucfirst($this->status);
             if(method_exists($this, $method)){
                 $this->$method($query);
             }
         }
+    }
+
+    /**
+     * 退款中状态
+     * @param ActiveQuery $query
+     * @return void
+     */
+    private function statusForRefunding(ActiveQuery $query){
+        $query->andWhere(["o.pay_status" => "refunding"]);
+    }
+
+    /**
+     * 已退款状态
+     * @param ActiveQuery $query
+     * @return void
+     */
+    private function statusForRefund(ActiveQuery $query){
+        $query->andWhere(["o.pay_status" => "refund"]);
     }
 
     /**

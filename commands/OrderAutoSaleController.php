@@ -32,8 +32,7 @@ class OrderAutoSaleController extends BaseCommandController {
             ])->andWhere(["IN", "status", [Order::STATUS_WAIT_RECEIVE]]);
             $query->andWhere("created_at <= '{$offset}'");
             $query->andWhere("pay_type <> '".Order::PAY_TYPE_GOODS_PAY."'");
-            echo $query->createCommand()->getRawSql();
-            exit;
+
             $order = $query->orderBy("id ASC")->one();
             if(!$order) continue;
 

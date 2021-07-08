@@ -94,7 +94,6 @@ class StoreForm extends BaseModel
             foreach ($list as &$item) {
                 $apply_data = SerializeHelper::decode($item['json_apply_data']);
                 $item['store_name'] = $apply_data['store_name'];
-                $item['realname']   = $apply_data['realname'];
                 $item['store_logo'] = '';
                 unset($item['json_apply_data'],$apply_data);
             }

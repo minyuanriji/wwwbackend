@@ -1,89 +1,10 @@
-<style>
-    .table-body {
-        padding: 20px;
-        background-color: #fff;
-    }
 
-    .input-item {
-        width: 250px;
-        margin: 0 0 20px;
-    }
-
-    .input-item .el-input__inner {
-        border-right: 0;
-    }
-
-    .input-item .el-input__inner:hover {
-        border: 1px solid #dcdfe6;
-        border-right: 0;
-        outline: 0;
-    }
-
-    .input-item .el-input__inner:focus {
-        border: 1px solid #dcdfe6;
-        border-right: 0;
-        outline: 0;
-    }
-
-    .input-item .el-input-group__append {
-        background-color: #fff;
-        border-left: 0;
-        width: 10%;
-        padding: 0;
-    }
-
-    .input-item .el-input-group__append .el-button {
-        padding: 0;
-    }
-
-    .input-item .el-input-group__append .el-button {
-        margin: 0;
-    }
-
-    .table-body .el-table .el-button {
-        padding: 0 !important;
-        border: 0;
-        margin: 0 5px;
-    }
-
-    .table-body .el-form-item {
-        margin-bottom: 0;
-    }
-
-    .el-alert {
-        padding: 0;
-        padding-left: 5px;
-        padding-bottom: 5px;
-    }
-
-    .el-alert--info .el-alert__description {
-        color: #606266;
-    }
-
-    .el-alert .el-button {
-        margin-left: 20px;
-    }
-
-    .export-dialog .el-dialog {
-        min-width: 350px;
-    }
-
-    .export-dialog .el-dialog__body {
-        padding: 20px 20px;
-    }
-
-    .export-dialog .el-button--submit {
-        color: #FFF;
-        background-color: #409EFF;
-        border-color: #409EFF;
-    }
-</style>
 
 <div id="app" v-cloak>
     <el-card class="box-card" shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <div>
-                <span>商户审核列表</span>
+                <span>入驻申请</span>
                 <div style="float: right;margin-top: -5px">
                     <el-button @click="exportRecord" type="primary" size="small">数据导出</el-button>
                 </div>
@@ -91,45 +12,21 @@
         </div>
         <div class="table-body">
             <div class="input-item">
-                <el-input  @keyup.enter.native="searchList" size="small" placeholder="请输入店铺名称" v-model="keyword" clearable @clear='searchList'>
+                <el-input  @keyup.enter.native="searchList" size="small" placeholder="申请人/手机号/店铺名称" v-model="keyword" clearable @clear='searchList'>
                     <el-button slot="append" icon="el-icon-search" @click="searchList"></el-button>
                 </el-input>
             </div>
             <el-tabs v-model="activeName" @tab-click="handleClick">
-                <el-tab-pane label="待审核" name="first"></el-tab-pane>
-                <el-tab-pane label="通过" name="second"></el-tab-pane>
-                <el-tab-pane label="未通过" name="third"></el-tab-pane>
-                <el-tab-pane label="特殊折扣申请" name="four"></el-tab-pane>
+                <el-tab-pane label="待审核" name="verifying"></el-tab-pane>
+                <el-tab-pane label="已通过" name="passed"></el-tab-pane>
+                <el-tab-pane label="未通过" name="refused"></el-tab-pane>
+                <el-tab-pane label="资料填写中" name="applying"></el-tab-pane>
+                <el-tab-pane label="特殊折扣申请" name="special_discount"></el-tab-pane>
             </el-tabs>
-            <el-table
-                    v-loading="listLoading"
-                    :data="list"
-                    border
-                    style="width: 100%"
-                    @selection-change="handleSelectionChange">
-                <el-table-column
-                        prop="id"
-                        label="ID"
-                        width="60">
-                </el-table-column>
-                <el-table-column
-                        label="店铺信息" width="200">
-                    <template slot-scope="scope">
-                        <div flex="cross:center">
-                            <com-image width="25" height="25" :src="scope.row.store.cover_url"></com-image>
-                            <com-ellipsis style="margin-left: 10px;" :line="1">{{scope.row.store.name}}</com-ellipsis>
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column label="用户" width="200">
-                    <template slot-scope="scope">
-                        <div flex="dir:left cross:center" v-if="scope.row.user">
-                            <com-image width="25" height="25" :src="scope.row.user.avatar"></com-image>
-                            <com-ellipsis style="margin-left: 10px;" :line="1">{{scope.row.user.nickname}}
-                            </com-ellipsis>
-                        </div>
-                    </template>
-                </el-table-column>
+            <el-table v-loading="listLoading" :data="list" border style="width: 100%" @selection-change="handleSelectionChange">
+                <el-table-column prop="id" label="ID" width="60"></el-table-column>
+                <el-table-column label="申请人" width="200"></el-table-column>
+                <el-table-column label="联系电话" width="200"></el-table-column>
                 <el-table-column label="推荐人" width='200'>
                     <template slot-scope="scope">
                         <div>{{scope.row.parent_nickname}}</div>
@@ -142,54 +39,30 @@
                         </DIV>
                     </template>
                 </el-table-column>
-                <el-table-column label="联系人" width='200'>
+                <el-table-column label="特殊折扣申请" width="200">
                     <template slot-scope="scope">
-                        <div>
-                            <com-ellipsis style="margin-left: 10px;" :line="1">{{scope.row.realname}}
-                            </com-ellipsis>
-                            <com-ellipsis style="margin-left: 10px;" :line="1">电话:{{scope.row.mobile}}
-                            </com-ellipsis>
+                        <div v-if="scope.row.is_special_discount == 1">
+                            <div>折扣：{{scope.row.settle_discount}}%</div>
+                            <div>说明：{{scope.row.settle_special_rate_remark}}</DIV>
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="特殊申请折扣" width='200' v-if="is_special == '1'">
+
+                <el-table-column label="申请时间" width="200">
                     <template slot-scope="scope">
-                        <div>折扣：{{scope.row.special_rate}}%</div>
-                        <div>说明：{{scope.row.special_rate_remark}}</DIV>
+                        {{scope.row.created_at|dateTimeFormat('Y-m-d H:i')}}
                     </template>
                 </el-table-column>
-
-                <el-table-column
-                        v-if="activeName == 'second'"
-                        label="入驻时间"
-                        prop="review_time"
-                        width="250">
+                <el-table-column label="更新时间" width="200">
+                    <template slot-scope="scope">
+                        {{scope.row.updated_at|dateTimeFormat('Y-m-d H:i')}}
+                    </template>
                 </el-table-column>
-                <el-table-column
-                        v-if="activeName == 'third'"
-                        label="审核时间"
-                        prop="review_time"
-                        width="250">
-                </el-table-column>
-                <el-table-column
-                        v-else
-                        label="申请时间"
-                        prop="created_at"
-                        width="250">
-                </el-table-column>
-                <el-table-column
-                        fixed="right"
-                        label="操作">
+                <el-table-column fixed="right" label="操作">
                     <template slot-scope="scope">
                         <el-button @click="edit(scope.row.id)" type="text" circle size="mini">
-                            <el-tooltip class="item" effect="dark" :content="scope.row.review_status == 0 ?'审核' : '详情'"
-                                        placement="top">
+                            <el-tooltip class="item" effect="dark" :content="scope.row.status == 'verifying' ? '审核' : '详情'" placement="top">
                                 <img src="statics/img/mall/order/detail.png" alt="">
-                            </el-tooltip>
-                        </el-button>
-                        <el-button @click="destroy(scope.row, scope.$index)" type="text" circle size="mini">
-                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
-                                <img src="statics/img/mall/del.png" alt="">
                             </el-tooltip>
                         </el-button>
                     </template>
@@ -247,8 +120,6 @@
                 page: 1,
                 pageCount: 0,
                 activeName: 'first',
-                review_status: 0,
-                is_special: 0,
                 keyword: null,
 
                 // 导出参数
@@ -274,7 +145,7 @@
                     is_show_download: false,
                     is_download: 0,
                     percentage: 0,
-                    action_url: '<?= Yii::$app->urlManager->createUrl('plugin/mch/mall/mch/export-list') ?>',
+                    action_url: '<?= Yii::$app->urlManager->createUrl('plugin/mch/mall/mch/export-review-list') ?>',
                     record_count: 0,//记录总数
                 }
             },
@@ -447,3 +318,84 @@
         }
     });
 </script>
+
+<style>
+    .table-body {
+        padding: 20px;
+        background-color: #fff;
+    }
+
+    .input-item {
+        width: 250px;
+        margin: 0 0 20px;
+    }
+
+    .input-item .el-input__inner {
+        border-right: 0;
+    }
+
+    .input-item .el-input__inner:hover {
+        border: 1px solid #dcdfe6;
+        border-right: 0;
+        outline: 0;
+    }
+
+    .input-item .el-input__inner:focus {
+        border: 1px solid #dcdfe6;
+        border-right: 0;
+        outline: 0;
+    }
+
+    .input-item .el-input-group__append {
+        background-color: #fff;
+        border-left: 0;
+        width: 10%;
+        padding: 0;
+    }
+
+    .input-item .el-input-group__append .el-button {
+        padding: 0;
+    }
+
+    .input-item .el-input-group__append .el-button {
+        margin: 0;
+    }
+
+    .table-body .el-table .el-button {
+        padding: 0 !important;
+        border: 0;
+        margin: 0 5px;
+    }
+
+    .table-body .el-form-item {
+        margin-bottom: 0;
+    }
+
+    .el-alert {
+        padding: 0;
+        padding-left: 5px;
+        padding-bottom: 5px;
+    }
+
+    .el-alert--info .el-alert__description {
+        color: #606266;
+    }
+
+    .el-alert .el-button {
+        margin-left: 20px;
+    }
+
+    .export-dialog .el-dialog {
+        min-width: 350px;
+    }
+
+    .export-dialog .el-dialog__body {
+        padding: 20px 20px;
+    }
+
+    .export-dialog .el-button--submit {
+        color: #FFF;
+        background-color: #409EFF;
+        border-color: #409EFF;
+    }
+</style>

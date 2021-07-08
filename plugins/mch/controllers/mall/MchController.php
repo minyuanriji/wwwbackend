@@ -80,13 +80,9 @@ class MchController extends Controller
     public function actionReview()
     {
         if (\Yii::$app->request->isAjax) {
-            if (\Yii::$app->request->isPost) {
-            } else {
-                $form = new MchReviewForm();
-                $form->attributes = \Yii::$app->request->get();
-
-                return $this->asJson($form->getList());
-            }
+            $form = new MchReviewForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->getList());
         } else {
             return $this->render('review');
         }

@@ -9,10 +9,10 @@ use yii\queue\JobInterface;
 class MchApplyAdoptNotificationWeTplJob extends Component implements JobInterface
 {
 
-    public $mch;
+    public $mch_apply;
 
     public function execute($queue)
     {
-        MchApplyAdoptNotification::sendWechatTemplate($this->mch);
+        MchApplyAdoptNotification::sendWechatTemplate($this->mch_apply);
     }
 }

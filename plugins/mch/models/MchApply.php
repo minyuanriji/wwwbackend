@@ -3,9 +3,13 @@ namespace app\plugins\mch\models;
 
 
 use app\models\BaseActiveRecord;
+use app\models\User;
 
 class MchApply extends BaseActiveRecord
 {
+    const STATUS_REFUSED = 'refused';
+    const STATUS_PASSED = 'passed';
+
     /**
      * {@inheritdoc}
      */

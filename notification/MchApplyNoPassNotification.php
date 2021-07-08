@@ -2,33 +2,34 @@
 
 namespace app\notification;
 
-use app\models\Store;
+use app\helpers\SerializeHelper;
 use app\models\User;
 use app\models\UserInfo;
 use app\notification\jobs\MchApplyNoPassNotificationWeTplJob;
 use app\notification\wechat_template_message\MchApplyWeTplMsg;
-use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchApply;
 
 class MchApplyNoPassNotification
 {
 
-    public static function send(Mch $mch)
+    public static function send(MchApply $mch_apply)
     {
-        /*(new MchApplyNoPassNotificationWeTplJob([
-            "mch" => $mch
-        ]))->execute(null);*/
+        (new MchApplyNoPassNotificationWeTplJob([
+            "mch_apply" => $mch_apply
+        ]))->execute(null);
 
-        \Yii::$app->queue->delay(0)->push(new MchApplyNoPassNotificationWeTplJob([
-            "mch" => $mch
-        ]));
+        /*\Yii::$app->queue->delay(0)->push(new MchApplyNoPassNotificationWeTplJob([
+            "mch_apply" => $mch_apply
+        ]));*/
     }
 
-    public static function sendWechatTemplate(Mch $mch)
+    public static function sendWechatTemplate(MchApply $mch_apply)
     {
-        $store = Store::findOne(["mch_id" => $mch->id]);
-        if (!$store) return;
+        if (!$mch_apply->json_apply_data) return;
 
-        $user = User::findOne($mch->user_id);
+        $apply_data = SerializeHelper::decode($mch_apply->json_apply_data);
+
+        $user = User::findOne($mch_apply->user_id);
         if (!$user) return;
 
         $userInfo = UserInfo::findOne([
@@ -37,20 +38,18 @@ class MchApplyNoPassNotification
         ]);
         if (!$userInfo) return;
 
-        $template_id = TemConfig::FailedPassAudit;
-        $data = [
-            'first' => '抱歉，门店审核未通过！',
-            'keyword1' => $store->name,
-            'keyword2' => $user->nickname . "[".$user->id."]",
-            'keyword3' => $mch->review_remark,
-            'keyword4' => date("Y-m-d H:i", $mch->updated_at),
-            'remark' => '请完善后再次提交',
-        ];
         (new MchApplyWeTplMsg([
-            "mall_id" => $mch->mall_id,
-            "openid" => $userInfo->openid,
-            "template_id" => $template_id,
-            "data" => $data,
+            "mall_id"       => $mch_apply->mall_id,
+            "openid"        => $userInfo->openid,
+            "template_id"   => TemConfig::FailedPassAudit,
+            "data" => [
+                'first'     => '抱歉，门店审核未通过！',
+                'keyword1'  => isset($apply_data['store_name']) ? $apply_data['store_name'] : '',
+                'keyword2'  => $user->nickname . "[".$user->id."]",
+                'keyword3'  => $mch_apply->remark,
+                'keyword4'  => date("Y-m-d H:i", $mch_apply->updated_at),
+                'remark'    => '请完善后再次提交',
+            ],
         ]))->send();
     }
 }

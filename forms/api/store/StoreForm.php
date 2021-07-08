@@ -15,6 +15,7 @@ use app\models\UserRelationshipLink;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
 use app\plugins\mch\models\MchCommonCat;
+use yii\base\BaseObject;
 
 class StoreForm extends BaseModel
 {
@@ -42,12 +43,12 @@ class StoreForm extends BaseModel
             ];
         }
         $user_link = UserRelationshipLink::findOne(['user_id' => \Yii::$app->user->id, 'is_delete' => 0]);
-        /*if (!$user_link) {
+        if (!$user_link) {
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => '关系链异常，请联系客服！'
             ];
-        }*/
+        }
         $user_ids = UserRelationshipLink::find()
             ->select('user_id')
             ->andWhere([
@@ -139,6 +140,35 @@ class StoreForm extends BaseModel
     }
 
     public function getDetail()
+    {
+        try {
+            $detail = MchApply::find()->where([
+                'id' => $this->id,
+                'mall_id' => \Yii::$app->mall->id,
+            ])->one();
+            if (!$detail)
+                throw new \Exception('商户不存在');
+
+            $apply_data = SerializeHelper::decode($detail->json_apply_data);
+
+            unset($detail->json_apply_data);
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '请求成功',
+                'data' => [
+                    'detail' => $detail,
+                    'apply_data' => $apply_data,
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => $e->getMessage(),
+            ];
+        }
+    }
+
+    public function getDetailOld()
     {
         try {
             $detail = Mch::find()->where([

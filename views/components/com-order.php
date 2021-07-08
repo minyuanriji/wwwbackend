@@ -456,9 +456,9 @@ Yii::$app->loadComponentView('order/com-city');
                                 <el-tag size="small" type="warning" v-if="item.is_pay == 0">未付款</el-tag>
                                 <el-tag size="small" type="warning" v-if="item.is_pay == 1 && item.is_send == 0">已付款
                                 </el-tag>
-                                <el-tag size="small" type="success"
+                                <!--<el-tag size="small" type="success"
                                     部分发货
-                                </el-tag>
+                                </el-tag>-->
                                 <el-tag size="small" type="success"
                                         v-if="item.is_send == 0 && item.is_pay == 1 && item.detailExpress && item.detailExpress.length == 0">
                                     未发货

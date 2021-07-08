@@ -106,35 +106,6 @@ class StoreForm extends BaseModel
         ];
     }
 
-    /*public function getDetail()
-    {
-        try {
-            $detail = Mch::find()->where([
-                'id' => $this->id,
-                'mall_id' => \Yii::$app->mall->id,
-                'is_delete' => 0,
-            ])->with('user.userInfo')->asArray()->one();
-            if (!$detail) {
-                throw new \Exception('商户不存在');
-            }
-
-            $detail['address'] = \Yii::$app->serializer->decode($detail['address']);
-
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '请求成功',
-                'data' => [
-                    'detail' => $detail,
-                ]
-            ];
-        } catch (\Exception $e) {
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => $e->getMessage(),
-            ];
-        }
-    }*/
-
     public function destroy()
     {
         try {

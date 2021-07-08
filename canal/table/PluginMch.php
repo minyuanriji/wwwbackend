@@ -15,7 +15,7 @@ class PluginMch
 
     public function update($mixDatas)
     {
-        foreach ($mixDatas as $mixData) {
+        /*foreach ($mixDatas as $mixData) {
             $condition = $mixData['condition'];
             $update = $mixData['update'];
             if (isset($update['review_status'])) {
@@ -28,6 +28,6 @@ class PluginMch
                     }
                 }
             }
-        }
+        }*/
     }
 }

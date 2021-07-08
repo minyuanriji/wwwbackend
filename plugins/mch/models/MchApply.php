@@ -7,8 +7,11 @@ use app\models\User;
 
 class MchApply extends BaseActiveRecord
 {
-    const STATUS_REFUSED = 'refused';
-    const STATUS_PASSED = 'passed';
+    const STATUS_REFUSED    = 'refused';    //拒绝
+    const STATUS_PASSED     = 'passed';     //通过
+    const STATUS_VERIFYING  = 'verifying';  //审核中
+    const STATUS_APPLYING   = 'applying';   //申请中
+    const DEFAULT_DISCOUNT  = 8;   //默认折扣
 
     /**
      * {@inheritdoc}

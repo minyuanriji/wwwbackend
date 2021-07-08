@@ -310,65 +310,41 @@ class StoreForm extends BaseModel
                 'msg' => '账户没有审核功能,请联系客服！',
             ];
 
-        $mch_exist = Mch::findOne($data['id']);
+        $mch_exist = MchApply::findOne($data['id']);
         if (!$mch_exist)
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => '该门店不存在,请联系客服！',
             ];
 
-        if (isset($data['is_special']) && $data['is_special']) {
-            $mch_exist->is_special          = $data['is_special'];
-            $mch_exist->special_rate        = isset($data['special_rate']) ? (10 - $data['special_rate']) * 10 : 0;
-            $mch_exist->special_rate_remark = isset($data['special_rate_remark']) ? $data['special_rate_remark'] : '';
-            if (!$mch_exist->save())
+        $apply_data = SerializeHelper::decode($mch_exist->json_apply_data);
+
+        if (isset($data['is_special_discount']) && $data['is_special_discount']) {
+            if ($data['special_rate'] > 10)
                 return [
                     'code' => ApiCode::CODE_FAIL,
-                    'msg' => '保存失败'
+                    'msg' => '折扣不能大于10'
                 ];
 
+            $mch_exist->is_special_discount             = $data['is_special_discount'];
+            $apply_data['settle_discount']              = $data['special_rate'];
+            $apply_data['settle_special_rate_remark']   = $data['settle_special_rate_remark'];
+            $mch_exist->json_apply_data = SerializeHelper::encode($apply_data);
         } else {
-            $transaction = \Yii::$app->db->beginTransaction();
-            try {
-                if ($data['review_status'] == Mch::REVIEW_STATUS_NOTPASS) { //审核不通过
-                    EfpsMchReviewInfo::updateAll(['status' => 3], ["mch_id" => $data['id']]);
-                    Mch::updateAll([
-                        "review_status" => Mch::REVIEW_STATUS_NOTPASS,
-                        "review_remark" => $data['review_remark']
-                    ], ["id" => $data['id']]);
-                } elseif($data['review_status'] == Mch::REVIEW_STATUS_CHECKED) { //审核通过
-                    if (isset($data['transfer_rate']) && $data['transfer_rate']) {
-                        if ($data['transfer_rate'] > 8.5 || $data['transfer_rate'] < 0)
-                            return [
-                                'code' => ApiCode::CODE_FAIL,
-                                'msg' => '折扣不能超过8.5折或低于0折，请移步特殊折扣申请！'
-                            ];
-
-                        $transfer_rate = (10 - $data['transfer_rate']) * 10;
-                    } else {
-                        $transfer_rate = 20;
-                    }
-                    $reviewData = EfpsMchReviewInfo::find()->where(["mch_id" => $data['id']])->asArray()->one();
-                    if(!$reviewData){
-                        throw new \Exception("无法获取审核信息");
-                    }
-                    EfpsMchReviewInfo::updateAll(['status' => 2], ["mch_id" => $data['id']]);
-                    Mch::updateAll(["review_status" => Mch::REVIEW_STATUS_CHECKED, 'transfer_rate' => $transfer_rate], [
-                        "id" => $data['id']
-                    ]);
-                }
-                $transaction->commit();
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-                return [
-                    'code' => ApiCode::CODE_FAIL,
-                    'msg' => $e->getMessage(),
-                    'error' => [
-                        'line' => $e->getLine()
-                    ]
-                ];
+            $mch_exist->status = $data['status'];
+            if ($data['status'] == MchApply::STATUS_REFUSED) { //审核不通过
+                $mch_exist->remark = isset($data['remark']) ? $data['remark'] : '审核不通过';
+            } elseif($data['status'] == MchApply::STATUS_PASSED) { //审核通过
+                $apply_data['settle_discount'] = isset($data['settle_discount']) ? $data['settle_discount'] : MchApply::DEFAULT_DISCOUNT;
+                $mch_exist->json_apply_data = SerializeHelper::encode($apply_data);
             }
         }
+        if (!$mch_exist->save())
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => '保存失败'
+            ];
+
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '保存成功'

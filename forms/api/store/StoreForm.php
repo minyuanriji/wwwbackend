@@ -335,7 +335,7 @@ class StoreForm extends BaseModel
             if ($data['status'] == MchApply::STATUS_REFUSED) { //审核不通过
                 $mch_exist->remark = isset($data['remark']) ? $data['remark'] : '审核不通过';
             } elseif($data['status'] == MchApply::STATUS_PASSED) { //审核通过
-                $apply_data['settle_discount'] = isset($data['settle_discount']) ? $data['settle_discount'] : MchApply::DEFAULT_DISCOUNT;
+                $apply_data['settle_discount'] = isset($data['special_rate']) ? $data['special_rate'] : MchApply::DEFAULT_DISCOUNT;
                 $mch_exist->json_apply_data = SerializeHelper::encode($apply_data);
             }
         }

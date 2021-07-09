@@ -47,11 +47,11 @@ class Store extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mall_id', 'description', 'created_at', 'updated_at', 'deleted_at', 'pic_url'], 'required'],
+            [['mall_id', 'created_at', 'updated_at', 'deleted_at', 'pic_url'], 'required'],
             [['mall_id', 'score', 'is_default', 'is_delete', 'mch_id', 'province_id', 'city_id',
                 'district_id'], 'integer'],
             [['description', 'pic_url', 'scope'], 'string'],
-            [['created_at', 'updated_at', 'deleted_at'], 'safe'],
+            [['description', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
             [['name'], 'string', 'max' => 65],
             [['mobile', 'address', 'longitude', 'latitude', 'cover_url'], 'string', 'max' => 255],
             [['business_hours'], 'string', 'max' => 125],

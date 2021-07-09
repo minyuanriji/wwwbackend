@@ -263,25 +263,26 @@ class UserForm extends BaseModel
         unset($userCenter['order_bar2']);
 
         //TODO
-        $isMch = Mch::find()->where([
+        $mch = Mch::find()->where([
+            'mall_id'   => \Yii::$app->mall->id,
             'user_id'   => \Yii::$app->user->id,
             'is_delete' => 0
-        ])->exists();
-        if($isMch){
+        ])->one();
+        if($mch && !$mch->is_delete && $mch->review_status == Mch::REVIEW_STATUS_CHECKED){
             $userCenter['menus'][] = [
-                "icon_url"  => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                "icon_url"  => "https://www.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
                 "name"      => "商户",
                 "link_url"  => "/pages/personalCentre/personalCentre",
                 "open_type" => "navigate"
             ];
             $userCenter['menus'][] = [
-                "icon_url"  => "https://dev.mingyuanriji.cn/web/static/stock_img.png",
+                "icon_url"  => "https://www.mingyuanriji.cn/web/static/stock_img.png",
                 "name"      => "进货专区",
                 "link_url"  => "/pages/diy/diy?page_id=103",
                 "open_type" => "navigate"
             ];
             $userCenter['menus'][] = [
-                "icon_url"  => "https://dev.mingyuanriji.cn/web/static/CancelTwo.png",
+                "icon_url"  => "https://www.mingyuanriji.cn/web/static/CancelTwo.png",
                 "name"      => "核销",
                 "link_url"  => "/pages/personalCentre/accountingOrder/accountingOrder",
                 "open_type" => "navigate"

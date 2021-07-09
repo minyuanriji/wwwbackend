@@ -10,9 +10,9 @@
                 </div>
             </div>
         </div>
-        <div class="table-body">
+        <div class="table-body" >
             <div class="input-item">
-                <el-input  @keyup.enter.native="searchList" size="small" placeholder="申请人/手机号/店铺名称" v-model="keyword" clearable @clear='searchList'>
+                <el-input  @keyup.enter.native="searchList" size="small" placeholder="申请人/手机号/用户名/ID" v-model="keyword" clearable @clear='searchList'>
                     <el-button slot="append" icon="el-icon-search" @click="searchList"></el-button>
                 </el-input>
             </div>
@@ -24,22 +24,32 @@
                 <el-tab-pane label="特殊折扣申请" name="special_discount"></el-tab-pane>
             </el-tabs>
             <el-table v-loading="listLoading" :data="list" border style="width: 100%" @selection-change="handleSelectionChange">
-                <el-table-column prop="id" label="ID" width="60"></el-table-column>
-                <el-table-column label="申请人" width="200"></el-table-column>
-                <el-table-column label="联系电话" width="200"></el-table-column>
-                <el-table-column label="推荐人" width='200'>
+                <el-table-column prop="id" label="ID" width="70"></el-table-column>
+                <el-table-column label="申请人" width="200">
                     <template slot-scope="scope">
-                        <div>{{scope.row.parent_nickname}}</div>
-                        <div>手机：{{scope.row.parent_mobile}}</DIV>
-                        <div>等级：
-                            <span v-if="scope.row.parent_role_type == 'branch_office'">分公司</span>
-                            <span v-if="scope.row.parent_role_type == 'partner'">合伙人</span>
-                            <span v-if="scope.row.parent_role_type == 'store'">店主</span>
-                            <span v-if="scope.row.parent_role_type == 'user'">普通用户</span>
-                        </DIV>
+                        <div style="font-size:12px;">
+                            <div>申请人姓名：{{scope.row.realname}}</DIV>
+                            <div>申请人电话：{{scope.row.mobile}}</DIV>
+                            <div>推荐人：{{scope.row.parent_nickname}}</div>
+                            <div>推荐人手机：{{scope.row.parent_mobile}}</DIV>
+                            <div>推荐人等级：
+                                <span v-if="scope.row.parent_role_type == 'branch_office'">分公司</span>
+                                <span v-if="scope.row.parent_role_type == 'partner'">合伙人</span>
+                                <span v-if="scope.row.parent_role_type == 'store'">店主</span>
+                                <span v-if="scope.row.parent_role_type == 'user'">普通用户</span>
+                            </DIV>
+                        </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="特殊折扣申请" width="200">
+                <el-table-column align="center" label="状态" width="100">
+                    <template slot-scope="scope">
+                        <div style="color:#333" v-if="scope.row.status == 'applying'">资料填写中</div>
+                        <div style="color:#cc3311" v-if="scope.row.status == 'refused'">未通过</div>
+                        <div style="color:green" v-if="scope.row.status == 'passed'">已通过</div>
+                        <div style="color:#0040ae" v-if="scope.row.status == 'verifying'">待审核</div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="特殊折扣申请" width="150">
                     <template slot-scope="scope">
                         <div v-if="scope.row.is_special_discount == 1">
                             <div>折扣：{{scope.row.settle_discount}}%</div>
@@ -47,22 +57,17 @@
                         </div>
                     </template>
                 </el-table-column>
-
-                <el-table-column label="申请时间" width="200">
+                <el-table-column label="日期" width="240">
                     <template slot-scope="scope">
-                        {{scope.row.created_at|dateTimeFormat('Y-m-d H:i')}}
-                    </template>
-                </el-table-column>
-                <el-table-column label="更新时间" width="200">
-                    <template slot-scope="scope">
-                        {{scope.row.updated_at|dateTimeFormat('Y-m-d H:i')}}
+                        <div>申请时间：{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
+                        <div>更新时间：{{scope.row.updated_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column fixed="right" label="操作">
                     <template slot-scope="scope">
-                        <el-button @click="edit(scope.row.id)" type="text" circle size="mini">
-                            <el-tooltip class="item" effect="dark" :content="scope.row.status == 'verifying' ? '审核' : '详情'" placement="top">
-                                <img src="statics/img/mall/order/detail.png" alt="">
+                        <el-button @click="applyEdit(scope.row)" size="mini" circle style="margin-left: 10px;">
+                            <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                <img src="statics/img/mall/edit.png" alt="">
                             </el-tooltip>
                         </el-button>
                     </template>
@@ -108,6 +113,109 @@
             </template>
         </el-dialog>
 
+        <el-dialog title="入驻审核" :visible.sync="apply.dialogVisible">
+            <el-form :model="apply.data" :rules="apply.rules" ref="applyForm" label-width="150px"  size="mini">
+                <el-tabs>
+                    <el-tab-pane label="店铺信息">
+                        <el-form-item label="店铺名称：" prop="store_name">
+                            <el-input :disabled="apply.data.status == 'verifying' ? false : true" v-model="apply.data.store_name" placeholder="请输入内容" style="width:80%"></el-input>
+                        </el-form-item>
+                        <el-form-item label="绑定手机：" prop="bind_mobile">
+                            <el-input :disabled="apply.data.status == 'verifying' ? false : true" v-model="apply.data.bind_mobile" placeholder="绑定手机" style="width:80%"></el-input>
+                        </el-form-item>
+                        <el-form-item label="绑定用户：">
+                            <div>{{apply.data.nickname}}</div>
+                        </el-form-item>
+                        <el-form-item label="行业分类：" prop="store_mch_common_cat_id">
+                            <el-select :disabled="apply.data.status == 'verifying' ? false : true" v-model="apply.data.store_mch_common_cat_id" placeholder="请选择" style="width:50%">
+                                <el-option
+                                        v-for="item in cats"
+                                        :key="item.id"
+                                        :label="item.name"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="店铺地址：" prop="store_address">
+                            <div>{{apply.data.province}} / {{apply.data.city}} / {{apply.data.district}}</div>
+                            <el-input :disabled="apply.data.status == 'verifying' ? false : true" v-model="apply.data.store_address" placeholder="详细地址" style="width:80%"></el-input>
+                        </el-form-item>
+                        <el-form-item label="店铺折扣：" >
+                            <el-input :disabled="apply.data.status == 'verifying' ? false : true" v-model="apply.data.settle_discount" placeholder="请输入内容" style="width:150px;">
+                                <template slot="append">折</template>
+                            </el-input>
+                        </el-form-item>
+                        <template v-if="apply.data.is_special_discount == 1">
+                            <el-form-item label="特殊折扣申请说明：" >
+                                <div style="color:gray">{{apply.data.settle_special_rate_remark}}</div>
+                            </el-form-item>
+                        </template>
+
+                    </el-tab-pane>
+                    <el-tab-pane label="结算信息">
+                        <el-form-item label="银行：">
+                            <div>{{apply.data.settle_bank}}</div>
+                        </el-form-item>
+                        <el-form-item label="开户人：">
+                            <div>{{apply.data.settle_realname}}</div>
+                        </el-form-item>
+                        <el-form-item label="银行卡号：">
+                            <div>{{apply.data.settle_num}}</div>
+                        </el-form-item>
+                    </el-tab-pane>
+                    <el-tab-pane label="申请人信息">
+                        <el-form-item label="申请人：">
+                            <div>{{apply.data.realname}}</div>
+                        </el-form-item>
+                        <el-form-item label="申请人手机：">
+                            <div>{{apply.data.mobile}}</div>
+                        </el-form-item>
+                        <el-form-item label="推荐人：">
+                            <div>{{apply.data.parent_nickname}}</div>
+                        </el-form-item>
+                        <el-form-item label="推荐人手机：">
+                            <div>{{apply.data.parent_mobile}}</div>
+                        </el-form-item>
+                        <el-form-item label="推荐人等级：">
+                            <div v-if="apply.data.parent_role_type == 'store'">店主</div>
+                            <div v-if="apply.data.parent_role_type == 'partner'">合伙人</div>
+                            <div v-if="apply.data.parent_role_type == 'branch_office'">分公司</div>
+                            <div v-if="apply.data.parent_role_type == 'user'">普通用户</div>
+                        </el-form-item>
+                    </el-tab-pane>
+                    <el-tab-pane label="企业信息">
+                        <el-form-item label="营业执照编号：">
+                            <div>{{apply.data.license_num}}</div>
+                        </el-form-item>
+                        <el-form-item label="营业执照名称：">
+                            <div>{{apply.data.license_name}}</div>
+                        </el-form-item>
+                        <el-form-item label="营业执照图片：">
+                            <img style="margin-top:10px;" width="50%" :src="apply.data.license_pic"/>
+                        </el-form-item>
+                    </el-tab-pane>
+                    <el-tab-pane label="法人资料">
+                        <el-form-item label="法人姓名：">
+                            <div>{{apply.data.cor_realname}}</div>
+                        </el-form-item>
+                        <el-form-item label="证件号码：">
+                            <div>{{apply.data.cor_num}}</div>
+                        </el-form-item>
+                        <el-form-item label="身份证正面：">
+                            <div><img width="50%" :src="apply.data.cor_pic1"/></div>
+                        </el-form-item>
+                        <el-form-item label="身份证反面：">
+                            <div><img width="50%" :src="apply.data.cor_pic2"/></div>
+                        </el-form-item>
+                    </el-tab-pane>
+                </el-tabs>
+            </el-form>
+            <div slot="footer" class="dialog-footer" v-if="apply.data.status == 'verifying'">
+                <el-button type="primary" @click="applyDo('passed')">通过</el-button>
+                <el-button type="danger" @click="applyDo('refused')">拒绝</el-button>
+            </div>
+        </el-dialog>
+
     </el-card>
 </div>
 <script>
@@ -119,7 +227,7 @@
                 listLoading: false,
                 page: 1,
                 pageCount: 0,
-                activeName: 'first',
+                activeName: 'verifying',
                 keyword: null,
 
                 // 导出参数
@@ -130,12 +238,116 @@
                     is_show_download: false,
                     is_download: 0,
                     percentage: 0,
-                    action_url: '<?= Yii::$app->urlManager->createUrl('plugin/mch/mall/mch/export-list') ?>',
+                    action_url: '',
                     record_count: 0,//记录总数
+                },
+
+                cats: [],
+
+                apply:{
+                    dialogVisible: false,
+                    data: {
+                        id: 0,
+                        status: 'verifying',
+                        nickname: '请输入',
+                        realname: '请输入',
+                        mobile: '请输入',
+                        bind_mobile: '请输入',
+                        parent_role_type: 'user',
+                        parent_nickname: '请输入',
+                        parent_mobile: '请输入',
+                        is_special_discount: 1,
+                        store_name: '请输入',
+                        store_mch_common_cat_id: "14",
+                        store_address: '请输入',
+                        settle_special_rate_remark: '请输入',
+                        settle_discount: 1,
+                        settle_bank: '请输入',
+                        settle_num: '请输入',
+                        settle_realname: '请输入',
+                        license_num: '请输入',
+                        license_name: '请输入',
+                        license_pic: '',
+                        cor_num: '请输入',
+                        cor_pic1: '',
+                        cor_pic2: '',
+                        cor_realname: '请输入',
+                        province: '',
+                        city: '',
+                        province: ''
+                    },
+                    rules: {
+                        store_name: [
+                            {required: true, message: '店铺名称不能为空', trigger: 'change'},
+                        ],
+                        bind_mobile: [
+                            {required: true, message: '绑定手机不能为空', trigger: 'change'},
+                        ],
+                        store_mch_common_cat_id: [
+                            {required: true, message: '行业分类不能为空', trigger: 'change'},
+                        ],
+                        store_address: [
+                            {required: true, message: '店铺地址不能为空', trigger: 'change'},
+                        ]
+                    },
                 }
             };
         },
         methods: {
+
+            applyDo(act) {
+                var self = this;
+                try {
+                    this.$refs['applyForm'].validate((valid) => {
+
+                        if (!valid) return;
+
+                        var apply_data = self.apply.data;
+                        apply_data['act'] = act;
+                        self.$prompt('请输入备注', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            beforeClose: (action, instance, done) => {
+                                if (action === 'confirm') {
+                                    instance.confirmButtonLoading = true;
+                                    instance.confirmButtonText = '执行中...';
+                                    apply_data['remark'] = instance.inputValue;
+                                    request({
+                                        params: {
+                                            r: 'plugin/mch/mall/mch/review-do',
+                                        },
+                                        method: 'post',
+                                        data: apply_data
+                                    }).then(e => {
+                                        instance.confirmButtonLoading = false;
+                                        if (e.data.code === 0) {
+                                            self.getList();
+                                            self.apply.dialogVisible = false;
+                                            self.$message.success(e.data.msg);
+                                            done();
+                                        } else {
+                                            instance.confirmButtonText = '确定';
+                                            self.$message.error(e.data.msg);
+                                        }
+                                    }).catch(e => {
+                                        done();
+                                        instance.confirmButtonLoading = false;
+                                    });
+                                }else{
+                                    done();
+                                }
+                            }
+                        });
+                    });
+                }catch (e) {
+                    console.log(e);
+                }
+            },
+
+            applyEdit(row){
+                this.apply.data = row;
+                this.apply.dialogVisible = true;
+            },
 
             //记录导出
             exportRecord(){
@@ -152,29 +364,14 @@
             exportRecordData(){
                 let self = this;
                 self.exportParams.is_show_download = true;
-                var review_status;
-                var is_special = 0;
-                if(self.activeName == "first"){
-                    review_status = 0;
-                }else if(self.activeName == "second"){
-                    review_status = 1;
-                }else if(self.activeName == "third"){
-                    review_status = 2;
-                }else if (self.activeName == "four") {
-                    review_status = 0;
-                    is_special = 1;
-                }
-
                 request({
                     params: {
-                        r: 'plugin/mch/mall/mch/export-list',
+                        r: 'plugin/mch/mall/mch/export-review-list',
                     },
                     data: {
                         page          : self.exportParams.page,
-                        search        : JSON.stringify(self.search),
                         choose_list   : self.choose_list,
-                        review_status : review_status,
-                        is_special    : is_special,
+                        review_status : self.activeName,
                         _csrf         : '<?= Yii::$app->request->csrfToken ?>',
                         is_download   : self.exportParams.is_download
                     },
@@ -217,91 +414,20 @@
                     params: {
                         r: 'plugin/mch/mall/mch/review',
                         page: self.page,
-                        review_status: self.review_status,
-                        is_special: self.is_special,
+                        review_status: self.activeName,
                         keyword: self.keyword,
                     },
                     method: 'get',
                 }).then(e => {
                     self.listLoading = false;
                     self.list = e.data.data.list;
+                    self.cats = e.data.data.cats;
                     self.pageCount = e.data.data.pagination.page_count;
                 }).catch(e => {
                     console.log(e);
                 });
             },
-            edit(id) {
-                if (id) {
-                    navigateTo({
-                        r: 'plugin/mch/mall/mch/edit',
-                        id: id,
-                        is_review: this.review_status == 0 ? 1 : 0,
-                    });
-                }
-            },
-            destroy(row, index) {
-                let self = this;
-                self.$confirm('删除该条数据, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    self.listLoading = true;
-                    request({
-                        params: {
-                            r: 'plugin/mch/mall/mch/destroy',
-                        },
-                        method: 'post',
-                        data: {
-                            id: row.id,
-                        }
-                    }).then(e => {
-                        self.listLoading = false;
-                        if (e.data.code === 0) {
-                            self.list.splice(index, 1);
-                            self.$message.success(e.data.msg);
-                        } else {
-                            self.$message.error(e.data.msg);
-                        }
-                    }).catch(e => {
-                        console.log(e);
-                    });
-                }).catch(() => {
-                    self.$message.info('已取消删除')
-                });
-            },
-            switchStatus(scope, type) {
-                let self = this;
-                self.listLoading = true;
-                request({
-                    params: {
-                        r: 'plugin/mch/mall/mch/switch-status',
-                    },
-                    method: 'post',
-                    data: {
-                        id: scope.row.id,
-                        switch_type: type,
-                    }
-                }).then(e => {
-                    self.listLoading = false;
-                    if (e.data.code == 0) {
-                        self.$message.success(e.data.msg);
-                    } else {
-                        self.$message.error(e.data.msg);
-                    }
-                }).catch(e => {
-                    console.log(e);
-                });
-            },
             handleClick(tab, event) {
-                console.log(tab.index);
-                if (tab.index == 3) {
-                    this.is_special = 1;
-                    this.review_status = 0;
-                } else {
-                    this.is_special = 0;
-                    this.review_status = tab.index;
-                }
                 this.getList();
             },
             // 全选单前页

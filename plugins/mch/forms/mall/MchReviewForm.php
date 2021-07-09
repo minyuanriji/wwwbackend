@@ -1,72 +1,89 @@
 <?php
-
 namespace app\plugins\mch\forms\mall;
 
 use app\core\ApiCode;
+use app\helpers\CityHelper;
 use app\models\BaseModel;
-use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchApply;
+use app\plugins\mch\models\MchCommonCat;
 
-class MchReviewForm extends BaseModel
-{
+class MchReviewForm extends BaseModel{
+
     public $page;
-    public $id;
     public $review_status;
     public $keyword;
-    public $is_special;
 
-    public function rules()
-    {
+    public function rules(){
         return [
-            [['id', 'review_status', 'is_special'], 'integer'],
+            [['review_status'], 'required'],
             [['keyword'], 'string'],
             [['page'], 'default', 'value' => 1],
         ];
     }
 
-    public function getList()
-    {
-        $query = Mch::find()->alias("m")->where([
-            'm.mall_id' => \Yii::$app->mall->id,
-            'm.is_delete' => 0,
-            'm.review_status' => $this->review_status
-        ]);
-        $query->leftJoin(["u" => User::tableName()], "u.id=m.user_id");
-        $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
+    public function getList(){
 
-        if ($this->keyword) {
-            $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
-            $query->andWhere(['m.id' => $mchIds]);
+        try {
+
+            $query = MchApply::find()->alias("ma");
+            $query->innerJoin(["u" => User::tableName()], "u.id=ma.user_id");
+            $query->innerJoin(["p" => User::tableName()], "p.id=u.parent_id");
+
+            if($this->review_status == "special_discount"){ //特殊折扣申请
+                $query->andWhere(["ma.is_special_discount" => 1]);
+            }else{
+                $query->andWhere(["ma.status" => $this->review_status]);
+            }
+
+            if(!empty($this->keyword)){
+                $query->andWhere([
+                    "OR",
+                    ["LIKE", "ma.realname", $this->keyword],
+                    ["LIKE", "ma.mobile", $this->keyword],
+                    ["ma.user_id" => $this->keyword],
+                    ["LIKE", "u.nickname", $this->keyword]
+                ]);
+            }
+
+            $selects = ["ma.*", "p.role_type as parent_role_type", "p.nickname as parent_nickname"];
+            $selects[] = "p.mobile as parent_mobile";
+            $selects[] = "u.nickname";
+            $query->select($selects);
+            $query->orderBy("ma.id DESC");
+
+            $list = $query->page($pagination, 20, (int)$this->page)->asArray()->all();
+            foreach($list as &$row){
+                $applyData = !empty($row['json_apply_data']) ? json_decode($row['json_apply_data'], true) : [];
+                $row = array_merge($row, $applyData);
+                $row['bind_mobile'] = !empty($row['bind_mobile']) ? $row['bind_mobile'] : $row['mobile'];
+                $city = CityHelper::reverseData($row['store_district_id'], $row['store_city_id'], $row['store_province_id']);
+                $row['province'] = !empty($city['province']) ? $city['province']['name'] : "";
+                $row['city'] = !empty($city['city']) ? $city['city']['name'] : "";
+                $row['district'] = !empty($city['district']) ? $city['district']['name'] : "";
+                unset($row['json_apply_data']);
+            }
+
+            $cats = MchCommonCat::find()->where([
+                "is_delete" => 0
+            ])->asArray()->orderBy("sort ASC")->all();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '请求成功',
+                'data' => [
+                    'list'       => $list,
+                    'pagination' => $pagination,
+                    'cats'       => $cats
+                ]
+            ];
+        }catch (\Exception $e){
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
         }
-        if ($this->is_special) {
-            $query->andWhere(['m.is_special' => $this->is_special]);
-        }
-
-        $list = $query->select([
-            "m.id", "m.realname", "m.mobile", "m.created_at", "m.user_id", "m.is_special", "m.special_rate", "m.special_rate_remark",
-            "p.id as parent_id", "p.nickname as parent_nickname",
-            "p.mobile as parent_mobile", "p.role_type as parent_role_type"
-        ])
-            ->with([
-                'user' => function ($query) {
-                    $query->select('id, nickname, avatar_url,');
-                },
-                'store' => function ($query) {
-                    $query->select('id, mch_id, cover_url, name');
-                }
-            ])
-            ->orderBy(['m.created_at' => SORT_DESC])
-            ->page($pagination)->asArray()->all();
-
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'msg' => '请求成功',
-            'data' => [
-                'list' => $list,
-                'pagination' => $pagination
-            ]
-        ];
     }
 
     public function getDetail()

@@ -8,6 +8,7 @@ use app\plugins\mch\forms\mall\MchForm;
 use app\plugins\mch\forms\mall\MchListExportForm;
 use app\plugins\mch\forms\mall\MchMallSettingEditForm;
 use app\plugins\mch\forms\mall\MchMallSettingForm;
+use app\plugins\mch\forms\mall\MchReviewDoForm;
 use app\plugins\mch\forms\mall\MchReviewForm;
 
 class MchController extends Controller
@@ -86,6 +87,13 @@ class MchController extends Controller
         } else {
             return $this->render('review');
         }
+    }
+
+    public function actionReviewDo()
+    {
+        $form = new MchReviewDoForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
     }
 
     /**

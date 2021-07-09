@@ -49,9 +49,7 @@ class Store extends BaseActiveRecord
         return [
             [['mall_id', 'created_at', 'updated_at', 'deleted_at'], 'required'],
             [['mall_id', 'mch_id', 'province_id', 'city_id', 'district_id'], 'integer'],
-            [['description', 'score', 'is_default', 'is_delete', 'business_hours', 'cover_url', 'pic_url', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
-            [['name'], 'string', 'max' => 65],
-            [['mobile', 'address', 'longitude', 'latitude'], 'string', 'max' => 255],
+            [['name', 'description', 'mobile', 'address', 'longitude', 'latitude', 'score', 'is_default', 'is_delete', 'business_hours', 'cover_url', 'pic_url', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
         ];
     }
 

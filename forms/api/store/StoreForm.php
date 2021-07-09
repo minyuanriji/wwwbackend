@@ -15,7 +15,8 @@ use app\models\UserRelationshipLink;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
 use app\plugins\mch\models\MchCommonCat;
-use yii\base\BaseObject;
+use app\plugins\mch\forms\common\apply\MchApplyRefuseForm;
+use app\plugins\mch\forms\common\apply\MchApplyPassForm;
 
 class StoreForm extends BaseModel
 {
@@ -333,9 +334,10 @@ class StoreForm extends BaseModel
             $apply_data['settle_special_rate_remark']   = $data['settle_special_rate_remark'];
             $mch_exist->json_apply_data = SerializeHelper::encode($apply_data);
         } else {
-            $mch_exist->status = $data['status'];
             if ($data['status'] == MchApply::STATUS_REFUSED) { //审核不通过
-                $mch_exist->remark = isset($data['remark']) ? $data['remark'] : '审核不通过';
+                $form = new MchApplyRefuseForm([
+                    "remark" => isset($data['remark']) ? $data['remark'] : '审核不通过',
+                ]);
             } elseif($data['status'] == MchApply::STATUS_PASSED) { //审核通过
                 if ($special_rate > 8.5)
                     return [
@@ -346,15 +348,23 @@ class StoreForm extends BaseModel
                 $apply_data['settle_discount'] = $special_rate;
                 $mch_exist->json_apply_data = SerializeHelper::encode($apply_data);
                 $mch_exist->remark = '审核通过';
+                if (!$mch_exist->save())
+                    return [
+                        'code' => ApiCode::CODE_FAIL,
+                        'msg' => '保存失败'
+                    ];
+
+                $form = new MchApplyPassForm([
+                    "bind_mobile" => $apply_data['bind_mobile']
+                ]);
             } else {
                 throw new \Exception('审核状态错误，请联系客服！');
             }
+            $form->id = $data['id'];
+            $res = $form->save();
         }
-        if (!$mch_exist->save())
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => '保存失败'
-            ];
+        if($res['code'] != ApiCode::CODE_SUCCESS)
+            throw new \Exception($res['msg']);
 
         return [
             'code' => ApiCode::CODE_SUCCESS,

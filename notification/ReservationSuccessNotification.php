@@ -20,13 +20,13 @@ class ReservationSuccessNotification
 
     public static function send(HotelOrder $hotel_order)
     {
-        (new ReservationSuccessNotificationWeTplJob([
+        /*(new ReservationSuccessNotificationWeTplJob([
             "hotel_order" => $hotel_order
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new ReservationSuccessNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new ReservationSuccessNotificationWeTplJob([
             "hotel_order" => $hotel_order
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate(HotelOrder $hotel_order)

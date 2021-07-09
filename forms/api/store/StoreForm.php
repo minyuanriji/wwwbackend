@@ -333,6 +333,12 @@ class StoreForm extends BaseModel
             $apply_data['settle_discount']              = $special_rate;
             $apply_data['settle_special_rate_remark']   = $data['settle_special_rate_remark'];
             $mch_exist->json_apply_data = SerializeHelper::encode($apply_data);
+            if (!$mch_exist->save())
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '保存失败'
+                ];
+            
         } else {
             if ($data['status'] == MchApply::STATUS_REFUSED) { //审核不通过
                 $form = new MchApplyRefuseForm([
@@ -362,10 +368,10 @@ class StoreForm extends BaseModel
             }
             $form->id = $data['id'];
             $res = $form->save();
-        }
-        if($res['code'] != ApiCode::CODE_SUCCESS)
-            throw new \Exception($res['msg']);
+            if($res['code'] != ApiCode::CODE_SUCCESS)
+                throw new \Exception($res['msg']);
 
+        }
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '保存成功'

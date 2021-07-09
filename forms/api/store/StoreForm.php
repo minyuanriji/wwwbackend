@@ -355,7 +355,7 @@ class StoreForm extends BaseModel
                     ];
 
                 $form = new MchApplyPassForm([
-                    "bind_mobile" => $apply_data['bind_mobile']
+                    "bind_mobile" => $mch_exist['mobile']
                 ]);
             } else {
                 throw new \Exception('审核状态错误，请联系客服！');

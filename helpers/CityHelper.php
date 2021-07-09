@@ -54,7 +54,10 @@ class CityHelper{
      * @return array|null
      */
     public static function reverseData($district_id = 0, $city_id = 0, $province_id = 0){
-        $arrs = DistrictData::getArr();
+        static $arrs = null;
+        if($arrs == null){
+            $arrs = DistrictData::getArr();
+        }
         $district = $city = $province = null;
         if(isset($arrs[$district_id])){
             $district = $arrs[$district_id];

@@ -35,6 +35,9 @@ abstract class MchEditFormBase extends BaseModel
     public $city_id;
     public $district_id;
     public $integral_fee_rate;
+    public $settle_bank;
+    public $settle_realname;
+    public $settle_num;
 
     /**
      * @var Mch
@@ -50,7 +53,7 @@ abstract class MchEditFormBase extends BaseModel
                 'province_id', 'city_id', 'district_id', 'integral_fee_rate'], 'integer'],
             [['mobile', 'address', 'logo', 'service_mobile', 'password'], 'string', 'max' => 255],
             [['username', 'realname', 'wechat', 'name', 'username', 'password'], 'string', 'max' => 65],
-            [['bg_pic_url', 'service_mobile'], 'safe']
+            [['bg_pic_url', 'service_mobile', 'settle_bank', 'settle_realname', 'settle_num'], 'safe']
         ];
     }
 

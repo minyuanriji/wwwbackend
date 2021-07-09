@@ -14,13 +14,13 @@ class MchApplyNoPassNotification
 
     public static function send(MchApply $mch_apply)
     {
-        (new MchApplyNoPassNotificationWeTplJob([
+        /*(new MchApplyNoPassNotificationWeTplJob([
             "mch_apply" => $mch_apply
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new MchApplyNoPassNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new MchApplyNoPassNotificationWeTplJob([
             "mch_apply" => $mch_apply
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate(MchApply $mch_apply)

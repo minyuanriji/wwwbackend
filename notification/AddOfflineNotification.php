@@ -12,13 +12,13 @@ class AddOfflineNotification
 
     public static function send(User $user)
     {
-        (new AddOfflineNotificationWeTplJob([
+        /*(new AddOfflineNotificationWeTplJob([
             "user" => $user
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new AddOfflineNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new AddOfflineNotificationWeTplJob([
             "user" => $user
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate(User $user)

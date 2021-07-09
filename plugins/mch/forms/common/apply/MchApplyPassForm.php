@@ -110,6 +110,7 @@ class MchApplyPassForm extends BaseModel{
         $isSpecialDiscount = isset($applyData['is_special_discount']) ? (int)$applyData['is_special_discount'] : 0;
         $specialRemark     = isset($applyData['settle_special_rate_remark']) ? (int)$applyData['settle_special_rate_remark'] : 0;
 
+        $mch->mch_common_cat_id   = $applyData['store_mch_common_cat_id'];
         $mch->review_status       = Mch::REVIEW_STATUS_CHECKED; //状态通过
         $mch->review_time         = time();
         $mch->realname            = $applyModel->realname;

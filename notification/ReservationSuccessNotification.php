@@ -43,16 +43,6 @@ class ReservationSuccessNotification
         $hotel = Hotels::findOne($hotel_order->hotel_id);
         if(!$hotel) return;
 
-        print_r([
-            'first'     => '您已完成支付，酒店预订成功。',
-            'keyword1'  => $hotel->name,
-            'keyword2'  => self::hotel_type[$hotel->type],
-            'keyword3'  => $hotel->booking_start_date,
-            'keyword4'  => $hotel->booking_num,
-            'keyword5'  => $hotel->order_price,
-            'remark'    => '感谢您的使用！如有疑问请联系客服020-31923526',
-        ]);die;
-
         (new HotelWeTplMsg([
             "mall_id"           => $hotel_order->mall_id,
             "openid"            => $userInfo->openid,
@@ -61,9 +51,9 @@ class ReservationSuccessNotification
                 'first'     => '您已完成支付，酒店预订成功。',
                 'keyword1'  => $hotel->name,
                 'keyword2'  => self::hotel_type[$hotel->type],
-                'keyword3'  => $hotel->booking_start_date,
-                'keyword4'  => $hotel->booking_num,
-                'keyword5'  => $hotel->order_price,
+                'keyword3'  => $hotel_order->booking_start_date,
+                'keyword4'  => $hotel_order->booking_num,
+                'keyword5'  => $hotel_order->order_price,
                 'remark'    => '感谢您的使用！如有疑问请联系客服020-31923526',
             ],
         ]))->send();

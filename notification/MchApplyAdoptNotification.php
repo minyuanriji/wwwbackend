@@ -14,13 +14,13 @@ class MchApplyAdoptNotification
 
     public static function send(MchApply $mch_apply)
     {
-        (new MchApplyAdoptNotificationWeTplJob([
+        /*(new MchApplyAdoptNotificationWeTplJob([
             "mch_apply" => $mch_apply
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new MchApplyAdoptNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new MchApplyAdoptNotificationWeTplJob([
             "mch_apply" => $mch_apply
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate(MchApply $mch_apply)

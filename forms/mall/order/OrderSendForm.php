@@ -25,6 +25,7 @@ class OrderSendForm extends BaseModel
     public $express_no;
     public $words;
 
+    public $express_code;
     public $arrCSV;
     public $url;
 
@@ -159,6 +160,7 @@ class OrderSendForm extends BaseModel
                 $orderSendForm->express = $this->express;
                 $orderSendForm->express_no = $v[2];
                 $orderSendForm->merchant_remark = '';
+                $orderSendForm->express_code = $this->express_code;
                 $orderSendForm->saveOrderDetailExpress();
                 $success[] = $v[1];
             }
@@ -185,6 +187,7 @@ class OrderSendForm extends BaseModel
         foreach ($expressList as $value) {
             if ($value['name'] == $this->express) {
                 $sentinel = true;
+                $this->express_code = $value['code'];
                 break;
             }
         }

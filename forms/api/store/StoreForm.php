@@ -4,6 +4,7 @@ namespace app\forms\api\store;
 
 use app\core\ApiCode;
 use app\helpers\ArrayHelper;
+use app\helpers\SerializeHelper;
 use app\models\BaseModel;
 use app\models\DistrictArr;
 use app\models\EfpsMchReviewInfo;
@@ -12,19 +13,21 @@ use app\models\Store;
 use app\models\User;
 use app\models\UserRelationshipLink;
 use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchApply;
 use app\plugins\mch\models\MchCommonCat;
+use yii\base\BaseObject;
 
 class StoreForm extends BaseModel
 {
     public $page;
     public $id;
-    public $review_status;
+    public $status;
     public $keyword;
 
     public function rules()
     {
         return [
-            [['id', 'review_status'], 'integer'],
+            [['id', 'status'], 'integer'],
             [['keyword'], 'string'],
             [['page'], 'default', 'value' => 1],
         ];
@@ -50,7 +53,7 @@ class StoreForm extends BaseModel
             ->select('user_id')
             ->andWhere([
                 "AND",
-                "`left` > '{$user_link->left}' AND `right` < '{$user_link->right}'"
+                "`left` > '$user_link->left' AND `right` < '$user_link->right'"
             ])
             ->asArray()
             ->all();
@@ -58,43 +61,42 @@ class StoreForm extends BaseModel
         $pagination = null;
         if ($user_ids) {
             $new_user_ids = array_column($user_ids,'user_id');
-            $query = Mch::find()->alias("m")->where([
-                'm.mall_id' => \Yii::$app->mall->id,
-                'm.is_delete' => 0,
-                'm.review_status' => $this->review_status,
+            $query = MchApply::find()->alias("ma")->where([
+                'ma.mall_id' => \Yii::$app->mall->id,
+                'ma.status' => $this->status,
             ]);
-            if ($this->review_status == 0) {
-                $query->andWhere(['m.is_special' => 0]);
+
+            if ($this->status == 'verifying') {
+                $query->andWhere(['ma.is_special_discount' => 0]);
             }
-            $query->leftJoin(["u" => User::tableName()], "u.id=m.user_id");
+            $query->leftJoin(["u" => User::tableName()], "u.id=ma.user_id");
             $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
-            $query->andWhere(['in','m.user_id',$new_user_ids]);
+            $query->andWhere(['in','ma.user_id',$new_user_ids]);
 
             if ($this->keyword) {
-                $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
-                $query->andWhere(['m.id' => $mchIds])
-                      ->orWhere(['like', 'm.mobile', $this->keyword]);
+                $query->where(['like', 'ma.mobile', $this->keyword]);
+                $query->orWhere(['like', 'ma.json_apply_data', $this->keyword]);
             }
 
             $list = $query->select([
-                        "m.id", "m.realname", "m.mobile",
-                        "DATE_FORMAT(FROM_UNIXTIME(m.created_at),'%Y-%m-%d %H:%i:%s') as created_at", "m.user_id",
+                        "ma.*",
+                        "DATE_FORMAT(FROM_UNIXTIME(ma.created_at),'%Y-%m-%d %H:%i:%s') as created_at",
                         "p.id as parent_id", "p.nickname as parent_nickname",
                         "p.mobile as parent_mobile",
                         "( CASE p.role_type WHEN 'store' THEN '店主' WHEN 'partner' THEN '合伙人' WHEN 'branch_office' THEN '分公司' WHEN 'user' THEN '普通用户' END ) AS 'parent_role_type'"
                     ])
-                    ->with([
-                        'user' => function ($query) {
-                            $query->select('id, nickname');
-                        },
-                        'store' => function ($query) {
-                            $query->select('id, mch_id, cover_url, name');
-                        }
-                    ])
-                    ->orderBy(['m.created_at' => SORT_DESC])
+                    ->orderBy(['ma.created_at' => SORT_DESC])
                     ->page($pagination,10)
                     ->asArray()
                     ->all();
+        }
+        if ($list) {
+            foreach ($list as &$item) {
+                $apply_data = SerializeHelper::decode($item['json_apply_data']);
+                $item['store_name'] = $apply_data['store_name'];
+                $item['store_logo'] = 'http://yingmlife-1302693724.cos.ap-guangzhou.myqcloud.com/uploads/images/original/20210427/823e0e8a9fe145eb6f11551ead680011.png';
+                unset($item['json_apply_data'],$apply_data);
+            }
         }
         return [
             'code' => ApiCode::CODE_SUCCESS,
@@ -105,35 +107,6 @@ class StoreForm extends BaseModel
             ]
         ];
     }
-
-    /*public function getDetail()
-    {
-        try {
-            $detail = Mch::find()->where([
-                'id' => $this->id,
-                'mall_id' => \Yii::$app->mall->id,
-                'is_delete' => 0,
-            ])->with('user.userInfo')->asArray()->one();
-            if (!$detail) {
-                throw new \Exception('商户不存在');
-            }
-
-            $detail['address'] = \Yii::$app->serializer->decode($detail['address']);
-
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '请求成功',
-                'data' => [
-                    'detail' => $detail,
-                ]
-            ];
-        } catch (\Exception $e) {
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => $e->getMessage(),
-            ];
-        }
-    }*/
 
     public function destroy()
     {
@@ -166,6 +139,50 @@ class StoreForm extends BaseModel
     }
 
     public function getDetail()
+    {
+        try {
+            $detail = MchApply::find()->where([
+                'id' => $this->id,
+                'mall_id' => \Yii::$app->mall->id,
+            ])->one();
+            if (!$detail)
+                throw new \Exception('商户不存在');
+
+            $apply_data = SerializeHelper::decode($detail->json_apply_data);
+
+            $mch_common_cat_name = MchCommonCat::find()->where([
+                'is_delete' => 0,
+                'mall_id' => \Yii::$app->mall->id,
+                'id' => $apply_data['store_mch_common_cat_id'],
+            ])->asArray()->one();
+            $apply_data['store_mch_common_cat_name'] = $mch_common_cat_name ? $mch_common_cat_name['name'] : '';
+
+            try {
+                $apply_data['districts'] = DistrictArr::getDistrict((int)$apply_data['store_province_id'])['name'] .
+                    DistrictArr::getDistrict((int)$apply_data['store_city_id'])['name'] .
+                    DistrictArr::getDistrict((int)$apply_data['store_district_id'])['name'];
+            } catch (\Exception $e) {
+                $apply_data['districts'] = '';
+            }
+
+            unset($detail->json_apply_data);
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '请求成功',
+                'data' => [
+                    'detail' => $detail,
+                    'apply_data' => $apply_data,
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => $e->getMessage(),
+            ];
+        }
+    }
+
+    public function getDetailOld()
     {
         try {
             $detail = Mch::find()->where([
@@ -293,65 +310,52 @@ class StoreForm extends BaseModel
                 'msg' => '账户没有审核功能,请联系客服！',
             ];
 
-        $mch_exist = Mch::findOne($data['id']);
+        $mch_exist = MchApply::findOne($data['id']);
         if (!$mch_exist)
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => '该门店不存在,请联系客服！',
             ];
 
-        if (isset($data['is_special']) && $data['is_special']) {
-            $mch_exist->is_special          = $data['is_special'];
-            $mch_exist->special_rate        = isset($data['special_rate']) ? (10 - $data['special_rate']) * 10 : 0;
-            $mch_exist->special_rate_remark = isset($data['special_rate_remark']) ? $data['special_rate_remark'] : '';
-            if (!$mch_exist->save())
+        $apply_data = SerializeHelper::decode($mch_exist->json_apply_data);
+
+        $special_rate = isset($data['special_rate']) ? $data['special_rate'] : MchApply::DEFAULT_DISCOUNT;
+
+        if (isset($data['is_special_discount']) && $data['is_special_discount']) {
+            if ($special_rate > 10)
                 return [
                     'code' => ApiCode::CODE_FAIL,
-                    'msg' => '保存失败'
+                    'msg' => '折扣不能大于10折'
                 ];
 
+            $mch_exist->is_special_discount             = $data['is_special_discount'];
+            $apply_data['settle_discount']              = $special_rate;
+            $apply_data['settle_special_rate_remark']   = $data['settle_special_rate_remark'];
+            $mch_exist->json_apply_data = SerializeHelper::encode($apply_data);
         } else {
-            $transaction = \Yii::$app->db->beginTransaction();
-            try {
-                if ($data['review_status'] == Mch::REVIEW_STATUS_NOTPASS) { //审核不通过
-                    EfpsMchReviewInfo::updateAll(['status' => 3], ["mch_id" => $data['id']]);
-                    Mch::updateAll([
-                        "review_status" => Mch::REVIEW_STATUS_NOTPASS,
-                        "review_remark" => $data['review_remark']
-                    ], ["id" => $data['id']]);
-                } elseif($data['review_status'] == Mch::REVIEW_STATUS_CHECKED) { //审核通过
-                    if (isset($data['transfer_rate']) && $data['transfer_rate']) {
-                        if ($data['transfer_rate'] > 8.5 || $data['transfer_rate'] < 0)
-                            return [
-                                'code' => ApiCode::CODE_FAIL,
-                                'msg' => '折扣不能超过8.5折或低于0折，请移步特殊折扣申请！'
-                            ];
+            $mch_exist->status = $data['status'];
+            if ($data['status'] == MchApply::STATUS_REFUSED) { //审核不通过
+                $mch_exist->remark = isset($data['remark']) ? $data['remark'] : '审核不通过';
+            } elseif($data['status'] == MchApply::STATUS_PASSED) { //审核通过
+                if ($special_rate > 8.5)
+                    return [
+                        'code'  => ApiCode::CODE_FAIL,
+                        'msg'   => '折扣不能大于8.5折'
+                    ];
 
-                        $transfer_rate = (10 - $data['transfer_rate']) * 10;
-                    } else {
-                        $transfer_rate = 20;
-                    }
-                    $reviewData = EfpsMchReviewInfo::find()->where(["mch_id" => $data['id']])->asArray()->one();
-                    if(!$reviewData){
-                        throw new \Exception("无法获取审核信息");
-                    }
-                    EfpsMchReviewInfo::updateAll(['status' => 2], ["mch_id" => $data['id']]);
-                    Mch::updateAll(["review_status" => Mch::REVIEW_STATUS_CHECKED, 'transfer_rate' => $transfer_rate], [
-                        "id" => $data['id']
-                    ]);
-                }
-                $transaction->commit();
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-                return [
-                    'code' => ApiCode::CODE_FAIL,
-                    'msg' => $e->getMessage(),
-                    'error' => [
-                        'line' => $e->getLine()
-                    ]
-                ];
+                $apply_data['settle_discount'] = $special_rate;
+                $mch_exist->json_apply_data = SerializeHelper::encode($apply_data);
+                $mch_exist->remark = '审核通过';
+            } else {
+                throw new \Exception('审核状态错误，请联系客服！');
             }
         }
+        if (!$mch_exist->save())
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg' => '保存失败'
+            ];
+
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '保存成功'

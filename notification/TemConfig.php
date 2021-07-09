@@ -246,28 +246,6 @@ class TemConfig
      * */
     const StorePassedAudit = 'hhs7TFHl-xcYstR79gp4LO0qwnES-vn3yjWHF7_ZceQ';
 
-    /*  @todo 售后服务处理进度提醒
-
-        您好，您的售后单2905928有新的客服回复：
-
-        服务类型：换货
-        处理状态：待处理
-        提交时间：2013-12-23 14:48:24
-        当前进度：您好，订单是第三方物流配送，无法直接取消，已登物流人员拦截，若拦截不成功，您请直接拒收哦，货款已有客服…
-
-        点击“详情”查看详细处理结果，如有疑问可回复KF联系
-
-        {{first.DATA}}
-
-        服务类型：{{HandleType.DATA}}
-        处理状态：{{Status.DATA}}
-        提交时间：{{RowCreateDate.DATA}}
-        当前进度：{{LogType.DATA}}
-        {{remark.DATA}}
-
-     * */
-    const AfterSalesServiceProgressReminder = 'kYfE2Vvpj3rBO-xGop4rgWzRSmTIqWFiGMJikVpUqGk';
-
     /*  @todo 店铺审核通知
 
         您的店铺已通过审核
@@ -415,4 +393,63 @@ class TemConfig
 
      * */
     const SubOrderSubCommission = 'F6dhQneZVsWxMEBFIoDq82rROQruWvLN0eTMXmQo1IY';
+
+    /*  @todo 预订成功通知
+
+        您已完成支付，预订成功。
+        酒店名称：香格里拉
+        预订房型：豪华房
+        入住日期：2017年05月02日
+        预订房数：1
+        订单金额：800
+        点击这里查看预订详情
+
+        {{first.DATA}}
+        酒店名称：{{keyword1.DATA}}
+        预订房型：{{keyword2.DATA}}
+        入住日期：{{keyword3.DATA}}
+        预订房数：{{keyword4.DATA}}
+        订单金额：{{keyword5.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const HotelReservationSuccessful = 'NucwFyosk892dUIijadXgOtXfoTys9xMtC_d-V8EGhY';
+
+    /*  @todo 订单取消失败通知
+
+        抱歉，您的订单取消失败
+        订单编号：1000029920
+        酒店名称：丽思卡尔顿
+        预订房型：豪华大床房
+        房间数量：1间（2晚）
+        入住时间：2018年3月21
+        如有疑问请及时联系我们的客服小妹。（点击查看更多详情）
+
+        {{first.DATA}}
+        订单编号：{{keyword1.DATA}}
+        酒店名称：{{keyword2.DATA}}
+        预订房型：{{keyword3.DATA}}
+        房间数量：{{keyword4.DATA}}
+        入住时间：{{keyword5.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const OrderCancellationFailed = '9Etr9bc8p-rgOEmG6RiPdZMz9oZKBjArR-mh4gtQVEQ';
+
+    /*  @todo 下线加入通知
+
+        欢迎您的加入
+        会员号：123
+        加入时间：2017.8.16
+        下线代理昵称：add
+        欢迎您的加入
+
+        {{first.DATA}}
+        会员号：{{keyword1.DATA}}
+        加入时间：{{keyword2.DATA}}
+        下线代理昵称：{{keyword3.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const OfflineJoinNotice = 'XnHCHU_uTBZb6yRxWpU27a5_Quuk0O4j3AU4omNa4JU';
 }

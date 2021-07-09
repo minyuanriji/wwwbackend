@@ -31,11 +31,11 @@ class MchController extends Controller
                 $form = new MchEditForm();
                 $data = \Yii::$app->request->post('form');
                 //var_dump($data);exit;
-                $form->attributes = $data;
+                $form->attributes  = $data;
                 $form->province_id = $data['district'][0];
-                $form->city_id = $data['district'][1];
+                $form->city_id     = $data['district'][1];
                 $form->district_id = $data['district'][2];
-                $form->attributes = \Yii::$app->request->post();
+                $form->attributes  = \Yii::$app->request->post();
                 return $this->asJson($form->save());
             } else {
                 $form = new MchForm();

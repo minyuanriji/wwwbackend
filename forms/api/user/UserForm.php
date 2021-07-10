@@ -76,6 +76,7 @@ class UserForm extends BaseModel
                     $mchInfo['mch_status'] = $mchApply->status;
                 }
             }
+            $returnData['mch_status'] = $mchInfo['mch_status'];
             $returnData['store']      = $mchInfo['store'];
             $returnData['category']   = $mchInfo['category'];
             $returnData['stat']       = [

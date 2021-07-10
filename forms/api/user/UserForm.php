@@ -51,7 +51,8 @@ class UserForm extends BaseModel
             'is_mch'    => 0,
             'store'     => null,
             'category'  => null,
-            'stat'      => null
+            'stat'      => null,
+            'mch_mobile'=> ''
         ];
         $mchInfo = Mch::find()->where([
             'user_id'   => \Yii::$app->user->id,
@@ -80,6 +81,8 @@ class UserForm extends BaseModel
                 'is_recycle' => 0,
                 'mch_id'    => $mchInfo['id']
             ])->count();
+
+            $returnData['mch_mobile'] = $mchInfo['mobile'];
         }
 
         return $returnData;

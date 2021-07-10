@@ -10,6 +10,7 @@ use app\plugins\mch\forms\mall\MchMallSettingEditForm;
 use app\plugins\mch\forms\mall\MchMallSettingForm;
 use app\plugins\mch\forms\mall\MchReviewDoForm;
 use app\plugins\mch\forms\mall\MchReviewForm;
+use app\plugins\mch\forms\mall\MchReviewListExportForm;
 
 class MchController extends Controller
 {
@@ -97,12 +98,12 @@ class MchController extends Controller
     }
 
     /**
-     * 导出记录
+     * 导出审核记录
      * @return \yii\web\Response
      */
-    public function actionExportList()
+    public function actionExportReviewList()
     {
-        $form = new MchListExportForm();
+        $form = new MchReviewListExportForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->export());
     }

@@ -73,7 +73,12 @@ class MchAccountWithdraw extends BaseModel{
             //通过易票联提现打款到银行卡
             if($mchCash->type == "efps_bank"){
 
-                $mchCash->status = 0;
+                //提现额如果小于5000，自动打款
+                if($mchCash->money < 5000){
+                    $mchCash->status = 1;
+                }else{
+                    $mchCash->status = 0;
+                }
 
                 $reviewInfo = EfpsMchReviewInfo::findOne([
                     "mch_id" => $mch->id

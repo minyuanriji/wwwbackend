@@ -30,8 +30,8 @@ class CloudAction extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['project_id', 'security', 'module_id', 'name', 'controllerID', 'actionID'], 'required'],
-            [['class_dir'], 'safe']
+            [['class_dir', 'project_id', 'security', 'module_id', 'name', 'controllerID', 'actionID'], 'required'],
+            [[], 'safe']
         ];
     }
 }

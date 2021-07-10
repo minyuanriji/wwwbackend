@@ -193,32 +193,30 @@ class IntegralLogic{
         try{
             if(!empty($order)){
                 $user_id = $order->user_id;
-                //Yii::error('红包券发放--123'.var_export($order->detail,true));
                 foreach($order->detail as $order_detail){
                     $is_order_paid = $order_detail->goods->is_order_paid || 0;//商品订单设置支付状态
                     $order_paid = $order_detail->goods->order_paid ? SerializeHelper::decode($order_detail->goods->order_paid) : [];//商品订单设置支付参数
 
+                    $goods_id = $order_detail->goods_id;
+                    $integral_setting = Goods::getGooodsIntegralSetting($goods_id);
+                    $integral_setting = json_decode($integral_setting,true);
+
+                    if(empty($integral_setting))
+                        continue;
+
+                    //计算需要赠送的红包
+                    $totalIntegralNum = intval($order_detail['num']) * intval($integral_setting['integral_num']);
+
+                    //不能大于支付金额
+                    $integral_setting['integral_num'] = min($totalIntegralNum, (float)$order_detail->total_original_price);
+
+                    //确保只赠送一次
+                    $integral_setting['period'] = 1;
+
                     if($type == 'paid' && $is_order_paid && $order_paid['is_integral_card']){  //商品订单设置支付状态下执行
-                        $goods_id = $order_detail->goods_id;
-                        $integral_setting = Goods::getGooodsIntegralSetting($goods_id);
-                        $integral_setting = json_decode($integral_setting,true);
-
-                        if(empty($integral_setting)) continue;
-
-                        for($i=0;$i<$order_detail['num'];$i++){ //根据该商品购买数量循环发送
-                            Integral::addIntegralPlan($user_id, $integral_setting,'购买商品赠送红包券','1');
-                        }
-
+                        Integral::addIntegralPlan($user_id, $integral_setting,'购买商品赠送红包券','1');
                     }elseif(!$is_order_paid){ //商品订单不设置支付状态下执行
-                        $goods_id = $order_detail->goods_id;
-                        $integral_setting = Goods::getGooodsIntegralSetting($goods_id);
-                        $integral_setting = json_decode($integral_setting,true);
-
-                        if(empty($integral_setting)) continue;
-
-                        for($i=0;$i<$order_detail['num'];$i++){ //根据该商品购买数量循环发送
-                            Integral::addIntegralPlan($user_id, $integral_setting,'购买商品赠送红包券','1');
-                        }
+                        Integral::addIntegralPlan($user_id, $integral_setting,'购买商品赠送红包券','1');
                     }
                 }
             }

@@ -160,7 +160,7 @@ class MchApplyPassForm extends BaseModel{
 
         $store->name        = $applyData['store_name'];
         $store->description = "";
-        $store->mobile      = $applyData['bind_mobile'];
+        $store->mobile      = (isset($applyData['bind_mobile']) && $applyData['bind_mobile']) ? $applyData['bind_mobile'] : $applyModel->mobile;
         $store->address     = $applyData['store_address'];
         $store->province_id = $applyData['store_province_id'];
         $store->city_id     = $applyData['store_city_id'];

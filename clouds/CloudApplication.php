@@ -34,6 +34,7 @@ class CloudApplication extends \yii\web\Application
             ]
         ]);
 
+        //根据请求的类型返回对应的请求结果
         \Yii::$app->on(self::EVENT_AFTER_REQUEST, function ($event){
             if(\Yii::$app->getRequest()->getIsAjax()){
                 \Yii::$app->getResponse()->format = Response::FORMAT_JSON;

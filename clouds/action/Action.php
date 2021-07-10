@@ -20,23 +20,19 @@ use app\clouds\tables\Table;
 use app\clouds\user\User;
 use yii\base\BaseObject;
 
-class Action extends BaseObject
+abstract class Action extends BaseObject
 {
-    private $action;
-    private $user_app;
-    private $route;
-    private $route_list_item;
+    private $actionModel;
+    private $userAppModel;
     private $project = null;
     private $module = null;
 
-    public function __construct(CloudAction $action, CloudUserAppRouteList $routeItem, CloudUserApp $userApp, Route $route, $config = [])
+    public function __construct(CloudAction $actionModel,  CloudUserApp $userAppModel,  $config = [])
     {
         parent::__construct($config);
 
-        $this->action          = $action;
-        $this->user_app        = $userApp;
-        $this->route           = $route;
-        $this->route_list_item = $routeItem;
+        $this->actionModel  = $actionModel;
+        $this->userAppModel = $userAppModel;
     }
 
     /**
@@ -58,13 +54,17 @@ class Action extends BaseObject
             throw new CloudException("”".$userApp->pathURI."“路由对象不存在");
         }
 
-        $action = Table::findOne(CloudAction::class, $routeItem->action_id);
-        if(!$action)
+        $actionModel = Table::findOne(CloudAction::class, $routeItem->action_id);
+        if(!$actionModel)
         {
             throw new CloudException("”".$routeItem->action_id."“操作对象不存在");
         }
 
-        return new Action($action, $routeItem, $userApp, $route);
+        //模块
+        $moduleModel =
+        $actionClass = "";
+
+        //return new Action($action, $routeItem, $userApp, $route);
     }
 
     /**

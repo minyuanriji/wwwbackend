@@ -57,6 +57,7 @@ abstract class BaseOrderForm extends BaseModel
     public $mch_id;
     public $order_by;
     public $plugin;
+    public $pay_type;
 
     public $flag;
     public $fields;
@@ -77,8 +78,9 @@ abstract class BaseOrderForm extends BaseModel
             [['order_id', 'is_mch', 'mch_id'], 'integer'],
             [['seller_remark', 'flag', 'platform', 'plugin'], 'string'],
             [['keyword', 'keyword_1'], 'trim'],
-            [['status', 'is_recycle', 'page', 'limit', 'user_id', 'send_type', 'store_id', 'is_clerk'], 'integer'],
+            [['status', 'is_recycle', 'page', 'limit', 'user_id', 'send_type','pay_type', 'store_id', 'is_clerk'], 'integer'],
             [['status',], 'default', 'value' => -1],
+            [['pay_type'], 'default', 'value' => -1],
             [['page',], 'default', 'value' => 1],
             [['date_start', 'date_end', 'fields', 'clerk_id'], 'trim'],
             [['is_send_show', 'is_cancel_show', 'is_clerk_show', 'is_confirm_show'], 'default', 'value' => 1],
@@ -373,7 +375,6 @@ abstract class BaseOrderForm extends BaseModel
 
         $query->keyword($this->platform, ['u.platform' => $this->platform]);
 
-        //$query->keyword($this->status == -1, ['AND', ['o.is_recycle' => 0], ['not', ['o.cancel_status' => 1]]])
         $query->keyword($this->status == 0, [
                 'AND',
                 ['o.is_pay' => 0, 'o.is_recycle' => 0],
@@ -417,6 +418,10 @@ abstract class BaseOrderForm extends BaseModel
                 ['o.cancel_status' => 0]
             ]);
 
+        $query->keyword($this->pay_type == 0, [
+            'AND',
+            ['>','o.integral_deduction_price','0'],
+        ]);
 
         ////////////////
 

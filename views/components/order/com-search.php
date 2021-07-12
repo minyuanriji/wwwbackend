@@ -75,7 +75,7 @@
                     <el-option label="同城配送" :value="2"></el-option>
                 </el-select>
             </div>
-            <div class="item-box" class="label">
+            <div class="item-box" class="label">请选择筛选方式
                 <el-input style="width: 350px" size="small" v-model="search.keyword" placeholder="请输入搜索内容" clearable
                           @clear="toSearch"
                           @keyup.enter.native="toSearch">
@@ -87,6 +87,15 @@
                     </el-select>
                 </el-input>
             </div>
+
+            <div class="item-box" flex="dir:left cross:center">
+                <div class="label">支付方式</div>
+                <el-select size="small" style="width: 120px" v-model="search.pay_type" @change="toSearch"
+                           placeholder="支付方式">
+                    <el-option label="红包" :value="0"></el-option>
+                </el-select>
+            </div>
+
             <div class="item-box" flex="cross:center">
                 <div v-if="isShowClear" @click="clearWhere" class="div-box clear-where">清空筛选条件</div>
             </div>
@@ -178,6 +187,7 @@
                         status: '',
                         plugin: 'all',
                         send_type: -1,
+                        pay_type: -1,
                     }
                 }
             },
@@ -209,7 +219,8 @@
             toSearch() {
                 this.search.page = 1;
                 this.$emit('search', this.search);
-                this.checkSearch();
+                console.log(this.search);
+                //this.checkSearch();
             },
             handleClick(res) {
                 this.search.status = this.newActiveName;
@@ -222,13 +233,19 @@
                 this.search.time = null;
                 this.search.platform = '';
                 this.search.send_type = -1;
+                this.search.pay_type = -1;
                 this.search.plugin = 'all';
                 this.toSearch();
             },
             checkSearch() {
-                if (this.search.keyword || (this.search.date_start && this.search.date_end)
-                    || this.search.plugin != 'all' || this.search.send_type != -1
-                    || this.search.platform) {
+                if (
+                    this.search.keyword ||
+                    (this.search.date_start && this.search.date_end) ||
+                    this.search.plugin != 'all' ||
+                    this.search.send_type != -1 ||
+                    this.search.platform ||
+                    this.search.pay_type != -1
+                ) {
                     this.isShowClear = true;
                 } else {
                     this.isShowClear = false;

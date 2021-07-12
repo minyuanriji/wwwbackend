@@ -565,6 +565,7 @@ Yii::$app->loadComponentView('order/com-city');
                             <div flex="dir:top">
                                 <div>
                                     <span style="font-size: 16px">￥{{item.total_pay_price}}</span>
+
                                     <el-popover
                                             placement="bottom"
                                             width="250"
@@ -607,18 +608,25 @@ Yii::$app->loadComponentView('order/com-city');
                                         </el-form>
                                         <img src="statics/img/mall/order/price.png" slot="reference" alt="">
                                     </el-popover>
+
                                     <slot name="other" :item="item"></slot>
                                 </div>
+                                <div>
+                                    (<span style="color: green">积分抵扣</span><span style="color: #909399">￥{{item.score_deduction_price}})</span>
+                                </div>
+                                <div>
+                                    (<span style="color: red">红包抵扣</span><span style="color: #909399">￥{{item.integral_deduction_price}})</span>
+                                </div>
                                 <div class="express-price">
-                            <span>
-                                <span style="color: #909399">(含运费￥{{item.express_price}})</span>
-                                <el-button type="text"
-                                           v-if="isShowEditExpressPrice && item.is_pay == 0 && item.is_send == 0 && search.status != 5"
-                                           circle
-                                           @click="openDialog(item, changePriceVisible = true)">
-                                    <img src="statics/img/mall/order/edit.png" alt="">
-                                </el-button>
-                            </span>
+                                    <span>
+                                        <span style="color: #909399">(含运费￥{{item.express_price}})</span>
+                                        <el-button type="text"
+                                                   v-if="isShowEditExpressPrice && item.is_pay == 0 && item.is_send == 0 && search.status != 5"
+                                                   circle
+                                                   @click="openDialog(item, changePriceVisible = true)">
+                                            <img src="statics/img/mall/order/edit.png" alt="">
+                                        </el-button>
+                                    </span>
                                 </div>
                                 <div>
                                     <el-tag size="mini" color="#E6A23C" style="color:#fff;border:0"
@@ -1066,7 +1074,7 @@ Yii::$app->loadComponentView('order/com-city');
             if (getQuery('clerk_id') > 0) {
                 this.search.clerk_id = getQuery('clerk_id');
             }
-            if(localStorage.getItem('order_page')){
+            if (localStorage.getItem('order_page')) {
                 this.search.page = localStorage.getItem('order_page');
             }
             this.getList();
@@ -1080,7 +1088,7 @@ Yii::$app->loadComponentView('order/com-city');
             // 进入商品详情
             toDetail(id) {
                 var path = window.location.origin + window.location.pathname + '?r=mall%2Forder%2Fdetail&order_id=' + id;
-                window.open(path,'_blank');
+                window.open(path, '_blank');
                 // return;
                 // this.$navigate({
                 //     r: this.orderDetailUrl,
@@ -1339,7 +1347,7 @@ Yii::$app->loadComponentView('order/com-city');
             // 分页
             pageChange(page) {
                 this.search.page = page;
-                localStorage.setItem('order_page',page);
+                localStorage.setItem('order_page', page);
                 this.getList();
             },
             openDialog(order) {

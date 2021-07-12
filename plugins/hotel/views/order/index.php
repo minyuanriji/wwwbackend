@@ -10,10 +10,25 @@
             <el-tab-pane label="已结束" name="finished"></el-tab-pane>
             <el-tab-pane label="已取消" name="cancel"></el-tab-pane>
             <div class="table-body">
-                <div class="input-item" style="width:300px;margin-bottom:20px;">
+                <span style="height: 32px;">下单时间：</span>
+                <el-date-picker
+                        class="item-box"
+                        size="small"
+                        @change="changeTime"
+                        v-model="search.time"
+                        type="datetimerange"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期">
+                </el-date-picker>
+
+                <div class="input-item" style="width:300px;margin-bottom:20px;display:inline-block;">
                     <el-input @keyup.enter.native="toSearch" size="small" placeholder="昵称/ID/手机号/订单号/酒店" v-model="search.keyword" clearable @clear="toSearch">
                         <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
                     </el-input>
+
+
                 </div>
 
                 <el-table :data="list" size="small" border v-loading="loading" style="margin-bottom: 15px">
@@ -95,6 +110,9 @@
                 search: {
                     keyword: '',
                     status: 'all',
+                    date_start: '',
+                    date_end: '',
+                    time: null,
                 },
                 loading: false,
                 activeName: 'all',
@@ -107,6 +125,19 @@
             this.loadData();
         },
         methods: {
+            // 日期搜索
+            changeTime() {
+                if (this.search.time) {
+                    this.search.date_start = this.search.time[0];
+                    this.search.date_end = this.search.time[1];
+                } else {
+                    this.search.date_start = null;
+                    this.search.date_end = null;
+                }
+                // console.log(this.search);
+                this.loadData();
+            },
+
             loadData(status = 'all', page = 1) {
                 this.loading = true;
                 request({
@@ -114,7 +145,9 @@
                         r: 'plugin/hotel/mall/order/list',
                         status: status,
                         page: page,
-                        keyword: this.search.keyword
+                        keyword: this.search.keyword,
+                        date_start: this.search.date_start,
+                        date_end: this.search.date_end,
                     },
                     method: 'get'
                 }).then(e => {

@@ -16,10 +16,12 @@ class HotelOrderListForm extends BaseModel{
 
     public $status;
     public $keyword;
+    public $date_start;
+    public $date_end;
 
     public function rules(){
         return [
-            [['status', 'keyword'], 'string']
+            [['status', 'keyword', 'date_start', 'date_end'], 'string']
         ];
     }
 
@@ -45,6 +47,10 @@ class HotelOrderListForm extends BaseModel{
                     ["u.mobile" => $this->keyword],
                     ["u.id" => $this->keyword]
                 ]);
+            }
+
+            if (!empty($this->date_start) && !empty($this->date_end)) {
+                $query->andFilterWhere(['between','o.pay_at',$this->date_start, $this->date_end]);
             }
 
             $this->statusFilter($query);

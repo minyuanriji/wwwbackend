@@ -63,6 +63,12 @@ class AddOfflineNotification
             ];
         }
 
+        if ($user->junior_at) {
+            $time = date('Y-m-d H:i:s', $user->junior_at);
+        } else {
+            $time = date('Y-m-d H:i:s', time());
+        }
+
         foreach ($open_id_array as $open_id) {
             (new UserWeTplMsg([
                 "mall_id"           => $user->mall_id,
@@ -71,7 +77,7 @@ class AddOfflineNotification
                 "data"              => [
                     'first'     => '您有新的成员加入！',
                     'keyword1'  => $open_id['id'],
-                    'keyword2'  => date('Y-m-d H:i:s', $user->junior_at),
+                    'keyword2'  => $time,
                     'keyword3'  => $user->nickname,
                     'remark'    => '',
                 ]

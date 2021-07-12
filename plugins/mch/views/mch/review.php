@@ -41,6 +41,7 @@
                         </div>
                     </template>
                 </el-table-column>
+                <el-table-column label="店铺名称" prop="store_name" width="200"></el-table-column>
                 <el-table-column align="center" label="状态" width="100">
                     <template slot-scope="scope">
                         <div style="color:#333" v-if="scope.row.status == 'applying'">资料填写中</div>

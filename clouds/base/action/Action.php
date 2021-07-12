@@ -10,13 +10,11 @@ namespace app\clouds\base\action;
 
 use app\clouds\base\errors\CloudException;
 use app\clouds\base\helpers\FuncHelper;
-use app\clouds\base\helpers\IdentityHelper;
 use app\clouds\base\module\Module;
 use app\clouds\base\project\Project;
 use app\clouds\base\route\Route;
 use app\clouds\base\tables\CloudAction;
 use app\clouds\base\tables\CloudProject;
-use app\clouds\base\tables\CloudUser;
 use app\clouds\base\tables\CloudUserApp;
 use app\clouds\base\tables\CloudUserAppRouteList;
 use app\clouds\base\tables\Table;
@@ -39,23 +37,21 @@ abstract class Action extends BaseObject
     }
 
     /**
-     * 访问权限判断
-     * @return bool
+     * 获取项目对象
+     * @return Project
      */
-    public function allowAccess()
+    public function getProject()
     {
+        return $this->project;
+    }
 
-        $access = false;
-        $identity = IdentityHelper::getIdentity();
-        if($this->actionModel->security == "public" || ($identity && $identity->getId() == $this->actionModel->author_id)) {
-            $access = true;
-        }else{ //授权访问
-            echo 'here';
-            exit;
-            $access = false;
-        }
-
-        return false;
+    /**
+     * 获取模块对象
+     * @return Module
+     */
+    public function getModule()
+    {
+        return $this->module;
     }
 
     /**
@@ -83,7 +79,7 @@ abstract class Action extends BaseObject
             throw new CloudException("”".$routeItem->action_id."“功能不存在");
         }
 
-        $project = static::getProject($actionModel->project_id);
+        $project = static::findProject($actionModel->project_id);
 
         $module = $project->getModule($actionModel->module_id);
 
@@ -96,7 +92,7 @@ abstract class Action extends BaseObject
      * @return Project
      * @throws CloudException
      */
-    protected static function getProject($project_id)
+    protected static function findProject($project_id)
     {
         $projectModel = Table::findOne(CloudProject::class, $project_id);
         if(!$projectModel || $projectModel->is_deleted)
@@ -129,4 +125,12 @@ abstract class Action extends BaseObject
         return "app\\clouds\\apps\\" . implode("\\", $dirs);
     }
 
+    /**
+     * 返回云操作数据对象模型
+     * @return CloudAction
+     */
+    public function getModel()
+    {
+        return $this->actionModel;
+    }
 }

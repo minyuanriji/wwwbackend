@@ -8,9 +8,11 @@
  */
 namespace app\clouds;
 
+use app\clouds\auth\AccessAuth;
 use app\clouds\base\action\Action;
 use app\clouds\base\consts\Code;
 use app\clouds\base\errors\CloudException;
+use app\clouds\base\helpers\IdentityHelper;
 use app\clouds\base\route\Route;
 use app\clouds\base\tables\CloudUserApp;
 use app\clouds\base\tables\Table;
@@ -35,9 +37,10 @@ class AppEngine extends BaseObject
         $action = Action::find($userApp, $route);
 
         //访问权限判断
-        if(!$action->allowAccess())
+        $auth = new AccessAuth($action);
+        if(!$auth->pass())
         {
-            throw new CloudException("无权限访问", Code::ACTION_NOT_ALLOW_ACCESS);
+            throw new CloudException("无权限访问:" . $action->getModel()->class_dir, Code::ACTION_NOT_ALLOW_ACCESS);
         }
 
         //设置操作命名空间

@@ -13,6 +13,7 @@ namespace app\clouds\base\tables;
 /**
  * Class CloudModule
  * @package app\clouds\tables
+ * @property integer $author_id
  * @property integer $project_id
  * @property string  $name
  * @property string  $class_dir
@@ -29,7 +30,7 @@ class CloudModule extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['project_id', 'name', 'class_dir'], 'required'],
+            [['author_id', 'project_id', 'name', 'class_dir'], 'required'],
             [['is_deleted', 'deleted_at'], 'safe']
         ];
     }

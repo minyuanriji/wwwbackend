@@ -12,7 +12,7 @@ Yii::$app->loadComponentView('com-dialog-select');
             </div>
         </div>
         <div class="table-body">
-            筛选
+            类型筛选
                 <el-select style="width: 120px;" size="small" v-model="is_manual" @change='search'>
                     <el-option key="all" label="全部" value=""></el-option>
                     <el-option key="1" label="管理员操作" value="1"></el-option>
@@ -120,7 +120,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     price: 0.00,
                     nickname: '',
                     remark: '',
-                    is_manual: '',
+                    is_manual: 1,
                 },
                 forDlgSelect:{
                     visible: false,

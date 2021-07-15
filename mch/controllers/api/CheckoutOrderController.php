@@ -1,12 +1,19 @@
 <?php
 namespace app\mch\controllers\api;
 
+use app\controllers\api\filters\LoginFilter;
 use app\mch\forms\api\CheckoutOrderInfoForm;
 use app\mch\forms\api\CheckoutOrderPayForm;
 use app\mch\forms\api\CheckoutOrderQrcodeForm;
 
 class CheckoutOrderController extends MchMApiController {
 
+    public function beforeAction($action){
+        if($action->id != "qrcode"){
+            $this->check_auth = false;
+        }
+        return parent::beforeAction($action);
+    }
 
     /**
      * 生成结账单
@@ -16,6 +23,7 @@ class CheckoutOrderController extends MchMApiController {
      * @throws \yii\db\Exception
      */
     public function actionQrcode(){
+
         $form = new CheckoutOrderQrcodeForm();
         $form->attributes = $this->requestData;
         $form->mch_id = $this->mch_id;

@@ -10,6 +10,7 @@ use app\plugins\mch\models\MchSubAccount;
 
 class MchMApiController extends ApiController{
 
+    protected $check_auth = true;
     protected $mch_id;
     protected $mchData;
     protected $is_sub = false;
@@ -27,7 +28,7 @@ class MchMApiController extends ApiController{
 
         $cleanSubHeader = false;
         try {
-            if($beforeAction){
+            if($beforeAction && $this->check_auth){
 
                 $headers = \Yii::$app->request->headers;
                 $subMchId = $headers['x-sub-mch-id'];
@@ -61,10 +62,9 @@ class MchMApiController extends ApiController{
 
                 $this->mch_id  = $mchData['id'];
                 $this->mchData = $mchData;
+
+                $this->checkAuth($action);
             }
-
-            $this->checkAuth($action);
-
         }catch (\Exception $e){
             \Yii::$app->response->data = [
                 'code' => ApiCode::CODE_FAIL,

@@ -28,6 +28,7 @@ use app\models\UserCoupon;
 use app\plugins\boss\models\Boss;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
+use app\plugins\mch\models\MchSubAccount;
 
 class UserForm extends BaseModel
 {
@@ -291,12 +292,6 @@ class UserForm extends BaseModel
         ])->one();
         if($mch && !$mch->is_delete && $mch->review_status == Mch::REVIEW_STATUS_CHECKED){
             $userCenter['menus'][] = [
-                "icon_url"  => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
-                "name"      => "商户",
-                "link_url"  => "/pages/personalCentre/personalCentre",
-                "open_type" => "navigate"
-            ];
-            $userCenter['menus'][] = [
                 "icon_url"  => "https://www.mingyuanriji.cn/web/static/stock_img.png",
                 "name"      => "进货专区",
                 "link_url"  => "/pages/diy/diy?page_id=103",
@@ -308,6 +303,27 @@ class UserForm extends BaseModel
                 "link_url"  => "/pages/personalCentre/accountingOrder/accountingOrder",
                 "open_type" => "navigate"
             ];
+        }
+        if($mch && !$mch->is_delete && $mch->review_status == Mch::REVIEW_STATUS_CHECKED) {
+            $userCenter['menus'][] = [
+                "icon_url" => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                "name" => "商户",
+                "link_url" => "/pages/personalCentre/personalCentre",
+                "open_type" => "navigate"
+            ];
+        }elseif(!\Yii::$app->user->isGuest){ //商户子账号
+            $subAccountCount = MchSubAccount::find()->where([
+                'mall_id' => \Yii::$app->mall->id,
+                'user_id' => \Yii::$app->user->id
+            ])->count();
+            if($subAccountCount){
+                $userCenter['menus'][] = [
+                    "icon_url" => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                    "name" => "商户",
+                    "link_url" => "/pages/personalCentre/subAccount/chooseToEnter/chooseToEnter",
+                    "open_type" => "navigate"
+                ];
+            }
         }
 
         //酒店订单

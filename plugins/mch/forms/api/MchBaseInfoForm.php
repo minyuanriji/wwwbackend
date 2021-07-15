@@ -4,6 +4,7 @@ namespace app\plugins\mch\forms\api;
 
 
 use app\core\ApiCode;
+use app\helpers\CityHelper;
 use app\models\BaseModel;
 use app\models\Goods;
 use app\models\Order;
@@ -60,6 +61,13 @@ class MchBaseInfoForm extends BaseModel{
                     $mchInfo['mch_status'] = $mchApply->status;
                 }
             }
+
+            $city = CityHelper::reverseData($mchInfo['store']['district_id'],
+                $mchInfo['store']['city_id'], $mchInfo['store']['province_id']);
+            $baseData['store']['province'] = $city['province'];
+            $baseData['store']['city'] = $city['city'];
+            $baseData['store']['district'] = $city['district'];
+
             $baseData['mch_status'] = $mchInfo['mch_status'];
             $baseData['store']      = $mchInfo['store'];
             $baseData['category']   = $mchInfo['category'];

@@ -6,6 +6,7 @@ namespace app\plugins\mch\forms\api;
 use app\core\ApiCode;
 use app\helpers\CityHelper;
 use app\models\BaseModel;
+use app\models\EfpsMchReviewInfo;
 use app\models\Goods;
 use app\models\Order;
 use app\plugins\mch\models\Mch;
@@ -33,7 +34,8 @@ class MchBaseInfoForm extends BaseModel{
                 'store'      => null,
                 'category'   => null,
                 'stat'       => null,
-                'mch_mobile' => ''
+                'mch_mobile' => '',
+                'settle'     => []
             ];
 
             $mchInfo = Mch::find()->where([
@@ -94,6 +96,16 @@ class MchBaseInfoForm extends BaseModel{
 
             $baseData['mch_mobile'] = $mchInfo['mobile'];
 
+            //获取结算信息
+            $efpsReviewInfo = EfpsMchReviewInfo::find()->where([
+                "mch_id" => $mchInfo['id']
+            ])->select([
+                "paper_settleAccountType", "paper_settleAccountNo",
+                "paper_settleAccount", "paper_settleTarget", "paper_openBank"
+            ])->one();
+            if($efpsReviewInfo){
+                $baseData['settle'] = $efpsReviewInfo;
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

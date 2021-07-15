@@ -65,9 +65,9 @@ class MchBaseInfoForm extends BaseModel{
             $baseData['store'] = $mchInfo['store'];
             $city = CityHelper::reverseData($mchInfo['store']['district_id'],
                 $mchInfo['store']['city_id'], $mchInfo['store']['province_id']);
-            $baseData['store']['province'] = $city['province'];
-            $baseData['store']['city'] = $city['city'];
-            $baseData['store']['district'] = $city['district'];
+            $baseData['store']['province'] = $city['province'] ? $city['province']['name'] : '';
+            $baseData['store']['city'] = $city['city'] ? $city['city']['name'] : '';
+            $baseData['store']['district'] = $city['district'] ? $city['district']['name'] : '';
 
             $baseData['mch_status'] = $mchInfo['mch_status'];
             $baseData['category']   = $mchInfo['category'];

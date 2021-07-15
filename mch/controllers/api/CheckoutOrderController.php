@@ -1,23 +1,12 @@
 <?php
 namespace app\mch\controllers\api;
 
-use app\controllers\api\ApiController;
-
-use app\controllers\api\filters\LoginFilter;
 use app\mch\forms\api\CheckoutOrderInfoForm;
 use app\mch\forms\api\CheckoutOrderPayForm;
 use app\mch\forms\api\CheckoutOrderQrcodeForm;
-use Yii;
 
-class CheckoutOrderController extends ApiController{
+class CheckoutOrderController extends MchMApiController {
 
-    public function behaviors(){
-        return array_merge(parent::behaviors(), [
-            'login' => [
-                'class' => LoginFilter::class,
-            ]
-        ]);
-    }
 
     /**
      * 生成结账单
@@ -29,6 +18,7 @@ class CheckoutOrderController extends ApiController{
     public function actionQrcode(){
         $form = new CheckoutOrderQrcodeForm();
         $form->attributes = $this->requestData;
+        $form->mch_id = $this->mch_id;
 
         return $this->asJson($form->getQrcode());
     }

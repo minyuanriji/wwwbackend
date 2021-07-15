@@ -69,9 +69,10 @@ class MchBaseInfoForm extends BaseModel{
             $baseData['store']['city'] = $city['city'] ? $city['city']['name'] : '';
             $baseData['store']['district'] = $city['district'] ? $city['district']['name'] : '';
 
-            $baseData['mch_status'] = $mchInfo['mch_status'];
-            $baseData['category']   = $mchInfo['category'];
-            $baseData['stat']       = [
+            $baseData['mch_status']  = $mchInfo['mch_status'];
+            $baseData['category']    = $mchInfo['category'];
+            $baseData['bind_mobile'] = $mchInfo['mobile'];
+            $baseData['stat']        = [
                 'account_money' => (float)$mchInfo['account_money'],
                 'order_num'     => 0,
                 'goods_num'     => 0

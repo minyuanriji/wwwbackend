@@ -105,7 +105,7 @@ class BindDeviceForm extends BaseModel{
 
                 $user = User::findOne($mch->user_id);
                 if(!$user || $user->is_delete){
-                    throw new \Exception("无法获取到商户所属小程序账号");
+                    throw new \Exception("无法获取到商户小程序账号");
                 }
 
                 $user->auth_key = \Yii::$app->security->generateRandomString();
@@ -124,6 +124,7 @@ class BindDeviceForm extends BaseModel{
                     'auth_key'     => $user->auth_key,
                     'mobile'       => $this->mobile,
                     'mch_id'       => (int)$mch->id,
+                    'is_sub'       => $subUser ? 1 : 0,
                     'access_token' => $subUser ? $subUser->access_token : $user->access_token
                 ]
             ];

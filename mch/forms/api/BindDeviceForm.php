@@ -123,7 +123,7 @@ class BindDeviceForm extends BaseModel{
                 'data' => [
                     'auth_key'     => $user->auth_key,
                     'mobile'       => $this->mobile,
-                    'mch_id'       => $mch->id,
+                    'mch_id'       => (int)$mch->id,
                     'access_token' => $subUser ? $subUser->access_token : $user->access_token
                 ]
             ];

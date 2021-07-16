@@ -2,7 +2,7 @@
 
 namespace app\plugins\mch\controllers\api\filter;
 
-use app\core\response\ApiCode;
+use app\core\ApiCode;
 use yii\base\ActionFilter;
 
 class MchLoginFilter extends ActionFilter

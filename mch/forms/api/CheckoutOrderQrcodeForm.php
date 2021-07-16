@@ -14,10 +14,11 @@ use app\plugins\mch\models\Mch;
 class CheckoutOrderQrcodeForm extends BaseModel {
 
     public $route;
+    public $mch_id;
 
     public function rules(){
         return [
-            [['route'], 'required'],
+            [['mch_id', 'route'], 'required'],
             [['route'], 'string']
         ];
     }
@@ -31,7 +32,7 @@ class CheckoutOrderQrcodeForm extends BaseModel {
         try {
             //获取商户
             $mchModel = Mch::findOne([
-                'user_id'       => \Yii::$app->user->id,
+                'id'            => $this->mch_id,
                 'review_status' => Mch::REVIEW_STATUS_CHECKED,
                 'is_delete'     => 0
             ]);

@@ -25,6 +25,8 @@ class WsServerController extends BaseCommandController {
                 return;
             }
 
+			$this->commandOut($frame->data);
+	
             $data = (array)@json_decode($frame->data, true);
 
             $action = !empty($data['action']) ? "messageAction" . $data['action'] : "invalidAction";

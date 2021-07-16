@@ -18,11 +18,13 @@ use app\models\BaseModel;
 use app\models\Order;
 use app\models\CommonOrder;
 use app\models\MemberLevel;
+use app\models\Store;
 use app\models\User;
 use app\models\UserChildren;
 use app\models\PriceLog;
 use app\models\UserRelationshipLink;
 use app\plugins\commission\models\CommissionGoodsPriceLog;
+use app\plugins\mch\models\Mch;
 
 class UserTeamForm extends BaseModel
 {
@@ -253,6 +255,14 @@ class UserTeamForm extends BaseModel
                     ["IN", "user_id", $teamQuery->select(["ut.id"])]
                 ])->sum("total_goods_original_price"), 2);
 
+                //获取店铺名
+                $mch = Mch::findOne(['user_id' => $user->id]);
+                if ($mch) {
+                    $store = Store::findOne(['mch_id' => $mch->id]);
+                    $item['store_name'] = $store ? $store->name : '无';
+                } else {
+                    $item['store_name'] = '无';
+                }
                 $list[] = $item;
             }
         }

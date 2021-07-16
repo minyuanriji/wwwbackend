@@ -53,6 +53,7 @@ class Integral extends BaseActiveRecord
             ['status','in','range'=>[self::STATUS_WAIT,self::STATUS_DOING,self::STATUS_FINISH]],
             ['period_unit','in','range'=>[self::UNIT_MONTH,self::UNIT_WEEK]],
             ['type','in','range'=>[self::TYPE_ALWAYS,self::TYPE_DYNAMIC]],
+            [['source_id', 'source_type'], 'safe']
 
         ];
     }

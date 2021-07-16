@@ -213,10 +213,14 @@ class IntegralLogic{
                     //确保只赠送一次
                     $integral_setting['period'] = 1;
 
+                    $integral_setting['source_type'] = "goods_order";
+                    $integral_setting['source_id'] = $order_detail->id;
+
+                    $desc = '购买商品[ID:'.$goods_id.']赠送红包券，支付金额：' . $order_detail->total_original_price;
                     if($type == 'paid' && $is_order_paid && $order_paid['is_integral_card']){  //商品订单设置支付状态下执行
-                        Integral::addIntegralPlan($user_id, $integral_setting,'购买商品赠送红包券','1');
+                        Integral::addIntegralPlan($user_id, $integral_setting,$desc,'1');
                     }elseif(!$is_order_paid){ //商品订单不设置支付状态下执行
-                        Integral::addIntegralPlan($user_id, $integral_setting,'购买商品赠送红包券','1');
+                        Integral::addIntegralPlan($user_id, $integral_setting,$desc,'1');
                     }
                 }
             }

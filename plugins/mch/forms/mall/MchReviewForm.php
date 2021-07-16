@@ -29,7 +29,7 @@ class MchReviewForm extends BaseModel{
 
             $query = MchApply::find()->alias("ma");
             $query->innerJoin(["u" => User::tableName()], "u.id=ma.user_id");
-            $query->innerJoin(["p" => User::tableName()], "p.id=u.parent_id");
+            $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
 
             if($this->review_status == "special_discount"){ //特殊折扣申请
                 $query->andWhere(["ma.is_special_discount" => 1]);

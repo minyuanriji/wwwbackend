@@ -7,8 +7,10 @@ use app\models\BaseModel;
 use app\models\EfpsMchReviewInfo;
 use app\models\Store;
 use app\models\User;
+use app\plugins\mch\forms\api\MchApplyOperationLogSaveForm;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
+use app\plugins\mch\models\MchApplyOperationLog;
 
 class MchApplyPassForm extends BaseModel{
 
@@ -22,7 +24,8 @@ class MchApplyPassForm extends BaseModel{
         ];
     }
 
-    public function save(){
+    public function save ($operation_terminal = MchApplyOperationLog::OPERATION_TERMINAL_BACKSTAGE)
+    {
         if(!$this->validate()){
             return $this->responseErrorInfo();
         }
@@ -31,11 +34,11 @@ class MchApplyPassForm extends BaseModel{
         try {
             $applyModel = MchApply::findOne($this->id);
             if (!$applyModel) {
-                throw new \Exception("申请记录不存在");
+                throw new \Exception("申请记录不存在", ApiCode::CODE_FAIL);
             }
 
             if ($applyModel->status != "verifying") {
-                throw new \Exception("非审核中状态无法操作");
+                throw new \Exception("非审核中状态无法操作", ApiCode::CODE_FAIL);
             }
 
             //绑定手机号唯一值检查
@@ -45,12 +48,12 @@ class MchApplyPassForm extends BaseModel{
                 "user_id <> '".$applyModel->user_id."'"
             ])->exists();
             if($existsMobile){
-                throw new \Exception("手机“".$this->bind_mobile."”已被其它商户绑定");
+                throw new \Exception("手机“".$this->bind_mobile."”已被其它商户绑定", ApiCode::CODE_FAIL);
             }
 
             $user = User::findOne($applyModel->user_id);
             if(!$user || $user->is_delete){
-                throw new \Exception("无法获取到用户信息");
+                throw new \Exception("无法获取到用户信息", ApiCode::CODE_FAIL);
             }
 
 
@@ -66,11 +69,19 @@ class MchApplyPassForm extends BaseModel{
             $applyModel->status     = "passed";
             $applyModel->updated_at = time();
             if(!$applyModel->save()){
-                throw new \Exception($this->responseErrorMsg($applyModel));
+                throw new \Exception($this->responseErrorMsg($applyModel), ApiCode::CODE_FAIL);
             }
 
-            $trans->commit();
+            if ($operation_terminal == MchApplyOperationLog::OPERATION_TERMINAL_BACKSTAGE) {
+                $user_id = \Yii::$app->admin->id;
+            } else {
+                $user_id = \Yii::$app->user->id;
+            }
+            $operation_save = MchApplyOperationLogSaveForm::addOperationLog($applyModel->mall_id, $applyModel->id, $operation_terminal, $user_id, MchApplyOperationLog::OPERATION_PASSED);
+            if ($operation_save['code'] != ApiCode::CODE_SUCCESS)
+                throw new \Exception(isset($operation_save['msg']) ? $operation_save['msg'] : $operation_save['message'], ApiCode::CODE_FAIL);
 
+            $trans->commit();
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg'  => '操作成功'
@@ -112,7 +123,7 @@ class MchApplyPassForm extends BaseModel{
 
         $mch->mch_common_cat_id   = $applyData['store_mch_common_cat_id'];
         $mch->review_status       = Mch::REVIEW_STATUS_CHECKED; //状态通过
-        $mch->review_time         = time();
+        $mch->review_time         = date('Y-m-d H:i:s', time());
         $mch->realname            = $applyModel->realname;
         $mch->mobile              = $this->bind_mobile;
         $mch->updated_at          = time();

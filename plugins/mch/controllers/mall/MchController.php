@@ -4,6 +4,7 @@ namespace app\plugins\mch\controllers\mall;
 
 use app\plugins\Controller;
 use app\plugins\mch\forms\mall\MchEditForm;
+use app\plugins\mch\forms\mall\MchExamineLogForm;
 use app\plugins\mch\forms\mall\MchForm;
 use app\plugins\mch\forms\mall\MchListExportForm;
 use app\plugins\mch\forms\mall\MchMallSettingEditForm;
@@ -145,4 +146,16 @@ class MchController extends Controller
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->editSort());
     }
+
+    public function actionExamineLog()
+    {
+        if (\Yii::$app->request->isAjax) {
+            $form = new MchExamineLogForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->getList());
+        } else {
+            return $this->render('examine-log');
+        }
+    }
+
 }

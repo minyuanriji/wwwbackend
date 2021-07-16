@@ -1,5 +1,5 @@
 <?php
-namespace app\plugins\hotel\forms\api\order;
+namespace app\plugins\addcredit\forms\api\order;
 
 
 use app\core\ApiCode;
@@ -61,6 +61,8 @@ class PhoneOrderSubmitForm extends BaseModel
                 "created_at"                => time(),
                 "updated_at"                => time(),
                 "integral_deduction_price"  => $this->order_price,
+                "order_status"              => 'unpaid',
+                "pay_status"                => 'unpaid',
             ]);
             if(!$order->save()){
                 throw new \Exception($this->responseErrorMsg($order));

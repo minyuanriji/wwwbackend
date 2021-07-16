@@ -74,6 +74,11 @@ class Plugin extends \app\plugins\Plugin
                 'icon' => 'el-icon-star-on',
             ],
             [
+                'name' => '门店审核日志',
+                'route' => 'plugin/mch/mall/mch/examine-log',
+                'icon' => 'el-icon-star-on',
+            ],
+            [
                 'name' => '所售类目',
                 'route' => 'plugin/mch/mall/common-cat/index',
                 'icon' => 'el-icon-star-on',

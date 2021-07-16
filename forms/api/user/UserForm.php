@@ -27,6 +27,7 @@ use app\models\UserCard;
 use app\models\UserCoupon;
 use app\plugins\boss\models\Boss;
 use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchApply;
 
 class UserForm extends BaseModel
 {
@@ -59,10 +60,27 @@ class UserForm extends BaseModel
             'is_delete' => 0
         ])->with(["store", "category"])->asArray()->one();
         if($mchInfo){
-            $returnData['is_mch']   = 1;
-            $returnData['store']    = $mchInfo['store'];
-            $returnData['category'] = $mchInfo['category'];
-            $returnData['stat']     = [
+            $returnData['is_mch']     = 1;
+            if($mchInfo['review_status'] == Mch::REVIEW_STATUS_CHECKED){
+                $mchInfo['mch_status'] = "passed";
+            }else{
+                $mchApply = MchApply::findOne(["user_id" => $mchInfo['user_id']]);
+                if($mchApply && $mchApply->status == "passed"){
+                    $mchApply->status = "applying";
+                    if(!$mchApply->save()){
+                        throw new \Exception($this->responseErrorMsg($mchApply));
+                    }
+                }
+                if(!$mchApply){
+                    $mchInfo['mch_status'] = "applying";
+                }else{
+                    $mchInfo['mch_status'] = $mchApply->status;
+                }
+            }
+            $returnData['mch_status'] = $mchInfo['mch_status'];
+            $returnData['store']      = $mchInfo['store'];
+            $returnData['category']   = $mchInfo['category'];
+            $returnData['stat']       = [
                 'account_money' => (float)$mchInfo['account_money'],
                 'order_num'     => 0,
                 'goods_num'     => 0
@@ -273,7 +291,7 @@ class UserForm extends BaseModel
         ])->one();
         if($mch && !$mch->is_delete && $mch->review_status == Mch::REVIEW_STATUS_CHECKED){
             $userCenter['menus'][] = [
-                "icon_url"  => "https://www.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                "icon_url"  => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
                 "name"      => "商户",
                 "link_url"  => "/pages/personalCentre/personalCentre",
                 "open_type" => "navigate"

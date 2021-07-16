@@ -36,20 +36,17 @@
         <div slot="header">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <span v-if="is_audit == 1" style="color: #409EFF;cursor: pointer"
-                          @click="$navigate({r:'plugin/mch/mall/mch/edit'})">入驻审核</span>
-                    <span v-if="is_audit == 0" style="color: #409EFF;cursor: pointer"
+                     <span style="color: #409EFF;cursor: pointer"
                           @click="$navigate({r:'plugin/mch/mall/mch/index'})">商户列表</span>
                 </el-breadcrumb-item>
-                <el-breadcrumb-item v-if="is_audit == 1">审核</el-breadcrumb-item>
-                <el-breadcrumb-item v-if="is_audit == 0">添加商户</el-breadcrumb-item>
+                <el-breadcrumb-item >编辑商户</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="form-body">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="160px" size="small">
                  <el-tabs v-model="activeName">
                     <el-tab-pane label="基本信息" name="basic">
-                        <el-form-item label="小程序用户" prop="user_id">
+                        <el-form-item label="绑定用户" prop="user_id">
                             <el-input style="display: none;" v-model="ruleForm.user_id"></el-input>
                             <el-input disabled v-model="nickname">
                                 <template slot="append">
@@ -89,19 +86,6 @@
                                     active-value="1"
                                     inactive-value="0">
                             </el-switch>
-                        </el-form-item>
-
-                        <el-form-item label="特殊折扣" prop="special_rate" v-if="ruleForm.is_special == '1'">
-                            <label slot="label" style="color: red">特殊折扣</label>
-                            <el-input disabled type="number" v-model.number="ruleForm.special_rate">
-                                <template slot="append">%</template>
-                            </el-input>
-                        </el-form-item>
-
-                        <el-form-item label="特殊折扣" prop="special_rate" v-if="ruleForm.is_special == '1'">
-                            <label slot="label" style="color: red">特殊折扣申请理由</label>
-                            <el-input disabled type="text" v-model.number="ruleForm.special_rate_remark">
-                            </el-input>
                         </el-form-item>
 
                         <el-form-item label="提现手续费" prop="transfer_rate">
@@ -251,327 +235,16 @@
                             </el-form-item>
                         </template>
                     </el-tab-pane>
-                    <el-tab-pane label="审核信息" name="review_info">
-
-                        <el-tabs v-model="review_status_activeName" type="border-card">
-                            <el-tab-pane label="审核状态" name="tab_review_status">
-                                <el-form-item label="进件商户" prop="register_type">
-                                    <el-radio v-model="review.register_type" label="separate_account">分账商户</el-radio>
-                                    <el-radio v-model="review.register_type" label="common">标准商户</el-radio>
-                                </el-form-item>
-                                <el-form-item v-if="review.register_type != 'separate_account'" label="是否收单" prop="acceptOrder">
-                                    <el-switch
-                                            v-model="review.acceptOrder"
-                                            active-value="1"
-                                            inactive-value="0">
-                                    </el-switch>
-                                </el-form-item>
-                                <el-form-item v-if="review.register_type != 'separate_account'" label="是否开户" prop="openAccount">
-                                    <el-switch
-                                            v-model="review.openAccount"
-                                            active-value="1"
-                                            inactive-value="0">
-                                    </el-switch>
-                                </el-form-item>
-                                <template>
-                                    <el-form-item label="审核状态" prop="review_status">
-                                        <el-radio v-model="ruleForm.review_status" label="1">审核通过</el-radio>
-                                        <el-radio v-model="ruleForm.review_status" label="2">审核不通过</el-radio>
-                                    </el-form-item>
-                                    <el-form-item label="审核结果">
-                                        <el-input v-model="ruleForm.review_remark" type="textarea" :row="5"></el-input>
-                                    </el-form-item>
-                                </template>
-                            </el-tab-pane name="review_info">
-                            <el-tab-pane v-if="review.register_type != 'separate_account'" label="营业执照" name="tab_review_license">
-                                <el-form-item label="商户类型" prop="paper_merchantType">
-                                    <el-radio v-model="review.paper_merchantType" label="1">个体</el-radio>
-                                    <el-radio v-model="review.paper_merchantType" label="2">企业</el-radio>
-                                    <el-radio v-model="review.paper_merchantType" label="3">个人</el-radio>
-                                </el-form-item>
-                                <el-form-item v-if="review.paper_merchantType==1 || review.paper_merchantType==2" label="营业执照号" prop="paper_businessLicenseCode">
-                                    <el-input v-model="review.paper_businessLicenseCode"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.paper_merchantType==1 || review.paper_merchantType==2" label="商户经营名称" prop="paper_businessLicenseName">
-                                    <el-input v-model="review.paper_businessLicenseName"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1 && (review.paper_merchantType==1 || review.paper_merchantType==2)" label="营业执照照片" prop="paper_businessLicensePhoto">
-                                    <com-attachment :multiple="false" :max="1" v-model="review.paper_businessLicensePhoto">
-                                        <el-tooltip class="item"
-                                                    effect="dark"
-                                                    placement="top">
-                                            <el-button size="mini">选择文件</el-button>
-                                        </el-tooltip>
-                                    </com-attachment>
-                                    <com-image mode="aspectFill" width='80px' height='80px' :src="review.paper_businessLicensePhoto">
-                                    </com-image>
-                                </el-form-item>
-                                <el-form-item v-if="review.paper_merchantType==1 || review.paper_merchantType==2" label="营业执照有效期（截止）" prop="paper_businessLicenseTo">
-                                    <el-date-picker
-                                            v-model="review.paper_businessLicenseTo"
-                                            type="datetime"
-                                            placeholder="选择日期">
-                                    </el-date-picker>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 || (review.acceptOrder==0 && (review.paper_merchantType==1 || review.paper_merchantType==2))" label="商户简称" prop="paper_shortName">
-                                    <el-input v-model="review.paper_shortName"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.paper_merchantType==1 || review.paper_merchantType==2" label="营业执照类型" prop="paper_isCc">
-                                    <el-radio v-model="review.paper_isCc" label="1">已3证合一</el-radio>
-                                    <el-radio v-model="review.paper_isCc" label="0">未3证合一</el-radio>
-                                </el-form-item>
-                                <el-form-item v-if="review.paper_merchantType==1 || review.paper_merchantType==2" label="法人姓名" prop="paper_lawyerName">
-                                    <el-input v-model="review.paper_lawyerName"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.paper_merchantType==1 || review.paper_merchantType==2" label="经营范围" prop="paper_businessScope">
-                                    <el-input :rows="2" type="textarea" v-model="review.paper_businessScope"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.paper_merchantType==1 || review.paper_merchantType==2" label="注册地址" prop="paper_registerAddress">
-                                    <el-input v-model="review.paper_registerAddress"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.paper_isCc==0 && (review.paper_merchantType==1 || review.paper_merchantType==2)" label="组织机构代码" prop="paper_organizationCode">
-                                    <el-input v-model="review.paper_organizationCode"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.paper_isCc==0 && (review.paper_merchantType==1 || review.paper_merchantType==2)" label="组织机构代码照片" prop="paper_organizationCodePhoto">
-                                    <com-attachment :multiple="false" :max="1" v-model="review.paper_organizationCodePhoto">
-                                        <el-tooltip class="item"
-                                                    effect="dark"
-                                                    placement="top">
-                                            <el-button size="mini">选择文件</el-button>
-                                        </el-tooltip>
-                                    </com-attachment>
-                                    <com-image mode="aspectFill" width='80px' height='80px' :src="review.paper_organizationCodePhoto">
-                                    </com-image>
-                                </el-form-item>
-
-                                <el-form-item v-if="review.paper_isCc==0 && (review.paper_merchantType==1 || review.paper_merchantType==2)" label="组织机构代码有效期（起始）" prop="paper_organizationCodeFrom">
-                                    <el-date-picker
-                                            v-model="review.paper_organizationCodeFrom"
-                                            type="datetime"
-                                            placeholder="选择日期">
-                                    </el-date-picker>
-                                </el-form-item>
-                                <el-form-item v-if="review.paper_isCc==0 && (review.paper_merchantType==1 || review.paper_merchantType==2)" label="组织机构代码有效期（截止）" prop="paper_organizationCodeTo">
-                                    <el-date-picker
-                                            v-model="review.paper_organizationCodeTo"
-                                            type="datetime"
-                                            placeholder="选择日期">
-                                    </el-date-picker>
-                                </el-form-item>
-
-                            </el-tab-pane>
-                            <el-tab-pane label="位置及环境" name="tab_review_place">
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1" label="经营地址" prop="paper_businessAddress">
-                                    <el-input v-model="review.paper_businessAddress"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1" label="省/市" prop="paper_province_city">
-                                    <el-cascader
-                                            v-model="paperProvinceCityValue"
-                                            :options="paperProvinceCityOptions"
-                                            @change="paperProvinceCityChange"></el-cascader>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1" label="MCC 码" prop="paper_mcc">
-                                    <el-cascader
-                                            v-model="paperMerchantMccValue"
-                                            :options="paperMerchantMccOptions"
-                                            @change="paperMerchantMccChange"></el-cascader>
-                                </el-form-item>
-                                <el-form-item label="银联快捷简称" prop="paper_unionShortName">
-                                    <el-input v-model="review.paper_unionShortName"></el-input>
-                                </el-form-item>
-
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1 && (review.paper_merchantType==1 || review.paper_merchantType==2)" label="门店门头照" prop="paper_storeHeadPhoto">
-                                    <com-attachment :multiple="false" :max="1" v-model="review.paper_storeHeadPhoto">
-                                        <el-tooltip class="item"
-                                                    effect="dark"
-                                                    placement="top">
-                                            <el-button size="mini">选择文件</el-button>
-                                        </el-tooltip>
-                                    </com-attachment>
-                                    <com-image mode="aspectFill" width='80px' height='80px' :src="review.paper_storeHeadPhoto">
-                                    </com-image>
-                                </el-form-item>
-
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1 && (review.paper_merchantType==1 || review.paper_merchantType==2)" label="门店内景照" prop="paper_storeHallPhoto">
-                                    <com-attachment :multiple="false" :max="1" v-model="review.paper_storeHallPhoto">
-                                        <el-tooltip class="item"
-                                                    effect="dark"
-                                                    placement="top">
-                                            <el-button size="mini">选择文件</el-button>
-                                        </el-tooltip>
-                                    </com-attachment>
-                                    <com-image mode="aspectFill" width='80px' height='80px' :src="review.paper_storeHallPhoto">
-                                    </com-image>
-                                </el-form-item>
-
-                            </el-tab-pane>
-                            <el-tab-pane label="法人资料"  name="tab_review_lawyer">
-                                <el-form-item label="证件类型" prop="paper_lawyerCertType">
-                                    <el-select v-model="review.paper_lawyerCertType" placeholder="请选择">
-                                        <el-option
-                                                v-for="item in lawyerCertTypes"
-                                                :key="item.value"
-                                                :label="item.label"
-                                                :value="item.value">
-                                        </el-option>
-                                    </el-select>
-                                </el-form-item>
-                                <el-form-item label="证件号码" prop="paper_lawyerCertNo">
-                                    <el-input v-model="review.paper_lawyerCertNo"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1" label="证件正面照" prop="paper_lawyerCertPhotoFront">
-                                    <com-attachment :multiple="false" :max="1" v-model="review.paper_lawyerCertPhotoFront">
-                                        <el-tooltip class="item"
-                                                    effect="dark"
-                                                    placement="top">
-                                            <el-button size="mini">选择文件</el-button>
-                                        </el-tooltip>
-                                    </com-attachment>
-                                    <com-image mode="aspectFill" width='80px' height='80px' :src="review.paper_lawyerCertPhotoFront">
-                                    </com-image>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1" label="证件背面照" prop="paper_lawyerCertPhotoBack">
-                                    <com-attachment :multiple="false" :max="1" v-model="review.paper_lawyerCertPhotoBack">
-                                        <el-tooltip class="item"
-                                                    effect="dark"
-                                                    placement="top">
-                                            <el-button size="mini">选择文件</el-button>
-                                        </el-tooltip>
-                                    </com-attachment>
-                                    <com-image mode="aspectFill" width='80px' height='80px' :src="review.paper_lawyerCertPhotoBack">
-                                    </com-image>
-                                </el-form-item>
-                                <el-form-item label="证件人姓名" prop="paper_certificateName">
-                                    <el-input v-model="review.paper_certificateName"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="(review.acceptOrder==1 && review.openAccount==1) || (review.acceptOrder==1 && review.paper_merchantType!=3)" label="证件有效期（截止）" prop="paper_certificateTo">
-                                    <el-date-picker
-                                            v-model="review.paper_certificateTo"
-                                            type="datetime"
-                                            placeholder="选择日期">
-                                    </el-date-picker>
-                                </el-form-item>
-
-                            </el-tab-pane>
-                            <el-tab-pane label="联系人" name="tab_review_contact">
-                                <el-form-item v-if="review.acceptOrder==1" label="联系人姓名" prop="paper_contactPerson">
-                                    <el-input v-model="review.paper_contactPerson"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.openAccount==1" label="联系人手机号码" prop="paper_contactPhone">
-                                    <el-input v-model="review.paper_contactPhone"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1" label="客服电话" prop="paper_serviceTel">
-                                    <el-input v-model="review.paper_serviceTel"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1" label="邮箱地址" prop="paper_email">
-                                    <el-input v-model="review.paper_email"></el-input>
-                                </el-form-item>
-                            </el-tab-pane>
-                            <el-tab-pane v-if="review.register_type != 'separate_account'" label="对公账户" name="tab_review_account">
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1 && review.paper_merchantType==2" label="账户名" prop="paper_licenceAccount">
-                                    <el-input v-model="review.paper_licenceAccount"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1 && review.paper_merchantType==2" label="账号" prop="paper_licenceAccountNo">
-                                    <el-input v-model="review.paper_licenceAccountNo"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1 && review.paper_merchantType==2" label="开户银行" prop="paper_licenceOpenBank">
-                                    <el-input v-model="review.paper_licenceOpenBank"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1 && review.paper_merchantType==2" label="开户支行" prop="paper_licenceOpenSubBank">
-                                    <el-input v-model="review.paper_licenceOpenSubBank"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.acceptOrder==1 && review.openAccount==1 && review.paper_merchantType==2" label="证明文件（照片）" prop="paper_openingLicenseAccountPhoto">
-                                    <com-attachment :multiple="false" :max="1" v-model="review.paper_openingLicenseAccountPhoto">
-                                        <el-tooltip class="item"
-                                                    effect="dark"
-                                                    placement="top">
-                                            <el-button size="mini">选择文件</el-button>
-                                        </el-tooltip>
-                                    </com-attachment>
-                                    <com-image mode="aspectFill" width='80px' height='80px' :src="review.paper_openingLicenseAccountPhoto">
-                                    </com-image>
-                                </el-form-item>
-
-                            </el-tab-pane>
-                            <el-tab-pane label="结算账号" name="tab_review_settle">
-                                <el-form-item v-if="review.openAccount==1 || review.paper_merchantType==1 || review.paper_merchantType==2" label="结算账户类型" prop="paper_settleAccountType">
-                                    <el-radio v-if="review.register_type != 'separate_account'" v-model="review.paper_settleAccountType" label="1">对公账户</el-radio>
-                                    <el-radio v-model="review.paper_settleAccountType" label="2">法人账户</el-radio>
-                                    <el-radio v-if="review.register_type != 'separate_account'" v-model="review.paper_settleAccountType" label="3">授权对公</el-radio>
-                                    <el-radio v-if="review.register_type != 'separate_account'" v-model="review.paper_settleAccountType" label="4">授权对私</el-radio>
-                                </el-form-item>
-                                <el-form-item v-if="review.openAccount==1 || review.paper_merchantType==1 || review.paper_merchantType==2" label="结算账户号" prop="paper_settleAccountNo">
-                                    <el-input v-model="review.paper_settleAccountNo"></el-input>
-                                </el-form-item>
-                                <el-form-item v-if="review.openAccount==1 || review.paper_merchantType==1 || review.paper_merchantType==2" label="结算账户名" prop="paper_settleAccount">
-                                    <el-input v-model="review.paper_settleAccount"></el-input>
-                                </el-form-item>
-
-                                <el-form-item v-if="review.openAccount==1" label="结算账户类型" prop="paper_settleTarget">
-                                    <el-radio v-model="review.paper_settleTarget" label="1">自动提现</el-radio>
-                                    <el-radio v-model="review.paper_settleTarget" label="2">手动提现</el-radio>
-                                </el-form-item>
-
-                                <el-form-item v-if="review.paper_settleAccountType==3 || review.paper_settleAccountType==4" label="结算账户附件" prop="paper_settleAttachment">
-                                    <com-attachment :multiple="false" :max="1" v-model="review.paper_settleAttachment">
-                                        <el-tooltip class="item"
-                                                    effect="dark"
-                                                    placement="top">
-                                            <el-button size="mini">选择文件</el-button>
-                                        </el-tooltip>
-                                    </com-attachment>
-                                    <com-image mode="aspectFill" width='80px' height='80px' :src="review.paper_settleAttachment">
-                                    </com-image>
-                                </el-form-item>
-
-                                <el-form-item v-if="review.openAccount==1 || review.paper_merchantType==1 || review.paper_merchantType==2" label="开户银行" prop="paper_openBank">
-                                    <el-input v-model="review.paper_openBank"></el-input>
-                                </el-form-item>
-
-                                <el-form-item v-if="review.paper_settleAccountType==1" label="开户支行" prop="paper_openSubBank">
-                                    <el-input v-model="review.paper_openSubBank"></el-input>
-                                </el-form-item>
-
-                                <el-form-item v-if="review.paper_settleAccountType==1" label="开户行联行号" prop="paper_openBankCode">
-                                    <el-input v-model="review.paper_openBankCode"></el-input>
-                                </el-form-item>
-
-
-                            </el-tab-pane>
-
-                            <el-tab-pane label="业务信息" name="tab_review_business">
-                                <el-form-item v-if="review.register_type != 'separate_account'" label="业务代码" prop="paper_businessCode">
-                                    <el-input v-model="review.paper_businessCode"></el-input>
-                                </el-form-item>
-
-                                <el-form-item label="结算周期" prop="paper_settleCycle">
-                                    <el-radio v-model="review.paper_settleCycle" label="D+0">D+0</el-radio>
-                                    <el-radio v-model="review.paper_settleCycle" label="D+1">D+1</el-radio>
-                                    <el-radio v-model="review.paper_settleCycle" label="T+0">T+0</el-radio>
-                                    <el-radio v-model="review.paper_settleCycle" label="T+1">T+1</el-radio>
-                                </el-form-item>
-
-
-                                <el-form-item label="结算方式" prop="paper_stage_feeType">
-                                    <el-radio v-model="review.paper_stage_feeType" label="0">按比例</el-radio>
-                                    <el-radio v-model="review.paper_stage_feeType" label="1">单笔收费</el-radio>
-                                </el-form-item>
-
-                                <el-form-item v-if="review.paper_stage_feeType==0" label="比例值" prop="paper_stage_feeRate">
-                                    <el-input placeholder="请输入内容" v-model="review.paper_stage_feeRate">
-                                        <template slot="append">%</template>
-                                    </el-input>
-                                </el-form-item>
-
-                                <el-form-item v-else label="单笔收费" prop="paper_stage_feePer">
-                                    <el-input placeholder="请输入内容" v-model="review.paper_stage_feePer">
-                                        <template slot="append">元</template>
-                                    </el-input>
-                                </el-form-item>
-
-                            </el-tab-pane>
-                        </el-tabs>
-
+                    <el-tab-pane label="结算信息" name="settle_info">
+                        <el-form-item label="银行名称" prop="settle_bank">
+                            <el-input v-model="ruleForm.settle_bank"></el-input>
+                        </el-form-item>
+                        <el-form-item label="开户人" prop="settle_realname">
+                            <el-input v-model="ruleForm.settle_realname"></el-input>
+                        </el-form-item>
+                        <el-form-item label="银行卡号" prop="settle_num">
+                            <el-input v-model="ruleForm.settle_num"></el-input>
+                        </el-form-item>
                     </el-tab-pane>
                 </el-tabs>
 
@@ -661,7 +334,10 @@
                     service_mobile: '',
                     district: [],
                     form_data: [],
-                    integral_fee_rate:0
+                    integral_fee_rate:0,
+                    settle_bank: '',
+                    settle_realname: '',
+                    settle_num: ''
                 },
                 rules: {
                     user_id: [
@@ -689,80 +365,6 @@
                         {required: true, message: '是否开业', trigger: 'change'},
                     ],
                 },
-                review: {
-                    acqMerId: '',
-                    acceptOrder: '0',
-                    openAccount: '0',
-                    register_type: 'separate_account',
-                    paper_merchantType: 0,
-                    paper_businessLicenseCode: '',
-                    paper_businessLicenseName: '',
-                    paper_businessLicensePhoto: '',
-                    paper_businessLicenseTo: '',
-                    paper_shortName: '',
-                    paper_isCc: 0,
-                    paper_lawyerName: '',
-                    paper_businessScope: '',
-                    paper_registerAddress: '',
-                    paper_organizationCode: '',
-                    paper_organizationCodePhoto: '',
-                    paper_organizationCodeFrom: '',
-                    paper_organizationCodeTo: '',
-                    paper_businessAddress: '',
-                    paper_province: '',
-                    paper_city: '',
-                    paper_mcc: '',
-                    paper_unionShortName: '',
-                    paper_storeHeadPhoto: '',
-                    paper_storeHallPhoto: '',
-                    paper_lawyerCertType: 0,
-                    paper_lawyerCertNo: '',
-                    paper_lawyerCertPhotoFront: '',
-                    paper_lawyerCertPhotoBack: '',
-                    paper_certificateName: '',
-                    paper_certificateTo: '',
-                    paper_contactPerson: '',
-                    paper_contactPhone: '',
-                    paper_serviceTel: '',
-                    paper_email: '',
-                    paper_licenceAccount: '',
-                    paper_licenceAccountNo: '',
-                    paper_licenceOpenBank: '',
-                    paper_licenceOpenSubBank: '',
-                    paper_openingLicenseAccountPhoto: '',
-                    paper_settleAccountType: 0,
-                    paper_settleAccountNo: '',
-                    paper_settleAccount: '',
-                    paper_settleTarget: 0,
-                    paper_settleAttachment: '',
-                    paper_openBank: '',
-                    paper_openSubBank: '',
-                    paper_openBankCode: '',
-                    paper_businessCode: '',
-                    paper_settleCycle: '',
-                    paper_stage_feeRate: 0,
-                    paper_stage_feePer: 0,
-                    paper_stage_amountFrom: 0,
-                    paper_stage_feeType:0,
-                },
-                lawyerCertTypes: [
-                    {value: 0, label: '身份证'},
-                    {value: 1, label: '居住证'},
-                    {value: 2, label: '签证'},
-                    {value: 3, label: '护照'},
-                    {value: 4, label: '户口本'},
-                    {value: 5, label: '军人证'},
-                    {value: 6, label: '团员证'},
-                    {value: 7, label: '党员证'},
-                    {value: 8, label: '港澳通行证'},
-                    {value: 9, label: '台胞证'},
-                    {value: 11, label: '临时身份证'},
-                    {value: 12, label: '回乡证'},
-                    {value: 13, label: '营业执照'},
-                    {value: 14, label: '组织机构代码证'},
-                    {value: 15, label: '驾驶证'},
-                    {value: 99, label: '其他'}
-                ],
                 btnLoading: false,
                 tableLoading: false,
                 cardLoading: false,
@@ -783,30 +385,12 @@
                 dialogImg: false,
                 click_img: '',
                 activeName: 'basic',
-                review_status_activeName: 'tab_review_status',
-
-                paperProvinceCityValue:[],
-                paperProvinceCityOptions: [],
-
-                paperMerchantMccValue: [],
-                paperMerchantMccOptions: []
             };
         },
         watch: {
-            'review.register_type'(val, oldVal){
-                this.registerTypeBindding(val);
-            }
+
         },
         methods: {
-            registerTypeBindding(val){
-                if(val == "separate_account"){ //分账商户
-                    this.review.acceptOrder = '0';
-                    this.review.openAccount = '1';
-                    this.review.paper_merchantType = '3';
-                    this.review.paper_settleAccountType = '2';
-                    this.review.paper_businessCode = 'WITHDRAW_TO_SETTMENT_DEBIT';
-                }
-            },
 
             getDetail() {
                 this.cardLoading = true;
@@ -821,17 +405,6 @@
                         this.review = e.data.data.review;
                         this.ruleForm = e.data.data.detail;
                         this.nickname = this.ruleForm.user.nickname;
-
-                        this.registerTypeBindding(this.review.register_type);
-
-                        this.paperProvinceCityValue = [];
-                        this.paperProvinceCityValue.push(this.review.paper_province);
-                        this.paperProvinceCityValue.push(this.review.paper_city);
-
-                        this.paperMerchantMccValue = [];
-                        this.paperMerchantMccValue.push(this.review['paper_mcc_obj'].type);
-                        this.paperMerchantMccValue.push(this.review['paper_mcc_obj'].code);
-
                     }
                 }).catch(e => {
                 });
@@ -848,8 +421,7 @@
                             method: 'post',
                             data: {
                                 form        : self.ruleForm,
-                                is_review   : self.is_review,
-                                review_info : self.review
+                                is_review   : self.is_review
                             }
                         }).then(e => {
                             self.btnLoading = false;
@@ -968,44 +540,6 @@
             dialogImgShow(imgUrl) {
                 this.dialogImg = true;
                 this.click_img = imgUrl;
-            },
-            paperProvinceCityChange(value){
-                this.review.paper_province = value[0];
-                this.review.paper_city = value[1];
-
-            },
-            getPaperProvinceCityOptions(){
-                if(this.paperProvinceCityOptions.length <= 0){
-                    request({
-                        params: {
-                            r: 'efps-region/index'
-                        },
-                    }).then(e => {
-                        if (e.data.code == 0) {
-                            this.paperProvinceCityOptions = e.data.data.regions;
-                        }
-                    }).catch(e => {
-
-                    });
-                }
-            },
-            paperMerchantMccChange(value){
-                this.review.paper_mcc = value[1];
-            },
-            getPaperMerchantMccOptions(){
-                if(this.paperMerchantMccOptions.length <= 0){
-                    request({
-                        params: {
-                            r: 'efps-merchant-mcc/index'
-                        },
-                    }).then(e => {
-                        if (e.data.code == 0) {
-                            this.paperMerchantMccOptions = e.data.data.mcc;
-                        }
-                    }).catch(e => {
-
-                    });
-                }
             }
         },
         mounted: function () {
@@ -1020,8 +554,6 @@
             this.is_audit = getQuery('id') ? 1 : 0;
             this.getCommonCatList();
             this.getDistrict();
-            this.getPaperProvinceCityOptions();
-            this.getPaperMerchantMccOptions();
         }
     });
 </script>

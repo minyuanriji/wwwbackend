@@ -52,7 +52,7 @@
                 <el-table-column label="特殊折扣申请" width="150">
                     <template slot-scope="scope">
                         <div v-if="scope.row.is_special_discount == 1">
-                            <div>折扣：{{scope.row.settle_discount}}%</div>
+                            <div>折扣：{{scope.row.settle_discount}}折</div>
                             <div>说明：{{scope.row.settle_special_rate_remark}}</DIV>
                         </div>
                     </template>

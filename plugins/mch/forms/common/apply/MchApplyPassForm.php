@@ -121,12 +121,13 @@ class MchApplyPassForm extends BaseModel{
         $isSpecialDiscount = isset($applyData['is_special_discount']) ? (int)$applyData['is_special_discount'] : 0;
         $specialRemark     = isset($applyData['settle_special_rate_remark']) ? (int)$applyData['settle_special_rate_remark'] : 0;
 
+        $mch->mch_common_cat_id   = $applyData['store_mch_common_cat_id'];
         $mch->review_status       = Mch::REVIEW_STATUS_CHECKED; //状态通过
         $mch->review_time         = time();
         $mch->realname            = $applyModel->realname;
         $mch->mobile              = $this->bind_mobile;
         $mch->updated_at          = time();
-        $mch->transfer_rate       = (int)((10 - $settleDiscount) / 100) * 100;
+        $mch->transfer_rate       = strval((10 - $settleDiscount) * 10);
         $mch->is_special          = $isSpecialDiscount;
         $mch->special_rate        = $mch->transfer_rate;
         $mch->special_rate_remark = $specialRemark;
@@ -169,6 +170,7 @@ class MchApplyPassForm extends BaseModel{
         }
 
         $store->name        = $applyData['store_name'];
+        $store->description = "";
         $store->mobile      = (isset($applyData['bind_mobile']) && $applyData['bind_mobile']) ? $applyData['bind_mobile'] : $applyModel->mobile;
         $store->address     = $applyData['store_address'];
         $store->province_id = $applyData['store_province_id'];

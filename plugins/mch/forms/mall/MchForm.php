@@ -96,44 +96,11 @@ class MchForm extends BaseModel
             $detail['password'] = $detail['mchAdmin']['password'];
             $detail['admin_id'] = $detail['mchAdmin']['id'];
 
-            $relatEfps = EfpsMchReviewInfo::findOne(["mch_id" => $this->id]);
-            if(!$relatEfps){
-                $relatEfps = new EfpsMchReviewInfo();
-                $relatEfps->mch_id        = $this->id;
-                $relatEfps->register_type = "separate_account";
-                $relatEfps->created_at    = time();
-                $relatEfps->updated_at    = time();
-                if(!$relatEfps->save()){
-                    throw new \Exception($this->responseErrorMsg($relatEfps));
-                }
-            }
-
-            $reviewData = ArrayHelper::toArray($relatEfps);
-            if(!empty($reviewData)){
-                $reviewData['acceptOrder'] = $reviewData['acceptOrder'] ? "1" : "0";
-                $reviewData['openAccount'] = $reviewData['openAccount'] ? "1" : "0";
-                $reviewData['paper_merchantType'] = (string)$reviewData['paper_merchantType'];
-                $reviewData['paper_isCc'] = $reviewData['paper_isCc'] ? "1" : "0";
-                $reviewData['paper_settleAccountType'] = (string)$reviewData['paper_settleAccountType'];
-                $reviewData['paper_settleTarget'] = (string)$reviewData['paper_settleTarget'];
-            }
-            $reviewData['paper_mcc_obj'] = ["type" => "", "code" => ""];
-            if(!empty($reviewData['paper_mcc'])){
-                $mcc = EfpsMerchantMcc::findOne(['code' => $reviewData['paper_mcc']]);
-                if($mcc){
-                    $reviewData['paper_mcc_obj'] = [
-                        "type" => $mcc->type,
-                        "code" => (string)$mcc->code
-                    ];
-                }
-            }
-
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
                 'data' => [
-                    'detail' => $detail,
-                    'review' => $reviewData
+                    'detail' => $detail
                 ]
             ];
         } catch (\Exception $e) {

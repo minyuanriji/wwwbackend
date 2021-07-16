@@ -11,6 +11,7 @@ use app\plugins\mch\forms\mall\MchMallSettingEditForm;
 use app\plugins\mch\forms\mall\MchMallSettingForm;
 use app\plugins\mch\forms\mall\MchReviewDoForm;
 use app\plugins\mch\forms\mall\MchReviewForm;
+use app\plugins\mch\forms\mall\MchReviewListExportForm;
 
 class MchController extends Controller
 {
@@ -32,11 +33,11 @@ class MchController extends Controller
                 $form = new MchEditForm();
                 $data = \Yii::$app->request->post('form');
                 //var_dump($data);exit;
-                $form->attributes = $data;
+                $form->attributes  = $data;
                 $form->province_id = $data['district'][0];
-                $form->city_id = $data['district'][1];
+                $form->city_id     = $data['district'][1];
                 $form->district_id = $data['district'][2];
-                $form->attributes = \Yii::$app->request->post();
+                $form->attributes  = \Yii::$app->request->post();
                 return $this->asJson($form->save());
             } else {
                 $form = new MchForm();
@@ -98,12 +99,12 @@ class MchController extends Controller
     }
 
     /**
-     * 导出记录
+     * 导出审核记录
      * @return \yii\web\Response
      */
-    public function actionExportList()
+    public function actionExportReviewList()
     {
-        $form = new MchListExportForm();
+        $form = new MchReviewListExportForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->export());
     }

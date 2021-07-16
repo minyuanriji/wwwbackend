@@ -9,5 +9,7 @@ class SubmitResult
     public $code;
     public $message;
 
+    public $order_no = null; //平台订单号
+
     public $response_content; //返回的原始数据
 }

@@ -123,7 +123,7 @@ class MchApplyPassForm extends BaseModel{
 
         $mch->mch_common_cat_id   = $applyData['store_mch_common_cat_id'];
         $mch->review_status       = Mch::REVIEW_STATUS_CHECKED; //状态通过
-        $mch->review_time         = time();
+        $mch->review_time         = date('Y-m-d H:i:s', time());
         $mch->realname            = $applyModel->realname;
         $mch->mobile              = $this->bind_mobile;
         $mch->updated_at          = time();

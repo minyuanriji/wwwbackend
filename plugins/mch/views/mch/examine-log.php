@@ -129,33 +129,28 @@
                 </el-table-column>
                 <el-table-column :show-overflow-tooltip="true" label="店铺名称" width="200">
                     <template slot-scope="scope">
-                        <div>{{scope.row.store.name}}</div>
+                        <div>{{scope.row.store_name}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column label="用户昵称" width="200">
                     <template slot-scope="scope">
-                        <div>{{scope.row.user.nickname}}</div>
+                        <div>{{scope.row.nickname}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作端" width="200">
                     <template slot-scope="scope">
-                        <div>{{scope.row.user.nickname}}</div>
+                        <div>{{scope.row.operation_terminal_type}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column
                         label="操作" width="200">
                     <template slot-scope="scope">
-                        <div>
-                            <com-ellipsis style="margin-left: 10px;" :line="1">{{scope.row.realname}}
-                            </com-ellipsis>
-                            <com-ellipsis style="margin-left: 10px;" :line="1">电话:{{scope.row.mobile}}
-                            </com-ellipsis>
-                        </div>
+                        <div>{{scope.row.operation_status}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column
                         label="操作时间"
-                        prop="review_time"
+                        prop="created_at"
                         width="220">
                 </el-table-column>
 
@@ -173,7 +168,6 @@
         </div>
     </el-card>
 </div>
-<script src="https://cdn.jsdelivr.net/clipboard.js/1.5.12/clipboard.min.js"></script>
 <script>
     const app = new Vue({
         el: '#app',
@@ -194,7 +188,6 @@
                 btnLoading: false,
                 mch_id: 0,
                 id: null,
-                sort: 0,
             };
         },
         methods: {
@@ -205,7 +198,6 @@
             },
             getList() {
                 let self = this;
-                self.listLoading = true;
                 request({
                     params: {
                         r: 'plugin/mch/mall/mch/examine-log',
@@ -214,11 +206,12 @@
                     },
                     method: 'get',
                 }).then(e => {
-                    self.listLoading = false;
-                    self.list = e.data.data.list;
-                    self.pageCount = e.data.data.pagination.page_count;
+                    self.list = e.data.list;
+                    self.pageCount = e.data.pagination.page_count;
                 }).catch(e => {
                     console.log(e);
+                    self.list = e.data.list;
+                    self.pageCount = e.data.pagination.page_count;
                 });
             },
             searchList() {
@@ -226,9 +219,8 @@
                 this.getList();
             },
         },
-        mounted: function () {
+        created: function () {
             this.getList();
-            this.route();
         }
     });
 </script>

@@ -12,7 +12,8 @@ use app\plugins\hotel\models\HotelPlateforms;
 use app\plugins\sign_in\models\User;
 use Google\Protobuf\Api;
 
-class PhoneOrderSubmitForm extends BaseModel {
+class PhoneOrderSubmitForm extends BaseModel
+{
 
     public $plateform_id;
     public $mobile;

@@ -1,5 +1,5 @@
 <?php
-namespace app\plugins\hotel\forms\api\order;
+namespace app\plugins\addcredit\forms\api\order;
 
 
 use app\core\ApiCode;

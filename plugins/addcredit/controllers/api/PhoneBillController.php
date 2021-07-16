@@ -1,12 +1,11 @@
 <?php
 
-namespace app\plugins\hotel\controllers\api;
+namespace app\plugins\addcredit\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
 use app\plugins\ApiController;
-use app\plugins\hotel\forms\api\HotelDetailForm;
-use app\plugins\hotel\forms\api\order\PhoneOrderPayForm;
-use app\plugins\hotel\forms\api\order\PhoneOrderSubmitForm;
+use app\plugins\addcredit\forms\api\order\PhoneOrderPayForm;
+use app\plugins\addcredit\forms\api\order\PhoneOrderSubmitForm;
 
 class PhoneBillController extends ApiController
 {
@@ -32,7 +31,6 @@ class PhoneBillController extends ApiController
         $form->attributes = $this->requestData;
         return $this->asJson($form->save());
     }
-
     /**
      * 话费充值
      * mobile  手机号
@@ -46,14 +44,5 @@ class PhoneBillController extends ApiController
         return $this->asJson($form->pay());
     }
 
-    /**
-     * 酒店信息
-     * @return \yii\web\Response
-     */
-    public function actionDetail()
-    {
-        $form = new HotelDetailForm();
-        $form->attributes = $this->requestData;
-        return $this->asJson($form->getDetail());
-    }
+
 }

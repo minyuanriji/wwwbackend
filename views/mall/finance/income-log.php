@@ -9,6 +9,7 @@
  */
 
 Yii::$app->loadComponentView('com-dialog-select');
+Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
 
 <div id="app" v-cloak>
@@ -43,7 +44,13 @@ Yii::$app->loadComponentView('com-dialog-select');
             </div>
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column prop="user.nickname" label="昵称"></el-table-column>
+                <el-table-column prop="user.nickname" label="昵称">
+                    <template slot-scope="scope">
+                        <com-user-finance-stat :user-id="parseInt(scope.row.user.id)">
+                            {{scope.row.user.nickname}}
+                        </com-user-finance-stat>
+                    </template>
+                </el-table-column>
                 <el-table-column label="收支情况(收益)" width="130">
                     <template slot-scope="scope">
                         <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.income}}</div>

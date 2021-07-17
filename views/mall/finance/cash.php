@@ -6,6 +6,8 @@
  * Date: 2020-04-16
  * Time: 17:16
  */
+
+Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
 
 <div id="app" v-cloak>
@@ -23,11 +25,27 @@
             <el-tab-pane label="已打款" name="2"></el-tab-pane>
             <el-tab-pane label="驳回" name="3"></el-tab-pane>
             <div class="table-body">
-                <el-table :data="list" size="small" border v-loading="loading" style="margin-bottom: 15px">
+                <el-date-picker size="small" v-model="date" type="datetimerange"
+                                style="float: left"
+                                value-format="yyyy-MM-dd HH:mm:ss"
+                                range-separator="至" start-placeholder="开始日期"
+                                @change="selectDateTime"
+                                end-placeholder="结束日期">
+                </el-date-picker>
+                <div class="input-item" style="margin-left:15px;display:inline-block;width:300px;">
+                    <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入昵称搜索" v-model="search.keyword" clearable @clear="goSearch">
+                        <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
+                    </el-input>
+                </div>
+                <el-table :data="list" size="small" border v-loading="loading" style="margin-top:20px;margin-bottom: 15px">
                     <el-table-column label="基本信息">
                         <template slot-scope="scope">
                                 <com-image mode="aspectFill" :src="scope.row.user.avatar" style="float: left;margin-right: 10px"></com-image>
-                            <div>{{scope.row.user.nickname}}</div>
+
+                            <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
+                                {{scope.row.user.nickname}}
+                            </com-user-finance-stat>
+
                             <img src="statics/img/mall/wx.png" v-if="scope.row.user.platform == 'wxapp'" alt="">
                             <img src="statics/img/mall/ali.png" v-else-if="scope.row.user.platform == 'aliapp'" alt="">
                             <img src="statics/img/mall/toutiao.png" v-else-if="scope.row.user.platform == 'ttapp'" alt="">
@@ -129,9 +147,12 @@
         el: '#app',
         data() {
             return {
+                date: '',
                 search: {
                     keyword: '',
                     status: -1,
+                    start_date: '',
+                    end_at: ''
                 },
                 loading: false,
                 activeName: '-1',
@@ -144,6 +165,25 @@
             this.loadData();
         },
         methods: {
+
+            goSearch() {
+                if (this.date == null) {
+                    this.date = ''
+                }
+                this.loadData(this.activeName, 1)
+            },
+
+            selectDateTime(e) {
+                if (e != null) {
+                    this.search.start_date = e[0];
+                    this.search.end_date = e[1];
+                } else {
+                    this.search.start_date = '';
+                    this.search.end_date = '';
+                }
+                this.goSearch();
+            },
+
             confirmSubmit() {
                 this.search.status = this.activeName
             },
@@ -154,6 +194,9 @@
                         r: 'mall/finance/cash',
                         status: status,
                         page: page,
+                        start_date: this.search.start_date,
+                        end_date: this.search.end_date,
+                        keyword: this.search.keyword,
                         user_id: getQuery('user_id'),
                     },
                     method: 'get'

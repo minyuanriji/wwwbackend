@@ -7,6 +7,7 @@ use app\models\BaseModel;
 use app\models\IntegralLog;
 use app\models\IntegralRecord;
 use app\models\User;
+use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelRefundApplyOrder;
 
@@ -260,6 +261,66 @@ class UserIntegralForm extends BaseModel{
         ]);
         if(!$integralLog->save()){
             throw new \Exception(json_encode($integralLog->getErrors()));
+        }
+    }
+
+    /**
+     * 支付话费订单
+     * @param AddcreditOrder $addcredit_order
+     * @param User $user
+     * @param $price
+     * @return array
+     */
+    public static function PhoneBillOrderPaySub(AddcreditOrder $addcredit_order, User $user, $price)
+    {
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+            $desc = "支付话费订单“".$addcredit_order->order_no."”";
+
+            static::change($user, $price, self::TYPE_SUB, "addcredit", $addcredit_order->id, $desc);
+
+            $t->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '扣取成功'
+            ];
+        }catch (\Exception $e){
+            $t->rollBack();
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * 话费订单退款抵扣券返还
+     * @param User $user
+     * @param $price
+     * @param $source_id
+     * @return array
+     */
+    public static function PhoneBillOrderRefundAdd(User $user, $price, $source_id){
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+            $desc = "话费订单[Detail Id:".$source_id."]退款退还红包券";
+
+            static::change($user, $price, self::TYPE_ADD, "addcredit_refund", $source_id, $desc);
+
+            $t->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '操作成功'
+            ];
+
+        }catch (\Exception $e){
+            $t->rollBack();
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
         }
     }
 }

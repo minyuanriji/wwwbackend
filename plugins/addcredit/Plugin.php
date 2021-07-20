@@ -1,4 +1,5 @@
 <?php
+
 namespace app\plugins\addcredit;
 
 use app\handlers\BaseHandler;
@@ -27,7 +28,23 @@ class Plugin extends \app\plugins\Plugin{
         return [
             [
                 'name' => '订单管理',
-                'route' => 'plugin/addcredit/mall/order/list',
+                'route' => 'plugin/addcredit/mall/order/order',
+                'icon' => 'el-icon-setting',
+                'action' => [
+
+                ]
+            ],
+            [
+                'name' => '售后管理',
+                'route' => 'plugin/addcredit/mall/order/order/refund-list',
+                'icon' => 'el-icon-setting',
+                'action' => [
+
+                ]
+            ],
+            [
+                'name' => '账户余额查询',
+                'route' => 'plugin/addcredit/mall/account/account/account-balance',
                 'icon' => 'el-icon-setting',
                 'action' => [
 
@@ -37,7 +54,7 @@ class Plugin extends \app\plugins\Plugin{
     }
 
     public function getIndexRoute(){
-        return 'plugin/addcredit/mall/order/list';
+        return 'plugin/addcredit/mall/order/order';
     }
 
 

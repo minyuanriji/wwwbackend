@@ -86,7 +86,7 @@ class MchExamineLogForm extends BaseModel
                     $item['nickname'] = $admin ? $admin->username : '';
                 }
                 $item['operation_status'] = self::operation[$item['operation']];
-                unset($item['mchApply'], $item['operation'],  $item['operation_terminal'],);
+                unset($item['mchApply'], $item['operation'],  $item['operation_terminal']);
             }
         }
         return [

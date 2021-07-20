@@ -1,16 +1,12 @@
 <?php
+
 namespace app\plugins\addcredit\forms\api\order;
 
-
 use app\core\ApiCode;
-use app\helpers\CommonHelper;
 use app\models\BaseModel;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
-use app\plugins\hotel\models\HotelOrder;
-use app\plugins\hotel\models\HotelPlateforms;
 use app\plugins\sign_in\models\User;
-use Google\Protobuf\Api;
 
 class PhoneOrderSubmitForm extends BaseModel
 {
@@ -56,7 +52,7 @@ class PhoneOrderSubmitForm extends BaseModel
                 "plateform_id"              => $this->plateform_id,
                 "user_id"                   => \Yii::$app->user->id,
                 "mobile"                    => $this->mobile,
-                "order_no"                  => "HF" . date("ymdHis") . rand(100, 999),
+                "order_no"                  => "HF" . $this->plateform_id . date("ymdHis") . rand(100, 999),
                 "order_price"               => $this->order_price,
                 "created_at"                => time(),
                 "updated_at"                => time(),

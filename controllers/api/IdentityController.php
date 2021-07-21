@@ -170,13 +170,18 @@ class IdentityController extends ApiController
         $recommend_id = !empty($this->requestData['recommend_id']) ? $this->requestData['recommend_id'] : 0;
         $headers = \Yii::$app->request->headers;
         $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 5;
-        if($stands_mall_id != 5){
-            $mall = Mall::findOne([['id' => $stands_mall_id], ['is_delete' => 0], ['is_recycle' => 0], ['is_disable' => 0]]);
-            if ($mall) {
-                $recommend_id = $mall->user_id;
+        if (!$recommend_id) {
+            if($stands_mall_id != 5){
+                $mall = Mall::findOne([['id' => $stands_mall_id], ['is_delete' => 0], ['is_recycle' => 0], ['is_disable' => 0]]);
+                if ($mall) {
+                    $recommend_id = $mall->user_id;
+                } else {
+                    $recommend_id = 9;
+                }
+            } else {
+                $recommend_id = 9;
             }
         }
-        $recommend_id = $recommend_id > 0 ? $recommend_id : 9;
         return $smsForm->bind($recommend_id,$stands_mall_id);
     }
 

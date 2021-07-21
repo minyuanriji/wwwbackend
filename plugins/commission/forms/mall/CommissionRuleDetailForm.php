@@ -9,6 +9,7 @@ use app\models\Goods;
 use app\models\Store;
 use app\plugins\commission\models\CommissionRuleChain;
 use app\plugins\commission\models\CommissionRules;
+use app\plugins\hotel\models\Hotels;
 
 class CommissionRuleDetailForm extends BaseModel{
 
@@ -70,11 +71,19 @@ class CommissionRuleDetailForm extends BaseModel{
                     }else{
                         $ruleData['item_id'] = 0;
                     }
-                }else{
+                } else if($ruleData['item_type'] == "store" || $ruleData['item_type'] == "checkout"){
                     $store = Store::findOne($ruleData['item_id']);
                     if($store){
                         $ruleData['store_name'] = $store->name;
                         $ruleData['store_pic']  = $store->cover_url;
+                    }else{
+                        $ruleData['item_id'] = 0;
+                    }
+                } else if($ruleData['item_type'] == "hotel" || $ruleData['item_type'] == "hotel_3r"){
+                    $hotels = Hotels::findOne($ruleData['item_id']);
+                    if($hotels){
+                        $ruleData['hotel_name'] = $hotels->name;
+                        $ruleData['hotel_thumb_url']  = $hotels->thumb_url;
                     }else{
                         $ruleData['item_id'] = 0;
                     }

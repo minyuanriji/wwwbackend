@@ -7,6 +7,7 @@ use app\plugins\commission\forms\mall\CommissionRuleListForm;
 use app\plugins\commission\forms\mall\CommissionRuleDetailForm;
 use app\plugins\commission\forms\mall\CommissionRuleEditForm;
 use app\plugins\commission\forms\mall\SearchGoodsForm;
+use app\plugins\commission\forms\mall\SearchHotelForm;
 use app\plugins\commission\forms\mall\SearchStoreForm;
 use app\plugins\Controller;
 
@@ -84,6 +85,16 @@ class RulesController extends Controller{
      */
     public function actionSearchStore(){
         $form = new SearchStoreForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->search());
+    }
+
+    /**
+     * 加载酒店
+     * @return string|yii\web\Response
+     */
+    public function actionSearchHotel(){
+        $form = new SearchHotelForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->search());
     }

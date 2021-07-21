@@ -76,7 +76,7 @@ class AddOfflineNotification
                 "template_id"       => TemConfig::MemberJoinReminder,
                 "data"              => [
                     'first'     => '您好，您有新成员加入！',
-                    'keyword1'  => $user->nickname . "[ID:" . $open_id_array[$i]['id'] . "]" ,
+                    'keyword1'  => $user->nickname . "[ID:" . $user->id . "]" ,
                     'keyword2'  => $time,
                     'remark'    => '',
                 ]

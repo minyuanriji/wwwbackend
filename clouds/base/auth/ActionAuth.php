@@ -6,11 +6,12 @@
  * Email: 746027209@qq.com
  * Date: 2021-07-12 15:06
  */
-namespace app\clouds\auth;
+namespace app\clouds\base\auth;
 
 
 use app\clouds\base\action\Action;
 use app\clouds\base\helpers\IdentityHelper;
+use app\clouds\base\tables\CloudAuthActionList;
 
 class ActionAuth extends Auth
 {
@@ -30,12 +31,17 @@ class ActionAuth extends Auth
     {
         $access = false;
         $identity = IdentityHelper::getIdentity();
-        if($this->actionModel->security == "public" || ($identity && $identity->getId() == $this->actionModel->author_id)) {
+        if($this->action->getModel()->security == "public" || ($identity && $identity->getId() == $this->action->getModel()->author_id)){
             $access = true;
-        }elseif($identity){ //授权访问
-
+        }elseif($identity && $this->action->getModel()->security == "authorize"){
+            $authItem = CloudAuthActionList::findOne([
+                "target_id" => $this->action->getModel()->id,
+                "user_id"   => $identity->getId()
+            ]);
+            if($authItem){
+                $access = true;
+            }
         }
-
-        return false;
+        return $access;
     }
 }

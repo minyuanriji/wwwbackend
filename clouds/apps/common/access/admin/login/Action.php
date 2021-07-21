@@ -4,11 +4,11 @@
  * @copyright: Copyright (c) #### ########
  * Author: Mr.Lin
  * Email: 746027209@qq.com
- * Date: 2021-07-10 15:18
+ * Date: 2021-07-17 17:11
  */
-namespace app\clouds\apps\common\access;
+namespace app\clouds\apps\common\access\admin\login;
 
-class Module extends \app\clouds\base\module\Module
+class Action extends \app\clouds\base\action\Action
 {
 
 }

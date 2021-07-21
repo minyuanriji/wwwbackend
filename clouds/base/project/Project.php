@@ -40,6 +40,16 @@ abstract class Project extends BaseObject
     }
 
     /**
+     * 获取所在命名空间
+     * @return string
+     */
+    public function getNamespace()
+    {
+        $projectDir = FuncHelper::convertNamesPath($this->projectModel->class_dir);
+        return "app\\clouds\\apps\\{$projectDir}";;
+    }
+
+    /**
      * 获取模块对象
      * @param $module_id
      * @return Module
@@ -55,9 +65,8 @@ abstract class Project extends BaseObject
                 throw new CloudException("”".$module_id."“模块不存在");
             }
 
-            $projectDir = FuncHelper::convertNamesPath($this->projectModel->class_dir);
             $moduleDir = FuncHelper::convertNamesPath($moduleModel->class_dir);
-            $moduleClass = "app\\clouds\\apps\\{$projectDir}\\{$moduleDir}\\Module";
+            $moduleClass = $this->getNamespace() . "\\{$moduleDir}\\Module";
             if(!class_exists($moduleClass))
             {
                 throw new CloudException("”".$moduleClass."“模块类不存在");

@@ -15,6 +15,7 @@ namespace app\clouds\base\tables;
  * @package app\clouds\tables
  * @property integer $author_id
  * @property string  $name
+ * @property string  $security
  * @property string  $class_dir
  * @property integer $is_deleted
  * @property integer $deleted_at
@@ -30,7 +31,7 @@ class CloudProject extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['author_id', 'name', 'class_dir'], 'required'],
+            [['author_id', 'name', 'security', 'class_dir'], 'required'],
             [['is_deleted', 'deleted_at'], 'safe']
         ];
     }

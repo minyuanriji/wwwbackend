@@ -6,7 +6,7 @@
  * Email: 746027209@qq.com
  * Date: 2021-07-12 15:06
  */
-namespace app\clouds\auth;
+namespace app\clouds\base\auth;
 
 
 use yii\base\BaseObject;

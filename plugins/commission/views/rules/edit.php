@@ -111,7 +111,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
         </div>
     </el-card>
 
-
     <!-- 选择商品对话框 -->
     <el-dialog title="设置商品" :visible.sync="ChooseGoods.dialog_visible" width="30%">
         <el-input @keyup.enter.native="loadGoodsList"

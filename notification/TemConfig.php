@@ -452,4 +452,19 @@ class TemConfig
 
      * */
     const OfflineJoinNotice = 'XnHCHU_uTBZb6yRxWpU27a5_Quuk0O4j3AU4omNa4JU';
+
+    /*  @todo 	成员加入提醒
+
+        您好，您的xx有新成员加入
+        姓名：李永强
+        时间：2015.10.1 8:00
+        您可以到xx管理后台管理您的源网成员。
+
+        {{first.DATA}}
+        姓名：{{keyword1.DATA}}
+        时间：{{keyword2.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const MemberJoinReminder = 'YdqBUmMmRYlCg5Kfp8JiGLGUqsVV-_Z8MJy4KN1yucU';
 }

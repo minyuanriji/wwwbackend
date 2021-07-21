@@ -1,6 +1,6 @@
 <?php
-namespace app\plugins\commission\forms\mall;
 
+namespace app\plugins\commission\forms\mall;
 
 use app\core\ApiCode;
 use app\helpers\ArrayHelper;
@@ -11,7 +11,8 @@ use app\plugins\commission\models\CommissionRuleChain;
 use app\plugins\commission\models\CommissionRules;
 use app\plugins\hotel\models\Hotels;
 
-class CommissionRuleDetailForm extends BaseModel{
+class CommissionRuleDetailForm extends BaseModel
+{
 
     public $id;
     public $store_id;

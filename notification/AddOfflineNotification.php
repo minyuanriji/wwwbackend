@@ -68,22 +68,19 @@ class AddOfflineNotification
         } else {
             $time = date('Y-m-d H:i:s', time());
         }
-
-        foreach ($open_id_array as $open_id) {
+        $user_num = count($open_id_array);
+        for ($i=0; $i < $user_num; $i++) {
             (new UserWeTplMsg([
                 "mall_id"           => $user->mall_id,
-                "openid"            => $open_id['open_id'],
-                "template_id"       => TemConfig::OfflineJoinNotice,
+                "openid"            => $open_id_array[$i]['open_id'],
+                "template_id"       => TemConfig::MemberJoinReminder,
                 "data"              => [
-                    'first'     => '您有新的成员加入！',
-                    'keyword1'  => $open_id['id'],
+                    'first'     => '您好，您有新成员加入！',
+                    'keyword1'  => $user->nickname . "[ID:" . $open_id_array[$i]['id'] . "]" ,
                     'keyword2'  => $time,
-                    'keyword3'  => $user->nickname,
                     'remark'    => '',
                 ]
             ]))->send();
-
-            sleep(2);
         }
     }
 }

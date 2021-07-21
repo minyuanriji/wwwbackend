@@ -1,4 +1,5 @@
 <?php
+
 namespace app\notification\wechat_template_message;
 
 /***

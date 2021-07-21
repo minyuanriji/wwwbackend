@@ -18,6 +18,7 @@ use app\forms\api\identity\WechatForm;
 use app\forms\api\user\UserBindForm;
 use app\helpers\ArrayHelper;
 use app\models\ErrorLog;
+use app\models\Mall;
 use phpDocumentor\Reflection\Types\Integer;
 use yii;
 use app\controllers\business\GetAttentionWeChat;
@@ -169,6 +170,13 @@ class IdentityController extends ApiController
         $recommend_id = !empty($this->requestData['recommend_id']) ? $this->requestData['recommend_id'] : 0;
         $headers = \Yii::$app->request->headers;
         $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 5;
+        if($stands_mall_id != 5){
+            $mall = Mall::findOne([['id' => $stands_mall_id], ['is_delete' => 0], ['is_recycle' => 0], ['is_disable' => 0]]);
+            if ($mall) {
+                $recommend_id = $mall->user_id;
+            }
+        }
+        $recommend_id = $recommend_id > 0 ? $recommend_id : 9;
         return $smsForm->bind($recommend_id,$stands_mall_id);
     }
 

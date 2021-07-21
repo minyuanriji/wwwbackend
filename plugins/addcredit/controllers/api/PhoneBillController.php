@@ -31,10 +31,11 @@ class PhoneBillController extends ApiController
         $form->attributes = $this->requestData;
         return $this->asJson($form->save());
     }
+
     /**
-     * 话费充值
-     * mobile  手机号
-     * price   充值金额
+     * 去支付
+     * order_no         订单号
+     * order_price      订单金额
      * @return \yii\web\Response
      */
     public function actionPrepaidRefill()

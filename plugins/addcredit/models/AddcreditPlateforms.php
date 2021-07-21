@@ -1,6 +1,6 @@
 <?php
-namespace app\plugins\addcredit\models;
 
+namespace app\plugins\addcredit\models;
 
 use app\models\BaseActiveRecord;
 

@@ -3,27 +3,31 @@
 namespace app\plugins\addcredit\plateform\sdk\k_default;
 
 use app\plugins\addcredit\models\AddcreditOrder;
+use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\addcredit\plateform\IOrder;
-use app\plugins\hotel\libs\bestwehotel\plateform_action\QueryOrderAction;
-use app\plugins\hotel\libs\bestwehotel\plateform_action\SubmitOrderAction;
 
 class PlateForm implements IOrder
 {
 
-    public function submit(AddcreditOrder $orderModel)
+    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform)
     {
         return (new SubmitOrderAction([
-            'hotelOrder' => $orderModel,
-            'plateform_class' => get_class($this)
+            'AddcreditOrder'    => $orderModel,
+            'AddcreditPlateforms' => $plateform,
         ]))->run();
-
     }
 
     public function query(AddcreditOrder $orderModel)
     {
         return (new QueryOrderAction([
-            'hotelOrder' => $orderModel,
-            'plateform_class' => get_class($this)
+            'AddcreditOrder' => $orderModel,
+        ]))->run();
+    }
+
+    public function accountBalanceQuery($plateforms_params)
+    {
+        return (new AccountBalanceQueryAction([
+            'plateforms_params' => $plateforms_params,
         ]))->run();
     }
 

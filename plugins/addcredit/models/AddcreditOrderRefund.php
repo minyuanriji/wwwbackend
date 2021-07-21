@@ -2,7 +2,6 @@
 
 namespace app\plugins\addcredit\models;
 
-
 use app\models\BaseActiveRecord;
 
 class AddcreditOrderRefund extends BaseActiveRecord

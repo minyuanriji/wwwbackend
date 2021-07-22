@@ -2,9 +2,7 @@
 
 namespace app\plugins\hotel\controllers\mall;
 
-use app\core\ApiCode;
 use app\plugins\Controller;
-use app\plugins\hotel\forms\mall\HotelPlatform;
 use app\plugins\hotel\forms\mall\HotelSettingForm;
 use app\plugins\hotel\forms\mall\platform_setting\JinJiangSettingForm;
 
@@ -23,23 +21,13 @@ class PlatformConfigurationController extends Controller
                 $res = $form->getDetail($param);
                 return $this->asJson($res);
             } else {
-                $data = \Yii::$app->serializer->decode(\Yii::$app->request->post('ruleForm'));
+                $data = \Yii::$app->request->post('ruleForm');
                 $jinjiang = new JinJiangSettingForm();
-                return $jinjiang->set($data);
+                $res = $jinjiang->set($data);
+                return $this->asJson($res);
             }
         } else {
             return $this->render('setting');
         }
-    }
-
-    /**
-     * 获取平台名称
-     */
-    public function actionGetPlatformData ()
-    {
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'data' => HotelPlatform::Platform
-        ];
     }
 }

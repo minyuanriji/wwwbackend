@@ -5,6 +5,7 @@ namespace app\plugins\giftpacks\forms\api;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\models\User;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
@@ -32,14 +33,7 @@ class GiftpacksDetailForm extends BaseModel{
                 throw new \Exception("大礼包不存在");
             }
 
-            $detail = $giftpacks->getAttributes();
-
-            $query = GiftpacksItem::find()->alias("gpi");
-            $query->leftJoin(["goi" => GiftpacksOrderItem::tableName()], "goi.pack_item_id=gpi.id");
-            $query->where([ "gpi.pack_id" => $this->pack_id, "gpi.is_delete" => 0]);
-            $query->groupBy("gpi.id HAVING count(gpi.id) < gpi.max_stock");
-
-            $detail['item_count'] = (int)$query->count();
+            $detail = static::detail($giftpacks);
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
@@ -54,5 +48,26 @@ class GiftpacksDetailForm extends BaseModel{
             ];
         }
 
+    }
+
+    //大礼包详情
+    public static function detail(Giftpacks $giftpacks){
+        $detail = $giftpacks->getAttributes();
+        $detail['item_count'] = static::getItemCount($giftpacks);
+        return $detail;
+    }
+
+    //红包抵扣价
+    public static function integralDeductionPrice(Giftpacks $giftpacks, User $user){
+        return (float)$giftpacks->price;
+    }
+
+    //获取大礼包商品数量
+    public static function getItemCount(Giftpacks $giftpacks){
+        $query = GiftpacksItem::find()->alias("gpi");
+        $query->leftJoin(["goi" => GiftpacksOrderItem::tableName()], "goi.pack_item_id=gpi.id");
+        $query->where([ "gpi.pack_id" => $giftpacks->id, "gpi.is_delete" => 0]);
+        $query->groupBy("gpi.id HAVING count(gpi.id) < gpi.max_stock");
+        return (int)$query->count();
     }
 }

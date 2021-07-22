@@ -14,8 +14,8 @@ use app\clouds\base\module\Module;
 use app\clouds\base\project\Project;
 use app\clouds\base\route\Route;
 use app\clouds\base\tables\CloudAction;
+use app\clouds\base\tables\CloudActionRoute;
 use app\clouds\base\tables\CloudProject;
-use app\clouds\base\tables\CloudUserApp;
 use app\clouds\base\tables\CloudUserAppRouteList;
 use app\clouds\base\tables\Table;
 use app\clouds\base\user\User;
@@ -37,6 +37,20 @@ abstract class Action extends BaseObject
     }
 
     /**
+     * 获取授权组件
+     * @return Action|null
+     */
+    public function getAuthAction()
+    {
+        $actionModel = Table::findOne(CloudAction::class, $this->actionModel->auth_action_id);
+        if($actionModel && !$actionModel->is_deleted)
+        {
+            return static::find($actionModel);
+        }
+        return null;
+    }
+
+    /**
      * 获取项目对象
      * @return Project
      */
@@ -55,34 +69,40 @@ abstract class Action extends BaseObject
     }
 
     /**
-     * 获取操作对象
-     * @param CloudUserApp $userApp
+     * 通过路由获取操作对象
      * @param Route $route
      * @return Action
      * @throws CloudException
      */
-    public static function find(CloudUserApp $userApp, Route $route)
+    public static function findByRoute(Route $route)
     {
-        $routeItem = Table::find(CloudUserAppRouteList::class)->where([
-            "user_id"  => $userApp->user_id,
-            "app_id"   => $userApp->id,
-            "path_uri" => $route->pathURI
+        $actionRoute = Table::find(CloudActionRoute::class)->where([
+            "host_name" => $route->host,
+            "path_uri"  => $route->pathURI
         ])->one();
-        if(!$routeItem)
+        if(!$actionRoute)
         {
-            throw new CloudException("”".$userApp->pathURI."“路由对象不存在");
+            throw new CloudException("无法访问 " . $route->scheme . "://" . $route->host . $route->pathURI);
         }
 
-        $actionModel = Table::findOne(CloudAction::class, $routeItem->action_id);
+        $actionModel = Table::findOne(CloudAction::class, $actionRoute->action_id);
         if(!$actionModel || $actionModel->is_deleted)
         {
-            throw new CloudException("”".$routeItem->action_id."“功能不存在");
+            throw new CloudException("CloudAction:".$actionRoute->action_id."对象不存在");
         }
+        return static::find($actionModel);
+    }
 
+    /**
+     * 获取操作对象
+     * @param CloudAction $actionModel
+     * @return CloudAction|null
+     * @throws CloudException
+     */
+    public static function find(CloudAction $actionModel)
+    {
         $project = static::findProject($actionModel->project_id);
-
         $module = $project->getModule($actionModel->module_id);
-
         return $module->getAction($actionModel->id);
     }
 
@@ -101,7 +121,7 @@ abstract class Action extends BaseObject
         }
 
         $classDir = FuncHelper::convertNamesPath($projectModel->class_dir);
-        $projectClass = "app\\clouds\\apps\\{$classDir}\\Project";
+        $projectClass = "{$classDir}\\Project";
         if(!class_exists($projectClass))
         {
             throw new CloudException("”".$projectClass."“项目类不存在");
@@ -113,16 +133,13 @@ abstract class Action extends BaseObject
     }
 
     /**
-     * 返回操作命名空间
+     * 获取所在命名空间
      * @return string
-     * @throws CloudException
      */
-    public function getNamespaceDir()
+    public function getNamespace()
     {
-        $dirs[] = FuncHelper::convertNamesPath($this->project->getModel()->class_dir);
-        $dirs[] = FuncHelper::convertNamesPath($this->module->getModel()->class_dir);
-        $dirs[] = FuncHelper::convertNamesPath($this->actionModel->class_dir);
-        return "app\\clouds\\apps\\" . implode("\\", $dirs);
+        $actionDir = FuncHelper::convertNamesPath($this->actionModel->class_dir);
+        return $this->module->getNamespace() . "\\{$actionDir}";
     }
 
     /**
@@ -132,5 +149,15 @@ abstract class Action extends BaseObject
     public function getModel()
     {
         return $this->actionModel;
+    }
+
+    /**
+     * 返回目录路径
+     * @return string
+     */
+    public function getDirPath()
+    {
+        $reflector = new \ReflectionClass(get_class($this));
+        return dirname($reflector->getFileName());
     }
 }

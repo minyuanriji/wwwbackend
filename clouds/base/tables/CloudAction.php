@@ -20,6 +20,7 @@ namespace app\clouds\base\tables;
  * @property string  $actionID
  * @property string  $security
  * @property string  $class_dir
+ * @property integer $auth_action_id
  * @property integer $is_deleted
  * @property integer $deleted_at
  */
@@ -34,7 +35,7 @@ class CloudAction extends BaseActiveRecord
     {
         return [
             [['author_id', 'class_dir', 'project_id', 'security', 'module_id', 'name', 'controllerID', 'actionID'], 'required'],
-            [['is_deleted', 'deleted_at'], 'safe']
+            [['auth_action_id', 'is_deleted', 'deleted_at'], 'safe']
         ];
     }
 }

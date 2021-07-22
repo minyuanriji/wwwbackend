@@ -13,7 +13,21 @@
             <el-tab-pane label="已驳回" name="return"></el-tab-pane>
 
             <div class="table-body">
-                <el-table :data="list" size="small" border v-loading="loading" style="margin-bottom: 15px">
+
+                <el-date-picker size="small" v-model="date" type="datetimerange"
+                                style="float: left"
+                                value-format="yyyy-MM-dd HH:mm:ss"
+                                range-separator="至" start-placeholder="开始日期"
+                                @change="selectDateTime"
+                                end-placeholder="结束日期">
+                </el-date-picker>
+                <div class="input-item" style="margin-left:15px;display:inline-block;width:300px;">
+                    <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入商户名称搜索" v-model="search.keyword" clearable @clear="goSearch">
+                        <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
+                    </el-input>
+                </div>
+
+                <el-table :data="list" size="small" border v-loading="loading" style="margin-top:20px;margin-bottom: 15px">
                     <el-table-column label="基本信息">
                         <template slot-scope="scope">
                             <com-image mode="aspectFill" :src="scope.row.cover_url" style="float: left;margin-right: 10px"></com-image>
@@ -112,9 +126,12 @@
         el: '#app',
         data() {
             return {
+                date: '',
                 search: {
                     keyword: '',
                     status: '',
+                    start_date: '',
+                    end_at: ''
                 },
                 loading: false,
                 activeName: '-1',
@@ -127,6 +144,24 @@
             this.loadData(this.activeName);
         },
         methods: {
+            goSearch() {
+                if (this.date == null) {
+                    this.date = ''
+                }
+                this.loadData(this.activeName, 1)
+            },
+
+            selectDateTime(e) {
+                if (e != null) {
+                    this.search.start_date = e[0];
+                    this.search.end_date = e[1];
+                } else {
+                    this.search.start_date = '';
+                    this.search.end_date = '';
+                }
+                this.goSearch();
+            },
+
             apply(row, act) {
                 this.$prompt('请输入备注', '提示', {
                     confirmButtonText: '确定',
@@ -173,7 +208,10 @@
                     params: {
                         r: 'mall/mch-cash/index',
                         status: status,
-                        page: page
+                        page: page,
+                        start_date: this.search.start_date,
+                        end_date: this.search.end_date,
+                        keyword: this.search.keyword,
                     },
                     method: 'get'
                 }).then(e => {

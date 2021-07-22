@@ -28,7 +28,7 @@ class IdentityHelper extends BaseObject
      */
     public static function getIdentity()
     {
-        return \Yii::$app->cloudUser->getIdentity();
+        return !\Yii::$app->cloudUser->isGuest ? \Yii::$app->cloudUser->getIdentity() : null;
     }
 
     /**

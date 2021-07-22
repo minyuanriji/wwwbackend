@@ -36,7 +36,7 @@ class CashListForm extends BaseModel
             [['page', 'limit', 'status', 'user_id'], 'integer'],
             [['fields'], 'safe'],
             [['flag'], 'string'],
-            [['keyword'], 'trim'],
+            [['keyword', 'start_date', 'end_date'], 'trim'],
         ];
     }
 
@@ -58,6 +58,10 @@ class CashListForm extends BaseModel
                 ->andWhere(['mall_id' => $this->mall_id]);
             $query = $query->andWhere(['in', 'user_id', $subQuery]);
         }
+        if ($this->start_date && $this->end_date) {
+            $query->andWhere(['<', 'created_at', strtotime($this->end_date)])
+                ->andWhere(['>', 'created_at', strtotime($this->start_date)]);
+        }
         $list = $query->page($pagination, $this->limit, $this->page)->all();
         $newList = [];
         /* @var Cash[] $list */
@@ -74,6 +78,7 @@ class CashListForm extends BaseModel
                 'created_at' => $item->created_at,
                 'updated_at' => $item->updated_at,
                 'content'=>$item->content?SerializeHelper::decode($item->content):[],
+                'user_id' => $item->user_id,
                 'user' => [
                     'avatar' => $item->user->avatar_url,
                     'nickname' => $item->user->nickname,

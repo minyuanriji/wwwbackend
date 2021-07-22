@@ -13,22 +13,21 @@ namespace app\clouds\base\tables;
 /**
  * Class CloudUserAppRouteList
  * @package app\clouds\tables
- * @property integer $user_id
- * @property integer $app_id
  * @property integer $action_id
+ * @property string  $host_name
  * @property string  $path_uri
  */
-class CloudUserAppRouteList extends BaseActiveRecord
+class CloudActionRoute extends BaseActiveRecord
 {
     public static function tableName()
     {
-        return "{{%cloud_user_app_route_list}}";
+        return "{{%cloud_action_route}}";
     }
 
     public function rules()
     {
         return [
-            [['user_id', 'app_id', 'action_id', 'path_uri'], 'required'],
+            [['action_id', 'host_name', 'path_uri'], 'required'],
             [[], 'integer']
         ];
     }

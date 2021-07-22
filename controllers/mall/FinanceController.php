@@ -14,6 +14,7 @@ namespace app\controllers\mall;
 use app\forms\mall\finance\BalanceLogListForm;
 use app\forms\mall\finance\CashForm;
 use app\forms\mall\finance\CashListForm;
+use app\forms\mall\finance\FinanceStatInfoForm;
 use app\forms\mall\finance\IncomeLogListForm;
 use app\forms\mall\finance\IncomeModifiedForm;
 use app\forms\mall\finance\IntegralLogListForm;
@@ -30,6 +31,16 @@ use app\controllers\business\WithdrawDeposit;
 
 class FinanceController extends MallController
 {
+    /**
+     * 获取财务统计信息
+     * @return \yii\web\Response
+     */
+    public function actionStatInfo()
+    {
+        $form = new FinanceStatInfoForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->get());
+    }
 
     /**
      * @Author: 广东七件事 ganxiaohao

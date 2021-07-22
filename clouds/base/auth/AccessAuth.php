@@ -6,7 +6,7 @@
  * Email: 746027209@qq.com
  * Date: 2021-07-12 14:39
  */
-namespace app\clouds\auth;
+namespace app\clouds\base\auth;
 
 
 use app\clouds\base\action\Action;
@@ -29,9 +29,9 @@ class AccessAuth extends Auth
     public function chainList()
     {
         return [
-            "ActionAuth"  => $this->action,
-            "ModuleAuth"  => $this->action->getModule(),
-            "ProjectAuth" => $this->action->getProject()
+            "app\\clouds\\base\\auth\\ActionAuth"  => $this->action,
+            "app\\clouds\\base\\auth\\ModuleAuth"  => $this->action->getModule(),
+            "app\\clouds\\base\\auth\\ProjectAuth" => $this->action->getProject()
         ];
     }
 
@@ -46,7 +46,6 @@ class AccessAuth extends Auth
 
         foreach($this->chainList() as $authClass => $object)
         {
-            $authClass = "app\\clouds\\auth\\{$authClass}";
             if(!class_exists($authClass))
             {
                 throw new CloudException("”".$authClass."“授权类不存在");

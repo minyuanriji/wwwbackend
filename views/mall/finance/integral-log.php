@@ -1,5 +1,6 @@
 <?php
 Yii::$app->loadComponentView('com-dialog-select');
+Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
@@ -33,7 +34,13 @@ Yii::$app->loadComponentView('com-dialog-select');
             </div>
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column prop="nickname" label="昵称"></el-table-column>
+                <el-table-column label="昵称" width="200">
+                    <template slot-scope="scope">
+                        <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
+                            {{scope.row.nickname}}
+                        </com-user-finance-stat>
+                    </template>
+                </el-table-column>
                 <el-table-column label="变动红包" width="150">
                     <template slot-scope="scope">
                         <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.integral}}</div>
@@ -116,7 +123,7 @@ Yii::$app->loadComponentView('com-dialog-select');
             return {
                 integralForm: {
                     type: "1",
-                    user_id: '',
+                    userId: '',
                     price: 0.00,
                     nickname: '',
                     remark: '',

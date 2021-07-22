@@ -12,10 +12,7 @@ namespace app\clouds;
 
 use app\clouds\base\consts\Code;
 use app\clouds\base\errors\CloudException;
-use app\clouds\base\helpers\IdentityHelper;
 use app\clouds\base\route\Route;
-use app\clouds\base\tables\CloudUser;
-use app\clouds\base\user\Identity;
 use app\clouds\base\user\User;
 use yii\web\Response;
 
@@ -23,11 +20,10 @@ class CloudApplication extends \yii\web\Application
 {
     public function run()
     {
-
         \Yii::$app->setComponents([
             "cloudUser" => [
                 'class' => 'yii\web\User',
-                'identityClass' => 'app\clouds\user\Identity',
+                'identityClass' => 'app\clouds\base\user\Identity',
                 'enableAutoLogin' => true,
             ]
         ]);
@@ -42,7 +38,7 @@ class CloudApplication extends \yii\web\Application
         });
 
         //TODO 测试
-        IdentityHelper::login(new Identity(CloudUser::findOne(10012)));
+        //IdentityHelper::login(new Identity(CloudUser::findOne(10012)));
 
         try {
             AppEngine::run($this, Route::parse());

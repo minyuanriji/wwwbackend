@@ -35,6 +35,16 @@ abstract class Module extends BaseObject
     }
 
     /**
+     * 获取所在命名空间
+     * @return string
+     */
+    public function getNamespace()
+    {
+        $moduleDir = FuncHelper::convertNamesPath($this->moduleModel->class_dir);
+        return $this->project->getNamespace() . "\\{$moduleDir}";;
+    }
+
+    /**
      * 访问权限判断
      * @return bool
      */
@@ -43,6 +53,12 @@ abstract class Module extends BaseObject
         return true;
     }
 
+    /**
+     * 获取功能对象
+     * @param $action_id
+     * @return mixed|null
+     * @throws CloudException
+     */
     public function getAction($action_id)
     {
         if(!isset($this->actions[$action_id]))
@@ -53,10 +69,8 @@ abstract class Module extends BaseObject
                 throw new CloudException("”".$action_id."“功能不存在");
             }
 
-            $projectDir = FuncHelper::convertNamesPath($this->project->getModel()->class_dir);
-            $moduleDir  = FuncHelper::convertNamesPath($this->moduleModel->class_dir);
             $actionDir  = FuncHelper::convertNamesPath($actionModel->class_dir);
-            $actionClass = "app\\clouds\\apps\\{$projectDir}\\{$moduleDir}\\{$actionDir}\\Action";
+            $actionClass = $this->getNamespace() . "\\{$actionDir}\\Action";
             if(!class_exists($actionClass))
             {
                 throw new CloudException("”".$actionClass."“功能类不存在");

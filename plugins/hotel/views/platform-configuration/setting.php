@@ -190,7 +190,7 @@
                 </el-tab-pane>
             </el-tabs>
             <el-button :loading="submitLoading" class="button-item" size="small" type="primary"
-                       @click="submit('ruleForm')">保存
+                       @click="submit">保存
             </el-button>
         </el-form>
     </el-card>
@@ -280,30 +280,25 @@
                 });
             },
 
-            submit(formName) {
-                this.$refs[formName].validate(valid => {
-                    if (valid) {
-                        this.submitLoading = true;
-                        request({
-                            params: {
-                                r: 'plugin/hotel/mall/platform-configuration/setting',
-                            },
-                            method: 'post',
-                            data: {
-                                ruleForm: JSON.stringify(this.ruleForm)
-                            },
-                        }).then(e => {
-                            this.submitLoading = false;
-                            if (e.data.code === 0) {
-                                this.$message.success(e.data.msg);
-                            } else {
-                                this.$message.error(e.data.msg);
-                            }
-                        }).catch(e => {
-                        });
+            submit() {
+                console.log(this.ruleForm)
+                this.submitLoading = true;
+                request({
+                    params: {
+                        r: 'plugin/hotel/mall/platform-configuration/setting',
+                    },
+                    method: 'post',
+                    data: {
+                        ruleForm: this.ruleForm
+                    },
+                }).then(e => {
+                    this.submitLoading = false;
+                    if (e.data.code === 0) {
+                        this.$message.success(e.data.msg);
                     } else {
-                        this.$message.error('部分参数验证不通过');
+                        this.$message.error(e.data.msg);
                     }
+                }).catch(e => {
                 });
             },
             handleClick(tab, event) {

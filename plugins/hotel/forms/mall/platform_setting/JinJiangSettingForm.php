@@ -55,12 +55,7 @@ class JinJiangSettingForm extends BaseModel
 
     public function set($data)
     {
-        $new_data = [
-            'account' => $data['account'],
-            'secretKey' => $data['secretKey'],
-        ];
-
-        $option = OptionLogic::set(Option::NAME_HOTEL_JINJIANG, $new_data, \Yii::$app->mall->id, Option::GROUP_HOTEL);
+        $option = OptionLogic::set(Option::NAME_HOTEL_JINJIANG, $data, \Yii::$app->mall->id, Option::GROUP_HOTEL);
         if ($option) {
             return [
                 'code' => ApiCode::CODE_SUCCESS,

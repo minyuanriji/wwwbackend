@@ -26,20 +26,22 @@ class Plugin extends \app\plugins\Plugin{
     public function getMenus(){
         return [
             [
+                'name' => '设置',
+                'route' => 'plugin/hotel/mall/platform-configuration/setting',
+                'icon' => 'el-icon-setting',
+                'action' => []
+            ],
+            [
                 'name' => '订单管理',
                 'route' => 'plugin/hotel/mall/order/list',
                 'icon' => 'el-icon-setting',
-                'action' => [
-
-                ]
+                'action' => []
             ],
             [
                 'name' => '售后管理',
                 'route' => 'plugin/hotel/mall/order/refund',
                 'icon' => 'el-icon-setting',
-                'action' => [
-
-                ]
+                'action' => []
             ],
         ];
     }

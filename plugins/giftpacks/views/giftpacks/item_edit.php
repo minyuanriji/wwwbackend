@@ -219,7 +219,7 @@
                         goods_id     : 0,
                         expired_at   : '',
                         max_stock    : 0,
-                        usable_times : 0
+                        usable_times : 1
                     };
                     this.dailogTitle = "添加商品";
                 }

@@ -12,7 +12,7 @@ class GiftpacksOrderItem extends BaseActiveRecord
      */
     public static function tableName()
     {
-        return '{{%giftpacks_order_item}}';
+        return '{{%plugin_giftpacks_order_item}}';
     }
 
     public function rules()

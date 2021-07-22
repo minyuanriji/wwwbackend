@@ -121,7 +121,7 @@ abstract class Action extends BaseObject
         }
 
         $classDir = FuncHelper::convertNamesPath($projectModel->class_dir);
-        $projectClass = "app\\clouds\\apps\\{$classDir}\\Project";
+        $projectClass = "{$classDir}\\Project";
         if(!class_exists($projectClass))
         {
             throw new CloudException("”".$projectClass."“项目类不存在");

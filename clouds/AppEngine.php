@@ -12,6 +12,7 @@ use app\clouds\base\action\Action;
 use app\clouds\base\auth\AccessAuth;
 use app\clouds\base\consts\Code;
 use app\clouds\base\errors\CloudException;
+use app\clouds\base\helpers\IdentityHelper;
 use app\clouds\base\route\Route;
 use yii\base\BaseObject;
 use Yii;
@@ -30,7 +31,8 @@ class AppEngine extends BaseObject
         if(!$auth->pass())
         {
             $authAction = null;
-            if(!Yii::$app->getRequest()->isAjax){
+            if(!IdentityHelper::isLogin() && !Yii::$app->getRequest()->isAjax)
+            {
                 $authAction = $action->getAuthAction();
             }
             if(!$authAction || !($authAction instanceof Action))

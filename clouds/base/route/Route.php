@@ -35,7 +35,6 @@ class Route extends BaseObject
             throw new RequestException("访问域名不能为空");
         }
 
-
         $route->host    = trim(strtolower($parseArray['host']));
         $route->scheme  = !empty($parseArray['scheme']) && strtolower($parseArray['scheme']) == "https" ? "https" : "http";
 

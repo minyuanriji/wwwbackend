@@ -13,7 +13,10 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/ant-design-vue@1.7.6/dist/antd.css" rel="stylesheet" type="text/css"/>
+
+    <!--
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
+    -->
     <script src="https://cdn.jsdelivr.net/npm/ant-design-vue@1.7.6/dist/antd.js"></script>
 
     <title><?= $this->title ?></title>

@@ -46,7 +46,7 @@ abstract class Project extends BaseObject
     public function getNamespace()
     {
         $projectDir = FuncHelper::convertNamesPath($this->projectModel->class_dir);
-        return "app\\clouds\\apps\\{$projectDir}";;
+        return $projectDir;
     }
 
     /**

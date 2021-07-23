@@ -17,25 +17,27 @@ class AccountBalanceQueryAction extends BaseObject
         $BalanceQueryResult = new BalanceQueryResult();
         try {
             $post_param = [
-                'mchid'      => $this->plateforms_params['mch_id'],
-                'sign'       => md5($this->plateforms_params['mch_id'] . $this->plateforms_params['my'])
+                'szAgentId'      => $this->plateforms_params['id'],
+                'szVerifyString' => md5("szAgentId=" . $this->plateforms_params['id'] . "&szKey=" . $this->plateforms_params['secret_key']),
+                'szFormat'       => "JSON"
             ];
             $response = Request::execute(Config::BALANCE_QUERY, $post_param);
+            print_r($response);die;
             $parseArray = @json_decode($response, true);
-            if (!isset($parseArray['code'])) {
+            if (!isset($parseArray['nRtn'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
             }
 
-            if ($parseArray['code'] != Code::BALANCE_QUERY_SUCCESS) {
-                if (isset($parseArray['msg'])) {
-                    throw new \Exception($parseArray['msg'] . " " . $parseArray['code'], ApiCode::CODE_FAIL);
+            if ($parseArray['nRtn'] != Code::BALANCE_QUERY_SUCCESS) {
+                if (isset($parseArray['szRtnCode'])) {
+                    throw new \Exception($parseArray['szRtnCode'] . "---code:" . $parseArray['nRtn'], ApiCode::CODE_FAIL);
                 } else {
-                    throw new \Exception("未知错误 " . $parseArray['code'], ApiCode::CODE_FAIL);
+                    throw new \Exception("未知错误 " . $parseArray['nRtn'], ApiCode::CODE_FAIL);
                 }
             }
 
-            $BalanceQueryResult->code = $parseArray['code'];
-            $BalanceQueryResult->balance = $parseArray['balance'];
+            $BalanceQueryResult->code = $parseArray['nRtn'];
+            $BalanceQueryResult->balance = $parseArray['fBalance'];
 
         } catch (\Exception $e) {
             $BalanceQueryResult->code = SubmitResult::CODE_FAIL;

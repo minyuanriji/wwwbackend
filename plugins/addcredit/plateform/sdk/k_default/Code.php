@@ -15,5 +15,5 @@ class Code
 
     //3、获取余额状态码
         //查询成功
-        const BALANCE_QUERY_SUCCESS = 100;
+        const BALANCE_QUERY_SUCCESS = 0;
 }

@@ -27,6 +27,7 @@ class PhoneOrderPayForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
+        $transaction = \Yii::$app->db->beginTransaction();
         try {
             $addcredit_order = AddcreditOrder::findOne(["order_no" => $this->order_no]);
             if (!$addcredit_order) {
@@ -46,12 +47,6 @@ class PhoneOrderPayForm extends BaseModel
             if ($user->static_integral < $this->order_price) {
                 throw new \Exception("红包数量不足", ApiCode::CODE_FAIL);
             }
-
-            //扣取红包
-            /*$res = UserIntegralForm::PhoneBillOrderPaySub($addcredit_order, $user, $this->order_price);
-            if ($res['code'] != ApiCode::CODE_SUCCESS) {
-                throw new \Exception("红包扣取失败：" . $res['msg'], ApiCode::CODE_FAIL);
-            }*/
 
             //平台下单
             $plateform = AddcreditPlateforms::findOne($addcredit_order->plateform_id);
@@ -80,11 +75,19 @@ class PhoneOrderPayForm extends BaseModel
                 throw new \Exception($this->responseErrorMsg($addcredit_order));
             }
 
+            //扣取红包
+            $res = UserIntegralForm::PhoneBillOrderPaySub($addcredit_order, $user, $this->order_price);
+            if ($res['code'] != ApiCode::CODE_SUCCESS) {
+                throw new \Exception("红包扣取失败：" . $res['msg'], ApiCode::CODE_FAIL);
+            }
+
+            $transaction->commit();
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '支付成功'
             ];
         } catch (\Exception $e) {
+            $transaction->rollBack();
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => $e->getMessage()

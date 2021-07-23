@@ -35,7 +35,7 @@ class AccountBalanceQueryAction extends BaseObject
             } else {
                 $BalanceQueryResult->balance = $parseArray['fBalance'];
             }
-            $BalanceQueryResult->code = $parseArray['nRtn'];
+            $BalanceQueryResult->code = BalanceQueryResult::CODE_SUCC;
 
         } catch (\Exception $e) {
             $BalanceQueryResult->code = SubmitResult::CODE_FAIL;

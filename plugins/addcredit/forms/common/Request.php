@@ -42,7 +42,8 @@ class Request
         }
     }
 
-    public static function http_get($url){
+    public static function http_get($url)
+    {
         //1. 初始化
         $ch = curl_init();
         //1.2 设置请求的url地址
@@ -62,15 +63,16 @@ class Request
         curl_setopt($ch,CURLOPT_SSL_VERIFYHOST,0);
         curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,0);
 
-        //1.9 获取是否有异常,大于0就是有异常
-        echo curl_error($ch);
-        if(curl_errno($ch) > 0){
-            //2. 输出错误信息
-            echo curl_error($ch);
-        };
-
         //1.4 关闭请求
         curl_close($ch);
+
+        $errno = curl_errno($ch);
+        $error = curl_error($ch);
+
+        if (!empty($errno)) {
+            throw new \Exception($error, ApiCode::CODE_FAIL);
+        }
+
         return $data;
     }
 }

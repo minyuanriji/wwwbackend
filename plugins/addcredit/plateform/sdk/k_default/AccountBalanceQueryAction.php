@@ -33,7 +33,7 @@ class AccountBalanceQueryAction extends BaseObject
             if ($parseArray['nRtn'] == Code::Frequent_Operation) {
                 $BalanceQueryResult->balance = '操作频繁，请30秒后再试！';
             } else {
-                $BalanceQueryResult->balance = $parseArray['fBalance'];
+                $BalanceQueryResult->balance = $parseArray['fBalance'] . "元";
             }
             $BalanceQueryResult->code = BalanceQueryResult::CODE_SUCC;
 

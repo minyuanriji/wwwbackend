@@ -63,16 +63,16 @@ class SubmitOrderAction extends BaseObject
                 'szVerifyString'    => md5('szAgentId=' . $plateforms_param->id . '&szOrderId=' . $this->AddcreditOrder->order_no . '&szPhoneNum=' . $this->AddcreditOrder->mobile . '&nMoney=' . (int)$this->AddcreditOrder->order_price . '&nSortType=' . $teltype . '&nProductClass=1&nProductType=1&szTimeStamp=' . $timeStamp . '&szKey=' . $plateforms_param->secret_key),
                 'szNotifyUrl'       => ''
             ];
-            $str_params = '';
+            /*$str_params = '';
             foreach ($post_param as $key => $value) {
                 if ($key == 'szAgentId') {
                     $str_params .= "?$key=".$value;
                 } else {
                     $str_params .= "&$key=".$value;
                 }
-            }
-            $response = Request::http_get(Config::PHONE_BILL_SUBMIT . $str_params);
-//            $response = Request::execute(Config::PHONE_BILL_SUBMIT, $post_param);
+            }*/
+//            $response = Request::http_get(Config::PHONE_BILL_SUBMIT . $str_params);
+            $response = Request::execute(Config::PHONE_BILL_SUBMIT, $post_param);
             $parseArray = @json_decode($response, true);
             if (!isset($parseArray['nRtn'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);

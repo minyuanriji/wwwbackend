@@ -31,8 +31,12 @@ class AccountBalanceQueryAction extends BaseObject
                 }
             }
 
+            if ($parseArray['nRtn'] == Code::Frequent_Operation) {
+                $BalanceQueryResult->balance = '操作频繁，请30秒后再试！';
+            } else {
+                $BalanceQueryResult->balance = $parseArray['fBalance'];
+            }
             $BalanceQueryResult->code = $parseArray['nRtn'];
-            $BalanceQueryResult->balance = $parseArray['fBalance'];
 
         } catch (\Exception $e) {
             $BalanceQueryResult->code = SubmitResult::CODE_FAIL;

@@ -17,8 +17,6 @@
                             <div>{{scope.row.balance}}</div>
                         </template>
                     </el-table-column>
-
-<!--                    <el-table-column label="操作"></el-table-column>-->
                 </el-table>
                 <div flex="box:last cross:center">
                     <div></div>

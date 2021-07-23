@@ -12,7 +12,6 @@ use app\plugins\addcredit\plateform\sdk\k_default\PlateForm;
 
 class PhoneOrderPayForm extends BaseModel
 {
-
     public $order_no;
     public $order_price;
 

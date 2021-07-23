@@ -48,11 +48,11 @@ class SubmitOrderAction extends BaseObject
     {
         $SubmitResult = new SubmitResult();
         try {
-            $plateforms_param = json_decode($this->AddcreditPlateforms->json_param);
+            $plateforms_param = @json_decode($this->AddcreditPlateforms->json_param);
             $teltype = (new TelType())->getPhoneType($this->AddcreditOrder->mobile);
             $timeStamp = date("Y-m-d H:i:s", time());
             $post_param = [
-                'szAgentId'         => $plateforms_param['id'],
+                'szAgentId'         => $plateforms_param->id,
                 'szOrderId'         => $this->AddcreditOrder->order_no,
                 'szPhoneNum'        => $this->AddcreditOrder->mobile,
                 'nMoney'            => (int)$this->AddcreditOrder->order_price,
@@ -60,7 +60,7 @@ class SubmitOrderAction extends BaseObject
                 'nProductClass'     => 1,//固定值
                 'nProductType'      => 1,//固定值
                 'szTimeStamp'       => $timeStamp,
-                'szVerifyString'    => md5('szAgentId=' . $plateforms_param['id'] . '&szOrderId=' . $this->AddcreditOrder->order_no . '&szPhoneNum=' . $this->AddcreditOrder->mobile . '&nMoney=' . (int)$this->AddcreditOrder->order_price . '&nSortType=' . $teltype . '&nProductClass=1&nProductType=1&szTimeStamp=' . $timeStamp . '&szKey=' . $plateforms_param['secret_key']),
+                'szVerifyString'    => md5('szAgentId=' . $plateforms_param->id . '&szOrderId=' . $this->AddcreditOrder->order_no . '&szPhoneNum=' . $this->AddcreditOrder->mobile . '&nMoney=' . (int)$this->AddcreditOrder->order_price . '&nSortType=' . $teltype . '&nProductClass=1&nProductType=1&szTimeStamp=' . $timeStamp . '&szKey=' . $plateforms_param->secret_key),
             ];
             $response = Request::execute(Config::PHONE_BILL_SUBMIT, $post_param);
             $parseArray = @json_decode($response, true);

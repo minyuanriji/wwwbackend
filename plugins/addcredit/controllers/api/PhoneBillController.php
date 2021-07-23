@@ -3,6 +3,7 @@
 namespace app\plugins\addcredit\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
+use app\plugins\addcredit\forms\api\order\RechargeRecordForm;
 use app\plugins\ApiController;
 use app\plugins\addcredit\forms\api\order\PhoneOrderPayForm;
 use app\plugins\addcredit\forms\api\order\PhoneOrderSubmitForm;
@@ -43,6 +44,18 @@ class PhoneBillController extends ApiController
         $form = new PhoneOrderPayForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->pay());
+    }
+
+    /**
+     * 充值记录
+     * plateforms_id   平台ID
+     * @return \yii\web\Response
+     */
+    public function actionRechargeRecord()
+    {
+        $form = new RechargeRecordForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->RechargeList());
     }
 
 

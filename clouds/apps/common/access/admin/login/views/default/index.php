@@ -1,152 +1,159 @@
-<template id="app">
-    <div id="userLayout" class="user-layout-wrapper">
-        <div class="container">
-            <div class="user-layout-lang">
-                <select-lang class="select-lang-trigger" />
+<template id="content">
+    <div class="main">
+
+        <a-form id="formLogin" class="user-layout-login" ref="formLogin">
+
+            <a-tabs :activeKey="tabActiveKey"  @change="callback">
+                <a-tab-pane key="1" tab="Tab 1">
+                    Content of Tab Pane 1
+                </a-tab-pane>
+                <a-tab-pane key="2" tab="Tab 2" force-render>
+                    Content of Tab Pane 2
+                </a-tab-pane>
+                <a-tab-pane key="3" tab="Tab 3">
+                    Content of Tab Pane 3
+                </a-tab-pane>
+            </a-tabs>
+
+            <a-tabs :activeKey="customActiveKey"
+                    :tabBarStyle="{ textAlign: 'center', borderBottom: 'unset' }"
+                    >
+                <a-tab-pane key="tab1" tab="账号密码登陆">
+                    <a-alert v-if="isLoginError" type="error" showIcon style="margin-bottom: 24px;" message="账号密码不正确" />
+                    <a-form-item>
+                        <a-input size="large" type="text" placeholder="用户名">
+                            <a-icon slot="prefix" type="user" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+                        </a-input>
+                    </a-form-item>
+
+                    <a-form-item>
+                        <a-input-password size="large" placeholder="密码"/>
+                            <a-icon slot="prefix" type="lock" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+                        </a-input-password>
+                    </a-form-item>
+                </a-tab-pane>
+                <a-tab-pane key="tab2" tab="手机号码登陆">
+                    <a-form-item>
+                        <a-input size="large" type="text" placeholder="手机号码" >
+                            <a-icon slot="prefix" type="mobile" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+                        </a-input>
+                    </a-form-item>
+
+                    <a-row :gutter="16">
+                        <a-col class="gutter-row" :span="16">
+                            <a-form-item>
+                                <a-input size="large" type="text" placeholder="验证码" >
+                                    <a-icon slot="prefix" type="mail" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+                                </a-input>
+                            </a-form-item>
+                        </a-col>
+                        <a-col class="gutter-row" :span="8">
+                            <a-button class="getCaptcha" tabindex="-1" :disabled="state.smsSendBtn" v-text="'获取验证码'"></a-button>
+                        </a-col>
+                    </a-row>
+                </a-tab-pane>
+            </a-tabs>
+
+            <a-form-item>
+                <a-checkbox>记住我</a-checkbox>
+                <router-link  class="forge-password" style="float: right;">忘记密码</router-link>
+            </a-form-item>
+
+            <a-form-item style="margin-top:24px">
+                <a-button
+                        size="large"
+                        type="primary"
+                        htmlType="submit"
+                        class="login-button"
+                        :loading="state.loginBtn"
+                        :disabled="state.loginBtn">登陆</a-button>
+            </a-form-item>
+
+            <div class="user-login-other">
+                <span>其它登陆方式</span>
+                <a>
+                    <a-icon class="item-icon" type="alipay-circle"></a-icon>
+                </a>
+                <a>
+                    <a-icon class="item-icon" type="taobao-circle"></a-icon>
+                </a>
+                <a>
+                    <a-icon class="item-icon" type="weibo-circle"></a-icon>
+                </a>
             </div>
-            <div class="user-layout-content">
-                <div class="top">
-                    <div class="header">
-                        <a href="/">
-                            <img src="https://preview.pro.antdv.com/assets/logo.f3103225.svg" class="logo" alt="logo">
-                            <span class="title">Ant Design</span>
-                        </a>
-                    </div>
-                    <div class="desc">
+        </a-form>
 
-                    </div>
-                </div>
-
-                <!-- content  -->
-
-                <div class="footer">
-                    <div class="links">
-                        <a href="_self">帮助</a>
-                        <a href="_self">隐私</a>
-                        <a href="_self">条款</a>
-                    </div>
-                    <div class="copyright">
-                        Copyright &copy; 2018 vueComponent
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
 <script>
     new Vue({
-        el: '#app',
+        el: '#content',
         data() {
             return {
+                tabActiveKey: 1,
 
+
+                customActiveKey: 'tab1',
+                loginBtn: false,
+                loginType: 0,
+                isLoginError: false,
+                requiredTwoStepCaptcha: false,
+                stepCaptchaVisible: false,
+                state: {
+                    time: 60,
+                    loginBtn: false,
+                    // login type: 0 email, 1 username, 2 telephone
+                    loginType: 0,
+                    smsSendBtn: false
+                }
             }
         },
         created() {
         },
         methods: {
-
+            callback(key) {
+                console.log(key);
+            }
         },
     });
 </script>
 
 <style type="text/css">
-#userLayout.user-layout-wrapper{height: 100%;}
-#userLayout.user-layout-wrapper .container .main{
-    max-width: 368px;
-    width: 98%;
-}
-#userLayout.user-layout-wrapper .container{
-    width: 100%;
-    min-height: 100%;
-    background: #f0f2f5 url(https://preview.pro.antdv.com/assets/background.5825f033.svg) no-repeat 50%;
-    background-size: 100%;
-    position: relative;
-}
-#userLayout.user-layout-wrapper .container .user-layout-lang{
+.user-layout-login label{font-size: 14px;}
+.user-layout-login .getCaptcha{
+    display: block;
     width: 100%;
     height: 40px;
-    line-height: 44px;
-    text-align: right;
 }
-#userLayout.user-layout-wrapper .container .user-layout-lang .select-lang-trigger{
-    cursor: pointer;
-    padding: 12px;
-    margin-right: 24px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    vertical-align: middle;
-}
-#userLayout.user-layout-wrapper .container .user-layout-content{
-    padding: 32px 0 24px;
-}
-#userLayout.user-layout-wrapper .container .user-layout-content .top{
-    text-align: center;
-}
-#userLayout.user-layout-wrapper .container .user-layout-content .top .header{
-    height: 44px;
-    line-height: 44px;
-}
-#userLayout.user-layout-wrapper .container .user-layout-content .top .header .badge{
-    position: absolute;
-    display: inline-block;
-    line-height: 1;
-    vertical-align: middle;
-    margin-left: -12px;
-    margin-top: -10px;
-    opacity: 0.8;
-}
-#userLayout.user-layout-wrapper .container .user-layout-content .top .header .logo{
-    height: 44px;
-    vertical-align: top;
-    margin-right: 16px;
-    border-style: none;
-}
-#userLayout.user-layout-wrapper .container .user-layout-content .top .header .title{
-    font-size: 33px;
-    color: rgba(0, 0, 0, .85);
-    font-family: Avenir, 'Helvetica Neue', Arial, Helvetica, sans-serif;
-    font-weight: 600;
-    position: relative;
-    top: 2px;
-}
-#userLayout.user-layout-wrapper .container .user-layout-content .top .desc {
+.user-layout-login .forge-password{
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.45);
-    margin-top: 12px;
-    margin-bottom: 40px;
 }
-#userLayout.user-layout-wrapper .container .user-layout-content .main{
-    min-width: 260px;
-    width: 368px;
-    margin: 0 auto;
-}
-#userLayout.user-layout-wrapper .container .user-layout-content .footer{
+.user-layout-login button.login-button{
+    padding: 0 15px;
+    font-size: 16px;
+    height: 40px;
     width: 100%;
-    bottom: 0;
-    padding: 0 16px;
-    margin: 48px 0 24px;
-    text-align: center;
 }
-#userLayout.user-layout-wrapper .container .user-layout-content .footer .links{
-    margin-bottom: 8px;
-    font-size: 14px;
+.user-layout-login .user-login-other{
+    text-align: left;
+    margin-top: 24px;
+    line-height: 22px;
 }
-#userLayout.user-layout-wrapper .container .user-layout-content .footer .links a{
-    color: rgba(0, 0, 0, 0.45);
-    transition: all 0.3s;
+.user-layout-login .user-login-other .item-icon{
+    font-size: 24px;
+    color: rgba(0, 0, 0, 0.2);
+    margin-left: 16px;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: color 0.3s;
 }
-#userLayout.user-layout-wrapper .container .user-layout-content .footer .links a &:not(:last-child) {
-    margin-right: 40px;
+.user-layout-login .user-login-other .item-icon &:hover{
+    color: #1890ff;
 }
-#userLayout.user-layout-wrapper .container .user-layout-content .footer .copyright{
-    color: rgba(0, 0, 0, 0.45);
-    font-size: 14px;
+.user-layout-login .user-login-other .register{
+    float: right;
 }
-#userLayout.user-layout-wrapper .container a{
-    text-decoration: none;
-}
+
 </style>
 

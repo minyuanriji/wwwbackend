@@ -7,6 +7,7 @@ use app\models\BaseModel;
 use app\models\IntegralLog;
 use app\models\IntegralRecord;
 use app\models\User;
+use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelRefundApplyOrder;
 
@@ -14,6 +15,40 @@ class UserIntegralForm extends BaseModel{
 
     const TYPE_ADD      = 1;
     const TYPE_SUB      = 2;
+
+    /**
+     * 支付大礼包订单订单
+     * @param HotelOrder $order
+     * @param User $user
+     * @param boolean $trans
+     * @return array
+     */
+    public static function giftpacksOrderPaySub(GiftpacksOrder $order, User $user, $trans = false){
+
+        $trans && ($t = \Yii::$app->db->beginTransaction());
+
+        try {
+            $desc = "支付大礼包“".$order->order_sn."”订单";
+            static::change($user, $order->integral_deduction_price, self::TYPE_SUB, "giftpacks_order", $order->id, $desc);
+
+            $trans && $t->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '扣取成功'
+            ];
+        }catch (\Exception $e){
+
+            $trans && $t->rollBack();
+
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+
+
+    }
 
     /**
      * 酒店预订订单退款
@@ -54,7 +89,7 @@ class UserIntegralForm extends BaseModel{
     public static function hotelOrderPaySub(HotelOrder $order, User $user, $price){
         $t = \Yii::$app->db->beginTransaction();
         try {
-            $desc = "支付酒店预订订单“".$order->order_no."”";
+            $desc = "支付酒店预订“".$order->order_no."”订单";
 
             static::change($user, $price, self::TYPE_SUB, "hotel_order", $order->id, $desc);
 

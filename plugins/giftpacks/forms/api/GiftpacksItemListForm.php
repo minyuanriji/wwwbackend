@@ -3,6 +3,7 @@
 namespace app\plugins\giftpacks\forms\api;
 
 use app\core\ApiCode;
+use app\models\BaseActiveRecord;
 use app\models\BaseModel;
 use app\models\Goods;
 use app\models\GoodsWarehouse;
@@ -51,15 +52,15 @@ class GiftpacksItemListForm extends BaseModel{
             $selects = ["gpi.*"];
             $selects[] = "g.price as goods_price"; //商品价格
             $selects[] = "s.name as store_name"; //店铺名称
+            $selects[] = "count(goi.id) as sold_num"; //已售数量
             $selects = array_merge($selects, ["s.mch_id", "s.score", "s.longitude", "s.latitude"]);
             $selects[] = "ST_Distance_sphere(point(s.longitude, s.latitude), point(".$this->longitude.", ".$this->latitude.")) as distance_mi";
+            $query->select($selects)->groupBy("goi.id");
 
-            $query->select($selects)
-                  ->orderBy("gpi.updated_at DESC")
-                  ->page($pagination, 10, max(1, (int)$this->page));
-            $query->groupBy("gpi.id HAVING count(gpi.id) < gpi.max_stock ");
-
-            $list = $query->asArray()->all();
+            $list = BaseActiveRecord::find()->from($query)->where([
+                "sold_num < max_stock"
+            ])->page($pagination, 10, max(1, (int)$this->page))
+              ->orderBy("gpi.updated_at DESC")->asArray()->all();
 
             if($list){
                 foreach($list as &$item){

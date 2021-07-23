@@ -2,7 +2,6 @@
 
 namespace app\plugins\addcredit\plateform\sdk\k_default;
 
-use app\controllers\business\WechatTemplate;
 use app\core\ApiCode;
 use app\plugins\addcredit\forms\common\Request;
 use app\plugins\addcredit\plateform\result\BalanceQueryResult;
@@ -23,7 +22,7 @@ class AccountBalanceQueryAction extends BaseObject
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
             }
 
-            if ($parseArray['nRtn'] != Code::BALANCE_QUERY_SUCCESS) {
+            if ($parseArray['nRtn'] != Code::BALANCE_QUERY_SUCCESS && $parseArray['nRtn'] != Code::Frequent_Operation) {
                 if (isset($parseArray['szRtnCode'])) {
                     throw new \Exception($parseArray['szRtnCode'] . "---code:" . $parseArray['nRtn'], ApiCode::CODE_FAIL);
                 } else {

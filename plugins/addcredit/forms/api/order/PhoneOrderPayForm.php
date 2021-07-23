@@ -48,10 +48,10 @@ class PhoneOrderPayForm extends BaseModel
             }
 
             //扣取红包
-            $res = UserIntegralForm::PhoneBillOrderPaySub($addcredit_order, $user, $this->order_price);
+            /*$res = UserIntegralForm::PhoneBillOrderPaySub($addcredit_order, $user, $this->order_price);
             if ($res['code'] != ApiCode::CODE_SUCCESS) {
                 throw new \Exception("红包扣取失败：" . $res['msg'], ApiCode::CODE_FAIL);
-            }
+            }*/
 
             //平台下单
             $plateform = AddcreditPlateforms::findOne($addcredit_order->plateform_id);

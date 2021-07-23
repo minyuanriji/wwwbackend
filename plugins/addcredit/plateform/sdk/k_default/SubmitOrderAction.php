@@ -61,6 +61,7 @@ class SubmitOrderAction extends BaseObject
                 'nProductType'      => 1,//固定值
                 'szTimeStamp'       => $timeStamp,
                 'szVerifyString'    => md5('szAgentId=' . $plateforms_param->id . '&szOrderId=' . $this->AddcreditOrder->order_no . '&szPhoneNum=' . $this->AddcreditOrder->mobile . '&nMoney=' . (int)$this->AddcreditOrder->order_price . '&nSortType=' . $teltype . '&nProductClass=1&nProductType=1&szTimeStamp=' . $timeStamp . '&szKey=' . $plateforms_param->secret_key),
+                'szNotifyUrl'       => ''
             ];
             $str_params = '';
             foreach ($post_param as $key => $value) {

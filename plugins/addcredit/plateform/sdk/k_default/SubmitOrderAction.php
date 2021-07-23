@@ -80,7 +80,7 @@ class SubmitOrderAction extends BaseObject
 
             if ($parseArray['nRtn'] != Code::ORDER_SUCCESS) {
                 if (isset($parseArray['szRtnCode'])) {
-                    throw new \Exception($parseArray['szRtnCode'] . " " . $parseArray['nRtn'], ApiCode::CODE_FAIL);
+                    throw new \Exception($parseArray['szRtnCode'] . "---code:" . $parseArray['nRtn'] . "---msg:" . Msg::msg()[$parseArray['nRtn']], ApiCode::CODE_FAIL);
                 } else {
                     throw new \Exception("未知错误 " . $parseArray['nRtn'], ApiCode::CODE_FAIL);
                 }

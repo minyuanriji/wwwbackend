@@ -33,7 +33,14 @@ class RechargeRecordForm extends BaseModel
                 'user_id' => \Yii::$app->user->id,
                 'mall_id' => \Yii::$app->mall->id,
             ])
-                ->select('id,mobile,order_price,pay_status,order_status,FROM_UNIXTIME( created_at, "%Y-%m-%d %H:%i:%s" ) AS created_at')
+                ->select([
+                    "id",
+                    "mobile",
+                    "order_price",
+                    "pay_status",
+                    "order_status",
+                    "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at",
+                ])
                 ->orderBy('created_at DESC')->limit(10)->asArray()->all();
 
             if ($result) {

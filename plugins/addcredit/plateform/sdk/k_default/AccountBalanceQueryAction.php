@@ -18,9 +18,6 @@ class AccountBalanceQueryAction extends BaseObject
         $BalanceQueryResult = new BalanceQueryResult();
         try {
             $response = Request::http_get(Config::BALANCE_QUERY . "?szAgentId=" . $this->plateforms_params['id'] . "&szVerifyString=" . md5("szAgentId=". $this->plateforms_params['id'] . "&szKey=" . $this->plateforms_params['secret_key']) . "&szFormat=JSON");
-            print_r(Config::BALANCE_QUERY . "?szAgentId=" . $this->plateforms_params['id'] . "&szVerifyString=" . md5("szAgentId=". $this->plateforms_params['id'] . "&szKey=" . $this->plateforms_params['secret_key']) . "&szFormat=JSON");
-            print_r($response);die;
-
             $parseArray = @json_decode($response, true);
             if (!isset($parseArray['nRtn'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);

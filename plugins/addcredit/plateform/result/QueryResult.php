@@ -14,5 +14,6 @@ class QueryResult
     public $status;
 
     public $response_content;
+    public $request_data;
 
 }

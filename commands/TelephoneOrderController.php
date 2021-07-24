@@ -56,7 +56,7 @@ class TelephoneOrderController extends BaseCommandController
                 if ($query_res->code != QueryResult::CODE_SUCC) {
                     throw new \Exception($query_res->message, ApiCode::CODE_FAIL);
                 }
-                $response_content = $query_res->response_content;
+                $response_content = json_decode($query_res->response_content);
                 try {
                     //成功，处理状态
                     $item->updated_at = time();

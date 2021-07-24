@@ -18,7 +18,6 @@ class TelephoneOrderController extends BaseCommandController
 
     public function actionMaintantJob()
     {
-        $this->orderQuery();die;
         $this->mutiKill();
 
         echo date("Y-m-d H:i:s") . " 话费订单查询中...\n";
@@ -27,8 +26,7 @@ class TelephoneOrderController extends BaseCommandController
             $this->sleep(1);
             try {
 
-                //检查订单是否已完成
-                $this->orderQuery();
+                $this->orderQuery();die;
 
             } catch (\Exception $e) {
                 $this->commandOut($e->getMessage());

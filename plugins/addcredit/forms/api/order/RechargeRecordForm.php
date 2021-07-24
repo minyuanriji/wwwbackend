@@ -50,6 +50,8 @@ class RechargeRecordForm extends BaseModel
                             $item['status'] = '充值成功';
                         } elseif ($item['order_status'] == 'processing') {
                             $item['status'] = '充值中...';
+                        } elseif ($item['order_status'] == 'fail') {
+                            $item['status'] = '失败';
                         }
                     } elseif ($item['pay_status'] == 'unpaid') {
                         $item['status'] = '未支付';

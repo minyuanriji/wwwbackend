@@ -34,7 +34,7 @@ class QueryOrderAction extends BaseObject
             }
             $QueryResult->code = QueryResult::CODE_SUCC;
             $QueryResult->response_content = $response;
-            $QueryResult->request_data = $post_param;
+            $QueryResult->request_data = json_encode($post_param);
 
         } catch (\Exception $e) {
             $QueryResult->code = QueryResult::CODE_FAIL;

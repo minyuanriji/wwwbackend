@@ -28,20 +28,10 @@ class QueryOrderAction extends BaseObject
                 'szVerifyString'    => md5("szAgentId=" . $plateforms_param->id . "&szOrderId=" . $this->AddcreditOrder->order_no . "&szKey=" . $plateforms_param->secret_key)
             ];
             $response = Request::execute(Config::ORDER_QUERY, $post_param);
-            print_r($response);die;
             $parseArray = @json_decode($response, true);
-            if (!isset($parseArray['code'])) {
+            if (!isset($parseArray['nRtn'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
             }
-
-            if ($parseArray['nRtn'] != Code::QUERY_SUCCESS) {
-                if (isset($parseArray['szRtnCode'])) {
-                    throw new \Exception(Msg::QueryMsg()[$parseArray['nRtn']], ApiCode::CODE_FAIL);
-                } else {
-                    throw new \Exception("未知错误 " . $parseArray['nRtn'], ApiCode::CODE_FAIL);
-                }
-            }
-
             $QueryResult->code = QueryResult::CODE_SUCC;
             $QueryResult->response_content = $response;
 

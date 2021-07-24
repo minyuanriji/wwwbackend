@@ -67,6 +67,7 @@ class PhoneOrderSubmitForm extends BaseModel
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data'  => [
+                    "order_id"    => $order->id,
                     "order_no"    => $order->order_no,
                     "order_price" => round($order->order_price, 2)
                 ]

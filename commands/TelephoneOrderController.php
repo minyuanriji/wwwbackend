@@ -7,7 +7,10 @@ use app\forms\common\UserIntegralForm;
 use app\models\User;
 use app\plugins\addcredit\forms\api\order\PhoneOrderRefundForm;
 use app\plugins\addcredit\models\AddcreditOrder;
+use app\plugins\addcredit\models\AddcreditPlateforms;
+use app\plugins\addcredit\plateform\result\QueryResult;
 use app\plugins\addcredit\plateform\sdk\k_default\Code;
+use app\plugins\addcredit\plateform\sdk\k_default\Msg;
 use app\plugins\addcredit\plateform\sdk\k_default\PlateForm;
 
 class TelephoneOrderController extends BaseCommandController
@@ -54,17 +57,37 @@ class TelephoneOrderController extends BaseCommandController
                 if (!$query_res) {
                     throw new \Exception('未知错误！', ApiCode::CODE_FAIL);
                 }
-                if ($query_res->code != Code::QUERY_SUCCESS) {
+                if ($query_res->code != QueryResult::CODE_SUCC) {
                     throw new \Exception($query_res->message, ApiCode::CODE_FAIL);
                 }
                 $response_content = json_decode($query_res->response_content);
                 $trans = \Yii::$app->db->beginTransaction();
                 try {
-                    if ($response_content['status'] == 3 && $response_content['arrival'] == 2) {
-                        $item->order_status = AddcreditOrder::ORDER_STATUS_SUC;
-                        $item->updated_at = time();
+                    //成功，处理状态
+                    $item->updated_at = time();
+                    switch ($response_content['nRtn'])
+                    {
+                        case Code::QUERY_SUCCESS:
+                            $item->order_status = AddcreditOrder::ORDER_STATUS_SUC;
+                            break;
+                        case Code::QUERY_FAIL:
+                            $item->order_status = AddcreditOrder::ORDER_STATUS_FAIL;
+                            break;
+                        case Code::QUERY_FREQUENTLY:
+                            throw new \Exception(Msg::QueryMsg()[$response_content['nRtn']], ApiCode::CODE_FAIL);
+                        case Code::QUERY_ORDER_EMPTY:
+                            //再次下单
+                            $plateform = AddcreditPlateforms::findOne($item->plateform_id);
+                            if (!$plateform) {
+                                throw new \Exception("无法获取平台信息", ApiCode::CODE_FAIL);
+                            }
+                            $plate_form = new PlateForm();
+                            $plate_form->submit($item, $plateform);
+                            break;
+                        default:
+                            break;
                     }
-                    if ($response_content['arrival'] == 3) {
+                    /*if ($response_content['nRtn'] == 3) {
                         $item->pay_status = AddcreditOrder::PAY_TYPE_REFUND;
                         $item->order_status = AddcreditOrder::ORDER_STATUS_FAIL;
 
@@ -85,7 +108,7 @@ class TelephoneOrderController extends BaseCommandController
                         if ($res['code'] != ApiCode::CODE_SUCCESS) {
                             throw new \Exception("红包返还失败：" . $res['msg'], ApiCode::CODE_FAIL);
                         }
-                    }
+                    }*/
                     if (!$item->save()) {
                         throw new \Exception("话费订单失败：" . json_encode($item->getErrors()), ApiCode::CODE_FAIL);
                     }

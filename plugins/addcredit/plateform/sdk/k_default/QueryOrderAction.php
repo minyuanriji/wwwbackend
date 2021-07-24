@@ -23,21 +23,22 @@ class QueryOrderAction extends BaseObject
             }
             $plateforms_param = json_decode($AddcreditPlateformsInfo->json_param);
             $post_param = [
-                'mchid'     => $plateforms_param['mch_id'],
-                'orderid'   => $this->AddcreditOrder->id,
-                'sign'      => md5($plateforms_param['mch_id'] . $this->AddcreditOrder->id . $plateforms_param[''])
+                'szAgentId'         => $plateforms_param->id,
+                'szOrderId'         => $this->AddcreditOrder->order_no,
+                'szVerifyString'    => md5("szAgentId=" . $plateforms_param->id . "&szOrderId=" . $this->AddcreditOrder->order_no . "&szKey=" . $plateforms_param->secret_key)
             ];
             $response = Request::execute(Config::ORDER_QUERY, $post_param);
+            print_r($response);die;
             $parseArray = @json_decode($response, true);
             if (!isset($parseArray['code'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
             }
 
-            if ($parseArray['code'] != Code::QUERY_SUCCESS) {
-                if (isset($parseArray['msg'])) {
-                    throw new \Exception($parseArray['msg'] . " " . $parseArray['code'], ApiCode::CODE_FAIL);
+            if ($parseArray['nRtn'] != Code::QUERY_SUCCESS) {
+                if (isset($parseArray['szRtnCode'])) {
+                    throw new \Exception(Msg::QueryMsg()[$parseArray['nRtn']], ApiCode::CODE_FAIL);
                 } else {
-                    throw new \Exception("未知错误 " . $parseArray['code'], ApiCode::CODE_FAIL);
+                    throw new \Exception("未知错误 " . $parseArray['nRtn'], ApiCode::CODE_FAIL);
                 }
             }
 

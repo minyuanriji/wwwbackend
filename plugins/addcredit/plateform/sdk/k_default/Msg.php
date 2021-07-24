@@ -5,7 +5,7 @@ namespace app\plugins\addcredit\plateform\sdk\k_default;
 class Msg
 {
 
-    public static function msg ()
+    public static function submitMsg ()
     {
         return [
             1000 => '系统接口维护',
@@ -22,6 +22,22 @@ class Msg
             3003 => '订单已存在',
             2050 => '下单异常',
             999  => '系统异常',
+        ];
+    }
+
+    public static function QueryMsg ()
+    {
+        return [
+            5001 => '查询接口关闭',
+            5002 => '请间隔30秒后再次查询同一订单',
+            5003 => '参数有误',
+            5004 => '签名错误',
+            5011 => '充值中',
+            5012 => '充值成功',
+            5013 => '充值失败',
+            5019 => '对账状态',
+            999 => '查询异常',
+            5005 => '订单不存在',
         ];
     }
 }

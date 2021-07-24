@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\core\BasePagination;
 use app\models\BaseModel;
 use app\models\GoodsService;
+use app\plugins\addcredit\models\AddcreditPlateforms;
 
 class PlateformsForm extends BaseModel
 {
@@ -34,10 +35,7 @@ class PlateformsForm extends BaseModel
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-04-16
-     * @Time: 14:17
-     * @Note: 获取商品服务列表，可带查询
+     * @Note: 获取平台列表，可带查询
      * @return array
      */
 
@@ -46,21 +44,22 @@ class PlateformsForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-        $query = GoodsService::find()->where([
-            'mall_id' => \Yii::$app->mall->id,
-            'mch_id' => \Yii::$app->admin->identity->mch_id,
-            'is_delete' => 0,
+        $query = AddcreditPlateforms::find()->where([
+            'mall_id' => \Yii::$app->mall->id
         ]);
 
         if ($this->keyword) {
             $query->andWhere(['like', 'name', $this->keyword]);
         }
-        /**
-         * @var BasePagination $pagination
-         */
         $list = $query->page($pagination)
-            ->orderBy(['sort' => SORT_ASC])
+            ->orderBy(['id' => SORT_ASC])
             ->asArray()->all();
+        if ($list) {
+            foreach ($list as &$item) {
+                $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
+                $item['json_param'] = json_decode($item['json_param'],true);
+            }
+        }
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '请求成功',
@@ -71,59 +70,19 @@ class PlateformsForm extends BaseModel
         ];
     }
 
-    public function getOptionList()
-    {
-        $list = $this->getAllServices();
-
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'msg' => '请求成功',
-            'data' => [
-                'list' => $list,
-            ]
-        ];
-    }
-
-    public function getAllServices()
-    {
-        if (!$this->validate()) {
-            return $this->responseErrorInfo();
-        }
-
-        $list = GoodsService::find()->where([
-            'mall_id' => \Yii::$app->mall->id,
-            'mch_id' => $this->mch_id ?: \Yii::$app->admin->identity->mch_id,
-            'is_delete' => 0,
-        ])->orderBy(['sort' => SORT_ASC])->all();
-
-        $newList = [];
-        /** @var GoodsService $item */
-        foreach ($list as $item) {
-            $newList[] = [
-                'id' => $item->id,
-                'name' => $item->name,
-                'is_default' => $item->is_default,
-            ];
-        }
-
-        return $newList;
-    }
-
     public function getDetail()
     {
-        $detail = GoodsService::find()->where([
+        $detail = AddcreditPlateforms::find()->where([
             'id' => $this->id,
-            'mall_id' => \Yii::$app->mall->id,
-            'mch_id' => \Yii::$app->admin->identity->mch_id,
         ])->asArray()->one();
-
         if ($detail) {
+            $json_param = json_decode($detail['json_param'],true);
+            $detail['cyd_id'] = $json_param['id'];
+            $detail['secret_key'] = $json_param['secret_key'];
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
-                'data' => [
-                    'detail' => $detail,
-                ]
+                'data' => $detail
             ];
         }
         return [
@@ -172,38 +131,5 @@ class PlateformsForm extends BaseModel
                 ]
             ];
         }
-    }
-
-    public function switchChange()
-    {
-        if (!$this->validate()) {
-            return $this->responseErrorInfo();
-        }
-        $services = GoodsService::find()->where([
-            'id' => $this->id,
-            'mall_id' => \Yii::$app->mall->id,
-            'mch_id' => \Yii::$app->admin->identity->mch_id,
-        ])->one();
-
-        if (!$services) {
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => '数据异常,该条数据不存在',
-            ];
-        }
-
-        $services->is_default = $this->is_default;
-        $res = $services->save();
-
-        if (!$res) {
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => $this->responseErrorMsg($services)
-            ];
-        }
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'msg' => '更新成功'
-        ];
     }
 }

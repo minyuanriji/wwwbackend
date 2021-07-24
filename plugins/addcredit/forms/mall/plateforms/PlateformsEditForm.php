@@ -5,22 +5,23 @@ namespace app\plugins\addcredit\forms\mall\plateforms;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\GoodsService;
+use app\plugins\addcredit\models\AddcreditPlateforms;
 
 class PlateformsEditForm extends BaseModel
 {
-
-    public $name;
-    public $remark;
-    public $is_default;
-    public $sort;
     public $id;
+    public $name;
+    public $sdk_dir;
+    public $ratio;
+    public $cyd_id;
+    public $secret_key;
 
     public function rules()
     {
         return [
-            [['name'], 'required'],
-            [['is_default', 'id', 'sort'], 'integer'],
-            [['remark'], 'string'],
+            [['name', 'sdk_dir', 'ratio', 'cyd_id', 'secret_key'], 'required'],
+            [['ratio', 'id', 'cyd_id'], 'integer'],
+            [['name', 'sdk_dir', 'secret_key'], 'string'],
         ];
     }
 
@@ -31,38 +32,32 @@ class PlateformsEditForm extends BaseModel
         }
         try {
             if ($this->id) {
-                $service = GoodsService::findOne(['mall_id' => \Yii::$app->mall->id, 'id' => $this->id]);
-                if (!$service) {
+                $plateforms = AddcreditPlateforms::findOne(['id' => $this->id]);
+                if (!$plateforms) {
                     return [
                         'code' => ApiCode::CODE_FAIL,
                         'msg' => '数据异常,该条数据不存在',
                     ];
                 }
             } else {
-                $service = new GoodsService();
-                $service->mall_id = \Yii::$app->mall->id;
-                $service->mch_id = \Yii::$app->admin->identity->mch_id;
+                $plateforms = new AddcreditPlateforms();
+                $plateforms->mall_id = \Yii::$app->mall->id;
             }
-
-            $service->is_default = $this->is_default;
-            $service->name = $this->name;
-            $service->sort = $this->sort;
-            $service->remark = $this->remark;
-            $res = $service->save();
-
-            if ($res) {
+            $plateforms->name = $this->name;
+            $plateforms->sdk_dir = $this->sdk_dir;
+            $plateforms->created_at = $plateforms->updated_at = time();
+            $plateforms->ratio = $this->ratio;
+            $plateforms->json_param = json_encode(['id' => $this->cyd_id, 'secret_key' => $this->secret_key]);
+            if ($plateforms->save()) {
                 return [
                     'code' => ApiCode::CODE_SUCCESS,
                     'msg' => '保存成功',
                 ];
             }
-
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => '保存失败',
             ];
-
-
         } catch (\Exception $e) {
             return [
                 'code' => ApiCode::CODE_FAIL,

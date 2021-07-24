@@ -66,6 +66,7 @@ class RechargeRecordForm extends BaseModel
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => $result,
+                'money_list' => $this->rechargeMoneyList($this->plateforms_id),
                 'msg' => ''
             ];
         } catch (\Exception $e) {
@@ -74,5 +75,27 @@ class RechargeRecordForm extends BaseModel
                 'msg' => $e->getMessage()
             ];
         }
+    }
+
+    public function rechargeMoneyList ($plateforms_id)
+    {
+        $plateforms = AddcreditPlateforms::findOne($plateforms_id);
+        if (!$plateforms) {
+            throw new \Exception('平台不存在！',ApiCode::CODE_FAIL);
+        }
+        return [
+            [
+                'redbag_num' => 50 + 50 * $plateforms->ratio / 100,
+                'price' => 50,
+            ],
+            [
+                'redbag_num' => 100 + 100 * $plateforms->ratio / 100,
+                'price' => 100,
+            ],
+            [
+                'redbag_num' => 200 + 200 * $plateforms->ratio / 100,
+                'price' => 200,
+            ],
+        ];
     }
 }

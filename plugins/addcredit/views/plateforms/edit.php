@@ -27,7 +27,7 @@
     <el-card shadow="never" style="border:0" class="box-card" body-style="background-color: #f3f3f3;padding: 10px 0 0;" class="box-card" v-loading="cardLoading">
         <div slot="header">
             <div flex="cross:center box:first">
-                <div><span @click="$navigate({r:'mall/service/index'})" class="text">服务</span>/服务编辑</div>
+                <div><span @click="$navigate({r:'mall/service/index'})" class="text">话费平台</span>/平台编辑</div>
                 <div flex="dir:right">
                     <div>
                         <el-button class="button-item" :loading="btnLoading" type="primary" @click="store('ruleForm')" size="small">保存</el-button>
@@ -39,22 +39,21 @@
             <el-form :model="ruleForm" :rules="rules" size="small" ref="ruleForm" label-width="120px">
                 <el-form-item prop="name">
                     <template slot='label'>
-                        <span>服务名称</span>
-                        <el-tooltip effect="dark" content="例如：正品保障|极速发货|7天退换货"
-                                placement="top">
-                            <i class="el-icon-info"></i>
-                        </el-tooltip>
+                        <span>平台名称</span>
                     </template>
                     <el-input v-model="ruleForm.name"></el-input>
                 </el-form-item>
-                <el-form-item label="排序" prop="sort">
-                    <el-input type="number" v-model="ruleForm.sort"></el-input>
+                <el-form-item label="sdk_dir目录" prop="sdk_dir">
+                    <el-input  v-model="ruleForm.sdk_dir"></el-input>
                 </el-form-item>
-                <el-form-item label="备注" prop="remark">
-                    <el-input type="textarea" v-model="ruleForm.remark"></el-input>
+                <el-form-item label="收费比例" prop="ratio">
+                    <el-input type="number" v-model="ruleForm.ratio"></el-input>
                 </el-form-item>
-                <el-form-item label="是否默认" prop="is_default">
-                    <el-switch v-model="ruleForm.is_default" active-value="1" inactive-value="0"></el-switch>
+                <el-form-item label="cyd_id" prop="cyd_id">
+                    <el-input v-model="ruleForm.cyd_id"></el-input>
+                </el-form-item>
+                <el-form-item label="秘钥" prop="secret_key">
+                    <el-input  v-model="ruleForm.secret_key"></el-input>
                 </el-form-item>
             </el-form>
         </div>
@@ -66,17 +65,25 @@
         data() {
             return {
                 ruleForm: {
-                    is_default: '0',
-                    remark: '',
-                    sort: 100,
+                    name: '',
+                    sdk_dir: '',
+                    ratio: 0,
+                    cyd_id: '',
+                    secret_key: '',
                 },
                 rules: {
                     name: [
-                        {required: true, message: '请输入服务名称', trigger: 'change'},
+                        {required: true, message: '请输入平台名称', trigger: 'change'},
                     ],
-                    sort: [
-                        {required: true, message: '请输入排序', trigger: 'change'},
+                    sdk_dir: [
+                        {required: true, message: '请输入平台SDK目录', trigger: 'change'},
                     ],
+                    cyd_id: [
+                        {required: true, message: '请输入平台ID', trigger: 'change'},
+                    ],
+                    secret_key: [
+                        {required: true, message: '请输入平台秘钥', trigger: 'change'},
+                    ]
                 },
                 btnLoading: false,
                 cardLoading: false,
@@ -90,7 +97,7 @@
                         self.btnLoading = true;
                         request({
                             params: {
-                                r: 'mall/service/edit'
+                                r: 'plugin/addcredit/mall/plateforms/plateforms/edit'
                             },
                             method: 'post',
                             data: {
@@ -101,7 +108,7 @@
                             if (e.data.code == 0) {
                                 self.$message.success(e.data.msg);
                                 navigateTo({
-                                    r: 'mall/service/index'
+                                    r: 'plugin/addcredit/mall/plateforms/plateforms/index'
                                 })
                             } else {
                                 self.$message.error(e.data.msg);
@@ -121,14 +128,14 @@
                 self.cardLoading = true;
                 request({
                     params: {
-                        r: 'mall/service/edit',
+                        r: 'plugin/addcredit/mall/plateforms/plateforms/edit',
                         id: getQuery('id')
                     },
                     method: 'get',
                 }).then(e => {
                     self.cardLoading = false;
                     if (e.data.code == 0) {
-                        self.ruleForm = e.data.data.detail;
+                        self.ruleForm = e.data.data;
                     } else {
                         self.$message.error(e.data.msg);
                     }

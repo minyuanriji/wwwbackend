@@ -14,10 +14,11 @@ class PhoneOrderSubmitForm extends BaseModel
     public $plateform_id;
     public $mobile;
     public $order_price;
+    public $integral_deduction_price;
 
     public function rules(){
         return [
-            [['plateform_id','mobile', 'order_price'], 'required'],
+            [['plateform_id','mobile', 'order_price', 'integral_deduction_price'], 'required'],
         ];
     }
 
@@ -56,7 +57,7 @@ class PhoneOrderSubmitForm extends BaseModel
                 "order_price"               => $this->order_price,
                 "created_at"                => time(),
                 "updated_at"                => time(),
-                "integral_deduction_price"  => $this->order_price,
+                "integral_deduction_price"  => $this->integral_deduction_price,
                 "order_status"              => 'unpaid',
                 "pay_status"                => 'unpaid',
             ]);

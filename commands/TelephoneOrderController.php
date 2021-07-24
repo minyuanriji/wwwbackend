@@ -92,8 +92,8 @@ class TelephoneOrderController extends BaseCommandController
                                 throw new \Exception("红包返还失败：" . $res['msg'], ApiCode::CODE_FAIL);
                             }
                             break;
-                        case Code::QUERY_FREQUENTLY:
-                            throw new \Exception(Msg::QueryMsg()[$response_content->nRtn], ApiCode::CODE_FAIL);
+//                        case Code::QUERY_FREQUENTLY:
+//                            throw new \Exception(Msg::QueryMsg()[$response_content->nRtn], ApiCode::CODE_FAIL);
                         case Code::QUERY_ORDER_EMPTY:
                             //再次下单
                             $plateform = AddcreditPlateforms::findOne($item->plateform_id);

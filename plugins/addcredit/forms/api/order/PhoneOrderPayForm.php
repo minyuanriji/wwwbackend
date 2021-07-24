@@ -68,7 +68,6 @@ class PhoneOrderPayForm extends BaseModel
             $addcredit_order->order_status = "processing";
             $addcredit_order->pay_status = "paid";
             $addcredit_order->pay_at = time();
-            $addcredit_order->integral_deduction_price = $this->order_price;
             $addcredit_order->plateform_request_data = $submit_res->request_data;
             $addcredit_order->plateform_response_data = $submit_res->response_content;
             if (!$addcredit_order->save()) {
@@ -76,7 +75,7 @@ class PhoneOrderPayForm extends BaseModel
             }
 
             //扣取红包
-            $res = UserIntegralForm::PhoneBillOrderPaySub($addcredit_order, $user, $this->order_price);
+            $res = UserIntegralForm::PhoneBillOrderPaySub($addcredit_order, $user, $addcredit_order->integral_deduction_price);
             if ($res['code'] != ApiCode::CODE_SUCCESS) {
                 throw new \Exception("红包扣取失败：" . $res['msg'], ApiCode::CODE_FAIL);
             }

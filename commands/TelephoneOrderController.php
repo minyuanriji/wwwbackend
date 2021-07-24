@@ -26,7 +26,7 @@ class TelephoneOrderController extends BaseCommandController
             $this->sleep(1);
             try {
 
-                $this->orderQuery();die;
+                $this->orderQuery();
 
             } catch (\Exception $e) {
                 $this->commandOut($e->getMessage());

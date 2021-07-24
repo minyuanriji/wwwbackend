@@ -45,9 +45,7 @@ class TelephoneOrderController extends BaseCommandController
             ])
             ->limit(10)->all();
 
-        if (!$orderList) {
-            return false;
-        }
+        if (!$orderList) return false;
 
         $plate_form = new PlateForm();
         foreach ($orderList as $item)
@@ -61,7 +59,6 @@ class TelephoneOrderController extends BaseCommandController
                     throw new \Exception($query_res->message, ApiCode::CODE_FAIL);
                 }
                 $response_content = $query_res->response_content;
-                $trans = \Yii::$app->db->beginTransaction();
                 try {
                     //成功，处理状态
                     $item->updated_at = time();
@@ -69,9 +66,15 @@ class TelephoneOrderController extends BaseCommandController
                     {
                         case Code::QUERY_SUCCESS:
                             $item->order_status = AddcreditOrder::ORDER_STATUS_SUC;
+                            if (!$item->save()) {
+                                throw new \Exception("话费订单失败：" . json_encode($item->getErrors()), ApiCode::CODE_FAIL);
+                            }
                             break;
                         case Code::QUERY_FAIL:
                             $item->order_status = AddcreditOrder::ORDER_STATUS_FAIL;
+                            if (!$item->save()) {
+                                throw new \Exception("话费订单失败：" . json_encode($item->getErrors()), ApiCode::CODE_FAIL);
+                            }
                             break;
                         case Code::QUERY_FREQUENTLY:
                             throw new \Exception(Msg::QueryMsg()[$response_content->nRtn], ApiCode::CODE_FAIL);
@@ -82,7 +85,13 @@ class TelephoneOrderController extends BaseCommandController
                                 throw new \Exception("无法获取平台信息", ApiCode::CODE_FAIL);
                             }
                             $plate_form = new PlateForm();
-                            $plate_form->submit($item, $plateform);
+                            $submit_res = $plate_form->submit($item, $plateform);
+                            if (!$submit_res) {
+                                throw new \Exception('未知错误！', ApiCode::CODE_FAIL);
+                            }
+                            if ($submit_res->code != ApiCode::CODE_SUCCESS) {
+                                throw new \Exception($submit_res->message, ApiCode::CODE_FAIL);
+                            }
                             break;
                         default:
                             break;
@@ -109,12 +118,8 @@ class TelephoneOrderController extends BaseCommandController
                             throw new \Exception("红包返还失败：" . $res['msg'], ApiCode::CODE_FAIL);
                         }
                     }*/
-                    if (!$item->save()) {
-                        throw new \Exception("话费订单失败：" . json_encode($item->getErrors()), ApiCode::CODE_FAIL);
-                    }
-                    $trans->commit();
+
                 } catch (\Exception $e) {
-                    $trans->rollBack();
                     $this->commandOut($e->getMessage());
                 }
             } catch (\Exception $e) {

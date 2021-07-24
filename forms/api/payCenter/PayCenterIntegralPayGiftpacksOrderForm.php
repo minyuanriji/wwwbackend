@@ -4,13 +4,11 @@ namespace app\forms\api\payCenter;
 
 use app\core\ApiCode;
 use app\forms\common\UserIntegralForm;
-use app\models\BaseActiveRecord;
 use app\models\BaseModel;
 use app\models\User;
 use app\plugins\giftpacks\forms\api\GiftpacksDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderSubmitForm;
 use app\plugins\giftpacks\models\Giftpacks;
-use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
 
@@ -87,21 +85,9 @@ class PayCenterIntegralPayGiftpacksOrderForm extends BaseModel{
             }
 
             //为用户生成礼包信息
-            $query = GiftpacksItem::find()->alias("gpi");
-            $query->leftJoin(["goi" => GiftpacksOrderItem::tableName()], "goi.pack_item_id=gpi.id");
-            $query->where([ "gpi.pack_id" => $giftpacks->id, "gpi.is_delete" => 0]);
-            $query->andWhere([
-                "OR",
-                "gpi.expired_at=0",
-                "gpi.expired_at > '".time()."'"
-            ]);
-            $query->groupBy("gpi.id");
+            $query = GiftpacksDetailForm::availableItemsQuery($giftpacks);
             $selects = ["gpi.id", "gpi.usable_times", "gpi.expired_at", "gpi.max_stock"];
-            $query->select(array_merge($selects, [
-                "count(goi.pack_item_id) AS sold_num"
-            ]));
-
-            $items = BaseActiveRecord::find()->asArray()->where("max_stock > sold_num")->from($query)->all();
+            $items = $query->asArray()->select($selects)->all();
             foreach($items as $item){
                 $orderItem = new GiftpacksOrderItem([
                     'mall_id'      => $order->mall_id,

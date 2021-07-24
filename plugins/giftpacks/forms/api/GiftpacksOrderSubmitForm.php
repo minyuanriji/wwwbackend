@@ -65,11 +65,7 @@ class GiftpacksOrderSubmitForm extends BaseModel{
 
     //检查是否可以下单支付
     public static function check(Giftpacks $giftpacks){
-        $soldNum = (int)GiftpacksOrder::find()->where([
-            "pack_id"    => $giftpacks->id,
-            "pay_status" => "paid",
-            "is_delete"  => 0
-        ])->count();
+        $soldNum = GiftpacksDetailForm::soldNum($giftpacks);
         if($giftpacks->max_stock <= $soldNum){
             throw new \Exception("大礼包".$giftpacks->id."已售罄");
         }

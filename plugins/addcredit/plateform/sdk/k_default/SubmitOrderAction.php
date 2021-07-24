@@ -64,19 +64,14 @@ class SubmitOrderAction extends BaseObject
                     throw new \Exception("未知错误 " . $parseArray['nRtn'], ApiCode::CODE_FAIL);
                 }
             }
-
             $SubmitResult->code = $parseArray['nRtn'];
             $SubmitResult->response_content = $response;
             $SubmitResult->request_data = json_encode($post_param);
             $SubmitResult->message = $parseArray['szRtnCode'];
-
         } catch (\Exception $e) {
             $SubmitResult->code = SubmitResult::CODE_FAIL;
             $SubmitResult->message = $e->getMessage();
         }
-
         return $SubmitResult;
     }
-
-
 }

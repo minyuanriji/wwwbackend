@@ -90,14 +90,17 @@
                         label="ID"
                         width="100">
                 </el-table-column>
-                <el-table-column
-                        label="平台名称" width="350px">
+                <el-table-column label="平台名称" width="350px">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">{{scope.row.name}}</com-ellipsis>
                     </template>
                 </el-table-column>
-                <el-table-column
-                        label="SDK目录">
+                <el-table-column label="SDK目录">
+                    <template slot-scope="scope">
+                        <com-ellipsis :line="1">{{scope.row.remark}}</com-ellipsis>
+                    </template>
+                </el-table-column>
+                <el-table-column label="收费比例">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">{{scope.row.remark}}</com-ellipsis>
                     </template>

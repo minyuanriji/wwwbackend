@@ -69,9 +69,27 @@ class TelephoneOrderController extends BaseCommandController
                             }
                             break;
                         case Code::QUERY_FAIL:
+                            $item->pay_status = AddcreditOrder::PAY_TYPE_REFUND;
                             $item->order_status = AddcreditOrder::ORDER_STATUS_FAIL;
                             if (!$item->save()) {
                                 throw new \Exception("话费订单失败：" . json_encode($item->getErrors()), ApiCode::CODE_FAIL);
+                            }
+                            $PhoneOrderRefundForm = new PhoneOrderRefundForm();
+                            $refund_res = $PhoneOrderRefundForm->save($item->mall_id, $item->id, $item->integral_deduction_price);
+                            if (isset($refund_res['code']) && $refund_res['code']) {
+                                throw new \Exception($refund_res['msg'], ApiCode::CODE_FAIL);
+                            }
+
+                            //用户
+                            $user = User::findOne($item->user_id);
+                            if (!$user || $user->is_delete) {
+                                throw new \Exception("无法获取用户信息", ApiCode::CODE_FAIL);
+                            }
+
+                            //返还红包
+                            $res = UserIntegralForm::PhoneBillOrderRefundAdd($user, $item->integral_deduction_price, $item->id);
+                            if ($res['code'] != ApiCode::CODE_SUCCESS) {
+                                throw new \Exception("红包返还失败：" . $res['msg'], ApiCode::CODE_FAIL);
                             }
                             break;
                         case Code::QUERY_FREQUENTLY:
@@ -94,28 +112,6 @@ class TelephoneOrderController extends BaseCommandController
                         default:
                             break;
                     }
-                    /*if ($response_content['nRtn'] == 3) {
-                        $item->pay_status = AddcreditOrder::PAY_TYPE_REFUND;
-                        $item->order_status = AddcreditOrder::ORDER_STATUS_FAIL;
-
-                        $PhoneOrderRefundForm = new PhoneOrderRefundForm();
-                        $refund_res = $PhoneOrderRefundForm->save($item->mall_id, $item->id, $item->integral_deduction_price);
-                        if (isset($refund_res['code']) && $refund_res['code']) {
-                            throw new \Exception($refund_res['msg'], ApiCode::CODE_FAIL);
-                        }
-
-                        //用户
-                        $user = User::findOne($item->user_id);
-                        if (!$user || $user->is_delete) {
-                            throw new \Exception("无法获取用户信息", ApiCode::CODE_FAIL);
-                        }
-
-                        //返还红包
-                        $res = UserIntegralForm::PhoneBillOrderRefundAdd($user, $item->integral_deduction_price, $item->id);
-                        if ($res['code'] != ApiCode::CODE_SUCCESS) {
-                            throw new \Exception("红包返还失败：" . $res['msg'], ApiCode::CODE_FAIL);
-                        }
-                    }*/
 
                 } catch (\Exception $e) {
                     $this->commandOut($e->getMessage());

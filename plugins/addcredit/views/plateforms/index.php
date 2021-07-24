@@ -97,12 +97,12 @@
                 </el-table-column>
                 <el-table-column label="SDK目录">
                     <template slot-scope="scope">
-                        <com-ellipsis :line="1">{{scope.row.remark}}</com-ellipsis>
+                        <com-ellipsis :line="1">{{scope.row.sdk_dir}}</com-ellipsis>
                     </template>
                 </el-table-column>
                 <el-table-column label="收费比例">
                     <template slot-scope="scope">
-                        <com-ellipsis :line="1">{{scope.row.remark}}</com-ellipsis>
+                        <com-ellipsis :line="1">{{scope.row.ratio}}%</com-ellipsis>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -110,7 +110,7 @@
                         width="220"
                         label="添加日期">
                     <template slot-scope="scope">
-                        <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
+                        <div>{{scope.row.created_at}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -122,11 +122,11 @@
                                 <img src="statics/img/mall/edit.png" alt="">
                             </el-tooltip>
                         </el-button>
-                        <el-button @click="destroy(scope.row.id, scope.$index)" circle type="text" size="mini">
+                        <!--<el-button @click="destroy(scope.row.id, scope.$index)" circle type="text" size="mini">
                             <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                 <img src="statics/img/mall/del.png" alt="">
                             </el-tooltip>
-                        </el-button>
+                        </el-button>-->
                     </template>
                 </el-table-column>
             </el-table>
@@ -200,7 +200,7 @@
                 let keyword = this.keyword;
                 request({
                     params: {
-                        r: 'mall/service/index',
+                        r: 'plugin/addcredit/mall/plateforms/plateforms/index',
                         keyword: keyword
                     },
                     method: 'get'
@@ -208,7 +208,6 @@
                     this.listLoading = false;
                     if (e.data.code === 0) {
                         this.list = e.data.data.list;
-                        this.select = e.data.data.select;
                         this.pagination = e.data.data.pagination;
                     }else{
                         this.$alert(e.data.msg, '提示', {
@@ -233,7 +232,7 @@
                 self.listLoading = true;
                 request({
                     params: {
-                        r: 'mall/service/index',
+                        r: 'plugin/addcredit/mall/plateforms/plateforms/index',
                         page: self.page
                     },
                     method: 'get',
@@ -248,12 +247,12 @@
             edit(id) {
                 if (id) {
                     navigateTo({
-                        r: 'mall/service/edit',
+                        r: 'plugin/addcredit/mall/plateforms/plateforms/edit',
                         id: id,
                     });
                 } else {
                     navigateTo({
-                        r: 'mall/service/edit',
+                        r: 'plugin/addcredit/mall/plateforms/plateforms/edit',
                     });
                 }
             },

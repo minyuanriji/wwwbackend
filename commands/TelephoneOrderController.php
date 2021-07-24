@@ -60,12 +60,12 @@ class TelephoneOrderController extends BaseCommandController
                 if ($query_res->code != QueryResult::CODE_SUCC) {
                     throw new \Exception($query_res->message, ApiCode::CODE_FAIL);
                 }
-                $response_content = json_decode($query_res->response_content);
+                $response_content = $query_res->response_content;
                 $trans = \Yii::$app->db->beginTransaction();
                 try {
                     //成功，处理状态
                     $item->updated_at = time();
-                    switch ($response_content['nRtn'])
+                    switch ($response_content->nRtn)
                     {
                         case Code::QUERY_SUCCESS:
                             $item->order_status = AddcreditOrder::ORDER_STATUS_SUC;
@@ -74,7 +74,7 @@ class TelephoneOrderController extends BaseCommandController
                             $item->order_status = AddcreditOrder::ORDER_STATUS_FAIL;
                             break;
                         case Code::QUERY_FREQUENTLY:
-                            throw new \Exception(Msg::QueryMsg()[$response_content['nRtn']], ApiCode::CODE_FAIL);
+                            throw new \Exception(Msg::QueryMsg()[$response_content->nRtn], ApiCode::CODE_FAIL);
                         case Code::QUERY_ORDER_EMPTY:
                             //再次下单
                             $plateform = AddcreditPlateforms::findOne($item->plateform_id);

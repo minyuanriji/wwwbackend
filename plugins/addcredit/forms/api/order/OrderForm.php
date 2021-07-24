@@ -35,9 +35,6 @@ class OrderForm extends BaseModel
             if (!$query) {
                 throw new \Exception('订单不存在！',ApiCode::CODE_FAIL);
             }
-            if ($query->pay_status != 'paid') {
-                throw new \Exception('订单支付状态错误！',ApiCode::CODE_FAIL);
-            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

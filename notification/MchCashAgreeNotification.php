@@ -36,7 +36,7 @@ class MchCashAgreeNotification
             $template_id = TemConfig::NoticeOfWithdrawalAndReceipt;
             $extra = json_decode($mch_cash->type_data,true);
             $data = [
-                'first'     => '您好，奖金余额已提现到账！',
+                'first'     => '您好，您的商户提现已到账！',
                 'keyword1'  => $mch_cash->money,
                 'keyword2'  => $extra['bankName'] . "尾号：" . substr($extra['bankCardNo'], -4),
                 'keyword3'  => date('Y-m-d H:i:s', $mch_cash->updated_at),

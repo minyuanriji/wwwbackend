@@ -4,11 +4,7 @@ namespace app\plugins\giftpacks\forms\api;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
-use app\models\Goods;
-use app\models\GoodsWarehouse;
-use app\models\Store;
-use app\plugins\giftpacks\models\GiftpacksItem;
-use app\plugins\giftpacks\models\GiftpacksOrderItem;
+use app\plugins\giftpacks\models\Giftpacks;
 
 class GiftpacksItemListForm extends BaseModel{
 
@@ -32,21 +28,12 @@ class GiftpacksItemListForm extends BaseModel{
         }
 
         try {
+            $giftpacks = Giftpacks::findOne($this->pack_id);
+            if(!$giftpacks || $giftpacks->is_delete){
+                throw new \Exception("大礼包不存在");
+            }
 
-            $query = GiftpacksItem::find()->alias("gpi");
-            $query->innerJoin(["s" => Store::tableName()], "s.id=gpi.store_id");
-            $query->innerJoin(["g" => Goods::tableName()], "g.id=gpi.goods_id");
-            $query->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");
-            $query->leftJoin(["goi" => GiftpacksOrderItem::tableName()], "goi.pack_item_id=gpi.id");
-
-            $query->where([ "gpi.pack_id" => $this->pack_id, "gpi.is_delete" => 0]);
-
-            //过期、库存为0的不显示
-            $query->andWhere([
-                "OR",
-                "gpi.expired_at=0",
-                "gpi.expired_at > '".time()."'"
-            ]);
+            $query = GiftpacksDetailForm::availableItemsQuery($giftpacks);
 
             $selects = ["gpi.*"];
             $selects[] = "g.price as goods_price"; //商品价格
@@ -54,12 +41,8 @@ class GiftpacksItemListForm extends BaseModel{
             $selects = array_merge($selects, ["s.mch_id", "s.score", "s.longitude", "s.latitude"]);
             $selects[] = "ST_Distance_sphere(point(s.longitude, s.latitude), point(".$this->longitude.", ".$this->latitude.")) as distance_mi";
 
-            $query->select($selects)
-                  ->orderBy("gpi.updated_at DESC")
-                  ->page($pagination, 10, max(1, (int)$this->page));
-            $query->groupBy("gpi.id HAVING count(gpi.id) < gpi.max_stock ");
-
-            $list = $query->asArray()->all();
+            $list = $query->select($selects)->page($pagination, 30, max(1, (int)$this->page))
+                          ->asArray()->all();
 
             if($list){
                 foreach($list as &$item){

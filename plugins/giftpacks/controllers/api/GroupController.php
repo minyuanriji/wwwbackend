@@ -5,10 +5,10 @@ namespace app\plugins\giftpacks\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
 use app\plugins\ApiController;
-use app\plugins\giftpacks\forms\api\GiftpacksOrderPreviewForm;
-use app\plugins\giftpacks\forms\api\GiftpacksOrderSubmitForm;
+use app\plugins\giftpacks\forms\api\GiftpacksGroupJoinForm;
+use app\plugins\giftpacks\forms\api\GiftpacksGroupNewForm;
 
-class OrderController extends ApiController{
+class GroupController extends ApiController{
 
     public function behaviors(){
         return array_merge(parent::behaviors(), [
@@ -18,24 +18,24 @@ class OrderController extends ApiController{
         ]);
     }
 
-
     /**
-     * 预览订单
+     * 新增一个拼单
      * @return \yii\web\Response
      */
-    public function actionPreview(){
-        $form = new GiftpacksOrderPreviewForm();
+    public function actionNewGroup(){
+        $form = new GiftpacksGroupNewForm();
         $form->attributes = $this->requestData;
-        return $this->asJson($form->preview());
+        return $this->asJson($form->addGroup());
     }
 
     /**
-     * 提交订单
+     * 参与拼单
      * @return \yii\web\Response
      */
-    public function actionSubmit(){
-        $form = new GiftpacksOrderSubmitForm();
+    public function actionJoin(){
+        $form = new GiftpacksGroupJoinForm();
         $form->attributes = $this->requestData;
-        return $this->asJson($form->save());
+        return $this->asJson($form->join());
     }
+
 }

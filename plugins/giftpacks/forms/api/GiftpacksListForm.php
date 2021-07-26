@@ -24,10 +24,14 @@ class GiftpacksListForm extends BaseModel{
 
         try {
 
-            $list = Giftpacks::find()->where(["is_delete" => 0])
-                        ->orderBy("updated_at DESC")
-                        ->page($pagination, 10, max(1, (int)$this->page))
-                        ->asArray()->all();;
+            $query = Giftpacks::find()->alias("gf")->where(["gf.is_delete" => 0])
+                        ->orderBy("gf.updated_at DESC");
+
+            $selects = ["gf.*"];
+            $selects[] = "(IFNULL((select count(*) from {{%plugin_giftpacks_order}} where pay_status='paid' AND is_delete=0 AND pack_id=gf.id), 0) + IFNULL((select sum(user_num) from {{%plugin_giftpacks_group}} where status='sharing' AND pack_id=gf.id), 0)) as sold_num";
+
+            $list = $query->select($selects)->page($pagination, 10, max(1, (int)$this->page))
+                        ->asArray()->all();
             if($list){
                 foreach($list as &$item){
                     $item['max_stock'] = (int)$item['max_stock'];

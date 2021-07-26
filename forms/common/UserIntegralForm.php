@@ -7,6 +7,8 @@ use app\models\BaseModel;
 use app\models\IntegralLog;
 use app\models\IntegralRecord;
 use app\models\User;
+use app\plugins\giftpacks\models\GiftpacksGroup;
+use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelRefundApplyOrder;
@@ -15,6 +17,41 @@ class UserIntegralForm extends BaseModel{
 
     const TYPE_ADD      = 1;
     const TYPE_SUB      = 2;
+
+    /**
+     * 支付大礼包拼团订单
+     * @param HotelOrder $order
+     * @param User $user
+     * @param boolean $trans
+     * @return array
+     */
+    public static function giftpacksGroupPaySub(GiftpacksGroupPayOrder $payOrder, User $user, $trans = false){
+
+        $trans && ($t = \Yii::$app->db->beginTransaction());
+
+        try {
+            $desc = "支付大礼包“".$payOrder->id."”拼单";
+            static::change($user, $payOrder->integral_deduction_price, self::TYPE_SUB, "giftpacks_group_payorder", $payOrder->id, $desc);
+
+            $trans && $t->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg'  => '扣取成功'
+            ];
+        }catch (\Exception $e){
+
+            $trans && $t->rollBack();
+
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+
+
+    }
+
 
     /**
      * 支付大礼包订单订单

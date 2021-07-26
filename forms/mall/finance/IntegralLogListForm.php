@@ -55,7 +55,9 @@ class IntegralLogListForm extends BaseModel{
                 ->andWhere(['>', 'il.created_at', strtotime($this->start_date)]);
         }
 
-        $query->select(["il.*", "u.nickname"]);
+        $selects = ["il.*", "u.nickname"];
+
+        $query->select($selects);
 
         $list = $query->page($pagination, $this->limit)->asArray()->all();
 

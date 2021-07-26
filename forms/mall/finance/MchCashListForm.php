@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\EfpsTransferOrder;
 use app\models\Store;
+use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCash;
 
@@ -38,6 +39,14 @@ class MchCashListForm extends BaseModel{
         $query->select(["mc.id", "s.mch_id", "s.name", "s.cover_url", "mc.money", "mc.fact_price", "mc.type", "mc.created_at",
             "mc.status", "mc.transfer_status", "m.account_money", "mc.order_no", "mc.service_fee_rate", "mc.updated_at",
             "eto.remark", "mc.content", "mc.type_data"]);
+
+        if ($this->keyword ) {
+           $query = $query->andWhere(["IN", "s.name", $this->keyword]);
+        }
+        if ($this->start_date && $this->end_date) {
+            $query->andWhere(['<', 'mc.created_at', strtotime($this->end_date)])
+                ->andWhere(['>', 'mc.created_at', strtotime($this->start_date)]);
+        }
 
         $query->orderBy(['mc.created_at' => SORT_DESC]);
 

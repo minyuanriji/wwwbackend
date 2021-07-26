@@ -55,3 +55,4 @@ web/uploads/images/*
 
 composer.lock
 /debug.php
+/clouds/statics

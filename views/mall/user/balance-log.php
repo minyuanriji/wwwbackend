@@ -5,6 +5,7 @@
  * author: xay
  */
 
+Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
 <style>
     .table-body {
@@ -83,7 +84,13 @@
 
                 <el-table-column prop="id" label="ID" width="80"></el-table-column>
 
-                <el-table-column prop="user.nickname" label="昵称"></el-table-column>
+                <el-table-column prop="user.nickname" label="昵称">
+                    <template slot-scope="scope">
+                        <com-user-finance-stat :user-id="parseInt(scope.row.user.id)">
+                            {{scope.row.user.nickname}}
+                        </com-user-finance-stat>
+                    </template>
+                </el-table-column>
 
                 <el-table-column label="收支情况(元)" width="180">
                     <template slot-scope="scope">

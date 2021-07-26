@@ -53,6 +53,7 @@ class Integral extends BaseActiveRecord
             ['status','in','range'=>[self::STATUS_WAIT,self::STATUS_DOING,self::STATUS_FINISH]],
             ['period_unit','in','range'=>[self::UNIT_MONTH,self::UNIT_WEEK]],
             ['type','in','range'=>[self::TYPE_ALWAYS,self::TYPE_DYNAMIC]],
+            [['source_id', 'source_type'], 'safe']
 
         ];
     }
@@ -109,6 +110,12 @@ class Integral extends BaseActiveRecord
             $model->next_publish_time = time();
             $model->desc              = $desc;
             $model->type              = $integral_setting['expire'] == -1 ? self::TYPE_ALWAYS : self::TYPE_DYNAMIC;
+
+            if(!empty($integral_setting['source_type'])){
+                $model->source_type = $integral_setting['source_type'];
+                $model->source_id = !empty($integral_setting['source_id']) ? $integral_setting['source_id'] : 0;
+            }
+
             if(!$model->save()){
                 throw new Exception($model->getErrorMessage());
             }

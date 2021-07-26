@@ -33,9 +33,9 @@ class CashPaidNotification
             $template_id = TemConfig::NoticeOfWithdrawalAndReceipt;
             $extra = json_decode($cash->extra,true);
             $data = [
-                'first'     => '您好，奖金余额已提现到账！',
+                'first'     => '您好，您的提现已到账！',
                 'keyword1'  => $cash->price,
-                'keyword2'  => $extra['name'] . "尾号：" . substr($extra['bank_account'], -4),
+                'keyword2'  => $extra['bank_name'] . "尾号：" . substr($extra['bank_account'], -4),
                 'keyword3'  => date('Y-m-d H:i:s', $cash->updated_at),
                 'keyword4'  => '具体到账时间以银行时间为准！',
                 'remark'    => '感谢您的使用！如有疑问请联系客服020-31923526',

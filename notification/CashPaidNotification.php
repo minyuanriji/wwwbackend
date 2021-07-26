@@ -30,14 +30,14 @@ class CashPaidNotification
 
         $res = EfpsTransfer::query($cash->order_no);
         if ($res['code'] == 0) {
-            $template_id = TemConfig::NoticeOfWithdrawal;
+            $template_id = TemConfig::NoticeOfWithdrawalAndReceipt;
+            $extra = json_decode($cash->extra,true);
             $data = [
-                'first'     => '您申请的提现金额已到帐！',
-                'keyword1'  => date('Y-m-d H:i:s', $cash->updated_at),
-                'keyword2'  => '银行卡转帐',
-                'keyword3'  => $cash->price,
-                'keyword4'  => $cash->price - $cash->fact_price,
-                'keyword5'  => $cash->fact_price,
+                'first'     => '您好，奖金余额已提现到账！',
+                'keyword1'  => $cash->price,
+                'keyword2'  => $extra['name'] . "尾号：" . substr($extra['bank_account'], -4),
+                'keyword3'  => date('Y-m-d H:i:s', $cash->updated_at),
+                'keyword4'  => '具体到账时间以银行时间为准！',
                 'remark'    => '感谢您的使用！如有疑问请联系客服020-31923526',
             ];
         } else {

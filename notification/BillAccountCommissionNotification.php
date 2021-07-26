@@ -49,7 +49,7 @@ class BillAccountCommissionNotification
             'keyword3'  => $checkout_order->order_price,
             'keyword4'  => $income_log['income'],
             'keyword5'  => date('Y-m-d H:i:s', $checkout_order->pay_at),
-            'remark'    => '感谢你的使用,如有疑问请联系020-31923526',
+            'remark'    => $income_log['desc'],
         ];
 
         (new CommissionWeTplMsg([

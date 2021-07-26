@@ -33,14 +33,14 @@ class MchCashAgreeNotification
 
         $res = EfpsTransfer::query($mch_cash->order_no);
         if ($res['code'] == 0) {
-            $template_id = TemConfig::NoticeOfWithdrawal;
+            $template_id = TemConfig::NoticeOfWithdrawalAndReceipt;
+            $extra = json_decode($mch_cash->type_data,true);
             $data = [
-                'first'     => '您申请的提现金额已到帐！',
-                'keyword1'  => date('Y-m-d H:i:s', $mch_cash->updated_at),
-                'keyword2'  => '银行卡转帐',
-                'keyword3'  => $mch_cash->money,
-                'keyword4'  => $mch_cash->money - $mch_cash->fact_price,
-                'keyword5'  => $mch_cash->fact_price,
+                'first'     => '您好，奖金余额已提现到账！',
+                'keyword1'  => $mch_cash->money,
+                'keyword2'  => $extra['bankName'] . "尾号：" . substr($extra['bankCardNo'], -4),
+                'keyword3'  => date('Y-m-d H:i:s', $mch_cash->updated_at),
+                'keyword4'  => '具体到账时间以银行时间为准！',
                 'remark'    => '感谢您的使用！如有疑问请联系客服020-31923526',
             ];
         } else {

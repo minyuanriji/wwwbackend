@@ -14,7 +14,7 @@ class GoodsAction extends Action{
     public function run(){
        while (true){
            if(!defined("ENV") || ENV != "pro"){
-               $this->controller->commandOut(date("Y/m/d H:i:s") . " commission goods action start");
+               //$this->controller->commandOut(date("Y/m/d H:i:s") . " commission goods action start");
            }
            sleep(1);
            //商品订单分佣。先检查新增情况，再处理状态改变
@@ -22,7 +22,7 @@ class GoodsAction extends Action{
                $this->doStatusChanged();
            }
            if(!defined("ENV") || ENV != "pro"){
-               $this->controller->commandOut(date("Y/m/d H:i:s") . " commission goods action end");
+               //$this->controller->commandOut(date("Y/m/d H:i:s") . " commission goods action end");
            }
        }
     }

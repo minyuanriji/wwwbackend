@@ -15,12 +15,12 @@ class StoreAction extends Action{
     public function run(){
         while (true){
             if(!defined("ENV") || ENV != "pro"){
-                $this->controller->commandOut(date("Y/m/d H:i:s") . " commission store action start");
+                //$this->controller->commandOut(date("Y/m/d H:i:s") . " commission store action start");
             }
             sleep(1);
             $this->doNew(); //店铺二维码收款分佣
             if(!defined("ENV") || ENV != "pro"){
-                $this->controller->commandOut(date("Y/m/d H:i:s") . " commission store action end");
+                //$this->controller->commandOut(date("Y/m/d H:i:s") . " commission store action end");
             }
         }
     }

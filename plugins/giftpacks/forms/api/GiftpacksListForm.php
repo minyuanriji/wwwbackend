@@ -35,6 +35,7 @@ class GiftpacksListForm extends BaseModel{
             if($list){
                 foreach($list as &$item){
                     $item['max_stock'] = (int)$item['max_stock'];
+                    $item['item_num']  = 0;
                 }
             }
 

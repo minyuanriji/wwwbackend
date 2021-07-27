@@ -223,6 +223,13 @@
                 <el-option key="store" label="店主" value="store"></el-option>
                 <el-option key="user" label="普通用户" value="user"></el-option>
             </el-select>
+
+            <el-select size="small" v-model="recommandData.team_type" @change='childSearch' class="select">
+                <el-option key="" label="全部团队" value=""></el-option>
+                <el-option key="direct_push" label="直推" value="direct_push"></el-option>
+                <el-option key="Interpulsion" label="间推" value="Interpulsion"></el-option>
+            </el-select>
+
             <el-date-picker size="small" v-model="recommandData.date" type="datetimerange"
                 style="float: left"
                 value-format="yyyy-MM-dd"
@@ -231,7 +238,7 @@
                 end-placeholder="结束日期">
             </el-date-picker>
 
-            <div class="input-item" style="margin-top:10px;width: 300px;">
+            <div class="input-item" style="width: 200px;margin-left: 10px;">
                 <el-input @keyup.enter.native="childSearch" size="small" placeholder="请输入ID/昵称/手机号" v-model="recommandData.keyword"
                           clearable @clear="childSearch">
                     <el-button slot="append" icon="el-icon-search" @click="childSearch"></el-button>
@@ -247,6 +254,11 @@
                         <div>{{scope.row.nickname}}</div>
                     </template>
                 </el-table-column>
+                <el-table-column label="团队类型">
+                    <template slot-scope="scope">
+                        {{scope.row.team_type}}
+                    </template>
+                </el-table-column>
                 <el-table-column label="等级" width="110">
                     <template slot-scope="scope">
                         <div v-if="scope.row.role_type == 'branch_office'">分公司</div>
@@ -259,6 +271,11 @@
                 <el-table-column label="日期">
                     <template slot-scope="scope">
                         {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
+                    </template>
+                </el-table-column>
+                <el-table-column label="店铺名">
+                    <template slot-scope="scope">
+                        {{scope.row.store_name}}
                     </template>
                 </el-table-column>
             </el-table>
@@ -344,7 +361,8 @@
                     end_date: '',
                     page: 1,
                     pageCount: 0,
-                    currentPage: 0
+                    currentPage: 0,
+                    team_type: '',
                 },
                 childData: []
             }
@@ -389,7 +407,8 @@
                         keyword: self.recommandData.keyword,
                         role_type: self.recommandData.role_type,
                         start_date: self.recommandData.start_date,
-                        end_date: self.recommandData.end_date
+                        end_date: self.recommandData.end_date,
+                        team_type: self.recommandData.team_type,
                     },
                 }).then(e => {
                     if (e.data.code === 0) {

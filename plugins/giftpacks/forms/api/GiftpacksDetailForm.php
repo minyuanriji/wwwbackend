@@ -47,6 +47,7 @@ class GiftpacksDetailForm extends BaseModel{
             if($giftpacks->group_enable){
                 //获取最新的两条拼单记录
                 $groupList = static::newestGroupLog($giftpacks);
+                $detail['group_num'] = 0;
             }
 
             return [

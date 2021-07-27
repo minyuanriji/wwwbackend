@@ -1,6 +1,6 @@
 <?php
-
 namespace app\forms\common;
+
 
 use app\core\ApiCode;
 use app\models\BaseModel;
@@ -8,11 +8,10 @@ use app\models\IntegralLog;
 use app\models\IntegralRecord;
 use app\models\User;
 use app\plugins\addcredit\models\AddcreditOrder;
-<<<<<<< HEAD
 use app\plugins\giftpacks\models\GiftpacksGroup;
 use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
-=======
->>>>>>> a5ee382239dd3f67647d1418761e0fc95b3dfdfd
+use app\plugins\giftpacks\models\GiftpacksGroup;
+use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelRefundApplyOrder;
@@ -338,6 +337,7 @@ class UserIntegralForm extends BaseModel{
             throw new \Exception(json_encode($integralLog->getErrors()));
         }
     }
+<<<<<<< HEAD
 
     /**
      * 支付话费订单
@@ -399,3 +399,6 @@ class UserIntegralForm extends BaseModel{
         }
     }
 }
+=======
+}
+>>>>>>> 6b6c7e692616b3e7d469d2ac1b841180f8b21740

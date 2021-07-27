@@ -17,8 +17,10 @@ class IncomeLog
                 if (isset($row['source_type'])) {
                     if ($row['source_type'] == 3) {
                         BillAccountCommissionNotification::send($row);
+                        \Yii::error('IncomeLogNotice:' . json_encode($row) . '---time:' . date("Y-m-d H:i:s", time()));
                     } elseif ($row['source_type'] == 4) {
                         StoreCommissionNotification::send($row);
+                        \Yii::error('IncomeLogNotice:' . json_encode($row) . '---time:' . date("Y-m-d H:i:s", time()));
                     }
                 }
             }
@@ -34,6 +36,7 @@ class IncomeLog
                 $income_log = \app\models\IncomeLog::findOne($condition);
                 if ($income_log && $income_log->source_type == 'goods') {
                     GoodsCommissionNotification::send($income_log);
+                    \Yii::error('IncomeLogNotice:' . json_encode($mixData) . '---time:' . date("Y-m-d H:i:s", time()));
                 }
             }
         }

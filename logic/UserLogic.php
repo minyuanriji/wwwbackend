@@ -93,46 +93,44 @@ class UserLogic
                         $user = $userInfos->user;
                     }
                 }
-                if(empty($user)){
-                    //生成用户的ID
-                    $startNum = (int)date("ymd");
-                    $stepS    = (int)date("s");
-                    $stepM    = (int)date("i") + $stepS;
-                    $stepH    = (int)date("H") + $stepM;
-                    $randUid  = $startNum + $stepH + $stepM + $stepS;
-                    while(User::findOne($randUid)){
-                        $randUid += rand(0, 5);
-                    }
+                //生成用户的ID
+                $startNum = (int)date("ymd");
+                $stepS    = (int)date("s");
+                $stepM    = (int)date("i") + $stepS;
+                $stepH    = (int)date("H") + $stepM;
+                $randUid  = $startNum + $stepH + $stepM + $stepS;
+                while(User::findOne($randUid)){
+                    $randUid += rand(0, 5);
+                }
 
-                    $user = new User();
-                    $user->id = $randUid;
-                    if (isset($userData["mobile"]) && $userData["mobile"]) {
-                        $user->mobile = $userData["mobile"];
-                    }
-                    $user->username         = isset($userData["username"]) ? $userData["username"] : "wechat_user";
+                $user = new User();
+                $user->id = $randUid;
+                if (isset($userData["mobile"]) && $userData["mobile"]) {
+                    $user->mobile = $userData["mobile"];
+                }
+                $user->username         = isset($userData["username"]) ? $userData["username"] : "wechat_user";
 //                    $user->mobile           = isset($userData["mobile"]) ? $userData["mobile"] : "";
-                    $user->mall_id          = \Yii::$app->mall->id;
-                    $user->access_token     = \Yii::$app->security->generateRandomString();
-                    $user->auth_key         = \Yii::$app->security->generateRandomString();
-                    $user->nickname         = isset($userData["nickname"]) ? $userData["nickname"] : "";
-                    $user->password         = isset($userData["password"]) ? \Yii::$app->getSecurity()->generatePasswordHash($userData["password"]) : "";
-                    $user->avatar_url       = isset($userData["avatar_url"]) ? $userData["avatar_url"] : "";
-                    $user->last_login_at    = time();
-                    $user->login_ip         = get_client_ip();
-                    $user->source           = isset($userData["source"]) ? $userData["source"] : \Yii::$app->source;
-                    $user->parent_id        = isset($userData["parent_id"]) ? $userData["parent_id"] : $parent_id;
-                    $user->second_parent_id = 0;
-                    $user->third_parent_id  = 0;
-                    if(!empty($user->parent_id)){
-                        $parentLink = UserRelationshipLink::findOne(["user_id" => $user->parent_id]);
-                        if(!$parentLink){
-                            throw new Exception("推荐人关系链异常");
-                        }
+                $user->mall_id          = \Yii::$app->mall->id;
+                $user->access_token     = \Yii::$app->security->generateRandomString();
+                $user->auth_key         = \Yii::$app->security->generateRandomString();
+                $user->nickname         = isset($userData["nickname"]) ? $userData["nickname"] : "";
+                $user->password         = isset($userData["password"]) ? \Yii::$app->getSecurity()->generatePasswordHash($userData["password"]) : "";
+                $user->avatar_url       = isset($userData["avatar_url"]) ? $userData["avatar_url"] : "";
+                $user->last_login_at    = time();
+                $user->login_ip         = get_client_ip();
+                $user->source           = isset($userData["source"]) ? $userData["source"] : \Yii::$app->source;
+                $user->parent_id        = (isset($userData["parent_id"]) && $userData["parent_id"]) ? $userData["parent_id"] : $parent_id;
+                $user->second_parent_id = 0;
+                $user->third_parent_id  = 0;
+                if(!empty($user->parent_id)){
+                    $parentLink = UserRelationshipLink::findOne(["user_id" => $user->parent_id]);
+                    if(!$parentLink){
+                        throw new Exception("推荐人关系链异常");
                     }
-                    if ($user->save() === false) {
-                        \Yii::error("userRegister ".var_export($user->getErrors(),true));
-                        throw new Exception("用户新增失败");
-                    }
+                }
+                if ($user->save() === false) {
+                    \Yii::error("userRegister ".var_export($user->getErrors(),true));
+                    throw new Exception("用户新增失败");
                 }
             }
             $userInfoModel = new UserInfo();

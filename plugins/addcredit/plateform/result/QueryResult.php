@@ -2,7 +2,6 @@
 
 namespace app\plugins\addcredit\plateform\result;
 
-
 class QueryResult
 {
     const CODE_SUCC = 0; //查询成功
@@ -13,5 +12,8 @@ class QueryResult
 
     //查询状态：waiting充值中 success已到账 fail失败
     public $status;
+
+    public $response_content;
+    public $request_data;
 
 }

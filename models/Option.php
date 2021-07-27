@@ -70,6 +70,12 @@ class Option extends BaseActiveRecord
     const NAME_MCH_MALL_SETTING = 'mch_mall_setting'; // 多商户设置
 
     /**
+     * 酒店相关设置
+     * */
+    const GROUP_HOTEL = "hotel";
+    const NAME_HOTEL_JINJIANG = "jin_jiang_setting";//锦江集团
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName()

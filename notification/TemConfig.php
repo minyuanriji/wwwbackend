@@ -4,26 +4,6 @@ namespace app\notification;
 
 class TemConfig
 {
-    /*  @todo 提现到帐通知
-
-        您申请的提现金额已到帐.
-        申请时间：2015/05/25 14:58
-        提现方式：银行卡转帐
-        提现金额：100.00
-        手续费用：2.00
-        到账金额：98.00
-        感谢你的使用.
-
-        {{first.DATA}}
-        申请时间：{{keyword1.DATA}}
-        提现方式：{{keyword2.DATA}}
-        提现金额：{{keyword3.DATA}}
-        手续费用：{{keyword4.DATA}}
-        到账金额：{{keyword5.DATA}}
-        {{remark.DATA}}
-     * */
-    const NoticeOfWithdrawal = '0d_ck3gQZprV4A4KEONI8YSoZJ4jDT9Nse0nUnSA_UU';
-
     /*  @todo 退款通知
 
         您好，您对微信影城影票的抢购未成功，已退款。
@@ -41,85 +21,6 @@ class TemConfig
      * */
     const Refund = '2qQH4QQUr9K7pMISYmFZcPaBqJOUw0WbtT8dnMT1UvA';
 
-    /*  @todo 支付成功通知
-
-        您好，您的微信支付已成功
-        订单编号：123456789901234567
-        消费金额：28.88元
-        消费门店：一元超市
-        消费时间：2016年4月8日17:00:00
-        点击累计消费金额
-
-        {{first.DATA}}
-        订单编号：{{keyword1.DATA}}
-        消费金额：{{keyword2.DATA}}
-        消费门店：{{keyword3.DATA}}
-        消费时间：{{keyword4.DATA}}
-        {{remark.DATA}}
-
-     * */
-    const OrderPaidSuccessfully = '4OTpgKhJe6igdWpW98aLLdTav9LQttEFZdDRRgDasbY';
-
-    /*  @todo 提现申请通知
-
-        你好,提现申请已经收到
-        昵称：张三
-        时间：2016年5月13日
-        金额：10.00元
-        提现方式：微信
-        感谢你的使用。
-
-        {{first.DATA}}
-        昵称：{{keyword1.DATA}}
-        时间：{{keyword2.DATA}}
-        金额：{{keyword3.DATA}}
-        方式：{{keyword4.DATA}}
-        {{remark.DATA}}
-
-     * */
-    const NoticeWithdrawalApplication = 'Dvl1-pZeOoR8sqhRLDBCYPodWQYosqng7aTUbK1TGNo';
-
-    /*  @todo 新订单通知
-
-        您收到了一条新的订单。
-
-        提交时间：02月18日 01时05分
-        订单类型：询价订单
-        客户信息：广州 王俊
-        兴趣车型：骐达 2011款 1.6 CVT 舒适版
-
-        截止24日09:39分,您尚有10个订单未处理。
-
-        {{first.DATA}}
-
-        提交时间：{{tradeDateTime.DATA}}
-        订单类型：{{orderType.DATA}}
-        客户信息：{{customerInfo.DATA}}
-        {{orderItemName.DATA}}：{{orderItemData.DATA}}
-        {{remark.DATA}}
-
-     * */
-    const NewOrder = 'HjruKiCf7wgKwxf1ndS5A3PUrGYS0_L33urKAuGiQ-A';
-
-    /*  @todo 订单包裹跟踪通知
-
-        您好，您的订单包裹已被您拒收
-
-        订单号：C0-xxxxxxx-xxxxxxx
-        包裹单号：xxxxxxxxxxxxxx
-        付款信息：￥125.67 现金付款
-        配送信息：1860000000
-        收件人：邹先生
-        如有疑问，请联系我们
-
-        {{first.DATA}}
-
-        订单号：{{order_id.DATA}}
-        包裹单号：{{package_id.DATA}}
-        {{remark.DATA}}
-     * */
-    const OrderTrackingNotification = 'JD341uE5o0oS9QfaRkUPXEbjiaFKWCYvtcOkZpANHVE';
-
     /*  @todo 店铺审核通知
 
         店铺审核已通过
@@ -136,61 +37,6 @@ class TemConfig
 
      * */
     const ShopApproved = 'P7xEjRG_Mmo-daLn2WVT7VBS8KXEJ1p3Np7nu26v_IQ';
-
-    /*  @todo 退货申请不通过通知
-
-        退货申请不通过通知提醒
-        带机单号：666666
-        卖场：文昌店
-        导购员：小李
-        点击查看详情
-
-        {{first.DATA}}
-        带机单号：{{keyword1.DATA}}
-        卖场：{{keyword2.DATA}}
-        导购员：{{keyword3.DATA}}
-        {{remark.DATA}}
-
-     * */
-    const NoticeRejectionReturnApplication = 'YVvKWlVCsI0wsj623kkaStTG4ujKzuXcx_3D6SOwNV8';
-
-    /*  @todo 商品已发出通知
-
-        亲，宝贝已经启程了，好想快点来到你身边
-
-        快递公司：顺丰快递
-        快递单号：3291987391
-        备注：如果疑问，请在微信服务号中输入“KF”，**将在第一时间为您服务！
-
-        {{first.DATA}}
-
-        快递公司：{{delivername.DATA}}
-        快递单号：{{ordername.DATA}}
-        {{remark.DATA}}
-
-     * */
-    const GoodsHaveBeenSent = 'ZO3iGIKPOdedWbNS_WOSAQn3efN3mXy230GsSaZnUFk';
-
-    /*  @todo 消费成功通知
-
-        您的推荐客户购买商品
-        消费金额：100
-        订单商品：测试商品
-        验证商户：测试商户
-        获得奖励：100.00
-        当前奖励：150.00
-        感谢您的使用
-
-        {{first.DATA}}
-        消费金额：{{keyword1.DATA}}
-        订单商品：{{keyword2.DATA}}
-        验证商户：{{keyword3.DATA}}
-        获得奖励：{{keyword4.DATA}}
-        当前奖励：{{keyword5.DATA}}
-        {{remark.DATA}}
-
-     * */
-    const SuccessfulConsumption = 'axc6kwJVZn_WBpHgkJ9Uif2W4NQFBkS-UKNlik-d1HQ';
 
     /*  @todo 提现申请成功通知
 
@@ -228,23 +74,6 @@ class TemConfig
         {{remark.DATA}}
      * */
     const ShopAudit = 'hElK22eezgqvmWPtyhy62JEpQ0xj6QkDlhzV1ZDecyg';
-
-    /*  @todo 店铺审核通知
-
-        您的店铺已通过审核
-        店铺名称：欢乐便利店
-        审核结果：审核通过
-        处理时间：2016年6月18日18:00
-        请前往您的店铺进行更多设置
-
-        {{first.DATA}}
-        店铺名称：{{keyword1.DATA}}
-        审核结果：{{keyword2.DATA}}
-        处理时间：{{keyword3.DATA}}
-        {{remark.DATA}}
-
-     * */
-    const StorePassedAudit = 'hhs7TFHl-xcYstR79gp4LO0qwnES-vn3yjWHF7_ZceQ';
 
     /*  @todo 店铺审核通知
 
@@ -436,20 +265,37 @@ class TemConfig
      * */
     const OrderCancellationFailed = '9Etr9bc8p-rgOEmG6RiPdZMz9oZKBjArR-mh4gtQVEQ';
 
-    /*  @todo 下线加入通知
+    /*  @todo 提现到账通知
 
-        欢迎您的加入
-        会员号：123
-        加入时间：2017.8.16
-        下线代理昵称：add
-        欢迎您的加入
+        你好，奖金余额已提现到账
+        提现金额：100.00元
+        提现账户：招商银行尾号0449
+        提现时间：2016-04-02 11:45:08
+        到账时间：2016-04-03 11:45:08
+        你的奖金已提现至银行卡，请查收！
 
         {{first.DATA}}
-        会员号：{{keyword1.DATA}}
-        加入时间：{{keyword2.DATA}}
-        下线代理昵称：{{keyword3.DATA}}
+        提现金额：{{keyword1.DATA}}
+        提现账户：{{keyword2.DATA}}
+        提现时间：{{keyword3.DATA}}
+        到账时间：{{keyword4.DATA}}
         {{remark.DATA}}
 
      * */
-    const OfflineJoinNotice = 'XnHCHU_uTBZb6yRxWpU27a5_Quuk0O4j3AU4omNa4JU';
+    const NoticeOfWithdrawalAndReceipt = '5RSmgUU2UopOxXN4zjdtHrJZle-xsVJlkjmgig5TUys';
+
+    /*  @todo 	成员加入提醒
+
+        您好，您的xx有新成员加入
+        姓名：李永强
+        时间：2015.10.1 8:00
+        您可以到xx管理后台管理您的源网成员。
+
+        {{first.DATA}}
+        姓名：{{keyword1.DATA}}
+        时间：{{keyword2.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const MemberJoinReminder = 'YdqBUmMmRYlCg5Kfp8JiGLGUqsVV-_Z8MJy4KN1yucU';
 }

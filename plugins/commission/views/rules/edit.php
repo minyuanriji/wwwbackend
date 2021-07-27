@@ -1,6 +1,8 @@
 <?php
 echo $this->render('../components/com-commission-rule-edit');
 echo $this->render('../components/com-commission-store-rule-edit');
+echo $this->render('../components/com-commission-hotel-rule-edit');
+echo $this->render('../components/com-commission-hotel_3r-rule-edit');
 ?>
 <div id="app" v-cloak>
     <el-card class="box-card" v-loading="loading" shadow="never" style="border:0"
@@ -20,57 +22,94 @@ echo $this->render('../components/com-commission-store-rule-edit');
                     <el-col>
                         <el-form-item label="对象类型" prop="item_type">
                             <el-radio-group v-model="ruleForm.item_type">
-                                <el-radio :label="'goods'">商品</el-radio>
-                                <el-radio :label="'checkout'">二维码收款</el-radio>
-                                <el-radio :label="'store'">门店</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'goods' || radioDisabled == false ? false : true" :label="'goods'">商品</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'checkout' || radioDisabled == false ? false : true" :label="'checkout'">二维码收款</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'store' || radioDisabled == false ? false : true" :label="'store'">门店</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'hotel' || radioDisabled == false ? false : true" :label="'hotel'">酒店直推分佣</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'hotel_3r' || radioDisabled == false ? false : true" :label="'hotel_3r'">酒店上级（3r）分佣</el-radio>
                             </el-radio-group>
                         </el-form-item>
 
-                        <el-form-item v-if="ruleForm.item_type != ''" :label="ruleForm.item_type == 'goods' ? '全部商品' : '全部'" prop="apply_all_item">
+                        <el-form-item v-if="ruleForm.item_type != ''" :label="'全部'" prop="apply_all_item">
                             <el-switch v-model="ruleForm.apply_all_item"
                                        active-text="是"
                                        inactive-text="否">
                             </el-switch>
                         </el-form-item>
 
-                        <!-- 选择一个商品或门店 -->
+                        <!-- 选择一个商品/门店/酒店 -->
                         <template v-if="!ruleForm.apply_all_item">
-                            <el-form-item :label="ruleForm.item_type == 'goods' ? '选择商品' : '选择门店'" prop="item_id">
 
+                            <el-form-item v-if="ruleForm.item_type == 'goods'" :label="'选择商品'" prop="item_id">
                                 <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
                                     <div style="padding-right: 10px;">
-                                        <com-image mode="aspectFill" :src="ruleForm.item_type == 'goods' ? ChooseGoods.goods_pic : ChooseStore.store_pic"></com-image>
+                                        <com-image mode="aspectFill" :src="ChooseGoods.goods_pic"></com-image>
                                     </div>
                                     <div flex="cross:top cross:center">
-                                        <div style="display:block;">{{ruleForm.item_type == 'goods' ? ChooseGoods.goods_name : ChooseStore.store_name}}</div>
+                                        <div style="display:block;">{{ChooseGoods.goods_name}}</div>
                                     </div>
                                 </div>
-
-                                <el-button v-if="ruleForm.item_type == 'goods'" @click="chooseGoodsDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
-                                <el-button v-else @click="chooseStoreDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
+                                <el-button @click="chooseGoodsDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
                             </el-form-item>
+
+                            <el-form-item v-if="ruleForm.item_type == 'store'"  :label="'选择门店'" prop="item_id">
+                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
+                                    <div style="padding-right: 10px;">
+                                        <com-image mode="aspectFill" :src="ChooseStore.store_pic"></com-image>
+                                    </div>
+                                    <div flex="cross:top cross:center">
+                                        <div style="display:block;">{{ChooseStore.store_name}}</div>
+                                    </div>
+                                </div>
+                                <el-button @click="chooseStoreDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
+                            </el-form-item>
+
+                            <el-form-item v-if="ruleForm.item_type == 'checkout'"  :label="'选择门店'" prop="item_id">
+                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
+                                    <div style="padding-right: 10px;">
+                                        <com-image mode="aspectFill" :src="ChooseStore.store_pic"></com-image>
+                                    </div>
+                                    <div flex="cross:top cross:center">
+                                        <div style="display:block;">{{ChooseStore.store_name}}</div>
+                                    </div>
+                                </div>
+                                <el-button @click="chooseStoreDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
+                            </el-form-item>
+
+                            <el-form-item v-if="ruleForm.item_type == 'hotel' || ruleForm.item_type == 'hotel_3r'" :label="'选择酒店'" prop="item_id">
+                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
+                                    <div style="padding-right: 10px;">
+                                        <com-image mode="aspectFill" :src="ChooseHotel.hotel_pic"></com-image>
+                                    </div>
+                                    <div flex="cross:top cross:center">
+                                        <div style="display:block;">{{ChooseHotel.hotel_name}}</div>
+                                    </div>
+                                </div>
+                                <el-button @click="chooseHotelDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
+                            </el-form-item>
+
                         </template>
 
                         <el-form-item label="设置规则">
 
                             <com-commission-store-rule-edit v-if="ruleForm.item_type == 'store'" @number = "newNumber" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains" :commiss_value = "commissonValue"></com-commission-store-rule-edit>
 
-                            <com-commission-rule-edit v-else @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-rule-edit>
+                            <com-commission-rule-edit v-if="ruleForm.item_type == 'goods' || ruleForm.item_type == 'checkout'" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-rule-edit>
+
+                            <com-commission-hotel-rule-edit v-if="ruleForm.item_type == 'hotel'" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"  @levelparam = "newLevelParam"  :commission_hotel_value = "commissionHotelValue"></com-commission-hotel-rule-edit>
+
+                            <com-commission-hotel_3r-rule-edit v-if="ruleForm.item_type == 'hotel_3r'"  @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-hotel_3r-rule-edit>
 
                         </el-form-item>
 
                         <el-form-item label="">
                             <el-button @click="saveCommissionRule" type="primary" size="medium">保存规则</el-button>
                         </el-form-item>
-
                     </el-col>
-
                 </el-card>
-
             </el-form>
         </div>
     </el-card>
-
 
     <!-- 选择商品对话框 -->
     <el-dialog title="设置商品" :visible.sync="ChooseGoods.dialog_visible" width="30%">
@@ -172,10 +211,58 @@ echo $this->render('../components/com-commission-store-rule-edit');
 
     </el-dialog>
 
+    <!-- 选择酒店对话框 -->
+    <el-dialog title="设置酒店" :visible.sync="ChooseHotel.dialog_visible" width="30%">
+        <el-input @keyup.enter.native="loadHotelList"
+                  size="small" placeholder="搜索酒店"
+                  v-model="ChooseHotel.search.keyword"
+                  clearable @clear="toHotelSearch"
+                  style="width:300px;">
+            <el-button slot="append" icon="el-icon-search" @click="toHotelSearch"></el-button>
+        </el-input>
+        <el-table v-loading="ChooseHotel.loadding" :data="ChooseHotel.list">
+            <el-table-column label="" width="100">
+                <template slot-scope="scope">
+                    <el-link @click="confirmChooseHotel(scope.row)" icon="el-icon-edit" type="primary">选择</el-link>
+                </template>
+            </el-table-column>
+            <el-table-column property="id" label="酒店ID" width="90"></el-table-column>
+            <el-table-column label="酒店名称">
+                <template slot-scope="scope">
+                    <div flex="box:first">
+                        <div style="padding-right: 10px;">
+                            <com-image mode="aspectFill" :src="scope.row.thumb_url"></com-image>
+                        </div>
+                        <div flex="cross:top cross:center">
+                            <div flex="dir:left">
+                                <el-tooltip class="item" effect="dark" placement="top">
+                                    <template slot="content">
+                                        <div style="width: 320px;">{{scope.row.name}}</div>
+                                    </template>
+                                    <com-ellipsis :line="2">{{scope.row.name}}</com-ellipsis>
+                                </el-tooltip>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <div style="text-align: right;margin-top:15px;">
+            <el-pagination
+                    v-if="ChooseStore.pagination.page_count > 1"
+                    style="display: inline-block;"
+                    background :page-size="ChooseStore.pagination.pageSize"
+                    @current-change="storePageChange"
+                    layout="prev, pager, next" :current-page="ChooseStore.pagination.current_page"
+                    :total="ChooseStore.pagination.total_count">
+            </el-pagination>
+        </div>
+
+    </el-dialog>
 
 </div>
 <script>
-
     const app = new Vue({
         el: '#app',
         data() {
@@ -224,6 +311,23 @@ echo $this->render('../components/com-commission-store-rule-edit');
                         page_count: 0
                     }
                 },
+                ChooseHotel: {
+                    hotel_name: '',
+                    hotel_pic:'',
+                    dialog_visible: false,
+                    loadding: false,
+                    list: [],
+                    search: {
+                        keyword: '',
+                        page: 1,
+                    },
+                    pagination: {
+                        pageSize: 10,
+                        current_page: 1,
+                        total_count: 0,
+                        page_count: 0
+                    }
+                },
                 loading: false,
                 ruleForm: {
                     item_type: '',
@@ -238,11 +342,14 @@ echo $this->render('../components/com-commission-store-rule-edit');
                 cardLoading: false,
                 commissionType: 1,
                 commissonValue: 0,
-                commissionRuleChains: []
+                commissionRuleChains: [],
+                commissionHotelValue:[],
+                radioDisabled:false,
             }
         },
         mounted: function () {
             if (getQuery('id')) {
+                this.radioDisabled = true;
                 this.getDetail();
             }
         },
@@ -259,6 +366,11 @@ echo $this->render('../components/com-commission-store-rule-edit');
             newNumber (data) {
                 if (data['value'] != null && typeof data.value != "undefined"){
                     this.commissonValue = data.value;
+                }
+            },
+            newLevelParam (data) {
+                if (data != null && typeof data != "undefined"){
+                    this.commissionHotelValue = data;
                 }
             },
 
@@ -284,6 +396,8 @@ echo $this->render('../components/com-commission-store-rule-edit');
                         self.ChooseGoods.goods_pic   = data.rule.goods_pic;
                         self.ChooseStore.store_name  = data.rule.store_name;
                         self.ChooseStore.store_pic   = data.rule.store_pic;
+                        self.ChooseHotel.hotel_name  = data.rule.hotel_name;
+                        self.ChooseHotel.hotel_pic   = data.rule.hotel_thumb_url;
                     }
                 }).catch(e => {
                 })
@@ -300,6 +414,24 @@ echo $this->render('../components/com-commission-store-rule-edit');
                             "commisson_value": self.commissonValue,
                             "unique_key":"user#all"
                         }]
+                    } else if (self.ruleForm.item_type == 'hotel') {
+                        for (let i=0;i<this.commissionHotelValue.length;i++) {
+                            this.commissionHotelValue[i].level = 1;
+                            if (this.commissionHotelValue[i].name == '普通会员') {
+                                this.commissionHotelValue[i].role_type = 'user';
+                                this.commissionHotelValue[i].unique_key = "user#all";
+                            } else if (this.commissionHotelValue[i].name == '分公司') {
+                                this.commissionHotelValue[i].role_type = 'branch_office';
+                                this.commissionHotelValue[i].unique_key = "branch_office#all";
+                            } else if (this.commissionHotelValue[i].name == '店主') {
+                                this.commissionHotelValue[i].role_type = 'store';
+                                this.commissionHotelValue[i].unique_key = "store#all";
+                            } else if (this.commissionHotelValue[i].name == '合伙人') {
+                                this.commissionHotelValue[i].role_type = 'partner';
+                                this.commissionHotelValue[i].unique_key = "partner#all";
+                            }
+                        }
+                        self.commissionRuleChains = this.commissionHotelValue;
                     }
                     if (valid) {
                         self.loading = true;
@@ -329,7 +461,6 @@ echo $this->render('../components/com-commission-store-rule-edit');
                     }
                 });
             },
-
 
 
             //--------------选择商品-----------------------------
@@ -418,6 +549,51 @@ echo $this->render('../components/com-commission-store-rule-edit');
                     }
                 }).catch(e => {
                     self.ChooseStore.loadding = false;
+                    self.$message.error("request fail");
+                });
+            },
+
+            //--------------选择酒店-----------------
+            confirmChooseHotel(row){
+                this.ruleForm.item_id = row.id;
+                this.ChooseHotel.hotel_name = row.name;
+                this.ChooseHotel.hotel_pic = row.thumb_url;
+                this.ChooseHotel.dialog_visible = false;
+            },
+            chooseHotelDialog(){
+                this.ChooseHotel.dialog_visible = true;
+                this.loadHotelList();
+            },
+            HotelPageChange(page){
+                this.ChooseHotel.search.page = page;
+                this.loadHotelList();
+            },
+            toHotelSearch(){
+                this.ChooseHotel.search.page = 1;
+                this.loadHotelList();
+            },
+            loadHotelList(){
+                let self = this;
+                self.ChooseHotel.loadding = true;
+                request({
+                    params: {
+                        r: "plugin/commission/mall/rules/search-hotel"
+                    },
+                    method: 'post',
+                    data: {
+                        page: self.ChooseHotel.search.page,
+                        keyword: self.ChooseHotel.search.keyword
+                    }
+                }).then(e => {
+                    self.ChooseHotel.loadding = false;
+                    if (e.data.code === 0) {
+                        self.ChooseHotel.list = e.data.data.list;
+                        self.ChooseHotel.pagination = e.data.data.pagination;
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.ChooseHotel.loadding = false;
                     self.$message.error("request fail");
                 });
             }

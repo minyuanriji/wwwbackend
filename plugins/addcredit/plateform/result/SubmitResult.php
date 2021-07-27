@@ -1,4 +1,5 @@
 <?php
+
 namespace app\plugins\addcredit\plateform\result;
 
 class SubmitResult
@@ -9,5 +10,6 @@ class SubmitResult
     public $code;
     public $message;
 
+    public $request_data; //请求数据
     public $response_content; //返回的原始数据
 }

@@ -1,12 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * 充值配置表单
- * Author: zal
- * Date: 2020-04-14
- * Time: 10:35
- */
 
 namespace app\forms\mall\option;
 

@@ -124,6 +124,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 integralForm: {
                     type: "1",
                     userId: '',
+                    user_id: '',
                     price: 0.00,
                     nickname: '',
                     remark: '',

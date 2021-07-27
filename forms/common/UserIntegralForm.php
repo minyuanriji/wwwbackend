@@ -1,5 +1,4 @@
 <?php
-
 namespace app\forms\common;
 
 use app\core\ApiCode;
@@ -48,8 +47,6 @@ class UserIntegralForm extends BaseModel{
                 'msg'  => $e->getMessage()
             ];
         }
-
-
     }
 
 

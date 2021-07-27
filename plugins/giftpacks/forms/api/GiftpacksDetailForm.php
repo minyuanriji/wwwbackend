@@ -42,10 +42,18 @@ class GiftpacksDetailForm extends BaseModel{
 
             $detail = static::detail($giftpacks);
 
+            //如果支持拼单
+            $groupList = $joinInfo = [];
+            if($giftpacks->group_enable){
+                //获取最新的两条拼单记录
+                $groupList = static::newestGroupLog($giftpacks);
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'detail' => $detail
+                    'detail'     => $detail,
+                    'group_list' => $groupList
                 ]
             ];
         }catch (\Exception $e){
@@ -63,6 +71,33 @@ class GiftpacksDetailForm extends BaseModel{
         $detail['item_count'] = static::getItemCount($giftpacks);
         $detail['sold_num'] = static::soldNum($giftpacks);
         return $detail;
+    }
+
+    //获取拼单记录
+    public static function newestGroupLog(Giftpacks $giftpacks, $num = 2){
+        $query = GiftpacksGroup::find()->alias("gg")
+                    ->innerJoin(["u" => User::tableName()], "u.id=gg.user_id")
+                    ->orderBy("gg.updated_at DESC");
+        $query->andWhere([
+            "AND",
+            ["gg.status" => "sharing"],
+            ["gg.pack_id" => $giftpacks->id],
+            [">", "gg.expired_at", time()],
+            [">", "gg.need_num", "gg.user_num"]
+        ]);
+        $selects = ["gg.id", "gg.need_num", "gg.user_num", "gg.expired_at",
+            "gg.user_id", "u.nickname", "u.avatar_url"
+        ];
+        $query->select($selects);
+        $groupLogs = $query->asArray()->limit($num)->all();
+        if($groupLogs){
+            foreach($groupLogs as &$log){
+                $log['still_need_num'] = intval($log['need_num']) - intval($log['user_num']);
+                unset($log['need_num']);
+                unset($log['user_num']);
+            }
+        }
+        return $groupLogs;
     }
 
     //已售数量
@@ -87,6 +122,11 @@ class GiftpacksDetailForm extends BaseModel{
     //红包抵扣价
     public static function integralDeductionPrice(Giftpacks $giftpacks, User $user){
         return (float)$giftpacks->price;
+    }
+
+    //拼单红包抵扣价
+    public static function groupIntegralDeductionPrice(Giftpacks $giftpacks, User $user){
+        return (float)$giftpacks->group_price;
     }
 
     //获取大礼包商品数量

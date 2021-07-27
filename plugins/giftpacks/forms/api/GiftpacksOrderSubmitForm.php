@@ -37,7 +37,7 @@ class GiftpacksOrderSubmitForm extends BaseModel{
                 "mall_id"     => \Yii::$app->mall->id,
                 "pack_id"     => $this->pack_id,
                 "user_id"     => \Yii::$app->user->id,
-                "order_sn"    => "GP" . date("YmdHis") . rand(10, 99),
+                "order_sn"    => static::generateUniqueOrderSn(),
                 "order_price" => $giftpacks->price,
                 "created_at"  => time(),
                 "updated_at"  => time(),
@@ -67,7 +67,22 @@ class GiftpacksOrderSubmitForm extends BaseModel{
     public static function check(Giftpacks $giftpacks){
         $soldNum = GiftpacksDetailForm::soldNum($giftpacks);
         if($giftpacks->max_stock <= $soldNum){
-            throw new \Exception("大礼包".$giftpacks->id."已售罄");
+            throw new \Exception("大礼包“".$giftpacks->title."”已售罄");
         }
+    }
+
+    //生成唯一订单号
+    public static function generateUniqueOrderSn(){
+        $orderSn = null;
+        while(true){
+            $orderSn = "GP" . date("YmdHis") . rand(10, 99);
+            $exists = GiftpacksOrder::find()->where([
+                "order_sn" => $orderSn
+            ])->exists();
+            if(!$exists){
+                break;
+            }
+        }
+        return $orderSn;
     }
 }

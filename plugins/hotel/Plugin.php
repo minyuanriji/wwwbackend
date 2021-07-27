@@ -26,8 +26,8 @@ class Plugin extends \app\plugins\Plugin{
     public function getMenus(){
         return [
             [
-                'name' => '设置',
-                'route' => 'plugin/hotel/mall/platform-configuration/setting',
+                'name' => '平台设置',
+                'route' => 'plugin/hotel/mall/platforms/setting',
                 'icon' => 'el-icon-setting',
                 'action' => []
             ],

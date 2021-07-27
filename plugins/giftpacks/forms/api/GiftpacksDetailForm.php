@@ -44,9 +44,12 @@ class GiftpacksDetailForm extends BaseModel{
 
             //如果支持拼单
             $groupList = $joinInfo = [];
+            $detail['group_num'] = 0;
             if($giftpacks->group_enable){
                 //获取最新的两条拼单记录
                 $groupList = static::newestGroupLog($giftpacks);
+
+                //TODO 拼单总数
                 $detail['group_num'] = 0;
             }
 

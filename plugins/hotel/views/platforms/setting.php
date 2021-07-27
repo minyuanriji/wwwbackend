@@ -163,35 +163,30 @@
 
 <div id="app" v-cloak>
     <el-card v-loading="loading" style="border:0" shadow="never" body-style="background-color: #f3f3f3;padding: 0 0;">
-        <el-form :model="ruleForm"
-                 :rules="rules"
-                 ref="ruleForm"
-                 label-width="172px"
-                 style="position: relative"
-                 size="small">
-            <el-tabs v-model="activeName" @tab-click="handleClick">
-                <el-tab-pane label="锦江集团" name="jin_jiang_setting">
+        <el-form :rules="rules" ref="ruleForm" :model="ruleForm" label-width="172px" style="position: relative" size="small">
+            <el-tabs v-model="activeName">
+                <el-tab-pane label="锦江集团" name="bestwehotel">
                     <el-row>
                         <el-col :span="24">
                             <div class="title">
-                                <span>基本信息</span>
+                                <span>账号设置</span>
                             </div>
                             <div class="form-body">
-                                <el-form-item label="账号" prop="account">
-                                    <el-input v-model="ruleForm.account"></el-input>
+                                <el-form-item label="APP ID" prop="bestwehotel.app_id">
+                                    <el-input placeholder="请输入" v-model="ruleForm.bestwehotel.app_id"></el-input>
                                 </el-form-item>
-
-                                <el-form-item label="秘钥" prop="secretKey">
-                                    <el-input v-model="ruleForm.secretKey"></el-input>
+                                <el-form-item label="KEY" prop="bestwehotel.key">
+                                    <el-input placeholder="请输入" v-model="ruleForm.bestwehotel.key"></el-input>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button :loading="submitLoading" type="primary" @click="submitForm('ruleForm')">保存</el-button>
                                 </el-form-item>
                             </div>
                         </el-col>
                     </el-row>
                 </el-tab-pane>
+
             </el-tabs>
-            <el-button :loading="submitLoading" class="button-item" size="small" type="primary"
-                       @click="submit">保存
-            </el-button>
         </el-form>
     </el-card>
 </div>
@@ -201,110 +196,67 @@
         el: '#app',
         data() {
             return {
+                activeName: "bestwehotel",
                 loading: false,
                 submitLoading: false,
-                mall: null,
-                activeName: 'jin_jiang_setting',
-
                 ruleForm: {
-                    account: '',
-                    secretKey: '',
+                    bestwehotel: {
+                        app_id: '',
+                        key: ''
+                    }
                 },
                 rules: {
-                    account: [
-                        {required: true, message: '请填写账号。'},
-                    ],
-                    secretKey: [
-                        {required: true, message: '请填写秘钥。'},
-                    ],
-                },
+
+                }
             };
         },
         created() {
-            this.loadData();
-            this.getSetData();
+            this.getSetting()
         },
         methods: {
-            change() {
-                request({
-                    params: {
-                        r: 'mall/setting/mall',
-                    },
-                    method: 'post',
-                    data: {
-                        key: 'integral_price_display',
-                        value: {
-                            is_display: this.is_goods_name_diy
-                        }
-                    }
-                }).then(e => {
-                    if (e.data.code === 0) {
-                        console.log(e, 'eeeeeee');
-                    } else {
-                        this.$message.error(e.data.msg);
-                    }
-                })
-            },
-            getSetData() {
-                request({
-                    params: {
-                        r: 'mall/setting/mall',
-                        key: 'integral_price_display',
-                    },
-                }).then(e => {
-                    if (e.data.code === 0) {
-                        this.is_goods_name_diy = e.data.data.is_display;
-                    } else {
-                        this.$message.error(e.data.msg);
-                    }
-                })
-            },
-
-            loadData() {
+            getSetting(){
                 this.loading = true;
                 request({
                     params: {
-                        r: 'plugin/hotel/mall/platform-configuration/setting',
-                        platformGroup: this.activeName,
+                        r: 'plugin/hotel/mall/platforms/setting'
                     },
-                    method: 'get',
                 }).then(e => {
                     this.loading = false;
                     if (e.data.code === 0) {
-                        console.log(e)
-                        this.ruleForm = e.data.data;
+                        this.ruleForm = e.data.data.setting;
                     } else {
                         this.$message.error(e.data.msg);
                     }
-                }).catch(e => {
-                });
+                })
             },
-
-            submit() {
-                console.log(this.ruleForm)
-                this.submitLoading = true;
-                request({
-                    params: {
-                        r: 'plugin/hotel/mall/platform-configuration/setting',
-                    },
-                    method: 'post',
-                    data: {
-                        ruleForm: this.ruleForm
-                    },
-                }).then(e => {
-                    this.submitLoading = false;
-                    if (e.data.code === 0) {
-                        this.$message.success(e.data.msg);
+            submitForm(formName){
+                this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        this.submitLoading = true;
+                        request({
+                            params: {
+                                r: 'plugin/hotel/mall/platforms/setting',
+                            },
+                            method: 'post',
+                            data: {
+                                jsonSettingArray: JSON.stringify(this.ruleForm)
+                            },
+                        }).then(e => {
+                            this.submitLoading = false;
+                            if (e.data.code === 0) {
+                                this.$message.success(e.data.msg);
+                            } else {
+                                this.$message.error(e.data.msg);
+                            }
+                        }).catch(e => {
+                        });
                     } else {
-                        this.$message.error(e.data.msg);
+                        this.$message.error('部分参数验证不通过');
                     }
-                }).catch(e => {
                 });
-            },
-            handleClick(tab, event) {
-                console.log(tab, event);
-            },
-        }
+            }
+        },
+        computed: {}
     });
 </script>
 <style>

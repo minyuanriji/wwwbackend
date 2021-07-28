@@ -341,11 +341,17 @@ class AppConfigLogic
      * 商城海报设置
      * @return null
      */
-    public static function getPosterConfig()
+    public static function getPosterConfig($stands_mall_id = 0)
     {
+        if ($stands_mall_id) {
+            $mall_id = $stands_mall_id;
+        } else {
+            $mall_id = \Yii::$app->mall->id;
+        }
+
         $option = OptionLogic::get(
             Option::NAME_POSTER,
-            \Yii::$app->mall->id,
+            $mall_id,
             Option::GROUP_APP
         );
         $default = (new PosterForm())->getDefault();

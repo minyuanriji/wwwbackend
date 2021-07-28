@@ -15,7 +15,7 @@ class SharePosterForm extends GrafikaOption implements BasePoster
     public function get($path = "pages/index/index", $stands_mall_id = 0)
     {
         $default = (new \app\forms\mall\poster\PosterForm())->getDefault()['share'];
-        $options = AppConfigLogic::getPosterConfig();
+        $options = AppConfigLogic::getPosterConfig($stands_mall_id);
         $option = $options["share"];
         $option = $this->optionDiff($option, $default);
         if(empty($option['name']['text'])){

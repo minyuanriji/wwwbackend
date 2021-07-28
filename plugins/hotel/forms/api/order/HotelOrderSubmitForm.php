@@ -63,6 +63,7 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
                 "booking_num"         => $this->num,
                 "booking_start_date"  => $this->start_date,
                 "booking_days"        => $this->days,
+                "real_booking_days"   => $this->days,
                 "booking_passengers"  => $this->passengers,
                 "booking_arrive_date" => date("Y-m-d H:i:s", strtotime($this->arrive_date)),
                 "created_at"          => time(),

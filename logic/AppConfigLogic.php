@@ -354,6 +354,9 @@ class AppConfigLogic
             $mall_id,
             Option::GROUP_APP
         );
+        if (!$option) {
+            self::getPosterConfig(5);
+        }
         $default = (new PosterForm())->getDefault();
         $option = self::check($option, $default);
 

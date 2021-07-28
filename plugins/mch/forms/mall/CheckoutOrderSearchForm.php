@@ -52,8 +52,7 @@ class CheckoutOrderSearchForm extends BaseModel{
         $list = [];
         if($rows){
             foreach($rows as $row){
-                if(empty($row['mchStore']) || empty($row['payUser']))
-                    continue;
+                if(empty($row['mchStore']) || empty($row['payUser'])) continue;
                 $row['format_pay_time'] = "";
                 if($row['is_pay']){
                     $row['format_pay_time'] = date("Y-m-d H:i:s", $row['pay_at']);

@@ -13,6 +13,8 @@ class CommissionController extends BaseCommandController{
             "goods"    => "app\\commands\\commission_action\\GoodsAction",
             "checkout" => "app\\commands\\commission_action\\CheckoutAction",
             "store"    => "app\\commands\\commission_action\\StoreAction",
+            "hotel"    => "app\\commands\\commission_action\\HotelAction",
+            "hotel3r"  => "app\\commands\\commission_action\\Hotel3rAction",
         ];
     }
 
@@ -39,7 +41,7 @@ class CommissionController extends BaseCommandController{
 
 
     /**
-     * 计算商家二维码收款单利润
+     * 计算利润
      * @param $order_price
      * @param $transfer_rate
      * @return mixed
@@ -66,7 +68,7 @@ class CommissionController extends BaseCommandController{
         }
 
         $query = User::find()->alias("u")
-            ->leftJoin("{{%user_relationship_link}} url", "url.user_id=u.id");
+                    ->leftJoin("{{%user_relationship_link}} url", "url.user_id=u.id");
         $query->andWhere([
             "AND",
             ["u.is_delete" => 0],
@@ -148,8 +150,8 @@ class CommissionController extends BaseCommandController{
             return $ruleData;
         };
 
-        $this->commandOut(json_encode($parentDatas));
         $currentLevel = count($parentDatas);
+
         foreach($parentDatas as $key => $parentData){
 
             $query = CommissionRuleChain::find()->alias("crc");
@@ -173,9 +175,9 @@ class CommissionController extends BaseCommandController{
                 $newQuery->andWhere("crc.unique_key LIKE '%{$relKey}'" );
                 $ruleData = $getChainRuleData($newQuery, $item_id);
 
-                $this->commandOut("current LEVEL:" . $currentLevel);
-                $this->commandOut($newQuery->createCommand()->getRawSql());
-                $this->commandOut(json_encode($ruleData));
+                //$this->commandOut("current LEVEL:" . $currentLevel);
+                //$this->commandOut($newQuery->createCommand()->getRawSql());
+                //$this->commandOut(json_encode($ruleData));
                 if($ruleData) break;
             }
 

@@ -16,6 +16,8 @@ class UserIncomeForm extends BaseModel{
     const TYPE_ADD      = 1;
     const TYPE_SUB      = 2;
 
+
+
     /**
      * 股东分红
      * @param User $user
@@ -166,7 +168,7 @@ class UserIncomeForm extends BaseModel{
 
     }
 
-    private static function change(User $user, $price, $type, $flag, $source_type, $source_id, $desc = null, $is_manual = 0){
+    protected static function change(User $user, $price, $type, $flag, $source_type, $source_id, $desc = null, $is_manual = 0){
 
         $totalIncome = floatval($user->total_income);
 

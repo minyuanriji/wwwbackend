@@ -85,4 +85,5 @@ class OrderController extends ApiController {
         $form->attributes = $this->requestData;
         return $this->asJson($form->getQrCode());
     }
+
 }

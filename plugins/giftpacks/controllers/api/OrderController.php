@@ -7,6 +7,7 @@ use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderListForm;
+use app\plugins\giftpacks\forms\api\GiftpacksOrderPackItemListForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderPreviewForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderSubmitForm;
 
@@ -39,6 +40,20 @@ class OrderController extends ApiController {
         $form->attributes = $this->requestData;
         return $this->asJson($form->getDetail());
     }
+
+    /**
+     * 订单礼包物品列表
+     * @return \yii\web\Response
+     */
+    public function actionPackItemList(){
+        $form = new GiftpacksOrderPackItemListForm();
+        $form->attributes = $this->requestData;
+        $form->city_id    = \Yii::$app->request->headers->get("x-city-id");
+        $form->longitude  = ApiController::$commonData['city_data']['longitude'];
+        $form->latitude   = ApiController::$commonData['city_data']['latitude'];
+        return $this->asJson($form->getList());
+    }
+
 
     /**
      * 预览订单

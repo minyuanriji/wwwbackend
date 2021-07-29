@@ -45,8 +45,9 @@ class GiftpacksOrderListForm extends BaseModel{
             $selects = ["go.id as order_id", "go.order_sn", "go.order_price",
                 "go.created_at", "go.pay_status", "go.pay_price", "go.pay_type",
                 "go.integral_deduction_price",
-                "go.pack_id", "gf.title", "gf.cover_pic"
+                "go.pack_id", "gf.title", "gf.cover_pic", "gf.descript"
             ];
+            $selects[] = "(SELECT COUNT(*) FROM {{%plugin_giftpacks_order_item}} WHERE order_id=go.id) as item_num";
 
             $query->orderBy("go.id DESC");
 
@@ -54,6 +55,7 @@ class GiftpacksOrderListForm extends BaseModel{
                         ->asArray()->all();
             if($list){
                 foreach($list as &$item){
+                    $item['item_num'] = (int)$item['item_num'];
                     $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
                 }
             }

@@ -4,6 +4,7 @@ namespace app\plugins\giftpacks\forms\api;
 
 
 use app\core\ApiCode;
+use app\helpers\CityHelper;
 use app\models\BaseModel;
 use app\models\Goods;
 use app\models\GoodsWarehouse;
@@ -53,7 +54,10 @@ class GiftpacksOrderPackItemListForm extends BaseModel{
                 "gpi.name", "gpi.cover_pic"
             ];
             $selects[] = "s.name as store_name"; //店铺名称
-            $selects = array_merge($selects, ["s.mch_id", "s.score", "s.longitude", "s.latitude"]);
+            $selects = array_merge($selects, [
+                "s.mch_id", "s.score", "s.longitude", "s.latitude",
+                "s.mobile", "s.address", "s.province_id", "s.city_id", "s.district_id"
+            ]);
             $selects[] = "ST_Distance_sphere(point(s.longitude, s.latitude), point(".$this->longitude.", ".$this->latitude.")) as distance_mi";
 
             $query->orderBy("goi.id DESC");
@@ -62,6 +66,12 @@ class GiftpacksOrderPackItemListForm extends BaseModel{
                 ->asArray()->all();
             if($list){
                 foreach($list as &$item){
+
+                    $cityData = CityHelper::reverseData($item['district_id'], $item['city_id'], $item['province_id']);
+                    $item['province'] = !empty($cityData['province']) ? $cityData['province']['name'] : "";
+                    $item['city'] = !empty($cityData['city']) ? $cityData['city']['name'] : "";
+                    $item['district'] = !empty($cityData['district']) ? $cityData['district']['name'] : "";
+
                     if($item['distance_mi'] > 1000){
                         $item['distance_format'] = round(($item['distance_mi']/1000), 1) . "km";
                     }else{

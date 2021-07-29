@@ -64,4 +64,5 @@ class GiftpacksOrderDetailForm extends BaseModel{
         $detail['integral_deduction_price'] = $order->integral_deduction_price;
         return $detail;
     }
+
 }

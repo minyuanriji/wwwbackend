@@ -5,6 +5,7 @@ namespace app\plugins\giftpacks\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
+use app\plugins\giftpacks\forms\api\GiftpacksOrderClerkQrCodeForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderListForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderPackItemListForm;
@@ -73,5 +74,15 @@ class OrderController extends ApiController {
         $form = new GiftpacksOrderSubmitForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->save());
+    }
+
+    /**
+     * 核销码
+     * @return \yii\web\Response
+     */
+    public function actionClerkQrCode(){
+        $form = new GiftpacksOrderClerkQrCodeForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->getQrCode());
     }
 }

@@ -42,6 +42,7 @@ class ClerkGetLogForm extends BaseModel{
 
             $query->select($selects);
             $query->orderBy("cl.id DESC");
+            $query->where(["cl.user_id" => \Yii::$app->user->id]);
 
             $rows = $query->page($pagination, 10, max(1, (int)$this->page))
                           ->asArray()->all();

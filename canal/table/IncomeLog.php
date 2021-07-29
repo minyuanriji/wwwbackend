@@ -2,10 +2,7 @@
 
 namespace app\canal\table;
 
-use app\notification\BillAccountCommissionNotification;
-use app\notification\GoodsCommissionNotification;
 use app\notification\RevenueRecordCommissionNotification;
-use app\notification\StoreCommissionNotification;
 
 class IncomeLog
 {

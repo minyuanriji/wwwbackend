@@ -17,7 +17,12 @@ class IncomeLog
         {
             if (isset($row['flag']) && $row['flag']) {
                 if (isset($row['source_type'])) {
-                    if ($row['source_type'] == 3 || $row['source_type'] == 4) {
+                    if ($row['source_type'] == 3) {
+                        $row['source_type'] = 'checkout';
+                        RevenueRecordCommissionNotification::send($row);
+                        \Yii::error('IncomeLogNotice:' . json_encode($row) . '---time:' . date("Y-m-d H:i:s", time()));
+                    } elseif ($row['source_type'] == 4){
+                        $row['source_type'] = 'store';
                         RevenueRecordCommissionNotification::send($row);
                         \Yii::error('IncomeLogNotice:' . json_encode($row) . '---time:' . date("Y-m-d H:i:s", time()));
                     }

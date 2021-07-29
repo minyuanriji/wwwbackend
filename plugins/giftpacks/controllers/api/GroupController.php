@@ -3,12 +3,12 @@
 namespace app\plugins\giftpacks\controllers\api;
 
 
+use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
-use app\plugins\ApiController;
 use app\plugins\giftpacks\forms\api\GiftpacksGroupJoinForm;
 use app\plugins\giftpacks\forms\api\GiftpacksGroupNewForm;
 
-class GroupController extends ApiController{
+class GroupController extends ApiController {
 
     public function behaviors(){
         return array_merge(parent::behaviors(), [

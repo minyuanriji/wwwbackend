@@ -3,12 +3,14 @@
 namespace app\plugins\giftpacks\controllers\api;
 
 
+use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
-use app\plugins\ApiController;
+use app\plugins\giftpacks\forms\api\GiftpacksOrderDetailForm;
+use app\plugins\giftpacks\forms\api\GiftpacksOrderListForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderPreviewForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderSubmitForm;
 
-class OrderController extends ApiController{
+class OrderController extends ApiController {
 
     public function behaviors(){
         return array_merge(parent::behaviors(), [
@@ -18,6 +20,25 @@ class OrderController extends ApiController{
         ]);
     }
 
+    /**
+     * 订单列表
+     * @return \yii\web\Response
+     */
+    public function actionList(){
+        $form = new GiftpacksOrderListForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->getList());
+    }
+
+    /**
+     * 订单详情
+     * @return \yii\web\Response
+     */
+    public function actionDetail(){
+        $form = new GiftpacksOrderDetailForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->getDetail());
+    }
 
     /**
      * 预览订单

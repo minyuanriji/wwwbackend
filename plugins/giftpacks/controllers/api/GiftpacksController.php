@@ -2,14 +2,14 @@
 
 namespace app\plugins\giftpacks\controllers\api;
 
-use app\plugins\ApiController;
+use app\controllers\api\ApiController;
 use app\plugins\giftpacks\forms\api\GiftpacksDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksGroupDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksGroupListForm;
 use app\plugins\giftpacks\forms\api\GiftpacksItemListForm;
 use app\plugins\giftpacks\forms\api\GiftpacksListForm;
 
-class GiftpacksController extends ApiController{
+class GiftpacksController extends ApiController {
 
     /**
      * 大礼包列表

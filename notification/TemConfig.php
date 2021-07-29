@@ -298,4 +298,21 @@ class TemConfig
 
      * */
     const MemberJoinReminder = 'YdqBUmMmRYlCg5Kfp8JiGLGUqsVV-_Z8MJy4KN1yucU';
+
+    /*  @todo 	收益到账通知
+
+        收益到账通知：
+        收益金额：220.30元
+        收益来源：荣事达旗舰店
+        到账时间：2014年7月21日 18:36
+        您的收益已到账。
+
+        {{first.DATA}}
+        收益金额：{{keyword1.DATA}}
+        收益来源：{{keyword2.DATA}}
+        到账时间：{{keyword3.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const IncomeArrival = '-fSmrfitWwJn1Lgr488aaJ2Q3BOAccuD3kHuHdi7BpE';
 }

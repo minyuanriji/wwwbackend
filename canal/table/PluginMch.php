@@ -1,5 +1,8 @@
 <?php
 
+/* 废弃 2021/07/29
+ *
+ * */
 namespace app\canal\table;
 
 use app\notification\MchApplyAdoptNotification;

@@ -39,7 +39,7 @@ class GiftpacksController extends ApiController {
         $form = new GiftpacksItemListForm();
         $form->attributes = $this->requestData;
         $form->city_id    = \Yii::$app->request->headers->get("x-city-id");
-        $form->longitude  = \app\controllers\api\ApiController::$commonData['city_data']['longitude'];
+        $form->longitude  = ApiController::$commonData['city_data']['longitude'];
         $form->latitude   = ApiController::$commonData['city_data']['latitude'];
 
         return $this->asJson($form->getList());

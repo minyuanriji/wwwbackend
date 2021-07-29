@@ -3,6 +3,7 @@
 namespace app\plugins\giftpacks\forms\api;
 
 use app\core\ApiCode;
+use app\helpers\CityHelper;
 use app\models\BaseModel;
 use app\plugins\giftpacks\models\Giftpacks;
 
@@ -38,7 +39,10 @@ class GiftpacksItemListForm extends BaseModel{
             $selects = ["gpi.*"];
             $selects[] = "g.price as goods_price"; //商品价格
             $selects[] = "s.name as store_name"; //店铺名称
-            $selects = array_merge($selects, ["s.mch_id", "s.score", "s.longitude", "s.latitude"]);
+            $selects = array_merge($selects, [
+                "s.mch_id", "s.score", "s.longitude", "s.latitude",
+                "s.mobile", "s.address", "s.province_id", "s.city_id", "s.district_id"
+            ]);
             $selects[] = "ST_Distance_sphere(point(s.longitude, s.latitude), point(".$this->longitude.", ".$this->latitude.")) as distance_mi";
 
             $list = $query->select($selects)->page($pagination, 30, max(1, (int)$this->page))
@@ -46,6 +50,12 @@ class GiftpacksItemListForm extends BaseModel{
 
             if($list){
                 foreach($list as &$item){
+
+                    $cityData = CityHelper::reverseData($item['district_id'], $item['city_id'], $item['province_id']);
+                    $item['province'] = !empty($cityData['province']) ? $cityData['province']['name'] : "";
+                    $item['city'] = !empty($cityData['city']) ? $cityData['city']['name'] : "";
+                    $item['district'] = !empty($cityData['district']) ? $cityData['district']['name'] : "";
+
                     if($item['distance_mi'] > 1000){
                         $item['distance_format'] = round(($item['distance_mi']/1000), 1) . "km";
                     }else{

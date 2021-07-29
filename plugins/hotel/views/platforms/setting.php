@@ -223,7 +223,12 @@
                 }).then(e => {
                     this.loading = false;
                     if (e.data.code === 0) {
-                        this.ruleForm = e.data.data.setting;
+                        var setting = typeof e.data.data.setting == "object" ? e.data.data.setting : {};
+                        if(typeof setting['bestwehotel'] == "undefined"){
+                            setting['bestwehotel'] = {app_id: '', key: ''};
+                        }
+                        this.ruleForm = setting;
+
                     } else {
                         this.$message.error(e.data.msg);
                     }

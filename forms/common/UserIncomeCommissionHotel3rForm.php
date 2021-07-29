@@ -132,7 +132,7 @@ class UserIncomeCommissionHotel3rForm extends UserIncomeForm
         $trans && ($t = \Yii::$app->db->beginTransaction());
         try {
 
-            $desc = "来自推荐用户酒店“".$hotel->name."，”日期“".$priceLog->date."”订单支付结算分佣，订单ID:" . $priceLog->hotel_order_id;
+            $desc = "来自推荐用户酒店“".$hotel->name."，”日期“".$priceLog->date."”订单支付待结算分佣，订单ID:" . $priceLog->hotel_order_id;
 
             static::change($user, $priceLog->price, self::TYPE_ADD, self::FLAG_FROZEN, "hotel_3r_commission", $priceLog->id, $desc);
 

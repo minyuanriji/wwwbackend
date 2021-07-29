@@ -7,7 +7,7 @@ use yii\console\Controller;
 class BaseCommandController extends Controller{
 
     public function sleep($second){
-
+        sleep(1);
     }
 
     public function mutiKill(){

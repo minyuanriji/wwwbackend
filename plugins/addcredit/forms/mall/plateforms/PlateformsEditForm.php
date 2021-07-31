@@ -15,12 +15,13 @@ class PlateformsEditForm extends BaseModel
     public $ratio;
     public $cyd_id;
     public $secret_key;
+    public $parent_id;
 
     public function rules()
     {
         return [
-            [['name', 'sdk_dir', 'ratio', 'cyd_id', 'secret_key'], 'required'],
-            [['ratio', 'id', 'cyd_id'], 'integer'],
+            [['name', 'sdk_dir', 'ratio', 'cyd_id', 'secret_key','parent_id'], 'required'],
+            [['ratio', 'id', 'cyd_id', 'parent_id'], 'integer'],
             [['name', 'sdk_dir', 'secret_key'], 'string'],
         ];
     }
@@ -47,6 +48,7 @@ class PlateformsEditForm extends BaseModel
             $plateforms->sdk_dir = $this->sdk_dir;
             $plateforms->created_at = $plateforms->updated_at = time();
             $plateforms->ratio = $this->ratio;
+            $plateforms->parent_id = $this->parent_id;
             $plateforms->json_param = json_encode(['id' => $this->cyd_id, 'secret_key' => $this->secret_key]);
             if ($plateforms->save()) {
                 return [

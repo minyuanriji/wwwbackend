@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\core\BasePagination;
 use app\models\BaseModel;
 use app\models\GoodsService;
+use app\models\User;
 use app\plugins\addcredit\models\AddcreditPlateforms;
 
 class PlateformsForm extends BaseModel
@@ -79,6 +80,17 @@ class PlateformsForm extends BaseModel
             $json_param = json_decode($detail['json_param'],true);
             $detail['cyd_id'] = $json_param['id'];
             $detail['secret_key'] = $json_param['secret_key'];
+            $user = User::findOne($detail['parent_id']);
+            if (!$user) {
+                throw new \Exception('用户不存在', ApiCode::CODE_FAIL);
+            }
+            $detail['parent_name'] = $user->nickname;
+            if (!$user) {
+                return [
+                    'code' => ApiCode::CODE_FAIL,
+                    'msg' => '数据为空',
+                ];
+            }
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',

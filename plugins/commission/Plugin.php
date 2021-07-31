@@ -42,7 +42,7 @@ class Plugin extends \app\plugins\Plugin{
     }
 
     public function getIndexRoute(){
-        return 'plugin/commission/mall/users/list';
+        return 'plugin/commission/mall/rules/index';
     }
 
 

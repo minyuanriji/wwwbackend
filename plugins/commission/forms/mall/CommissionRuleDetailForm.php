@@ -7,6 +7,8 @@ use app\helpers\ArrayHelper;
 use app\models\BaseModel;
 use app\models\Goods;
 use app\models\Store;
+use app\models\User;
+use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\commission\models\CommissionRuleChain;
 use app\plugins\commission\models\CommissionRules;
 use app\plugins\hotel\models\Hotels;
@@ -54,12 +56,9 @@ class CommissionRuleDetailForm extends BaseModel
             ])->asArray()->all();
 
             $ruleData = ArrayHelper::toArray($rule);
-            //$ruleData['commission_type'] = (string)$ruleData['commission_type'];
 
-            $ruleData['goods_name'] = "";
-            $ruleData['goods_pic']  = "";
-            $ruleData['store_name'] = "";
-            $ruleData['store_pic']  = "";
+            $ruleData['name']  = "";
+            $ruleData['pic']   = "";
 
             if(!$ruleData['apply_all_item']){
                 if($ruleData['item_type'] == "goods"){
@@ -67,24 +66,39 @@ class CommissionRuleDetailForm extends BaseModel
                         "id" => $ruleData['item_id']
                     ])->asArray()->one();
                     if($goods && $goods['goodsWarehouse']){
-                        $ruleData['goods_name'] = $goods['goodsWarehouse']['name'];
-                        $ruleData['goods_pic']  = $goods['goodsWarehouse']['cover_pic'];
+                        $ruleData['name'] = $goods['goodsWarehouse']['name'];
+                        $ruleData['pic']  = $goods['goodsWarehouse']['cover_pic'];
                     }else{
                         $ruleData['item_id'] = 0;
                     }
-                } else if($ruleData['item_type'] == "store" || $ruleData['item_type'] == "checkout"){
+                } else if ($ruleData['item_type'] == "store" || $ruleData['item_type'] == "checkout") {
                     $store = Store::findOne($ruleData['item_id']);
                     if($store){
-                        $ruleData['store_name'] = $store->name;
-                        $ruleData['store_pic']  = $store->cover_url;
+                        $ruleData['name'] = $store->name;
+                        $ruleData['pic']  = $store->cover_url;
                     }else{
                         $ruleData['item_id'] = 0;
                     }
-                } else if($ruleData['item_type'] == "hotel" || $ruleData['item_type'] == "hotel_3r"){
+                } else if ($ruleData['item_type'] == "hotel_3r"){
                     $hotels = Hotels::findOne($ruleData['item_id']);
                     if($hotels){
-                        $ruleData['hotel_name'] = $hotels->name;
-                        $ruleData['hotel_thumb_url']  = $hotels->thumb_url;
+                        $ruleData['name'] = $hotels->name;
+                        $ruleData['pic']  = $hotels->thumb_url;
+                    }else{
+                        $ruleData['item_id'] = 0;
+                    }
+                } else if ($ruleData['item_type'] == "hotel" || $ruleData['item_type'] == "addcredit"){
+                    $user = User::findOne($ruleData['item_id']);
+                    if($user){
+                        $ruleData['name'] = $user->nickname;
+                        $ruleData['pic']  = $user->avatar_url;
+                    }else{
+                        $ruleData['item_id'] = 0;
+                    }
+                } else if ($ruleData['item_type'] == "addcredit_3r"){
+                    $add_plate = AddcreditPlateforms::findOne($ruleData['item_id']);
+                    if($add_plate){
+                        $ruleData['name'] = $add_plate->name;
                     }else{
                         $ruleData['item_id'] = 0;
                     }

@@ -22,11 +22,13 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                     <el-col>
                         <el-form-item label="对象类型" prop="item_type">
                             <el-radio-group v-model="ruleForm.item_type">
-                                <el-radio :disabled="ruleForm.item_type == 'goods' || radioDisabled == false ? false : true" :label="'goods'">商品</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'checkout' || radioDisabled == false ? false : true" :label="'checkout'">二维码收款</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'store' || radioDisabled == false ? false : true" :label="'store'">门店</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'goods' || radioDisabled == false ? false : true" :label="'goods'">商品消费分佣</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'checkout' || radioDisabled == false ? false : true" :label="'checkout'">门店二维码收款</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'store' || radioDisabled == false ? false : true" :label="'store'">门店直推分佣</el-radio>
                                 <el-radio :disabled="ruleForm.item_type == 'hotel' || radioDisabled == false ? false : true" :label="'hotel'">酒店直推分佣</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'hotel_3r' || radioDisabled == false ? false : true" :label="'hotel_3r'">酒店上级（3r）分佣</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'hotel_3r' || radioDisabled == false ? false : true" :label="'hotel_3r'">酒店消费分佣</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'addcredit' || radioDisabled == false ? false : true" :label="'addcredit'">话费直推分佣</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'addcredit_3r' || radioDisabled == false ? false : true" :label="'addcredit_3r'">话费消费分佣</el-radio>
                             </el-radio-group>
                         </el-form-item>
 
@@ -37,55 +39,52 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                             </el-switch>
                         </el-form-item>
 
-                        <!-- 选择一个商品/门店/酒店 -->
+                        <!-- 选择一个商品/门店/酒店/话费 -->
                         <template v-if="!ruleForm.apply_all_item">
 
                             <el-form-item v-if="ruleForm.item_type == 'goods'" :label="'选择商品'" prop="item_id">
                                 <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
                                     <div style="padding-right: 10px;">
-                                        <com-image mode="aspectFill" :src="ChooseGoods.goods_pic"></com-image>
+                                        <com-image mode="aspectFill" :src="choice.pic"></com-image>
                                     </div>
                                     <div flex="cross:top cross:center">
-                                        <div style="display:block;">{{ChooseGoods.goods_name}}</div>
+                                        <div style="display:block;">{{choice.name}}</div>
                                     </div>
                                 </div>
                                 <el-button @click="chooseGoodsDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
                             </el-form-item>
 
-                            <el-form-item v-if="ruleForm.item_type == 'store'"  :label="'选择门店'" prop="item_id">
+                            <el-form-item v-if="ruleForm.item_type == 'store' || ruleForm.item_type == 'checkout'"  :label="'选择门店'" prop="item_id">
                                 <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
                                     <div style="padding-right: 10px;">
-                                        <com-image mode="aspectFill" :src="ChooseStore.store_pic"></com-image>
+                                        <com-image mode="aspectFill" :src="choice.pic"></com-image>
                                     </div>
                                     <div flex="cross:top cross:center">
-                                        <div style="display:block;">{{ChooseStore.store_name}}</div>
+                                        <div style="display:block;">{{choice.name}}</div>
                                     </div>
                                 </div>
                                 <el-button @click="chooseStoreDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
                             </el-form-item>
 
-                            <el-form-item v-if="ruleForm.item_type == 'checkout'"  :label="'选择门店'" prop="item_id">
+                            <el-form-item v-if="ruleForm.item_type == 'hotel_3r' || ruleForm.item_type == 'hotel'" :label="'选择酒店'" prop="item_id">
                                 <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
                                     <div style="padding-right: 10px;">
-                                        <com-image mode="aspectFill" :src="ChooseStore.store_pic"></com-image>
+                                        <com-image mode="aspectFill" :src="choice.pic"></com-image>
                                     </div>
                                     <div flex="cross:top cross:center">
-                                        <div style="display:block;">{{ChooseStore.store_name}}</div>
-                                    </div>
-                                </div>
-                                <el-button @click="chooseStoreDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
-                            </el-form-item>
-
-                            <el-form-item v-if="ruleForm.item_type == 'hotel' || ruleForm.item_type == 'hotel_3r'" :label="'选择酒店'" prop="item_id">
-                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
-                                    <div style="padding-right: 10px;">
-                                        <com-image mode="aspectFill" :src="ChooseHotel.hotel_pic"></com-image>
-                                    </div>
-                                    <div flex="cross:top cross:center">
-                                        <div style="display:block;">{{ChooseHotel.hotel_name}}</div>
+                                        <div style="display:block;">{{choice.name}}</div>
                                     </div>
                                 </div>
                                 <el-button @click="chooseHotelDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
+                            </el-form-item>
+
+                            <el-form-item v-if="ruleForm.item_type == 'addcredit' || ruleForm.item_type == 'addcredit_3r'" :label="'选择话费平台'" prop="item_id">
+                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
+                                    <div flex="cross:top cross:center">
+                                        <div style="display:block;">{{choice.name}}</div>
+                                    </div>
+                                </div>
+                                <el-button @click="chooseAddcreditDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
                             </el-form-item>
 
                         </template>
@@ -94,9 +93,9 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
 
                             <com-commission-store-rule-edit v-if="ruleForm.item_type == 'store'" @number = "newNumber" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains" :commiss_value = "commissonValue"></com-commission-store-rule-edit>
 
-                            <com-commission-rule-edit v-if="ruleForm.item_type == 'goods' || ruleForm.item_type == 'checkout'" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-rule-edit>
+                            <com-commission-rule-edit v-if="ruleForm.item_type == 'goods' || ruleForm.item_type == 'checkout' || ruleForm.item_type == 'addcredit_3r'" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-rule-edit>
 
-                            <com-commission-hotel-rule-edit v-if="ruleForm.item_type == 'hotel'" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"  @levelparam = "newLevelParam"  :commission_hotel_value = "commissionHotelValue"></com-commission-hotel-rule-edit>
+                            <com-commission-hotel-rule-edit v-if="ruleForm.item_type == 'hotel' || ruleForm.item_type == 'addcredit'" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"  @levelparam = "newLevelParam"  :commission_hotel_value = "commissionHotelValue"></com-commission-hotel-rule-edit>
 
                             <com-commission-hotel_3r-rule-edit v-if="ruleForm.item_type == 'hotel_3r'"  @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-hotel_3r-rule-edit>
 
@@ -261,6 +260,102 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
 
     </el-dialog>
 
+    <!-- 选择直推用户 -->
+    <el-dialog title="设置直推用户" :visible.sync="ChooseDirectPush.dialog_visible" width="30%">
+        <el-input @keyup.enter.native="loadDirectPushList"
+                  size="small" placeholder="搜索名称"
+                  v-model="ChooseDirectPush.search.keyword"
+                  clearable @clear="toDirectPushSearch"
+                  style="width:300px;">
+            <el-button slot="append" icon="el-icon-search" @click="toDirectPushSearch"></el-button>
+        </el-input>
+        <el-table v-loading="ChooseDirectPush.loadding" :data="ChooseDirectPush.list">
+            <el-table-column label="" width="100">
+                <template slot-scope="scope">
+                    <el-link @click="confirmChooseDirectPush(scope.row)" icon="el-icon-edit" type="primary">选择</el-link>
+                </template>
+            </el-table-column>
+            <el-table-column property="id" label="用户ID" width="90"></el-table-column>
+            <el-table-column label="用户名称">
+                <template slot-scope="scope">
+                    <div flex="box:first">
+                        <div style="padding-right: 10px;">
+                            <com-image mode="aspectFill" :src="scope.row.avatar_url"></com-image>
+                        </div>
+                        <div flex="cross:top cross:center">
+                            <div flex="dir:left">
+                                <el-tooltip class="item" effect="dark" placement="top">
+                                    <template slot="content">
+                                        <div style="width: 320px;">{{scope.row.nickname}}</div>
+                                    </template>
+                                    <com-ellipsis :line="2">{{scope.row.nickname}}</com-ellipsis>
+                                </el-tooltip>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column label="身份" width="90">
+                <template slot-scope="scope">
+                    {{scope.row.role_type}}
+                </template>
+            </el-table-column>
+            <el-table-column label="身份1" width="90">
+                <template slot-scope="scope">
+                    {{scope.row.role_type_text}}
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <div style="text-align: right;margin-top:15px;">
+            <el-pagination
+                    v-if="ChooseDirectPush.pagination.page_count > 1"
+                    style="display: inline-block;"
+                    background :page-size="ChooseDirectPush.pagination.pageSize"
+                    @current-change="DirectPushPageChange"
+                    layout="prev, pager, next" :current-page="ChooseDirectPush.pagination.current_page"
+                    :total="ChooseDirectPush.pagination.total_count">
+            </el-pagination>
+        </div>
+
+    </el-dialog>
+
+    <!-- 选择话费平台 -->
+    <el-dialog title="设置话费平台" :visible.sync="ChooseAddcredit.dialog_visible" width="30%">
+        <el-input @keyup.enter.native="loadAddcreditList"
+                  size="small" placeholder="搜索名称"
+                  v-model="ChooseAddcredit.search.keyword"
+                  clearable @clear="toAddcreditSearch"
+                  style="width:300px;">
+            <el-button slot="append" icon="el-icon-search" @click="toAddcreditSearch"></el-button>
+        </el-input>
+        <el-table v-loading="ChooseAddcredit.loadding" :data="ChooseAddcredit.list">
+            <el-table-column label="" width="100">
+                <template slot-scope="scope">
+                    <el-link @click="confirmChooseAddcredit(scope.row)" icon="el-icon-edit" type="primary">选择</el-link>
+                </template>
+            </el-table-column>
+            <el-table-column property="id" label="话费平台ID" width="150"></el-table-column>
+            <el-table-column label="平台名称">
+                <template slot-scope="scope">
+                    {{scope.row.name}}
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <div style="text-align: right;margin-top:15px;">
+            <el-pagination
+                    v-if="ChooseStore.pagination.page_count > 1"
+                    style="display: inline-block;"
+                    background :page-size="ChooseStore.pagination.pageSize"
+                    @current-change="storePageChange"
+                    layout="prev, pager, next" :current-page="ChooseStore.pagination.current_page"
+                    :total="ChooseStore.pagination.total_count">
+            </el-pagination>
+        </div>
+
+    </el-dialog>
+
 </div>
 <script>
     const app = new Vue({
@@ -278,8 +373,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
 
             return {
                 ChooseGoods: {
-                    goods_name: '',
-                    goods_pic:'',
                     dialog_visible: false,
                     loadding: false,
                     list: [],
@@ -295,8 +388,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                     }
                 },
                 ChooseStore: {
-                    store_name: '',
-                    store_pic:'',
                     dialog_visible: false,
                     loadding: false,
                     list: [],
@@ -312,8 +403,42 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                     }
                 },
                 ChooseHotel: {
-                    hotel_name: '',
-                    hotel_pic:'',
+                    dialog_visible: false,
+                    loadding: false,
+                    list: [],
+                    search: {
+                        keyword: '',
+                        page: 1,
+                    },
+                    pagination: {
+                        pageSize: 10,
+                        current_page: 1,
+                        total_count: 0,
+                        page_count: 0
+                    }
+                },
+                ChooseAddcredit: {
+                    dialog_visible: false,
+                    loadding: false,
+                    list: [],
+                    search: {
+                        keyword: '',
+                        page: 1,
+                    },
+                    pagination: {
+                        pageSize: 10,
+                        current_page: 1,
+                        total_count: 0,
+                        page_count: 0
+                    }
+                },
+                choice: {
+                    name:'',
+                    pic:'',
+                },
+                ChooseDirectPush: {
+                    direct_push_name: '',
+                    direct_push_pic:'',
                     dialog_visible: false,
                     loadding: false,
                     list: [],
@@ -333,6 +458,9 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                     item_type: '',
                     apply_all_item: false,
                     item_id: 0
+                },
+                DirectPush: {
+                    role_type : '',
                 },
                 rules: {
                     item_type: [
@@ -354,7 +482,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
             }
         },
         methods: {
-
             updateCommissionRule(data){
                 if(data['type'] != null && typeof data.type != "undefined"){
                     this.commissionType = data.type;
@@ -374,6 +501,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 }
             },
 
+            //获取规则详情
             getDetail(){
                 var self = this;
                 self.cardLoading = true;
@@ -392,12 +520,8 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                         self.commissionType          = data.rule.commission_type;
                         self.commissonValue          = data.chains[0].commisson_value;
                         self.commissionRuleChains    = data.chains;
-                        self.ChooseGoods.goods_name  = data.rule.goods_name;
-                        self.ChooseGoods.goods_pic   = data.rule.goods_pic;
-                        self.ChooseStore.store_name  = data.rule.store_name;
-                        self.ChooseStore.store_pic   = data.rule.store_pic;
-                        self.ChooseHotel.hotel_name  = data.rule.hotel_name;
-                        self.ChooseHotel.hotel_pic   = data.rule.hotel_thumb_url;
+                        self.choice.name             = data.rule.name;
+                        self.choice.pic              = data.rule.pic;
                     }
                 }).catch(e => {
                 })
@@ -432,6 +556,13 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                             }
                         }
                         self.commissionRuleChains = this.commissionHotelValue;
+                    } else if (self.ruleForm.item_type == 'addcredit') {
+                        self.commissionRuleChains = [{
+                            "role_type": self.DirectPush.role_type,
+                            "level":1,
+                            "commisson_value": self.commissonValue,
+                            "unique_key": self.DirectPush.role_type + "#all"
+                        }]
                     }
                     if (valid) {
                         self.loading = true;
@@ -462,12 +593,11 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 });
             },
 
-
             //--------------选择商品-----------------------------
             confirmChooseGoods(row){
                 this.ruleForm.item_id = row.id;
-                this.ChooseGoods.goods_name = row.name;
-                this.ChooseGoods.goods_pic = row.cover_pic;
+                this.choice.name = row.name;
+                this.choice.pic = row.cover_pic;
                 this.ChooseGoods.dialog_visible = false;
             },
             chooseGoodsDialog(){
@@ -511,8 +641,8 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
             //--------------选择门店-----------------------------
             confirmChooseStore(row){
                 this.ruleForm.item_id = row.id;
-                this.ChooseStore.store_name = row.name;
-                this.ChooseStore.store_pic = row.cover_pic;
+                this.choice.name = row.name;
+                this.choice.pic = row.cover_pic;
                 this.ChooseStore.dialog_visible = false;
             },
             chooseStoreDialog(){
@@ -556,8 +686,8 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
             //--------------选择酒店-----------------
             confirmChooseHotel(row){
                 this.ruleForm.item_id = row.id;
-                this.ChooseHotel.hotel_name = row.name;
-                this.ChooseHotel.hotel_pic = row.thumb_url;
+                this.choice.name = row.name;
+                this.choice.pic = row.thumb_url;
                 this.ChooseHotel.dialog_visible = false;
             },
             chooseHotelDialog(){
@@ -596,11 +726,99 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                     self.ChooseHotel.loadding = false;
                     self.$message.error("request fail");
                 });
-            }
+            },
+
+            //--------------选择话费-----------------
+            confirmChooseAddcredit(row){
+                this.ruleForm.item_id = row.id;
+                this.choice.name = row.name;
+                this.choice.pic = row.thumb_url;
+                this.ChooseAddcredit.dialog_visible = false;
+            },
+            chooseAddcreditDialog(){
+                this.ChooseAddcredit.dialog_visible = true;
+                this.loadAddcreditList();
+            },
+            AddcreditPageChange(page){
+                this.ChooseAddcredit.search.page = page;
+                this.loadAddcreditList();
+            },
+            toAddcreditSearch(){
+                this.ChooseAddcredit.search.page = 1;
+                this.loadAddcreditList();
+            },
+            loadAddcreditList(){
+                let self = this;
+                self.ChooseAddcredit.loadding = true;
+                request({
+                    params: {
+                        r: "plugin/commission/mall/rules/search-addcredit"
+                    },
+                    method: 'post',
+                    data: {
+                        page: self.ChooseAddcredit.search.page,
+                        keyword: self.ChooseAddcredit.search.keyword
+                    }
+                }).then(e => {
+                    self.ChooseAddcredit.loadding = false;
+                    if (e.data.code === 0) {
+                        self.ChooseAddcredit.list = e.data.data.list;
+                        self.ChooseAddcredit.pagination = e.data.data.pagination;
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.ChooseAddcredit.loadding = false;
+                    self.$message.error("request fail");
+                });
+            },
+
+            //--------------选择直推用户-----------------
+            confirmChooseDirectPush(row){
+                this.ruleForm.item_id = row.id;
+                this.DirectPush.role_type = row.role_type;
+                this.choice.name = row.nickname;
+                this.choice.pic = row.avatar_url;
+                this.ChooseDirectPush.dialog_visible = false;
+            },
+            chooseDirectPushDialog(){
+                this.ChooseDirectPush.dialog_visible = true;
+                this.loadDirectPushList();
+            },
+            DirectPushPageChange(page){
+                this.ChooseDirectPush.search.page = page;
+                this.loadDirectPushList();
+            },
+            toDirectPushSearch(){
+                this.ChooseDirectPush.search.page = 1;
+                this.loadDirectPushList();
+            },
+            loadDirectPushList(){
+                let self = this;
+                self.ChooseDirectPush.loadding = true;
+                let params = Object.assign({
+                    r: "mall/user/index",
+                    page: self.ChooseDirectPush.search.page,
+                    keyword: self.ChooseDirectPush.search.keyword
+                }, this.params);
+                request({
+                    params: params
+                }).then(e => {
+                    self.ChooseDirectPush.loadding = false;
+                    if (e.data.code === 0) {
+                        self.ChooseDirectPush.list = e.data.data.list;
+                        self.ChooseDirectPush.pagination = e.data.data.pagination;
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.ChooseDirectPush.loadding = false;
+                    self.$message.error("request fail");
+                });
+            },
         }
     });
 </script>
-
 <style>
     .form_box {
         background-color: #f3f3f3;

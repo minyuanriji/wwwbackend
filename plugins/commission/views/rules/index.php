@@ -85,11 +85,13 @@
                 <el-table-column prop="id" label="ID" width="90"></el-table-column>
                 <el-table-column label="类型" width="180">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.item_type == 'checkout'">二维码收款</div>
-                        <div v-if="scope.row.item_type == 'goods'">商品</div>
-                        <div v-if="scope.row.item_type == 'store'">门店</div>
-                        <div v-if="scope.row.item_type == 'hotel'">酒店</div>
-                        <div v-if="scope.row.item_type == 'hotel_3r'">酒店上级（3r）分佣</div>
+                        <div v-if="scope.row.item_type == 'checkout'">门店二维码收款</div>
+                        <div v-if="scope.row.item_type == 'goods'">商品消费分佣</div>
+                        <div v-if="scope.row.item_type == 'store'">门店直推分佣</div>
+                        <div v-if="scope.row.item_type == 'hotel'">酒店直推分佣</div>
+                        <div v-if="scope.row.item_type == 'hotel_3r'">酒店消费分佣</div>
+                        <div v-if="scope.row.item_type == 'addcredit'">话费直推分佣</div>
+                        <div v-if="scope.row.item_type == 'addcredit_3r'">话费消费分佣</div>
                     </template>
                 </el-table-column>
                 <el-table-column label="对象名称">
@@ -100,6 +102,8 @@
                             <div v-if="scope.row.item_type == 'hotel'">全部酒店</div>
                             <div v-if="scope.row.item_type == 'store'">全部门店</div>
                             <div v-if="scope.row.item_type == 'hotel_3r'">全部酒店上级（3r）分佣</div>
+                            <div v-if="scope.row.item_type == 'addcredit'">全部话费直推</div>
+                            <div v-if="scope.row.item_type == 'addcredit_3r'">全部话费消费分佣</div>
                         </div>
                         <div v-else>
                             <div v-if="scope.row.item_type == 'checkout' || scope.row.item_type == 'store'">
@@ -108,8 +112,11 @@
                             <div v-if="scope.row.item_type == 'goods'">
                                 商品：{{scope.row.goods_name}}[ID:{{scope.row.item_id}}]
                             </div>
-                            <div v-if="scope.row.item_type == 'hotel' || scope.row.item_type == 'hotel_3r'">
+                            <div v-if="scope.row.item_type == 'hotel_3r' || scope.row.item_type == 'hotel'">
                                 酒店：{{scope.row.hotel_name}}[ID:{{scope.row.item_id}}]
+                            </div>
+                            <div v-if="scope.row.item_type == 'addcredit' || scope.row.item_type == 'addcredit_3r'">
+                                话费：{{scope.row.addcredit_name}}[ID:{{scope.row.item_id}}]
                             </div>
                         </div>
                     </template>
@@ -181,8 +188,20 @@
                     },
                     {
                         value: 'hotel',
-                        label: '酒店'
-                    }
+                        label: '酒店直推'
+                    },
+                    {
+                        value: 'hotel_3r',
+                        label: '酒店消费'
+                    },
+                    {
+                        value: 'addcredit',
+                        label: '话费直推'
+                    },
+                    {
+                        value: 'addcredit_3r',
+                        label: '话费消费'
+                    },
                 ]
             };
         },

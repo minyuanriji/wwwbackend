@@ -1,19 +1,12 @@
 <?php
 namespace app\commands;
 
-use app\commands\commission_action\Addcredit3rAction;
-use app\commands\commission_action\AddcreditAction;
 use app\models\User;
 use app\models\UserRelationshipLink;
 use app\plugins\commission\models\CommissionRuleChain;
 use yii\db\ActiveQuery;
 
 class CommissionController extends BaseCommandController{
-
-    /*public function actionTest(){
-//        (new AddcreditAction(null,null))->run();
-        (new Addcredit3rAction(null,null))->run();
-    }*/
 
     public function actions(){
         return [

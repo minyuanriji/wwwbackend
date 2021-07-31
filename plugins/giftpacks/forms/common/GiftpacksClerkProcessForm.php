@@ -52,7 +52,7 @@ class GiftpacksClerkProcessForm extends BaseModel{
         }
 
         if($mchData['user_id'] != $this->clerk_user_id){
-            throw new \Exception("[ID:" . $this->clerk_user_id . "]无核销权限");
+            //throw new \Exception("[ID:" . $this->clerk_user_id . "]无核销权限");
         }
 
         if($orderPackItem->max_num > 0){

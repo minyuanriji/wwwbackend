@@ -83,11 +83,11 @@ class GiftpacksOrderClerkQrCodeForm extends BaseModel{
             if($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_WECHAT){
                 $dir = "giftpacks-order/offline-qrcode/" . $order->id . "/" . $orderPackItem->id . time() . '.jpg';
                 $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
-                CommonLogic::createQrcode(["id" => $clerkData->id], $this, $this->route_with_param, $dir);
+                CommonLogic::createQrcode([], $this, $this->route_with_param . "?id=" . $clerkData->id, $dir);
                 $res = ['file_path' => $imgUrl];
             }else{
                 $qrCode = new QrCodeCommon();
-                $res = $qrCode->getQrCode(["id" => $clerkData->id], 100, $this->route_with_param);
+                $res = $qrCode->getQrCode([], 100, $this->route_with_param . "?id=" . $clerkData->id);
             }
 
             return [

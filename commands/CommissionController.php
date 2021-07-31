@@ -11,7 +11,7 @@ use yii\db\ActiveQuery;
 class CommissionController extends BaseCommandController{
 
     public function actionTest(){
-        (new AddcreditAction(null,null))->run();
+//        (new AddcreditAction(null,null))->run();
         (new Addcredit3rAction(null,null))->run();
     }
 

@@ -538,7 +538,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                             "commisson_value": self.commissonValue,
                             "unique_key":"user#all"
                         }]
-                    } else if (self.ruleForm.item_type == 'hotel') {
+                    } else if (self.ruleForm.item_type == 'hotel' || self.ruleForm.item_type == 'addcredit') {
                         for (let i=0;i<this.commissionHotelValue.length;i++) {
                             this.commissionHotelValue[i].level = 1;
                             if (this.commissionHotelValue[i].name == '普通会员') {
@@ -556,13 +556,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                             }
                         }
                         self.commissionRuleChains = this.commissionHotelValue;
-                    } else if (self.ruleForm.item_type == 'addcredit') {
-                        self.commissionRuleChains = [{
-                            "role_type": self.DirectPush.role_type,
-                            "level":1,
-                            "commisson_value": self.commissonValue,
-                            "unique_key": self.DirectPush.role_type + "#all"
-                        }]
                     }
                     if (valid) {
                         self.loading = true;

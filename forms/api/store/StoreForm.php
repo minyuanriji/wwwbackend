@@ -346,7 +346,7 @@ class StoreForm extends BaseModel
 
                 $operation_save = MchApplyOperationLogSaveForm::addOperationLog($mch_exist->mall_id, $mch_exist->id,MchApplyOperationLog::OPERATION_TERMINAL_RECEPTION, \Yii::$app->user->id, MchApplyOperationLog::OPERATION_SPECIAL);
                 if ($operation_save['code'] != ApiCode::CODE_SUCCESS)
-                    throw new \Exception(isset($operation_save['msg']) ? $operation_save['msg'] : $operation_save['message'], ApiCode::CODE_FAIL);
+                    throw new \Exception(isset($operation_save['msg']) ? $operation_save['msg'] : $operation_save['message']);
 
 
             } else {
@@ -374,13 +374,13 @@ class StoreForm extends BaseModel
                         "bind_mobile" => $mch_exist['mobile']
                     ]);
                 } else {
-                    throw new \Exception('审核状态错误，请联系客服！', ApiCode::CODE_FAIL);
+                    throw new \Exception('审核状态错误，请联系客服！');
                 }
 
                 $form->id = $data['id'];
                 $res = $form->save(MchApplyOperationLog::OPERATION_TERMINAL_RECEPTION);
                 if($res['code'] != ApiCode::CODE_SUCCESS)
-                    throw new \Exception(isset($res['msg']) ? $res['msg'] : $res['message'], ApiCode::CODE_FAIL);
+                    throw new \Exception(isset($res['msg']) ? $res['msg'] : $res['message']);
 
             }
 

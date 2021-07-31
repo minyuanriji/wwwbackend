@@ -87,7 +87,7 @@ class GiftpacksOrderClerkQrCodeForm extends BaseModel{
                 $res = ['file_path' => $imgUrl];
             }else{
                 $qrCode = new QrCodeCommon();
-                $res = $qrCode->getQrCode([], 100, $this->route_with_param . "?id=" . $clerkData->id);
+                $res = $qrCode->getQrCode(['id' => $clerkData->id], 100, $this->route_with_param);
             }
 
             return [

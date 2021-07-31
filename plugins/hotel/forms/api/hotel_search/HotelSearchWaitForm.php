@@ -19,7 +19,10 @@ class HotelSearchWaitForm extends HotelSearchForm{
             return $this->responseErrorInfo();
         }
 
+        $cacheObj = \Yii::$app->getCache();
+
         try {
+
             sleep(1);
 
             $searchData = static::getSearchDataByPrepareId($this->prepare_id);
@@ -30,7 +33,7 @@ class HotelSearchWaitForm extends HotelSearchForm{
             $content = !empty($searchData['content']) ? json_decode($searchData['content'], true) : [];
             $isFinished = 0;
             if(!$searchData['is_running'] || empty($content['hotel_ids'])){
-                $jobList = \Yii::$app->getCache()->get(static::jobListCacheKey($searchData['search_id']));
+                $jobList = $cacheObj->get(static::jobListCacheKey($searchData['search_id']));
                 if(!empty($jobList)){
                     $nowTime = time();
                     foreach($jobList as $pid => $time){
@@ -43,6 +46,16 @@ class HotelSearchWaitForm extends HotelSearchForm{
             }else{
 
             }
+
+            /*if($isFinished){
+                $cacheKey = "HotelSearchWaitTask:" . $this->prepare_id;
+                $delayCount = $cacheObj->get();
+                if(!$delayCount || $delayCount < 3){
+                    //$isFinished = 0;
+                    $cacheObj->set($cacheKey, intval($delayCount) + 1, 1800);
+                }
+            }*/
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [

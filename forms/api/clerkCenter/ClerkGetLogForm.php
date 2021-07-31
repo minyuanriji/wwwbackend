@@ -31,7 +31,7 @@ class ClerkGetLogForm extends BaseModel{
             $query = ClerkLog::find()->alias("cl")
                         ->innerJoin(["cd" => ClerkData::tableName()], "cd.id=cl.clerk_data_id");
 
-            $selects = ["cd.source_type", "cl.created_at", "cl.remark"];
+            $selects = ["cd.source_id", "cd.source_type", "cl.created_at", "cl.remark"];
 
             //核销大礼包物品
             $query->leftJoin(["goi" => GiftpacksOrderItem::tableName()], "goi.id=cd.source_id AND cd.source_type='giftpacks_order_item'");
@@ -53,6 +53,10 @@ class ClerkGetLogForm extends BaseModel{
                     $item['descript'] = "";
                     if($row['source_type'] == "giftpacks_order_item"){
                         $item['descript'] = "核销大礼包“".$row['pack_item_name']."”";
+                    }elseif($row['source_type'] == "mch_baopin_order"){
+                        $item['descript'] = "核销爆品订单[ID:".$row['source_id']."]";
+                    }elseif($row['source_type'] == "mch_normal_order"){
+                        $item['descript'] = "核销商品订单[ID:".$row['source_id']."]";
                     }
                     $list[] = $item;
                 }

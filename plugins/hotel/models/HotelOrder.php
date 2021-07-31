@@ -20,9 +20,11 @@ class HotelOrder extends BaseActiveRecord
     {
         return [
             [['mall_id', 'hotel_id', 'user_id', 'product_code', 'unique_id', 'order_no', 'order_status',
-              'order_price', 'booking_num', 'booking_start_date', 'booking_days', 'booking_passengers',
+              'order_price', 'booking_num', 'booking_start_date', 'booking_days', 'real_booking_days', 'booking_passengers',
               'booking_arrive_date', 'created_at', 'updated_at', 'pay_status'], 'required'],
-            [['pay_at', 'pay_type', 'pay_price', 'integral_deduction_price', 'integral_fee_rate', 'origin_booking_data'], 'safe']
+            [['pay_at', 'pay_type', 'pay_price', 'integral_deduction_price', 'integral_fee_rate', 'origin_booking_data',
+              'commission_status', 'commission_remark',
+              'commission_3r_status', 'commission_3r_remark'], 'safe']
         ];
     }
 

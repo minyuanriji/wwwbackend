@@ -7,6 +7,7 @@ use app\plugins\ApiController;
 use app\plugins\hotel\forms\api\HotelDetailForm;
 use app\plugins\hotel\forms\api\HotelSearchPrepareForm;
 use app\plugins\hotel\forms\api\HotelSimpleListForm;
+use app\plugins\hotel\libs\bestwehotel\Config;
 
 class HotelController extends ApiController{
 

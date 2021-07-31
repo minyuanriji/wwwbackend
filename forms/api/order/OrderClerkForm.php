@@ -15,6 +15,7 @@ use app\forms\common\order\OrderClerkCommon;
 use app\forms\common\QrCodeCommon;
 use app\logic\CommonLogic;
 use app\models\BaseModel;
+use app\models\clerk\ClerkData;
 use app\models\ClerkUser;
 use app\models\Mall;
 use app\models\Order;
@@ -26,6 +27,7 @@ class OrderClerkForm extends BaseModel
     public $clerk_remark;
     public $clerk_code;
     public $action_type; // 1.小程序端确认收款 | 2.后台确认收款
+    public $route;
 
 
     public function rules()
@@ -33,7 +35,7 @@ class OrderClerkForm extends BaseModel
         return [
             [['id', 'action_type'], 'integer'],
             [['id'], 'required'],
-            [['clerk_remark', 'clerk_code'], 'string'],
+            [['clerk_remark', 'clerk_code', 'route'], 'string'],
         ];
     }
 
@@ -108,6 +110,11 @@ class OrderClerkForm extends BaseModel
     public function qrClerkCode()
     {
         try {
+
+            if(empty($this->route)){
+                throw new \Exception("路由参数不能为空");
+            }
+
             /** @var Order $order */
             $order = Order::find()->where([
                 'id'        => $this->id,
@@ -129,24 +136,69 @@ class OrderClerkForm extends BaseModel
                 throw new \Exception('订单未支付');
             }
 
+
+            /**
+             * 订单类型：
+             *  平台订单     normal_order
+             *  爆品订单     baopin_order
+             *  商户普通订单  mch_normal_order
+             *  商户爆品订单  mch_baopin_order
+             */
+            $sourceType = $processClass = "";
+            if(!empty($order->mch_id)){
+                if($order->order_type == "offline_baopin"){
+                    $sourceType = "mch_baopin_order";
+                    $processClass = "app\\plugins\\mch\\forms\\common\\clerk\\BaopinOrderClerkProcessForm";
+                }else{
+                    $sourceType = "mch_normal_order";
+                    $processClass = "app\\plugins\\mch\\forms\\common\\clerk\\OrderClerkProcessForm";
+                }
+            }else{
+                if($order->order_type == "offline_baopin"){
+                    $sourceType = "baopin_order";
+                    $processClass = "app\\forms\\common\\order\\BaopinOrderClerkProcessForm";
+                }else{
+                    $sourceType = "normal_order";
+                    $processClass = "app\\forms\\common\\order\\OrderClerkProcessForm";
+                }
+            }
+
+            $uniqueData = [
+                "mall_id"      => $order->mall_id,
+                "source_type"  => $sourceType,
+                "source_id"    => $order->id,
+                "app_platform" => \Yii::$app->appPlatform
+            ];
+            $clerkData = ClerkData::findOne($uniqueData);
+            if(!$clerkData){
+                $clerkData = new ClerkData($uniqueData);
+                $clerkData->code          = date("ymdHis") . rand(10000, 99999);
+                $clerkData->updated_at    = time();
+                $clerkData->process_class = $processClass;
+                if(!$clerkData->save()){
+                    throw new \Exception($this->responseErrorMsg($clerkData));
+                }
+            }
+
             $appPlatform = \Yii::$app->appPlatform;
             if($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_WECHAT){
                 $dir = "order/offline-qrcode/" . $order->id . time() . '.jpg';
                 $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
-                CommonLogic::createQrcode([], $this, '/h5/#/pages/more-shop/more-shop' . "?id=" . $order->id, $dir);
+                CommonLogic::createQrcode([], $this, $this->route . "?id=" . $clerkData->id, $dir);
                 $res = [
                     'file_path' => $imgUrl,
                 ];
             }else{
                 $qrCode = new QrCodeCommon();
-                $res = $qrCode->getQrCode(['id' => $this->id, 'rnd' => time()], 100, 'pages/more-shop/more-shop');
+                $res = $qrCode->getQrCode(['id' => $clerkData->id], 100, $this->route);
             }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
                 'data' => array_merge($res, [
-                    "code" => $order->offline_qrcode
+                    "id"   => $clerkData->id,
+                    "code" => $clerkData->code
                 ])
             ];
         } catch (\Exception $e) {

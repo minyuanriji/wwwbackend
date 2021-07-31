@@ -2,42 +2,57 @@
 
 namespace app\plugins\giftpacks\forms\api;
 
+
 use app\core\ApiCode;
 use app\helpers\CityHelper;
 use app\models\BaseModel;
-use app\plugins\giftpacks\models\Giftpacks;
+use app\models\Goods;
+use app\models\GoodsWarehouse;
+use app\models\Store;
+use app\plugins\giftpacks\models\GiftpacksItem;
+use app\plugins\giftpacks\models\GiftpacksOrder;
+use app\plugins\giftpacks\models\GiftpacksOrderItem;
 
-class GiftpacksItemListForm extends BaseModel{
+class GiftpacksOrderPackItemListForm extends BaseModel{
 
     public $page;
-    public $pack_id;
+    public $order_id;
     public $city_id;
     public $longitude;
     public $latitude;
 
     public function rules(){
         return [
-            [['pack_id', 'longitude', 'latitude'], 'required'],
+            [['order_id', 'longitude', 'latitude'], 'required'],
             [['city_id', 'page'], 'integer']
         ];
     }
 
     public function getList(){
 
-        if(!$this->validate()){
+        if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
 
         try {
-            $giftpacks = Giftpacks::findOne($this->pack_id);
-            if(!$giftpacks || $giftpacks->is_delete){
-                throw new \Exception("大礼包不存在");
-            }
 
-            $query = GiftpacksDetailForm::availableItemsQuery($giftpacks);
+            $query = GiftpacksOrderItem::find()->alias("goi")
+                        ->innerJoin(["go" => GiftpacksOrder::tableName()], "go.id=goi.order_id")
+                        ->innerJoin(["gpi" => GiftpacksItem::tableName()], "gpi.id=goi.pack_item_id")
+                        ->innerJoin(["s" => Store::tableName()], "s.id=gpi.store_id")
+                        ->innerJoin(["g" => Goods::tableName()], "g.id=gpi.goods_id")
+                        ->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");
 
-            $selects = ["gpi.*"];
-            $selects[] = "g.price as goods_price"; //商品价格
+            $query->where([
+                "goi.order_id" => $this->order_id,
+                "go.mall_id"   => \Yii::$app->mall->id,
+                "go.user_id"   => \Yii::$app->user->id,
+                "go.is_delete" => 0
+            ]);
+
+            $selects = ["goi.pack_item_id", "goi.order_id", "goi.max_num", "goi.current_num", "goi.expired_at",
+                "gpi.name", "gpi.cover_pic"
+            ];
             $selects[] = "s.name as store_name"; //店铺名称
             $selects = array_merge($selects, [
                 "s.mch_id", "s.score", "s.longitude", "s.latitude",
@@ -45,9 +60,10 @@ class GiftpacksItemListForm extends BaseModel{
             ]);
             $selects[] = "ST_Distance_sphere(point(s.longitude, s.latitude), point(".$this->longitude.", ".$this->latitude.")) as distance_mi";
 
-            $list = $query->select($selects)->page($pagination, 30, max(1, (int)$this->page))
-                          ->asArray()->all();
+            $query->orderBy("goi.id DESC");
 
+            $list = $query->select($selects)->page($pagination, 10, max(1, (int)$this->page))
+                ->asArray()->all();
             if($list){
                 foreach($list as &$item){
 
@@ -65,10 +81,9 @@ class GiftpacksItemListForm extends BaseModel{
 
                     $item['score'] = number_format($item['score'], 1);
 
-                    $item['max_stock'] = (int)$item['max_stock'];
                     $infos = [];
-                    if($item['usable_times'] > 0){
-                        $infos[] = "可使用" . $item['usable_times'] . "次";
+                    if($item['max_num'] > 0){
+                        $infos[] = "还剩".$item['current_num']."次";
                     }else{
                         $infos[] = "不限次数";
                     }
@@ -78,9 +93,14 @@ class GiftpacksItemListForm extends BaseModel{
                         $infos[] = "永久有效";
                     }
                     $item['infos'] = implode("，", $infos);
+
+                    if(($item['max_num'] > 0 && $item['current_num'] <= 0) || ($item['expired_at'] > 0 && $item['expired_at'] < time())){
+                        $item['is_available'] = 0;
+                    }else{
+                        $item['is_available'] = 1;
+                    }
                 }
             }
-
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
@@ -94,7 +114,5 @@ class GiftpacksItemListForm extends BaseModel{
                 'msg'  => $e->getMessage()
             ];
         }
-
     }
-
 }

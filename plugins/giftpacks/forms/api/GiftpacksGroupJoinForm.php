@@ -55,23 +55,25 @@ class GiftpacksGroupJoinForm extends BaseModel{
             }
 
             //每个人只能参与一次
-            $exists = GiftpacksGroupPayOrder::find()->where([
+            $payOrder = GiftpacksGroupPayOrder::find()->where([
                 "mall_id"    => $group->mall_id,
                 "group_id"   => $group->id,
                 "user_id"    => \Yii::$app->user->id
-            ])->exists();
-            if($exists){
-                throw new \Exception("请勿重复参与");
+            ])->one();
+            if($payOrder && $payOrder->pay_status != "unpaid"){
+                throw new \Exception("请勿重复参与 id:" . $group->id);
             }
 
-            $payOrder = new GiftpacksGroupPayOrder([
-                "mall_id"    => $group->mall_id,
-                "group_id"   => $group->id,
-                "user_id"    => \Yii::$app->user->id,
-                "pay_status" => "unpaid"
-            ]);
-            if(!$payOrder->save()){
-                throw new \Exception($this->responseErrorMsg($payOrder));
+            if(!$payOrder){
+                $payOrder = new GiftpacksGroupPayOrder([
+                    "mall_id"    => $group->mall_id,
+                    "group_id"   => $group->id,
+                    "user_id"    => \Yii::$app->user->id,
+                    "pay_status" => "unpaid"
+                ]);
+                if(!$payOrder->save()){
+                    throw new \Exception($this->responseErrorMsg($payOrder));
+                }
             }
 
             return [

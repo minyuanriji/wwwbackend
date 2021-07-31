@@ -124,7 +124,11 @@ class HotelSearchDoForm extends HotelSearchForm{
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg'  => $e->getMessage()
+                'msg'  => $e->getMessage(),
+                'error' => [
+                    'line' => $e->getLine(),
+                    'file' => $e->getFile()
+                ]
             ];
         }
     }

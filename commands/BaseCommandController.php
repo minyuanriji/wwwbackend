@@ -6,15 +6,15 @@ use yii\console\Controller;
 
 class BaseCommandController extends Controller{
 
-    protected function sleep($second){
+    public function sleep($second){
+        sleep(1);
+    }
+
+    public function mutiKill(){
 
     }
 
-    protected function mutiKill(){
-
-    }
-
-    protected function commandOut($message){
+    public function commandOut($message){
         echo $message . "\n";
     }
 }

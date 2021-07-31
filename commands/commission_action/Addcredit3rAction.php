@@ -20,8 +20,6 @@ class Addcredit3rAction extends Action
 
     public function run()
     {
-//        $this->doNew();
-
         while (true) {
             $this->doNew();
         }

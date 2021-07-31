@@ -16,11 +16,11 @@ class AddcreditAction extends Action
 {
     public function run ()
     {
-        $this->doNew();
+//        $this->doNew();
 
-        /*while (true) {
+        while (true) {
             $this->doNew();
-        }*/
+        }
     }
 
     //新增话费分佣结算记录

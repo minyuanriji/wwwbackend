@@ -2,6 +2,7 @@
 namespace app\commands\hotel_task_action;
 
 use app\core\ApiCode;
+use app\models\Mall;
 use app\plugins\hotel\helpers\OrderHelper;
 use app\plugins\hotel\models\HotelOrder;
 use yii\base\Action;
@@ -9,6 +10,9 @@ use yii\base\Action;
 class QueryAction extends Action{
 
     public function run(){
+
+        \Yii::$app->mall = Mall::findOne(5);
+
         while(true){
             try {
                 //查询状态为已支付、待确认的订单

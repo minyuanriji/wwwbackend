@@ -36,11 +36,14 @@ class SearchAction extends Action{
                     $res = $form->run($lock);
                     if($res['code'] != ApiCode::CODE_SUCCESS){
                         echo $res['msg'] . "\n";
+                        echo json_encode($res['error']) . '\n';
                     }else{
                         echo "HotelSearch task:{$searchId} finished. founds ".$res['data']['founds'] . "\n";
                     }
                 }catch (\Exception $e){
                     echo $e->getMessage() . "\n";
+                    echo $e->getLine() . "\n";
+                    echo $e->getFile() . "\n";
                 }
 
                 $form->removeJob();

@@ -88,13 +88,12 @@ class StoreAction extends Action{
                 }
                 //计算分佣金额
                 $transferRate = (int)$checkoutOrder['transfer_rate'];//商户手续费
-                $commission_res['profit_price'] = $this->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate);
+                $commission_res['profit_price'] = $this->controller->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate);
                 if($commission_res['commission_type'] == 1){ //按百分比
                     $price = (floatval($commission_res['commisson_value'])/100) * floatval($commission_res['profit_price']);
                 }else{ //按固定值
                     $price = (float)$commission_res['commisson_value'];
                 }
-
                 //生成分佣记录
                 if($price > 0){
                     $priceLog = CommissionStorePriceLog::findOne([
@@ -148,12 +147,14 @@ class StoreAction extends Action{
                         }catch (\Exception $e){
                             $trans->rollBack();
                             $this->controller->commandOut($e->getMessage());
+                            $this->controller->commandOut("line:" . $e->getLine());
                         }
                     }
                 }
 
             }catch (\Exception $e){
                 $this->controller->commandOut($e->getMessage());
+                $this->controller->commandOut("line:" . $e->getLine());
             }
 
             MchCheckoutOrder::updateAll([

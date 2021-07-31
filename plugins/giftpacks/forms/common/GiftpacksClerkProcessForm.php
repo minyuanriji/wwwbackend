@@ -2,24 +2,19 @@
 
 namespace app\plugins\giftpacks\forms\common;
 
-use app\models\BaseModel;
+use app\forms\common\CommonClerkProcessForm;
 use app\models\clerk\ClerkData;
 use app\models\Store;
 use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
 use app\plugins\mch\models\Mch;
 
-class GiftpacksClerkProcessForm extends BaseModel{
+class GiftpacksClerkProcessForm extends CommonClerkProcessForm {
 
-    public $clerk_user_id;
-
-    public function rules(){
-        return [
-            [['clerk_user_id'], 'required']
-        ];
-    }
-
-    //处理核销
+    /**
+     * @param ClerkData $clerkData
+     * @throws \Exception
+     */
     public function process(ClerkData $clerkData){
 
         //获取服务订单
@@ -44,9 +39,9 @@ class GiftpacksClerkProcessForm extends BaseModel{
 
         //判断商户权限
         $mchData = Store::find()->alias("s")
-            ->innerJoin(["m" => Mch::tableName()], "m.id=s.mch_id")
-            ->where(["m.is_delete" => 0, "s.id" => $packItem->store_id])
-            ->select(["m.user_id"])->asArray()->one();
+                    ->innerJoin(["m" => Mch::tableName()], "m.id=s.mch_id")
+                    ->where(["m.is_delete" => 0, "s.id" => $packItem->store_id])
+                    ->select(["m.user_id"])->asArray()->one();
         if(!$mchData){
             throw new \Exception("商户信息不存在");
         }

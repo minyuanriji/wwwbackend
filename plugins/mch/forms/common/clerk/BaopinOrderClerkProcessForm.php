@@ -30,10 +30,12 @@ class BaopinOrderClerkProcessForm extends CommonClerkProcessForm
         //检查订单
         OrderClerkProcessForm::checkOrder($order);
 
-        //获取订单所属商户
-        $mch = Mch::findOne($order->mch_id);
+        //核销用户绑定的商户
+        $mch = Mch::findOne([
+            "user_id" => $this->clerk_user_id
+        ]);
         if(!$mch || $mch->is_delete){
-            throw new \Exception("商户[ID:".$order->mch_id."]不存在");
+            throw new \Exception("核销用户[ID:".$this->clerk_user_id."]不是商户");
         }
 
         //获取门店
@@ -62,13 +64,12 @@ class BaopinOrderClerkProcessForm extends CommonClerkProcessForm
             }
             //判断是否有库存
             if($baopinMchGoods->stock_num < $detail->num){
-                $hasPermission = false;
-                break;
+                throw new \Exception("[ID:".$mch->id."]商户爆品库存不足");
             }
             $baopinMchGoodsList[] = [$detail->num, $baopinMchGoods];
         }
         if (!$hasPermission) {
-            throw new \Exception("[ID:".$mch->id."]商户无爆品核销权限");
+            throw new \Exception("[ID:".$mch->id."]商户无此爆品核销权限");
         }
 
         //更新商户爆品库

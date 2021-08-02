@@ -52,7 +52,7 @@ class SubmitOrderAction extends BaseObject {
                 "roomCount"   => $this->hotelOrder->booking_num,
                 "dtArrorig"   => $this->hotelOrder->booking_start_date,
                 "dtDeporig"   => $endDay,
-                "payType"     => 0,
+                "payType"     => 1,
                 "totalRate"   => $this->hotelOrder->order_price,
                 "externalId"  => $this->hotelOrder->order_no,
                 "productCode" => isset($bookingData['productCode']) ? $bookingData['productCode'] : '',

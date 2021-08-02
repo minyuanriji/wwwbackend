@@ -6,6 +6,9 @@
             <el-form-item label="标题" prop="title">
                 <el-input v-model="formData.title"></el-input>
             </el-form-item>
+            <el-form-item label="描述" prop="descript">
+                <el-input type="textarea" :rows="2" placeholder="请输入描述" v-model="formData.descript"></el-input>
+            </el-form-item>
             <el-form-item label="封面" prop="cover_pic">
                 <com-attachment :multiple="false" :max="1" v-model="formData.cover_pic">
                     <el-tooltip class="item"
@@ -17,9 +20,37 @@
                 </com-attachment>
                 <com-image mode="aspectFill" width='80px' height='80px' :src="formData.cover_pic"></com-image>
             </el-form-item>
-            <el-form-item label="价格">
+            <el-form-item label="库存" prop="max_stock">
+                <el-input type="number" style="width:150px" v-model="formData.max_stock"></el-input>
+            </el-form-item>
+            <el-form-item label="价格" prop="price">
                 <el-input type="number" style="width:150px" v-model="formData.price"></el-input>
             </el-form-item>
+            <el-form-item label="利润" prop="profit_price">
+                <el-input type="number" style="width:150px" v-model="formData.profit_price"></el-input>
+            </el-form-item>
+
+            <el-form-item label="拼团" prop="group_enable">
+                <el-switch
+                        v-model="formData.group_enable"
+                        active-text="启用"
+                        inactive-text="关闭">
+                </el-switch>
+                <el-card v-if="formData.group_enable" shadow="never">
+                    <el-form-item label="拼团价" prop="group_price">
+                        <el-input type="number" style="width:150px" v-model="formData.group_price"></el-input>
+                    </el-form-item>
+                    <el-form-item label="人数" prop="group_need_num">
+                        <el-input type="number" style="width:150px" v-model="formData.group_need_num"></el-input>
+                    </el-form-item>
+                    <el-form-item label="有效期" prop="group_expire_time">
+                        <el-input placeholder="请输入内容" style="width:150px"  v-model="formData.group_expire_time">
+                            <template slot="append">时</template>
+                        </el-input>
+                    </el-form-item>
+                </el-card>
+            </el-form-item>
+
         </el-form>
 
         <div slot="footer" class="dialog-footer">
@@ -29,26 +60,45 @@
     </el-dialog>
 </div>
 <script>
+    function initFormData(){
+        return {
+            title: '',
+            cover_pic: '',
+            max_stock: 0,
+            price: 0,
+            profit_price: 0,
+            descript: '',
+            group_enable: false,
+            group_price: 0,
+            group_need_num: 0,
+            group_expire_time: ''
+        };
+    }
     const editApp = new Vue({
         el: '#edit_app',
         data: {
             dailogTitle: '',
             dialogFormVisible: false,
             btnLoading: false,
-            formData: {
-                title: '',
-                cover_pic: '',
-                price: 0
-            },
+            formData: initFormData(),
             rules: {
                 title: [
                     {required: true, message: '标题不能为空', trigger: 'change'}
                 ],
+                descript: [
+                    {required: true, message: '描述不能为空', trigger: 'change'}
+                ],
                 cover_pic: [
                     {required: true, message: '封面不能为空', trigger: 'change'}
                 ],
+                max_stock: [
+                    {required: true, message: '库存不能为空', trigger: 'change'}
+                ],
                 price: [
                     {required: true, message: '价格不能为空', trigger: 'change'}
+                ],
+                profit_price: [
+                    {required: true, message: '利润不能为空', trigger: 'change'}
                 ]
             },
             savedCallFn : null
@@ -59,23 +109,30 @@
                 this.dialogFormVisible = true;
                 this.savedCallFn = fn;
                 if(row != null){
+                    var groupEnable = row.group_enable == 1 ? true : false;
                     this.formData = row;
+                    this.formData['group_enable'] = groupEnable;
+                }else{
+                    this.formData = initFormData();
                 }
             },
             hide(){
                 this.dialogFormVisible = false;
             },
             save() {
+                let formData = JSON.parse(JSON.stringify(this.formData));
                 this.$refs['formData'].validate((valid) => {
                     let self = this;
                     if (valid) {
                         self.btnLoading = true;
+                        formData['group_enable'] = formData['group_enable'] ? 1 : 0;
+                        formData['group_expire_time'] = 3600 * formData['group_expire_time'];
                         request({
                             params: {
                                 r: 'plugin/giftpacks/mall/giftpacks/edit'
                             },
                             method: 'post',
-                            data: self.formData
+                            data: formData
                         }).then(e => {
                             self.btnLoading = false;
                             if (e.data.code == 0) {

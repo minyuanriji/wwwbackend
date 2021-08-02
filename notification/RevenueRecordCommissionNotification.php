@@ -51,6 +51,15 @@ class RevenueRecordCommissionNotification
             case 'goods':
                 $keyword2 = '商品消费分佣';
                 break;
+            case 'giftpacks_commission':
+                $keyword2 = '大礼包消费分佣';
+                break;
+            case 'addcredit':
+                $keyword2 = '话费直推分佣';
+                break;
+            case 'addcredit_3r':
+                $keyword2 = '话费消费分佣';
+                break;
             default:
                 break;
         }
@@ -64,7 +73,7 @@ class RevenueRecordCommissionNotification
                 'keyword1'  => $income_log['income'],
                 'keyword2'  => $keyword2,
                 'keyword3'  => date('Y-m-d H:i:s', time()),
-                'remark'    => $income_log['desc'],
+                'remark'    => $income_log['desc']
             ]
         ]))->send();
     }

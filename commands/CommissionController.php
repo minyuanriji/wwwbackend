@@ -8,6 +8,8 @@ use yii\db\ActiveQuery;
 
 class CommissionController extends BaseCommandController{
 
+    const ERR_CODE_NOT_FOUND_PARENTS = 50001;
+
     public function actions(){
         return [
             "goods"         => "app\\commands\\commission_action\\GoodsAction",
@@ -17,6 +19,7 @@ class CommissionController extends BaseCommandController{
             "hotel3r"       => "app\\commands\\commission_action\\Hotel3rAction",
             "addcredit"     => "app\\commands\\commission_action\\AddcreditAction",
             "addcredit3r"   => "app\\commands\\commission_action\\Addcredit3rAction",
+            "giftpacks"     => "app\\commands\\commission_action\\GiftpacksAction",
         ];
     }
 
@@ -80,7 +83,7 @@ class CommissionController extends BaseCommandController{
 
         $parentDatas = $query->asArray()->all();
         if(!$parentDatas){
-            throw new \Exception("无法获取上级[ID:".$userLink->parent_id."]信息");
+            throw new \Exception("无法获取上级[ID:".$userLink->parent_id."]信息", self::ERR_CODE_NOT_FOUND_PARENTS);
         }
 
         //对获取的所有上级进行处理

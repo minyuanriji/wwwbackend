@@ -92,6 +92,7 @@
                         <div v-if="scope.row.item_type == 'hotel_3r'">酒店消费分佣</div>
                         <div v-if="scope.row.item_type == 'addcredit'">话费直推分佣</div>
                         <div v-if="scope.row.item_type == 'addcredit_3r'">话费消费分佣</div>
+                        <div v-if="scope.row.item_type == 'giftpacks'">大礼包消费分佣</div>
                     </template>
                 </el-table-column>
                 <el-table-column label="对象名称">
@@ -104,6 +105,7 @@
                             <div v-if="scope.row.item_type == 'hotel_3r'">全部酒店上级（3r）分佣</div>
                             <div v-if="scope.row.item_type == 'addcredit'">全部话费直推</div>
                             <div v-if="scope.row.item_type == 'addcredit_3r'">全部话费消费分佣</div>
+                            <div v-if="scope.row.item_type == 'giftpacks'">全部大礼包消费分佣</div>
                         </div>
                         <div v-else>
                             <div v-if="scope.row.item_type == 'checkout' || scope.row.item_type == 'store'">
@@ -117,6 +119,9 @@
                             </div>
                             <div v-if="scope.row.item_type == 'addcredit' || scope.row.item_type == 'addcredit_3r'">
                                 话费：{{scope.row.addcredit_name}}[ID:{{scope.row.item_id}}]
+                            </div>
+                            <div v-if="scope.row.item_type == 'giftpacks'">
+                                大礼包：{{scope.row.giftpacks_name}}[ID:{{scope.row.item_id}}]
                             </div>
                         </div>
                     </template>
@@ -201,6 +206,10 @@
                     {
                         value: 'addcredit_3r',
                         label: '话费消费'
+                    },
+                    {
+                        value: 'giftpacks',
+                        label: '大礼包消费'
                     },
                 ]
             };

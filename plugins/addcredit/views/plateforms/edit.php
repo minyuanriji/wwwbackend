@@ -42,8 +42,13 @@
                 <el-form-item label="sdk_dir目录" prop="sdk_dir">
                     <el-input  v-model="ruleForm.sdk_dir"></el-input>
                 </el-form-item>
-                <el-form-item label="收费比例" prop="ratio">
+                <el-form-item label="红包收费比例" prop="ratio">
                     <el-input type="number" v-model="ruleForm.ratio"></el-input>
+                    <span style="color: red;font-size: 12px">例如：10   充值100元 红包扣取110</span>
+                </el-form-item>
+                <el-form-item label="服务费" prop="transfer_rate">
+                    <el-input  type="number" v-model="ruleForm.transfer_rate"></el-input>
+                    <span style="color: red;font-size: 12px">请输入服务费0-100</span>
                 </el-form-item>
                 <el-form-item label="推荐人" prop="parent_id">
                     <el-autocomplete size="small"
@@ -66,10 +71,11 @@
                 ruleForm: {
                     name: '',
                     sdk_dir: '',
-                    ratio: 0,
+                    ratio: '',
                     cyd_id: '',
                     secret_key: '',
                     parent_id: '',
+                    transfer_rate: '',
                 },
                 rules: {
                     name: [
@@ -83,6 +89,9 @@
                     ],
                     secret_key: [
                         {required: true, message: '请输入平台秘钥', trigger: 'change'},
+                    ],
+                    transfer_rate: [
+                        {required: true, message: '请输入服务费0-100', trigger: 'change'},
                     ]
                 },
                 btnLoading: false,
@@ -132,9 +141,9 @@
                             self.btnLoading = false;
                             if (e.data.code == 0) {
                                 self.$message.success(e.data.msg);
-                                /*navigateTo({
+                                navigateTo({
                                     r: 'plugin/addcredit/mall/plateforms/plateforms/index'
-                                })*/
+                                })
                             } else {
                                 self.$message.error(e.data.msg);
                             }

@@ -23,7 +23,7 @@ class MchApplyLicenseForm extends BaseModel{
 
     public function rules(){
         return [
-            [['user_id', 'license_num', 'license_name', 'license_pic', 'cor_realname', 'cor_num', 'cor_pic1', 'cor_pic2'], 'required'],
+            [['user_id', 'license_name', 'license_pic', 'cor_realname', 'cor_num', 'cor_pic1', 'cor_pic2'], 'required'],//'license_num'
             [['user_id'], 'integer'],
             [['settle_num', 'settle_realname', 'settle_bank', 'settle_discount'], 'safe']
         ];
@@ -53,7 +53,7 @@ class MchApplyLicenseForm extends BaseModel{
             }
 
             $applyData = @json_decode($applyModel->json_apply_data, true);
-            $applyData['license_num']        = $this->license_num;
+            $applyData['license_num']        = '';//$this->license_num   7/31 暂时取消
             $applyData['license_name']       = $this->license_name;
             $applyData['license_pic']        = $this->license_pic;
             $applyData['cor_num']            = $this->cor_num;

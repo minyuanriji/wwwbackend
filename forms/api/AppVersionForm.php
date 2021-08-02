@@ -10,10 +10,11 @@ use app\models\BaseModel;
 class AppVersionForm extends BaseModel{
 
     public $platform;
+	public $type;
 
     public function rules(){
         return [
-            [['platform'], 'required']
+            [['platform', 'type'], 'required']
         ];
     }
 
@@ -26,8 +27,8 @@ class AppVersionForm extends BaseModel{
         try {
 
             $version = Apps::find()->where([
-                "type"      => "merchant",
-                "platform"  => "android",
+                "type"      => $this->type,
+                "platform"  => $this->platform,
                 "is_delete" => 0
             ])->asArray()->orderBy("version_code DESC")->one();
 
@@ -36,7 +37,7 @@ class AppVersionForm extends BaseModel{
             }
 
             return [
-                'code' => ApiCode::CODE_FAIL,
+                'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'version_code'  => $version['version_code'],
                     'version_name'  => $version['version_name'],

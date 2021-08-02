@@ -19,7 +19,8 @@ class GiftpacksOrder extends BaseActiveRecord
     {
         return [
             [['mall_id', 'pack_id', 'user_id', 'order_sn', 'created_at', 'updated_at', 'pay_status'], 'required'],
-            [['pay_at', 'pay_price', 'pay_type', 'integral_deduction_price', 'integral_fee_rate', 'is_delete'], 'safe']
+            [['pay_at', 'pay_price', 'pay_type', 'integral_deduction_price', 'integral_fee_rate', 'is_delete',
+              'commission_status', 'commission_remark'], 'safe']
         ];
     }
 }

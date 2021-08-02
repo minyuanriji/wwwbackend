@@ -6,8 +6,8 @@ use app\notification\RevenueRecordCommissionNotification;
 
 class IncomeLog
 {
-    const source_type_value = ['boss','hotel_commission','hotel_3r_commission','goods','giftpacks_commission'];
-    const add_source_type_key = [3,4,10,11];
+    const source_type_value = ['boss','hotel_commission','hotel_3r_commission','goods'];
+    const add_source_type_key = [3,4,10,11,12];
 
     public function insert($rows)
     {
@@ -24,6 +24,8 @@ class IncomeLog
                             $row['source_type'] = 'addcredit';
                         } elseif ($row['source_type'] == 11){
                             $row['source_type'] = 'addcredit_3r';
+                        } elseif ($row['source_type'] == 12){
+                            $row['source_type'] = 'giftpacks_commission';
                         }
                         RevenueRecordCommissionNotification::send($row);
                         \Yii::error('IncomeLogNotice:' . json_encode($row) . '---time:' . date("Y-m-d H:i:s", time()));

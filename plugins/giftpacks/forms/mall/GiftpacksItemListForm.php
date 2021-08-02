@@ -38,7 +38,7 @@ class GiftpacksItemListForm extends BaseModel{
             $query->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");
             $query->innerJoin(["s" => Store::tableName()], "s.id=gpi.store_id");
 
-            $query->andWhere(["gpi.is_delete" => 0]);
+            $query->andWhere(["gpi.pack_id" => $this->pack_id, "gpi.is_delete" => 0]);
 
             if(!empty($this->keyword)){
                 $query->andWhere([

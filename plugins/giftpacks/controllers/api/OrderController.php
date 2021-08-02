@@ -7,6 +7,7 @@ use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderClerkQrCodeForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderDetailForm;
+use app\plugins\giftpacks\forms\api\GiftpacksOrderItemDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderListForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderPackItemListForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderPreviewForm;
@@ -39,6 +40,19 @@ class OrderController extends ApiController {
     public function actionDetail(){
         $form = new GiftpacksOrderDetailForm();
         $form->attributes = $this->requestData;
+        return $this->asJson($form->getDetail());
+    }
+
+    /**
+     * 订单商品项详情
+     * @return \yii\web\Response
+     */
+    public function actionItemDetail(){
+        $form = new GiftpacksOrderItemDetailForm();
+        $form->attributes = $this->requestData;
+        $form->city_id    = \Yii::$app->request->headers->get("x-city-id");
+        $form->longitude  = ApiController::$commonData['city_data']['longitude'];
+        $form->latitude   = ApiController::$commonData['city_data']['latitude'];
         return $this->asJson($form->getDetail());
     }
 

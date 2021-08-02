@@ -155,11 +155,22 @@ class UserForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-        $child_ids = UserChildren::find()->where(['user_id' => $this->user_id, 'is_delete' => 0])->select('child_id')->column();
+        //$child_ids = UserChildren::find()->where(['user_id' => $this->user_id, 'is_delete' => 0])->select('child_id')->column();
+
+        $userRelationshipLink = UserRelationshipLink::findOne(["user_id" => $this->user_id]);
+        $childSubQuery = UserRelationshipLink::find()->select(["user_id"])
+                            ->andWhere([
+                                "AND",
+                                [">", "left", $userRelationshipLink->left],
+                                ["<", "right", $userRelationshipLink->right]
+                            ]);
+
         $query = User::find()->alias('u')->select('u.id,u.nickname')
-            ->where(['u.is_inviter' => 1, 'u.mall_id' => \Yii::$app->mall->id])->andWhere(
-              ['LIKE', 'u.nickname', $this->keyword]
-            );
+            ->where(['u.is_inviter' => 1, 'u.mall_id' => \Yii::$app->mall->id])
+            ->andWhere([
+                "OR",
+                ['LIKE', 'u.nickname', $this->keyword]
+            ]);
 
         if(is_numeric($this->keyword)){
             $query->orWhere(
@@ -167,9 +178,10 @@ class UserForm extends BaseModel
             );
         }
 
-        if (count($child_ids)) {
+        $query->andWhere(['not in', 'u.id', $childSubQuery]);
+        /*if (count($child_ids)) {
             $query->andWhere(['not in', 'u.id', $child_ids]);
-        }
+        }*/
         $list = $query->orderBy('id desc')->limit(30)->all();
         return [
             'code' => ApiCode::CODE_SUCCESS,

@@ -20,7 +20,7 @@
                 <el-table @sort-change="sortReload" :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           >
                     <el-table-column sortable="custom" prop="id" width="60" label="ID"></el-table-column>
-                    <el-table-column sortable="custom" label="标题" width="320">
+                    <el-table-column sortable="custom" label="标题" width="280">
                         <template slot-scope="scope">
                             <div flex="box:first">
                                 <div style="padding-right: 10px;">
@@ -38,6 +38,18 @@
                                         </el-link>
                                     </div>
                                 </div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="price" width="100" label="价格"></el-table-column>
+                    <el-table-column prop="max_stock" width="100" label="库存"></el-table-column>
+                    <el-table-column prop="scope" width="150" label="拼团">
+                        <template slot-scope="scope">
+                            <div v-if="scope.row.group_enable != 1" style="color:gray">关闭</div>
+                            <div v-else>
+                                <div>拼团价：{{scope.row.group_price}}</div>
+                                <div>满人数：{{scope.row.group_need_num}}人</div>
+                                <div>有效期：{{scope.row.group_expire_time}}时</div>
                             </div>
                         </template>
                     </el-table-column>

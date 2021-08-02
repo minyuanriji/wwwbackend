@@ -5,6 +5,7 @@ namespace app\plugins\giftpacks\forms\mall;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksItem;
 
 class GiftpacksSaveItemForm extends BaseModel{
@@ -32,18 +33,24 @@ class GiftpacksSaveItemForm extends BaseModel{
 
         try {
 
-            $item = GiftpacksItem::findOne([
+            $giftpacks = Giftpacks::findOne($this->pack_id);
+            if(!$giftpacks || $giftpacks->is_delete){
+                throw new \Exception("大礼包不存在");
+            }
+
+            if($this->max_stock < $giftpacks->max_stock){
+                throw new \Exception("商品库存不能低于大礼包库存");
+            }
+
+            $uniqueData = [
+                "mall_id"  => \Yii::$app->mall->id,
                 "pack_id"  => $this->pack_id,
                 "store_id" => $this->store_id,
                 "goods_id" => $this->goods_id,
-            ]);
+            ];
+            $item = GiftpacksItem::findOne($uniqueData);
             if(!$item){
-                $item = new GiftpacksItem([
-                    "mall_id"  => \Yii::$app->mall->id,
-                    "pack_id"  => $this->pack_id,
-                    "store_id" => $this->store_id,
-                    "goods_id" => $this->goods_id,
-                ]);
+                $item = new GiftpacksItem($uniqueData);
             }
 
             $item->name       = $this->name;

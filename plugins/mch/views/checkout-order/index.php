@@ -111,7 +111,7 @@
         <div class="table-body">
             <el-form @submit.native.prevent="searchList" size="small" :inline="true" :model="search">
                 <el-form-item>
-                    <el-select v-model="search.pay_status" placeholder="请选择" style="width:110px;">
+                    <el-select v-model="search.pay_status" placeholder="请选择"  @change="searchList" style="width:110px;">
                         <el-option
                                 v-for="item in pay_options"
                                 :key="item.value"

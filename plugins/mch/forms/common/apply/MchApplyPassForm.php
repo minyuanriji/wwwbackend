@@ -34,11 +34,11 @@ class MchApplyPassForm extends BaseModel{
         try {
             $applyModel = MchApply::findOne($this->id);
             if (!$applyModel) {
-                throw new \Exception("申请记录不存在", ApiCode::CODE_FAIL);
+                throw new \Exception("申请记录不存在");
             }
 
             if ($applyModel->status != "verifying") {
-                throw new \Exception("非审核中状态无法操作", ApiCode::CODE_FAIL);
+                throw new \Exception("非审核中状态无法操作");
             }
 
             //绑定手机号唯一值检查
@@ -48,12 +48,12 @@ class MchApplyPassForm extends BaseModel{
                 "user_id <> '".$applyModel->user_id."'"
             ])->exists();
             if($existsMobile){
-                throw new \Exception("手机“".$this->bind_mobile."”已被其它商户绑定", ApiCode::CODE_FAIL);
+                throw new \Exception("手机“".$this->bind_mobile."”已被其它商户绑定");
             }
 
             $user = User::findOne($applyModel->user_id);
             if(!$user || $user->is_delete){
-                throw new \Exception("无法获取到用户信息", ApiCode::CODE_FAIL);
+                throw new \Exception("无法获取到用户信息");
             }
 
 
@@ -69,7 +69,7 @@ class MchApplyPassForm extends BaseModel{
             $applyModel->status     = "passed";
             $applyModel->updated_at = time();
             if(!$applyModel->save()){
-                throw new \Exception($this->responseErrorMsg($applyModel), ApiCode::CODE_FAIL);
+                throw new \Exception($this->responseErrorMsg($applyModel));
             }
 
             if ($operation_terminal == MchApplyOperationLog::OPERATION_TERMINAL_BACKSTAGE) {
@@ -79,7 +79,7 @@ class MchApplyPassForm extends BaseModel{
             }
             $operation_save = MchApplyOperationLogSaveForm::addOperationLog($applyModel->mall_id, $applyModel->id, $operation_terminal, $user_id, MchApplyOperationLog::OPERATION_PASSED);
             if ($operation_save['code'] != ApiCode::CODE_SUCCESS)
-                throw new \Exception(isset($operation_save['msg']) ? $operation_save['msg'] : $operation_save['message'], ApiCode::CODE_FAIL);
+                throw new \Exception(isset($operation_save['msg']) ? $operation_save['msg'] : $operation_save['message']);
 
             $trans->commit();
             return [

@@ -6,6 +6,7 @@ use app\plugins\commission\forms\mall\CommissionRuleDeleteForm;
 use app\plugins\commission\forms\mall\CommissionRuleListForm;
 use app\plugins\commission\forms\mall\CommissionRuleDetailForm;
 use app\plugins\commission\forms\mall\CommissionRuleEditForm;
+use app\plugins\commission\forms\mall\SearchAddcreditForm;
 use app\plugins\commission\forms\mall\SearchGoodsForm;
 use app\plugins\commission\forms\mall\SearchHotelForm;
 use app\plugins\commission\forms\mall\SearchStoreForm;
@@ -95,6 +96,16 @@ class RulesController extends Controller{
      */
     public function actionSearchHotel(){
         $form = new SearchHotelForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->search());
+    }
+
+    /**
+     * 加载话费平台
+     * @return string|yii\web\Response
+     */
+    public function actionSearchAddcredit(){
+        $form = new SearchAddcreditForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->search());
     }

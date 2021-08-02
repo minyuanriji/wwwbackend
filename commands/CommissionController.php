@@ -10,11 +10,13 @@ class CommissionController extends BaseCommandController{
 
     public function actions(){
         return [
-            "goods"    => "app\\commands\\commission_action\\GoodsAction",
-            "checkout" => "app\\commands\\commission_action\\CheckoutAction",
-            "store"    => "app\\commands\\commission_action\\StoreAction",
-            "hotel"    => "app\\commands\\commission_action\\HotelAction",
-            "hotel3r"  => "app\\commands\\commission_action\\Hotel3rAction",
+            "goods"         => "app\\commands\\commission_action\\GoodsAction",
+            "checkout"      => "app\\commands\\commission_action\\CheckoutAction",
+            "store"         => "app\\commands\\commission_action\\StoreAction",
+            "hotel"         => "app\\commands\\commission_action\\HotelAction",
+            "hotel3r"       => "app\\commands\\commission_action\\Hotel3rAction",
+            "addcredit"     => "app\\commands\\commission_action\\AddcreditAction",
+            "addcredit3r"   => "app\\commands\\commission_action\\Addcredit3rAction",
         ];
     }
 

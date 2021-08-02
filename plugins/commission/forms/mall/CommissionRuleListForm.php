@@ -30,7 +30,8 @@ class CommissionRuleListForm extends BaseModel{
         $query->leftJoin("{{%goods}} g", "g.id=crl.item_id AND crl.item_type='goods'");
         $query->leftJoin("{{%goods_warehouse}} gw", "gw.id=g.goods_warehouse_id");
         $query->leftJoin("{{%store}} s", "s.id=crl.item_id AND crl.item_type='checkout'");
-        $query->leftJoin("{{%plugin_hotels}} h", "h.id=crl.item_id AND crl.item_type='hotel'");
+        $query->leftJoin("{{%plugin_hotels}} h", "h.id=crl.item_id AND crl.item_type='hotel_3r'");
+        $query->leftJoin("{{%plugin_commission_rule_chain}} pcrc", "pcrc.id=crl.item_id AND crl.item_type='addcredit_3r'");
 
         $query->andWhere(["crl.is_delete" => 0]);
 
@@ -48,7 +49,8 @@ class CommissionRuleListForm extends BaseModel{
                 "(crl.mch_id='".(int)$this->keyword."' AND crl.item_type='checkout')",
                 "(gw.name LIKE '%".addslashes($this->keyword)."%' AND crl.item_type='goods')",
                 "(s.name LIKE '%".addslashes($this->keyword)."%' AND crl.item_type='checkout')",
-                "(h.name LIKE '%".addslashes($this->keyword)."%' AND crl.item_type='hotel')"
+                "(h.name LIKE '%".addslashes($this->keyword)."%' AND crl.item_type='hotel')",
+                "(pcrc.name LIKE '%".addslashes($this->keyword)."%' AND crl.item_type='addcredit_3r')",
             ]);
         }
 
@@ -68,7 +70,7 @@ class CommissionRuleListForm extends BaseModel{
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '请求成功',
             'data' => [
-                'list' => $list ? $list : [],
+                'list' => $list,
                 'pagination' => $pagination,
             ]
         ];

@@ -341,6 +341,7 @@ Yii::$app->loadComponentView('order/com-city');
                     :active-name="activeName"
                     :is-show-order-type="isShowOrderType"
                     :is-show-order-plugin="isShowOrderPlugin"
+                    :is-show-mch-count="isShowMchCount"
                     :new-search="newSearch"
                     :select-list="selectList">
             </com-search>
@@ -1007,6 +1008,11 @@ Yii::$app->loadComponentView('order/com-city');
             },
             // 插件筛选
             isShowOrderPlugin: {
+                type: Boolean,
+                default: false
+            },
+            // 显示商户订单查询总数
+            isShowMchCount: {
                 type: Boolean,
                 default: false
             },

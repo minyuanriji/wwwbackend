@@ -63,7 +63,7 @@ abstract class OrderPayFormBase extends BaseModel
      * @Author: 广东七件事 zal
      * @Date: 2020-05-07
      * @Time: 11:20
-     * @param Order[] $order
+     * @param Order $order
      * @param User $userData
      * @return array
      */
@@ -104,6 +104,7 @@ abstract class OrderPayFormBase extends BaseModel
         $returnData = $this->getReturnData(is_array($order) ? $order : [$order]);
         $data["is_pay_password"] = $isPayPassword;
         $data["union_id"] = $returnData["id"];
+        $data["is_send"] = $order->send_type;
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"",$data);
     }
 

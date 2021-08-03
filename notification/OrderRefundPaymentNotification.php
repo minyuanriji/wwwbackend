@@ -48,7 +48,7 @@ class OrderRefundPaymentNotification
             "mall_id"           => $order_refund->mall_id,
             "openid"            => $userInfo->openid,
             "first"             => '您订单号为'. $order->order_no .'的已退款成功',
-            "price"             => $order_refund->reality_refund_price,
+            "price"             => $order_refund->reality_refund_price . '+红包（' . $order->integral_deduction_price . '）',
         ]))->send();
     }
 }

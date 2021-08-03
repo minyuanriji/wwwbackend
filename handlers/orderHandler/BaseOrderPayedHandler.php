@@ -30,6 +30,7 @@ use app\models\OrderRefund;
 use app\models\User;
 use app\models\UserCard;
 use app\forms\efps\distribute\EfpsDistributeForm;
+use app\plugins\mch\forms\common\price_log\PriceLogNewOrderForm;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
 
 /**
@@ -102,8 +103,10 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
         // 消费升级会员等级
         $this->upLevel();
 
-        //分账
-        EfpsDistributeForm::goodsOrder($this->order);
+        //如果是商家订单，生成商品订单待结算记录
+        if($this->order->mch_id){
+            PriceLogNewOrderForm::create($this->order);
+        }
 
         //多商户订单结算
         //GoodsOrderAutoSettleForm::settle($this->order);

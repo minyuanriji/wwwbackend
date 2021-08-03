@@ -16,7 +16,6 @@ class AddcreditAction extends Action
 {
     public function run ()
     {
-        $this->doNew();die;
         while (true) {
             $this->doNew();
         }

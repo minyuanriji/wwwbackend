@@ -105,10 +105,11 @@
                 <el-tab-pane v-for="(item, index) in tabs" :key="index" :name="item.value">
                     <div slot="label" style="float: left;" >
                         <span>{{item.name}}</span>
-                        <el-badge :value="item.count.num" class="item" v-if="
-                                                                        item.value==0 ||
-                                                                        item.value==1 ||
-                                                                        item.value==2"/>
+                        <el-badge
+                                :value="item.count.num"
+                                class="item"
+                                v-if="item.value==0 || item.value==1 || item.value==2"
+                        />
                     </div>
                 </el-tab-pane>
             </el-tabs>
@@ -171,6 +172,10 @@
                 default: true
             },
             isShowOrderPlugin: {
+                type: Boolean,
+                default: false
+            },
+            isShowMchCount: {
                 type: Boolean,
                 default: false
             },
@@ -254,7 +259,8 @@
             getOrderCount() {
                 this.loading = true;
                 let params = {
-                    r: this.orderCount
+                    r: this.orderCount,
+                    mch_count:this.isShowMchCount
                 };
                 request({
                     params: params,

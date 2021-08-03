@@ -65,6 +65,8 @@ abstract class BaseOrderForm extends BaseModel
     public $platform;//所属平台
     public $parent_id;
 
+    public $mch_count;
+
     // 前端操作 显示设置
     public $is_send_show;
     public $is_cancel_show;
@@ -82,6 +84,7 @@ abstract class BaseOrderForm extends BaseModel
             [['status',], 'default', 'value' => -1],
             [['pay_type'], 'default', 'value' => -1],
             [['page',], 'default', 'value' => 1],
+            [['mch_count'], 'safe'],
             [['date_start', 'date_end', 'fields', 'clerk_id'], 'trim'],
             [['is_send_show', 'is_cancel_show', 'is_clerk_show', 'is_confirm_show'], 'default', 'value' => 1],
             [['send_type'], 'default', 'value' => -1]
@@ -368,8 +371,18 @@ abstract class BaseOrderForm extends BaseModel
                 if ($this->is_mch) {
                     $query->andWhere(['>', 'o.mch_id', 0]);
                 } else {
-                    $query->andWhere(['o.mch_id' => 0]);
+                    if ($this->mch_count == 'true') {
+                        $query->andWhere(['>','o.mch_id', 0]);
+                    } else {
+                        $query->andWhere(['o.mch_id' => 0]);
+                    }
                 }
+            }
+        } else {
+            if ($this->mch_count == 'true') {
+                $query->andWhere(['>','o.mch_id', 0]);
+            } else {
+                $query->andWhere(['o.mch_id' => 0]);
             }
         }
 

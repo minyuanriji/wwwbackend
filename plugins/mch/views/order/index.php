@@ -8,6 +8,7 @@ Yii::$app->loadComponentView('com-order');
         <com-order
                 :select-list="selectList"
                 :is-show-recycle="false"
+                :is-show-mch-count="true"
                 :is-show-confirm="false"
                 :is-show-finish="false"
                 :is-show-send="false"
@@ -15,6 +16,7 @@ Yii::$app->loadComponentView('com-order');
                 :is-show-print="false"
                 :is-show-remark="false"
                 :is-show-cancel="false"
+                :is-show-order-plugin="true"
                 :is-show-edit-address="false"
                 :is-show-edit-express-price="false"
                 :is-show-edit-single-price="false"

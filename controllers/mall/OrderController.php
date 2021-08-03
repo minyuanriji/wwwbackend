@@ -61,6 +61,7 @@ class OrderController extends OrderManagerController
     {
         if (\Yii::$app->request->isAjax) {
             $order = new OrderForm();
+            $order->attributes = \Yii::$app->request->get();
             $order->status = 0;//未付款总数
             $unpaid_count = $order->search_num();
             $order->status = 1;//代发货总数

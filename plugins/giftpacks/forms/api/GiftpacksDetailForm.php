@@ -49,8 +49,14 @@ class GiftpacksDetailForm extends BaseModel{
                 //获取最新的两条拼单记录
                 $groupList = static::newestGroupLog($giftpacks);
 
-                //TODO 拼单总数
-                $detail['group_num'] = 0;
+                //拼单总数
+                $detail['group_num'] = (int)GiftpacksGroup::find()->andWhere([
+                                            "AND",
+                                            ["status" => "sharing"],
+                                            ["pack_id" => $giftpacks->id],
+                                            [">", "expired_at", time()],
+                                            [">", "need_num", "user_num"]
+                                        ])->count();
             }
 
             return [
@@ -139,8 +145,13 @@ class GiftpacksDetailForm extends BaseModel{
         return (int)$query->count();
     }
 
-    //有效的大礼包物品查询对象a
+    //有效的大礼包商品查询对象
     public static function availableItemsQuery(Giftpacks $giftpacks){
+        return static::availableItemsQueryByPackId($giftpacks->id);
+    }
+
+    //通过大礼包ID获取有效的大礼包商品查询对象
+    public static function availableItemsQueryByPackId($pack_id){
 
         $unionQuery1 = GiftpacksOrderItem::find()->alias("goi")
                     ->innerJoin(["go" => GiftpacksOrder::tableName()], "go.id = goi.order_id")
@@ -150,7 +161,7 @@ class GiftpacksDetailForm extends BaseModel{
                     ])->andWhere([
                         "AND",
                         ["`go`.`pay_status`" => "paid"],
-                        ["`go`.`pack_id`" => $giftpacks->id],
+                        ["`go`.`pack_id`" => $pack_id],
                         ["`go`.`is_delete`" => 0]
                     ])->groupBy("`goi`.`pack_item_id`");
 
@@ -163,7 +174,7 @@ class GiftpacksDetailForm extends BaseModel{
                         "AND",
                         ["gg.status" => "sharing"],
                         "gg.expired_at > '".time()."'",
-                        ["gg.pack_id" => $giftpacks->id],
+                        ["gg.pack_id" => $pack_id],
                     ])->groupBy("ggpi.pack_item_id");
 
         $statQuery = BaseActiveRecord::find()->from($unionQuery1->union($unionQuery2))
@@ -174,7 +185,7 @@ class GiftpacksDetailForm extends BaseModel{
 
         $query = GiftpacksItem::find()->alias("gpi");
         $query->leftJoin(["st" => $statQuery], "st.pack_item_id=gpi.id");
-        $query->where(["gpi.is_delete" => 0, "gpi.pack_id" => $giftpacks->id]);
+        $query->where(["gpi.is_delete" => 0, "gpi.pack_id" => $pack_id]);
         $query->andWhere([
             "OR",
             "st.order_num IS NULL",

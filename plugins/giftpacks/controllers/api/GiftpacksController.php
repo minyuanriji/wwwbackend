@@ -6,6 +6,7 @@ use app\controllers\api\ApiController;
 use app\plugins\giftpacks\forms\api\GiftpacksDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksGroupDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksGroupListForm;
+use app\plugins\giftpacks\forms\api\GiftpacksItemDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksItemListForm;
 use app\plugins\giftpacks\forms\api\GiftpacksListForm;
 
@@ -28,6 +29,19 @@ class GiftpacksController extends ApiController {
     public function actionDetail(){
         $form = new GiftpacksDetailForm();
         $form->attributes = $this->requestData;
+        return $this->asJson($form->getDetail());
+    }
+
+    /**
+     * 大礼包商品详情
+     * @return \yii\web\Response
+     */
+    public function actionItemDetail(){
+        $form = new GiftpacksItemDetailForm();
+        $form->attributes = $this->requestData;
+        $form->city_id    = \Yii::$app->request->headers->get("x-city-id");
+        $form->longitude  = ApiController::$commonData['city_data']['longitude'];
+        $form->latitude   = ApiController::$commonData['city_data']['latitude'];
         return $this->asJson($form->getDetail());
     }
 

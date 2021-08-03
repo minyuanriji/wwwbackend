@@ -127,6 +127,7 @@ class OrderListCommon extends BaseModel
         //$this->query->andWhere(['send_type' => 0]);
 
         if($this->only_offline_order){ //只显示核销订单
+            $this->query->andWhere(["o.is_pay" => 1]);
             $this->query->andWhere(["IN", "o.order_type", ["offline_baopin", "offline_normal"]]);
             if(!$this->only_offline_used){
                 $this->query->andWhere([

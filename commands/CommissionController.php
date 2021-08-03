@@ -1,8 +1,6 @@
 <?php
 namespace app\commands;
 
-use app\commands\commission_action\Addcredit3rAction;
-use app\commands\commission_action\AddcreditAction;
 use app\models\User;
 use app\models\UserRelationshipLink;
 use app\plugins\commission\models\CommissionRuleChain;
@@ -10,11 +8,7 @@ use yii\db\ActiveQuery;
 
 class CommissionController extends BaseCommandController{
 
-    public function actionTest ()
-    {
-        (new AddcreditAction(null,null))->run();
-        (new Addcredit3rAction(null,null))->run();
-    }
+    const ERR_CODE_NOT_FOUND_PARENTS = 50001;
 
     public function actions(){
         return [
@@ -25,6 +19,7 @@ class CommissionController extends BaseCommandController{
             "hotel3r"       => "app\\commands\\commission_action\\Hotel3rAction",
             "addcredit"     => "app\\commands\\commission_action\\AddcreditAction",
             "addcredit3r"   => "app\\commands\\commission_action\\Addcredit3rAction",
+            "giftpacks"     => "app\\commands\\commission_action\\GiftpacksAction",
         ];
     }
 
@@ -54,10 +49,11 @@ class CommissionController extends BaseCommandController{
      * 计算利润
      * @param $order_price
      * @param $transfer_rate
+     * @param $integral_fee_rate
      * @return mixed
      */
-    public function calculateCheckoutOrderProfitPrice($order_price, $transfer_rate){
-        return max(0, $order_price * ($transfer_rate/100 - 0.1) * 0.6);
+    public function calculateCheckoutOrderProfitPrice($order_price, $transfer_rate, $integral_fee_rate = 0){
+        return max(0, $order_price * ($transfer_rate/100 - 0.1 + $integral_fee_rate) * 0.6);
     }
 
     /**
@@ -88,7 +84,7 @@ class CommissionController extends BaseCommandController{
 
         $parentDatas = $query->asArray()->all();
         if(!$parentDatas){
-            throw new \Exception("无法获取上级[ID:".$userLink->parent_id."]信息");
+            throw new \Exception("无法获取上级[ID:".$userLink->parent_id."]信息", self::ERR_CODE_NOT_FOUND_PARENTS);
         }
 
         //对获取的所有上级进行处理

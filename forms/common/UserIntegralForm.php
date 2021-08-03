@@ -29,7 +29,7 @@ class UserIntegralForm extends BaseModel{
         $trans && ($t = \Yii::$app->db->beginTransaction());
 
         try {
-            $desc = "支付大礼包“".$payOrder->id."”拼单";
+            $desc = "大礼包拼单支付订单[ID:".$payOrder->id."]";
             static::change($user, $payOrder->integral_deduction_price, self::TYPE_SUB, "giftpacks_group_payorder", $payOrder->id, $desc);
 
             $trans && $t->commit();
@@ -297,7 +297,7 @@ class UserIntegralForm extends BaseModel{
         }
     }
 
-    private static function change(User $user, $price, $type, $source_type, $source_id, $desc = null, $is_manual = 0){
+    protected static function change(User $user, $price, $type, $source_type, $source_id, $desc = null, $is_manual = 0){
 
         $staticIntegral = floatval($user->static_integral);
 

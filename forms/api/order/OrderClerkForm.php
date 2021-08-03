@@ -145,22 +145,15 @@ class OrderClerkForm extends BaseModel
              *  商户爆品订单  mch_baopin_order
              */
             $sourceType = $processClass = "";
-            if(!empty($order->mch_id)){
-                if($order->order_type == "offline_baopin"){
-                    $sourceType = "mch_baopin_order";
-                    $processClass = "app\\plugins\\mch\\forms\\common\\clerk\\BaopinOrderClerkProcessForm";
-                }else{
-                    $sourceType = "mch_normal_order";
-                    $processClass = "app\\plugins\\mch\\forms\\common\\clerk\\OrderClerkProcessForm";
-                }
+            if($order->order_type == "offline_baopin"){
+                $sourceType = "mch_baopin_order";
+                $processClass = "app\\plugins\\mch\\forms\\common\\clerk\\BaopinOrderClerkProcessForm";
+            }elseif(!empty($order->mch_id)){
+                $sourceType = "mch_normal_order";
+                $processClass = "app\\plugins\\mch\\forms\\common\\clerk\\OrderClerkProcessForm";
             }else{
-                if($order->order_type == "offline_baopin"){
-                    $sourceType = "baopin_order";
-                    $processClass = "app\\forms\\common\\order\\BaopinOrderClerkProcessForm";
-                }else{
-                    $sourceType = "normal_order";
-                    $processClass = "app\\forms\\common\\order\\OrderClerkProcessForm";
-                }
+                $sourceType = "normal_order";
+                $processClass = "app\\forms\\common\\order\\OrderClerkProcessForm";
             }
 
             $uniqueData = [

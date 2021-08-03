@@ -49,10 +49,11 @@ class CommissionController extends BaseCommandController{
      * 计算利润
      * @param $order_price
      * @param $transfer_rate
+     * @param $integral_fee_rate
      * @return mixed
      */
-    public function calculateCheckoutOrderProfitPrice($order_price, $transfer_rate){
-        return max(0, $order_price * ($transfer_rate/100 - 0.1) * 0.6);
+    public function calculateCheckoutOrderProfitPrice($order_price, $transfer_rate, $integral_fee_rate = 0){
+        return max(0, $order_price * ($transfer_rate/100 - 0.1 + $integral_fee_rate) * 0.6);
     }
 
     /**

@@ -1,8 +1,6 @@
 <?php
 namespace app\commands;
 
-use app\commands\commission_action\Addcredit3rAction;
-use app\commands\commission_action\AddcreditAction;
 use app\models\User;
 use app\models\UserRelationshipLink;
 use app\plugins\commission\models\CommissionRuleChain;
@@ -10,11 +8,15 @@ use yii\db\ActiveQuery;
 
 class CommissionController extends BaseCommandController{
 
+<<<<<<< HEAD
     public function actionTest ()
     {
         (new AddcreditAction(null,null))->run();
         (new Addcredit3rAction(null,null))->run();
     }
+=======
+    const ERR_CODE_NOT_FOUND_PARENTS = 50001;
+>>>>>>> 92868b18619440856c63892d50d6b8f64e1898f8
 
     public function actions(){
         return [
@@ -55,10 +57,11 @@ class CommissionController extends BaseCommandController{
      * 计算利润
      * @param $order_price
      * @param $transfer_rate
+     * @param $integral_fee_rate
      * @return mixed
      */
-    public function calculateCheckoutOrderProfitPrice($order_price, $transfer_rate){
-        return max(0, $order_price * ($transfer_rate/100 - 0.1) * 0.6);
+    public function calculateCheckoutOrderProfitPrice($order_price, $transfer_rate, $integral_fee_rate = 0){
+        return max(0, $order_price * ($transfer_rate/100 - 0.1 + $integral_fee_rate) * 0.6);
     }
 
     /**

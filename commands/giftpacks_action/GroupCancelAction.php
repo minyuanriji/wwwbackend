@@ -71,7 +71,7 @@ class GroupCancelAction extends Action{
                 $t->commit();
 
                 $this->controller->commandOut("[ID:".$group->id."]拼单取消处理成功");
-                
+
             }catch (\Exception $e){
                 $t->rollBack();
                 $this->controller->commandOut($e->getMessage());

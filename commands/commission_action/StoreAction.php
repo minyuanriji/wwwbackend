@@ -39,7 +39,7 @@ class StoreAction extends Action{
             ["mco.is_delete" => 0],
             ["mco.store_commission_status" => 0]
         ]);
-        $query->select(["mco.*", "s.name", "m.transfer_rate","m.user_id"]);
+        $query->select(["mco.*", "s.name", "m.transfer_rate", "m.integral_fee_rate", "m.user_id"]);
         $checkoutOrders = $query->asArray()->limit(10)->all();
         if(!$checkoutOrders){
             return false;
@@ -88,7 +88,8 @@ class StoreAction extends Action{
                 }
                 //计算分佣金额
                 $transferRate = (int)$checkoutOrder['transfer_rate'];//商户手续费
-                $commission_res['profit_price'] = $this->controller->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate);
+                $integralFeeRate = (int)$checkoutOrder['integral_fee_rate'];
+                $commission_res['profit_price'] = $this->controller->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate, $integralFeeRate);
                 if($commission_res['commission_type'] == 1){ //按百分比
                     $price = (floatval($commission_res['commisson_value'])/100) * floatval($commission_res['profit_price']);
                 }else{ //按固定值

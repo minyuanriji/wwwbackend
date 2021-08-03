@@ -19,7 +19,7 @@ class GiftpacksGroupPayOrder extends BaseActiveRecord
     {
         return [
             [['mall_id', 'group_id', 'user_id', 'pay_status'], 'required'],
-            [['integral_fee_rate', 'pay_at', 'pay_price', 'pay_type', 'integral_deduction_price'], 'safe']
+            [['remark', 'integral_fee_rate', 'pay_at', 'pay_price', 'pay_type', 'integral_deduction_price'], 'safe']
         ];
     }
 }

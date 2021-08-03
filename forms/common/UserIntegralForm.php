@@ -297,7 +297,7 @@ class UserIntegralForm extends BaseModel{
         }
     }
 
-    private static function change(User $user, $price, $type, $source_type, $source_id, $desc = null, $is_manual = 0){
+    protected static function change(User $user, $price, $type, $source_type, $source_id, $desc = null, $is_manual = 0){
 
         $staticIntegral = floatval($user->static_integral);
 

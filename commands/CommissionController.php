@@ -8,15 +8,7 @@ use yii\db\ActiveQuery;
 
 class CommissionController extends BaseCommandController{
 
-<<<<<<< HEAD
-    public function actionTest ()
-    {
-        (new AddcreditAction(null,null))->run();
-        (new Addcredit3rAction(null,null))->run();
-    }
-=======
     const ERR_CODE_NOT_FOUND_PARENTS = 50001;
->>>>>>> 92868b18619440856c63892d50d6b8f64e1898f8
 
     public function actions(){
         return [

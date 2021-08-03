@@ -11,7 +11,6 @@ class IncomeLog
 
     public function insert($rows)
     {
-print_r($rows);die;
         foreach ($rows as $row)
         {
             if (isset($row['flag']) && $row['flag']) {
@@ -38,7 +37,6 @@ print_r($rows);die;
 
     public function update($mixDatas)
     {
-print_r($mixDatas);die;
         foreach ($mixDatas as $mixData) {
             $condition = $mixData['condition'];
             $update = $mixData['update'];

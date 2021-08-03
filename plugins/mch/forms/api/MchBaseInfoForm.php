@@ -11,6 +11,7 @@ use app\models\Goods;
 use app\models\Order;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
+use app\plugins\mch\models\MchPriceLog;
 
 class MchBaseInfoForm extends BaseModel{
 
@@ -106,6 +107,13 @@ class MchBaseInfoForm extends BaseModel{
             if($efpsReviewInfo){
                 $baseData['settle'] = $efpsReviewInfo;
             }
+
+            //获取商户待结算金额
+            $fzAccountMoney = (float)MchPriceLog::find()->where([
+                "status" => "unconfirmed",
+                "mch_id" => $mchInfo['id']
+            ])->sum("price");
+            $baseData['stat']['fz_account_money'] = $fzAccountMoney;
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

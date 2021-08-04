@@ -221,7 +221,11 @@ class PayCenterIntegralPayGiftpacksGroupForm extends BaseModel{
             $t->rollBack();
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg'  => $e->getMessage()
+                'msg'  => $e->getMessage(),
+                'error' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ];
         }
     }

@@ -16,6 +16,7 @@ use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
 use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
+use app\plugins\mch\forms\common\price_log\PriceLogNewGiftpacksOrderItemForm;
 
 class PayCenterIntegralPayGiftpacksGroupForm extends BaseModel{
 
@@ -192,6 +193,9 @@ class PayCenterIntegralPayGiftpacksGroupForm extends BaseModel{
                     if(!$orderItem->save()){
                         throw new \Exception($this->responseErrorMsg($orderItem));
                     }
+
+                    //生成大礼包订单商户结算记录
+                    PriceLogNewGiftpacksOrderItemForm::create($orderItem);
                 }
 
                 //结算拼单任务

@@ -12,7 +12,6 @@ use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
 use app\plugins\mch\forms\common\price_log\PriceLogNewGiftpacksOrderItemForm;
-use app\plugins\mch\models\MchPriceLog;
 
 class PayCenterIntegralPayGiftpacksOrderForm extends BaseModel{
 

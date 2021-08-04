@@ -2,7 +2,7 @@
 
 namespace app\plugins\mch\forms\common\price_log;
 
-
+use app\models\BaseModel;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchPriceLog;
@@ -64,7 +64,7 @@ class PriceLogNewGiftpacksOrderItemForm extends BaseModel{
                 }
             }
         }catch (\Exception $e){
-
+            throw $e;
         }
 
     }

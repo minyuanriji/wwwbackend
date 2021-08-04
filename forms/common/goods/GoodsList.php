@@ -202,9 +202,10 @@ class GoodsList extends BaseModel
             return $this->responseErrorInfo();
         }
         $this->getQuery();
+        $this->sortWhere();
         return $this->query->page($this->pagination, $this->limit, $this->page)
             ->groupBy($this->group_by_name)
-            ->orderBy('id DESC')
+            //->orderBy('id DESC')
             ->asArray($this->is_array)
             ->all();
     }

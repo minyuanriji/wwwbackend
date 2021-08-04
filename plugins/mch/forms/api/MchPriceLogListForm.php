@@ -28,7 +28,8 @@ class MchPriceLogListForm extends BaseModel{
         try {
 
             $query = MchPriceLog::find()->where([
-                "status" => $this->status
+                "status" => $this->status,
+                "mch_id" => $this->mch_id
             ])->orderBy("id DESC");
 
             $selects = ["price", "created_at", "status", "source_type", "content"];

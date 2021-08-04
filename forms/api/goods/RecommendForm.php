@@ -76,6 +76,7 @@ class RecommendForm extends BaseModel implements ICacheForm
         $form->sign = ['mch', ''];
         $form->limit = $recommendCount;
         $form->exceptSelf = $this->goods_id;
+        $form->sort = 4;
         $goodsList = $form->getList();
         $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['list' => $goodsList]);
     }

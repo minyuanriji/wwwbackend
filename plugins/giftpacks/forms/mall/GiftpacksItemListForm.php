@@ -55,7 +55,7 @@ class GiftpacksItemListForm extends BaseModel{
             }
 
             if(empty($orderBy)){
-                $orderBy = "gpi.updated_at " . (!$this->sort_type   ? "DESC" : "ASC");
+                $orderBy = "gpi.id " . (!$this->sort_type   ? "DESC" : "ASC");
             }
 
             $selects = ["gpi.*"];

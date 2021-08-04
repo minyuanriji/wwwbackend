@@ -7,7 +7,8 @@ class MchTaskController extends BaseCommandController{
 
     public function actions(){
         return [
-            "order-price-log" => "app\\commands\\mch_task_action\\OrderPriceLogAction"
+            "order-price-log" => "app\\commands\\mch_task_action\\OrderPriceLogAction",
+            "giftpacks-order-price-log" => "app\\commands\\mch_task_action\\GiftpacksOrderPriceLogAction"
         ];
     }
 

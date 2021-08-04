@@ -11,6 +11,8 @@ use app\plugins\giftpacks\forms\api\GiftpacksOrderSubmitForm;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
+use app\plugins\mch\forms\common\price_log\PriceLogNewGiftpacksOrderItemForm;
+use app\plugins\mch\models\MchPriceLog;
 
 class PayCenterIntegralPayGiftpacksOrderForm extends BaseModel{
 
@@ -86,21 +88,33 @@ class PayCenterIntegralPayGiftpacksOrderForm extends BaseModel{
 
             //为用户生成礼包信息
             $query = GiftpacksDetailForm::availableItemsQuery($giftpacks);
-            $selects = ["gpi.id", "gpi.usable_times", "gpi.expired_at", "gpi.max_stock"];
+            $selects = ["s.mch_id", "gpi.id", "gpi.store_id", "gpi.item_price", "gpi.usable_times", "gpi.expired_at", "gpi.max_stock"];
             $items = $query->asArray()->select($selects)->all();
             foreach($items as $item){
+
+                //生成大礼包订单商品记录
+                $otherData = [
+                    'mch_id'     => $item['mch_id'],
+                    'store_id'   => $item['store_id'],
+                    'item_price' => $item['item_price']
+                ];
                 $orderItem = new GiftpacksOrderItem([
-                    'mall_id'      => $order->mall_id,
-                    'order_id'     => $order->id,
-                    'pack_item_id' => $item['id'],
-                    'max_num'      => $item['usable_times'],
-                    'current_num'  => $item['usable_times'],
-                    'expired_at'   => $item['expired_at']
+                    'mall_id'         => $order->mall_id,
+                    'order_id'        => $order->id,
+                    'pack_item_id'    => $item['id'],
+                    'max_num'         => $item['usable_times'],
+                    'current_num'     => $item['usable_times'],
+                    'expired_at'      => $item['expired_at'],
+                    'other_json_data' => json_encode($otherData)
                 ]);
                 if(!$orderItem->save()){
                     throw new \Exception($this->responseErrorMsg($orderItem));
                 }
+
+                //生成大礼包订单商户结算记录
+                PriceLogNewGiftpacksOrderItemForm::create($orderItem);
             }
+
 
             $t->commit();
 

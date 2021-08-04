@@ -12,6 +12,7 @@ class GiftpacksSaveItemForm extends BaseModel{
 
     public $name;
     public $cover_pic;
+    public $item_price;
     public $pack_id;
     public $store_id;
     public $goods_id;
@@ -21,7 +22,7 @@ class GiftpacksSaveItemForm extends BaseModel{
 
     public function rules(){
         return [
-            [['name', 'cover_pic', 'pack_id', 'store_id',
+            [['name', 'cover_pic', 'item_price', 'pack_id', 'store_id',
               'goods_id', 'expired_at', 'max_stock', 'usable_times'], 'required']
         ];
     }
@@ -53,8 +54,18 @@ class GiftpacksSaveItemForm extends BaseModel{
                 $item = new GiftpacksItem($uniqueData);
             }
 
+            //总结算价不能大于大礼包价格
+            $totalItemPrice = $this->item_price + (float)GiftpacksItem::find()->where([
+                "is_delete" => 0,
+                "pack_id"   => $giftpacks->id
+            ])->andWhere(["NOT IN", "id", [$item ? $item->id : 0]])->sum("item_price");
+            if($totalItemPrice > $giftpacks->price){
+                throw new \Exception("总结算价不能大于大礼包价：" . $giftpacks->price);
+            }
+
             $item->name       = $this->name;
             $item->cover_pic  = $this->cover_pic;
+            $item->item_price = $this->item_price;
             $item->created_at = time();
             $item->updated_at = time();
             $item->expired_at = !empty($this->expired_at) ? strtotime($this->expired_at) : 0;

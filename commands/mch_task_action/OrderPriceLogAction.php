@@ -2,32 +2,18 @@
 
 namespace app\commands\mch_task_action;
 
-use app\core\ApiCode;
-use app\mch\forms\mch\MchAccountModifyForm;
-use app\models\Mall;
 use app\models\Order;
 use app\models\OrderDetail;
-use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchPriceLog;
-use yii\base\Action;
 
-class OrderPriceLogAction extends Action{
+class OrderPriceLogAction extends BasePriceLogAction{
 
-    public function run(){
-        while(true) {
-            if(!$this->doSuccess()){
-                if(!$this->doCanceled()){
-                    sleep(5);
-                }
-            }
-        }
-    }
 
     /**
-     * 未结算，订单已确认收货
-     * @return boolean
+     * 获取可结算记录
+     * @return MchPriceLog
      */
-    private function doSuccess(){
+    public function getPriceLog(){
         $query = MchPriceLog::find()->alias("mpl")
                     ->innerJoin(["od" => OrderDetail::tableName()], "mpl.source_id=od.id")
                     ->innerJoin(["o" => Order::tableName()], "o.id=od.order_id");
@@ -42,57 +28,20 @@ class OrderPriceLogAction extends Action{
             ["o.is_confirm" => 1]
         ]);
 
-        $data = $query->select([
-            "mpl.id", "mpl.mall_id", "mpl.mch_id", "mpl.store_id",
-            "mpl.price", "mpl.content", "mpl.other_json_data"
-        ])->asArray()->orderBy("mpl.updated_at ASC")->one();
+        $data = $query->select(["mpl.id"])->asArray()->orderBy("mpl.updated_at ASC")->one();
 
         if(!$data){
             return false;
         }
 
-        $otherData = (array)@json_decode($data['other_json_data']);
-
-        MchPriceLog::updateAll(["updated_at" => time()], ["id" => $data['id']]);
-
-        \Yii::$app->mall = Mall::findOne($data['mall_id']);
-
-        $t = \Yii::$app->getDb()->beginTransaction();
-        try {
-
-            //修改商家帐户
-            $mch = Mch::findOne($data['mch_id']);
-            if($mch && !$mch->is_delete){
-                $res = MchAccountModifyForm::modify($mch, $data['price'], $data['content'], true);
-                if($res['code'] != ApiCode::CODE_SUCCESS){
-                    $otherData['remark'] = $res['msg'];
-                }
-            }else{
-                $otherData['remark'] = "无法获取商家[ID:".$data['mch_id']."]信息";
-            }
-
-            //设置结算记录状态为已成功
-            MchPriceLog::updateAll([
-                "updated_at"      => time(),
-                "status"          => "success",
-                "other_json_data" => json_encode($otherData)
-            ], ["id" => $data['id']]);
-
-            $t->commit();
-
-            $this->controller->commandOut("商家订单结算记录[ID:".$data['id']."]处理成功");
-
-        }catch (\Exception $e){
-            $t->rollBack();
-            $this->controller->commandOut($e->getMessage());
-        }
+        return MchPriceLog::findOne($data['id']);
     }
 
     /**
-     * 未结算，已退款
+     * 设置结算失败
      * @return boolean
      */
-    private function doCanceled(){
+    protected function doCanceled(){
         $query = MchPriceLog::find()->alias("mpl")
             ->innerJoin(["od" => OrderDetail::tableName()], "mpl.source_id=od.id")
             ->innerJoin(["o" => Order::tableName()], "o.id=od.order_id");

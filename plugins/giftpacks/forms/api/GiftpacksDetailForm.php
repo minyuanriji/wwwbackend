@@ -16,6 +16,7 @@ use app\plugins\giftpacks\models\GiftpacksGroupPackItem;
 use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
+use app\plugins\mch\models\Mch;
 
 class GiftpacksDetailForm extends BaseModel{
 

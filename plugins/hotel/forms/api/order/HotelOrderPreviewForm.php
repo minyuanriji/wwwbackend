@@ -58,6 +58,11 @@ class HotelOrderPreviewForm extends BaseModel{
 
             //用户最近入住酒店信息
             $user_hotel_info = $this->getUserHotelOrderInfo($user->id);
+            if ($user_hotel_info) {
+                $booking_passengers = $user_hotel_info->booking_passengers;
+            } else {
+                $booking_passengers = [];
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
@@ -71,7 +76,7 @@ class HotelOrderPreviewForm extends BaseModel{
                     'days'              => (int)$this->days,
                     'hotel_info'        => ApiHotelHelper::format($hotel),
                     'booking_item'      => $bookingItem,
-                    'hotel_order_info'  => $user_hotel_info
+                    'hotel_order_info'  => $booking_passengers
                 ]
             ];
         }catch (\Exception $e){

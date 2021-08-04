@@ -37,7 +37,7 @@ class RevenueRecordCommissionNotification
                 $keyword2 = '推荐门店分佣';
                 break;
             case 'checkout':
-                $keyword2 = '推荐门店分佣';
+                $keyword2 = '门店消费分佣';
                 break;
             case 'boss':
                 $keyword2 = '股东分红';

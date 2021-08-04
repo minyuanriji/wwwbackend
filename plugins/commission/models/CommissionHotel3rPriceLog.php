@@ -4,6 +4,7 @@ namespace app\plugins\commission\models;
 
 
 use app\models\BaseActiveRecord;
+use app\models\User;
 
 
 class CommissionHotel3rPriceLog extends BaseActiveRecord
@@ -25,5 +26,10 @@ class CommissionHotel3rPriceLog extends BaseActiveRecord
             [['mall_id', 'hotel_order_id', 'user_id', 'date', 'status', 'created_at', 'updated_at'], 'required'],
             [['rule_data_json'], 'safe']
         ];
+    }
+
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 }

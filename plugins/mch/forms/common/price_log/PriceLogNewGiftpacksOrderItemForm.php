@@ -21,7 +21,7 @@ class PriceLogNewGiftpacksOrderItemForm extends BaseModel{
                 "is_delete"     => 0
             ]);
             if(!$mch){
-                throw new \Exception("商户信息不存在");
+                throw new \Exception("商户[ID:".$otherData['mch_id']."]信息不存在");
             }
 
             $uniqueData = [

@@ -6,6 +6,7 @@ use app\models\BaseModel;
 use app\models\User;
 use app\plugins\hotel\helpers\ApiHotelHelper;
 use app\plugins\hotel\helpers\OrderHelper;
+use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelRoom;
 use app\plugins\hotel\models\Hotels;
 
@@ -55,18 +56,22 @@ class HotelOrderPreviewForm extends BaseModel{
             //用红包抵扣需要的数量
             $integralPrice = OrderHelper::getIntegralPrice($orderPrice);
 
+            //用户最近入住酒店信息
+            $user_hotel_info = $this->getUserHotelOrderInfo($user->id);
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'order_price'    => floatval($orderPrice),
-                    'integral_price' => floatval($integralPrice),
-                    'user_integral'  => floatval($user->static_integral),
-                    'num'            => intval($this->num),
-                    'start_day'      => $this->start_date,
-                    'end_day'        => $endDay,
-                    'days'           => (int)$this->days,
-                    'hotel_info'     => ApiHotelHelper::format($hotel),
-                    'booking_item'   => $bookingItem
+                    'order_price'       => floatval($orderPrice),
+                    'integral_price'    => floatval($integralPrice),
+                    'user_integral'     => floatval($user->static_integral),
+                    'num'               => intval($this->num),
+                    'start_day'         => $this->start_date,
+                    'end_day'           => $endDay,
+                    'days'              => (int)$this->days,
+                    'hotel_info'        => ApiHotelHelper::format($hotel),
+                    'booking_item'      => $bookingItem,
+                    'hotel_order_info'  => $user_hotel_info
                 ]
             ];
         }catch (\Exception $e){
@@ -143,5 +148,15 @@ class HotelOrderPreviewForm extends BaseModel{
             throw new \Exception("无法查询到酒店预订信息");
         }
         return $bookingItem;
+    }
+
+    /**
+     * 获取用戶最近一个订单信息
+     * @return Hotels
+     * @throws \Exception
+     */
+    protected function getUserHotelOrderInfo($user_id){
+        $hotel_order = HotelOrder::find()->where(['user_id' => $user_id])->select('booking_passengers')->orderBy('id desc')->one();
+        return $hotel_order;
     }
 }

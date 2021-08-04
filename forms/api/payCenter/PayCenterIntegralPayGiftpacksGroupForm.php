@@ -179,16 +179,26 @@ class PayCenterIntegralPayGiftpacksGroupForm extends BaseModel{
                                 "ggpi.group_id" => $group->id,
                                 "ggpi.mall_id"  => $group->mall_id
                             ])->select([
+                                "s.mch_id", "gpi.store_id", "gpi.item_price",
                                 "ggpi.pack_item_id", "gpi.usable_times", "gpi.expired_at", "gpi.max_stock", "ggpi.user_id"
                             ])->asArray()->all();
                 foreach($items as $item){
+
+                    //生成大礼包订单商品记录
+                    $otherData = [
+                        'mch_id'     => $item['mch_id'],
+                        'store_id'   => $item['store_id'],
+                        'item_price' => $item['item_price']
+                    ];
+
                     $orderItem = new GiftpacksOrderItem([
-                        'mall_id'      => $giftpacks->mall_id,
-                        'order_id'     => $userOrderIds[$item['user_id']],
-                        'pack_item_id' => $item['pack_item_id'],
-                        'max_num'      => $item['usable_times'],
-                        'current_num'  => $item['usable_times'],
-                        'expired_at'   => $item['expired_at']
+                        'mall_id'         => $giftpacks->mall_id,
+                        'order_id'        => $userOrderIds[$item['user_id']],
+                        'pack_item_id'    => $item['pack_item_id'],
+                        'max_num'         => $item['usable_times'],
+                        'current_num'     => $item['usable_times'],
+                        'expired_at'      => $item['expired_at'],
+                        'other_json_data' => json_encode($otherData)
                     ]);
                     if(!$orderItem->save()){
                         throw new \Exception($this->responseErrorMsg($orderItem));

@@ -15,8 +15,8 @@ class GiftpacksOrderPriceLogAction extends BasePriceLogAction {
      */
     public function getPriceLog(){
         $query = MchPriceLog::find()->alias("mpl")
-            ->innerJoin(["goi" => GiftpacksOrderItem::tableName()], "goi.id=mpl.source_id")
-            ->innerJoin(["go" => GiftpacksOrder::tableName()], "go.id=goi.order_id");
+                    ->innerJoin(["goi" => GiftpacksOrderItem::tableName()], "goi.id=mpl.source_id")
+                    ->innerJoin(["go" => GiftpacksOrder::tableName()], "go.id=goi.order_id");
         $query->where([
             "mpl.status"      => "unconfirmed",
             "mpl.source_type" => "giftpacks_order_item",

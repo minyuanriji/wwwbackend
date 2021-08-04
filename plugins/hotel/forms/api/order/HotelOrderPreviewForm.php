@@ -76,7 +76,7 @@ class HotelOrderPreviewForm extends BaseModel{
                     'days'              => (int)$this->days,
                     'hotel_info'        => ApiHotelHelper::format($hotel),
                     'booking_item'      => $bookingItem,
-                    'hotel_order_info'  => $booking_passengers
+                    'hotel_order_info'  => json_decode($booking_passengers,true)
                 ]
             ];
         }catch (\Exception $e){

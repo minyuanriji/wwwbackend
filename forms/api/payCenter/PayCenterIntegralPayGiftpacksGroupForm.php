@@ -6,6 +6,7 @@ namespace app\forms\api\payCenter;
 use app\core\ApiCode;
 use app\forms\common\UserIntegralForm;
 use app\models\BaseModel;
+use app\models\Store;
 use app\models\User;
 use app\plugins\giftpacks\forms\api\GiftpacksDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderSubmitForm;
@@ -175,6 +176,7 @@ class PayCenterIntegralPayGiftpacksGroupForm extends BaseModel{
                 //生成礼包订单项记录
                 $items = GiftpacksGroupPackItem::find()->alias("ggpi")
                             ->innerJoin(["gpi" => GiftpacksItem::tableName()], "gpi.id=ggpi.pack_item_id")
+                            ->innerJoin(["s" => Store::tableName()], "s.id=gpi.store_id")
                             ->where([
                                 "ggpi.group_id" => $group->id,
                                 "ggpi.mall_id"  => $group->mall_id

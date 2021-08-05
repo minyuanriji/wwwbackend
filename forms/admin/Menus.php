@@ -804,6 +804,10 @@ class Menus
                         'route' => 'mall/finance/index',
                     ],
                     [
+                        'name' => '财务概况',
+                        'route' => 'plugin/finance_analysis/mall/finance/analysis',
+                    ],
+                    [
                         'name' => '余额记录',
                         'route' => 'mall/finance/balance-log',
                     ],

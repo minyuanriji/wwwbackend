@@ -201,10 +201,12 @@ class GoodsList extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
+
         $this->getQuery();
+        $this->sortWhere();
         return $this->query->page($this->pagination, $this->limit, $this->page)
             ->groupBy($this->group_by_name)
-            ->orderBy('id DESC')
+            //->orderBy('id DESC')
             ->asArray($this->is_array)
             ->all();
     }
@@ -318,10 +320,11 @@ class GoodsList extends BaseModel
                 break;
             // 销量
             case 4:
-                $this->query->orderBy([
+                $this->query->orderBy('g.virtual_sales DESC, g.created_at DESC');
+                /*$this->query->orderBy([
                     'total_sales' => SORT_DESC,
                     'g.id' => SORT_DESC,
-                ]);
+                ]);*/
                 break;
             case 5:
                 $this->query->orderBy('g.updated_at DESC');

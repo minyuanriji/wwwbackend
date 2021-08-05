@@ -53,7 +53,6 @@ class Menus
      */
     public static function getMallMenus($isPluginMenus = false)
     {
-
         $menu_item = [
             'name' => '',
             'key' => '',
@@ -62,7 +61,6 @@ class Menus
             'icon_active' => '',
             'children' => [],
         ];
-
         $mallMenus = [
             [
                 'name' => '概况',
@@ -851,11 +849,46 @@ class Menus
                             ],
                         ]
                     ],
-                   
-
                 ],
             ],
-
+            [
+                'name' => '分佣',
+                'key' => 'commission',
+                'route' => '',
+                'icon' => 'statics/img/mall/nav/Sub-Commission.png',
+                'icon_active' => 'statics/img/mall/nav/Sub-Commission.png',
+                'icon_font' => 'el-icon-s-tools',
+                'children' => [
+                    [
+                        'name' => '商品消费分佣记录',
+                        'route' => 'mall/commission/goods-consume-log',
+                    ],
+                    [
+                        'name' => '门店推荐分佣记录',
+                        'route' => 'mall/commission/store-recommend-log',
+                    ],
+                    [
+                        'name' => '门店结账分佣记录',
+                        'route' => 'mall/commission/store-scan-code-log',
+                    ],
+                    [
+                        'name' => '酒店推荐分佣记录',
+                        'route' => 'mall/commission/hotel-recommend-log',
+                    ],
+                    [
+                        'name' => '酒店消费分佣记录',
+                        'route' => 'mall/commission/hotel-scan-code-log',
+                    ],
+                    [
+                        'name' => '话费推荐分佣记录',
+                        'route' => 'mall/commission/addcredit-recommend-log',
+                    ],
+                    [
+                        'name' => '话费充值分佣记录',
+                        'route' => 'mall/commission/addcredit-scan-code-log',
+                    ],
+                ],
+            ],
             [
                 'key' => 'course',
                 'name' => '教程管理',

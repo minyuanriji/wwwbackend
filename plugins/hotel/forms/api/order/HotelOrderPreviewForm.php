@@ -157,8 +157,6 @@ class HotelOrderPreviewForm extends BaseModel{
 
     /**
      * 获取用戶最近一个订单信息
-     * @return Hotels
-     * @throws \Exception
      */
     protected function getUserHotelOrderInfo($user_id){
         $hotel_order = HotelOrder::find()->where(['user_id' => $user_id])->select('booking_passengers')->orderBy('id desc')->one();

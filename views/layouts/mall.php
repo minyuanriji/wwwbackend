@@ -330,7 +330,8 @@ $currentRoute = Yii::$app->controller->route;
                              @mouseenter="_aside.mouseenterEvent2()"
                              @mouseleave="_aside.mouseleaveEvent2()"
                              class="left-menu left-menu-2"
-                             :class="{'left-menu-2-show': !_aside.isShowMenu}">
+                             :class="{'left-menu-2-show': !_aside.isShowMenu}"
+                             style="width: 160px;">
                             <!-- 展示收起按钮 -->
                             <div @click="_aside.isShowMenu = false" v-if="_aside.isShowMenu" class="is-show-menu-1">
                                 <i class="el-icon-s-fold"></i>

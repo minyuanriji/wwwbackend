@@ -802,12 +802,12 @@ class Menus
                 'icon_font' => 'el-icon-s-finance',
                 'children' => [
                     [
-                        'name' => '财务概况',
-                        'route' => 'mall/finance-analysis/index',
-                    ],
-                    [
                         'name' => '用户财务',
                         'route' => 'mall/finance/index',
+                    ],
+                    [
+                        'name' => '财务概况',
+                        'route' => 'plugin/finance_analysis/mall/finance/analysis',
                     ],
                     [
                         'name' => '余额记录',

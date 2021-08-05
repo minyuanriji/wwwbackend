@@ -1,12 +1,3 @@
-<?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Author: zal
- * Date: 2020-04-14
- * Time: 17:19
- */
-?>
 <style>
     .form-body {
         padding: 20px 0;
@@ -115,9 +106,9 @@
                             self.btnLoading = false;
                             if (e.data.code == 0) {
                                 self.$message.success(e.data.msg);
-                                navigateTo({
+                                /*navigateTo({
                                     r: 'mall/role-user/index'
-                                })
+                                })*/
                             } else {
                                 self.$message.error(e.data.msg);
                             }

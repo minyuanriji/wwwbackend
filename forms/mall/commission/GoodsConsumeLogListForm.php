@@ -78,9 +78,11 @@ class GoodsConsumeLogListForm extends BaseModel
                     $user = User::findOne($order->user_id);
                     $item['buy_user_name'] = $user ? $user->nickname : '';
                     $item['order_no'] = $order->order_no;
+                    $item['total_pay_price'] = $order->total_pay_price;
                 } else {
                     $item['order_no'] = '';
                     $item['buy_user_name'] = '';
+                    $item['total_pay_price'] = '';
                 }
                 $item['identity'] = '';
                 if (isset($item['user']['role_type'])) {

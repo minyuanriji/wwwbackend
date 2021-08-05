@@ -45,6 +45,7 @@
                         <div>扣除积分：<b style="color:#cc3311">{{scope.row.use_score_price}}</b></div>
                         <div>扣除红包：<b style="color:#cc3311">{{scope.row.integral_price}}</b></div>
                         <div>商品总价(优惠后)：<b style="color:#cc3311">{{scope.row.total_price}}元</b></div>
+                        <div>实际支付（含运费）：<b style="color:#cc3311">{{scope.row.total_pay_price}}元</b></div>
                     </template>
                 </el-table-column>
 
@@ -56,7 +57,7 @@
                 </el-table-column>
 
                 <el-table-column label="收益(元)" width="180">
-                    <template slot-scope="scope">{{scope.row.price}}</template>
+                    <template slot-scope="scope"><b style="color: red">{{scope.row.price}}</b></template>
                 </el-table-column>
 
                 <el-table-column label="状态" width="180">

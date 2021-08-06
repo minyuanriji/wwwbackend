@@ -47,7 +47,12 @@ class PayCenterIntegralPayGiftpacksOrderForm extends BaseModel{
                 throw new \Exception("大礼包".$order->pack_id."不存在或已下架");
             }
 
-            //检查是否可以支付
+            //检查是否支持红包支付
+            if($giftpacks->allow_currency != "integral"){
+                throw new \Exception("不允许使用红包支付");
+            }
+
+            //检查是否可以下单
             GiftpacksOrderSubmitForm::check($giftpacks);
 
             if(\Yii::$app->user->id != $order->user_id){

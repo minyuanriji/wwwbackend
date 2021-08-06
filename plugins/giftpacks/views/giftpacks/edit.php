@@ -21,13 +21,24 @@
                 <com-image mode="aspectFill" width='80px' height='80px' :src="formData.cover_pic"></com-image>
             </el-form-item>
             <el-form-item label="库存" prop="max_stock">
-                <el-input type="number" style="width:150px" v-model="formData.max_stock"></el-input>
+                <el-input type="number" style="width:150px" v-model="formData.max_stock">
+                    <template slot="append">件</template>
+                </el-input>
             </el-form-item>
             <el-form-item label="价格" prop="price">
-                <el-input type="number" style="width:150px" v-model="formData.price"></el-input>
+                <el-input type="number" style="width:150px" v-model="formData.price">
+                    <template slot="append">元</template>
+                </el-input>
             </el-form-item>
             <el-form-item label="利润" prop="profit_price">
-                <el-input type="number" style="width:150px" v-model="formData.profit_price"></el-input>
+                <el-input type="number" style="width:150px" v-model="formData.profit_price">
+                    <template slot="append">元</template>
+                </el-input>
+            </el-form-item>
+            <el-form-item label="限购" prop="purchase_limits_num">
+                <el-input type="number" style="width:150px" v-model="formData.purchase_limits_num">
+                    <template slot="append">件</template>
+                </el-input>
             </el-form-item>
 
             <el-form-item label="拼团" prop="group_enable">
@@ -67,6 +78,7 @@
             max_stock: 0,
             price: 0,
             profit_price: 0,
+            purchase_limits_num: 1,
             descript: '',
             group_enable: false,
             group_price: 0,
@@ -99,6 +111,9 @@
                 ],
                 profit_price: [
                     {required: true, message: '利润不能为空', trigger: 'change'}
+                ],
+                purchase_limits_num:[
+                    {required: true, message: '限购数量不能为空', trigger: 'change'}
                 ]
             },
             savedCallFn : null

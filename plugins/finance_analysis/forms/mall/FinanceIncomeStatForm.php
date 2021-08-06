@@ -79,8 +79,8 @@ class FinanceIncomeStatForm extends BaseModel{
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    "total_income"   => $totalIncome,
-                    "total_disburse" => $totalDisburse
+                    "total_income"   => round($totalIncome, 2),
+                    "total_disburse" => round($totalDisburse, 2)
                 ]
             ];
         }catch (\Exception $e){

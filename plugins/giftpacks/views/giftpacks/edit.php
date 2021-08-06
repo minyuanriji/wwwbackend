@@ -20,25 +20,54 @@
                 </com-attachment>
                 <com-image mode="aspectFill" width='80px' height='80px' :src="formData.cover_pic"></com-image>
             </el-form-item>
-            <el-form-item label="库存" prop="max_stock">
-                <el-input type="number" style="width:150px" v-model="formData.max_stock">
-                    <template slot="append">件</template>
-                </el-input>
-            </el-form-item>
-            <el-form-item label="价格" prop="price">
-                <el-input type="number" style="width:150px" v-model="formData.price">
-                    <template slot="append">元</template>
-                </el-input>
-            </el-form-item>
-            <el-form-item label="利润" prop="profit_price">
-                <el-input type="number" style="width:150px" v-model="formData.profit_price">
-                    <template slot="append">元</template>
-                </el-input>
-            </el-form-item>
-            <el-form-item label="限购" prop="purchase_limits_num">
-                <el-input type="number" style="width:150px" v-model="formData.purchase_limits_num">
-                    <template slot="append">件</template>
-                </el-input>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="库存" prop="max_stock">
+                        <el-input type="number" style="width:150px" v-model="formData.max_stock">
+                            <template slot="append">件</template>
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="价格" prop="price">
+                        <el-input type="number" style="width:150px" v-model="formData.price">
+                            <template slot="append">元</template>
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="利润" prop="profit_price">
+                        <el-input type="number" style="width:150px" v-model="formData.profit_price">
+                            <template slot="append">元</template>
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="限购" prop="purchase_limits_num">
+                        <el-input type="number" style="width:150px" v-model="formData.purchase_limits_num">
+                            <template slot="append">件</template>
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
+            <el-form-item label="支付模式" prop="allow_currency">
+                <el-radio v-model="formData.allow_currency" label="money">现金</el-radio>
+                <el-radio v-model="formData.allow_currency" label="integral">红包</el-radio>
+                <el-card shadow="never" v-if="formData.allow_currency == 'money'">
+                    <el-form-item label="返红包" prop="integral_enable">
+                        <el-switch
+                                v-model="formData.integral_enable"
+                                active-text="启用"
+                                inactive-text="关闭">
+                        </el-switch>
+                    </el-form-item>
+                    <el-form-item label="数量" prop="integral_give_num" v-if="formData.integral_enable">
+                        <el-input type="number" style="width:150px" v-model="formData.integral_give_num"></el-input>
+                    </el-form-item>
+                </el-card>
             </el-form-item>
 
             <el-form-item label="拼团" prop="group_enable">
@@ -83,7 +112,10 @@
             group_enable: false,
             group_price: 0,
             group_need_num: 0,
-            group_expire_time: ''
+            group_expire_time: '',
+            allow_currency: 'money',
+            integral_enable: false,
+            integral_give_num: 0
         };
     }
     const editApp = new Vue({
@@ -114,6 +146,9 @@
                 ],
                 purchase_limits_num:[
                     {required: true, message: '限购数量不能为空', trigger: 'change'}
+                ],
+                allow_currency: [
+                    {required: true, message: '请选择支付模式', trigger: 'change'}
                 ]
             },
             savedCallFn : null
@@ -125,8 +160,10 @@
                 this.savedCallFn = fn;
                 if(row != null){
                     var groupEnable = row.group_enable == 1 ? true : false;
+                    var integralEnable = row.integral_enable == 1 ? true : false;
                     this.formData = row;
                     this.formData['group_enable'] = groupEnable;
+                    this.formData['integral_enable'] = integralEnable;
                 }else{
                     this.formData = initFormData();
                 }
@@ -140,7 +177,8 @@
                     let self = this;
                     if (valid) {
                         self.btnLoading = true;
-                        formData['group_enable'] = formData['group_enable'] ? 1 : 0;
+                        formData['integral_enable']   = formData['integral_enable'] ? 1 : 0;
+                        formData['group_enable']      = formData['group_enable'] ? 1 : 0;
                         formData['group_expire_time'] = 3600 * formData['group_expire_time'];
                         request({
                             params: {

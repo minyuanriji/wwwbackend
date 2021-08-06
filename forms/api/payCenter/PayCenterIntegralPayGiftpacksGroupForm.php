@@ -62,6 +62,12 @@ class PayCenterIntegralPayGiftpacksGroupForm extends BaseModel{
                 throw new \Exception("大礼包不存在");
             }
 
+            //检查是否支持红包支付
+            if($giftpacks->allow_currency != "integral"){
+                throw new \Exception("不允许使用红包支付");
+            }
+
+            //检查是否可以下单
             GiftpacksOrderSubmitForm::check($giftpacks);
 
             if(!$giftpacks->group_enable){

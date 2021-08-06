@@ -789,6 +789,18 @@ class Menus
                         'route' => 'plugin/integral_card/admin/card/index',
 
                     ],
+                    [
+                        'name' => '积分自动发放计划',
+                        'route' => '',
+                        'children' => [
+                            [
+                                'name' => '积分管理列表',
+                                'route' => 'mall/integral/index',
+                                'action' => [
+                                ]
+                            ],
+                        ]
+                    ],
                 ],
             ],
             [

@@ -32,19 +32,26 @@
                     <div style="color:green">+{{total_income}}元</div>
                     <div class="info-item-name">
                         <span>收入</span>
-                        <el-tooltip class="item" effect="dark" :content="income_tooltip" placement="bottom">
+                        <el-tooltip class="item" effect="dark" :content="income_tip" placement="bottom">
                             <i class="el-icon-question"></i>
                         </el-tooltip>
                     </div>
                 </div>
 
                 <div class="num-info-item">
-                    <div style="color:red">-{{total_disburse}}元</div>
+                    <div style="color:red">{{total_disburse}}元</div>
                     <div class="info-item-name">
                         <span>支出</span>
                         <el-tooltip class="item" effect="dark" :content="disburse_tip" placement="bottom">
                             <i class="el-icon-question"></i>
                         </el-tooltip>
+                    </div>
+                </div>
+
+                <div class="num-info-item">
+                    <div>{{total_profit}}元</div>
+                    <div class="info-item-name">
+                        <span>毛利</span>
                     </div>
                 </div>
 
@@ -88,6 +95,11 @@
                     return s[this.search.s_date];
                 }
                 return 0;
+            },
+            total_profit:function(){
+                var profit = this.total_income + this.total_disburse;
+                profit = profit.toFixed(2);
+                return profit;
             }
         },
         methods: {
@@ -107,7 +119,10 @@
                     if (e.data.code == 0) {
                         self.total_income = e.data.data.total_income;
                         self.total_disburse = e.data.data.total_disburse;
-                    } else {
+                        if(self.total_disburse != 0 ){
+                            self.total_disburse = -1 * self.total_disburse;
+                        }
+                     } else {
                         self.$message.error(e.data.msg);
                     }
                 }).catch(e => {
@@ -149,7 +164,7 @@
 
     .com-analysis-income .num-info .num-info-item {
         text-align: center;
-        width: 50%;
+        width: 33.3%;
         border-left: 1px dashed #EFF1F7;
     }
 

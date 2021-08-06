@@ -35,7 +35,7 @@ class PriceLogNewGiftpacksOrderItemForm extends BaseModel{
             if(!$priceLog){
 
                 //服务费比例
-                $serviceFeeRate = max(0, min(100, (int)$mch->transfer_rate));
+                $serviceFeeRate = 0;
 
                 //计算要结算给商家的钱
                 $amount = $otherData['item_price'];

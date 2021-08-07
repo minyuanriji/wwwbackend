@@ -34,7 +34,7 @@ Yii::$app->loadComponentView('com-attachment-edit')
                 <template slot-scope="scope">
                     <el-switch :disabled="scope.row.status == 1" @change="handleEnable(scope.row)" active-value="1"
                                inactive-value="0"
-                               v-model="scope.row.status"/>
+                               v-model="scope.row.status"></el-switch>
                 </template>
             </el-table-column>
             <el-table-column label="操作">

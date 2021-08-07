@@ -74,15 +74,19 @@
                 </el-table-column>
 
                 <el-table-column label="周期" width="80">
-                    <template slot-scope="scope">{{scope.row.period}}</template>
+                    <template slot-scope="scope">
+                        {{scope.row.period}}
+                        <span v-if="scope.row.period_unit == 'week'">周</span>
+                        <span v-if="scope.row.period_unit == 'month'">月</span>
+                    </template>
                 </el-table-column>
-
+<!--
                 <el-table-column prop="period_unit" label="周期单位" width="80">
                     <template slot-scope="scope">
                         <span v-if="scope.row.period_unit == 'week'">周</span>
                         <span v-if="scope.row.period_unit == 'month'">月</span>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
 
                 <el-table-column prop="type" label="积分类型">
                     <template slot-scope="scope">

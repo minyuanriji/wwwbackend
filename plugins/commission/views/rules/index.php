@@ -189,7 +189,7 @@
                     },
                     {
                         value: 'store',
-                        label: '门店'
+                        label: 'VIP会员'
                     },
                     {
                         value: 'hotel',

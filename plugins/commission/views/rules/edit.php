@@ -631,7 +631,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                             } else if (this.commissionHotelValue[i].name == '分公司') {
                                 this.commissionHotelValue[i].role_type = 'branch_office';
                                 this.commissionHotelValue[i].unique_key = "branch_office#all";
-                            } else if (this.commissionHotelValue[i].name == '店主') {
+                            } else if (this.commissionHotelValue[i].name == 'VIP会员') {
                                 this.commissionHotelValue[i].role_type = 'store';
                                 this.commissionHotelValue[i].unique_key = "store#all";
                             } else if (this.commissionHotelValue[i].name == '合伙人') {

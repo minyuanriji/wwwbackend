@@ -52,7 +52,7 @@
                         <el-option key="user" label="普通用户" value="user"></el-option>
                         <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
                         <el-option key="partner" label="合伙人" value="partner"></el-option>
-                        <el-option key="store" label="店主" value="store"></el-option>
+                        <el-option key="store" label="VIP会员" value="store"></el-option>
                     </el-select>
                 </el-form-item>
 

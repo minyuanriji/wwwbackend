@@ -260,6 +260,7 @@ class CommonGoods extends BaseModel
             \Yii::error('超级会员卡获取配置失败');
             \Yii::error($e);
         }
+        $detail['purchase_permission'] = $detail['purchase_permission'] ? json_decode($detail['purchase_permission'], true) : [];
         return $detail;
     }
 

@@ -412,11 +412,7 @@
                                         </el-checkbox-group>
                                     </div>
                                 </el-form-item>
-
-
-
                             </div>
-
                         </el-col>
                     </el-row>
                 </el-tab-pane>

@@ -389,6 +389,16 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         <el-switch :active-value="1" :inactive-value="0" v-model="ruleForm.is_on_site_consumption">
                                         </el-switch>
                                     </el-form-item>
+
+                                    <el-form-item label="购买权限" prop="purchase_permission">
+                                        <el-checkbox-group v-model="ruleForm.purchase_permission">
+                                            <el-checkbox label="user">普通用户</el-checkbox>
+                                            <el-checkbox label="store">VIP会员</el-checkbox>
+                                            <el-checkbox label="partner">合伙人</el-checkbox>
+                                            <el-checkbox label="branch_office">分公司</el-checkbox>
+                                        </el-checkbox-group>
+                                    </el-form-item>
+
                                     <!-- 自定义 -->
                                     <el-dialog :title="app_share['type'] == 'pic_bg' ? `查看自定义分享图片图例`:`查看自定义分享标题图例`" :visible.sync="app_share.dialog" width="30%">
                                         <div flex="dir:left main:center" class="app-share">
@@ -930,7 +940,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         </el-switch>
                                         <div v-if="ruleForm.enable_upgrade_user_role == 1">
                                             <el-select v-model="ruleForm.upgrade_user_role_type">
-                                                <el-option :label="'店主'" :value="'store'"></el-option>
+                                                <el-option :label="'VIP会员'" :value="'store'"></el-option>
                                                 <el-option :label="'合伙人'" :value="'partner'"></el-option>
                                                 <el-option :label="'分公司'" :value="'branch_office'"></el-option>
                                             </el-select>
@@ -1086,10 +1096,12 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         <com-goods-distribution-new v-model="ruleForm" :is_mch="is_mch" :goods_type="goods_type" :goods_id="goods_id" v-if="activeName == 'third'">
                         </com-goods-distribution-new>
                     </el-tab-pane>
+
                     <el-tab-pane label="经销设置" name="fourth" v-if="is_show_agent">
                         <com-goods-agent v-model="ruleForm" :is_mch="is_mch" :goods_type="goods_type" :goods_id="goods_id" v-if="activeName == 'fourth'">
                         </com-goods-agent>
                     </el-tab-pane>
+
                     <el-tab-pane label="区域设置" name="fifth" v-if="is_show_area">
                         <com-goods-area v-model="ruleForm" :is_mch="is_mch" :goods_type="goods_type" :goods_id="goods_id" v-if="activeName == 'fifth'">
                         </com-goods-area>
@@ -1302,9 +1314,10 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 fulfil_price: 0,
                 cannotrefund:["1","2","3"],
                 profit_price: 0,  //商品利润
-                enable_upgrade_user_role:0, //下单后升级会员店主、合伙人或分公司
+                enable_upgrade_user_role:0, //下单后升级会员VIP会员、合伙人或分公司
                 upgrade_user_role_type: '',
-                product: ''
+                product: '',
+                purchase_permission: [],
             };
             let rules = {
                 cats: [{
@@ -1392,7 +1405,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 priceName_page: 1,
                 priceName_page_count: 0,
                 detail_data: '',
-
                 goods_id: 0,
                 keyword: '',
                 goods_type: 'MALL_GOODS',
@@ -1460,7 +1472,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 use_score: 0,
                 video_type: 1,
                 cardDialogVisible: false,
-
                 // 积分券赠送数据
                 score_setting: {
                     "integral_num": 0, //积分数量
@@ -1469,8 +1480,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     "expire": 30 //有效天数
                 },
                 isPermanentScore: 0, //默认永久
-
-
                 // 红包券赠送数据
                 integral_setting: {
                     "integral_num": 0, //积分数量
@@ -1479,8 +1488,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     "expire": 30 //有效天数
                 },
                 isPermanent: 0, //默认永久
-
-
                 // 红包券赠送数据
                 order_paid: {
                     is_score:0,
@@ -1488,7 +1495,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     is_integral_card:0,
                     is_member_upgrade:0,
                 },
-
                 // 红包券赠送数据
                 order_sales: {
                     is_score:0,
@@ -1496,7 +1502,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     is_integral_card:0,
                     is_member_upgrade:0,
                 },
-
                 info: {
                     id: "1",
                     mall_id: "5",

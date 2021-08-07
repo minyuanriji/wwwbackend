@@ -35,7 +35,7 @@
                             <div>推荐人等级：
                                 <span v-if="scope.row.parent_role_type == 'branch_office'">分公司</span>
                                 <span v-if="scope.row.parent_role_type == 'partner'">合伙人</span>
-                                <span v-if="scope.row.parent_role_type == 'store'">店主</span>
+                                <span v-if="scope.row.parent_role_type == 'store'">VIP会员</span>
                                 <span v-if="scope.row.parent_role_type == 'user'">普通用户</span>
                             </DIV>
                         </div>
@@ -178,7 +178,7 @@
                             <div>{{apply.data.parent_mobile}}</div>
                         </el-form-item>
                         <el-form-item label="推荐人等级：">
-                            <div v-if="apply.data.parent_role_type == 'store'">店主</div>
+                            <div v-if="apply.data.parent_role_type == 'store'">VIP会员</div>
                             <div v-if="apply.data.parent_role_type == 'partner'">合伙人</div>
                             <div v-if="apply.data.parent_role_type == 'branch_office'">分公司</div>
                             <div v-if="apply.data.parent_role_type == 'user'">普通用户</div>

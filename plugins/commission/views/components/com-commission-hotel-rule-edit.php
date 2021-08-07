@@ -51,7 +51,7 @@
                         commisson_value:''
                     },
                     {
-                        name:'店主',
+                        name:'VIP会员',
                         commisson_value:''
                     },
                     {
@@ -71,7 +71,7 @@
                     this.level_list[i].name = '分公司';
                     this.level_list[i].commisson_value = this.chains[i].commisson_value;
                 } else if (this.chains[i].role_type == 'store') {
-                    this.level_list[i].name = '店主';
+                    this.level_list[i].name = 'VIP会员';
                     this.level_list[i].commisson_value = this.chains[i].commisson_value;
                 } else if (this.chains[i].role_type == 'partner') {
                     this.level_list[i].name = '合伙人';

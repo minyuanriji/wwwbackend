@@ -59,6 +59,7 @@ class GiftpacksGroupNewForm extends BaseModel{
             //生成待支付记录
             $payOrder = new GiftpacksGroupPayOrder([
                 'mall_id'    => \Yii::$app->mall->id,
+                "order_sn"   => "GPPO" . date("ymdHis") . rand(1000, 9999),
                 'group_id'   => $group->id,
                 'user_id'    => \Yii::$app->user->id,
                 'pay_status' => 'unpaid'

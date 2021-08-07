@@ -41,15 +41,16 @@ class GiftpacksGroupNewForm extends BaseModel{
 
             //生成拼单记录，把状态设置为已关闭
             $group = new GiftpacksGroup([
-                'mall_id'    => \Yii::$app->mall->id,
-                'pack_id'    => $giftpacks->id,
-                'user_id'    => \Yii::$app->user->id,
-                'need_num'   => $giftpacks->group_need_num,
-                'user_num'   => 0,
-                'status'     => 'closed',
-                'expired_at' => (time() + $giftpacks->group_expire_time),
-                'created_at' => time(),
-                'updated_at' => time()
+                'mall_id'       => \Yii::$app->mall->id,
+                'pack_id'       => $giftpacks->id,
+                'user_id'       => \Yii::$app->user->id,
+                'need_num'      => $giftpacks->group_need_num,
+                'user_num'      => 0,
+                'status'        => 'closed',
+                'expired_at'    => (time() + $giftpacks->group_expire_time),
+                'created_at'    => time(),
+                'updated_at'    => time(),
+                "process_class" => "app\\plugins\\giftpacks\\forms\\common\\GiftpacksGroupPaidProcessForm"
             ]);
             if(!$group->save()){
                 throw new \Exception($this->responseErrorMsg($group));

@@ -2,12 +2,10 @@
 
 namespace app\commands\giftpacks_action;
 
-use app\core\ApiCode;
-use app\forms\common\UserIntegralGiftpacksForm;
 use app\models\Mall;
-use app\models\User;
+use app\plugins\giftpacks\forms\common\GiftpacksGroupCancelRefundProcessForm;
+use app\plugins\giftpacks\forms\common\GiftpacksGroupRefundProcessForm;
 use app\plugins\giftpacks\models\GiftpacksGroup;
-use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
 use yii\base\Action;
 
 class GroupCancelAction extends Action{
@@ -37,36 +35,7 @@ class GroupCancelAction extends Action{
             $t = \Yii::$app->db->beginTransaction();
             try {
 
-                //获取支付记录
-                $payOrders = GiftpacksGroupPayOrder::find()->where([
-                    "pay_status" => "paid",
-                    "group_id"   => $group->id
-                ])->all();
-                if($payOrders){
-                    foreach($payOrders as $payOrder){ //退红包
-                        $user = User::findOne($payOrder->user_id);
-                        if(!$user) continue;
-                        if($payOrder->pay_type == "integral"){
-                            $res = UserIntegralGiftpacksForm::groupCancelRefundAdd($payOrder, $user, false);
-                            if($res['code'] != ApiCode::CODE_SUCCESS){
-                                $payOrder->remark = $res['msg'];
-                            }else{
-                                $payOrder->pay_status = "refund";
-                            }
-                        }else{
-                            $payOrder->remark = "未实现除红包外的退款";
-                        }
-                        if(!$payOrder->save()){
-                            throw new \Exception(json_encode($payOrder->getErrors()));
-                        }
-                    }
-                }
-
-                $group->status = "closed";
-                $group->updated_at = time();
-                if(!$group->save()){
-                    throw new \Exception(json_encode($group->getErrors()));
-                }
+                GiftpacksGroupCancelRefundProcessForm::refund($group);
 
                 $t->commit();
 
@@ -76,7 +45,6 @@ class GroupCancelAction extends Action{
                 $t->rollBack();
                 $this->controller->commandOut($e->getMessage());
             }
-
         }
     }
 

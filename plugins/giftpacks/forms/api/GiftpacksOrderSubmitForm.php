@@ -36,14 +36,15 @@ class GiftpacksOrderSubmitForm extends BaseModel{
             static::check($giftpacks);
 
             $order = new GiftpacksOrder([
-                "mall_id"     => \Yii::$app->mall->id,
-                "pack_id"     => $this->pack_id,
-                "user_id"     => \Yii::$app->user->id,
-                "order_sn"    => static::generateUniqueOrderSn(),
-                "order_price" => $giftpacks->price,
-                "created_at"  => time(),
-                "updated_at"  => time(),
-                "pay_status"  => "unpaid"
+                "mall_id"       => \Yii::$app->mall->id,
+                "pack_id"       => $this->pack_id,
+                "user_id"       => \Yii::$app->user->id,
+                "order_sn"      => static::generateUniqueOrderSn(),
+                "order_price"   => $giftpacks->price,
+                "created_at"    => time(),
+                "updated_at"    => time(),
+                "pay_status"    => "unpaid",
+                "process_class" => "app\\plugins\\giftpacks\\forms\\common\\GiftpacksOrderPaidProcessForm"
             ]);
 
             if(!$order->save()){

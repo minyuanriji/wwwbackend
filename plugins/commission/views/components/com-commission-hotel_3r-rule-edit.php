@@ -41,7 +41,7 @@
                                         <td v-for="role_type in chain.relationship">
                                             <span v-if="role_type == 'branch_office'">分公司</span>
                                             <span v-if="role_type == 'partner'">合伙人</span>
-                                            <span v-if="role_type == 'store'">店主</span>
+                                            <span v-if="role_type == 'store'">VIP会员</span>
                                             <span v-if="role_type == 'all'">消费者</span>
                                         </td>
                                         <td>
@@ -86,7 +86,7 @@
                                         <td v-for="role_type in chain.relationship">
                                             <span v-if="role_type == 'branch_office'">分公司</span>
                                             <span v-if="role_type == 'partner'">合伙人</span>
-                                            <span v-if="role_type == 'store'">店主</span>
+                                            <span v-if="role_type == 'store'">VIP会员</span>
                                             <span v-if="role_type == 'all'">消费者</span>
                                         </td>
                                         <td>
@@ -104,8 +104,8 @@
 
             </el-tab-pane>
 
-            <!-- 店主 -->
-            <el-tab-pane label="店主">
+            <!-- VIP会员 -->
+            <el-tab-pane label="VIP会员">
                 <table cellspacing="0" cellpadding="0" width="100%">
                     <tr>
                         <th>关系</th>
@@ -130,7 +130,7 @@
                                         <td v-for="role_type in chain.relationship">
                                             <span v-if="role_type == 'branch_office'">分公司</span>
                                             <span v-if="role_type == 'partner'">合伙人</span>
-                                            <span v-if="role_type == 'store'">店主</span>
+                                            <span v-if="role_type == 'store'">VIP会员</span>
                                             <span v-if="role_type == 'all'">消费者</span>
                                         </td>
                                         <td>

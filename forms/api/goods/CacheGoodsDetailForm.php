@@ -1,6 +1,7 @@
 <?php
 namespace app\forms\api\goods;
 
+use app\canal\table\User;
 use app\core\ApiCode;
 use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
@@ -183,7 +184,31 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
 
             //商品是否是爆品
 
-            $sourceData = $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['goods' => $info, 'is_mch' => !empty($mchInfo) ? 1 : 0, 'mch' => $mchInfo]);
+            //判断是否可以购买
+            $is_buy_power = 0;
+            if ($login_user_id = \Yii::$app->user->id) {
+                $user = \app\models\User::findOne($login_user_id);
+                if ($goods->purchase_permission) {
+                    $purchase_permission = json_decode($goods->purchase_permission,true);
+                    if($user && !$user->is_delete){
+                        if (in_array($user->role_type, $purchase_permission)) {
+                            $is_buy_power = 1;
+                        }
+                    }
+                } else {
+                    $is_buy_power = 1;
+                }
+            }
+
+            $sourceData = $this->returnApiResultData(
+                ApiCode::CODE_SUCCESS,
+                '',
+                [
+                    'goods' => $info,
+                    'is_mch' => !empty($mchInfo) ? 1 : 0,
+                    'mch' => $mchInfo,
+                    'is_buy_power' => $is_buy_power,
+                ]);
 
             return new APICacheDataForm([
                 "sourceData" => $sourceData

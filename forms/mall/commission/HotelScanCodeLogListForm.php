@@ -85,7 +85,7 @@ class HotelScanCodeLogListForm extends BaseModel
                 $item['identity'] = '';
                 if (isset($item['user']['role_type'])) {
                     if ($item['user']['role_type'] == 'store') {
-                        $item['identity'] = '门店';
+                        $item['identity'] = 'VIP会员';
                     } elseif ($item['user']['role_type'] == 'partner') {
                         $item['identity'] = '合伙人';
                     } elseif ($item['user']['role_type'] == 'branch_office') {

@@ -2,10 +2,11 @@
 
 namespace app\controllers\api\payCenter;
 
+
 use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
 
-class IntegralPayController extends ApiController{
+class BalancePayController extends ApiController{
 
     public function behaviors(){
         return array_merge(parent::behaviors(), [
@@ -20,7 +21,7 @@ class IntegralPayController extends ApiController{
      * @return \yii\web\Response
      */
     public function actionGiftpacks(){
-        $form = new \app\forms\api\payCenter\giftpacks\integral\PayOrderForm();
+        $form = new \app\forms\api\payCenter\giftpacks\balance\PayOrderForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->pay());
     }
@@ -30,9 +31,8 @@ class IntegralPayController extends ApiController{
      * @return \yii\web\Response
      */
     public function actionGiftpacksGroup(){
-        $form = new \app\forms\api\payCenter\giftpacks\integral\PayGroupForm();
+        $form = new \app\forms\api\payCenter\giftpacks\balance\PayGroupForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->pay());
     }
-
 }

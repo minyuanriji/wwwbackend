@@ -18,7 +18,8 @@ class GiftpacksGroup extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mall_id', 'pack_id', 'user_id', 'need_num', 'created_at', 'updated_at'], 'required'],
+            [['mall_id', 'pack_id', 'user_id', 'need_num', 'created_at',
+              'updated_at', 'process_class'], 'required'],
             [['user_num', 'status', 'expired_at'], 'safe']
         ];
     }

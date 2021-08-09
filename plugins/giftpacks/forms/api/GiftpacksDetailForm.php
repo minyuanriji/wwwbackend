@@ -93,8 +93,8 @@ class GiftpacksDetailForm extends BaseModel{
         $detail['integral_enable']     = $giftpacks->integral_enable;
         $detail['integral_give_num']   = $giftpacks->integral_give_num;
 
-        $detail['is_finished']         = 0;
-        $detail['expired_at']          = 3600 * 24 * 7;
+        $detail['is_finished']         = time() > $giftpacks->expired_at ? 1 : 0;
+        $detail['expired_at']          = $giftpacks->expired_at;
         $detail['view_num']            = intval(time()/1000000);
 
         $detail['item_count']          = static::getItemCount($giftpacks);

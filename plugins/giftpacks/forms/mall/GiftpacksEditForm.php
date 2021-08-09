@@ -13,6 +13,7 @@ class GiftpacksEditForm extends BaseModel{
     public $title;
     public $cover_pic;
     public $max_stock;
+    public $expired_at;
     public $price;
     public $profit_price;
     public $purchase_limits_num;
@@ -29,7 +30,7 @@ class GiftpacksEditForm extends BaseModel{
 
     public function rules(){
         return [
-            [['title', 'cover_pic', 'allow_currency'], 'required'],
+            [['title', 'cover_pic', 'expired_at', 'allow_currency'], 'required'],
             [['integral_give_num', 'purchase_limits_num', 'price', 'profit_price', 'group_price'], 'number', 'min' => 0],
             [['integral_enable', 'group_enable', 'max_stock', 'group_need_num', 'group_expire_time'], 'integer'],
             [['id', 'descript'], 'safe']
@@ -59,6 +60,7 @@ class GiftpacksEditForm extends BaseModel{
             $model->title               = $this->title;
             $model->cover_pic           = $this->cover_pic;
             $model->updated_at          = time();
+            $model->expired_at          = strtotime($this->expired_at);
             $model->max_stock           = $this->max_stock;
             $model->price               = $this->price;
             $model->profit_price        = $this->profit_price;

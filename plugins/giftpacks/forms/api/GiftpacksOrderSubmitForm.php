@@ -69,6 +69,12 @@ class GiftpacksOrderSubmitForm extends BaseModel{
     //检查是否可以下单支付
     public static function check(Giftpacks $giftpacks){
 
+        //到期判断
+        if($giftpacks->expired_at < time()){
+            throw new \Exception("大礼包“".$giftpacks->title."”已结束");
+        }
+
+
         $soldNum = GiftpacksDetailForm::soldNum($giftpacks);
         if($giftpacks->max_stock <= $soldNum){
             throw new \Exception("大礼包“".$giftpacks->title."”已售罄");

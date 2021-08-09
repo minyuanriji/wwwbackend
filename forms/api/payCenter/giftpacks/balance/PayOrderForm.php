@@ -16,7 +16,7 @@ class PayOrderForm extends BalanceBasePayForm{
      * @return float
      */
     protected function payBalance(User $user){
-        return $this->getGiftpacks()->price;
+        return $this->getGiftpacksOrder()->order_price;
     }
 
     /**

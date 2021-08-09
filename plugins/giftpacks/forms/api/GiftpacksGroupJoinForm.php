@@ -67,6 +67,7 @@ class GiftpacksGroupJoinForm extends BaseModel{
             if(!$payOrder){
                 $payOrder = new GiftpacksGroupPayOrder([
                     "mall_id"    => $group->mall_id,
+                    "order_sn"   => "GPPO" . date("ymdHis") . rand(1000, 9999),
                     "group_id"   => $group->id,
                     "user_id"    => \Yii::$app->user->id,
                     "pay_status" => "unpaid"

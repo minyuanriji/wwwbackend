@@ -85,6 +85,7 @@ class GiftpacksDetailForm extends BaseModel{
         $detail['max_stock']           = $giftpacks->max_stock;
         $detail['group_enable']        = $giftpacks->group_enable;
         $detail['group_price']         = $giftpacks->group_price;
+        $detail['group_hour_expired']  = 24;
         $detail['price']               = $giftpacks->price;
         $detail['purchase_limits_num'] = $giftpacks->purchase_limits_num;
         $detail['allow_currency']      = $giftpacks->allow_currency;

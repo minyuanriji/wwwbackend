@@ -6,6 +6,9 @@
             <el-form-item label="标题" prop="title">
                 <el-input v-model="formData.title"></el-input>
             </el-form-item>
+            <el-form-item label="到期时间" prop="expired_at">
+                <el-date-picker v-model="formData.expired_at" type="date" placeholder="选择日期"></el-date-picker>
+            </el-form-item>
             <el-form-item label="描述" prop="descript">
                 <el-input type="textarea" :rows="2" placeholder="请输入描述" v-model="formData.descript"></el-input>
             </el-form-item>
@@ -105,6 +108,7 @@
             title: '',
             cover_pic: '',
             max_stock: 0,
+            expired_at: '',
             price: 0,
             profit_price: 0,
             purchase_limits_num: 1,
@@ -128,6 +132,9 @@
             rules: {
                 title: [
                     {required: true, message: '标题不能为空', trigger: 'change'}
+                ],
+                expired_at: [
+                    {required: true, message: '到期时间不能为空', trigger: 'change'}
                 ],
                 descript: [
                     {required: true, message: '描述不能为空', trigger: 'change'}

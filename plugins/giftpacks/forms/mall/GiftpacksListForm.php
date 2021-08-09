@@ -44,6 +44,7 @@ class GiftpacksListForm extends BaseModel{
             $list = $query->orderBy($orderBy)->page($pagination, 20)->asArray()->all();
             if($list){
                 foreach($list as &$item){
+                    $item['expired_at'] = date("Y-m-d H:i:s", $item['expired_at']);
                     $item['group_expire_time'] = (int)($item['group_expire_time']/3600);
                 }
             }

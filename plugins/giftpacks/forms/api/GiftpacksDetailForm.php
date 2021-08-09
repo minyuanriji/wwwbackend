@@ -78,6 +78,7 @@ class GiftpacksDetailForm extends BaseModel{
 
     //大礼包详情
     public static function detail(Giftpacks $giftpacks){
+
         $detail['id']                  = $giftpacks->id;
         $detail['title']               = $giftpacks->title;
         $detail['cover_pic']           = $giftpacks->cover_pic;
@@ -85,6 +86,7 @@ class GiftpacksDetailForm extends BaseModel{
         $detail['max_stock']           = $giftpacks->max_stock;
         $detail['group_enable']        = $giftpacks->group_enable;
         $detail['group_price']         = $giftpacks->group_price;
+        $detail['group_hour_expired']  = intval($giftpacks->group_expire_time / 3600);
         $detail['price']               = $giftpacks->price;
         $detail['purchase_limits_num'] = $giftpacks->purchase_limits_num;
         $detail['allow_currency']      = $giftpacks->allow_currency;
@@ -93,7 +95,7 @@ class GiftpacksDetailForm extends BaseModel{
 
         $detail['is_finished']         = 0;
         $detail['expired_at']          = 3600 * 24 * 7;
-        $detail['view_num']            = 1000;
+        $detail['view_num']            = intval(time()/1000000);
 
         $detail['item_count']          = static::getItemCount($giftpacks);
         $detail['sold_num']            = static::soldNum($giftpacks);

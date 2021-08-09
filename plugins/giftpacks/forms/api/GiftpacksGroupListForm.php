@@ -44,13 +44,14 @@ class GiftpacksGroupListForm extends BaseModel{
                 [">", "gg.need_num", "gg.user_num"]
             ]);
             $selects = ["gg.id", "gg.need_num", "gg.user_num", "gg.expired_at",
-                "gg.user_id", "u.nickname", "u.avatar_url"
+                "gg.created_at", "gg.user_id", "u.nickname", "u.avatar_url"
             ];
             $query->select($selects);
 
             $list = $query->page($pagination, 10, max(1, (int)$this->page))->asArray()->all();
             if($list){
                 foreach($list as &$log){
+                    $log['created_at']     = date("Y-m-d H:i:s");
                     $log['still_need_num'] = intval($log['need_num']) - intval($log['user_num']);
                     unset($log['need_num']);
                     unset($log['user_num']);

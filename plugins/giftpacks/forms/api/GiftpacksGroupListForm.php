@@ -38,7 +38,7 @@ class GiftpacksGroupListForm extends BaseModel{
                 ->orderBy("gg.updated_at DESC");
             $query->andWhere([
                 "AND",
-                ["gg.status" => "sharing"],
+                ["gg.status" => "success"],
                 ["gg.pack_id" => $giftpacks->id],
                 [">", "gg.expired_at", time()],
                 [">", "gg.need_num", "gg.user_num"]

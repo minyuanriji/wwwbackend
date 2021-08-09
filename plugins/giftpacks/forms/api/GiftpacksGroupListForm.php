@@ -40,8 +40,8 @@ class GiftpacksGroupListForm extends BaseModel{
                 "AND",
                 ["gg.status" => "success"],
                 ["gg.pack_id" => $giftpacks->id],
-                [">", "gg.expired_at", time()],
-                [">", "gg.need_num", "gg.user_num"]
+                //[">", "gg.expired_at", time()],
+                //[">", "gg.need_num", "gg.user_num"]
             ]);
             $selects = ["gg.id", "gg.need_num", "gg.user_num", "gg.expired_at",
                 "gg.created_at", "gg.user_id", "u.nickname", "u.avatar_url"

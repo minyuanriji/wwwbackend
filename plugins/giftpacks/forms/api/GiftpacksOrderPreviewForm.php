@@ -37,12 +37,11 @@ class GiftpacksOrderPreviewForm extends BaseModel{
                 throw new \Exception("用户不存在");
             }
 
-            $integralDeductionPrice = GiftpacksDetailForm::integralDeductionPrice($giftpacks, $user);
-
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'detail' => $detail,
+                    'balance' => intval($user->balance),
                     'integrals' => (float)$user->static_integral,
                     'integral_deduction_price' => $integralDeductionPrice
                 ]

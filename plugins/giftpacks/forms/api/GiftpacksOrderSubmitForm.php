@@ -63,7 +63,6 @@ class GiftpacksOrderSubmitForm extends BaseModel{
                 'msg'  => $e->getMessage()
             ];
         }
-
     }
 
     //检查是否可以下单支付
@@ -73,7 +72,6 @@ class GiftpacksOrderSubmitForm extends BaseModel{
         if($giftpacks->expired_at < time()){
             throw new \Exception("大礼包“".$giftpacks->title."”已结束");
         }
-
 
         $soldNum = GiftpacksDetailForm::soldNum($giftpacks);
         if($giftpacks->max_stock <= $soldNum){

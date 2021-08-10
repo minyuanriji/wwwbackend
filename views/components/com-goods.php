@@ -865,23 +865,25 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 									<el-form-item  label="红包券赠送" prop="status">
 									    <el-switch v-model="info.enable_integral" :active-value="1" :inactive-value="0" active-text="开启" inactive-text="关闭">
 									    </el-switch>
+                                        <!--
 									    <div v-if="info.enable_integral==1">
 									        <el-switch v-model="isPermanent" :active-value="1" :inactive-value="0" active-text="限时有效" inactive-text="永久有效" @change="isPermanentChange">
 									        </el-switch>
-									    </div>
+									    </div>-->
 									
 									    <div v-if="info.enable_integral==1" class="demo-input-suffix agent-setting-item">
 									
 									        <el-input type="number" :min="0" class="member-money" v-model="integral_setting.integral_num" placeholder="">
 									            <template slot="append">红包券</template>
 									        </el-input>
+                                            <!--
 									        <el-input type="number" :min="0" class="member-money" v-model="integral_setting.period" placeholder="">
 									            <template slot="append">月</template>
 									        </el-input>
 									        <el-input v-if="isPermanent==1" type="number" class="member-money" style="width: 180px;" v-model="integral_setting.expire" placeholder="">
 									            <template slot="append">有效期(天)</template>
 									        </el-input>
-									
+									        -->
 									    </div>
 									
 									    <!-- <el-input type="number" min="0" class="member-money" oninput="this.value = this.value.replace(/[^0-9\.]/g, '');" placeholder="请输最高抵扣金额" v-model="info.max_deduct_integral">
@@ -1474,11 +1476,11 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 // 红包券赠送数据
                 integral_setting: {
                     "integral_num": 0, //积分数量
-                    "period": 12, //周期
+                    "period": 1, //周期
                     "period_unit": "month", //单位
                     "expire": 30 //有效天数
                 },
-                isPermanent: 0, //默认永久
+                isPermanent: 1, //默认永久
 
 
                 // 红包券赠送数据

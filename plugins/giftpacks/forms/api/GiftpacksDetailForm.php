@@ -49,15 +49,6 @@ class GiftpacksDetailForm extends BaseModel{
             if($giftpacks->group_enable){
                 //获取最新的两条拼单记录
                 $groupList = static::newestGroupLog($giftpacks);
-
-                //拼单总数
-                $detail['group_num'] = (int)GiftpacksGroup::find()->andWhere([
-                                            "AND",
-                                            ["status" => "sharing"],
-                                            ["pack_id" => $giftpacks->id],
-                                            [">", "expired_at", time()],
-                                            [">", "need_num", "user_num"]
-                                        ])->count();
             }
 
             return [
@@ -86,6 +77,7 @@ class GiftpacksDetailForm extends BaseModel{
         $detail['max_stock']           = $giftpacks->max_stock;
         $detail['group_enable']        = $giftpacks->group_enable;
         $detail['group_price']         = $giftpacks->group_price;
+        $detail['group_num']           = $giftpacks->group_need_num;
         $detail['group_hour_expired']  = intval($giftpacks->group_expire_time / 3600);
         $detail['price']               = $giftpacks->price;
         $detail['purchase_limits_num'] = $giftpacks->purchase_limits_num;

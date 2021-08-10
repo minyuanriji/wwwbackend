@@ -174,10 +174,13 @@ abstract class EfpsWechatBasePayForm extends BaseModel{
                 throw new \Exception($res['msg']);
             }
 
+            $data = $res['data']['wxJsapiParam'];
+            $data['wx_type'] = $appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_WECHAT ? "wechat" : "mp-wx";
+
             return [
                 'code'  => ApiCode::CODE_SUCCESS,
                 'msg'   => '请求成功',
-                'data'  => $res['data']['wxJsapiParam']
+                'data'  => $data
             ];
         }catch (\Exception $e){
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());

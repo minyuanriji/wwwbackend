@@ -74,6 +74,8 @@ class GiftpacksGroupNewForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'group_id' => $group->id,
+					'balance' => 0,
+					'user_integral' => 0,
 					'group_price' => 0,
 					'integral_deduction_price' => 0
                 ]

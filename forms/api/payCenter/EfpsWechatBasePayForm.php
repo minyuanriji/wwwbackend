@@ -19,12 +19,14 @@ abstract class EfpsWechatBasePayForm extends BaseModel{
     const NOTIFY_URI   = "/web/pay-notify/efps.php";
 
     public $union_id;
+    public $redirect_url;
     public $stands_mall_id;
 
     public function rules(){
         return [
             [['union_id'], 'required'],
-            [['stands_mall_id'], 'integer']
+            [['stands_mall_id'], 'integer'],
+            [['redirect_url'], 'string']
         ];
     }
 
@@ -120,6 +122,7 @@ abstract class EfpsWechatBasePayForm extends BaseModel{
             $efpsPaymentOrder->transactionStartTime   = date("YmdHis");
             $efpsPaymentOrder->nonceStr               = md5(uniqid());
             $efpsPaymentOrder->notifyUrl              = self::NOTIFY_URI;
+            $efpsPaymentOrder->redirectUrl            = $this->redirect_url;
             $efpsPaymentOrder->update_at              = time();
             $efpsPaymentOrder->is_pay                 = 0;
 
@@ -162,6 +165,7 @@ abstract class EfpsWechatBasePayForm extends BaseModel{
                 "customerCode" => $efpsPaymentOrder->customerCode,
                 "payAmount"    => $efpsPaymentOrder->payAmount,
                 "notifyUrl"    => $efpsPaymentOrder->notifyUrl,
+                "redirect_url" => $efpsPaymentOrder->redirectUrl,
                 "orderInfo"    => json_decode($efpsPaymentOrder->orderInfo, true)
             ];
 

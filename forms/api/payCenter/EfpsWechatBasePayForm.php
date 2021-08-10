@@ -165,7 +165,7 @@ abstract class EfpsWechatBasePayForm extends BaseModel{
                 "customerCode" => $efpsPaymentOrder->customerCode,
                 "payAmount"    => $efpsPaymentOrder->payAmount,
                 "notifyUrl"    => $efpsPaymentOrder->notifyUrl,
-                "redirect_url" => $efpsPaymentOrder->redirectUrl,
+                "redirectUrl"  => $efpsPaymentOrder->redirectUrl,
                 "orderInfo"    => json_decode($efpsPaymentOrder->orderInfo, true)
             ];
 

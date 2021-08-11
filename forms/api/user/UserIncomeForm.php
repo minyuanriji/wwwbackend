@@ -150,7 +150,7 @@ class UserIncomeForm extends BaseModel
         }*/
 
         if ($this->updated_at) {
-            $query->andWhere('FROM_UNIXTIME(updated_at,"%Y年%m")="'.$this->updated_at.'"');
+            $query->andWhere('FROM_UNIXTIME(updated_at,"%Y年%m月")="'.$this->updated_at.'"');
         }
 
         if ($this->source_type) {

@@ -92,7 +92,9 @@
                 <el-form-item label="最大库存" prop="max_stock">
                     <el-input type="number" style="width:150px" v-model="formData.max_stock"></el-input>
                 </el-form-item>
-
+                <el-form-item label="结算价格" prop="item_price">
+                    <el-input style="width:150px" v-model="formData.item_price"></el-input>
+                </el-form-item>
                 <el-form-item label="不限次数">
                     <el-switch v-model="no_limit" active-text="是" inactive-text="否"></el-switch>
                 </el-form-item>
@@ -139,6 +141,9 @@
                 ],
                 max_stock: [
                     {required: true, message: '最大库存不能为空', trigger: 'change'}
+                ],
+                item_price: [
+                    {required: true, message: '结算价不能为空', trigger: 'change'}
                 ]
             },
             search: {

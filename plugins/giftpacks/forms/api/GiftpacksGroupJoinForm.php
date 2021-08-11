@@ -5,6 +5,7 @@ namespace app\plugins\giftpacks\forms\api;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\models\User;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksGroup;
 use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
@@ -29,7 +30,7 @@ class GiftpacksGroupJoinForm extends BaseModel{
 
             //获取拼单信息
             $group = GiftpacksGroup::findOne($this->group_id);
-            if(!$group){
+            if(!$group || $group->status != "sharing"){
                 throw new \Exception("拼单信息不存在");
             }
 
@@ -45,8 +46,13 @@ class GiftpacksGroupJoinForm extends BaseModel{
                 throw new \Exception("不支持拼单功能");
             }
 
+            $user = User::findOne(\Yii::$app->user->id);
+            if(!$user || $user->is_delete){
+                throw new \Exception("用户不存在");
+            }
+
             //拼单信息判断
-            if(!in_array($group->status, ["closed", "sharing"]) || $group->expired_at < time()){
+            if($group->expired_at < time()){
                 throw new \Exception("拼单已结束或已过期");
             }
 
@@ -67,6 +73,7 @@ class GiftpacksGroupJoinForm extends BaseModel{
             if(!$payOrder){
                 $payOrder = new GiftpacksGroupPayOrder([
                     "mall_id"    => $group->mall_id,
+                    "order_sn"   => "GPPO" . date("ymdHis") . rand(1000, 9999),
                     "group_id"   => $group->id,
                     "user_id"    => \Yii::$app->user->id,
                     "pay_status" => "unpaid"
@@ -76,9 +83,16 @@ class GiftpacksGroupJoinForm extends BaseModel{
                 }
             }
 
+
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg'  => '待支付记录创建成功'
+                'data' => [
+                    'balance'                  => $user->balance,
+                    'user_integral'            => $user->static_integral,
+                    'group_price'              => $giftpacks->group_price,
+                    'integral_deduction_price' => GiftpacksDetailForm::groupIntegralDeductionPrice($giftpacks, $user)
+                ]
             ];
         }catch (\Exception $e){
             return [

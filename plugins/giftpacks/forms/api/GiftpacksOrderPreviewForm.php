@@ -42,8 +42,11 @@ class GiftpacksOrderPreviewForm extends BaseModel{
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'detail' => $detail,
-                    'integrals' => (float)$user->static_integral,
+                    'detail'      => $detail,
+                    'price'       => $detail['price'],
+                    'group_price' => $detail['group_price'],
+                    'balance'     => $user->balance,
+                    'integrals'   => (float)$user->static_integral,
                     'integral_deduction_price' => $integralDeductionPrice
                 ]
             ];

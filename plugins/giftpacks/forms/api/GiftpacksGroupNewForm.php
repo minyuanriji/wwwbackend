@@ -5,6 +5,7 @@ namespace app\plugins\giftpacks\forms\api;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\models\User;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksGroup;
 use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
@@ -41,15 +42,16 @@ class GiftpacksGroupNewForm extends BaseModel{
 
             //生成拼单记录，把状态设置为已关闭
             $group = new GiftpacksGroup([
-                'mall_id'    => \Yii::$app->mall->id,
-                'pack_id'    => $giftpacks->id,
-                'user_id'    => \Yii::$app->user->id,
-                'need_num'   => $giftpacks->group_need_num,
-                'user_num'   => 0,
-                'status'     => 'closed',
-                'expired_at' => (time() + $giftpacks->group_expire_time),
-                'created_at' => time(),
-                'updated_at' => time()
+                'mall_id'       => \Yii::$app->mall->id,
+                'pack_id'       => $giftpacks->id,
+                'user_id'       => \Yii::$app->user->id,
+                'need_num'      => $giftpacks->group_need_num,
+                'user_num'      => 0,
+                'status'        => 'closed',
+                'expired_at'    => (time() + $giftpacks->group_expire_time),
+                'created_at'    => time(),
+                'updated_at'    => time(),
+                "process_class" => "app\\plugins\\giftpacks\\forms\\common\\GiftpacksGroupPaidProcessForm"
             ]);
             if(!$group->save()){
                 throw new \Exception($this->responseErrorMsg($group));
@@ -58,6 +60,7 @@ class GiftpacksGroupNewForm extends BaseModel{
             //生成待支付记录
             $payOrder = new GiftpacksGroupPayOrder([
                 'mall_id'    => \Yii::$app->mall->id,
+                "order_sn"   => "GPPO" . date("ymdHis") . rand(1000, 9999),
                 'group_id'   => $group->id,
                 'user_id'    => \Yii::$app->user->id,
                 'pay_status' => 'unpaid'
@@ -68,10 +71,19 @@ class GiftpacksGroupNewForm extends BaseModel{
 
             $t->commit();
 
+            $user = User::findOne(\Yii::$app->user->id);
+            if(!$user || $user->is_delete){
+                throw new \Exception("用户不存在");
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'group_id' => $group->id
+                    'group_id'                 => $group->id,
+					'balance'                  => $user->balance,
+					'user_integral'            => $user->static_integral,
+					'group_price'              => $giftpacks->group_price,
+					'integral_deduction_price' => GiftpacksDetailForm::groupIntegralDeductionPrice($giftpacks, $user)
                 ]
             ];
         }catch (\Exception $e){

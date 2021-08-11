@@ -4,8 +4,6 @@ namespace app\controllers\api\payCenter;
 
 use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
-use app\forms\api\payCenter\PayCenterIntegralPayGiftpacksGroupForm;
-use app\forms\api\payCenter\PayCenterIntegralPayGiftpacksOrderForm;
 
 class IntegralPayController extends ApiController{
 
@@ -22,7 +20,7 @@ class IntegralPayController extends ApiController{
      * @return \yii\web\Response
      */
     public function actionGiftpacks(){
-        $form = new PayCenterIntegralPayGiftpacksOrderForm();
+        $form = new \app\forms\api\payCenter\giftpacks\integral\PayOrderForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->pay());
     }
@@ -32,7 +30,7 @@ class IntegralPayController extends ApiController{
      * @return \yii\web\Response
      */
     public function actionGiftpacksGroup(){
-        $form = new PayCenterIntegralPayGiftpacksGroupForm();
+        $form = new \app\forms\api\payCenter\giftpacks\integral\PayGroupForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->pay());
     }

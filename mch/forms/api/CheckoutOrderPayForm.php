@@ -177,6 +177,7 @@ class CheckoutOrderPayForm extends BaseModel {
                 'supportPayTypes' => $supportPayTypes,
             ];
 
+
             $paymentConfigs = AppConfigLogic::getPaymentConfig();
             $data["pay_password_status"] = isset($paymentConfigs["pay_password_status"]) ? $paymentConfigs["pay_password_status"] : 0;
             $isPayPassword = empty($userData["transaction_password"]) ? 0 : 1;

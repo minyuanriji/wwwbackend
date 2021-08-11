@@ -16,7 +16,7 @@
 
        <el-table :data="list" border v-loading="loading" style="margin-top:20px;width: 100%">
             <el-table-column prop="id" label="编号ID"  width="90"></el-table-column>
-            <el-table-column label="商品信息" width="180">
+            <el-table-column label="商品信息" width="150">
                 <template slot-scope="scope">
                     <div flex="box:first">
                         <div style="padding-right: 10px;">
@@ -37,15 +37,16 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column prop="store_name" label="门店信息" width="180"></el-table-column>
-            <el-table-column prop="goods_price" label="独立价格" width="100"></el-table-column>
+            <el-table-column prop="store_name" label="门店信息" width="150"></el-table-column>
+            <el-table-column prop="goods_price" label="独立价格" width="90"></el-table-column>
+            <el-table-column prop="item_price" label="结算价格" width="90"></el-table-column>
             <el-table-column label="有效期" width="150">
                 <template slot-scope="scope">
                     <div v-if="scope.row.expired_at != ''">{{scope.row.expired_at}}</div>
                     <div v-else style="color:green">永久有效</div>
                 </template>
             </el-table-column>
-            <el-table-column prop="max_stock" label="库存" width="100">
+            <el-table-column prop="max_stock" label="库存" width="90">
                 <template slot-scope="scope">
                     <div>{{scope.row.order_item_num}}/{{scope.row.max_stock}}</div>
                 </template>

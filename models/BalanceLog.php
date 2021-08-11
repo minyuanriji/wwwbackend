@@ -37,11 +37,11 @@ class BalanceLog extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'mall_id', 'type', 'money','balance', 'desc', 'custom_desc', 'created_at'], 'required'],
+            [['user_id', 'mall_id', 'type', 'money','balance', 'desc', 'created_at'], 'required'],
             [['user_id', 'mall_id', 'type'], 'integer'],
             [['money','balance'], 'number'],
-            [['desc', 'custom_desc'], 'string'],
-            [['created_at'], 'safe'],
+            [['desc', 'custom_desc', 'custom_desc'], 'string'],
+            [['created_at', 'source_type', 'source_id'], 'safe'],
         ];
     }
 

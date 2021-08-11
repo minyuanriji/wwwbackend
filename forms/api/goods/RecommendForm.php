@@ -76,6 +76,8 @@ class RecommendForm extends BaseModel implements ICacheForm
         $form->sign = ['mch', ''];
         $form->limit = $recommendCount;
         $form->exceptSelf = $this->goods_id;
+        $form->sort = 4;
+
         $goodsList = $form->getList();
         $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['list' => $goodsList]);
     }
@@ -129,6 +131,7 @@ class RecommendForm extends BaseModel implements ICacheForm
         $form = new GoodsList();
         $form->is_login = $this->is_login;
         $form->login_uid = $this->login_uid;
+
         if ($key == 'goods') {
             /** @var Goods $goods */
             $goods = Goods::find()->with('goodsWarehouse.cats')->where([
@@ -157,9 +160,11 @@ class RecommendForm extends BaseModel implements ICacheForm
             }
         }
 
+        //TODO
+        $form->sort = 4;
 
         $form->status = 1;
-        $form->sign = ['mch', ''];
+        //$form->sign = ['mch', ''];
         $list = $form->getList();
         $this->pagination=$form->pagination;
         // 商品重新排序

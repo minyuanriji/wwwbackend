@@ -19,7 +19,7 @@ class GiftpacksOrderItem extends BaseActiveRecord
     {
         return [
             [['mall_id', 'order_id', 'pack_item_id'], 'required'],
-            [['current_num', 'max_num', 'expired_at'], 'safe']
+            [['current_num', 'max_num', 'expired_at', 'other_json_data'], 'safe']
         ];
     }
 }

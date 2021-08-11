@@ -13,9 +13,11 @@ use app\models\User;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksGroup;
 use app\plugins\giftpacks\models\GiftpacksGroupPackItem;
+use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
 use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
+use app\plugins\mch\models\Mch;
 
 class GiftpacksDetailForm extends BaseModel{
 
@@ -43,26 +45,36 @@ class GiftpacksDetailForm extends BaseModel{
             $detail = static::detail($giftpacks);
 
             //如果支持拼单
-            $groupList = $joinInfo = [];
-            $detail['group_num'] = 0;
-            if($giftpacks->group_enable){
+            $myGroup = ['has_group' => 0, 'is_owner' => 0, 'group_id' => 0];
+            if($giftpacks->group_enable && !\Yii::$app->user->isGuest){
                 //获取最新的两条拼单记录
                 $groupList = static::newestGroupLog($giftpacks);
 
-                //拼单总数
-                $detail['group_num'] = (int)GiftpacksGroup::find()->andWhere([
-                                            "AND",
-                                            ["status" => "sharing"],
-                                            ["pack_id" => $giftpacks->id],
-                                            [">", "expired_at", time()],
-                                            [">", "need_num", "user_num"]
-                                        ])->count();
+                //获取我发起或我参与未结束的团
+                $userId = \Yii::$app->user->id;
+                $groupData = GiftpacksGroupPayOrder::find()->alias("ggpo")
+                    ->innerJoin(["gg" => GiftpacksGroup::tableName()], "gg.id=ggpo.group_id")
+                    ->andWhere([
+                        "AND",
+                        ["gg.pack_id" => $giftpacks->id],
+                        ["gg.status"  => "sharing"]
+                    ])->andWhere([
+                        "OR",
+                        ["gg.user_id" => $userId],
+                        "ggpo.user_id='{$userId}' AND ggpo.pay_status='paid'"
+                    ])->select(["gg.*"])->asArray()->one();
+                if($groupData){
+                    $myGroup['has_group'] = 1;
+                    $myGroup['is_owner']  = $groupData['user_id'] == $userId ? 1 : 0;
+                    $myGroup['group_id']  = (int)$groupData['id'];
+                }
             }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'detail'     => $detail,
+                    'my_group'   => $myGroup,
                     'group_list' => $groupList
                 ]
             ];
@@ -77,9 +89,29 @@ class GiftpacksDetailForm extends BaseModel{
 
     //大礼包详情
     public static function detail(Giftpacks $giftpacks){
-        $detail = $giftpacks->getAttributes();
-        $detail['item_count'] = static::getItemCount($giftpacks);
-        $detail['sold_num'] = static::soldNum($giftpacks);
+
+        $detail['id']                  = $giftpacks->id;
+        $detail['title']               = $giftpacks->title;
+        $detail['cover_pic']           = $giftpacks->cover_pic;
+        $detail['descript']            = $giftpacks->descript;
+        $detail['max_stock']           = $giftpacks->max_stock;
+        $detail['group_enable']        = $giftpacks->group_enable;
+        $detail['group_price']         = $giftpacks->group_price;
+        $detail['group_num']           = $giftpacks->group_need_num;
+        $detail['group_hour_expired']  = intval($giftpacks->group_expire_time / 3600);
+        $detail['price']               = $giftpacks->price;
+        $detail['purchase_limits_num'] = $giftpacks->purchase_limits_num;
+        $detail['allow_currency']      = $giftpacks->allow_currency;
+        $detail['integral_enable']     = $giftpacks->integral_enable;
+        $detail['integral_give_num']   = $giftpacks->integral_give_num;
+
+        $detail['is_finished']         = time() > $giftpacks->expired_at ? 1 : 0;
+        $detail['expired_at']          = $giftpacks->expired_at;
+        $detail['view_num']            = intval(time()/1000000);
+
+        $detail['item_count']          = static::getItemCount($giftpacks);
+        $detail['sold_num']            = static::soldNum($giftpacks);
+
         return $detail;
     }
 

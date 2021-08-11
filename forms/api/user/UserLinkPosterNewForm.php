@@ -44,9 +44,7 @@ class UserLinkPosterNewForm extends GrafikaOption implements BasePoster{
             if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
                 $file = $this->qrcode($option, [
                     [
-                        'user_id' => \Yii::$app->user->id,
-                        'pid'     => \Yii::$app->user->id,
-                        'mall_id' => \Yii::$app->mall->id
+                        'pid'     => \Yii::$app->user->id
                     ],
                     280,
                     'pages/index/index'

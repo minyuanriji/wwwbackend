@@ -114,7 +114,7 @@ class MchListExportForm extends BaseModel{
             'created_at'       => '申请时间'
         ];
         $roleTypes = [
-            'store'         => '店主',
+            'store'         => 'VIP会员',
             'partner'       => '合伙人',
             'branch_office' => '分公司',
             'user'          => '普通用户'

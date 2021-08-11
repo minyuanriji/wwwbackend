@@ -634,7 +634,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
                 "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/partner.png"
             ],
             'store' => [
-                "name" => "店主",
+                "name" => "VIP会员",
                 "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/store.png"
             ],
             'user' => [

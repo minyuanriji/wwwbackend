@@ -272,7 +272,7 @@ class UserForm extends BaseModel
             ->all();
 
         $roleTypes = [
-            'store' => '店主',
+            'store' => 'VIP会员',
             'partner' => '合伙人',
             'branch_office' => '分公司',
             'user' => '用户'

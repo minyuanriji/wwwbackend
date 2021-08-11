@@ -110,6 +110,7 @@ abstract class BaseGoodsEdit extends BaseModel
     protected $newAttrs;
     protected $sign;
     public $expressName;
+    public $purchase_permission;
 
 
     /** @var  Mch */
@@ -134,7 +135,7 @@ abstract class BaseGoodsEdit extends BaseModel
             [['forehead', 'id','fulfil_price','full_relief_price','max_deduct_integral','enable_integral','enable_score','is_order_paid', 'is_order_sales'], 'number'],
             [['cats', 'mchCats', 'services', 'cards', 'attr', 'attrGroups', 'member_price',
                 'select_attr_groups', 'labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund',
-                'upgrade_user_role_type'], 'safe'],
+                'upgrade_user_role_type','purchase_permission'], 'safe'],
             [['virtual_sales', 'freight_id', 'is_level', 'is_level_alone', 'forehead', 'forehead_score',
                 'give_score', 'individual_share', 'is_level_alone', 'pieces', 'share_type', 'accumulative',
                 'attr_setting_type', 'goods_weight', 'is_area_limit', 'form_id'], 'default', 'value' => 0],
@@ -181,6 +182,7 @@ abstract class BaseGoodsEdit extends BaseModel
             'is_order_sales' => ' 订单完结后设置',
             'order_sales' => ' 订单完结后参数设置',
             'cannotrefund' => '是否支持退换货',
+            'purchase_permission' => '购买权限',
         ];
     }
 
@@ -384,8 +386,14 @@ abstract class BaseGoodsEdit extends BaseModel
         $goods->use_virtual_sales = $this->use_virtual_sales;
         $goods->is_area_limit = $this->is_area_limit;
         $goods->area_limit = \Yii::$app->serializer->encode($this->area_limit);
-        $goods ->goods_brand = $this -> goods_brand;
-        $goods ->goods_supplier = $this -> goods_supplier;
+        $goods->goods_brand = $this->goods_brand;
+        $goods->goods_supplier = $this->goods_supplier;
+        if($this->purchase_permission != []){
+            $goods->purchase_permission = SerializeHelper::encode($this->purchase_permission);
+        } else {
+            $goods->purchase_permission = '';
+        }
+
         if($this->labels!=[]){
             $goods->labels = SerializeHelper::encode($this->labels);
         }
@@ -435,7 +443,7 @@ abstract class BaseGoodsEdit extends BaseModel
             $goods->price_display = json_encode($this->price_display);
         }
 
-        //下单后升级会员店主、合伙人或分公司
+        //下单后升级会员VIP会员、合伙人或分公司
         $goods->enable_upgrade_user_role = (int)$this->enable_upgrade_user_role;
         if(!empty($this->upgrade_user_role_type)){
             $goods->upgrade_user_role_type = $this->upgrade_user_role_type;

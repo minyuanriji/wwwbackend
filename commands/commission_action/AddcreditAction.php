@@ -56,7 +56,8 @@ class AddcreditAction extends Action
             }
 
             //计算利润
-            $profit = max(0, $addcreditOrder->order_price * ($plateforms->transfer_rate / 100 - 0.1) * 0.6);
+//            $profit = max(0, $addcreditOrder->order_price * ($plateforms->transfer_rate / 100 - 0.1) * 0.6);
+            $profit = max(0, $addcreditOrder->order_price * (1 - $plateforms->transfer_rate / 100 - 0.1 + $plateforms->ratio / 100) * 0.6);
 
             if ($profit <= 0) {
                 $addcreditOrder->commission_status = 1;

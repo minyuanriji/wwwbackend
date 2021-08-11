@@ -109,6 +109,9 @@ class CardDetail extends BaseActiveRecord{
                 (new UserModel()) -> updateUsers(['level' => 4],$user_id);
             }
 
+            if($level['role_type'] == 'user'){
+                (new UserModel()) -> updateUsers(['role_type' => 'store'],$user_id);
+            }
             return $model;
         }catch(Exception $e){
             self::$error = $e->getMessage();

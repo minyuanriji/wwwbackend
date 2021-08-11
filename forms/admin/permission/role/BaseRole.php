@@ -16,6 +16,8 @@ use app\logic\AuthLogic;
 use app\models\Admin;
 use app\models\BaseModel;
 use app\models\Mall;
+use app\models\RolePermission;
+use app\models\RoleUser;
 
 /**
  * @property array $permission
@@ -168,7 +170,35 @@ abstract class BaseRole extends BaseModel
                 'route' => $this->getPluginIndexRoute($plugin),
                 'showDetail' => $this->showDetail
             ];
-        };
+        }
+
+        $admin_id = \Yii::$app->admin->id;
+        $role_user = RoleUser::findOne(['admin_id' => $admin_id]);
+        if ($role_user && !$role_user->is_delete) {
+            $role_per = RolePermission::findOne(['role_id' => $role_user->role_id]);
+            if ($role_per && !$role_per->is_delete) {
+                if ($role_per->permissions) {
+                    $permissions = json_decode($role_per->permissions,true);
+                    $title = [];
+                    foreach ($permissions as &$item) {
+                        $new_item = substr($item, strpos($item,'/') + 1);
+                        $title[] = substr($new_item, 0,strpos($new_item,'/'));
+                    }
+                    if ($title) {
+                        $title = array_values(array_unique($title));
+                        $new_plugins = [];
+                        foreach ($plugins as $plugin) {
+                            foreach ($title as $value) {
+                                if ($plugin['name'] == $value) {
+                                    $new_plugins[] = $plugin;
+                                }
+                            }
+                        }
+                        return $new_plugins;
+                    }
+                }
+            }
+        }
         return $plugins;
     }
 
@@ -221,7 +251,7 @@ abstract class BaseRole extends BaseModel
             } catch (ClassNotFoundException $exception) {
                 continue;
             }
-        };
+        }
         $this->pluginList = $plugins;
         return $plugins;
     }

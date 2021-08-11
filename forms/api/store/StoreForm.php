@@ -87,7 +87,7 @@ class StoreForm extends BaseModel
                         "DATE_FORMAT(FROM_UNIXTIME(ma.created_at),'%Y-%m-%d %H:%i:%s') as created_at",
                         "p.id as parent_id", "p.nickname as parent_nickname",
                         "p.mobile as parent_mobile",
-                        "( CASE p.role_type WHEN 'store' THEN '店主' WHEN 'partner' THEN '合伙人' WHEN 'branch_office' THEN '分公司' WHEN 'user' THEN '普通用户' END ) AS 'parent_role_type'"
+                        "( CASE p.role_type WHEN 'store' THEN 'VIP会员' WHEN 'partner' THEN '合伙人' WHEN 'branch_office' THEN '分公司' WHEN 'user' THEN '普通用户' END ) AS 'parent_role_type'"
                     ])
                     ->orderBy(['ma.created_at' => SORT_DESC])
                     ->page($pagination,10)

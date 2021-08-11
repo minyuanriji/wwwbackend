@@ -79,7 +79,7 @@ class MchReviewListExportForm extends BaseModel{
                 'applying'  => '资料填写中'
             ];
             $roleTypeText = [
-                'store'         => '店主',
+                'store'         => 'VIP会员',
                 'partner'       => '合伙人',
                 'branch_office' => '分公司',
                 'user'          => '普通用户'

@@ -65,7 +65,7 @@
                                 <el-input v-model="nav.name" placeholder="名称" size="small"
                                           style="margin-bottom: 5px"></el-input>
                                 <div @click="pickLinkClick(index)">
-                                    <el-input v-model="nav.url" placeholder="点击选择链接" readonly
+                                    <el-input v-model="nav.url" placeholder="点击选择链接"
                                               size="small">
                                         <com-pick-link slot="append" @selected="linkSelected">
                                             <el-button size="small">选择链接</el-button>

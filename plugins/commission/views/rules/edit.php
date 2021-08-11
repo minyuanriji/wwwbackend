@@ -29,6 +29,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                                 <el-radio :disabled="ruleForm.item_type == 'hotel_3r' || radioDisabled == false ? false : true" :label="'hotel_3r'">酒店消费分佣</el-radio>
                                 <el-radio :disabled="ruleForm.item_type == 'addcredit' || radioDisabled == false ? false : true" :label="'addcredit'">话费直推分佣</el-radio>
                                 <el-radio :disabled="ruleForm.item_type == 'addcredit_3r' || radioDisabled == false ? false : true" :label="'addcredit_3r'">话费消费分佣</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'giftpacks' || radioDisabled == false ? false : true" :label="'giftpacks'">大礼包消费分佣</el-radio>
                             </el-radio-group>
                         </el-form-item>
 
@@ -87,13 +88,33 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                                 <el-button @click="chooseAddcreditDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
                             </el-form-item>
 
+                            <el-form-item v-if="ruleForm.item_type == 'giftpacks'" :label="'选择大礼包'" prop="item_id">
+                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
+                                    <div style="padding-right: 10px;">
+                                        <com-image mode="aspectFill" :src="choice.pic"></com-image>
+                                    </div>
+                                    <div flex="cross:top cross:center">
+                                        <div style="display:block;">{{choice.name}}</div>
+                                    </div>
+                                </div>
+                                <el-button @click="chooseGiftPacksDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
+                            </el-form-item>
+
                         </template>
 
                         <el-form-item label="设置规则">
 
                             <com-commission-store-rule-edit v-if="ruleForm.item_type == 'store'" @number = "newNumber" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains" :commiss_value = "commissonValue"></com-commission-store-rule-edit>
 
-                            <com-commission-rule-edit v-if="ruleForm.item_type == 'goods' || ruleForm.item_type == 'checkout' || ruleForm.item_type == 'addcredit_3r'" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-rule-edit>
+                            <com-commission-rule-edit
+                                    v-if="ruleForm.item_type == 'goods' ||
+                                          ruleForm.item_type == 'checkout' ||
+                                          ruleForm.item_type == 'addcredit_3r' ||
+                                          ruleForm.item_type == 'giftpacks'"
+                                    @update="updateCommissionRule"
+                                    :ctype="commissionType"
+                                    :chains="commissionRuleChains">
+                            </com-commission-rule-edit>
 
                             <com-commission-hotel-rule-edit v-if="ruleForm.item_type == 'hotel' || ruleForm.item_type == 'addcredit'" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"  @levelparam = "newLevelParam"  :commission_hotel_value = "commissionHotelValue"></com-commission-hotel-rule-edit>
 
@@ -356,6 +377,56 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
 
     </el-dialog>
 
+    <!-- 选择大礼包对话框 -->
+    <el-dialog title="设置大礼包" :visible.sync="ChooseGiftPacks.dialog_visible" width="30%">
+        <el-input @keyup.enter.native="loadGiftPacksList"
+                  size="small" placeholder="搜索大礼包"
+                  v-model="ChooseGiftPacks.search.keyword"
+                  clearable @clear="toGiftPacksSearch"
+                  style="width:300px;">
+            <el-button slot="append" icon="el-icon-search" @click="toGiftPacksSearch"></el-button>
+        </el-input>
+        <el-table v-loading="ChooseGiftPacks.loadding" :data="ChooseGiftPacks.list">
+            <el-table-column label="" width="100">
+                <template slot-scope="scope">
+                    <el-link @click="confirmChooseGiftPacks(scope.row)" icon="el-icon-edit" type="primary">选择</el-link>
+                </template>
+            </el-table-column>
+            <el-table-column property="id" label="大礼包ID" width="90"></el-table-column>
+            <el-table-column label="大礼包名称">
+                <template slot-scope="scope">
+                    <div flex="box:first">
+                        <div style="padding-right: 10px;">
+                            <com-image mode="aspectFill" :src="scope.row.cover_pic"></com-image>
+                        </div>
+                        <div flex="cross:top cross:center">
+                            <div flex="dir:left">
+                                <el-tooltip class="item" effect="dark" placement="top">
+                                    <template slot="content">
+                                        <div style="width: 320px;">{{scope.row.title}}</div>
+                                    </template>
+                                    <com-ellipsis :line="2">{{scope.row.title}}</com-ellipsis>
+                                </el-tooltip>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <div style="text-align: right;margin-top:15px;">
+            <el-pagination
+                    v-if="ChooseGiftPacks.pagination.page_count > 1"
+                    style="display: inline-block;"
+                    background :page-size="ChooseGiftPacks.pagination.pageSize"
+                    @current-change="GiftPacksPageChange"
+                    layout="prev, pager, next" :current-page="ChooseGiftPacks.pagination.current_page"
+                    :total="ChooseGiftPacks.pagination.total_count">
+            </el-pagination>
+        </div>
+
+    </el-dialog>
+
 </div>
 <script>
     const app = new Vue({
@@ -432,13 +503,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                         page_count: 0
                     }
                 },
-                choice: {
-                    name:'',
-                    pic:'',
-                },
                 ChooseDirectPush: {
-                    direct_push_name: '',
-                    direct_push_pic:'',
                     dialog_visible: false,
                     loadding: false,
                     list: [],
@@ -452,6 +517,25 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                         total_count: 0,
                         page_count: 0
                     }
+                },
+                ChooseGiftPacks: {
+                    dialog_visible: false,
+                    loadding: false,
+                    list: [],
+                    search: {
+                        keyword: '',
+                        page: 1,
+                    },
+                    pagination: {
+                        pageSize: 10,
+                        current_page: 1,
+                        total_count: 0,
+                        page_count: 0
+                    }
+                },
+                choice: {
+                    name:'',
+                    pic:'',
                 },
                 loading: false,
                 ruleForm: {
@@ -547,7 +631,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                             } else if (this.commissionHotelValue[i].name == '分公司') {
                                 this.commissionHotelValue[i].role_type = 'branch_office';
                                 this.commissionHotelValue[i].unique_key = "branch_office#all";
-                            } else if (this.commissionHotelValue[i].name == '店主') {
+                            } else if (this.commissionHotelValue[i].name == 'VIP会员') {
                                 this.commissionHotelValue[i].role_type = 'store';
                                 this.commissionHotelValue[i].unique_key = "store#all";
                             } else if (this.commissionHotelValue[i].name == '合伙人') {
@@ -806,6 +890,51 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                     }
                 }).catch(e => {
                     self.ChooseDirectPush.loadding = false;
+                    self.$message.error("request fail");
+                });
+            },
+
+            //--------------选择大礼包-----------------------------
+            confirmChooseGiftPacks(row){
+                this.ruleForm.item_id = row.id;
+                this.choice.name = row.title;
+                this.choice.pic = row.cover_pic;
+                this.ChooseGiftPacks.dialog_visible = false;
+            },
+            chooseGiftPacksDialog(){
+                this.ChooseGiftPacks.dialog_visible = true;
+                this.loadGiftPacksList();
+            },
+            GiftPacksPageChange(page){
+                this.ChooseGiftPacks.search.page = page;
+                this.loadGiftPacksList();
+            },
+            toGiftPacksSearch(){
+                this.ChooseGiftPacks.search.page = 1;
+                this.loadGiftPacksList();
+            },
+            loadGiftPacksList(){
+                let self = this;
+                self.ChooseGiftPacks.loadding = true;
+                request({
+                    params: {
+                        r: "plugin/commission/mall/rules/search-gift-packs"
+                    },
+                    method: 'post',
+                    data: {
+                        page: self.ChooseGiftPacks.search.page,
+                        keyword: self.ChooseGiftPacks.search.keyword
+                    }
+                }).then(e => {
+                    self.ChooseGiftPacks.loadding = false;
+                    if (e.data.code === 0) {
+                        self.ChooseGiftPacks.list = e.data.data.list;
+                        self.ChooseGiftPacks.pagination = e.data.data.pagination;
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.ChooseGiftPacks.loadding = false;
                     self.$message.error("request fail");
                 });
             },

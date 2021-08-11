@@ -36,7 +36,7 @@ class UserLinkPosterNewForm extends GrafikaOption implements BasePoster{
                 "size" => 240,
                 "top" => 1030,
                 "left" => 460,
-                "type" => 0,
+                "type" => 1,
                 "file_type" => "image"
             ];
 

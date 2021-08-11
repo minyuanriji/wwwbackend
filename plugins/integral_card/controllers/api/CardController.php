@@ -37,8 +37,7 @@ class CardController extends ApiBaseController
      * 积分券充值
      * @Author bing
      * @DateTime 2020-10-10 19:48:51
-     * @copyright: Copyright (c) 2020 广东七件事集团
-     * @return void
+     * @return \yii\web\Response
      */
     public function actionRecharge(){
         $params = $this->requestData;
@@ -57,7 +56,7 @@ class CardController extends ApiBaseController
      * @Author bing
      * @DateTime 2020-10-10 19:48:51
      * @copyright: Copyright (c) 2020 广东七件事集团
-     * @return void
+     * @return \yii\web\Response
      */
     public function actionRechargeRecord(){
         $params = $this->requestData;
@@ -92,7 +91,7 @@ class CardController extends ApiBaseController
      * @Author bing
      * @DateTime 2020-10-10 19:48:51
      * @copyright: Copyright (c) 2020 广东七件事集团
-     * @return void
+     * @return \yii\web\Response
      */
     public function actionMyIntegral(){
         $params = $this->requestData;

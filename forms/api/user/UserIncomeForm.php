@@ -142,15 +142,15 @@ class UserIncomeForm extends BaseModel
     public function getList()
     {
         $query = IncomeLog::find()->where(['user_id' => \Yii::$app->user->identity->id, 'is_delete' => 0]);
-        if ($this->status == 0) {
+        /*if ($this->status == 0) {
             $query->andWhere(['type' => IncomeLog::TYPE_IN]);
         }
         if ($this->status == 1) {
             $query->andWhere(['type' => IncomeLog::TYPE_OUT]);
-        }
+        }*/
 
         if ($this->updated_at) {
-            $query->andWhere('FROM_UNIXTIME(updated_at,"%Y-%m")="'.$this->updated_at.'"');
+            $query->andWhere('FROM_UNIXTIME(updated_at,"%Y年%m")="'.$this->updated_at.'"');
         }
 
         if ($this->source_type) {

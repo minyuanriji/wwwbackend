@@ -125,7 +125,7 @@ class BaseController extends \yii\web\Controller
      * @param array $url
      * @param string $msg
      * @param array $data
-     * @return void
+     * @return
      */
     public function success($msg='success',$data=[],$url=[]){
         return $this->asJson(array(
@@ -140,7 +140,7 @@ class BaseController extends \yii\web\Controller
      * @param array $url
      * @param string $msg
      * @param array $data
-     * @return void
+     * @return
      */
     public function error($msg='failed',$data=[],$url=[]){
         return $this->asJson(array(

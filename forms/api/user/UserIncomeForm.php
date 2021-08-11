@@ -34,12 +34,15 @@ class UserIncomeForm extends BaseModel
 
     public $status;
 
+    public $source_type;
+
+    public $updated_at;
 
     public function rules()
     {
         return [
             [['page', 'limit', 'flag'], 'integer'],
-            [['sign'], 'string'],
+            [['sign', 'source_type','updated_at'], 'string'],
             [['status'], 'integer'],
             ['page', 'default', 'value' => 1],
             ['limit', 'default', 'value' => 20],
@@ -140,10 +143,18 @@ class UserIncomeForm extends BaseModel
     {
         $query = IncomeLog::find()->where(['user_id' => \Yii::$app->user->identity->id, 'is_delete' => 0]);
         if ($this->status == 0) {
-            $query = $query->andWhere(['type' => IncomeLog::TYPE_IN]);
+            $query->andWhere(['type' => IncomeLog::TYPE_IN]);
         }
         if ($this->status == 1) {
-            $query = $query->andWhere(['type' => IncomeLog::TYPE_OUT]);
+            $query->andWhere(['type' => IncomeLog::TYPE_OUT]);
+        }
+
+        if ($this->updated_at) {
+            $query->andWhere('FROM_UNIXTIME(updated_at,"%Y-%m")="'.$this->updated_at.'"');
+        }
+
+        if ($this->source_type) {
+            $query->andWhere(['source_type' => $this->source_type]);
         }
         /**
          * @var BasePagination $pagination
@@ -151,7 +162,9 @@ class UserIncomeForm extends BaseModel
         $list = $query->page($pagination, 10, $this->page)->orderBy('created_at DESC')->asArray()->all();
 
         foreach ($list as &$item) {
-            $item['created_at'] = date('Y-m-d H:i:s', $item['created_at']);
+            $item['created_at'] = date('m月d日 H:i', $item['created_at']);
+            $item['money'] = sprintf("%.2f",$item['money']);
+            $item['income'] = sprintf("%.2f",$item['income']);
         }
 
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, ['list' => $list, 'pagination' => $pagination]);

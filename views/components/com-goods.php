@@ -950,6 +950,40 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 
                                     </el-form-item>
 
+                                    <el-form-item >
+                                        <template slot='label'>
+                                            <span>首次购买该商品</span>
+                                        </template>
+                                        <el-input type="number" min="0" max="100"
+                                                  oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
+                                                  placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
+                                            <template slot="append">件</template>
+                                        </el-input>
+
+                                    </el-form-item>
+
+                                    <el-form-item >
+                                        <template slot='label'>
+                                            <span>返红包数</span>
+                                        </template>
+                                        <el-input type="number" min="0" max="100"
+                                                  oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
+                                                  placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
+                                        </el-input>
+
+                                    </el-form-item>
+
+                                    <el-form-item >
+                                        <template slot='label'>
+                                            <span>商品利润</span>
+                                        </template>
+                                        <el-input type="number" min="0" max="100"
+                                                  oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
+                                                  placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
+                                            <template slot="append">元</template>
+                                        </el-input>
+                                    </el-form-item>
+
 								</el-col>
                             </el-row>
 

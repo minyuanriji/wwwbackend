@@ -108,11 +108,17 @@ class UserBindForm extends BaseModel
                 if(!$userInfoModel){ //没有授权信息就生成一条
                     $userInfoModel = new UserInfo($uniqueData);
                 }
-                $userInfoModel->mch_id        = 0;
-                $userInfoModel->user_id       = $userResult->id;
-                $userInfoModel->openid        = isset($userInfo['openid']) ? $userInfo['openid'] : "";
-                $userInfoModel->unionid       = isset($userInfo["unionid"]) ? $userInfo["unionid"] : "";
-                $userInfoModel->platform_data = isset($userInfo["platform_data"]) ? $userInfo["platform_data"] : "";
+                $userInfoModel->mch_id  = 0;
+                $userInfoModel->user_id = $userResult->id;
+                if(!empty($userInfo['openid'])){
+                    $userInfoModel->openid = $userInfo['openid'];
+                }
+                if(!empty($userInfo["unionid"])){
+                    $userInfoModel->unionid = $userInfo["unionid"];
+                }
+                if(!empty($userInfo["platform_data"])){
+                    $userInfoModel->platform_data = $userInfo["platform_data"];
+                }
                 if(!$userInfoModel->save()) {
                     throw new Exception("用户授权信息新增失败");
                 }

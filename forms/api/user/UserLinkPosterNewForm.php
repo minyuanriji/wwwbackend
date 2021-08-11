@@ -4,11 +4,12 @@
 namespace app\forms\api\user;
 
 use app\core\ApiCode;
+use app\forms\api\poster\BasePoster;
 use app\forms\common\grafika\CustomizeFunction;
-use app\models\BaseModel;
+use app\forms\common\grafika\GrafikaOption;
 use app\models\User;
 
-class UserLinkPosterNewForm extends BaseModel{
+class UserLinkPosterNewForm extends GrafikaOption implements BasePoster{
 
     public $flag;
 

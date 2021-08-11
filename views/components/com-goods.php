@@ -932,10 +932,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                   placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
                                             <template slot="append">元</template>
                                         </el-input>
-
                                     </el-form-item>
-
-
 
                                     <el-form-item label="下单升级会员" prop="enable_upgrade_user_role">
                                         <el-switch v-model="ruleForm.enable_upgrade_user_role" :active-value="1" :inactive-value="0" active-text="开启" inactive-text="关闭">
@@ -947,46 +944,43 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                 <el-option :label="'分公司'" :value="'branch_office'"></el-option>
                                             </el-select>
                                         </div>
-
                                     </el-form-item>
 
-                                    <el-form-item >
-                                        <template slot='label'>
-                                            <span>首次购买该商品</span>
-                                        </template>
-                                        <el-input type="number" min="0" max="100"
-                                                  oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
-                                                  placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
-                                            <template slot="append">件</template>
-                                        </el-input>
+                                    <div style="border-style: solid;border-width: 1px;border-color: RGB(123,125,128);padding-top: 20px;padding-right: 20px">
+                                        <el-form-item >
+                                            <template slot='label'>
+                                                <span>首次购买该商品</span>
+                                            </template>
+                                            <el-input type="number" min="0" max="100"
+                                                      oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
+                                                      placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
+                                                <template slot="append">件</template>
+                                            </el-input>
+                                        </el-form-item>
 
-                                    </el-form-item>
+                                        <el-form-item>
+                                            <template slot='label'>
+                                                <span>首次购买返红包数</span>
+                                            </template>
+                                            <el-input type="number" min="0" max="100"
+                                                      oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
+                                                      placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
+                                            </el-input>
+                                        </el-form-item>
 
-                                    <el-form-item >
-                                        <template slot='label'>
-                                            <span>返红包数</span>
-                                        </template>
-                                        <el-input type="number" min="0" max="100"
-                                                  oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
-                                                  placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
-                                        </el-input>
-
-                                    </el-form-item>
-
-                                    <el-form-item >
-                                        <template slot='label'>
-                                            <span>商品利润</span>
-                                        </template>
-                                        <el-input type="number" min="0" max="100"
-                                                  oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
-                                                  placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
-                                            <template slot="append">元</template>
-                                        </el-input>
-                                    </el-form-item>
-
+                                        <el-form-item >
+                                            <template slot='label'>
+                                                <span>首次购买商品利润</span>
+                                            </template>
+                                            <el-input type="number" min="0" max="100"
+                                                      oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
+                                                      placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
+                                                <template slot="append">元</template>
+                                            </el-input>
+                                        </el-form-item>
+                                    </div>
 								</el-col>
                             </el-row>
-
                         </el-card>
 
                         <!-- 商品详情 -->
@@ -997,11 +991,9 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             </div>
                             <el-row>
                                 <el-col :xl="12" :lg="16">
-
                                     <el-form-item label="商品详情">
                                         <com-rich-text style="width: 750px" v-model="ruleForm.detail"></com-rich-text>
                                     </el-form-item>
-
                                 </el-col>
                             </el-row>
                         </el-card>
@@ -1009,7 +1001,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     </el-tab-pane>
 
                     <el-tab-pane label="订单设置" name="order" v-if="is_order == 1">
-                        
                         <el-form-item prop="is_order_paid">
                             <template slot='label'>
                                 <span>订单支付后执行</span>

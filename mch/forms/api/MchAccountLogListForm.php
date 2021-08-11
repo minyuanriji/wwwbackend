@@ -9,11 +9,12 @@ class MchAccountLogListForm extends BaseModel{
 
     public $mch_id;
     public $type;
+    public $created_at;
 
     public function rules(){
         return [
             [['mch_id'], 'required'],
-            [['type'], 'string']
+            [['type','created_at'], 'string']
         ];
     }
 
@@ -36,12 +37,16 @@ class MchAccountLogListForm extends BaseModel{
             }
         }
 
+        if ($this->created_at) {
+            $query->andWhere('FROM_UNIXTIME(mal.created_at,"%Y年%m月")="'.$this->created_at.'"');
+        }
+
         $list = $query->page($pagination)
                       ->orderBy(['mal.created_at' => SORT_DESC])
                       ->asArray()
                       ->all();
         foreach($list as &$item){
-            $item['format_date'] = date("Y-m-d H:i", $item['created_at']);
+            $item['format_date'] = date('m月d日 H:i', $item['created_at']);
         }
 
         return [

@@ -291,7 +291,6 @@ class UserController extends ApiController
      */
     public function actionLinkPosterNew(){
         $form = new UserLinkPosterNewForm();
-        $form->attributes = $this->requestData;
         return $this->asJson($form->get());
     }
 

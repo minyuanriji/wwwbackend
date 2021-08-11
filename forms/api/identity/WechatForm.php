@@ -190,12 +190,13 @@ class WechatForm extends BaseModel
             //解密微信加密数据
             $data = $wechatModel->miniProgram->encryptor->decryptData($sessionKey,$iv,$encrypted);
             \Yii::warning("miniAuthorized data=".json_encode($data));
-            $data["openid"] = $data["openId"];
-            $data["nickname"] = $data["nickName"];
-            $data["headimgurl"] = $data["avatarUrl"];
+            $data["openid"]      = $data["openId"];
+            $data["nickname"]    = $data["nickName"];
+            $data["headimgurl"]  = $data["avatarUrl"];
             $data["session_key"] = $sessionKey;
-            $data["unionid"] = isset($data["unionId"]) ? $data["unionId"] : ((isset($data["unionid"])) ? $data["unionid"] : "");
-            $returnData = $this->userHandle($data,$stands_mall_id);
+            $data["unionid"]     = isset($data["unionId"]) ? $data["unionId"] : ((isset($data["unionid"])) ? $data["unionid"] : "");
+
+            $returnData = $this->userHandle($data, $stands_mall_id);
 
             \Yii::warning("userData resultData=".json_encode($returnData));
             $setting = \Yii::$app->mall->getMallSetting(['close_auth_bind']);
@@ -228,29 +229,6 @@ class WechatForm extends BaseModel
                 try{
                     $user_data = (new UserMode()) -> getOneUserParent($returnData['access_token']);
                     (new UserMode()) -> updateUsers(['parent_id' => $parent_user_id],$user_data['id']);
-                    if(empty($user_data['parent_id'])){
-                        $parent_data = new UserParent();
-                        $parent_data -> mall_id = \Yii::$app->mall->id;
-                        $parent_data -> user_id = $user_data['id'];
-                        $parent_data -> parent_id = $parent_user_id;
-                        $parent_data -> updated_at = time();
-                        $parent_data -> created_at = time();
-                        $parent_data -> deleted_at = time();
-                        $parent_data -> is_delete = 0;
-                        $parent_data -> level = 1;
-                        $parent_data -> save();
-                        $UserChildren = new UserChildren();
-                        $UserChildren -> id = null;
-                        $UserChildren -> mall_id = \Yii::$app->mall->id;
-                        $UserChildren -> user_id = $parent_user_id;
-                        $UserChildren -> child_id = $user_data['id'];
-                        $UserChildren -> level = 1;
-                        $UserChildren -> created_at = time();
-                        $UserChildren -> updated_at = time();
-                        $UserChildren -> deleted_at = 0;
-                        $UserChildren -> is_delete = 0;
-                        $UserChildren -> save();
-                    }
                     $transaction -> commit();
                 }catch (\Exception $e){
                 }
@@ -288,7 +266,7 @@ class WechatForm extends BaseModel
      * @throws \yii\base\Exception
      */
     private function userHandle($userInfo,$stands_mall_id){
-        $userResult = UserLogic::checkIsAuthorized($userInfo,$this->user_id,$stands_mall_id);
+        $userResult = UserLogic::checkIsAuthorized($userInfo, $this->user_id, $stands_mall_id);
 
         \Yii::warning("userHandle 是否授权 userResult:".var_export($userResult,true));
         if(empty($userResult)){

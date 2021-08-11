@@ -13,6 +13,7 @@ use app\models\User;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksGroup;
 use app\plugins\giftpacks\models\GiftpacksGroupPackItem;
+use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
 use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
@@ -44,16 +45,36 @@ class GiftpacksDetailForm extends BaseModel{
             $detail = static::detail($giftpacks);
 
             //如果支持拼单
-            $groupList = $joinInfo = [];
-            if($giftpacks->group_enable){
+            $myGroup = ['has_group' => 0, 'is_owner' => 0, 'group_id' => 0];
+            if($giftpacks->group_enable && !\Yii::$app->user->isGuest){
                 //获取最新的两条拼单记录
                 $groupList = static::newestGroupLog($giftpacks);
+
+                //获取我发起或我参与未结束的团
+                $userId = \Yii::$app->user->id;
+                $groupData = GiftpacksGroupPayOrder::find()->alias("ggpo")
+                    ->innerJoin(["gg" => GiftpacksGroup::tableName()], "gg.id=ggpo.group_id")
+                    ->andWhere([
+                        "AND",
+                        ["gg.pack_id" => $giftpacks->id],
+                        ["gg.status"  => "sharing"]
+                    ])->andWhere([
+                        "OR",
+                        ["gg.user_id" => $userId],
+                        "ggpo.user_id='{$userId}' AND ggpo.pay_status='paid'"
+                    ])->select(["gg.*"])->asArray()->one();
+                if($groupData){
+                    $myGroup['has_group'] = 1;
+                    $myGroup['is_owner']  = $groupData['user_id'] == $userId ? 1 : 0;
+                    $myGroup['group_id']  = (int)$groupData['id'];
+                }
             }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'detail'     => $detail,
+                    'my_group'   => $myGroup,
                     'group_list' => $groupList
                 ]
             ];

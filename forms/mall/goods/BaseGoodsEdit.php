@@ -111,7 +111,7 @@ abstract class BaseGoodsEdit extends BaseModel
     protected $sign;
     public $expressName;
     public $purchase_permission;
-
+    public $first_buy_setting;
 
     /** @var  Mch */
     protected $mch;
@@ -135,7 +135,7 @@ abstract class BaseGoodsEdit extends BaseModel
             [['forehead', 'id','fulfil_price','full_relief_price','max_deduct_integral','enable_integral','enable_score','is_order_paid', 'is_order_sales'], 'number'],
             [['cats', 'mchCats', 'services', 'cards', 'attr', 'attrGroups', 'member_price',
                 'select_attr_groups', 'labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund',
-                'upgrade_user_role_type','purchase_permission'], 'safe'],
+                'upgrade_user_role_type','purchase_permission','first_buy_setting'], 'safe'],
             [['virtual_sales', 'freight_id', 'is_level', 'is_level_alone', 'forehead', 'forehead_score',
                 'give_score', 'individual_share', 'is_level_alone', 'pieces', 'share_type', 'accumulative',
                 'attr_setting_type', 'goods_weight', 'is_area_limit', 'form_id'], 'default', 'value' => 0],
@@ -183,6 +183,7 @@ abstract class BaseGoodsEdit extends BaseModel
             'order_sales' => ' 订单完结后参数设置',
             'cannotrefund' => '是否支持退换货',
             'purchase_permission' => '购买权限',
+            'first_buy_setting' => '商品首次购买配置',
         ];
     }
 
@@ -225,7 +226,6 @@ abstract class BaseGoodsEdit extends BaseModel
             }
         }
     }
-
 
     /**
      * 商品规格数据验证
@@ -392,6 +392,11 @@ abstract class BaseGoodsEdit extends BaseModel
             $goods->purchase_permission = SerializeHelper::encode($this->purchase_permission);
         } else {
             $goods->purchase_permission = '';
+        }
+        if($this->first_buy_setting != []){
+            $goods->first_buy_setting = SerializeHelper::encode($this->first_buy_setting);
+        } else {
+            $goods->first_buy_setting = '';
         }
 
         if($this->labels!=[]){

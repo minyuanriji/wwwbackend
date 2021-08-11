@@ -951,9 +951,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                             <template slot='label'>
                                                 <span>首次购买该商品</span>
                                             </template>
-                                            <el-input type="number" min="0" max="100"
-                                                      oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
-                                                      placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
+                                            <el-input type="number" v-model="ruleForm.first_buy_setting.buy_num">
                                                 <template slot="append">件</template>
                                             </el-input>
                                         </el-form-item>
@@ -962,9 +960,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                             <template slot='label'>
                                                 <span>首次购买返红包数</span>
                                             </template>
-                                            <el-input type="number" min="0" max="100"
-                                                      oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
-                                                      placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
+                                            <el-input type="number" v-model="ruleForm.first_buy_setting.return_red_envelopes">
                                             </el-input>
                                         </el-form-item>
 
@@ -972,9 +968,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                             <template slot='label'>
                                                 <span>首次购买商品利润</span>
                                             </template>
-                                            <el-input type="number" min="0" max="100"
-                                                      oninput="this.value = this.value.replace(/[^0-9\.]/g, '');"
-                                                      placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
+                                            <el-input type="number" v-model="ruleForm.first_buy_setting.return_commission">
                                                 <template slot="append">元</template>
                                             </el-input>
                                         </el-form-item>
@@ -1345,6 +1339,11 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 upgrade_user_role_type: '',
                 product: '',
                 purchase_permission: [],
+                first_buy_setting:{
+                    buy_num : 0,
+                    return_red_envelopes : 0,
+                    return_commission : 0,
+                }
             };
             let rules = {
                 cats: [{
@@ -1516,10 +1515,13 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 },
                 isPermanent: 1, //默认永久
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 =======
 >>>>>>> c47e1f425aa8f706073b67c5bfa61a12e23d611a
+=======
+>>>>>>> 7ce3d4abd36032b40bbc86bb88f7f96d29a9240c
                 // 红包券赠送数据
                 order_paid: {
                     is_score:0,
@@ -1551,7 +1553,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     is_order_sales:"0",
                     
                 },
-
             };
         },
         created() {
@@ -1660,7 +1661,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     this.score_setting.expire = 1;
                 }
             },
-
             isOrderSetting(e,o,type){
                 let self = this;
                 console.log(e,o,type); 
@@ -1682,7 +1682,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     }
                 }
             },
-
             loadmore() {
                 if (this.page <= this.priceName_page_count) {
                     this.getGoodsNameDiy();
@@ -1802,7 +1801,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 this.ruleForm.cats = arr;
                 this.$refs.ruleForm.validateField('cats');
             },
-
             selectMchCat(cats) {
                 this.mchCats = cats;
                 let arr = [];
@@ -1829,7 +1827,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             delPic(index) {
                 this.ruleForm.pic_url.splice(index, 1)
             },
-
             catDialogCancel() {
                 let that = this;
                 that.mchDialogVisible = false;
@@ -1847,7 +1844,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     })
                 }
             },
-
             getPermissions() {
                 let self = this;
                 request({
@@ -1870,7 +1866,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     console.log(e);
                 });
             },
-
             store(formName) {
                 let self = this;
                 let url = null;
@@ -1895,8 +1890,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         } else {
                             delete self.cForm['is_vip_card_goods']
                         }
-
-
                         let postData = JSON.parse(JSON.stringify(self.cForm));
                         // 这里是追加红包券赠送的字段
                         // max_deduct_integral 最大抵扣红包券
@@ -1926,7 +1919,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             "display_id": this.pic_value ? this.pic_value : 0,
                         }];
                         postData.price_display = priceName_obj;
-                        //console.log(postData);return false;
+                        // console.log(postData);return;
                         request({
                             params: {
                                 r: this.url

@@ -82,6 +82,7 @@ use Yii;
  * @property string $is_on_site_consumption 是否到店消费类商品
  * @property int $integral_fee_rate 使用红包券支付，需要额外收取的红包券比例
  * @property int $purchase_permission 购买权限
+ * @property int $first_buy_setting 首次购买商品配置
  *
  */
 class Goods extends BaseActiveRecord
@@ -120,7 +121,7 @@ class Goods extends BaseActiveRecord
             [['price', 'profit_price', 'forehead', 'payment_amount', 'forehead_score', 'confine_order_count','full_relief_price','fulfil_price','max_deduct_integral','enable_integral','enable_score', 'is_order_paid','is_order_sales'], 'number'],
             [['attr_groups', 'area_limit'], 'string'],
             [['area_limit'], 'default', 'value' => ''],
-            [['created_at', 'updated_at', 'deleted_at','labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund', 'is_on_site_consumption', 'purchase_permission'], 'safe'],
+            [['created_at', 'updated_at', 'deleted_at','labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund', 'is_on_site_consumption', 'purchase_permission', 'first_buy_setting'], 'safe'],
             [['sign', 'app_share_pic'], 'string', 'max' => 255],
             [['app_share_title'], 'string', 'max' => 65],
 	        [['full_relief_price','fulfil_price'], 'default', 'value' => 0],
@@ -191,7 +192,8 @@ class Goods extends BaseActiveRecord
             'is_order_sales'=>'订单完结后设置',
             'order_sales'=>'订单完结后参数设置',
             'cannotrefund' => '是否支持退换货 ',
-            '$purchase_permission' => '购买权限',
+            'purchase_permission' => '购买权限',
+            'first_buy_setting' => '商品首次购买配置',
         ];
     }
 

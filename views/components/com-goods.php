@@ -1489,13 +1489,9 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     "period_unit": "month", //单位
                     "expire": 30 //有效天数
                 },
-<<<<<<< HEAD
-                isPermanent: 0, //默认永久
-=======
                 isPermanent: 1, //默认永久
 
 
->>>>>>> 4defb936d38390200702c47936933f15327dac0d
                 // 红包券赠送数据
                 order_paid: {
                     is_score:0,

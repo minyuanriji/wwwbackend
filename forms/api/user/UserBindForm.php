@@ -65,47 +65,34 @@ class UserBindForm extends BaseModel
             //手机号是否已绑定
             $userResult = UserLogic::checkUserMobileIsExist($this->mobile);
             \Yii::warning("userBindForm platFrom=".\Yii::$app->appPlatform." userResult = ".var_export($userResult,true));
-            //已经绑定的情况
-            if($userResult){
-                //当前登录用户是不是已经授权了当前平台
-                /** @var UserInfo $currentUserInfo */
-                $currentUserInfo = UserInfo::getOneUserInfo(["user_id" => \Yii::$app->user->id, "mall_id" => $stands_mall_id,"platform" => \Yii::$app->appPlatform,'is_delete' => 0]);
-                \Yii::warning("userBindForm currentUserInfo = ".var_export($currentUserInfo,true));
+
+            if($userResult){ //已存在绑定用户
+                
                 \Yii::$app->user->logout();
                 \Yii::$app->user->login($userResult);
-                //绑定过的用户是不是已经授权了当前平台
-                $bindUserInfo = UserInfo::getOneUserInfo(["user_id" => $userResult->id, "mall_id" => $stands_mall_id,"platform" => \Yii::$app->appPlatform,'is_delete' => 0]);
-                \Yii::warning("userBindForm bindUserInfo = ".var_export($bindUserInfo,true));
-                //如果绑定过的用户也已经授权了当前平台，则不做操作，如果没有授权，则将当前登录用户的授权信息更新到绑定过的账户上
-                if(!empty($currentUserInfo) && empty($bindUserInfo)){
-                    \Yii::warning("userBindForm auth save ");
-                    //当前授权的用户id
-                    $currentUserId = $currentUserInfo->user_id;
-                    $currentUserInfo->user_id = $userResult->id;
-                    $result = $currentUserInfo->save();
-                    if($result !== false){
-                        //删除了授权的用户，因为之前已经绑定了对应手机的用户
-                        $users = User::findOne($currentUserId);
-                        if(!empty($users)){
-                            $users->is_delete = 1;
-                            $res = $users->save();
-                            \Yii::warning("userBindForm res = ".$res.";error:".var_export($users->getErrors(),true));
-                        }
-                    }
 
-                }else if(!empty($bindUserInfo)){
-                    throw new \Exception("手机号已经被其他用户绑定过了");
-                }else if(empty($bindUserInfo)){
-                    //当前平台没有该用户信息，就新增一条
-                    $userResult = UserLogic::userRegister($userInfo,$userResult,$parent_id,$stands_mall_id);
-                    if (!$userResult->access_token) {
-                        $access_token = \Yii::$app->security->generateRandomString();
-                        $userResult->access_token = $access_token;
-                        if (!$userResult->save()) {
-                            \Yii::error("UpdateUserAccessToken ".var_export($userResult->getErrors(),true));
-                            throw new Exception("更新用户access_token失败");
-                        }
-                    }
+                //判断授权信息
+                $uniqueData = [
+                    "user_id"   => $userResult->id,
+                    "mall_id"   => $stands_mall_id,
+                    "platform"  => \Yii::$app->appPlatform
+                ];
+                $userInfoModel = UserInfo::findOne($uniqueData);
+                if(!$userInfoModel){ //没有授权信息就生成一条
+                    $userInfoModel = new UserInfo($uniqueData);
+                }
+                $userInfoModel->mch_id        = 0;
+                $userInfoModel->unionid       = isset($userInfo["unionid"]) ? $userInfo["unionid"] : "";
+                $userInfoModel->openid        = isset($userInfo["openid"]) ? $userInfo["openid"] : "";
+                $userInfoModel->platform_data = isset($userInfo["platform_data"]) ? $userInfo["platform_data"] : "";
+                if(!$userInfoModel->save()) {
+                    throw new Exception("用户授权信息新增失败");
+                }
+
+                $userResult->access_token = \Yii::$app->security->generateRandomString();
+                if (!$userResult->save()) {
+                    \Yii::error("UpdateUserAccessToken ".var_export($userResult->getErrors(),true));
+                    throw new Exception("更新用户access_token失败");
                 }
             }else{
                 //没有绑定手机号

@@ -1514,14 +1514,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     "expire": 30 //有效天数
                 },
                 isPermanent: 1, //默认永久
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-
-=======
->>>>>>> c47e1f425aa8f706073b67c5bfa61a12e23d611a
-=======
->>>>>>> 7ce3d4abd36032b40bbc86bb88f7f96d29a9240c
                 // 红包券赠送数据
                 order_paid: {
                     is_score:0,

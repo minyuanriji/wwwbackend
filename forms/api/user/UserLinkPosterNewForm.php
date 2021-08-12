@@ -3,17 +3,16 @@
 
 namespace app\forms\api\user;
 
+use app\controllers\business\Poster;
 use app\core\ApiCode;
 use app\forms\api\poster\BasePoster;
-use app\forms\common\grafika\CustomizeFunction;
 use app\forms\common\grafika\GrafikaOption;
+use app\forms\common\QrCodeCommon;
 use app\models\User;
 
 class UserLinkPosterNewForm extends GrafikaOption implements BasePoster{
 
     public $flag;
-
-    use CustomizeFunction;
 
     public function rules(){
         return [
@@ -29,28 +28,11 @@ class UserLinkPosterNewForm extends GrafikaOption implements BasePoster{
 
         try {
 
-            $shareUrl = \Yii::$app->request->hostInfo . '/h5/#/pages/index/index?user_id='. \Yii::$app->user->id . '&pid=' . \Yii::$app->user->id;
-
-            $option['qr_code'] = [
-                "is_show" => 1,
-                "size" => 240,
-                "top" => 1030,
-                "left" => 460,
-                "type" => 1,
-                "file_type" => "image"
-            ];
-
             if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
-                $file = $this->qrcode($option, [
-                    [
-                        'pid' => \Yii::$app->user->id
-                    ],
-                    280,
-                    'pages/index/index'
-                ], $this);
+                $code = (new QrCodeCommon())->getQrCode(['pid' => \Yii::$app->user->id], 350, 'pages/index/index');
             }
 
-            $option = array_merge($option, [
+            $config = array(
                 'bg_url' => \Yii::$app->basePath . '/web/statics/bg/redpack.png',//背景图片路径
                 'text' => [
                     [
@@ -67,7 +49,7 @@ class UserLinkPosterNewForm extends GrafikaOption implements BasePoster{
                     [
                         'name' => '二维码', //图片名称，用于出错时定位
                         'url' => '',
-                        'stream' => $file,
+                        'stream' => file_get_contents($code['file_path']),
                         'left' => 190,
                         'top' => 390,
                         'right' => 0,
@@ -78,13 +60,22 @@ class UserLinkPosterNewForm extends GrafikaOption implements BasePoster{
                         'opacity' => 100
                     ]
                 ]
-            ]);
+            );
+            Poster::setConfig($config);
 
-            $editor = $this->getPoster($option);
+            //设置保存路径
+            $fileName =  "/web/temp/" . md5(uniqid()) . ".jpg";
+            if(!Poster::make(\Yii::$app->basePath . $fileName)){
+                throw new \Exception("分享海报生成失败");
+            }
 
-            echo $editor->qrcode_url . '?v=' . time();
-            exit;
+            //是否要清理缓存资源
+            Poster::clear();
 
+            return [
+                'status' => 1,
+                'img'    => \Yii::$app->request->hostInfo . $fileName
+            ];
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,

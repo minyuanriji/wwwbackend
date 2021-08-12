@@ -394,6 +394,9 @@ abstract class BaseGoodsEdit extends BaseModel
             $goods->purchase_permission = '';
         }
         if($this->first_buy_setting != []){
+            $this->first_buy_setting['period'] = 1;
+            $this->first_buy_setting['period_unit'] = "month";
+            $this->first_buy_setting['expire'] = -1;
             $goods->first_buy_setting = SerializeHelper::encode($this->first_buy_setting);
         } else {
             $goods->first_buy_setting = '';

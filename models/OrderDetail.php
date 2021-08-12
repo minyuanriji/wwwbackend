@@ -230,8 +230,8 @@ class OrderDetail extends BaseActiveRecord
         $query      = self::find()->alias("od");
         if (isset($params["order"])) {
             $query->leftJoin(['ord' => Order::tableName()], 'ord.id = od.order_id');
+            $query->where(["ord.is_delete" => self::NO]);
         }
-        $query->where(["is_delete" => self::NO]);
         if (isset($params["id"]) && !empty($params["id"])) {
             $params["is_one"] = 1;
             $query->andWhere(["od.id" => $params["id"]]);
@@ -249,7 +249,7 @@ class OrderDetail extends BaseActiveRecord
             $query->andWhere(["ord.is_pay" => $params["is_pay"]]);
         }
         //排序
-        $orderByColumn = isset($params["sort_key"]) ? $params["sort_key"] : "id";
+        $orderByColumn = isset($params["sort_key"]) ? $params["sort_key"] : "od.id";
         $orderByType   = isset($params["sort_val"]) ? $params["sort_val"] : " desc";
         $orderBy       = $orderByColumn . " " . $orderByType;
         if (!empty($fields)) {

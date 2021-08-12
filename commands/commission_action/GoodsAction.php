@@ -45,14 +45,12 @@ class GoodsAction extends Action{
             ["od.is_delete" => 0],
             ["od.commission_status" => 0]
         ]);
-        $query->select(["od.id as order_detail_id", "od.num", "od.is_refund", "od.refund_status", "od.created_at", "od.updated_at", "o.mall_id", "o.user_id", "od.order_id", "od.goods_id", "od.total_original_price", "od.total_price", "g.profit_price", "gw.name"]);
+        $query->select(["od.id as order_detail_id", "od.num", "od.is_refund", "od.refund_status", "od.created_at", "od.updated_at", "o.mall_id", "o.user_id", "od.order_id", "od.goods_id", "od.total_original_price", "od.total_price", "g.profit_price", "gw.name","g.first_buy_setting"]);
         $orderDetailData = $query->asArray()->one();
         if(!$orderDetailData){
             return false;
         }
-
         try {
-
             if($orderDetailData['is_refund'] && $orderDetailData['refund_status'] == 20){
                 throw new \Exception("订单商品[ID:".$orderDetailData['order_detail_id']."]已退款");
             }
@@ -74,8 +72,54 @@ class GoodsAction extends Action{
                 }else{ //按固定值
                     $price = (float)$ruleData['commisson_value'];
                 }
-
                 $price = $price * intval($orderDetailData['num']);
+
+                //判断该商品是否设置首次利润
+                if ($orderDetailData['first_buy_setting']) {
+                    $first_buy_setting = json_decode($orderDetailData['first_buy_setting'], true);
+                    if (isset($first_buy_setting['buy_num']) && $first_buy_setting['buy_num'] > 0) {
+                        //查询该商品该用户购买过几次
+                        $fields = ["sum(od.num) as total","od.goods_id"];
+                        $params["order"] = 1;
+                        $params["user_id"] = $orderDetailData['user_id'];
+                        $params["is_pay"] = 1;
+                        $params["goods_id"] = $orderDetailData['goods_id'];
+                        $params["mall_id"] = $orderDetailData['mall_id'];
+                        $params["is_one"] = 1;
+                        $sameOrderList = OrderDetail::getSameCatsGoodsOrderTotal($params,$fields);
+                        $sameOrderList['total'] = $sameOrderList['total'] - $orderDetailData['num'];
+                        $total = 0;
+                        if(!empty($sameOrderList)){
+                            $total = max(0, $sameOrderList['total']);
+                        }
+                        $surplus_num = $first_buy_setting['buy_num'] - $total; //可以购买次数 - 已经购买次数 = 剩余可购买次数
+                        if ($surplus_num > 0) {
+                            $profit_num = $surplus_num - $orderDetailData['num']; //剩余次数 - 当前购买次数 = 剩剩余可购买次数
+                            if ($profit_num >= 0) {
+                                $ruleData['profit_price'] = $first_buy_setting['return_commission'];
+                                if($ruleData['commission_type'] == 1){ //按百分比
+                                    $price = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
+                                }else{ //按固定值
+                                    $price = (float)$ruleData['profit_price'];
+                                }
+                                $price = $price * intval($orderDetailData['num']);
+                            } elseif ($profit_num < 0) {
+                                $ruleData['profit_price'] = $first_buy_setting['return_commission'];
+                                if($ruleData['commission_type'] == 1){ //按百分比
+                                    $price_one = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
+                                }else{ //按固定值
+                                    $price_one = (float)$first_buy_setting['return_commission'];
+                                }
+                                if($ruleData['commission_type'] == 1){ //按百分比
+                                    $price_two = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
+                                }else{ //按固定值
+                                    $price_two = (float)$ruleData['commisson_value'];
+                                }
+                                $price = $surplus_num * $price_one + intval(abs($profit_num)) * $price_two;
+                            }
+                        }
+                    }
+                }
 
                 //生成分佣记录
                 if($price > 0){

@@ -55,6 +55,29 @@ class UserBindForm extends BaseModel
         }
         try {
             $userInfo = \Yii::$app->cache->get($this->key);
+
+            /*$userInfo = [
+                "openId" => "ozvug4lfH__6SIvHWgCwaoKCwDiM",
+                "nickName" => "微信用户",
+                "gender" => 0,
+                "language" => "",
+                "city" => "",
+                "province" => "",
+                "country" => "",
+                "avatarUrl" => "https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132",
+                "unionId" => "o2jF35uJT9pCMpQLkyWb6LYZM-Qk",
+                "watermark" => [
+                    "timestamp" => "1628660972",
+                    "appid" => "wx3ab6add3406998a1"
+                ],
+                "openid" => "ozvug4lfH__6SIvHWgCwaoKCwDiM",
+                "nickname" => "微信用户",
+                "headimgurl" => "https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132",
+                "session_key" => "o3O+o1TIbGxax7IZxqtucw==",
+                "unionid" => "o2jF35uJT9pCMpQLkyWb6LYZM-Qk"
+            ];*/
+
+
             if(empty($userInfo)){
                 return [
                     'code' => ApiCode::CODE_NOT_LOGIN,
@@ -67,24 +90,35 @@ class UserBindForm extends BaseModel
             \Yii::warning("userBindForm platFrom=".\Yii::$app->appPlatform." userResult = ".var_export($userResult,true));
 
             if($userResult){ //已存在绑定用户
-                
+
                 \Yii::$app->user->logout();
                 \Yii::$app->user->login($userResult);
 
                 //判断授权信息
                 $uniqueData = [
-                    "user_id"   => $userResult->id,
-                    "mall_id"   => $stands_mall_id,
-                    "platform"  => \Yii::$app->appPlatform
+                    "mall_id"  => $stands_mall_id,
+                    "platform" => \Yii::$app->appPlatform
                 ];
+                if(!empty($userInfo['openid'])){
+                    $uniqueData['openid'] = $userInfo['openid'];
+                }else{
+                    $uniqueData['user_id'] = $userResult->id;
+                }
                 $userInfoModel = UserInfo::findOne($uniqueData);
                 if(!$userInfoModel){ //没有授权信息就生成一条
                     $userInfoModel = new UserInfo($uniqueData);
                 }
-                $userInfoModel->mch_id        = 0;
-                $userInfoModel->unionid       = isset($userInfo["unionid"]) ? $userInfo["unionid"] : "";
-                $userInfoModel->openid        = isset($userInfo["openid"]) ? $userInfo["openid"] : "";
-                $userInfoModel->platform_data = isset($userInfo["platform_data"]) ? $userInfo["platform_data"] : "";
+                $userInfoModel->mch_id  = 0;
+                $userInfoModel->user_id = $userResult->id;
+                if(!empty($userInfo['openid'])){
+                    $userInfoModel->openid = $userInfo['openid'];
+                }
+                if(!empty($userInfo["unionid"])){
+                    $userInfoModel->unionid = $userInfo["unionid"];
+                }
+                if(!empty($userInfo["platform_data"])){
+                    $userInfoModel->platform_data = $userInfo["platform_data"];
+                }
                 if(!$userInfoModel->save()) {
                     throw new Exception("用户授权信息新增失败");
                 }
@@ -123,4 +157,5 @@ class UserBindForm extends BaseModel
         }
     }
 }
+
 

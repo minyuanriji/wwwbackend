@@ -67,7 +67,7 @@ class UserLinkPosterNewForm extends GrafikaOption implements BasePoster{
                     [
                         'name' => '二维码', //图片名称，用于出错时定位
                         'url' => '',
-                        'stream' => file_get_contents($file),
+                        'stream' => $file,
                         'left' => 190,
                         'top' => 390,
                         'right' => 0,

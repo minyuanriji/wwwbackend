@@ -104,9 +104,8 @@ class GoodsAction extends Action{
                                 }
                                 $price = $price * intval($orderDetailData['num']);
                             } elseif ($profit_num < 0) {
-                                $ruleData['profit_price'] = $first_buy_setting['return_commission'];
                                 if($ruleData['commission_type'] == 1){ //按百分比
-                                    $price_one = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
+                                    $price_one = (floatval($ruleData['commisson_value'])/100) * floatval($first_buy_setting['return_commission']);
                                 }else{ //按固定值
                                     $price_one = (float)$first_buy_setting['return_commission'];
                                 }

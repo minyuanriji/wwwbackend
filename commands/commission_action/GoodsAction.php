@@ -114,7 +114,7 @@ class GoodsAction extends Action{
                                 }else{ //按固定值
                                     $price_two = (float)$ruleData['commisson_value'];
                                 }
-                                $ruleData['profit_price'] += $first_buy_setting['return_commission'];
+                                $ruleData['profit_price'] = $first_buy_setting['return_commission'] * $surplus_num + $ruleData['profit_price'] * abs($profit_num);
                                 $price = $surplus_num * $price_one + intval(abs($profit_num)) * $price_two;
                             }
                         }

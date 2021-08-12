@@ -51,6 +51,24 @@ class GiftpacksGroupJoinForm extends BaseModel{
                 throw new \Exception("用户不存在");
             }
 
+            //获取我发起或我参与未结束的团
+            $userId = \Yii::$app->user->id;
+            $existGroup = GiftpacksGroupPayOrder::find()->alias("ggpo")
+                ->innerJoin(["gg" => GiftpacksGroup::tableName()], "gg.id=ggpo.group_id")
+                ->andWhere([
+                    "AND",
+                    ["gg.pack_id" => $giftpacks->id],
+                    ["gg.status"  => "sharing"]
+                ])->andWhere([
+                    "OR",
+                    ["gg.user_id" => $userId],
+                    "ggpo.user_id='{$userId}' AND ggpo.pay_status='paid'"
+                ])->exists();
+            if($existGroup){
+                throw new \Exception("你有正在参与未结束的活动，请勿重复参与");
+            }
+
+
             //拼单信息判断
             if($group->expired_at < time()){
                 throw new \Exception("拼单已结束或已过期");

@@ -932,10 +932,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                   placeholder="请输入0-100的数值" v-model="info.integral_fee_rate">
                                             <template slot="append">元</template>
                                         </el-input>
-
                                     </el-form-item>
-
-
 
                                     <el-form-item label="下单升级会员" prop="enable_upgrade_user_role">
                                         <el-switch v-model="ruleForm.enable_upgrade_user_role" :active-value="1" :inactive-value="0" active-text="开启" inactive-text="关闭">
@@ -947,12 +944,37 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                 <el-option :label="'分公司'" :value="'branch_office'"></el-option>
                                             </el-select>
                                         </div>
-
                                     </el-form-item>
 
+                                    <div style="border-style: solid;border-width: 1px;border-color: RGB(123,125,128);padding-top: 20px;padding-right: 20px">
+                                        <el-form-item >
+                                            <template slot='label'>
+                                                <span>首次购买该商品</span>
+                                            </template>
+                                            <el-input type="number" v-model="ruleForm.first_buy_setting.buy_num">
+                                                <template slot="append">件</template>
+                                            </el-input>
+                                        </el-form-item>
+
+                                        <el-form-item>
+                                            <template slot='label'>
+                                                <span>首次购买返红包数</span>
+                                            </template>
+                                            <el-input type="number" v-model="ruleForm.first_buy_setting.return_red_envelopes">
+                                            </el-input>
+                                        </el-form-item>
+
+                                        <el-form-item >
+                                            <template slot='label'>
+                                                <span>首次购买商品利润</span>
+                                            </template>
+                                            <el-input type="number" v-model="ruleForm.first_buy_setting.return_commission">
+                                                <template slot="append">元</template>
+                                            </el-input>
+                                        </el-form-item>
+                                    </div>
 								</el-col>
                             </el-row>
-
                         </el-card>
 
                         <!-- 商品详情 -->
@@ -963,11 +985,9 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             </div>
                             <el-row>
                                 <el-col :xl="12" :lg="16">
-
                                     <el-form-item label="商品详情">
                                         <com-rich-text style="width: 750px" v-model="ruleForm.detail"></com-rich-text>
                                     </el-form-item>
-
                                 </el-col>
                             </el-row>
                         </el-card>
@@ -975,7 +995,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     </el-tab-pane>
 
                     <el-tab-pane label="订单设置" name="order" v-if="is_order == 1">
-                        
                         <el-form-item prop="is_order_paid">
                             <template slot='label'>
                                 <span>订单支付后执行</span>
@@ -1320,6 +1339,11 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 upgrade_user_role_type: '',
                 product: '',
                 purchase_permission: [],
+                first_buy_setting:{
+                    buy_num : 0,
+                    return_red_envelopes : 0,
+                    return_commission : 0,
+                }
             };
             let rules = {
                 cats: [{
@@ -1521,7 +1545,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     is_order_sales:"0",
                     
                 },
-
             };
         },
         created() {
@@ -1630,7 +1653,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     this.score_setting.expire = 1;
                 }
             },
-
             isOrderSetting(e,o,type){
                 let self = this;
                 console.log(e,o,type); 
@@ -1652,7 +1674,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     }
                 }
             },
-
             loadmore() {
                 if (this.page <= this.priceName_page_count) {
                     this.getGoodsNameDiy();
@@ -1772,7 +1793,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 this.ruleForm.cats = arr;
                 this.$refs.ruleForm.validateField('cats');
             },
-
             selectMchCat(cats) {
                 this.mchCats = cats;
                 let arr = [];
@@ -1799,7 +1819,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             delPic(index) {
                 this.ruleForm.pic_url.splice(index, 1)
             },
-
             catDialogCancel() {
                 let that = this;
                 that.mchDialogVisible = false;
@@ -1817,7 +1836,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     })
                 }
             },
-
             getPermissions() {
                 let self = this;
                 request({
@@ -1840,7 +1858,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     console.log(e);
                 });
             },
-
             store(formName) {
                 let self = this;
                 let url = null;
@@ -1865,8 +1882,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         } else {
                             delete self.cForm['is_vip_card_goods']
                         }
-
-
                         let postData = JSON.parse(JSON.stringify(self.cForm));
                         // 这里是追加红包券赠送的字段
                         // max_deduct_integral 最大抵扣红包券
@@ -1896,7 +1911,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             "display_id": this.pic_value ? this.pic_value : 0,
                         }];
                         postData.price_display = priceName_obj;
-                        //console.log(postData);return false;
+                        // console.log(postData);return;
                         request({
                             params: {
                                 r: this.url

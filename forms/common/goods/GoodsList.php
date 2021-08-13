@@ -75,7 +75,7 @@ class GoodsList extends BaseModel
             [['limit',], 'default', 'value' => 10],
             [['keyword', 'goods_warehouse_ids', 'date_start', 'date_end'], 'string'],
             [['is_array', 'isSignCondition'], 'default', 'value' => 0],
-            [['page', 'sort'], 'default', 'value' => 1],
+            [['page'], 'default', 'value' => 1],//, 'sort'
             [['model'], 'default', 'value' => 'app\models\Goods'],
             [['relations', 'cat_id', 'goods_id', 'exceptSelf', 'goodsWarehouseId', 'ids'], 'safe'],
             [['sign', 'sort_prop', 'signWhere'], 'trim'],
@@ -203,10 +203,13 @@ class GoodsList extends BaseModel
         }
 
         $this->getQuery();
-        $this->sortWhere();
+        if ($this->sort) {
+            $this->sortWhere();
+        } else {
+            $this->query->orderBy('id DESC');
+        }
         return $this->query->page($this->pagination, $this->limit, $this->page)
             ->groupBy($this->group_by_name)
-            //->orderBy('id DESC')
             ->asArray($this->is_array)
             ->all();
     }

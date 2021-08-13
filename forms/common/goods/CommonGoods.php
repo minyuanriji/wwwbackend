@@ -261,6 +261,13 @@ class CommonGoods extends BaseModel
             \Yii::error($e);
         }
         $detail['purchase_permission'] = $detail['purchase_permission'] ? json_decode($detail['purchase_permission'], true) : [];
+        $detail['first_buy_setting'] = $detail['first_buy_setting'] ?
+            json_decode($detail['first_buy_setting'], true) :
+            [
+                'buy_num' => 0,
+                'return_red_envelopes' => 0,
+                'return_commission' => 0,
+            ];
         return $detail;
     }
 

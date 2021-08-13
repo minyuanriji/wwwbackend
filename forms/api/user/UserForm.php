@@ -330,7 +330,7 @@ class UserForm extends BaseModel
         $userCenter['menus'][] = [
             "icon_url"  => "https://dev.mingyuanriji.cn/web/static/hotel-orders.png",
             "name"      => "酒店",
-            "link_url"  => "/pages/hotel/orderList/orderList",
+            "link_url"  => "/mch/hotel/orderList/orderList",
             "open_type" => "navigate"
         ];
 

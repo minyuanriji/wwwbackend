@@ -82,6 +82,7 @@ use Yii;
  * @property string $is_on_site_consumption 是否到店消费类商品
  * @property int $integral_fee_rate 使用红包券支付，需要额外收取的红包券比例
  * @property int $purchase_permission 购买权限
+ * @property int $first_buy_setting 首次购买商品配置
  *
  */
 class Goods extends BaseActiveRecord
@@ -117,14 +118,14 @@ class Goods extends BaseActiveRecord
                 'forehead_score_type', 'accumulative', 'individual_share', 'attr_setting_type', 'is_level',
                 'is_level_alone', 'share_type', 'is_default_services', 'sort', 'is_delete', 'payment_people',
                 'payment_num', 'payment_order', 'is_area_limit', 'form_id'], 'integer'],
-            [['price', 'profit_price', 'forehead', 'payment_amount', 'forehead_score', 'confine_order_count','full_relief_price','fulfil_price','max_deduct_integral','enable_integral','enable_score', 'is_order_paid','is_order_sales'], 'number'],
+            [['price', 'profit_price', 'forehead', 'payment_amount', 'forehead_score', 'confine_order_count', 'full_relief_price', 'fulfil_price', 'max_deduct_integral', 'enable_integral', 'enable_score', 'is_order_paid', 'is_order_sales'], 'number'],
             [['attr_groups', 'area_limit'], 'string'],
             [['area_limit'], 'default', 'value' => ''],
-            [['created_at', 'updated_at', 'deleted_at','labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund', 'is_on_site_consumption', 'purchase_permission'], 'safe'],
+            [['created_at', 'updated_at', 'deleted_at', 'labels', 'price_display', 'integral_setting', 'score_setting', 'order_paid', 'order_sales', 'cannotrefund', 'is_on_site_consumption', 'purchase_permission', 'first_buy_setting'], 'safe'],
             [['sign', 'app_share_pic'], 'string', 'max' => 255],
             [['app_share_title'], 'string', 'max' => 65],
-	        [['full_relief_price','fulfil_price'], 'default', 'value' => 0],
-	        [['integral_setting','score_setting','order_paid','order_sales'],'default','value'=>''],
+            [['full_relief_price', 'fulfil_price'], 'default', 'value' => 0],
+            [['integral_setting', 'score_setting', 'order_paid', 'order_sales'], 'default', 'value' => ''],
             [['integral_fee_rate', 'enable_upgrade_user_role'], 'integer'],
             [['upgrade_user_role_type'], 'safe']
         ];
@@ -177,21 +178,22 @@ class Goods extends BaseActiveRecord
             'confine_order_count' => '限单数量',
             'is_show_sales' => '是否显示销量',
             'use_virtual_sales' => '是否启用虚拟销量',
-            'labels'            => '商品标签',
+            'labels' => '商品标签',
             'full_relief_price' => '单品满额减免金额',
             'fulfil_price' => '单品满额金额',
-            'price_display'=>'自定义商品价格显示字样',
-            'max_deduct_integral'=>'最大抵扣红包券',
-            'enable_integral' =>'是否启用红包券赠送',
-            'integral_setting'=>'红包券赠送设置',
-            'enable_score' =>'是否启用积分券赠送',
-            'score_setting'=>'积分券赠送设置',
-            'is_order_paid'=>'订单支付后设置',
-            'order_paid'=>'订单支付后参数设置',
-            'is_order_sales'=>'订单完结后设置',
-            'order_sales'=>'订单完结后参数设置',
+            'price_display' => '自定义商品价格显示字样',
+            'max_deduct_integral' => '最大抵扣红包券',
+            'enable_integral' => '是否启用红包券赠送',
+            'integral_setting' => '红包券赠送设置',
+            'enable_score' => '是否启用积分券赠送',
+            'score_setting' => '积分券赠送设置',
+            'is_order_paid' => '订单支付后设置',
+            'order_paid' => '订单支付后参数设置',
+            'is_order_sales' => '订单完结后设置',
+            'order_sales' => '订单完结后参数设置',
             'cannotrefund' => '是否支持退换货 ',
-            '$purchase_permission' => '购买权限',
+            'purchase_permission' => '购买权限',
+            'first_buy_setting' => '商品首次购买配置',
         ];
     }
 
@@ -408,50 +410,65 @@ class Goods extends BaseActiveRecord
      * 获取商品红包券设置
      * @Author bing
      * @DateTime 2020-10-15 12:54:18
-     * @copyright: Copyright (c) 2020 广东七件事集团
      * @param [type] $goods_id
-     * @return void
+     * @return
+     * @copyright: Copyright (c) 2020 广东七件事集团
      */
-    public static function getGooodsIntegralSetting($goods_id){
+    /*废弃*/
+    public static function getOldGooodsIntegralSetting($goods_id)
+    {
         $integral_setting = self::find()->select('integral_setting')
-        ->where(array('id'=>$goods_id,'mall_id'=>Yii::$app->mall->id,'enable_integral'=>1))
-        ->scalar();
-        return $integral_setting ?? null;
+            ->where(array('id' => $goods_id, 'mall_id' => Yii::$app->mall->id, 'enable_integral' => 1))
+            ->scalar();
+        return $integral_setting;
     }
+
+    public static function getGooodsIntegralSetting($goods_id)
+    {
+        $integral_setting = self::find()
+            ->select('integral_setting,first_buy_setting')
+            ->where(array('id' => $goods_id))
+            ->asArray()
+            ->one();
+        return $integral_setting;
+    }
+
     /**
      * 获取商品积分券设置
      * @Author bing
      * @DateTime 2020-10-15 12:54:18
-     * @copyright: Copyright (c) 2020 广东七件事集团
      * @param [type] $goods_id
-     * @return void
+     * @return
+     * @copyright: Copyright (c) 2020 广东七件事集团
      */
-    public static function getGooodsScoreSetting($goods_id){
+    public static function getGooodsScoreSetting($goods_id)
+    {
         $score_setting = self::find()->select('score_setting')
-        ->where(array('id'=>$goods_id,'mall_id'=>Yii::$app->mall->id,'enable_score'=>1))
-        ->scalar();
-        return $score_setting ?? null;
+            ->where(array('id' => $goods_id, 'mall_id' => Yii::$app->mall->id, 'enable_score' => 1))
+            ->scalar();
+        return $score_setting;
     }
 
     /**
      * 获取订单设置
      * @Author bing
      * @DateTime 2020-10-15 12:54:18
-     * @copyright: Copyright (c) 2020 广东七件事集团
      * @param [type] $goods_id
      * @return void
+     * @copyright: Copyright (c) 2020 广东七件事集团
      */
-    public static function getGooodsOrderSetting($goods_id,$type=0){
-        if($type=='paid'){
+    public static function getGooodsOrderSetting($goods_id, $type = 0)
+    {
+        if ($type == 'paid') {
             $field = 'order_paid';
-            $where = array('id'=>$goods_id,'mall_id'=>Yii::$app->mall->id,'is_order_paid'=>1);
-        }else{
+            $where = array('id' => $goods_id, 'mall_id' => Yii::$app->mall->id, 'is_order_paid' => 1);
+        } else {
             $field = 'order_sales';
-            $where = array('id'=>$goods_id,'mall_id'=>Yii::$app->mall->id,'is_order_sales'=>1);
+            $where = array('id' => $goods_id, 'mall_id' => Yii::$app->mall->id, 'is_order_sales' => 1);
         }
         $setting = self::find()->select($field)
-        ->where($where)
-        ->scalar();
+            ->where($where)
+            ->scalar();
         return $setting ?? null;
     }
 }

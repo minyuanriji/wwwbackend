@@ -86,6 +86,16 @@ class ApiController extends BaseController
         $this->enableCsrfValidation = false;
         $headers = \Yii::$app->request->headers;
 
+        //小程序访问
+        if($headers['x-app-platform'] == "mp-wx"){
+            $appId          = isset($headers['x-mp-appid']) ? $headers['x-mp-appid'] : "";
+            $version        = isset($headers['x-mp-version']) ? $headers['x-mp-version'] : "";
+            $currentVersion = dirname(ROOT_PATH) . "/runtime/mp-wx/{$appId}.version";
+            if(empty($version) || $version != $currentVersion){
+
+            }
+        }
+
         $this->getParamsData()->setMall($headers)->setCity($headers)->login($headers)->wechatSubscribe()->saveFormIdList($headers)->bindParent($headers)->checkInviter();
 
         /*$lng = "113.1172052002";

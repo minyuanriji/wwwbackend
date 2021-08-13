@@ -23,7 +23,7 @@ class GiftpacksClerkProcessForm extends CommonClerkProcessForm {
             throw new \Exception("服务订单不存在");
         }
 
-        if($orderPackItem->max_num > 0 && $orderPackItem->max_num <= 0){
+        if($orderPackItem->max_num > 0 && $orderPackItem->current_num <= 0){
             throw new \Exception("服务次数已用完");
         }
 

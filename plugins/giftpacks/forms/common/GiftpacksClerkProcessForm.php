@@ -23,7 +23,7 @@ class GiftpacksClerkProcessForm extends CommonClerkProcessForm {
             throw new \Exception("服务订单不存在");
         }
 
-        if($orderPackItem->max_num > 0 && $orderPackItem->max_num <= 0){
+        if($orderPackItem->max_num > 0 && $orderPackItem->current_num <= 0){
             throw new \Exception("服务次数已用完");
         }
 
@@ -47,7 +47,7 @@ class GiftpacksClerkProcessForm extends CommonClerkProcessForm {
         }
 
         if($mchData['user_id'] != $this->clerk_user_id){
-            //throw new \Exception("[ID:" . $this->clerk_user_id . "]无核销权限");
+            throw new \Exception("[ID:" . $this->clerk_user_id . "]无核销权限");
         }
 
         if($orderPackItem->max_num > 0){
@@ -59,3 +59,4 @@ class GiftpacksClerkProcessForm extends CommonClerkProcessForm {
     }
 
 }
+

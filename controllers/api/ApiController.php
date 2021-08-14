@@ -86,17 +86,36 @@ class ApiController extends BaseController
         $this->enableCsrfValidation = false;
         $headers = \Yii::$app->request->headers;
 
-        //小程序访问
-        if($headers['x-app-platform'] == "mp-wx"){
+        $this->getParamsData();
+
+        //TODO 临时应付小程序上线审核处理 2021/08/13
+        $devUrl = "dev.mingyuanriji.cn";
+        if($headers['x-app-platform'] == "mp-wx" && \Yii::$app->getRequest()->getHostName() != $devUrl){
             $appId          = isset($headers['x-mp-appid']) ? $headers['x-mp-appid'] : "";
             $version        = isset($headers['x-mp-version']) ? $headers['x-mp-version'] : "";
             $currentVersion = dirname(ROOT_PATH) . "/runtime/mp-wx/{$appId}.version";
             if(empty($version) || $version != $currentVersion){
-
+                //重定向到测试地址
+                $curl = new \Curl\Curl();
+                foreach($headers as $name => $values){
+                    if(substr($name, 0, 2) == "x-"){
+                        $value = is_array($values) ? array_shift($values) : "";
+                        $curl->setHeader($name, $value);
+                    }
+                }
+                $url = str_replace(\Yii::$app->getRequest()->getHostName(), $devUrl, \Yii::$app->getRequest()->getAbsoluteUrl());
+                $url = preg_replace("/https?/i", "https", $url);
+                $curl->setOpt(CURLOPT_SSL_VERIFYPEER, false);
+                $curl->setOpt(CURLOPT_SSL_VERIFYHOST, false);
+                $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 10);
+                $curl->setOpt(CURLOPT_TIMEOUT, 15);
+                $curl->post($url, $this->requestData);
+                header('Content-Type:application/json; charset=utf-8');
+                die($curl->getResponse());
             }
         }
 
-        $this->getParamsData()->setMall($headers)->setCity($headers)->login($headers)->wechatSubscribe()->saveFormIdList($headers)->bindParent($headers)->checkInviter();
+        $this->setMall($headers)->setCity($headers)->login($headers)->wechatSubscribe()->saveFormIdList($headers)->bindParent($headers)->checkInviter();
 
         /*$lng = "113.1172052002";
         $lat = "23.017962033827";

@@ -300,7 +300,7 @@ class UserForm extends BaseModel
             $userCenter['menus'][] = [
                 "icon_url"  => "https://www.mingyuanriji.cn/web/static/CancelTwo.png",
                 "name"      => "核销",
-                "link_url"  => "/pages/personalCentre/accountingOrder/accountingOrder",
+                "link_url"  => "/mch/personalCentre/accountingOrder/accountingOrder",
                 "open_type" => "navigate"
             ];
         }

@@ -65,7 +65,7 @@ class DataForm extends BaseModel
             $this->mch_id = \Yii::$app->mchId;
             $this->is_mch_role = true;
         }
-        
+
         $permission_arr = \Yii::$app->branch->childPermission(\Yii::$app->mall->admin->adminInfo);//直接取商城所属账户权限，对应绑定管理员账户方法修改只给于app_admin权限
         if (!is_array($permission_arr) && $permission_arr) {
             $this->mch_per = true;
@@ -100,8 +100,7 @@ class DataForm extends BaseModel
         if ($type == 1 || $type == 0) {
             //商品排行
             $goods_query = $this->goods_where();
-            $goods_query->select("g.`goods_warehouse_id`,COALESCE(SUM(od.`total_price`),0) AS `total_price`,COALESCE(SUM(od.`num`),0) AS `num`")
-                ->groupBy('g.goods_warehouse_id');
+            $goods_query->select("g.`goods_warehouse_id`,COALESCE(SUM(od.`total_price`),0) AS `total_price`,COALESCE(SUM(od.`num`),0) AS `num`")->groupBy('g.goods_warehouse_id');
             if ($this->flag == "EXPORT") {
                 $new_query = clone $goods_query;
                 $this->export($new_query, $type);
@@ -117,8 +116,7 @@ class DataForm extends BaseModel
         if ($type == 2 || $type == 0) {
             //用户排行
             $users_query = $this->users_where();
-            $users_query->select("o.user_id,COALESCE(SUM(od.`total_price`),0) AS `total_price`,COALESCE(SUM(od.`num`),0) AS `num`,`i`.`platform`")
-                ->groupBy('user_id');
+            $users_query->select("o.user_id,COALESCE(SUM(od.`total_price`),0) AS `total_price`,COALESCE(SUM(od.`num`),0) AS `num`,`i`.`platform`")->groupBy('user_id');
             if ($this->flag == "EXPORT") {
                 $new_query = clone $users_query;
                 $this->export($new_query, $type);
@@ -130,7 +128,7 @@ class DataForm extends BaseModel
                 ->all();
             foreach ($user_top_list as $key => $v) {
                 $user_top_list[$key]['nickname'] = $v['user']['nickname'];
-                // $user_top_list[$key]['avatar'] = $v['user']['userInfo']['avatar'];
+                $user_top_list[$key]['avatar'] = $v['user']['avatar_url'];
                 unset($user_top_list[$key]['user']);
             }
         }
@@ -241,15 +239,17 @@ class DataForm extends BaseModel
         if ($this->platform) {
             $user_query->andWhere(['u.platform' => $this->platform]);
         }
-        $data_arr['user_count'] = $user_query->andWhere(['u.mch_id' => 0, 'u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id,])
-            ->count();//用户数
+        $data_arr['user_count'] = $user_query->andWhere(['u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id])->count();//用户数 'u.mch_id' => 0,
         //以下随时间查询改变
-        $order_query = Order::find()->alias('o')->where(['o.is_recycle' => 0, 'o.is_delete' => 0, 'o.mall_id' => \Yii::$app->mall->id,])
+        $order_query = Order::find()->alias('o')
+            ->where(['o.is_recycle' => 0, 'o.is_delete' => 0, 'o.mall_id' => \Yii::$app->mall->id, 'o.cancel_status' => 0])
             ->leftJoin(['i' => User::tableName()], 'i.id = o.user_id')
-            ->andWhere(['not', ['o.cancel_status' => 1]])->andWhere(['o.mch_id' => 0]);
-        $good_query = Goods::find()->alias('g')->where(['g.is_delete' => 0, 'g.mall_id' => \Yii::$app->mall->id,])->groupBy('goods_warehouse_id');
-        //时间查询
+            //->andWhere(['not', ['o.cancel_status' => 1]])
+            ->andWhere(['o.mch_id' => 0]);
 
+        $good_query = Goods::find()->alias('g')->where(['g.is_delete' => 0, 'g.mall_id' => \Yii::$app->mall->id])->groupBy('goods_warehouse_id');
+
+        //时间查询
         if ($this->date_start) {
             $startTime = strtotime(($this->date_start) . ' 00:00:00');
             $order_query->andWhere(['>=', 'o.created_at', $startTime]);
@@ -279,16 +279,18 @@ class DataForm extends BaseModel
 
         $all_query = clone $order_query;
         $data_arr['order_num'] = $all_query->count();
+
         $pay_query = clone $order_query;
         $data_arr['pay_num'] = $pay_query->andWhere(['or', ['o.is_pay' => 1], ['o.pay_type' => 2]])->count();
 
         $price_query = clone $order_query;
         $data_arr['pay_price'] = $price_query->andWhere(['or', ['o.is_pay' => 1], ['o.pay_type' => 2]])->sum('o.total_pay_price');
         $data_arr['pay_price'] = $data_arr['pay_price'] ?? '0';
+
         $wait_query = clone $order_query;
-        $data_arr['wait_send_num'] = $wait_query->andWhere(['is_send' => 0])
+        $data_arr['wait_send_num'] = $wait_query->andWhere(['o.is_send' => 0])
             ->andWhere(['or', ['o.is_pay' => 1], ['o.pay_type' => 2]])
-            ->andWhere(['o.cancel_status' => 0, 'o.sale_status' => 0])
+            ->andWhere(['o.sale_status' => 0])
             ->count();
 
         $wait_pay_query = clone $order_query;
@@ -422,7 +424,7 @@ class DataForm extends BaseModel
         }
 
         if ($this->date_end) {
-            $query->andWhere(['<=', 'od.created_at', strtotime( $this->date_end. ' 23:59:59')]);
+            $query->andWhere(['<=', 'od.created_at', strtotime($this->date_end . ' 23:59:59')]);
         }
 
         //排序
@@ -439,7 +441,7 @@ class DataForm extends BaseModel
             ->with('user')
 //            ->leftJoin(['u' => User::tableName()], 'o.user_id = u.id')
             ->leftJoin(['i' => User::tableName()], 'i.id = o.user_id')
-            ->andWhere(['od.is_delete' => 0]);
+            ->andWhere(['od.is_delete' => 0, 'i.is_delete' => 0]);
 
         //店铺查询
         if ($this->mch_id) {

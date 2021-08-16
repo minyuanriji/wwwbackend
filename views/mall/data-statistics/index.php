@@ -199,7 +199,7 @@ Yii::$app->loadComponentView('statistics/com-search');
             <!-- 数据总览 -->
             <div class="num-info">
                 <div class="num-info-item">
-                    <div>{{all_data.user_count}}</div>
+                    <div><a href="<?= \Yii::$app->request->hostInfo ?>/web/index.php?r=mall%2Fuser%2Findex">{{all_data.user_count}}</a></div>
                     <div class="info-item-name">
                         <span>用户数</span>
                         <el-tooltip class="item" effect="dark" content="统计全平台用户数，不随店铺的更改而更改" placement="bottom">
@@ -208,7 +208,7 @@ Yii::$app->loadComponentView('statistics/com-search');
                     </div>
                 </div>
                 <div class="num-info-item">
-                    <div>{{all_data.goods_num}}</div>
+                    <div><a href="<?= \Yii::$app->request->hostInfo ?>/web/index.php?r=mall%2Fgoods%2Findex">{{all_data.goods_num}}</a></div>
                     <div class="info-item-name">商品数
                         <el-tooltip class="item" effect="dark" content="统计某时间段内添加的商品总数" placement="bottom">
                             <i class="el-icon-question"></i>
@@ -216,7 +216,7 @@ Yii::$app->loadComponentView('statistics/com-search');
                     </div>
                 </div>
                 <div class="num-info-item">
-                    <div>{{all_data.order_num}}</div>
+                    <div><a href="<?= \Yii::$app->request->hostInfo ?>/web/index.php?r=mall%2Forder%2Findex">{{all_data.order_num}}</a></div>
                     <div class="info-item-name">订单数</div>
                 </div>
                 <div class="num-info-item">
@@ -224,7 +224,7 @@ Yii::$app->loadComponentView('statistics/com-search');
                     <div class="info-item-name">待发货订单数</div>
                 </div>
                 <div class="num-info-item">
-                    <div>{{all_data.pro_order}}</div>
+                    <div><a href="<?= \Yii::$app->request->hostInfo ?>/web/index.php?r=mall%2Forder%2Frefund">{{all_data.pro_order}}</a></div>
                     <div class="info-item-name">维权订单数</div>
                 </div>
             </div>

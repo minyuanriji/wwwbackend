@@ -1,19 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: 阿源
- * Date: 2020/10/22
- * Time: 11:39
- */
-namespace app\forms\mall\data_statistics;
 
+namespace app\forms\mall\data_statistics;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\DistrictArr;
 use app\models\MemberLevel;
 use app\models\StatisticsVirtualConfig;
-
 
 class StatisticsForm extends BaseModel
 {
@@ -45,7 +38,6 @@ class StatisticsForm extends BaseModel
             [['total_transactions','today_earnings'] ,'double', 'min' => 0]
         ];
     }
-
 
     /**
      * 获取配置详情

@@ -300,7 +300,7 @@ class UserForm extends BaseModel
             $userCenter['menus'][] = [
                 "icon_url"  => "https://www.mingyuanriji.cn/web/static/CancelTwo.png",
                 "name"      => "核销",
-                "link_url"  => "/pages/personalCentre/accountingOrder/accountingOrder",
+                "link_url"  => "/mch/personalCentre/accountingOrder/accountingOrder",
                 "open_type" => "navigate"
             ];
         }
@@ -308,7 +308,7 @@ class UserForm extends BaseModel
             $userCenter['menus'][] = [
                 "icon_url" => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
                 "name" => "商户",
-                "link_url" => "/pages/personalCentre/personalCentre",
+                "link_url" => "/mch/personalCentre/personalCentre",
                 "open_type" => "navigate"
             ];
         }elseif(!\Yii::$app->user->isGuest){ //商户子账号
@@ -320,7 +320,7 @@ class UserForm extends BaseModel
                 $userCenter['menus'][] = [
                     "icon_url" => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
                     "name" => "商户",
-                    "link_url" => "/pages/personalCentre/subAccount/chooseToEnter/chooseToEnter",
+                    "link_url" => "/mch/personalCentre/subAccount/chooseToEnter/chooseToEnter",
                     "open_type" => "navigate"
                 ];
             }

@@ -132,6 +132,7 @@ class QrCodeCommon extends BaseModel
                     unset($scene[$k]);
                     continue;
                 }
+
                 $sceneStr .= "{$k}={$v}&";
             }
             $sceneStr = rtrim($sceneStr, "&");

@@ -190,7 +190,8 @@ class AttachmentUploadForm extends Model
         }elseif(!empty($this->customSaveName)){
             $this->saveName = $this->customSaveName;
         } else {
-            $this->saveName = md5_file($this->file->tempName) . '.' . $this->file->getExtension();
+            $tempName = !empty($this->file->tempName) ? $this->file->tempName : $this->file->name;
+            $this->saveName = md5_file($tempName) . '.' . $this->file->getExtension();
         }
 
         $this->saveFile = $this->baseWebPath . $this->savePath . $this->saveName;

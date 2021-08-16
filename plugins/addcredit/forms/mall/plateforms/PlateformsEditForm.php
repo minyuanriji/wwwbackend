@@ -22,7 +22,7 @@ class PlateformsEditForm extends BaseModel
     {
         return [
             [['name', 'sdk_dir', 'ratio', 'cyd_id', 'secret_key','parent_id', 'transfer_rate'], 'required'],
-            [['ratio', 'id', 'cyd_id', 'parent_id','transfer_rate'], 'integer'],
+            [['ratio', 'id', 'parent_id','transfer_rate'], 'integer'],
             [['name', 'sdk_dir', 'secret_key'], 'string'],
         ];
     }

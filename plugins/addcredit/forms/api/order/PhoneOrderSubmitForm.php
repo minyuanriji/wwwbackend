@@ -30,21 +30,21 @@ class PhoneOrderSubmitForm extends BaseModel
         try {
             $plate = AddcreditPlateforms::findOne($this->plateform_id);
             if (!$plate) {
-                throw new \Exception('平台不存在！', ApiCode::CODE_FAIL);
+                throw new \Exception('平台不存在！');
             }
 
             $mobile = $this->validatePhone($this->mobile);
             if (!$mobile) {
-                throw new \Exception('手机号码错误,请重新输入！', ApiCode::CODE_FAIL);
+                throw new \Exception('手机号码错误,请重新输入！');
             }
 
             $user = User::findOne(['id' => \Yii::$app->user->id, 'is_delete' => 0]);
             if (!$user) {
-                throw new \Exception('账户不存在！', ApiCode::CODE_FAIL);
+                throw new \Exception('账户不存在！');
             }
 
             if ($this->order_price > $user->static_integral) {
-                throw new \Exception('账户红包不足！', ApiCode::CODE_FAIL);
+                throw new \Exception('账户红包不足！');
             }
 
             //生成订单

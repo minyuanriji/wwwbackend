@@ -7,7 +7,8 @@ use app\core\ApiCode;
 class Request
 {
 
-    private static $devUrl = "http://120.25.166.45:10186";
+//    private static $devUrl = "http://120.25.166.45:10186";
+    private static $devUrl = "http://182.92.71.201:50003";
 
     public static function execute($url, $post_param)
     {

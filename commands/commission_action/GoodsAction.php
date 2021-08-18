@@ -32,11 +32,13 @@ class GoodsAction extends Action{
      * @return boolean
      */
     private function doNew(){
+
         //订单已付款、分佣状态未处理
         $query = OrderDetail::find()->alias("od");
         $query->innerJoin("{{%order}} o", "o.id=od.order_id");
         $query->innerJoin("{{%goods}} g", "g.id=od.goods_id");
         $query->innerJoin("{{%goods_warehouse}} gw", "gw.id=g.goods_warehouse_id");
+        $query->leftJoin(["lianc_u" => User::tableName()], "lianc_u.id=g.lianc_user_id AND lianc_u.is_lianc=1 AND lianc_u.is_delete=0");
         $query->andWhere([
             "AND",
             ["o.is_pay" => 1],
@@ -45,17 +47,129 @@ class GoodsAction extends Action{
             ["od.is_delete" => 0],
             ["od.commission_status" => 0]
         ]);
-        $query->select(["od.id as order_detail_id", "od.num", "od.is_refund", "od.refund_status", "od.created_at", "od.updated_at", "o.mall_id", "o.user_id", "od.order_id", "od.goods_id", "od.total_original_price", "od.total_price", "g.profit_price", "gw.name","g.first_buy_setting"]);
+        $query->select([
+            "od.id as order_detail_id", "od.num", "od.is_refund", "od.refund_status", "od.created_at",
+            "od.updated_at", "o.mall_id", "o.user_id", "od.order_id", "od.goods_id", "od.total_original_price",
+            "od.total_price", "g.profit_price", "gw.name","g.first_buy_setting",
+            "lianc_u.id as lianc_user_id", "g.lianc_commission_type", "g.lianc_commisson_value",
+            "(lianc_u.income+lianc_u.income_frozen) as lianc_total_income"
+        ]);
         $orderDetailData = $query->asArray()->one();
         if(!$orderDetailData){
             return false;
         }
+
+        /**
+         * 计算分佣金额
+         * @param $profitPrice      商品利润
+         * @param $num              数量
+         * @param $commissonType    分佣类型
+         * @param $commissonValue   分佣值
+         * @return float|int
+         */
+        $getCommissionPriceFunc = function($profitPrice, $num, $commissonType, $commissonValue){
+            if($commissonType == 1){ //按百分比
+                $price = (floatval($commissonValue)/100) * floatval($profitPrice);
+            }else{ //按固定值
+                $price = (float)$commissonValue;
+            }
+            return $price * intval($num);
+        };
+
+        /**
+         * 新增待结算分佣记录
+         * @param $userId          用户ID
+         * @param $isLianc         是否联创用户收益
+         * @param $price           待结算金额
+         * @param $totalIncome     当前用户总收益
+         * @param $ruleData        分佣规则数据
+         * @param $orderDetailData 订单详情数据
+         */
+        $newPriceLogFunc = function($userId, $isLianc, $price, $totalIncome, $ruleData, $orderDetailData){
+
+            $price = min($price, $orderDetailData['profit_price']);
+
+            $uniqueData = [
+                "mall_id"         => $orderDetailData['mall_id'],
+                "order_id"        => $orderDetailData['order_id'],
+                "order_detail_id" => $orderDetailData['order_detail_id'],
+                "goods_id"        => $orderDetailData['goods_id'],
+                "user_id"         => $userId,
+                "is_lianc"        => (int)$isLianc
+            ];
+            $priceLog = CommissionGoodsPriceLog::findOne($uniqueData);
+            if(!$priceLog){ //没有生成过再去生成
+                $trans = \Yii::$app->db->beginTransaction();
+                try {
+                    $ruleData['price'] = $price;
+                    $priceLog = new CommissionGoodsPriceLog(array_merge($uniqueData, [
+                        "price"           => round($price, 5),
+                        "status"          => 0,
+                        "created_at"      => $orderDetailData['created_at'],
+                        "updated_at"      => $orderDetailData['updated_at'],
+                        "rule_data_json"  => json_encode($ruleData)
+                    ]));
+                    if(!$priceLog->save()){
+                        throw new \Exception(json_encode($priceLog->getErrors()));
+                    }
+                    $this->controller->commandOut("生成分佣记录 [ID:".$priceLog->id."]");
+
+                    //收入记录
+                    if($isLianc){
+                        $desc = "来自品牌商合作商品“".$orderDetailData['name']."”消费结算[ID:".$priceLog->id."]";
+                    }else{
+                        $desc = "来自商品“".$orderDetailData['name']."”消费分佣[ID:".$priceLog->id."]";
+                    }
+                    $incomeLog = new IncomeLog([
+                        'mall_id'     => $orderDetailData['mall_id'],
+                        'user_id'     => $userId,
+                        'type'        => 1,
+                        'money'       => $totalIncome,
+                        'income'      => $priceLog->price,
+                        'desc'        => $desc,
+                        'flag'        => 0, //冻结
+                        'source_id'   => $priceLog->id,
+                        'source_type' => 'goods',
+                        'created_at'  => $orderDetailData['created_at'],
+                        'updated_at'  => $orderDetailData['updated_at']
+                    ]);
+                    if(!$incomeLog->save()){
+                        throw new \Exception(json_encode($incomeLog->getErrors()));
+                    }
+
+                    User::updateAllCounters([
+                        "total_income"  => $priceLog->price,
+                        "income_frozen" => $priceLog->price
+                    ], ["id" => $userId]);
+
+                    $trans->commit();
+                }catch (\Exception $e){
+                    $trans->rollBack();
+                    $this->controller->commandOut($e->getMessage());
+                }
+            }
+        };
+
         try {
+
             if($orderDetailData['is_refund'] && $orderDetailData['refund_status'] == 20){
                 throw new \Exception("订单商品[ID:".$orderDetailData['order_detail_id']."]已退款");
             }
 
             $parentDatas = $this->controller->getCommissionParentRuleDatas($orderDetailData['user_id'], $orderDetailData['goods_id'], 'goods');
+
+            //联创合伙人收益
+            if(!empty($orderDetailData['lianc_user_id'])){
+                $liancData = [
+                    'lianc_commission_type' => $orderDetailData['lianc_commission_type'],
+                    'lianc_commisson_value' => $orderDetailData['lianc_commisson_value']
+                ];
+                $liancData['profit_price'] = $orderDetailData['profit_price'];
+                $price = $getCommissionPriceFunc($liancData['profit_price'], $orderDetailData['num'], $liancData['lianc_commission_type'], $liancData['lianc_commisson_value']);
+                if($price > 0){
+                    $newPriceLogFunc($orderDetailData['lianc_user_id'], 1, $price, $orderDetailData['lianc_total_income'], $liancData, $orderDetailData);
+                }
+            }
 
             //通过相关规则键获取分佣规则进行分佣
             foreach($parentDatas as $parentData){
@@ -67,12 +181,7 @@ class GoodsAction extends Action{
 
                 //计算分佣金额
                 $ruleData['profit_price'] = $orderDetailData['profit_price'];
-                if($ruleData['commission_type'] == 1){ //按百分比
-                    $price = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
-                }else{ //按固定值
-                    $price = (float)$ruleData['commisson_value'];
-                }
-                $price = $price * intval($orderDetailData['num']);
+                $price = $getCommissionPriceFunc($ruleData['profit_price'], $orderDetailData['num'], $ruleData['commission_type'], $ruleData['commisson_value']);
 
                 //判断该商品是否设置首次利润
                 if ($orderDetailData['first_buy_setting']) {
@@ -123,64 +232,8 @@ class GoodsAction extends Action{
 
                 //生成分佣记录
                 if($price > 0){
-                    $priceLog = CommissionGoodsPriceLog::findOne([
-                        "order_id"        => $orderDetailData['order_id'],
-                        "order_detail_id" => $orderDetailData['order_detail_id'],
-                        "goods_id"        => $orderDetailData['goods_id'],
-                        "user_id"         => $parentData['id'],
-                    ]);
-                    if(!$priceLog){ //没有生成过再去生成
-                        $trans = \Yii::$app->db->beginTransaction();
-                        try {
-                            $priceLog = new CommissionGoodsPriceLog([
-                                "mall_id"         => $orderDetailData['mall_id'],
-                                "order_id"        => $orderDetailData['order_id'],
-                                "order_detail_id" => $orderDetailData['order_detail_id'],
-                                "goods_id"        => $orderDetailData['goods_id'],
-                                "user_id"         => $parentData['id'],
-                                "price"           => round($price, 5),
-                                "status"          => 0,
-                                "created_at"      => $orderDetailData['created_at'],
-                                "updated_at"      => $orderDetailData['updated_at'],
-                                "rule_data_json"  => json_encode($ruleData)
-                            ]);
-                            if(!$priceLog->save()){
-                                throw new \Exception(json_encode($priceLog->getErrors()));
-                            }
-                            $this->controller->commandOut("生成分佣记录 [ID:".$priceLog->id."]");
-
-                            //收入记录
-                            $incomeLog = new IncomeLog([
-                                'mall_id'     => $orderDetailData['mall_id'],
-                                'user_id'     => $parentData['id'],
-                                'type'        => 1,
-                                'money'       => $parentData['total_income'],
-                                'income'      => $priceLog->price,
-                                'desc'        => "来自商品“".$orderDetailData['name']."”分佣记录[ID:".$priceLog->id."]",
-                                'flag'        => 0, //冻结
-                                'source_id'   => $priceLog->id,
-                                'source_type' => 'goods',
-                                'created_at'  => $orderDetailData['created_at'],
-                                'updated_at'  => $orderDetailData['updated_at']
-                            ]);
-                            if(!$incomeLog->save()){
-                                throw new \Exception(json_encode($incomeLog->getErrors()));
-                            }
-
-                            User::updateAllCounters([
-                                "total_income"  => $priceLog->price,
-                                "income_frozen" => $priceLog->price
-                            ], ["id" => $parentData['id']]);
-
-                            $trans->commit();
-                        }catch (\Exception $e){
-                            $trans->rollBack();
-                            $this->controller->commandOut($e->getMessage());
-                        }
-
-                    }
+                    $newPriceLogFunc($parentData['id'], 0, $price, $parentData['total_income'], $ruleData, $orderDetailData);
                 }
-
             }
         }catch (\Exception $e){
             $this->controller->commandOut($e->getMessage());
@@ -241,15 +294,23 @@ class GoodsAction extends Action{
                     ], ["id" => $priceLog['id']]);
 
                     //取消收入记录的冻结状态
-                    IncomeLog::updateAll([
-                        "flag" => 1
-                    ], ["source_id" => $priceLog['id'], "source_type" => "goods"]);
-
-                    //更新用户收入信息
-                    User::updateAllCounters([
-                        "income" => $priceLog['price'],
-                        "income_frozen" => -1 * abs($priceLog['price'])
-                    ], ["id" => $priceLog['user_id']]);
+                    $incomeLog = IncomeLog::findOne([
+                        "source_id"   => $priceLog['id'],
+                        "source_type" => "goods",
+                        "flag"        => 0
+                    ]);
+                    if($incomeLog){
+                        $incomeLog->flag = 1;
+                        $incomeLog->updated_at = time();
+                        if(!$incomeLog->save()){
+                            throw new \Exception(json_encode($incomeLog->getErrors()));
+                        }
+                        //更新用户收入信息
+                        User::updateAllCounters([
+                            "income"        => $priceLog['price'],
+                            "income_frozen" => -1 * abs($priceLog['price'])
+                        ], ["id" => $priceLog['user_id']]);
+                    }
 
                     $trans->commit();
 
@@ -289,30 +350,33 @@ class GoodsAction extends Action{
                     ], ["id" => $priceLog['id']]);
 
                     //新增一条收入支出记录
-                    $userData = User::find()->where(["id" => $priceLog['user_id']])->select(["total_income"])->one();
-                    $totalIncome = $userData ? $userData['total_income'] : 0;
-                    $incomeLog = new IncomeLog([
-                        'mall_id'     => $priceLog['mall_id'],
-                        'user_id'     => $priceLog['user_id'],
-                        'type'        => 2,
-                        'money'       => $totalIncome,
-                        'income'      => $priceLog['price'],
-                        'desc'        => "分佣记录 [ID:".$priceLog['id']."] 已取消，扣除冻结佣金",
-                        'flag'        => 0, //冻结
-                        'source_id'   => $priceLog['id'],
-                        'source_type' => 'goods',
-                        'created_at'  => time(),
-                        'updated_at'  => time()
-                    ]);
-                    if(!$incomeLog->save()){
-                        throw new \Exception(json_encode($incomeLog->getErrors()));
+                    $user = User::findOne($priceLog['user_id']);
+                    if($user){
+                        $totalIncome = $user->income + $user->income_frozen;
+                        $incomeLog = new IncomeLog([
+                            'mall_id'     => $priceLog['mall_id'],
+                            'user_id'     => $priceLog['user_id'],
+                            'type'        => 2,
+                            'money'       => $totalIncome,
+                            'income'      => $priceLog['price'],
+                            'desc'        => "分佣记录 [ID:".$priceLog['id']."] 已取消，扣除冻结佣金",
+                            'flag'        => 0, //冻结
+                            'source_id'   => $priceLog['id'],
+                            'source_type' => 'goods',
+                            'created_at'  => time(),
+                            'updated_at'  => time()
+                        ]);
+                        if(!$incomeLog->save()){
+                            throw new \Exception(json_encode($incomeLog->getErrors()));
+                        }
+
+                        //更新用户收入信息
+                        User::updateAllCounters([
+                            "total_income"  => -1 * abs($priceLog['price']),
+                            "income_frozen" => -1 * abs($priceLog['price'])
+                        ], ["id" => $priceLog['user_id']]);
                     }
 
-                    //更新用户收入信息
-                    User::updateAllCounters([
-                        "total_income"  => -1 * abs($priceLog['price']),
-                        "income_frozen" => -1 * abs($priceLog['price'])
-                    ], ["id" => $priceLog['user_id']]);
 
                     $trans->commit();
 

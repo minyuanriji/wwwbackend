@@ -80,7 +80,7 @@ class CommissionController extends BaseCommandController{
             ["u.is_delete" => 0],
             ["IN", "u.role_type", ["store", "partner", "branch_office"]],
             ("url.`left` < '".$userLink->left."' AND url.`right` > '".$userLink->right."'")
-        ])->select(["u.id", "u.parent_id", "u.total_income", "u.role_type", "u.nickname"])->orderBy("url.`left` DESC");
+        ])->select(["u.id", "u.parent_id", "(u.income+u.income_frozen) as total_income", "u.role_type", "u.nickname"])->orderBy("url.`left` DESC");
 
         $parentDatas = $query->asArray()->all();
         if(!$parentDatas){

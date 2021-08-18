@@ -137,12 +137,11 @@ class DataForm extends BaseModel
             //图表
             $table_query = $this->table_where();
             $table_list = $table_query->select("DATE_FORMAT(`o`.`created_at`, '%H') AS `time`,COUNT(DISTINCT `o`.`user_id`) AS `user_num`,
-  COUNT(DATE_FORMAT(`o`.`created_at`, '%Y-%m-%d')) AS `order_num`,SUM(`o`.`total_pay_price`) AS `total_pay_price`,SUM(`d`.`num`) AS `goods_num`")
+  COUNT(`o`.`id`) AS `order_num`,SUM(`o`.`total_pay_price`) AS `total_pay_price`,SUM(`d`.`num`) AS `goods_num`")
                 ->groupBy('time')
                 ->orderBy('time')
                 ->asArray()
                 ->all();
-
             foreach ($table_list as $value) {
                 $table_data['user_num'] += $value['user_num'];
                 $table_data['order_num'] += $value['order_num'];
@@ -239,7 +238,7 @@ class DataForm extends BaseModel
         if ($this->platform) {
             $user_query->andWhere(['u.platform' => $this->platform]);
         }
-        $data_arr['user_count'] = $user_query->andWhere(['u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id])->count();//用户数 'u.mch_id' => 0,
+        $user_query->andWhere(['u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id]);//用户数 'u.mch_id' => 0,
         //以下随时间查询改变
         $order_query = Order::find()->alias('o')
             ->where(['o.is_recycle' => 0, 'o.is_delete' => 0, 'o.mall_id' => \Yii::$app->mall->id, 'o.cancel_status' => 0])
@@ -254,12 +253,14 @@ class DataForm extends BaseModel
             $startTime = strtotime(($this->date_start) . ' 00:00:00');
             $order_query->andWhere(['>=', 'o.created_at', $startTime]);
             $good_query->andWhere(['>=', 'g.created_at', $startTime]);
+            $user_query->andWhere(['>=', 'u.created_at', $startTime]);
         }
 
         if ($this->date_end) {
             $endTime = strtotime(($this->date_end) . ' 23:59:59');
             $order_query->andWhere(['<=', 'o.created_at', $endTime]);
             $good_query->andWhere(['<=', 'g.created_at', $endTime]);
+            $user_query->andWhere(['<=', 'u.created_at', $endTime]);
         }
 
         //插件分类查询
@@ -275,6 +276,9 @@ class DataForm extends BaseModel
         if ($this->platform) {
             $order_query->andWhere(['u.platform' => $this->platform]);
         }
+
+        $data_arr['user_count'] = $user_query->count();
+
         $data_arr['goods_num'] = $good_query->count();
 
         $all_query = clone $order_query;
@@ -311,10 +315,10 @@ class DataForm extends BaseModel
         //昨天的数据需要按小时分组，默认取昨天数据
         if (empty($this->date_start) || $this->date_start == $this->date_end) {
             $query->select("DATE_FORMAT(`o`.`created_at`, '%H') AS `time`,COUNT(DISTINCT `o`.`user_id`) AS `user_num`,
-  COUNT(DATE_FORMAT(`o`.`created_at`, '%Y-%m-%d')) AS `order_num`,SUM(`o`.`total_pay_price`) AS `total_pay_price`,SUM(`d`.`num`) AS `goods_num`");
+  COUNT(`o`.`id`) AS `order_num`,SUM(`o`.`total_pay_price`) AS `total_pay_price`,SUM(`d`.`num`) AS `goods_num`");
         } else {
             $query->select("`o`.`created_at` AS `time`,COUNT(DISTINCT `o`.`user_id`) AS `user_num`,
-  COUNT(DATE_FORMAT(`o`.`created_at`, '%Y-%m-%d')) AS `order_num`,SUM(`o`.`total_pay_price`) AS `total_pay_price`,SUM(`d`.`num`) AS `goods_num`");
+  COUNT(`o`.`id`) AS `order_num`,SUM(`o`.`total_pay_price`) AS `total_pay_price`,SUM(`d`.`num`) AS `goods_num`");
         }
         $list = $query->groupBy('time')
             ->orderBy('time')
@@ -382,7 +386,7 @@ class DataForm extends BaseModel
         $orderQuery = OrderDetail::find()->alias('od')->where(['is_delete' => 0])
             ->select(['od.order_id', 'SUM(`od`.`num`) num'])->groupBy('od.order_id');
         $query = Order::find()->alias('o')
-            ->where(['o.is_recycle' => 0, 'o.is_pay' => 1, 'o.mall_id' => \Yii::$app->mall->id,])
+            ->where(['o.is_recycle' => 0, 'o.is_pay' => 1, 'o.mall_id' => \Yii::$app->mall->id])
             ->andWhere(['o.is_delete' => 0])->andWhere(['not', ['o.cancel_status' => 1]])
             ->leftJoin(['d' => $orderQuery], 'd.order_id = o.id')
             ->leftJoin(['i' => User::tableName()], 'i.id = o.user_id');

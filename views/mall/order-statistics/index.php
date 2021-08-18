@@ -164,7 +164,7 @@ Yii::$app->loadComponentView('statistics/com-header');
                 <el-tab-pane label="已完成订单" name="1"></el-tab-pane>
                 <el-tab-pane label="已取消订单" name="2"></el-tab-pane>
                 <el-tab-pane label="售后中订单" name="3"></el-tab-pane>
-                <el-tab-pane label="已完成售后订单" name="4"></el-tab-pane>
+<!--                <el-tab-pane label="已完成售后订单" name="4"></el-tab-pane>-->
             </el-tabs>
             <el-table v-loading="list_loading"
                       :header-cell-style="{background:'#F3F5F6','color':'#303133',padding: '6px 0',fontWeight: '400'}"

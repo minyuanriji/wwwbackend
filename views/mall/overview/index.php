@@ -1,14 +1,4 @@
 <?php
-
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: hp
- * Date: 2020年7月6日
- * Time: 15:40
- */
-
 defined('YII_ENV') or exit('Access Denied');
 $urlManager = Yii::$app->urlManager;
 Yii::$app->loadComponentView('com-count-up');
@@ -342,7 +332,6 @@ Yii::$app->loadComponentView('overvier/com-funnel');
                 </div>
                 <div class="data-statistics">
                     <div class="statistic up user-map-goods">
-
                         <div class="user-data-statistics box-1">
                             <div class="data-statistics-title">用户数据统计</div>
                             <div class="items">
@@ -502,7 +491,7 @@ Yii::$app->loadComponentView('overvier/com-funnel');
                         <img class="icon" src="statics/img/mall/data-screen/msg.png" style="width: 30px;height: 28px;margin-right: 10px">
                         <span v-if="detail_data">{{detail_data.services[1].value}}</span>
                     </div>
-                    <div v-if="is_services_show" class="customer-service" flex="main:center cross:center" style="background-image: url('statics/img/mall/data-screen/data-kefu.png');background-size: 100%;height: 117px;padding: 0 14px">
+                    <!--<div v-if="is_services_show" class="customer-service" flex="main:center cross:center" style="background-image: url('statics/img/mall/data-screen/data-kefu.png');background-size: 100%;height: 117px;padding: 0 14px">
                         <div class="div" style="margin-right: 10px;height: 83px;width: 83px"></div>
                         <div class="regards">
                             <div class="text">Hi!我是苏珊，请问您遇到了什么问题了吗？</div>
@@ -511,7 +500,7 @@ Yii::$app->loadComponentView('overvier/com-funnel');
                                 <span><a :href="services_url" target="_blank" style="color: #fff;text-decoration: none;">立即联系</a></span>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>

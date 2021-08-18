@@ -202,6 +202,7 @@ class UserForm extends BaseModel
         };
         $mall_id = \Yii::$app->mall->id;
 
+<<<<<<< HEAD
         if(!empty($this->search)){
             $search = (array)@json_decode($this->search, true);
             foreach($search as $key => $val){
@@ -211,6 +212,8 @@ class UserForm extends BaseModel
             }
         }
 
+=======
+>>>>>>> 1a8f5739cea0bfc97f5989216fff9e35bf6f1173
         $query = User::find()->alias('u')->where([
             'u.is_delete' => 0,
             'u.mall_id' => $mall_id,

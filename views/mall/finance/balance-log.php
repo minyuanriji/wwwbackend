@@ -1,22 +1,11 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-13
- * Time: 14:07
- */
-
 Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
-
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <div>
                 <span>余额收支</span>
-
             </div>
         </div>
         <div class="table-body">

@@ -21,7 +21,7 @@ class CommissionGoodsPriceLog extends BaseActiveRecord
     {
         return [
             [['mall_id', 'order_id', 'order_detail_id', 'goods_id', 'user_id', 'price', 'status', 'created_at', 'updated_at'], 'required'],
-            [['rule_data_json'], 'safe']
+            [['is_lianc', 'rule_data_json'], 'safe']
         ];
     }
 

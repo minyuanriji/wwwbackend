@@ -48,93 +48,99 @@ class CartForm extends BaseModel
             return $this->returnApiResultData();
         }
 
-        $user_id = \Yii::$app->user->id;
-        //查询条件
-        $wheres = [
-            'mall_id' => \Yii::$app->mall->id,
-            'user_id' => $user_id,
-            'sign' => '',
-        ];
-        $list = Cart::getList($wheres);
-        $user = User::findOne(['id' => $user_id]);
-        $newList = [];
+        try {
+            $user_id = \Yii::$app->user->id;
 
-
-        /** @var Cart[] $list */
-        foreach ($list as $item) {
-
-
-            $newItem = ArrayHelper::toArray($item);
-            $goods = ArrayHelper::toArray($item->goods);
-            $newItem['not_can_buy_reason']='';
-            $newItem['is_not_can_buy'] =0;
-            if ($goods['confine_order_count'] > -1) {
-                $count = OrderDetail::find()->alias('od')
-                    ->select('od.order_id')
-                    ->leftJoin(['o' => Order::tableName()], 'od.order_id=o.id')
-                    ->where([
-                        'o.cancel_status' => 0,
-                        'o.is_delete' => 0,
-                        'o.is_recycle' => 0,
-                        'o.user_id' => \Yii::$app->user->identity->id,
-                        'od.is_delete' => 0,
-                        'od.goods_id' => $goods['id'],
-                    ])
-                    ->groupBy('od.order_id')
-                    ->count();
-                if ($count >= $goods['confine_order_count']) {
-                    $newItem['is_not_can_buy'] =1;
-                    $newItem['not_can_buy_reason'] = "该商品限购{$count}单";
-                }
-            }
-            if ($goods['confine_count'] > -1) {
-                $count = OrderDetail::find()->alias('od')
-                    ->leftJoin(['o' => Order::tableName()], 'od.order_id=o.id')
-                    ->where([
-                        'o.cancel_status' => 0,
-                        'o.is_delete' => 0,
-                        'o.is_recycle' => 0,
-                        'o.user_id' => \Yii::$app->user->identity->id,
-                        'od.is_delete' => 0,
-                        'od.goods_id' => $goods['id'],
-                    ])
-                    ->sum('num');
-                if ($count >= $goods['confine_count']) {
-                    $newItem['is_not_can_buy'] =1;
-                    $newItem['not_can_buy_reason'] = "该商品限购{$count}件";
-                }
+            if(!$user_id){
+                throw new \Exception("未登录");
             }
 
-            $goods = $this->unsetGoodsField($goods);
-            $newItem["cart_id"] = $item["id"];
-            $newItem['goods'] = $goods;
+            //查询条件
+            $wheres = [
+                'mall_id' => \Yii::$app->mall->id,
+                'user_id' => $user_id,
+                'sign' => '',
+            ];
+            $list = Cart::getList($wheres);
+            $user = User::findOne(['id' => $user_id]);
+            $newList = [];
 
-            //$newItem['store'] = ArrayHelper::toArray($item->store);
-            $newItem['attrs'] = $item->attrs ? ArrayHelper::toArray($item->attrs) : $item->attrs;
-            //优惠价
-            //$newItem['reduce_price'] = 0;
-            if ($item->attrs) {
-                //商品规格
-                $newItem['attrs']['attr'] = (new Goods())->signToAttr($item->attrs->sign_id, $item->goods->attr_groups);
-                //$newItem['attr_str'] = 0;
-                if ($item->attr_info) {
-                    try {
-                        $attrInfo = \Yii::$app->serializer->decode($item->attr_info);
-                        $reducePrice = $attrInfo['price'] - $item->attrs->price;
-                        if ($attrInfo['price'] - $item->attrs->price) {
-                            $newItem['reduce_price'] = $reducePrice;
-                        }
-                    } catch (\Exception $exception) {
+
+            /** @var Cart[] $list */
+            foreach ($list as $item) {
+
+
+                $newItem = ArrayHelper::toArray($item);
+                $goods = ArrayHelper::toArray($item->goods);
+                $newItem['not_can_buy_reason']='';
+                $newItem['is_not_can_buy'] =0;
+                if ($goods['confine_order_count'] > -1) {
+                    $count = OrderDetail::find()->alias('od')
+                        ->select('od.order_id')
+                        ->leftJoin(['o' => Order::tableName()], 'od.order_id=o.id')
+                        ->where([
+                            'o.cancel_status' => 0,
+                            'o.is_delete' => 0,
+                            'o.is_recycle' => 0,
+                            'o.user_id' => \Yii::$app->user->identity->id,
+                            'od.is_delete' => 0,
+                            'od.goods_id' => $goods['id'],
+                        ])
+                        ->groupBy('od.order_id')
+                        ->count();
+                    if ($count >= $goods['confine_order_count']) {
+                        $newItem['is_not_can_buy'] =1;
+                        $newItem['not_can_buy_reason'] = "该商品限购{$count}单";
                     }
                 }
-            } else {
-                //$newItem['attr_str'] = 1;
-            }
-            $newItem['goods']['name'] = $item->goods->name;
-            $newItem['goods']['cover_pic'] = $item->goods->coverPic;
-            $newItem['goods']['status'] = $item->goods->status;
+                if ($goods['confine_count'] > -1) {
+                    $count = OrderDetail::find()->alias('od')
+                        ->leftJoin(['o' => Order::tableName()], 'od.order_id=o.id')
+                        ->where([
+                            'o.cancel_status' => 0,
+                            'o.is_delete' => 0,
+                            'o.is_recycle' => 0,
+                            'o.user_id' => \Yii::$app->user->identity->id,
+                            'od.is_delete' => 0,
+                            'od.goods_id' => $goods['id'],
+                        ])
+                        ->sum('num');
+                    if ($count >= $goods['confine_count']) {
+                        $newItem['is_not_can_buy'] =1;
+                        $newItem['not_can_buy_reason'] = "该商品限购{$count}件";
+                    }
+                }
 
-            // 购物车显示会员价
+                $goods = $this->unsetGoodsField($goods);
+                $newItem["cart_id"] = $item["id"];
+                $newItem['goods'] = $goods;
+
+                //$newItem['store'] = ArrayHelper::toArray($item->store);
+                $newItem['attrs'] = $item->attrs ? ArrayHelper::toArray($item->attrs) : $item->attrs;
+                //优惠价
+                //$newItem['reduce_price'] = 0;
+                if ($item->attrs) {
+                    //商品规格
+                    $newItem['attrs']['attr'] = (new Goods())->signToAttr($item->attrs->sign_id, $item->goods->attr_groups);
+                    //$newItem['attr_str'] = 0;
+                    if ($item->attr_info) {
+                        try {
+                            $attrInfo = \Yii::$app->serializer->decode($item->attr_info);
+                            $reducePrice = $attrInfo['price'] - $item->attrs->price;
+                            if ($attrInfo['price'] - $item->attrs->price) {
+                                $newItem['reduce_price'] = $reducePrice;
+                            }
+                        } catch (\Exception $exception) {
+                        }
+                    }
+                } else {
+                    //$newItem['attr_str'] = 1;
+                }
+                $newItem['goods']['name'] = $item->goods->name;
+                $newItem['goods']['cover_pic'] = $item->goods->coverPic;
+                $newItem['goods']['status'] = $item->goods->status;
+
+                // 购物车显示会员价
 //            if ($user && $user->level && $item->goods->is_level && $item->mch_id == 0 && $item->attrs) {
 //                if ($item->goods->is_level_alone) {
 //                    foreach ($item->attrs->memberPrice as $mItem) {
@@ -157,18 +163,28 @@ class CartForm extends BaseModel
 //                }
 //            }
 
-            $newList[] = $newItem;
+                $newList[] = $newItem;
+            }
+
+            //加入插件商品
+            //$this->getPluginGoods($newList);
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'data' => [
+                    'list' => $newList
+                ],
+            ];
+        }catch (\Exception $e){
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage(),
+                'error' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            ];
         }
-
-        //加入插件商品
-        //$this->getPluginGoods($newList);
-
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'data' => [
-                'list' => $newList
-            ],
-        ];
     }
 
     /**

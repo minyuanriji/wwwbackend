@@ -89,12 +89,17 @@ class ApiController extends BaseController
         $this->getParamsData();
 
         //TODO 临时应付小程序上线审核处理 2021/08/13
-        $devUrl = "dev.mingyuanriji.cn";
+        $devUrl = "mpwx.mingyuanriji.cn";
         if($headers['x-app-platform'] == "mp-wx" && \Yii::$app->getRequest()->getHostName() != $devUrl){
             $appId          = isset($headers['x-mp-appid']) ? $headers['x-mp-appid'] : "";
             $version        = isset($headers['x-mp-version']) ? $headers['x-mp-version'] : "";
-            $currentVersion = dirname(ROOT_PATH) . "/runtime/mp-wx/{$appId}.version";
-            if(empty($version) || $version != $currentVersion){
+            $path = dirname(ROOT_PATH) . "/runtime/mp-wx";
+            !is_dir($path) && mkdir($path, 0755, true);
+            $currentVersion = @file_get_contents("{$path}/{$appId}.version");
+            if(empty($version) || $version != trim($currentVersion)){
+                @file_put_contents("{$path}/{$appId}.debug", json_encode([
+                    "version" => $version
+                ]));
                 //重定向到测试地址
                 $curl = new \Curl\Curl();
                 foreach($headers as $name => $values){

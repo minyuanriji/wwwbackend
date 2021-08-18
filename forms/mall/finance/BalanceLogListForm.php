@@ -38,32 +38,50 @@ class BalanceLogListForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         };
-        $query = BalanceLog::find()->alias('b')->where([
-            'b.mall_id' => \Yii::$app->mall->id,
-        ])->joinwith(['user' => function ($query) {
-            if ($this->keyword) {
-                $query->where(['like', 'nickname', $this->keyword]);
+
+
+        try {
+            $query = BalanceLog::find()->alias('b')->where([
+                'b.mall_id' => \Yii::$app->mall->id,
+            ])->joinwith(['user' => function ($query) {
+                if ($this->keyword) {
+                    $query->where(['like', 'nickname', $this->keyword]);
+                }
+            }])->orderBy('id desc');
+            if ($this->user_id) {
+                $query->andWhere(['b.user_id' => $this->user_id]);
             }
-        }])->orderBy('id desc');
-        if ($this->user_id) {
-            $query->andWhere(['b.user_id' => $this->user_id]);
+            if ($this->start_date && $this->end_date) {
+                $query->andWhere(['<', 'b.created_at', strtotime($this->end_date)])
+                    ->andWhere(['>', 'b.created_at', strtotime($this->start_date)]);
+            }
+            $list = $query->page($pagination, $this->limit)->asArray()->all();
+            foreach ($list as &$v) {
+                if(!empty($v['custom_desc'])){
+                    $v['info_desc'] = SerializeHelper::decode($v['custom_desc']);
+                }else{
+                    $v['info_desc'] = [];
+                }
+            }
+            unset($v);
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'data' => [
+                    'list' => $list,
+                    'pagination' => $pagination
+                ]
+            ];
+        }catch (\Exception $e){
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage(),
+                'error' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            ];
         }
-        if ($this->start_date && $this->end_date) {
-            $query->andWhere(['<', 'b.created_at', strtotime($this->end_date)])
-                ->andWhere(['>', 'b.created_at', strtotime($this->start_date)]);
-        }
-        $list = $query->page($pagination, $this->limit)->asArray()->all();
-        foreach ($list as &$v) {
-            $v['info_desc'] = SerializeHelper::decode($v['custom_desc']);
-        };
-        unset($v);
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'data' => [
-                'list' => $list,
-                'pagination' => $pagination
-            ]
-        ];
+
 
     }
 

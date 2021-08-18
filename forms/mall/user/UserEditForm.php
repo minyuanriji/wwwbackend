@@ -34,11 +34,12 @@ class UserEditForm extends BaseModel
     public $parent_id;
     public $is_inviter;
     public $is_examine;
+    public $is_lianc;
 
     public function rules()
     {
         return [
-            [['parent_id', 'is_blacklist', 'id', 'member_level', 'is_inviter', 'is_examine'], 'integer'],
+            [['parent_id', 'is_blacklist', 'id', 'member_level', 'is_inviter', 'is_examine', 'is_lianc'], 'integer'],
             [['money'], 'number'],
             [['contact_way', 'remark'], 'string', 'max' => 255],
             [['role_type'], 'string']
@@ -56,7 +57,8 @@ class UserEditForm extends BaseModel
             'remark' => '备注',
             'money' => '佣金',
             'is_inviter' => '是否是推广者',
-            'is_examine' => '是否拥有审核资格'
+            'is_examine' => '是否拥有审核资格',
+            'is_lianc' => '是否联创合伙人'
         ];
     }
 
@@ -140,6 +142,7 @@ class UserEditForm extends BaseModel
             $form->is_inviter = $this->is_inviter;
         }
         $form->is_examine = $this->is_examine;
+        $form->is_lianc = $this->is_lianc;
         $t = \Yii::$app->db->beginTransaction();
         try {
             if (!$form->save()) {

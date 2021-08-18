@@ -127,7 +127,7 @@ class Goods extends BaseActiveRecord
             [['full_relief_price', 'fulfil_price'], 'default', 'value' => 0],
             [['integral_setting', 'score_setting', 'order_paid', 'order_sales'], 'default', 'value' => ''],
             [['integral_fee_rate', 'enable_upgrade_user_role'], 'integer'],
-            [['upgrade_user_role_type'], 'safe']
+            [['upgrade_user_role_type', 'lianc_user_id', 'lianc_commission_type', 'lianc_commisson_value'], 'safe']
         ];
     }
 

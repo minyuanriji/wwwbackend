@@ -61,6 +61,12 @@
                                      :fetch-suggestions="querySearchAsync" placeholder="请输入搜索内容"
                                      @select="inviterClick"></el-autocomplete>
                 </el-form-item>
+
+                <el-form-item label="联创合伙人" prop="is_lianc">
+                    <el-switch v-model="form.is_lianc" :active-value="1" :inactive-value="0"></el-switch>
+                    <span class="tip">开启可设置商品归属</span>
+               </el-form-item>
+
                 <!-- --- -->
                 <el-form-item label="加入黑名单" prop="is_blacklist">
                     <el-switch v-model="form.is_blacklist" :active-value="1" :inactive-value="0"></el-switch>
@@ -107,7 +113,8 @@
             return {
                 form: {
                     share: {},
-                    role_type: 'user'
+                    role_type: 'user',
+                    is_lianc: 0
                 },
                 mall_members: [],
                 keyword: '',

@@ -36,12 +36,12 @@ class ScoreLogListForm extends BaseModel
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
-        };
+        }
         $query = ScoreLog::find()->alias('b')->where([
             'b.mall_id' => \Yii::$app->mall->id,
         ])->joinwith(['user' => function ($query) {
             if ($this->keyword) {
-                $query->where(['like', 'nickname', $this->keyword]);
+                $query->andWhere(['or', ['like', 'mobile', $this->keyword], ['like', 'nickname', $this->keyword]]);
             }
         }])->orderBy('id desc');
         if ($this->user_id) {

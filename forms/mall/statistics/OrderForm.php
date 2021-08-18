@@ -109,17 +109,21 @@ class OrderForm extends BaseModel
 
             $now = $now_query->select("COUNT(DISTINCT `o`.`user_id`) AS `user_num`,
   COUNT(`o`.`id`) AS `order_num`,COALESCE(SUM(`o`.`total_pay_price`),0) AS `total_pay_price`,COALESCE(sum(`d`.`num`),0) as `goods_num`")
-                ->andWhere(['>=', 'o.created_at', date('Y-m-d 00:00:00', time())])
+                ->andWhere(['>=', 'o.created_at', strtotime(date('Y-m-d 00:00:00', time()))])
                 ->asArray()
                 ->one();
-
-            $query->select("DATE_FORMAT(`o`.`created_at`, '%Y-%m-%d') AS `time`,COUNT(DISTINCT `o`.`user_id`) AS `user_num`,
-  COUNT(`o`.`id`) AS `order_num`,COALESCE(SUM(`o`.`total_pay_price`),0) AS `total_pay_price`,COALESCE(sum(`d`.`num`),0) as `goods_num`")
+            $query->select([
+                    "DATE_FORMAT(FROM_UNIXTIME(`o`.`created_at`), '%Y-%m-%d' ) AS `time`",
+                    "COUNT(DISTINCT `o`.`user_id`) AS `user_num`",
+                    "COUNT(`o`.`id`) AS `order_num`",
+                    "COALESCE(SUM(`o`.`total_pay_price`),0) AS `total_pay_price`",
+                    "COALESCE(sum(`d`.`num`),0) as `goods_num`",
+                ])
                 ->groupBy('time')
                 ->orderBy('time DESC');
         }
         //多商户列表
-        $list = \Yii::$app->plugin->getList();
+        /*$list = \Yii::$app->plugin->getList();
         $mch_list = [];
         if(!empty($list)){
             foreach ($list as $value) {
@@ -153,7 +157,8 @@ class OrderForm extends BaseModel
                     $this->store = '门店-' . $store_item['name'];
                 }
             }
-        }
+        }*/
+
         if ($this->flag == "EXPORT") {
             $new_query = clone $query;
             $this->export($new_query);
@@ -163,7 +168,6 @@ class OrderForm extends BaseModel
         $list = $query->page($pagination)
             ->asArray()
             ->all();
-
 
         //插件分类订单list
         $plugins_list = Order::find()->select('sign')
@@ -183,8 +187,8 @@ class OrderForm extends BaseModel
             'data' => [
                 'pagination' => $pagination,
                 'plugins_list' => $plugins_list,
-                'mch_list' => $mch_list,
-                'store_list' => $store_list,
+                /*'mch_list' => $mch_list,
+                'store_list' => $store_list,*/
                 'all' => $all,
                 'now' => $now,
                 'list' => $list,
@@ -211,7 +215,6 @@ class OrderForm extends BaseModel
             ->keyword($this->status == 3, ['AND', ['not', ['o.cancel_status' => 1]], ['o.sale_status' => 1]])
             ->keyword($this->status == 4, ['AND', ['not', ['o.cancel_status' => 1]], ['o.sale_status' => 1]]);
 
-
         //时间查询
         if ($this->date_start) {
             $query->andWhere(['>=', 'o.created_at', strtotime($this->date_start . ' 00:00:00')]);
@@ -222,13 +225,13 @@ class OrderForm extends BaseModel
         }
 
         //多商户
-        if ($this->mch_id) {
+        /*if ($this->mch_id) {
             $query->andWhere(['o.mch_id' => $this->mch_id]);
         }
         //门店
         if ($this->store_id) {
             $query->andWhere(['o.store_id' => $this->store_id]);
-        }
+        }*/
 //        //商品分类
 //        if ($this->cats_ids) {
 //            $goods_ids = $this->get_goods_ids();
@@ -260,13 +263,13 @@ class OrderForm extends BaseModel
             ->leftJoin(['i' => User::tableName()], 'i.id = o.user_id');
 
         //多商户
-        if ($this->mch_id) {
+        /*if ($this->mch_id) {
             $query->andWhere(['o.mch_id' => $this->mch_id]);
         }
         //门店
         if ($this->store_id) {
             $query->andWhere(['o.store_id' => $this->store_id]);
-        }
+        }*/
 //        //商品分类
 //        if ($this->cats_ids) {
 //            $goods_ids = $this->get_goods_ids();

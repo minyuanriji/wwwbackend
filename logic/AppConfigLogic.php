@@ -351,7 +351,7 @@ class AppConfigLogic
 
         $option = OptionLogic::get(
             Option::NAME_POSTER,
-            \Yii::$app->mall->id,
+            $mall_id,//\Yii::$app->mall->id,
             Option::GROUP_APP
         );
         if (!$option) {

@@ -202,7 +202,7 @@ Yii::$app->loadComponentView('statistics/com-search');
                     <div><a href="<?= \Yii::$app->request->hostInfo ?>/web/index.php?r=mall%2Fuser%2Findex">{{all_data.user_count}}</a></div>
                     <div class="info-item-name">
                         <span>用户数</span>
-                        <el-tooltip class="item" effect="dark" content="统计全平台用户数，不随店铺的更改而更改" placement="bottom">
+                        <el-tooltip class="item" effect="dark" content="统计全平台用户数" placement="bottom">
                             <i class="el-icon-question"></i>
                         </el-tooltip>
                     </div>

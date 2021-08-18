@@ -1,6 +1,6 @@
 <?php
 Yii::$app->loadComponentView('com-rich-text');
-Yii::$app->loadComponentView('goods/com-dialog-select');
+Yii::$app->loadComponentView('com-dialog-select');
 Yii::$app->loadComponentView('goods/com-attr');
 Yii::$app->loadComponentView('goods/com-attr-select');
 Yii::$app->loadComponentView('goods/com-add-cat');
@@ -165,6 +165,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             <el-form :model="cForm" :rules="cRule" ref="ruleForm" label-width="180px" size="small" class="demo-ruleForm">
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="基础设置" name="first" v-if="is_basic == 1">
+
                         <!-- 选择分类 -->
                         <slot name="before_cats"></slot>
                         <el-card v-if="is_cats == 1" shadow="never" class="mt-24">
@@ -192,6 +193,31 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                     </el-form-item>
                                 </el-col>
                             </el-row>
+                        </el-card>
+
+                        <!-- 联创合伙人 -->
+                        <el-card shadow="never" class="mt-24">
+                            <div slot="header">
+                                <span>联创合伙人</span>
+                            </div>
+                            <el-row>
+                                <el-col :xl="12" :lg="16">
+                                    <el-form-item label="品牌商归属">
+                                        <el-tag @close="clearLiancUser" type="warning" closable disable-transitions v-if="forLiancDlgSelect.selection.id > 0">{{forLiancDlgSelect.selection.nickname}}[UID:{{forLiancDlgSelect.selection.id}}]</el-tag>
+                                        <el-button @click="openLiancDlgSelect" type="primary">选择用户</el-button>
+                                    </el-form-item>
+                                    <el-form-item label="分佣" v-if="forLiancDlgSelect.selection.id > 0">
+                                        <el-input type="number" placeholder="请输入内容" v-model="ruleForm.lianc_commisson_value" style="width:350px">
+                                            <el-select v-model="ruleForm.lianc_commission_type" slot="prepend" style="width:110px;">
+                                                <el-option label="按百分比" value="1"></el-option>
+                                                <el-option label="按固定值" value="2"></el-option>
+                                            </el-select>
+                                            <template slot="append">{{ruleForm.lianc_commission_type == 1 ? '%' : '元'}}</template>
+                                        </el-input>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+
                         </el-card>
 
                         <!-- 基本信息 -->
@@ -977,6 +1003,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             </el-row>
                         </el-card>
 
+
+
                         <!-- 商品详情 -->
                         <slot name="before_detail"></slot>
                         <el-card shadow="never" class="mt-24" v-if="is_detail == 1">
@@ -1146,7 +1174,20 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             </template>
         </com-preview>
 
+
+        <com-dialog-select
+                @close="closeLiancDlgSelect"
+                @selected="confirmLiancDlgSelect"
+                :url="forLiancDlgSelect.url"
+                :multiple="forLiancDlgSelect.multiple"
+                :title="forLiancDlgSelect.title"
+                :list-key="forLiancDlgSelect.listKey"
+                :params="forLiancDlgSelect.params"
+                :columns="forLiancDlgSelect.columns"
+                :extra-search="forLiancDlgSelect.extraSearch"
+                :visible="forLiancDlgSelect.visible"></com-dialog-select>
     </el-card>
+
 </template>
 <script src="<?= Yii::$app->request->baseUrl ?>/statics/unpkg/vuedraggable@2.18.1/dist/vuedraggable.umd.min.js"></script>
 <script>
@@ -1343,7 +1384,10 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     buy_num : 0,
                     return_red_envelopes : 0,
                     return_commission : 0,
-                }
+                },
+                lianc_user_id: 0,
+                lianc_commission_type: '1',
+                lianc_commisson_value: 0
             };
             let rules = {
                 cats: [{
@@ -1425,6 +1469,22 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 }, ],
             };
             return {
+                forLiancDlgSelect:{
+                    visible: false,
+                    multiple: false,
+                    title: "选择用户",
+                    params: {},
+                    columns: [
+                        {label:"手机号", key:"mobile"},
+                        {label:"等级", key:"role_type_text"}
+                    ],
+                    listKey: 'nickname',
+                    extraSearch:{
+                        is_lianc: 1
+                    },
+                    url: "mall/user/index",
+                    selection: {nickname: '', id: 0}
+                },
                 pic_options: [],
                 pic_value: '',
                 is_loading: false,
@@ -1611,6 +1671,18 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             }
         },
         methods: {
+            clearLiancUser(){
+                this.forLiancDlgSelect.selection = {nickname: '', id: 0}
+            },
+            openLiancDlgSelect(){
+                this.forLiancDlgSelect.visible = true;
+            },
+            closeLiancDlgSelect(){
+                this.forLiancDlgSelect.visible = false;
+            },
+            confirmLiancDlgSelect(selection){
+                this.forLiancDlgSelect.selection = selection;
+            },
             open_show(id){
                 this.ExpressFlag = true;
                 this.CustomExpress = id;
@@ -1883,6 +1955,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             delete self.cForm['is_vip_card_goods']
                         }
                         let postData = JSON.parse(JSON.stringify(self.cForm));
+                        postData['lianc_user_id'] = self.forLiancDlgSelect.selection.id;
                         // 这里是追加红包券赠送的字段
                         // max_deduct_integral 最大抵扣红包券
                         // enable_integral 是否启用积分赠送
@@ -1964,6 +2037,13 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         // 初始化自定义商品名
                         this.getGoodsNameDiy();
 
+                        //联创合伙人
+                        self.forLiancDlgSelect.selection = Object.assign(
+                            self.forLiancDlgSelect.selection,
+                            detail['lianc_user_info']
+                        );
+                        detail['lianc_commission_type'] = detail['lianc_commission_type'] + "";
+
                         if (detail['use_attr'] === 0) {
                             detail['attr_groups'] = [];
                         }
@@ -2043,7 +2123,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         if (infoObj.is_order_sales == 1) {
                             self.order_sales = infoObj.order_sales;
                         }
-
                     } else {
                         self.$message.error(e.data.msg);
                     }

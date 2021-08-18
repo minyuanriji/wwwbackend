@@ -86,7 +86,41 @@ class ApiController extends BaseController
         $this->enableCsrfValidation = false;
         $headers = \Yii::$app->request->headers;
 
-        $this->getParamsData()->setMall($headers)->setCity($headers)->login($headers)->wechatSubscribe()->saveFormIdList($headers)->bindParent($headers)->checkInviter();
+        $this->getParamsData();
+
+        //TODO 临时应付小程序上线审核处理 2021/08/13
+        $devUrl = "mpwx.mingyuanriji.cn";
+        if($headers['x-app-platform'] == "mp-wx" && \Yii::$app->getRequest()->getHostName() != $devUrl){
+            $appId          = isset($headers['x-mp-appid']) ? $headers['x-mp-appid'] : "";
+            $version        = isset($headers['x-mp-version']) ? $headers['x-mp-version'] : "";
+            $path = dirname(ROOT_PATH) . "/runtime/mp-wx";
+            !is_dir($path) && mkdir($path, 0755, true);
+            $currentVersion = @file_get_contents("{$path}/{$appId}.version");
+            if(empty($version) || $version != trim($currentVersion)){
+                @file_put_contents("{$path}/{$appId}.debug", json_encode([
+                    "version" => $version
+                ]));
+                //重定向到测试地址
+                $curl = new \Curl\Curl();
+                foreach($headers as $name => $values){
+                    if(substr($name, 0, 2) == "x-"){
+                        $value = is_array($values) ? array_shift($values) : "";
+                        $curl->setHeader($name, $value);
+                    }
+                }
+                $url = str_replace(\Yii::$app->getRequest()->getHostName(), $devUrl, \Yii::$app->getRequest()->getAbsoluteUrl());
+                $url = preg_replace("/https?/i", "https", $url);
+                $curl->setOpt(CURLOPT_SSL_VERIFYPEER, false);
+                $curl->setOpt(CURLOPT_SSL_VERIFYHOST, false);
+                $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 10);
+                $curl->setOpt(CURLOPT_TIMEOUT, 15);
+                $curl->post($url, $this->requestData);
+                header('Content-Type:application/json; charset=utf-8');
+                die($curl->getResponse());
+            }
+        }
+
+        $this->setMall($headers)->setCity($headers)->login($headers)->wechatSubscribe()->saveFormIdList($headers)->bindParent($headers)->checkInviter();
 
         /*$lng = "113.1172052002";
         $lat = "23.017962033827";

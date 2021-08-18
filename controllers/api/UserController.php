@@ -19,6 +19,7 @@ use app\forms\api\user\GiveScoreForm;
 use app\forms\api\user\UserAddressForm;
 use app\forms\api\user\UserEditForm;
 use app\forms\api\user\UserForm;
+use app\forms\api\user\UserLinkPosterNewForm;
 use app\forms\api\user\UserRechargeForm;
 use app\forms\common\attachment\CommonAttachment;
 use app\controllers\business\{Qrcode,Poster,NewUserIntegral};
@@ -282,6 +283,15 @@ class UserController extends ApiController
 //        echo '<img src="data:'.$data.'">';
         $data = $this -> actionLinkPoster($filename);
         return $this -> asJson($data);
+    }
+
+    /**
+     * 分享领取海报领取红包（新版）
+     * @return array
+     */
+    public function actionLinkPosterNew(){
+        $form = new UserLinkPosterNewForm();
+        return $this->asJson($form->get());
     }
 
     /**

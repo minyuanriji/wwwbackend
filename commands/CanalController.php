@@ -26,13 +26,11 @@ class CanalController extends Controller
             $client->connect("81.71.7.222", 11111);
             $client->checkValid();
 
-            if(defined("ENV") && ENV == "pro"){
-                $client->subscribe("1001", "example", "myrj.*");
-            }else{
-                $client->subscribe("1001", "example", "dev_myrj.*");
-            }
+            $client->subscribe("1001", "example", "myrj.*");
 
             # $client->subscribe("1001", "example", "db_name.tb_name"); # 设置过滤
+
+            $allowSchemas = ["myrj"];
 
             while (true) {
                 $message = $client->get(100);
@@ -42,6 +40,10 @@ class CanalController extends Controller
                         $rowChange->mergeFromString($entry->getStoreValue());
                         $evenType = $rowChange->getEventType();
                         $header = $entry->getHeader();
+
+                        if(!in_array($header->getSchemaName(), $allowSchemas)){
+                            continue;
+                        }
 
                         $tableName = $header->getTableName();
                         $tablePrefix = \Yii::$app->getDb()->tablePrefix;
@@ -74,6 +76,7 @@ class CanalController extends Controller
                             }
                             if($evenType == EventType::INSERT){
                                 if(method_exists($tableClass, "insert")){
+                                    echo "Run insert:" . $tableClassName . "\n";
                                     $tableClass->insert($changeRows);
                                 }
                             }
@@ -97,6 +100,7 @@ class CanalController extends Controller
                                 ];
                             }
                             if(method_exists($tableClass, "update")){
+                                echo "Run update:" . $tableClassName . "\n";
                                 $tableClass->update($mixDatas);
                             }
                         }

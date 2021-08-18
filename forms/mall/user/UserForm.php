@@ -51,6 +51,8 @@ class UserForm extends BaseModel
     public $fields;
     public $award_id;
     public $is_change_name = 0;
+    public $search;
+    public $is_lianc = 0;
 
     public function rules()
     {
@@ -60,10 +62,10 @@ class UserForm extends BaseModel
             [['id', 'member_level', 'user_id', 'award_id', 'status', 'is_admin'], 'integer'],
             [['keyword'], 'string', 'max' => 255],
             [['page_size'], 'default', 'value' => 10],
-            [['fields'], 'safe'],
+            [['fields', 'is_lianc'], 'safe'],
             [['keyword', 'platform'], 'default', 'value' => ''],
             [['is_change_name'], 'boolean'],
-            [['role_type'], 'string']
+            [['role_type', 'search'], 'string']
         ];
     }
 
@@ -200,6 +202,14 @@ class UserForm extends BaseModel
         };
         $mall_id = \Yii::$app->mall->id;
 
+        if(!empty($this->search)){
+            $search = (array)@json_decode($this->search, true);
+            foreach($search as $key => $val){
+                if(isset($this->attributes[$key])){
+                    $this->$key = $val;
+                }
+            }
+        }
         $query = User::find()->alias('u')->where([
             'u.is_delete' => 0,
             'u.mall_id' => $mall_id,
@@ -220,6 +230,10 @@ class UserForm extends BaseModel
 
         if(!empty($this->role_type)){
             $query->andWhere(["u.role_type" => $this->role_type]);
+        }
+
+        if($this->is_lianc){
+            $query->andWhere(["u.is_lianc" => 1]);
         }
 
         if ($this->flag == "EXPORT") {
@@ -330,6 +344,7 @@ class UserForm extends BaseModel
             'created_at' => date("Y-m-d H:i:s", $user->created_at),
             'parent_id' => $user->parent_id,
             'is_examine' => $user->is_examine,
+            'is_lianc' => (int)$user->is_lianc
         ];
 
         $mall_members = MemberLevel::findAll(['mall_id' => \Yii::$app->mall->id, 'status' => 1, 'is_delete' => 0]);

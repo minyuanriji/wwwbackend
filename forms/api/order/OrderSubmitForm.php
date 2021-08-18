@@ -1809,6 +1809,7 @@ class OrderSubmitForm extends BaseModel
                     break;
                 }
             }
+
             if (!$rule) {
                 continue;
             }
@@ -1827,6 +1828,7 @@ class OrderSubmitForm extends BaseModel
         }
         $firstPriceList   = [];
         $totalSecondPrice = 0;
+
         foreach ($postageRuleGroups as $group) {
             /** @var PostageRules $postageRule */
             $postageRule = $group['postage_rule'];
@@ -1882,7 +1884,19 @@ class OrderSubmitForm extends BaseModel
         ];
         //$express_price = (new PostageRulesBus()) -> getExpressPrice($goods_data,1);
         //$express_price = array_sum($express_price);
-        $expressItem['express_price'] = price_format(max($firstPriceList) + $totalSecondPrice);
+
+        //累积运费
+        $totalFirstPrices = 0;
+        if(is_array($firstPriceList)){
+            foreach($firstPriceList as $firstPrice){
+                $totalFirstPrices += $firstPrice;
+            }
+        }else{
+            $totalFirstPrices = floatval($firstPriceList);
+        }
+
+
+        $expressItem['express_price'] = price_format($totalFirstPrices + $totalSecondPrice);
         //$expressItem['express_price'] = $express_price;
         $expressItem['total_price']   = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
         return $expressItem;

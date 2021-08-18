@@ -89,6 +89,11 @@ abstract class BaseGoodsEdit extends BaseModel
     public $enable_upgrade_user_role;
     public $upgrade_user_role_type;
 
+    //联创
+    public $lianc_user_id;
+    public $lianc_commission_type;
+    public $lianc_commisson_value;
+
     //分销
     public $individual_share;
     public $share_type;
@@ -147,7 +152,7 @@ abstract class BaseGoodsEdit extends BaseModel
                 'is_default_services'], 'default', 'value' => 1],
             [['price', 'forehead_score', 'profit_price'], 'number', 'min' => 0],
             [['price', 'profit_price'], 'number', 'max' => 9999999],
-            [['is_on_site_consumption', 'enable_upgrade_user_role'], 'number'],
+            [['is_on_site_consumption', 'enable_upgrade_user_role', 'lianc_user_id', 'lianc_commission_type', 'lianc_commisson_value'], 'number'],
             [['fulfil_price','full_relief_price'],'default','value'=>0],
             [['integral_fee_rate'], 'integer', 'min' => 0, 'max' => 100]
         ];
@@ -426,6 +431,10 @@ abstract class BaseGoodsEdit extends BaseModel
         $goods->is_order_paid = $this->is_order_paid;
         $goods->is_order_sales = $this->is_order_sales;
         $goods->profit_price = (float)$this->profit_price;
+
+        $goods->lianc_user_id = $this->lianc_user_id;
+        $goods->lianc_commission_type = $this->lianc_commission_type;
+        $goods->lianc_commisson_value = $this->lianc_commisson_value;
 
         if(!empty($this->integral_setting)){
             $goods->integral_setting = json_encode($this->integral_setting);

@@ -21,6 +21,7 @@ use app\models\MemberLevel;
 use app\models\Order;
 use app\models\OrderDetail;
 use app\models\PostageRules;
+use app\models\User;
 use yii\helpers\ArrayHelper;
 use app\services\Goods\PriceDisplayService;
 
@@ -268,6 +269,15 @@ class CommonGoods extends BaseModel
                 'return_red_envelopes' => 0,
                 'return_commission' => 0,
             ];
+
+        //联创合伙人
+        $detail['lianc_user_info'] = [];
+        if($detail['lianc_user_id']){
+            $detail['lianc_user_info'] = User::find()->where([
+                "id" => $detail['lianc_user_id']
+            ])->asArray()->one();
+        }
+
         return $detail;
     }
 

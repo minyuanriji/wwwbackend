@@ -199,7 +199,7 @@ class UserForm extends BaseModel
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
-        };
+        }
         $mall_id = \Yii::$app->mall->id;
 
         if(!empty($this->search)){
@@ -213,7 +213,7 @@ class UserForm extends BaseModel
 
         $query = User::find()->alias('u')->where([
             'u.is_delete' => 0,
-            'u.mall_id' => $mall_id,
+            'u.mall_id' => $mall_id
         ]);
         $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
         $query->leftJoin(["url" => UserRelationshipLink::tableName()], "url.user_id=u.id");

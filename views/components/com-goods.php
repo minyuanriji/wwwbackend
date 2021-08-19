@@ -1386,7 +1386,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     return_commission : 0,
                 },
                 lianc_user_id: 0,
-                lianc_commission_type: '1',
+                lianc_commission_type: 1,
                 lianc_commisson_value: 0
             };
             let rules = {

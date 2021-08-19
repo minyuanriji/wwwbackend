@@ -1,12 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * 用户管理-用户管理-用户中心
- * Author: zal
- * Date: 2020-04-15
- * Time: 15:35
- */
 
 namespace app\controllers\mall;
 

@@ -61,10 +61,11 @@ class CommissionController extends BaseCommandController{
      * @param $user_id
      * @param $item_id
      * @param $item_type
+     * @param $lianc_user_id 品牌商ID。如果消费用户是品牌商直推的，品牌商临时升级成分公司
      * @return array
      * @throws \Exception
      */
-    public function getCommissionParentRuleDatas($user_id, $item_id, $item_type){
+    public function getCommissionParentRuleDatas($user_id, $item_id, $item_type, $lianc_user_id = null){
 
         //获取支付用户信息
         $user = User::findOne($user_id);
@@ -73,6 +74,7 @@ class CommissionController extends BaseCommandController{
             throw new \Exception("支付用户[ID:".($user ? $user->id : 0)."]不存在或关系链异常");
         }
 
+        $selects = ["u.id", "u.parent_id", "(u.income+u.income_frozen) as total_income", "u.role_type", "u.nickname"];
         $query = User::find()->alias("u")
                     ->leftJoin("{{%user_relationship_link}} url", "url.user_id=u.id");
         $query->andWhere([
@@ -80,9 +82,23 @@ class CommissionController extends BaseCommandController{
             ["u.is_delete" => 0],
             ["IN", "u.role_type", ["store", "partner", "branch_office"]],
             ("url.`left` < '".$userLink->left."' AND url.`right` > '".$userLink->right."'")
-        ])->select(["u.id", "u.parent_id", "(u.income+u.income_frozen) as total_income", "u.role_type", "u.nickname"])->orderBy("url.`left` DESC");
+        ])->select($selects)->orderBy("url.`left` DESC");
 
-        $parentDatas = $query->asArray()->all();
+        $parentDatas = [];
+
+        //如果消费用户是品牌商直推的，品牌商临时升级成分公司
+        if(!empty($lianc_user_id)){
+            $parentData = User::find()->alias("u")->where(["u.id" => $lianc_user_id])->select($selects)->asArray()->one();
+            if($parentData){
+                $parentData['role_type'] = "branch_office";
+                $parentDatas[] = $parentData;
+            }
+        }
+
+        $rows = $query->asArray()->all();
+        if($rows){
+            $parentDatas = array_merge($parentDatas, $rows);
+        }
         if(!$parentDatas){
             throw new \Exception("无法获取上级[ID:".$userLink->parent_id."]信息", self::ERR_CODE_NOT_FOUND_PARENTS);
         }

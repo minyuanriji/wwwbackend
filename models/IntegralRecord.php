@@ -104,13 +104,13 @@ class IntegralRecord extends BaseActiveRecord{
 
                 //绑定积分券所属上级
                 $beforeParentId = $wallet['parent_id'];
-                if($wallet['parent_id'] == 0 && $parentid > 0){
+                if(!$wallet['parent_id'] && $parentid > 0){
                     $resx = self::checkBindParent($wallet,$parentid);
                     if($resx){
-                        $wallet->parent_id = $parentid;
+                        $wallet->parent_id        = $parentid;
                         $wallet->second_parent_id = $resx['parent_id'];
-                        $wallet->third_parent_id = $resx['second_parent_id'];
-                        $wallet->junior_at = time();
+                        $wallet->third_parent_id  = $resx['second_parent_id'];
+                        $wallet->junior_at        = time();
                     }
                 }
 
@@ -118,11 +118,11 @@ class IntegralRecord extends BaseActiveRecord{
                 $resxx = $wallet->save(false);
                 if($resxx === false) {
                     throw new Exception($wallet->getErrorMessage());
-                }else{
+                }/*else{
                     if($beforeParentId == 0 && $parentid > 0){ //变更上下级归属
                         $wallet->bindParent($beforeParentId);
                     }
-                }
+                }*/
             }
 
             $transaction->commit();

@@ -61,13 +61,13 @@ class DistributionForm extends BaseModel
             $user->is_distributor = 0;
             $parentId = $distribution->user->parent_id;
             if ($user->save()) {
-                User::updateAll(
+                /*User::updateAll(
                     ['parent_id' => 0],
                     ['or',
                         ['parent_id' => $distribution->user_id],
                         ['user_id' => $distribution->user_id]
                     ]
-                );
+                );*/
                 $t->commit();
                 \Yii::$app->trigger(HandlerRegister::CHANGE_PARENT, new DistributionMemberEvent([
                     'mall' => \Yii::$app->mall,

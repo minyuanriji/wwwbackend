@@ -37,12 +37,16 @@ class RelationLogic extends BaseLogic
      */
     public static function bindParent($user, $parent_id, $is_manual = 0)
     {
+
+        if($user->parent_id == $parent_id)
+            return;
+
         $relation = RelationSetting::findOne(['mall_id' => \Yii::$app->mall->id, 'use_relation' => 1, 'is_delete' => 0]);
         if (!$relation) {
             throw new Exception('未启用关系链'.$parent_id);
         }
 
-        if($user->parent_id){
+        if($user->parent_id && $user->parent_id != 9){
             throw new Exception('用户已存在上级');
         }
 
@@ -77,9 +81,9 @@ class RelationLogic extends BaseLogic
         }*/
 
         //如果用户已有关系链，删除
-        UserRelationshipLink::deleteAll([
+        /*UserRelationshipLink::deleteAll([
             "user_id" => $user->id
-        ]);
+        ]);*/
 
         $user->parent_id = $parent_id;
         $user->junior_at = time();
@@ -119,9 +123,9 @@ class RelationLogic extends BaseLogic
                     /** @var User $userChilds */
                     $userChilds = User::getOneData(["id" => $ch["child_id"]]);
                     $parent_ids = UserLogic::getUserThreeParentIds($ch["child_id"]);
-                    $userChilds->parent_id = isset($parent_ids[1]["parent_id"]) ? $parent_ids[1]["parent_id"] : 0;
-                    $userChilds->second_parent_id = isset($parent_ids[2]["parent_id"]) ? $parent_ids[2]["parent_id"] : 0;
-                    $userChilds->third_parent_id = isset($parent_ids[3]["parent_id"]) ? $parent_ids[3]["parent_id"] : 0;
+                    //$userChilds->parent_id = isset($parent_ids[1]["parent_id"]) ? $parent_ids[1]["parent_id"] : 0;
+                    //$userChilds->second_parent_id = isset($parent_ids[2]["parent_id"]) ? $parent_ids[2]["parent_id"] : 0;
+                    //$userChilds->third_parent_id = isset($parent_ids[3]["parent_id"]) ? $parent_ids[3]["parent_id"] : 0;
                     $res = $userChilds->save();
                     if($res === false){
                         throw new \Exception("用户上级更新失败！");

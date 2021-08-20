@@ -59,13 +59,13 @@ class StockForm extends BaseModel
             $user->is_inviter = 0;
             $parentId = $agent->user->parent_id;
             if ($user->save()) {
-                User::updateAll(
+                /*User::updateAll(
                     ['parent_id' => 0],
                     ['or',
                         ['parent_id' => $agent->user_id],
                         ['user_id' => $agent->user_id]
                     ]
-                );
+                );*/
                 $t->commit();
          /*       \Yii::$app->trigger(HandlerRegister::CHANGE_DISTRIBUTION_MEMBER, new AgentMemberEvent([
                     'mall' => \Yii::$app->mall,

@@ -36,6 +36,7 @@ class GoodsAction extends Action{
         //订单已付款、分佣状态未处理
         $query = OrderDetail::find()->alias("od");
         $query->innerJoin("{{%order}} o", "o.id=od.order_id");
+        $query->innerJoin(["u" => User::tableName()], "u.id=o.user_id");
         $query->innerJoin("{{%goods}} g", "g.id=od.goods_id");
         $query->innerJoin("{{%goods_warehouse}} gw", "gw.id=g.goods_warehouse_id");
         $query->leftJoin(["lianc_u" => User::tableName()], "lianc_u.id=g.lianc_user_id AND lianc_u.is_lianc=1 AND lianc_u.is_delete=0");
@@ -49,7 +50,7 @@ class GoodsAction extends Action{
         ]);
         $query->select([
             "od.id as order_detail_id", "od.num", "od.is_refund", "od.refund_status", "od.created_at",
-            "od.updated_at", "o.mall_id", "o.user_id", "od.order_id", "od.goods_id", "od.total_original_price",
+            "od.updated_at", "o.mall_id", "o.user_id", "u.parent_id", "od.order_id", "od.goods_id", "od.total_original_price",
             "od.total_price", "g.profit_price", "gw.name","g.first_buy_setting",
             "lianc_u.id as lianc_user_id", "g.lianc_commission_type", "g.lianc_commisson_value",
             "(lianc_u.income+lianc_u.income_frozen) as lianc_total_income"
@@ -156,20 +157,28 @@ class GoodsAction extends Action{
                 throw new \Exception("订单商品[ID:".$orderDetailData['order_detail_id']."]已退款");
             }
 
-            $parentDatas = $this->controller->getCommissionParentRuleDatas($orderDetailData['user_id'], $orderDetailData['goods_id'], 'goods');
 
             //联创合伙人收益
+            $liancUserId = null;
             if(!empty($orderDetailData['lianc_user_id'])){
                 $liancData = [
                     'lianc_commission_type' => $orderDetailData['lianc_commission_type'],
                     'lianc_commisson_value' => $orderDetailData['lianc_commisson_value']
                 ];
+
                 $liancData['profit_price'] = $orderDetailData['profit_price'];
                 $price = $getCommissionPriceFunc($liancData['profit_price'], $orderDetailData['num'], $liancData['lianc_commission_type'], $liancData['lianc_commisson_value']);
                 if($price > 0){
                     $newPriceLogFunc($orderDetailData['lianc_user_id'], 1, $price, $orderDetailData['lianc_total_income'], $liancData, $orderDetailData);
                 }
+
+                //如果消费用户是品牌商直推的，品牌商临时升级成分公司
+                if($orderDetailData['parent_id'] == $orderDetailData['lianc_user_id']){
+                    $liancUserId = $orderDetailData['lianc_user_id'];
+                }
             }
+
+            $parentDatas = $this->controller->getCommissionParentRuleDatas($orderDetailData['user_id'], $orderDetailData['goods_id'], 'goods', $liancUserId);
 
             //通过相关规则键获取分佣规则进行分佣
             foreach($parentDatas as $parentData){

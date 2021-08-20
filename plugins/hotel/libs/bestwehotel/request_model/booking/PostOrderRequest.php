@@ -38,7 +38,7 @@ class PostOrderRequest extends BaseRequest{
     public $passengers = [];
 
     //以下是可选内容
-    public $lastArrTim;
+    public $lastArrTime;
     public $remarks;
     public $totalRate;
     public $bookMobile;

@@ -60,13 +60,13 @@ class AreaForm extends BaseModel
             $user->is_inviter = 0;
             $parentId = $area->user->parent_id;
             if ($user->save()) {
-                User::updateAll(
+                /*User::updateAll(
                     ['parent_id' => 0],
                     ['or',
                         ['parent_id' => $area->user_id],
                         ['user_id' => $area->user_id]
                     ]
-                );
+                );*/
                 $t->commit();
 
                 return [

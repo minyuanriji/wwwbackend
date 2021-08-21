@@ -28,6 +28,7 @@ class ParentChangeJob extends BaseObject implements JobInterface
 
     public function execute($queue)
     {
+        return;
         \Yii::$app->setMall(Mall::findOne($this->mall_id));
         $user_id = $this->user_id;
         $parent_id = $this->parent_id;

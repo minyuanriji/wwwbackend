@@ -11,6 +11,15 @@
                     <el-col :span="24" style="margin-bottom:5px;text-align: center">”{{nickname}}“财务概况</el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">
+                    <el-col :span="12" class="l-label">用户等级</el-col>
+                    <el-col :span="12">
+                        <span v-if="role_type == 'branch_office'">分公司</span>
+                        <span v-if="role_type == 'partner'">合伙人</span>
+                        <span v-if="role_type == 'store'">VIP会员</span>
+                        <span v-if="role_type == 'user'">普通用户</span>
+                    </el-col>
+                </el-row>
+                <el-row class="user-finance-stat-row">
                     <el-col :span="12" class="l-label">商品消费总额</el-col>
                     <el-col :span="12"><span style="color:green">{{stat_info.total_goods_paid}}元</span></el-col>
                 </el-row>
@@ -68,6 +77,7 @@
                 is_loaded: false,
                 loading: false,
                 nickname: 'XXX',
+                role_type: '',
                 stat_info: {
                     total_goods_paid: 0.00, //商品消费总额
                     total_checkout_paid: 0.00, //店铺消费总额
@@ -98,6 +108,7 @@
                         self.loading = false;
                         self.stat_info = e.data.data.stat_info;
                         self.nickname = e.data.data.nickname;
+                        self.role_type = e.data.data.role_type;
                     } else {
                         self.$message.error(e.data.msg);
                     }

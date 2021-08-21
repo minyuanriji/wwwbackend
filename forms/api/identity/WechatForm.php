@@ -225,12 +225,13 @@ class WechatForm extends BaseModel
             \Yii::$app->cache->set($openid,$data);
             $returnData["key"] = $openid;
             if(!empty($parent_user_id)){
-                $transaction = \Yii::$app->db->beginTransaction();
-                try{
-                    $user_data = (new UserMode()) -> getOneUserParent($returnData['access_token']);
-                    (new UserMode()) -> updateUsers(['parent_id' => $parent_user_id],$user_data['id']);
-                    $transaction -> commit();
-                }catch (\Exception $e){
+                $user_data = (new UserMode()) -> getOneUserParent($returnData['access_token']);
+                if(!$user_data['parent_id'] || ($user_data['parent_id'] == 9)){
+                    try{
+                        (new UserMode()) -> updateUsers(['parent_id' => $parent_user_id],$user_data['id']);
+                    }catch (\Exception $e){
+
+                    }
                 }
             }
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);

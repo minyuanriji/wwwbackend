@@ -140,7 +140,7 @@ abstract class BaseGoodsEdit extends BaseModel
             [['forehead', 'id','fulfil_price','full_relief_price','max_deduct_integral','enable_integral','enable_score','is_order_paid', 'is_order_sales'], 'number'],
             [['cats', 'mchCats', 'services', 'cards', 'attr', 'attrGroups', 'member_price',
                 'select_attr_groups', 'labels','price_display','integral_setting','score_setting','order_paid','order_sales','cannotrefund',
-                'upgrade_user_role_type','purchase_permission','first_buy_setting'], 'safe'],
+                'upgrade_user_role_type','purchase_permission','first_buy_setting', 'lianc_commission_type', 'lianc_commisson_value'], 'safe'],
             [['virtual_sales', 'freight_id', 'is_level', 'is_level_alone', 'forehead', 'forehead_score',
                 'give_score', 'individual_share', 'is_level_alone', 'pieces', 'share_type', 'accumulative',
                 'attr_setting_type', 'goods_weight', 'is_area_limit', 'form_id'], 'default', 'value' => 0],
@@ -152,7 +152,7 @@ abstract class BaseGoodsEdit extends BaseModel
                 'is_default_services'], 'default', 'value' => 1],
             [['price', 'forehead_score', 'profit_price'], 'number', 'min' => 0],
             [['price', 'profit_price'], 'number', 'max' => 9999999],
-            [['is_on_site_consumption', 'enable_upgrade_user_role', 'lianc_user_id', 'lianc_commission_type', 'lianc_commisson_value'], 'number'],
+            [['is_on_site_consumption', 'enable_upgrade_user_role', 'lianc_user_id'], 'number'],
             [['fulfil_price','full_relief_price'],'default','value'=>0],
             [['integral_fee_rate'], 'integer', 'min' => 0, 'max' => 100]
         ];

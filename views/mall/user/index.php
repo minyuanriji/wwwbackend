@@ -85,6 +85,8 @@
                                     用户收益：{{scope.row.total_income}}人（查看）
                                 </el-link>
                             </div>
+                            <div>团队订单数：{{scope.row.team_order_sum}}</div>
+                            <div>团队订单金额：{{scope.row.team_order_price}}元</div>
                         </div>
                     </template>
                 </el-table-column>

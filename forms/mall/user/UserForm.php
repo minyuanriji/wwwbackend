@@ -296,6 +296,15 @@ class UserForm extends BaseModel
             }
             $v['role_type_text'] = isset($roleTypes[$v['role_type']]) ? $roleTypes[$v['role_type']] : '';
             $v['order_sum'] = price_format($v['order_sum'] - $v['order_sum_cancel'] - $v['order_sum_refund']);
+
+            $team_all = $this->getTeamOrder($v['user_id']);
+            if (isset($team_all['order_num'])) {
+                $v['team_order_sum'] = $team_all['order_num'];
+                $v['team_order_price'] = $team_all['total_price'];
+            } else {
+                $v['team_order_sum'] = 0;
+                $v['team_order_price'] = 0;
+            }
         }
         unset($v);
 
@@ -575,5 +584,37 @@ class UserForm extends BaseModel
                 'pagination' => $pagination,
             ]
         ];
+    }
+
+    //获取团队订单数、总金额
+    public function getTeamOrder ($user_id)
+    {
+        try {
+            $user_link = UserRelationshipLink::findOne(['user_id' => $user_id, 'is_delete' => 0]);
+            if (!$user_link){
+                throw new \Exception('用户关系链异常');
+            }
+            $user_ids = UserRelationshipLink::find()->alias('ul')
+                    ->andWhere("ul.left > $user_link->left AND ul.right < $user_link->right")
+                    ->select('user_id')->asArray()->all();
+            $data = [
+                'order_num' => 0,
+                'total_price' => 0
+            ];
+            if ($user_ids && is_array($user_ids)) {
+                $query = Order::find()->andWhere(['in','user_id',$user_ids]);
+                $price_query = clone $query;
+                //获取总订单数
+                $data['order_num'] = $query->count();
+                //获取总金额
+                $data['total_price'] = $price_query->sum('total_pay_price');
+            }
+            return $data;
+        } catch (\Exception $e) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
     }
 }

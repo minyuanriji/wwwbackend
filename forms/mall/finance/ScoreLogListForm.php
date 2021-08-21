@@ -53,8 +53,8 @@ class ScoreLogListForm extends BaseModel
         }
         $list = $query->page($pagination, $this->limit)->asArray()->all();
         foreach ($list as &$v) {
-            $v['info_desc'] = SerializeHelper::decode($v['custom_desc']);
-        };
+            $v['info_desc'] = $v['custom_desc'] ? SerializeHelper::decode($v['custom_desc']) : [];
+        }
         unset($v);
         return [
             'code' => ApiCode::CODE_SUCCESS,

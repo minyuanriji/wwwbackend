@@ -11,7 +11,9 @@
 namespace app\controllers\mall;
 
 use app\forms\mall\statistics\DataForm;
+use app\forms\mall\statistics\GoodsStatisticsForm;
 use app\forms\mall\statistics\InitDataForm;
+use yii\base\BaseObject;
 
 class DataStatisticsController extends StatisticsMangerController
 {
@@ -101,5 +103,20 @@ class DataStatisticsController extends StatisticsMangerController
     {
         $form = new InitDataForm();
         return $this->asJson($form->search());
+    }
+
+    /**
+     * 商品统计
+     * @return string|\yii\web\Response
+     */
+    public function actionGoodsStatistics()
+    {
+        if (\Yii::$app->request->isAjax) {
+            $form = new GoodsStatisticsForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->search());
+        } else {
+            return $this->render('goods-statistics');
+        }
     }
 }

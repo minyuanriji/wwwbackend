@@ -40,11 +40,6 @@ class UserWxAddressForm extends BaseModel
             [['is_default',], 'default', 'value' => 0],
             [['name', 'mobile'], 'string', 'max' => 255],
             [['detail'], 'string', 'max' => 1000],
-            [['mobile'], PhoneNumberValidator::className(), 'when' => function ($model) {
-                $mall = Mall::findOne(['id' => \Yii::$app->mall->id]);
-                $status = $mall->getMallSettingOne('mobile_verify');
-                return $status == 1;
-            }],
         ];
     }
 

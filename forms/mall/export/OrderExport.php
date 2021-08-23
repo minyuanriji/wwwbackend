@@ -181,10 +181,10 @@ class OrderExport extends BaseExport
 
         }
 
-        $list = $query->with(['user.userInfo', 'detailExpress', 'clerk', 'store', 'detail.goods.goodsWarehouse', 'refund', 'paymentOrder.paymentOrderUnion'])
-            ->orderBy('o.created_at DESC')
-            ->all();
         try {
+            $list = $query->with(['user.userInfo', 'detailExpress', 'clerk', 'store', 'detail.goods.goodsWarehouse', 'refund', 'paymentOrder.paymentOrderUnion'])
+                ->orderBy('o.created_at DESC')
+                ->all();
             $this->transform($list);
             $this->getFields();
             $dataList = $this->getDataList();
@@ -268,8 +268,12 @@ class OrderExport extends BaseExport
             }
 
             if($item->detailExpress){
-                $arr['express_no'] = $item->detailExpress[0]->express_no;
-                $arr['express'] = $item->detailExpress[0]->express;
+                if($item->detailExpress[0]->send_type == 1){
+                    $arr['express_no'] = $item->detailExpress[0]->express_no;
+                    $arr['express'] = $item->detailExpress[0]->express;
+                }else{
+                    $arr['express'] = $item->detailExpress[0]->express_content;
+                }
             }
 
             if ($item->mch_id > 0) {

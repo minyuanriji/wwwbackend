@@ -106,7 +106,7 @@ class AreaUserEditForm extends BaseModel
                 $area->district_id = $this->district_id;
                 $area->province_id = $this->province_id;
                 $area->city_id = $this->city_id;
-                $area->town_id = $this->town_id;
+//                $area->town_id = $this->town_id;
                 $area->is_delete = 0;
                 if (empty($this->apply_status) || ($this->apply_status == AreaApply::STATUS_PASS)) {
                     if($area->save()){

@@ -87,7 +87,7 @@ class AreaListForm extends BaseModel
             $newItem['province'] = '未知';
             $newItem['city'] = '未知';
             $newItem['district'] = '未知';
-            $newItem['town'] = '未知';
+//            $newItem['town'] = '未知';
             foreach ($address_list as $address) {
                 if ($address['level'] == 'province') {
                     if ($address['id'] == $item->province_id) {
@@ -106,13 +106,13 @@ class AreaListForm extends BaseModel
                 }
             }
 
-            $town = Town::findOne($item->town_id);
+            /*$town = Town::findOne($item->town_id);
             if ($town) {
                 $newItem['town'] = $town->name;
-            }
+            }*/
 
 
-            $newItem['address']=$newItem['province'].','.$newItem['city'].','.$newItem['district'].','.$newItem['town'];
+            $newItem['address']=$newItem['province'].','.$newItem['city'].','.$newItem['district']/*.','.$newItem['town']*/;
 
             $newList[] = $newItem;
         }

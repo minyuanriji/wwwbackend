@@ -126,7 +126,7 @@ class StoreAction extends Action{
                                 'mall_id'     => $checkoutOrder['mall_id'],
                                 'user_id'     => $user->parent_id,
                                 'type'        => 1,
-                                'money'       => $parent_user['total_income'],
+                                'money'       => $parent_user->total_income,
                                 'income'      => $priceLog->price,
                                 'desc'        => "来自店铺“".$checkoutOrder['name']."”的营业额分佣记录[ID:".$priceLog->id."]",
                                 'flag'        => 1, //到账
@@ -142,7 +142,7 @@ class StoreAction extends Action{
                             User::updateAllCounters([
                                 "total_income"  => $priceLog->price,
                                 "income" => $priceLog->price
-                            ], ["id" => $parent_user['id']]);
+                            ], ["id" => $parent_user->id]);
 
                             $trans->commit();
                         }catch (\Exception $e){

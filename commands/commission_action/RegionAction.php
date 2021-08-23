@@ -3,11 +3,10 @@
 namespace app\commands\commission_action;
 
 use app\models\IncomeLog;
-use app\models\Store;
 use app\models\User;
 use app\plugins\area\models\AreaAgent;
-use app\plugins\commission\models\CommissionRules;
-use app\plugins\commission\models\CommissionStorePriceLog;
+use app\plugins\area\models\AreaSetting;
+use app\plugins\commission\models\CommissionRegionPriceLog;
 use app\plugins\mch\models\MchCheckoutOrder;
 use yii\base\Action;
 
@@ -16,7 +15,6 @@ class RegionAction extends Action
 
     public function run()
     {
-
         $this->doNew();die;
         while (true) {
             if (!defined("ENV") || ENV != "pro") {
@@ -52,121 +50,105 @@ class RegionAction extends Action
             return false;
         }
 
+        //获取省市区分佣比列
+        $AreaSetting = AreaSetting::find()->select('key,value')->where(['is_delete' => 0])->asArray()->all();
+        if (!$AreaSetting) {
+            return false;
+        }
+        $newAreaSetting = array_combine(array_column($AreaSetting, 'key'),$AreaSetting);
+
         foreach ($checkoutOrders as $checkoutOrder) {
 
             try {
                 //获取符合当前门店区域的用户
                 $region_user = $this->getRegion($checkoutOrder['mall_id'], $checkoutOrder['province_id'], $checkoutOrder['city_id'], $checkoutOrder['district_id']);
-                print_r($region_user);die;
-
-
-
-                //获取店铺用户信息及上级用户
-                $user = User::findOne($checkoutOrder['user_id']);
-                if (!$user)
-                    throw new \Exception("商铺用户[ID:" . ($user ? $user->id : 0) . "]不存在");
-
-                $parent_user = User::findOne($user->parent_id);
-                if (!$parent_user)
-                    throw new \Exception("商铺上级用户[ID:" . ($parent_user ? $parent_user->id : 0) . "]不存在");
-
-                if ($parent_user->role_type == 'user')
-                    throw new \Exception("普通用户不分佣");
-
-                //获取当前店铺分佣规则
-                $query = CommissionRules::find()->alias("cr");
-                $query->leftJoin("{{%plugin_commission_rule_chain}} crc", "cr.id=crc.rule_id");
-                $newQuery = clone $query;
-                $query->andWhere([
-                    "AND",
-                    ["cr.item_type" => 'store'],
-                    ["cr.item_id" => $checkoutOrder['store_id']],
-                    ['cr.is_delete' => 0],
-                ]);
-                $commission_res = $query->select(["cr.commission_type", "crc.level", "crc.commisson_value"])->asArray()->one();
-
-                if (!$commission_res) {
-
-                    //查询是否设置公共规则
-                    $commission_res = $newQuery->andWhere([
-                        "AND",
-                        ["cr.item_type" => 'store'],
-                        ["cr.apply_all_item" => 1],
-                        ['cr.is_delete' => 0],
-                    ])->select(["cr.commission_type", "crc.level", "crc.commisson_value"])->asArray()->one();
-
-                    if (!$commission_res) {
-                        $this->controller->commandOut('没有分佣规则');
-                        continue;
-                    }
+                if (!$region_user) {
+//                    $this->controller->commandOut('没有符合当前门店区域的用户');
+                    continue;
                 }
+
                 //计算分佣金额
                 $transferRate = (int)$checkoutOrder['transfer_rate'];//商户手续费
                 $integralFeeRate = (int)$checkoutOrder['integral_fee_rate'];
-                $commission_res['profit_price'] = $this->controller->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate, $integralFeeRate);
-                if ($commission_res['commission_type'] == 1) { //按百分比
-                    $price = (floatval($commission_res['commisson_value']) / 100) * floatval($commission_res['profit_price']);
-                } else { //按固定值
-                    $price = (float)$commission_res['commisson_value'];
-                }
-                //生成分佣记录
-                if ($price > 0) {
-                    $priceLog = CommissionStorePriceLog::findOne([
-                        "user_id" => $user->parent_id,
-                        "item_id" => $checkoutOrder['id'],
-                        "item_type" => 'checkout',
-                    ]);
-                    if (!$priceLog) { //没有生成过再去生成
-                        $trans = \Yii::$app->db->beginTransaction();
-                        try {
-                            $priceLog = new CommissionStorePriceLog([
-                                "mall_id" => $checkoutOrder['mall_id'],
-                                "item_id" => $checkoutOrder['id'],
-                                "item_type" => 'checkout',
-                                "user_id" => $user->parent_id,
-                                "price" => round($price, 5),
-                                "status" => 1,
-                                "created_at" => $checkoutOrder['created_at'],
-                                "updated_at" => $checkoutOrder['updated_at'],
-                                "rule_data_json" => json_encode($commission_res)
-                            ]);
-                            if (!$priceLog->save()) {
-                                throw new \Exception(json_encode($priceLog->getErrors()));
+//                $rule_data_json['profit_price'] = (new CommissionController(null,null))->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate, $integralFeeRate);
+                $rule_data_json['profit_price'] = $this->controller->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate, $integralFeeRate);
+
+                foreach ($region_user as $value) {
+                    $user = User::findOne($value['user_id']);
+                    if (!$user) {
+                        throw new \Exception("商铺用户[ID:".($user ? $user->id : 0)."]不存在");
+                    }
+
+                    if ($value['level'] == 4) {
+                        $rule_data_json['commisson_value'] = $newAreaSetting['province_price']['value'];
+                    } else if ($value['level'] == 3) {
+                        $rule_data_json['commisson_value'] = $newAreaSetting['city_price']['value'];
+                    } else if ($value['level'] == 2) {
+                        $rule_data_json['commisson_value'] = $newAreaSetting['district_price']['value'];
+                    } else {
+//                        $this->controller->commandOut('该区域暂无分佣');
+                        continue;
+                    }
+                    $price = (floatval($rule_data_json['commisson_value']) / 100) * floatval($rule_data_json['profit_price']);
+                    $rule_data_json['commission_type'] = 1;
+                    //生成分佣记录
+                    if ($price > 0) {
+                        $priceLog = CommissionRegionPriceLog::findOne([
+                            "user_id" => $value['user_id'],
+                            "item_id" => $checkoutOrder['id'],
+                            "item_type" => 'checkout',
+                        ]);
+                        if (!$priceLog) { //没有生成过再去生成
+                            $trans = \Yii::$app->db->beginTransaction();
+                            try {
+                                $priceLog = new CommissionRegionPriceLog([
+                                    "mall_id" => $checkoutOrder['mall_id'],
+                                    "item_id" => $checkoutOrder['id'],
+                                    "item_type" => 'checkout',
+                                    "user_id" => $value['user_id'],
+                                    "price" => round($price, 5),
+                                    "status" => 1,
+                                    "created_at" => time(),
+                                    "updated_at" => time(),
+                                    "rule_data_json" => json_encode($rule_data_json)
+                                ]);
+                                if (!$priceLog->save()) {
+                                    throw new \Exception(json_encode($priceLog->getErrors()));
+                                }
+                                $this->controller->commandOut("生成分佣记录 [ID:" . $priceLog->id . "]");
+
+                                //收入记录
+                                $incomeLog = new IncomeLog([
+                                    'mall_id' => $checkoutOrder['mall_id'],
+                                    'user_id' => $value['user_id'],
+                                    'type' => 1,
+                                    'money' => $user->total_income,
+                                    'income' => $priceLog->price,
+                                    'desc' => "来自店铺“" . $checkoutOrder['name'] . "”的营业额分佣记录[ID:" . $priceLog->id . "]",
+                                    'flag' => 1, //到账
+                                    'source_id' => $priceLog->id,
+                                    'source_type' => 'region',
+                                    'created_at' => time(),
+                                    'updated_at' => time()
+                                ]);
+                                if (!$incomeLog->save()) {
+                                    throw new \Exception(json_encode($incomeLog->getErrors()));
+                                }
+
+                                User::updateAllCounters([
+                                    "total_income" => $priceLog->price,
+                                    "income" => $priceLog->price
+                                ], ["id" => $user->id]);
+
+                                $trans->commit();
+                            } catch (\Exception $e) {
+                                $trans->rollBack();
+                                $this->controller->commandOut($e->getMessage());
+                                $this->controller->commandOut("line:" . $e->getLine());
                             }
-                            $this->controller->commandOut("生成分佣记录 [ID:" . $priceLog->id . "]");
-
-                            //收入记录
-                            $incomeLog = new IncomeLog([
-                                'mall_id' => $checkoutOrder['mall_id'],
-                                'user_id' => $user->parent_id,
-                                'type' => 1,
-                                'money' => $parent_user['total_income'],
-                                'income' => $priceLog->price,
-                                'desc' => "来自店铺“" . $checkoutOrder['name'] . "”的营业额分佣记录[ID:" . $priceLog->id . "]",
-                                'flag' => 1, //到账
-                                'source_id' => $priceLog->id,
-                                'source_type' => 'store',
-                                'created_at' => $checkoutOrder['created_at'],
-                                'updated_at' => $checkoutOrder['updated_at']
-                            ]);
-                            if (!$incomeLog->save()) {
-                                throw new \Exception(json_encode($incomeLog->getErrors()));
-                            }
-
-                            User::updateAllCounters([
-                                "total_income" => $priceLog->price,
-                                "income" => $priceLog->price
-                            ], ["id" => $parent_user['id']]);
-
-                            $trans->commit();
-                        } catch (\Exception $e) {
-                            $trans->rollBack();
-                            $this->controller->commandOut($e->getMessage());
-                            $this->controller->commandOut("line:" . $e->getLine());
                         }
                     }
                 }
-
             } catch (\Exception $e) {
                 $this->controller->commandOut($e->getMessage());
                 $this->controller->commandOut("line:" . $e->getLine());
@@ -200,7 +182,7 @@ class RegionAction extends Action
                     ['district_id' => $district_id],
                     ['level' => 2],
                 ],
-            ])->asArray()->all();
+            ])->orderBy('level DESC')->asArray()->all();
 
         return $AreaAgent;
     }

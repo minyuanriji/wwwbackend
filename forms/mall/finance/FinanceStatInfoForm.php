@@ -105,7 +105,8 @@ class FinanceStatInfoForm extends BaseModel{
                 'data' => [
                     'stat_info' => $data,
                     'nickname'  => $user ? $user->nickname : '',
-                    'user_id'   => $user ? $user->id : 0
+                    'user_id'   => $user ? $user->id : 0,
+                    'role_type' => $user ? $user->role_type : ''
                 ]
             ];
         }catch (\Exception $e){

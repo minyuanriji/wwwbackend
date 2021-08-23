@@ -1,37 +1,22 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-08
- * Time: 15:47
- */
-
 
 namespace app\plugins\area\controllers\mall;
 
 use app\core\ApiCode;
-use app\plugins\area\forms\api\AreaApplyForm;
 use app\plugins\area\forms\mall\ApplyListForm;
 use app\plugins\area\forms\mall\AreaSettingForm;
 use app\plugins\area\forms\mall\IncomeListForm;
 use app\plugins\area\models\AreaAgent;
 use app\plugins\area\models\AreaApply;
 use app\plugins\Controller;
-use app\plugins\area\forms\mall\AreaGoodsForm;
 use app\plugins\area\forms\mall\AreaListForm;
 use app\plugins\area\forms\mall\AreaRemarksForm;
 use app\plugins\area\forms\mall\AreaUserEditForm;
-
 
 class AreaController extends Controller
 {
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * Date: 2020-05-10
-     * Time: 21:35
      * @Note:区域代理列表
      * @return string|\yii\web\Response
      * @throws \Exception
@@ -53,9 +38,6 @@ class AreaController extends Controller
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * Date: 2020-05-10
-     * Time: 21:36
      * @Note:修改备注
      */
     public function actionRemarksEdit()
@@ -70,9 +52,6 @@ class AreaController extends Controller
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-11
-     * @Time: 15:36
      * @Note:查找用户
      */
     public function actionSearchUser()
@@ -86,9 +65,6 @@ class AreaController extends Controller
 
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-11
-     * @Time: 15:45
      * @Note:
      * @return string|\yii\web\Response
      */
@@ -105,9 +81,6 @@ class AreaController extends Controller
 
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-11
-     * @Time: 16:56
      * @Note:修改等级
      * @return \yii\web\Response
      */
@@ -122,9 +95,6 @@ class AreaController extends Controller
 
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-11
-     * @Time: 16:56
      * @Note:批量修改区域代理等级
      * @return \yii\web\Response
      */
@@ -139,9 +109,6 @@ class AreaController extends Controller
 
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-07-10
-     * @Time: 9:18
      * @Note:区域代理设置
      * @return string|\yii\web\Response
      */
@@ -162,9 +129,6 @@ class AreaController extends Controller
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-07-10
-     * @Time: 9:19
      * @Note:提成明细
      */
     public function actionIncomeList()

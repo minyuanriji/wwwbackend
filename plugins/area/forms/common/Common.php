@@ -94,7 +94,9 @@ class Common extends BaseModel
         $frozen_price = 0;
         $yesterday_price = 0;
         $area = $this->getAreaUser($user);
-        if (empty($area)) {
+
+        //2021/08/21 屏蔽代码 、成为区域代理需要后台手动添加，不能通过程序添加
+        /*if (empty($area)) {
             $is_apply = AreaSetting::getValueByKey(AreaSetting::IS_APPLY, \Yii::$app->mall->id);
             $is_check = AreaSetting::getValueByKey(AreaSetting::IS_CHECK, \Yii::$app->mall->id);
             if ($is_apply == 0 && $is_check == 0) {
@@ -117,7 +119,7 @@ class Common extends BaseModel
             } else {
                 return null;
             }
-        }
+        }*/
         $is_price = '0.00';
         if (!empty($area)) {
             $total_price = $area->total_price;

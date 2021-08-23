@@ -4,9 +4,6 @@ namespace app\plugins\area\models;
 
 use app\models\BaseActiveRecord;
 use app\models\User;
-use app\plugins\area\events\AreaInsertEvent;
-use app\plugins\area\handlers\AreaInsertHandler;
-use Yii;
 
 /**
  * This is the model class for table "{{%plugin_area_agent}}".
@@ -34,18 +31,14 @@ use Yii;
  */
 class AreaAgent extends BaseActiveRecord
 {
-
     const UPGRADE_STATUS_CONDITION = 1;
     const UPGRADE_STATUS_GOODS = 2;
     const UPGRADE_STATUS_MANUAL = 3;
-
 
     const LEVEL_TOWN=1;
     const LEVEL_DISTRICT=2;
     const LEVEL_CITY=3;
     const LEVEL_PROVINCE=4;
-
-
 
     const LEVEL = [
         0 => '普通用户',
@@ -109,10 +102,5 @@ class AreaAgent extends BaseActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
-    }
-
-    public function getAreaLevel()
-    {
-        return $this->hasOne(AreaLevel::class, ['level' => 'level', 'is_delete' => self::NO]);
     }
 }

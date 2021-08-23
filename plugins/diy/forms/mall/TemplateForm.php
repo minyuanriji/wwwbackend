@@ -175,6 +175,24 @@ class TemplateForm extends BaseModel
         if (!$this->validate()) {
             return $this->getErrorResponse();
         }
+        $diy_template = DiyTemplate::find()
+            ->select('id,name')
+            ->where(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id])
+            ->orderBy('id DESC')
+            ->page($pagination, 10)
+            ->asArray()
+            ->all();
+
+        return [
+            'code' => ApiCode::CODE_SUCCESS,
+            'msg' => '请求成功',
+            'data' => [
+                'list' => $diy_template,
+                'pagination' => $pagination
+            ]
+        ];
+
+
         $query = DiyPage::find()->alias('p')->select('p.*')->where([
             'p.mall_id' => \Yii::$app->mall->id,
             'p.is_delete' => 0,
@@ -201,14 +219,6 @@ class TemplateForm extends BaseModel
         $diyAccessLog = $model->getLog();
         //todo slow
         foreach ($list as $key => $template) {
-            /*try {
-                \Yii::$app->request->headers['x-app-version'] = '4.2.82';
-                $goodsCount = $model->getGoodsCount($template['id']);
-            } catch (\Exception $e) {
-                $goodsCount = 0;
-               // dd($e);//开发测试
-            }*/
-
             array_push($newList, [
                 'id' => $template['id'],
                 'name' => $template['title'],

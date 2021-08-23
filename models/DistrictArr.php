@@ -26099,11 +26099,11 @@ class DistrictArr
     /**
      * 根据level和name拿到id
      */
-    public function getId($name){
+    public function getId($name, $level = 'province'){
         $districtArr = $this->getArr();
         $data = [];
         foreach ($districtArr as $v){
-            if ($v['level'] == 'province'){
+            if ($v['level'] == $level){
                 $data[] = $v;
             }
         }

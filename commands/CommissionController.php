@@ -76,7 +76,7 @@ class CommissionController extends BaseCommandController{
 
         $selects = ["u.id", "u.parent_id", "(u.income+u.income_frozen) as total_income", "u.role_type", "u.nickname"];
         $query = User::find()->alias("u")
-                    ->leftJoin("{{%user_relationship_link}} url", "url.user_id=u.id");
+            ->leftJoin("{{%user_relationship_link}} url", "url.user_id=u.id");
         $query->andWhere([
             "AND",
             ["u.is_delete" => 0],
@@ -85,20 +85,32 @@ class CommissionController extends BaseCommandController{
         ])->select($selects)->orderBy("url.`left` DESC");
 
         $parentDatas = [];
-
-        //如果消费用户是品牌商直推的，品牌商临时升级成分公司
-        if(!empty($lianc_user_id)){
-            $parentData = User::find()->alias("u")->where(["u.id" => $lianc_user_id])->select($selects)->asArray()->one();
-            if($parentData){
-                $parentData['role_type'] = "branch_office";
-                $parentDatas[] = $parentData;
-            }
-        }
-
         $rows = $query->asArray()->all();
         if($rows){
             $parentDatas = array_merge($parentDatas, $rows);
         }
+
+        //如果消费用户是品牌商直推的，品牌商临时升级成分公司
+        if(!empty($lianc_user_id)){
+            //先判断是否已经在列表中
+            $isExists = false;
+            foreach($parentDatas as $key => $parentData){
+                if($parentData['id'] == $lianc_user_id){
+                    $parentDatas[$key]['role_type'] = "branch_office";
+                    $isExists = true;
+                    break;
+                }
+            }
+            //如果不存在说明是直推，在头部插入
+            if(!$isExists){
+                $parentData = User::find()->alias("u")->where(["u.id" => $lianc_user_id])->select($selects)->asArray()->one();
+                if($parentData){
+                    $parentData['role_type'] = "branch_office";
+                    array_unshift($parentDatas, $parentData);
+                }
+            }
+        }
+
         if(!$parentDatas){
             throw new \Exception("无法获取上级[ID:".$userLink->parent_id."]信息", self::ERR_CODE_NOT_FOUND_PARENTS);
         }
@@ -106,9 +118,12 @@ class CommissionController extends BaseCommandController{
         //对获取的所有上级进行处理
         $existData = $newParentDatas = [];
         $partner2Data = null;
-        foreach($parentDatas as $parentData){
+        unset($parentData);
+        for($i=0; $i < count($parentDatas); $i++){
+            $parentData = $parentDatas[$i];
             if(count($existData) >= 3) break;
             $appendNew = false;
+
             if(empty($partner2Data) && isset($existData['partner']) && $parentData['role_type'] == "partner"){
                 if($existData['partner']['parent_id'] == $parentData['id']){
                     $partner2Data = $parentData;
@@ -116,11 +131,12 @@ class CommissionController extends BaseCommandController{
                 }
             }elseif($parentData['role_type'] == "store" && !isset($existData['store']) && !isset($existData['branch_office']) && !isset($existData['partner'])){
                 $appendNew = true;
-            }elseif($parentData['role_type'] == "partner"&& !isset($existData['partner']) && !isset($existData['branch_office'])){
+            }elseif($parentData['role_type'] == "partner" && !isset($existData['partner']) && !isset($existData['branch_office'])){
                 $appendNew = true;
             }elseif($parentData['role_type'] == "branch_office" && !isset($existData['branch_office'])){
                 $appendNew = true;
             }
+
             if($appendNew){
                 $existData[$parentData['role_type']] = $parentData;
                 $newParentDatas[] = $parentData;
@@ -173,7 +189,6 @@ class CommissionController extends BaseCommandController{
         };
 
         $currentLevel = count($parentDatas);
-
         foreach($parentDatas as $key => $parentData){
 
             $query = CommissionRuleChain::find()->alias("crc");

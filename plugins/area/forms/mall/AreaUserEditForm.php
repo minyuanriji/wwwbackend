@@ -76,15 +76,30 @@ class AreaUserEditForm extends BaseModel
             if (!$user) {
                 return ['code' => ApiCode::CODE_FAIL, 'msg' => '用户不存在'];
             }
-            $area = AreaAgent::findOne(['user_id' => $user->id, 'is_delete' => 0]);
+
+            $area = AreaAgent::findOne([
+                'mall_id'       => \Yii::$app->mall->id,
+                'level'         => $this->level,
+                'district_id'   => $this->district_id,
+                'province_id'   => $this->province_id,
+                'city_id'       => $this->city_id,
+                'town_id'       => $this->town_id,
+                'is_delete'     => 0
+            ]);
+            if ($area) {
+                throw new \Exception('该区域已存在代理商uid:'. $area->user_id);
+            }
+
+            //可以多区域设置某一个用户
+            /*$area = AreaAgent::findOne(['user_id' => $user->id, 'is_delete' => 0]);
             if ($area) {
                 return ['code' => ApiCode::CODE_FAIL, 'msg' => '用户已经是经销商，请勿重复提交'];
-            } else {
+            } else {*/
                 $area = new AreaAgent();
                 $area->mall_id = $user->mall_id;
                 $area->user_id = $user->id;
                 $area->created_at = time();
-            }
+//            }
             $t = \Yii::$app->db->beginTransaction();
             try {
                 $area->level = $this->level;

@@ -1,23 +1,14 @@
 <?php
 /**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
  * 接口-用户地址model
- * Author: zal
- * Date: 2020-05-05
- * Time: 10:16
  */
 
 namespace app\forms\api\user;
 
 use app\core\ApiCode;
-use app\forms\common\DeliveryCommon;
 use app\models\BaseModel;
 use app\models\DistrictArr;
-use app\models\Mall;
 use app\models\UserAddress;
-use app\validators\PhoneNumberValidator;
-use function Sodium\add;
 
 class UserWxAddressForm extends BaseModel
 {
@@ -39,7 +30,12 @@ class UserWxAddressForm extends BaseModel
             [['id', 'is_default', 'limit'], 'integer'],
             [['is_default',], 'default', 'value' => 0],
             [['name', 'mobile'], 'string', 'max' => 255],
-            [['detail'], 'string', 'max' => 1000],
+            [['detail'], 'string', 'max' => 1000],/*
+            [['mobile'], PhoneNumberValidator::className(), 'when' => function ($model) {
+                $mall = Mall::findOne(['id' => \Yii::$app->mall->id]);
+                $status = $mall->getMallSettingOne('mobile_verify');
+                return $status == 1;
+            }],*/
         ];
     }
 

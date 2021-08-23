@@ -83,6 +83,14 @@ class OrderExport extends BaseExport
                 'value' => '运费',
             ],
             [
+                'key' => 'express',
+                'value' => '快递公司',
+            ],
+            [
+                'key' => 'express_no',
+                'value' => '快递编号',
+            ],
+            [
                 'key' => 'created_at',
                 'value' => '下单时间',
             ],
@@ -146,6 +154,10 @@ class OrderExport extends BaseExport
                 'key' => 'remark',
                 'value' => '备注/表单',
             ],
+            [
+                'key' => 'remark',
+                'value' => '备注/表单',
+            ],
         ];
 
         if (\Yii::$app->admin->identity->mch_id > 0) {
@@ -169,7 +181,7 @@ class OrderExport extends BaseExport
 
         }
 
-        $list = $query->with(['user.userInfo', 'clerk', 'store', 'detail.goods.goodsWarehouse', 'refund', 'paymentOrder.paymentOrderUnion'])
+        $list = $query->with(['user.userInfo', 'detailExpress', 'clerk', 'store', 'detail.goods.goodsWarehouse', 'refund', 'paymentOrder.paymentOrderUnion'])
             ->orderBy('o.created_at DESC')
             ->all();
         try {
@@ -243,6 +255,9 @@ class OrderExport extends BaseExport
             $arr['city_mobile'] = $item->city_mobile;
 
             $arr['express_price'] = 0;
+            $arr['express_no']    = '';
+            $arr['express']       = '';
+
             if ($item->send_type == 1) {
                 $arr['clerk_name'] = $item['clerk'] ? $item['clerk']['nickname'] : '';
                 $arr['store_name'] = $item['store'] ? $item['store']['name'] : '';
@@ -251,6 +266,12 @@ class OrderExport extends BaseExport
                 $arr['express_no'] = $item->express_no;
                 $arr['express'] = $item->express;
             }
+
+            if($item->detailExpress){
+                $arr['express_no'] = $item->detailExpress[0]->express_no;
+                $arr['express'] = $item->detailExpress[0]->express;
+            }
+
             if ($item->mch_id > 0) {
                 $arr['store_name'] = $item->mch->store->name;
             }
@@ -316,6 +337,7 @@ class OrderExport extends BaseExport
                 $arr['remark'] = $newFormData ?: $item->remark;
                 $newList[] = $arr;
             }
+
         }
         $this->dataList = $newList;
     }

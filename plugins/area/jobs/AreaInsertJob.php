@@ -1,16 +1,6 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-21
- * Time: 20:35
- */
 
 namespace app\plugins\area\jobs;
-
-
 
 use app\models\User;
 use app\models\UserChildren;
@@ -35,10 +25,6 @@ class AreaInsertJob extends Component implements JobInterface
         // TODO: Implement execute() method.
         $list = UserParent::find()->where(['user_id' => $this->user_id, 'is_delete' => 0, 'mall_id' => $this->mall_id])->all();
         foreach ($list as $item) {
-            /**
-             * @var UserParent $item
-             *
-             */
             // 所有的分销商
             $growth = UserGrowth::findOne(['user_id' => $item->parent_id, 'keyword' => UserGrowth::KEY_DISTRIBUTION_COUNT, 'is_delete' => 0, 'mall_id' => $this->mall_id]);
             if (!$growth) {

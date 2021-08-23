@@ -4,9 +4,6 @@ namespace app\plugins\area\models;
 
 use app\models\BaseActiveRecord;
 use app\models\User;
-use app\plugins\area\events\AreaInsertEvent;
-use app\plugins\area\handlers\AreaInsertHandler;
-use Yii;
 
 /**
  * This is the model class for table "{{%plugin_area_apply}}".

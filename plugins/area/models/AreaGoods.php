@@ -3,7 +3,6 @@
 namespace app\plugins\area\models;
 
 use app\models\BaseActiveRecord;
-use Yii;
 
 /**
  * This is the model class for table "{{%plugin_area_goods}}".

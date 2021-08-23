@@ -4,7 +4,6 @@ namespace app\plugins\area\models;
 
 use app\models\BaseActiveRecord;
 use Yii;
-use yii\base\Model;
 
 /**
  * This is the model class for table "{{%plugin_area_setting}}".

@@ -21,6 +21,7 @@ use app\forms\api\user\UserEditForm;
 use app\forms\api\user\UserForm;
 use app\forms\api\user\UserLinkPosterNewForm;
 use app\forms\api\user\UserRechargeForm;
+use app\forms\api\user\UserWxAddressForm;
 use app\forms\common\attachment\CommonAttachment;
 use app\controllers\business\{Qrcode,Poster,NewUserIntegral};
 use app\forms\mall\member\RegisterAgreeForm;
@@ -133,6 +134,17 @@ class UserController extends ApiController
         $form = new UserAddressForm();
         $form->attributes = $this->requestData;
         return $form->save();
+    }
+
+    /**
+     * 保存微信收货地址
+     * @return array
+     */
+    public function actionWxUserAddressSave()
+    {
+        $form = new UserWxAddressForm();
+        $form->attributes = $this->requestData;
+        return $form->saveWx();
     }
 
     /**

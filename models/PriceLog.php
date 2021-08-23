@@ -56,4 +56,7 @@ class PriceLog extends BaseActiveRecord
     public function getUser(){
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+    public function getCommonOrderDetail(){
+        return $this->hasOne(CommonOrderDetail::class, ['id' => 'common_order_detail_id']);
+    }
 }

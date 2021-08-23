@@ -1,26 +1,14 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-07-08
- * Time: 14:30
- */
 
 namespace app\plugins\area\controllers\mall;
-
 
 use app\plugins\area\forms\mall\AreaGoodsForm;
 use app\plugins\Controller;
 
 class GoodsController extends Controller
 {
-
     public function actionAreaSetting()
     {
-
-
         if (\Yii::$app->request->isAjax) {
 
             if (\Yii::$app->request->isGet) {
@@ -48,6 +36,5 @@ class GoodsController extends Controller
             return $this->render('edit');
         }
     }
-
 
 }

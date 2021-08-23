@@ -1,15 +1,6 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-08
- * Time: 16:10
- */
 
 namespace app\plugins\area\controllers\mall;
-
 
 use app\core\ApiCode;
 use app\plugins\Controller;
@@ -22,15 +13,9 @@ use app\plugins\area\forms\mall\AreaLevelListForm;
 
 use app\plugins\area\models\AreaLevel;
 
-
 class LevelController extends Controller
 {
-
-
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-12
-     * @Time: 9:52
      * @Note:等级列表
      * @return string|\yii\web\Response
      */
@@ -44,18 +29,12 @@ class LevelController extends Controller
                 $form->attributes = \Yii::$app->request->get();
                 return $this->asJson($form->search());
             }
-
         }
-
         return $this->render('index');
     }
 
 
-
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-12
-     * @Time: 9:23
      * @Note:编辑
      * @return string|\yii\web\Response
      */
@@ -78,9 +57,6 @@ class LevelController extends Controller
 
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-12
-     * @Time: 9:52
      * @Note:等级状态变更
      * @return \yii\web\Response
      */
@@ -114,17 +90,12 @@ class LevelController extends Controller
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-12
-     * @Time: 9:52
      * @Note:删除
      * @return \yii\web\Response
      */
     public function actionDelete()
     {
-
         if (\Yii::$app->request->isAjax) {
-
             if (\Yii::$app->request->isPost) {
                 $form = new AreaLevelDeleteForm();
                 $form->attributes = \Yii::$app->request->post();
@@ -135,15 +106,11 @@ class LevelController extends Controller
 
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-05-12
-     * @Time: 9:47
      * @Note:获取分销配置以及权重
      * @return \yii\web\Response
      */
     public function actionSetting()
     {
-
         return $this->asJson([
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '',

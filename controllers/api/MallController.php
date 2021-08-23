@@ -118,9 +118,6 @@ class MallController extends ApiController
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-04-29
-     * @Time: 17:09
      * @Note:用户中心配置
      */
     public function actionUserCenterConfig()

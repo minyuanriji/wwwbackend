@@ -1,26 +1,19 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-08
- * Time: 16:11
- */
 Yii::$app->loadComponentView('com-dialog-select');
 Yii::$app->loadComponentView('com-select-cat');
 ?>
 <div id="app" v-cloak>
     <el-card class="box-card" v-loading="loading" shadow="never" style="border:0"
              body-style="background-color: #f3f3f3;padding: 10px 0 0;">
-        <div slot="header">
+        <!--<div slot="header">
             <div>
                 <span>基础设置</span>
             </div>
-        </div>
+        </div>-->
         <div class="form_box">
             <el-form :model="ruleForm" size="small" ref="ruleForm" label-width="150px">
-                <el-card shadow="never">
+
+                <!--<el-card shadow="never">
                     <div slot="header">
                         <div>
                             <span>区域分红设置</span>
@@ -62,7 +55,8 @@ Yii::$app->loadComponentView('com-select-cat');
                             </el-col>
                         </el-row>
                     </div>
-                </el-card>
+                </el-card>-->
+
                 <el-card shadow="never" style="margin-top:20px">
                     <div slot="header">
                         <div>
@@ -71,7 +65,7 @@ Yii::$app->loadComponentView('com-select-cat');
                     </div>
                     <div>
                         <el-row>
-                            <el-col :span="16">
+                            <!--<el-col :span="16">
                                 <el-form-item label="开启平均分红" style="margin-bottom: 0">
                                     <div>
                                         <el-switch v-model="ruleForm.is_equal" :active-value="1" :inactive-value="0">
@@ -85,10 +79,10 @@ Yii::$app->loadComponentView('com-select-cat');
                                         <el-switch v-model="ruleForm.is_level" :active-value="1" :inactive-value="0">
                                         </el-switch>
                                     </div>
-                                </el-form-item>
+                                </el-form-item>-->
 
 
-                                <el-form-item label="默认分红比例" style="margin-bottom: 0">
+                                <el-form-item label="默认分红比例" style="margin-bottom: 0; width: 500px">
                                     <div>
 
                                         <el-form-item label="省代">
@@ -114,14 +108,14 @@ Yii::$app->loadComponentView('com-select-cat');
 
                                     </div>
                                 </el-form-item>
-                                <el-form-item prop="compute_type" label="结算方式">
+                               <!-- <el-form-item prop="compute_type" label="结算方式">
                                     <el-col :span="24">
                                         <el-radio-group v-model="ruleForm.compute_type" size="small">
                                             <el-radio :label="0" border>订单完成后</el-radio>
                                             <el-radio :label="1" border>订单支付后</el-radio>
                                         </el-radio-group>
                                     </el-col>
-                                </el-form-item>
+                                </el-form-item>-->
 
                             </el-col>
                         </el-row>
@@ -154,7 +148,6 @@ Yii::$app->loadComponentView('com-select-cat');
                     town_price: 0,//镇
                     compute_type: 0,//计算方式  0 订单完成后 1支付完成,
                     protocol:'',
-
                 },
             }
         },

@@ -15,7 +15,6 @@ class RegionAction extends Action
 
     public function run()
     {
-        $this->doNew();die;
         while (true) {
             if (!defined("ENV") || ENV != "pro") {
                 //$this->controller->commandOut(date("Y/m/d H:i:s") . " commission Region action start");
@@ -44,7 +43,7 @@ class RegionAction extends Action
             ["mco.region_commission_status" => 0]
         ]);
         $query->select(["mco.*", "s.name", "m.transfer_rate", "m.integral_fee_rate", "m.user_id", "s.province_id", "s.city_id", "s.district_id"]);
-        $checkoutOrders = $query->asArray()->limit(10)->all();
+        $checkoutOrders = $query->asArray()->limit(10)->orderBy('id DESC')->all();
 
         if (!$checkoutOrders) {
             return false;
@@ -70,7 +69,6 @@ class RegionAction extends Action
                 //计算分佣金额
                 $transferRate = (int)$checkoutOrder['transfer_rate'];//商户手续费
                 $integralFeeRate = (int)$checkoutOrder['integral_fee_rate'];
-//                $rule_data_json['profit_price'] = (new CommissionController(null,null))->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate, $integralFeeRate);
                 $rule_data_json['profit_price'] = $this->controller->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate, $integralFeeRate);
 
                 foreach ($region_user as $value) {
@@ -124,7 +122,7 @@ class RegionAction extends Action
                                     'type' => 1,
                                     'money' => $user->total_income,
                                     'income' => $priceLog->price,
-                                    'desc' => "来自店铺“" . $checkoutOrder['name'] . "”的营业额分佣记录[ID:" . $priceLog->id . "]",
+                                    'desc' => "来自店铺“" . $checkoutOrder['name'] . "”的区域分红记录[ID:" . $priceLog->id . "]",
                                     'flag' => 1, //到账
                                     'source_id' => $priceLog->id,
                                     'source_type' => 'region',
@@ -155,7 +153,7 @@ class RegionAction extends Action
             }
 
             MchCheckoutOrder::updateAll([
-                "store_commission_status" => 1
+                "region_commission_status" => 1
             ], ["id" => $checkoutOrder['id']]);
         }
 

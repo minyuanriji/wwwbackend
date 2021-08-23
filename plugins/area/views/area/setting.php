@@ -100,11 +100,11 @@ Yii::$app->loadComponentView('com-select-cat');
                                                 <template slot="append">%</template>
                                             </el-input>
                                         </el-form-item>
-                                        <el-form-item label="镇代">
+                                        <!--<el-form-item label="镇代">
                                             <el-input v-model.number="ruleForm.town_price" type="number">
                                                 <template slot="append">%</template>
                                             </el-input>
-                                        </el-form-item>
+                                        </el-form-item>-->
 
                                     </div>
                                 </el-form-item>

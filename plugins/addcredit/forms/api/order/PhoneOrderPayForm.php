@@ -8,7 +8,7 @@ use app\models\BaseModel;
 use app\models\User;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
-use app\plugins\addcredit\plateform\sdk\two_sdk\PlateForm;
+use app\plugins\addcredit\plateform\sdk\two_sdk\PlateForm as two_PlateForm;
 use app\plugins\addcredit\plateform\sdk\k_default\PlateForm as one_PlateForm;
 
 class PhoneOrderPayForm extends BaseModel
@@ -23,8 +23,8 @@ class PhoneOrderPayForm extends BaseModel
         ];
     }
 
-    //废弃
-    public function payOld()
+
+    public function pay()
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
@@ -56,7 +56,7 @@ class PhoneOrderPayForm extends BaseModel
                 throw new \Exception("无法获取平台信息", ApiCode::CODE_FAIL);
             }
 
-            $plate_form = new PlateForm();
+            $plate_form = new one_PlateForm();
             $submit_res = $plate_form->submit($addcredit_order, $plateform);
 
             if (!$submit_res) {
@@ -96,7 +96,8 @@ class PhoneOrderPayForm extends BaseModel
         }
     }
 
-    public function pay()
+    //废弃
+    public function payOld()
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
@@ -131,7 +132,7 @@ class PhoneOrderPayForm extends BaseModel
             /*$plate_form = new one_PlateForm();
             $submit_res = $plate_form->submit($addcredit_order, $plateform);*/
 
-            $plate_form = new PlateForm();
+            $plate_form = new two_PlateForm();
             $submit_res = $plate_form->submit($addcredit_order, $plateform);
 
             if (!$submit_res) {

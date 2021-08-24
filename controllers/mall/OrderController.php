@@ -17,6 +17,7 @@ use app\forms\common\order\OrderRefundForm;
 use app\forms\common\order\PrintForm;
 use app\forms\mall\order\OrderForm;
 use app\forms\mall\order\OrderDetailForm;
+use app\forms\mall\order\OrderRefundSubmitForm;
 use app\forms\mall\order\OrderSendForm;
 use app\forms\mall\order\OrderClerkForm;
 use app\forms\mall\order\OrderUpdateAddressForm;
@@ -440,6 +441,19 @@ class OrderController extends OrderManagerController
             $form = new OrderForm();
             $form->attributes = \Yii::$app->request->post();
             return $this->asJson($form->orderSales());
+        }
+    }
+
+    /**
+     * 后台手动处理申请售后
+     * @return \yii\web\Response
+     */
+    public function actionManualAfterSales()
+    {
+        if (\Yii::$app->request->isPost) {
+            $form = new OrderRefundSubmitForm();
+            $form->attributes = \Yii::$app->request->post();
+            return $this->asJson($form->submit());
         }
     }
 }

@@ -1,12 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * 订单
- * Author: zal
- * Date: 2020-04-17
- * Time: 14:11
- */
 
 namespace app\forms\mall\order;
 

@@ -436,8 +436,6 @@ abstract class BaseOrderForm extends BaseModel
             ['>','o.integral_deduction_price','0'],
         ]);
 
-        ////////////////
-
         if ($this->user_id) {
             $query->andWhere(['o.user_id' => $this->user_id]);
         }

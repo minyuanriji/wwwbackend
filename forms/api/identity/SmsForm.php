@@ -61,7 +61,7 @@ class SmsForm extends BaseModel
             );
             if(!$res || $res['status'] == 0) {
                 throw new \Exception('验证码功能未开启');
-            };
+            }
             $sms->sendCaptcha($this->mobile);
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"验证码获取成功");
         } catch (\Exception $exception) {

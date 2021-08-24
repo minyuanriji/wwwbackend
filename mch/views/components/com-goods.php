@@ -260,10 +260,10 @@ echo $this->render('../components/goods/com-goods-form');
                                         </el-switch>
                                     </el-form-item>
 
-                                    <el-form-item label="是否到店消费" prop="status">
+                                    <!--<el-form-item label="是否到店消费" prop="status">
                                         <el-switch :active-value="1" :inactive-value="0" v-model="ruleForm.is_on_site_consumption">
                                         </el-switch>
-                                    </el-form-item>
+                                    </el-form-item>-->
                                 </el-col>
                             </el-row>
                         </el-card>
@@ -514,7 +514,7 @@ echo $this->render('../components/goods/com-goods-form');
                 use_attr: 0,
                 goods_num: 0,
                 status: 0,
-                is_on_site_consumption:0,//到店消费类商品
+                is_on_site_consumption:1,//到店消费类商品
                 unit: '件',
                 virtual_sales: 0,
                 cover_pic: '',

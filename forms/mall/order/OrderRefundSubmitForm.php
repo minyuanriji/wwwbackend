@@ -1,22 +1,10 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * 订单api-订单退款提交
- * Author: zal
- * Date: 2020-05-13
- * Time: 14:50
- */
 
-namespace app\forms\api\order;
+namespace app\forms\mall\order;
 
 use app\core\ApiCode;
-use app\forms\common\order\OrderCommon;
-use app\helpers\sms\Sms;
-use app\logic\AppConfigLogic;
 use app\logic\CommonLogic;
 use app\models\BaseModel;
-use app\models\CommonOrder;
 use app\models\Order;
 use app\models\OrderDetail;
 use app\models\OrderRefund;
@@ -35,16 +23,17 @@ class OrderRefundSubmitForm extends BaseModel
     public $is_receipt = -1;
     /** @var int 退货方式0快递配送 */
     public $refund_type = 0;
+    public $is_backstage;
 
     public $refund_total_price;
 
     public function rules()
     {
         return [
-            [['order_detail_id','reason', 'type', 'pic_list', 'refund_price', 'reason'], 'required'],
-            [['order_detail_id','is_receipt', 'type'], 'integer'],
+            [['order_detail_id', 'type', 'refund_price'], 'required'],
+            [['order_detail_id','is_receipt', 'type', 'is_backstage'], 'integer'],
             [['refund_price'],'number'],
-            [['remark', 'reason'], 'string'],
+            [['remark'], 'string'],
             [['refund_total_price'],'safe']
         ];
     }
@@ -88,18 +77,6 @@ class OrderRefundSubmitForm extends BaseModel
             if (!in_array($orderDetail->order->status,[Order::STATUS_WAIT_DELIVER,Order::STATUS_WAIT_RECEIVE,Order::STATUS_WAIT_COMMENT]))
                 throw new \Exception('该订单状态下,无法申请售后');
 
-            //目前没有预售价，暂时设置为0
-            $advance_price = 0;
-//            // 退款金额不能大于商品单价
-//            if ($this->type <= OrderRefund::TYPE_REFUND_RETURN && price_format($this->refund_price) > price_format($orderDetail->total_price + $advance_price)) {
-//                throw new \Exception('最多可退款金额￥' . price_format($orderDetail->total_price + $advance_price));
-//            }
-//            // 退款金额需去除运费
-//            $realityPrice = price_format($orderDetail->order->total_pay_price - $orderDetail->order->express_price) ?: 0;
-//            if ($this->type <= OrderRefund::TYPE_REFUND_RETURN && price_format($this->refund_price) > price_format($realityPrice + $advance_price)) {
-//                throw new \Exception('最多可退款金额￥' . price_format($realityPrice + $advance_price));
-//            }
-
             $realityPrice = price_format($orderDetail->total_price);
 
             if ($this->refund_price > $realityPrice) {
@@ -109,23 +86,30 @@ class OrderRefundSubmitForm extends BaseModel
             if (count($orderDetail->userCards) > 0 && $this->type <= OrderRefund::TYPE_REFUND_RETURN) {
                 throw new \Exception('商品赠送的卡券已使用,该商品无法申请退货');
             }
+
+            $order = Order::findOne($orderDetail->order_id);
+            if (!$order) {
+                throw new \Exception('订单不存在');
+            }
             // 生成售后订单
             $t = \Yii::$app->db->beginTransaction();
             $orderRefund = new OrderRefund();
-            $orderRefund->mall_id = \Yii::$app->mall->id;
+            $orderRefund->mall_id = $order->mall_id;
             $orderRefund->mch_id = $orderDetail->order->mch_id;
-            $orderRefund->user_id = \Yii::$app->user->id;
+            $orderRefund->user_id = $order->user_id;
             $orderRefund->order_id = $orderDetail->order_id;
             $orderRefund->order_detail_id = $this->order_detail_id;
             $orderRefund->order_no = Order::getOrderNo('RE');
             $orderRefund->type = $this->type;
             $orderRefund->refund_type = $this->refund_type;
             $orderRefund->is_receipt = ($this->is_receipt == -1 || $this->is_receipt == "") ? 0 : $this->is_receipt;
-            $orderRefund->reason = $this->reason;
+            $orderRefund->reason = $this->reason ?: '后台管理员手动申请售后ID：' . \Yii::$app->admin->id;
             $orderRefund->refund_price = $this->refund_total_price;
             $orderRefund->remark = $this->remark;
-            $orderRefund->pic_list = $this->pic_list;
+            $orderRefund->pic_list = '';//$this->pic_list;
             $orderRefund->is_refund = OrderRefund::NO;
+            $orderRefund->is_backstage = $this->is_backstage;
+            $orderRefund->admin_id = \Yii::$app->admin->id;
             $res = $orderRefund->save();
             if (!$res) {
                 $t->rollBack();
@@ -148,22 +132,8 @@ class OrderRefundSubmitForm extends BaseModel
                     throw new \Exception($this->responseErrorMsg($orderDetail->order));
                 }
             }
-
-//            $result = CommonOrderForm::updateCommonOrder(["status" => CommonOrder::STATUS_INVALID],["order_id" => $orderDetail->order_id]);
-//            if(!$result){
-//                $t->rollBack();
-//                throw new \Exception("公共订单更新失败");
-//            }
             $t->commit();
-
-            //xuyaoxiang:短信通知
-            $sms       = new Sms();
-            $smsConfig = AppConfigLogic::getSmsConfig();
-            if($smsConfig['mobile_list']){
-                $sms->sendOrderRefundMessage($smsConfig['mobile_list'], $orderDetail->order->id);
-            }
-
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'提交成功, 请等待商家处理');
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'提交成功');
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($e));
         }

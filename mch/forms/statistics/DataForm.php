@@ -210,8 +210,7 @@ class DataForm extends BaseModel{
         if ($this->platform) {
             $user_query->andWhere(['u.platform' => $this->platform]);
         }
-        /*$data_arr['user_count'] = $user_query->andWhere(['u.mch_id' => 0, 'u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id,])
-            ->count();*///用户数
+        /*$data_arr['user_count'] = $user_query->andWhere(['u.mch_id' => \Yii::$app->admin->identity->mch_id, 'u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id,])->count();*///用户数
         $user_sum = StatisticsVirtualConfig::find()->where(['mall_id'=>\Yii::$app->mall->id,'is_delete'=>0])->select(['user_sum'])->asArray()->one();
         $data_arr['user_count'] = $user_sum['user_sum'];
         

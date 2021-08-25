@@ -311,10 +311,16 @@ class UserController extends ApiController
      * @return array
      */
     public function actionLinkPoster($flag = ''){
+        $headers = \Yii::$app->request->headers;
+        $stands_mall_id = isset($headers['x-stands-mall-id']) ? $headers['x-stands-mall-id'] : 0;
         $qrCodeData = '';
         $WeChatCode = '';
         if(empty($flag)){
-            $code = \Yii::$app->request->hostInfo . '/h5/#/pages/index/index?user_id='. \Yii::$app->user->identity ->id . '&pid=' . \Yii::$app->user->identity ->id;
+            if ($stands_mall_id) {
+                $code = \Yii::$app->request->hostInfo . '/mirror/#/pages/index/index?user_id='. \Yii::$app->user->identity ->id . '&pid=' . \Yii::$app->user->identity ->id . '&stands_mall_id=' . $stands_mall_id;
+            } else {
+                $code = \Yii::$app->request->hostInfo . '/h5/#/pages/index/index?user_id='. \Yii::$app->user->identity ->id . '&pid=' . \Yii::$app->user->identity ->id;
+            }
             $qrCodeData = QRcode::pngData($code,13);
         }else{
             $WeChatCode = $flag;

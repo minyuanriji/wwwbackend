@@ -11,7 +11,7 @@ use app\plugins\addcredit\plateform\sdk\k_default\PlateForm;
 class AccountForm extends BaseModel
 {
     public function balanceQuery()
-    {
+    {die;
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }

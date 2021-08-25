@@ -85,6 +85,10 @@ class RechargeRecordForm extends BaseModel
         }
         return [
             [
+                'redbag_num' => 30 + 30 * $plateforms->ratio / 100,
+                'price' => 30,
+            ],
+            [
                 'redbag_num' => 50 + 50 * $plateforms->ratio / 100,
                 'price' => 50,
             ],
@@ -95,6 +99,14 @@ class RechargeRecordForm extends BaseModel
             [
                 'redbag_num' => 200 + 200 * $plateforms->ratio / 100,
                 'price' => 200,
+            ],
+            [
+                'redbag_num' => 300 + 300 * $plateforms->ratio / 100,
+                'price' => 300,
+            ],
+            [
+                'redbag_num' => 500 + 500 * $plateforms->ratio / 100,
+                'price' => 500,
             ],
         ];
     }

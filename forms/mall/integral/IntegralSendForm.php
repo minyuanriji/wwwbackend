@@ -56,6 +56,7 @@ class IntegralSendForm extends BaseModel
             if ($this->keyword) {
                 $query->where(['like', 'nickname', $this->keyword]);
             }
+            $query->andWhere(['is_delete' => 0]);
         }]);
 
         $list = $query
@@ -63,7 +64,6 @@ class IntegralSendForm extends BaseModel
             ->orderBy('i.id DESC')
             ->asArray()
             ->all();
-
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'data' => [

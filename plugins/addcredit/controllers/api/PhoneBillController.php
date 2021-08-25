@@ -35,12 +35,12 @@ class PhoneBillController extends ApiController
     }
 
     /**
-     * 去支付  废弃
+     * 去支付
      * order_no         订单号
      * order_price      订单金额
      * @return \yii\web\Response
      */
-    public function actionPrepaidRefillOld()
+    public function actionPrepaidRefill()
     {
         $form = new PhoneOrderPayForm();
         $form->attributes = $this->requestData;
@@ -48,12 +48,12 @@ class PhoneBillController extends ApiController
     }
 
     /**
-     * 去支付
+     * 去支付  废弃
      * order_no         订单号
      * order_price      订单金额
      * @return \yii\web\Response
      */
-    public function actionPrepaidRefill()
+    public function actionPrepaidRefillOld()
     {
         $form = new PhoneOrderPayForm();
         $form->attributes = $this->requestData;

@@ -1,6 +1,8 @@
 <?php
 namespace app\commands;
 
+use app\commands\commission_action\RegionAction;
+use app\commands\commission_action\RegionGoodsAction;
 use app\models\User;
 use app\models\UserRelationshipLink;
 use app\plugins\commission\models\CommissionRuleChain;
@@ -9,6 +11,11 @@ use yii\db\ActiveQuery;
 class CommissionController extends BaseCommandController{
 
     const ERR_CODE_NOT_FOUND_PARENTS = 50001;
+
+    /*public function  actionRegionGoods ()
+    {
+        (new RegionGoodsAction(null,null))->run();
+    }*/
 
     public function actions(){
         return [
@@ -20,6 +27,8 @@ class CommissionController extends BaseCommandController{
             "addcredit"     => "app\\commands\\commission_action\\AddcreditAction",
             "addcredit3r"   => "app\\commands\\commission_action\\Addcredit3rAction",
             "giftpacks"     => "app\\commands\\commission_action\\GiftpacksAction",
+           /* "region"        => "app\\commands\\commission_action\\RegionAction",//门店二维码收款区域分红
+            "regionGoods"   => "app\\commands\\commission_action\\RegionGoodsAction",//商品消费区域分红*/
         ];
     }
 

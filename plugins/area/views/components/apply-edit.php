@@ -23,7 +23,7 @@
                         </el-cascader>
                     </el-form-item>
                 </el-form>
-                <el-form @submit.native.prevent size="small" label-width="150px" v-if="level==1">
+                <!--<el-form @submit.native.prevent size="small" label-width="150px" v-if="level==1">
                     <el-form-item label="镇">
                         <el-select v-model="town_id" placeholder="请选择镇">
                             <el-option
@@ -33,7 +33,7 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                </el-form>
+                </el-form>-->
             </template>
 
             <el-form @submit.native.prevent size="small" label-width="150px">
@@ -114,10 +114,10 @@
                         name: '区代',
                         level: 2
                     },
-                    {
+                    /*{
                         name: '镇代',
                         level: 1
-                    },
+                    },*/
                 ],
                 level: ''
             }

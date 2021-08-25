@@ -1034,6 +1034,12 @@ class Menus
                                     ],
                                 ],
                             ],
+                            [
+                                'name' => '商品统计',
+                                'route' => 'mall/data-statistics/goods-statistics',
+                                'action' => [
+                                ],
+                            ],
 //                            [
 //                                'name' => '分销排行',
 //                                'route' => 'mall/score-statistics/index',

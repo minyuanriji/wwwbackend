@@ -1,12 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-06-29
- * Time: 16:51
- */
 
 namespace app\plugins\area\controllers\api;
 
@@ -31,7 +23,6 @@ class AreaController extends ApiController
         ]);
     }
 
-
     public function actionApply()
     {
         $form = new AreaApplyForm();
@@ -40,9 +31,6 @@ class AreaController extends ApiController
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-06-29
-     * @Time: 16:58
      * @Note:分销中心
      */
     public function actionInfo()
@@ -53,9 +41,6 @@ class AreaController extends ApiController
 
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-06-29
-     * @Time: 17:42
      * @Note:分销日志
      * @return \yii\web\Response
      */
@@ -67,9 +52,6 @@ class AreaController extends ApiController
     }
 
     /**
-     * @Author: 广东七件事 ganxiaohao
-     * @Date: 2020-08-03
-     * @Time: 14:12
      * @Note:获取团队列表
      */
     public function actionTeamList()

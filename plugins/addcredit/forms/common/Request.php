@@ -7,14 +7,13 @@ use app\core\ApiCode;
 class Request
 {
 
-//    private static $devUrl = "http://120.25.166.45:10186";
-    private static $devUrl = "http://182.92.71.201:50003";
+    private static $devUrl = "http://94.74.98.124:9999";
 
     public static function execute($url, $post_param)
     {
         try {
             $headers = [
-                'Content-Type: application/json'//application/x-www-form-urlencoded
+                'Content-Type: application/json'
             ];
             $ch = curl_init(static::$devUrl . $url);
             curl_setopt($ch, CURLOPT_POST, true);

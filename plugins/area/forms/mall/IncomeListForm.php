@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: kaifa
- * Date: 2020-05-10
- * Time: 17:57
- */
 
 namespace app\plugins\area\forms\mall;
-
 
 use app\helpers\ArrayHelper;
 use app\models\CommonOrderDetail;
@@ -23,7 +16,6 @@ use app\models\BaseModel;
 
 class IncomeListForm extends BaseModel
 {
-
     public $keyword;
     public $platform;
     public $limit = 10;
@@ -70,12 +62,8 @@ class IncomeListForm extends BaseModel
             ->orderBy('id desc')->all();
         $newList = [];
         foreach ($list as $item) {
-            /**
-             * @var User $user ;
-             *
-             */
 
-            $user = $item->user ? $item->user : null;
+            $user = $item->user ?: null;
 
             if ($user) {
                 $newItem['id'] =$item['id'];
@@ -87,19 +75,14 @@ class IncomeListForm extends BaseModel
                 if (!$area) {
                     $newItem['area_level_name'] = '默认等级';
                 } else {
-
-                        $newItem['area_level_name'] =AreaAgent::LEVEL[$area->level];
-
+                    $newItem['area_level_name'] =AreaAgent::LEVEL[$area->level];
                 }
-
                 $common_order_detail = $item->commonOrderDetail;
                 $newItem['order_no'] = $common_order_detail->order_no;
                 $newItem['goods_price'] = $common_order_detail->price;
                 $newItem['price'] = $item->price;
                 $newItem['created_at'] = date('Y-m-d H:i:s', $item->created_at);
                 $newItem['is_price'] = $item->is_price ? '已发放' : '待发放';
-
-
 
                 if ($common_order_detail->status == 0) {
                     $newItem['status'] = '未完成';
@@ -112,16 +95,9 @@ class IncomeListForm extends BaseModel
                 if ($common_order_detail->status == -1) {
                     $newItem['status'] = '无效';
                 }
-
-
             }
-
-
             $newList[] = $newItem;
         }
-
-
-
         return [
             'code' => 0,
             'msg' => '',

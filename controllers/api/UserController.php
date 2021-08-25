@@ -21,6 +21,7 @@ use app\forms\api\user\UserEditForm;
 use app\forms\api\user\UserForm;
 use app\forms\api\user\UserLinkPosterNewForm;
 use app\forms\api\user\UserRechargeForm;
+use app\forms\api\user\UserWxAddressForm;
 use app\forms\common\attachment\CommonAttachment;
 use app\controllers\business\{Qrcode,Poster,NewUserIntegral};
 use app\forms\mall\member\RegisterAgreeForm;
@@ -133,6 +134,17 @@ class UserController extends ApiController
         $form = new UserAddressForm();
         $form->attributes = $this->requestData;
         return $form->save();
+    }
+
+    /**
+     * 保存微信收货地址
+     * @return array
+     */
+    public function actionWxUserAddressSave()
+    {
+        $form = new UserWxAddressForm();
+        $form->attributes = $this->requestData;
+        return $form->saveWx();
     }
 
     /**
@@ -299,10 +311,16 @@ class UserController extends ApiController
      * @return array
      */
     public function actionLinkPoster($flag = ''){
+        $headers = \Yii::$app->request->headers;
+        $stands_mall_id = isset($headers['x-stands-mall-id']) ? $headers['x-stands-mall-id'] : 0;
         $qrCodeData = '';
         $WeChatCode = '';
         if(empty($flag)){
-            $code = \Yii::$app->request->hostInfo . '/h5/#/pages/index/index?user_id='. \Yii::$app->user->identity ->id . '&pid=' . \Yii::$app->user->identity ->id;
+            if ($stands_mall_id) {
+                $code = \Yii::$app->request->hostInfo . '/mirror/#/pages/index/index?user_id='. \Yii::$app->user->identity ->id . '&pid=' . \Yii::$app->user->identity ->id . '&stands_mall_id=' . $stands_mall_id;
+            } else {
+                $code = \Yii::$app->request->hostInfo . '/h5/#/pages/index/index?user_id='. \Yii::$app->user->identity ->id . '&pid=' . \Yii::$app->user->identity ->id;
+            }
             $qrCodeData = QRcode::pngData($code,13);
         }else{
             $WeChatCode = $flag;

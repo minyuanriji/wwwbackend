@@ -1,12 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-04-23
- * Time: 21:10
- */
 Yii::$app->loadComponentView('order/com-search');
 Yii::$app->loadComponentView('order/com-edit-address');
 Yii::$app->loadComponentView('order/com-edit-seller-remark');
@@ -477,6 +469,17 @@ Yii::$app->loadComponentView('order/com-city');
                             </template>
                         </div>
 
+
+                        <el-button
+                                v-if="item.sale_status == 0 && item.is_pay == 1"
+                                style="right: 100px"
+                                class="com-order-del"
+                                @click="moveCloserAfterSale(item)"
+                                type="text">
+                            <el-tooltip class="item" effect="dark" content="申请售后" placement="top">
+                                <img src="statics/img/mall/order/sales-service.png" alt="">
+                            </el-tooltip>
+                        </el-button>
                         <el-button
                                 v-if="isShowCancel && item.is_send == 0 && item.cancel_status == 0 && item.is_cancel_show == 1 && item.status == 1"
                                 style="right: 60px"
@@ -1445,7 +1448,55 @@ Yii::$app->loadComponentView('order/com-city');
                         }
                     }
                 });
-            }
+            },
+            // 移近申请售后
+            moveCloserAfterSale(e) {
+                let text = "是否申请售后?"
+                let para = {
+                    integral_score_price: e.score_deduction_price,
+                    is_receipt: e.is_confirm,
+                    order_detail_id: e.detail[0].id,
+                    pic_list: '',
+                    reason: '',
+                    refund_price: e.total_goods_price,
+                    refund_total_price: e.total_pay_price,
+                    refund_type: 0,
+                    remark: '',
+                    textColor: '',
+                    type: 0,
+                    is_backstage: 1,
+                }
+                this.$confirm(text, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning',
+                    center: true
+                }).then(() => {
+                    request({
+                        params: {
+                            r: 'mall/order/manual-after-sales',
+                        },
+                        data: para,
+                        method: 'post'
+                    }).then(e => {
+                        e.visible = false;
+                        this.submitLoading = false;
+                        if (e.data.code === 0) {
+                            this.$message({
+                                message: e.data.msg,
+                                type: 'success'
+                            });
+                            window.location.href = _baseUrl + '/index.php?' + "r=mall/order/refund";
+                        } else {
+                            console.log(e);
+                            alert(e.data.msg)
+                        }
+                    }).catch(e => {
+                        self.$message.error(e);
+                    });
+                }).catch(() => {
+                });
+            },
         },
     });
 </script>

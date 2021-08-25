@@ -123,7 +123,7 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
         if($giftpacks->integral_enable && $giftpacks->integral_give_num > 0){
             $modifyForm = new UserIntegralModifyForm([
                 "type"        => 1,
-                "integral"    => $giftpacks->integral_give_num,
+                "integral"    => min($order->order_price, $giftpacks->integral_give_num),
                 "is_manual"   => 0,
                 "desc"        => "购买大礼包“".$giftpacks->title."”赠送红包",
                 "source_id"   => $order->id,

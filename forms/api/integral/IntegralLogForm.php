@@ -61,8 +61,8 @@ class IntegralLogForm extends BaseModel
             [
                 'list' => $list,
                 'detailed_count'    => [
-                    'income'        => $income,
-                    'expenditure'   => $expenditure,
+                    'income'        => $income ?: 0,
+                    'expenditure'   => $expenditure ?: 0,
                 ],
                 'pagination' => $pagination
             ]);

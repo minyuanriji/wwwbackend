@@ -178,8 +178,8 @@ class UserIncomeForm extends BaseModel
             [
                 'list'              => $list,
                 'detailed_count'    => [
-                    'income'        => $income,
-                    'expenditure'   => $expenditure,
+                    'income'        => sprintf("%.2f", $income ?: 0),
+                    'expenditure'   => sprintf("%.2f", $expenditure ?: 0),
                 ],
                 'pagination'        => $pagination
             ]

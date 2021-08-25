@@ -1,12 +1,5 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-04-28
- * Time: 11:49
- */
+
 namespace app\controllers\api;
 
 use app\controllers\api\filters\CheckParentFilter;
@@ -25,7 +18,6 @@ class GoodsPosterController extends ApiController
     }
     /**
      * 商品海报
-     * @return \yii\web\R1esponse
      * @throws \Exception
      */
     public function actionPoster(){

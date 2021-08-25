@@ -427,7 +427,7 @@ class Goods extends BaseActiveRecord
     {
         $integral_setting = self::find()
             ->select('integral_setting,first_buy_setting')
-            ->where(array('id' => $goods_id, 'enable_integral' => 1))
+            ->where(array('id' => $goods_id, 'mall_id' => Yii::$app->mall->id, 'enable_integral' => 1))
             ->asArray()
             ->one();
         return $integral_setting;
@@ -472,3 +472,4 @@ class Goods extends BaseActiveRecord
         return $setting ?? null;
     }
 }
+

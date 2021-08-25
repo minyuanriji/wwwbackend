@@ -109,21 +109,6 @@ class TelephoneOrderController extends BaseCommandController
                                 }
                             }
                             break;
-                        case one_Code::PAY_STATUS_UNPAID:
-                            //再次下单
-                            $plateform = AddcreditPlateforms::findOne($item->plateform_id);
-                            if (!$plateform) {
-                                throw new \Exception("无法获取平台信息", ApiCode::CODE_FAIL);
-                            }
-                            $plate_form = new one_PlateForm();
-                            $submit_res = $plate_form->submit($item, $plateform);
-                            if (!$submit_res) {
-                                throw new \Exception('未知错误！', ApiCode::CODE_FAIL);
-                            }
-                            if ($submit_res->code != ApiCode::CODE_SUCCESS) {
-                                throw new \Exception($submit_res->message, ApiCode::CODE_FAIL);
-                            }
-                            break;
                         default:
                             break;
                     }

@@ -37,20 +37,21 @@ class SubmitOrderAction extends BaseObject
             if (!in_array($teltype, self::TEL_TYPE)) throw new \Exception("手机号码错误");
 
             $timeStamp = time();
+            $timeout = 86400;
             $rand = rand(100000, 999999);
+            $notify = '94.74.98.124';
             $post_param = [
                 'mchid'       => $plateforms_param->id,
                 'tel'         => $this->AddcreditOrder->mobile,
                 'orderid'     => $this->AddcreditOrder->order_no,
                 'price'       => (int)$this->AddcreditOrder->order_price,
                 'teltype'     => $teltype,
-                'timeout'     => 86400,
-                'notify'      => '94.74.98.124',
+                'timeout'     => $timeout,
+                'notify'      => $notify,
                 'time'        => $timeStamp,
                 'rand'        => $rand,
-                'sign'        => md5($plateforms_param->id . $this->AddcreditOrder->mobile . $this->AddcreditOrder->order_price . $this->AddcreditOrder->order_no . $teltype . 86400 . '94.74.98.124' . $timeStamp . $rand . $plateforms_param->secret_key)
+                'sign'        => md5($plateforms_param->id .  $this->AddcreditOrder->mobile . (int)$this->AddcreditOrder->order_price . $this->AddcreditOrder->order_no . $teltype . $timeout . $notify . $timeStamp . $rand . $plateforms_param->secret_key)
             ];
-            print_r($post_param);die;
             $response = Request::execute(Config::PHONE_BILL_SUBMIT, $post_param);
             $parseArray = @json_decode($response, true);
             if (!isset($parseArray['code'])) {

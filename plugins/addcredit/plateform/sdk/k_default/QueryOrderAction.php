@@ -27,7 +27,6 @@ class QueryOrderAction extends BaseObject
         pay_time 字符串 支付时间（2021-01-28 00:00:00）
         status 字符串 1 未支付 2 支付中 3 已支付 4 支付失败
         arrival 字符串 0未到账 1到账中 2已到账 3已退款
-
      * */
     public function run ()
     {

@@ -156,6 +156,13 @@ class GiftpacksGroupPaidProcessForm extends BaseModel{
                 if(!$order->save()){
                     throw new \Exception($this->responseErrorMsg($order));
                 }
+
+                //赠送红包
+                GiftpacksOrderPaidProcessForm::giveIntegral($giftpacks, $order);
+
+                //赠送积分
+                GiftpacksOrderPaidProcessForm::giveScore($giftpacks, $order);
+
                 $userOrderIds[$payOrder->user_id] = $order->id;
             }
 

@@ -70,6 +70,16 @@
                     <el-form-item label="数量" prop="integral_give_num" v-if="formData.integral_enable">
                         <el-input type="number" style="width:150px" v-model="formData.integral_give_num"></el-input>
                     </el-form-item>
+                    <el-form-item label="返积分" prop="score_enable">
+                        <el-switch
+                                v-model="formData.score_enable"
+                                active-text="启用"
+                                inactive-text="关闭">
+                        </el-switch>
+                    </el-form-item>
+                    <el-form-item label="数量" prop="score_give_num" v-if="formData.score_enable">
+                        <el-input type="number" style="width:150px" v-model="formData.score_give_num"></el-input>
+                    </el-form-item>
                 </el-card>
             </el-form-item>
 
@@ -119,7 +129,9 @@
             group_expire_time: '',
             allow_currency: 'money',
             integral_enable: false,
-            integral_give_num: 0
+            integral_give_num: 0,
+            score_enable: false,
+            score_give_num: 0
         };
     }
     const editApp = new Vue({
@@ -168,9 +180,11 @@
                 if(row != null){
                     var groupEnable = row.group_enable == 1 ? true : false;
                     var integralEnable = row.integral_enable == 1 ? true : false;
+                    var scoreEnable = row.score_enable == 1 ? true : false;
                     this.formData = row;
-                    this.formData['group_enable'] = groupEnable;
+                    this.formData['group_enable']    = groupEnable;
                     this.formData['integral_enable'] = integralEnable;
+                    this.formData['score_enable']    = scoreEnable;
                 }else{
                     this.formData = initFormData();
                 }
@@ -187,6 +201,7 @@
                         formData['integral_enable']   = formData['integral_enable'] ? 1 : 0;
                         formData['group_enable']      = formData['group_enable'] ? 1 : 0;
                         formData['group_expire_time'] = 3600 * formData['group_expire_time'];
+                        formData['score_enable']      = formData['score_enable'] ? 1 : 0;
                         request({
                             params: {
                                 r: 'plugin/giftpacks/mall/giftpacks/edit'

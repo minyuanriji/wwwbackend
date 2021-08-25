@@ -4,6 +4,8 @@
 namespace app\plugins\giftpacks\forms\common;
 
 
+use app\forms\common\UserIntegralModifyForm;
+use app\forms\common\UserScoreModifyForm;
 use app\models\BaseModel;
 use app\models\User;
 use app\plugins\giftpacks\forms\api\GiftpacksDetailForm;
@@ -75,6 +77,12 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
             throw new \Exception($this->responseErrorMsg($order));
         }
 
+        //赠送红包
+        static::giveIntegral($giftpacks, $order);
+
+        //赠送积分
+        static::giveScore($giftpacks, $order);
+
         //为用户生成礼包信息
         $query = GiftpacksDetailForm::availableItemsQuery($giftpacks);
         $selects = ["s.mch_id", "gpi.id", "gpi.store_id", "gpi.item_price", "gpi.usable_times", "gpi.expired_at", "gpi.max_stock"];
@@ -105,4 +113,49 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
         }
     }
 
+    /**
+     * 赠送红包
+     * @param Giftpacks $giftpacks
+     * @param GiftpacksOrder $order
+     * @throws \Exception
+     */
+    public static function giveIntegral(Giftpacks $giftpacks, GiftpacksOrder $order){
+        if($giftpacks->integral_enable && $giftpacks->integral_give_num > 0){
+            $modifyForm = new UserIntegralModifyForm([
+                "type"        => 1,
+                "integral"    => $giftpacks->integral_give_num,
+                "is_manual"   => 0,
+                "desc"        => "购买大礼包“".$giftpacks->title."”赠送红包",
+                "source_id"   => $order->id,
+                "source_type" => "giftpacks_order"
+            ]);
+            $modifyForm->modify(User::findOne([
+                "id" => $order->user_id,
+                "is_delete" => 0
+            ]));
+        }
+    }
+
+    /**
+     * 赠送积分
+     * @param Giftpacks $giftpacks
+     * @param GiftpacksOrder $order
+     * @throws \Exception
+     */
+    public static function giveScore(Giftpacks $giftpacks, GiftpacksOrder $order){
+        if($giftpacks->score_enable && $giftpacks->score_give_num > 0){
+            $desc = "购买大礼包“".$giftpacks->title."”赠送积分";
+            $modifyForm = new UserScoreModifyForm([
+                "type"        => 1,
+                "score"       => $giftpacks->score_give_num,
+                "desc"        => $desc,
+                "custom_desc" => $desc,
+                "source_type" => "giftpacks_order"
+            ]);
+            $modifyForm->modify(User::findOne([
+                "id" => $order->user_id,
+                "is_delete" => 0
+            ]));
+        }
+    }
 }

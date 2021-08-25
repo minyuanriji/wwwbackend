@@ -43,7 +43,6 @@ class RegionGoodsAction extends Action
      */
     private function doNew()
     {
-
         //订单已付款、分佣状态未处理
         $query = OrderDetail::find()->alias("od");
         $query->innerJoin("{{%order}} o", "o.id=od.order_id");
@@ -89,12 +88,19 @@ class RegionGoodsAction extends Action
             }
         }
 
+        //获取符合当前门店区域的用户
+        $region_user = $this->controller->getRegion($orderDetailData['mall_id'], $province_id, $city_id, $district_id);
+        if (!$region_user) {
+//                    $this->controller->commandOut('没有符合当前门店区域的用户');
+        }
+        //计算分佣金额
+        $transferRate = (int)$checkoutOrder['transfer_rate'];//商户手续费
+        $integralFeeRate = (int)$checkoutOrder['integral_fee_rate'];
+        $rule_data_json['profit_price'] = $this->controller->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate, $integralFeeRate);
+
         print_r($province_id);
         print_r($city_id);
         print_r($district_id);die;
-
-
-
 
 
 

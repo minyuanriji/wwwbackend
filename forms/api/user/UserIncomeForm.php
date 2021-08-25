@@ -169,7 +169,7 @@ class UserIncomeForm extends BaseModel
         foreach ($list as &$item) {
             $item['created_at'] = date('m月d日 H:i', $item['created_at']);
             $item['money'] = sprintf("%.2f",$item['money']);
-            $item['income'] = sprintf("%.2f",$item['income']);
+//            $item['income'] = sprintf("%.2f",$item['income']);
         }
 
         return $this->returnApiResultData(

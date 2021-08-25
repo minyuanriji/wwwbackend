@@ -5,6 +5,7 @@ use app\commands\commission_action\RegionAction;
 use app\commands\commission_action\RegionGoodsAction;
 use app\models\User;
 use app\models\UserRelationshipLink;
+use app\plugins\area\models\AreaAgent;
 use app\plugins\commission\models\CommissionRuleChain;
 use yii\db\ActiveQuery;
 
@@ -233,6 +234,34 @@ class CommissionController extends BaseCommandController{
         }
 
         return $parentDatas;
+    }
+
+    /* *
+     * 获取区域分红符合条件的人
+     * */
+    public function getRegion ($mall_id, $province_id, $city_id, $district_id)
+    {
+        $AreaAgent = AreaAgent::find()->where(['mall_id' => $mall_id, 'is_delete' => 0])
+            ->andWhere([
+                'or',
+                [
+                    'and',
+                    ['province_id' => $province_id],
+                    ['level' => 4],
+                ],
+                [
+                    'and',
+                    ['city_id' => $city_id],
+                    ['level' => 3],
+                ],
+                [
+                    'and',
+                    ['district_id' => $district_id],
+                    ['level' => 2],
+                ],
+            ])->orderBy('level DESC')->asArray()->all();
+
+        return $AreaAgent;
     }
 
 }

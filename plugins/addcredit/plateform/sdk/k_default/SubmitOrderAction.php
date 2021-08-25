@@ -48,7 +48,7 @@ class SubmitOrderAction extends BaseObject
                 'notify'      => 1,
                 'time'        => $timeStamp,
                 'rand'        => $rand,
-                'sign'        => md5($plateforms_param->id . $this->AddcreditOrder->mobile . $this->AddcreditOrder->order_price . $this->AddcreditOrder->order_no . $teltype . 500 . 1 . $timeStamp . $rand . $plateforms_param->secret_key)
+                'sign'        => md5($plateforms_param->id . $this->AddcreditOrder->mobile . $this->AddcreditOrder->order_price . $this->AddcreditOrder->order_no . $teltype . 1000 . 1 . $timeStamp . $rand . $plateforms_param->secret_key)
             ];
             $response = Request::execute(Config::PHONE_BILL_SUBMIT, $post_param);
             $parseArray = @json_decode($response, true);

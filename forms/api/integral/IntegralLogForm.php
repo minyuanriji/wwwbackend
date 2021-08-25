@@ -40,6 +40,13 @@ class IntegralLogForm extends BaseModel
         if ($this->source_type) {
             $query->andWhere(['source_type' => $this->source_type]);
         }
+
+        $incomeQuery = clone $query;
+        $income = $incomeQuery->andWhere(['type' => 1])->sum('integral');
+
+        $expenditureQuery = clone $query;
+        $expenditure = $expenditureQuery->andWhere(['type' => 2])->sum('integral');
+
         $list = $query->page($pagination, 10, $this->page)->orderBy('id DESC')->asArray()->all();
 
         foreach ($list as &$item) {
@@ -48,6 +55,16 @@ class IntegralLogForm extends BaseModel
             $item['income'] = sprintf("%.2f", $item['income']);
         }
 
-        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, ['list' => $list, 'pagination' => $pagination]);
+        return $this->returnApiResultData(
+            ApiCode::CODE_SUCCESS,
+            null,
+            [
+                'list' => $list,
+                'detailed_count'    => [
+                    'income'        => $income,
+                    'expenditure'   => $expenditure,
+                ],
+                'pagination' => $pagination
+            ]);
     }
 }

@@ -178,7 +178,7 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
                 $scoreSetting = [
                     "integral_num" => isset($scoreGiveSettings['integral_num']) ? $scoreGiveSettings['integral_num'] : 0,
                     "period"       => isset($scoreGiveSettings['period']) ? $scoreGiveSettings['period'] : 0,
-                    "period_unit"  => isset($scoreGiveSettings['period_unit']) ? $scoreGiveSettings : 'month',
+                    "period_unit"  => isset($scoreGiveSettings['period_unit']) ? $scoreGiveSettings['period_unit'] : 'month',
                     "expire"       => isset($scoreGiveSettings['expire']) ? $scoreGiveSettings['expire'] : 0,
                     "source_type"  => "giftpacks_order",
                     "source_id"    => $order->id

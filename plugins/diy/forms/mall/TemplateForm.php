@@ -172,7 +172,7 @@ class TemplateForm extends BaseModel
 
     public function search()
     {
-        if (!$this->validate()) {
+        /*if (!$this->validate()) {
             return $this->getErrorResponse();
         }
         $diy_template = DiyTemplate::find()
@@ -190,7 +190,7 @@ class TemplateForm extends BaseModel
                 'list' => $diy_template,
                 'pagination' => $pagination
             ]
-        ];
+        ];*/
 
 
         $query = DiyPage::find()->alias('p')->select('p.*')->where([
@@ -223,7 +223,7 @@ class TemplateForm extends BaseModel
                 'id' => $template['id'],
                 'name' => $template['title'],
                 'is_home_page' => $template['is_home_page'],
-                'created_at' => $template['created_at'],
+                'created_at' => date('Y-m-d H:i:s', $template['created_at']),
                 'userCount' => count($diyAccessLog[$template['id']]['userIds'] ?? []),
                 'accessCount' => $diyAccessLog[$template['id']]['accessCount'] ?? 0,
                 //'goodsCount' => $goodsCount,

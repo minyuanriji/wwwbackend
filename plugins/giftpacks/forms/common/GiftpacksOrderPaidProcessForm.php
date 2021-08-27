@@ -159,18 +159,21 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
         if($giftpacks->score_enable ){
             $scoreGiveSettings = !empty($giftpacks->score_give_settings) ? (array)@json_decode($giftpacks->score_give_settings) : [];
             if(isset($scoreGiveSettings['is_permanent']) && $scoreGiveSettings['is_permanent'] == 1){ //赠送永久积分
-                $desc = "购买大礼包“".$giftpacks->title."”赠送积分";
-                $modifyForm = new UserScoreModifyForm([
-                    "type"        => 1,
-                    "score"       => $giftpacks->score_give_num,
-                    "desc"        => $desc,
-                    "custom_desc" => $desc,
-                    "source_type" => "giftpacks_order"
-                ]);
-                $modifyForm->modify(User::findOne([
-                    "id" => $order->user_id,
-                    "is_delete" => 0
-                ]));
+                $integralNum = isset($scoreGiveSettings['integral_num']) ? $scoreGiveSettings['integral_num'] : 0;
+                if($integralNum > 0){
+                    $desc = "购买大礼包“".$giftpacks->title."”赠送积分";
+                    $modifyForm = new UserScoreModifyForm([
+                        "type"        => 1,
+                        "score"       => $integralNum,
+                        "desc"        => $desc,
+                        "custom_desc" => $desc,
+                        "source_type" => "giftpacks_order"
+                    ]);
+                    $modifyForm->modify(User::findOne([
+                        "id" => $order->user_id,
+                        "is_delete" => 0
+                    ]));
+                }
             }else{ //限时积分
                 $scoreSetting = [
                     "integral_num" => isset($scoreGiveSettings['integral_num']) ? $scoreGiveSettings['integral_num'] : 0,

@@ -178,7 +178,7 @@ class AttachmentUploadForm extends Model
         if (in_array($this->file->getExtension(), $this->docExt)) {
             $this->type = 'doc';
             if($this->file->getExtension()=='pem') {
-                $this->savePath = '/uploads/doc/original/cert/mall_' . ($this->mall_id ? $this->mall_id : 0) . '/' . date('YmdHis') . '/';
+                $this->savePath = '/uploads/doc/original/cert/mall_' . ($this->mall_id ?: 0) . '/' . date('YmdHis') . '/';
             }else{
                 $this->savePath = '/uploads/doc/original/' . $dateFolder . '/';
             }

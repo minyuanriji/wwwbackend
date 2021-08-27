@@ -35,16 +35,16 @@ class PriceLogNewGiftpacksOrderItemForm extends BaseModel{
             if(!$priceLog){
 
                 //服务费比例
-                $serviceFeeRate = 0;
+                //$serviceFeeRate = 0;
 
                 //计算要结算给商家的钱
                 $amount = $otherData['item_price'];
-                $serviceFee = ($serviceFeeRate/100) * floatval($amount);
-                $price = $amount - $serviceFee;
+                //$serviceFee = ($serviceFeeRate/100) * floatval($amount);
+                //$price = $amount - $serviceFee;
                 $otherData = [
                     'amount'             => $amount,
                     'transfer_rate'      => $mch->transfer_rate,
-                    'service_fee'        => $serviceFee,
+                    'service_fee'        => 0,
                     'giftpacks_order_id' => $orderItem->order_id,
                     'order_item_id'      => $orderItem->id
                 ];
@@ -52,7 +52,7 @@ class PriceLogNewGiftpacksOrderItemForm extends BaseModel{
                 //生成待结算记录
                 $content = "来自大礼包订单[ID:".$orderItem->order_id."]的收益";
                 $priceLog = new MchPriceLog(array_merge($uniqueData, [
-                    "price"           => $price,
+                    "price"           => $amount,
                     "created_at"      => time(),
                     "updated_at"      => time(),
                     "status"          => "unconfirmed",

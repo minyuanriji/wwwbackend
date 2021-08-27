@@ -7,6 +7,7 @@ namespace app\plugins\giftpacks\forms\common;
 use app\forms\common\UserIntegralModifyForm;
 use app\forms\common\UserScoreModifyForm;
 use app\models\BaseModel;
+use app\models\Integral;
 use app\models\User;
 use app\plugins\giftpacks\forms\api\GiftpacksDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksOrderSubmitForm;
@@ -155,19 +156,32 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
      * @throws \Exception
      */
     public static function giveScore(Giftpacks $giftpacks, GiftpacksOrder $order){
-        if($giftpacks->score_enable && $giftpacks->score_give_num > 0){
-            $desc = "购买大礼包“".$giftpacks->title."”赠送积分";
-            $modifyForm = new UserScoreModifyForm([
-                "type"        => 1,
-                "score"       => $giftpacks->score_give_num,
-                "desc"        => $desc,
-                "custom_desc" => $desc,
-                "source_type" => "giftpacks_order"
-            ]);
-            $modifyForm->modify(User::findOne([
-                "id" => $order->user_id,
-                "is_delete" => 0
-            ]));
+        if($giftpacks->score_enable ){
+            $scoreGiveSettings = !empty($giftpacks->score_give_settings) ? (array)@json_decode($giftpacks->score_give_settings) : [];
+            if(isset($scoreGiveSettings['is_permanent']) && $scoreGiveSettings['is_permanent'] == 1){ //赠送永久积分
+                $desc = "购买大礼包“".$giftpacks->title."”赠送积分";
+                $modifyForm = new UserScoreModifyForm([
+                    "type"        => 1,
+                    "score"       => $giftpacks->score_give_num,
+                    "desc"        => $desc,
+                    "custom_desc" => $desc,
+                    "source_type" => "giftpacks_order"
+                ]);
+                $modifyForm->modify(User::findOne([
+                    "id" => $order->user_id,
+                    "is_delete" => 0
+                ]));
+            }else{ //限时积分
+                $scoreSetting = [
+                    "integral_num" => isset($scoreGiveSettings['integral_num']) ? $scoreGiveSettings['integral_num'] : 0,
+                    "period"       => isset($scoreGiveSettings['period']) ? $scoreGiveSettings['period'] : 0,
+                    "period_unit"  => isset($scoreGiveSettings['period_unit']) ? $scoreGiveSettings : 'month',
+                    "expire"       => isset($scoreGiveSettings['expire']) ? $scoreGiveSettings['expire'] : 0,
+                    "source_type"  => "giftpacks_order",
+                    "source_id"    => $order->id
+                ];
+                Integral::addIntegralPlan($order->user_id, $scoreSetting, '购买大礼包赠送积分券', '0');
+            }
         }
     }
 }

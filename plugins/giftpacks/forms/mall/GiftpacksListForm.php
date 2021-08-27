@@ -43,9 +43,19 @@ class GiftpacksListForm extends BaseModel{
 
             $list = $query->orderBy($orderBy)->page($pagination, 20)->asArray()->all();
             if($list){
+                $scoreGiveSettings = [
+                    "is_permanent" => 0,
+                    "integral_num" => 0,
+                    "period"       => 1,
+                    "period_unit"  => "month",
+                    "expire"       => 30
+                ];
                 foreach($list as &$item){
                     $item['expired_at'] = date("Y-m-d H:i:s", $item['expired_at']);
                     $item['group_expire_time'] = (int)($item['group_expire_time']/3600);
+                    $item['score_give_settings'] = array_merge($scoreGiveSettings,
+                            !empty($item['score_give_settings']) ? (array)@json_decode($item['score_give_settings']) : []);
+                    $item['score_give_settings']['is_permanent'] = (int)$item['score_give_settings']['is_permanent'];
                 }
             }
 

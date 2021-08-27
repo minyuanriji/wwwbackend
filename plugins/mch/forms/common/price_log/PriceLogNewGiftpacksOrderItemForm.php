@@ -50,7 +50,7 @@ class PriceLogNewGiftpacksOrderItemForm extends BaseModel{
                 ];
 
                 //生成待结算记录
-                $content = "来自大礼包订单[ID:".$orderItem->order_id."]的收益";
+                $content = "来自大礼包订单[ID:".$orderItem->order_id."]的结算收益";
                 $priceLog = new MchPriceLog(array_merge($uniqueData, [
                     "price"           => $amount,
                     "created_at"      => time(),

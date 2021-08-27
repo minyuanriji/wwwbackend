@@ -29,14 +29,14 @@ class GiftpacksEditForm extends BaseModel{
     public $integral_give_num;
 
     public $score_enable;
-    public $score_give_num;
+    public $score_give_settings;
 
     public function rules(){
         return [
             [['title', 'cover_pic', 'expired_at', 'allow_currency'], 'required'],
             [['integral_give_num', 'purchase_limits_num', 'price', 'profit_price', 'group_price'], 'number', 'min' => 0],
-            [['integral_enable', 'score_enable', 'score_give_num', 'group_enable', 'max_stock', 'group_need_num', 'group_expire_time'], 'integer'],
-            [['id', 'descript'], 'safe']
+            [['integral_enable', 'score_enable', 'group_enable', 'max_stock', 'group_need_num', 'group_expire_time'], 'integer'],
+            [['id', 'descript', 'score_give_settings'], 'safe']
         ];
     }
 
@@ -77,14 +77,14 @@ class GiftpacksEditForm extends BaseModel{
             $model->integral_enable     = $this->integral_enable;
             $model->integral_give_num   = $this->integral_give_num;
             $model->score_enable        = $this->score_enable;
-            $model->score_give_num      = $this->score_give_num;
+            $model->score_give_settings = is_array($this->score_give_settings) ? json_encode($this->score_give_settings) : '';
             $model->allow_currency      = $this->allow_currency;
 
             if($this->allow_currency != "money"){ //非现金支付
-                $model->integral_enable   = 0;
-                $model->integral_give_num = 0;
-                $model->score_enable      = 0;
-                $model->score_give_num    = 0;
+                $model->integral_enable     = 0;
+                $model->integral_give_num   = 0;
+                $model->score_enable        = 0;
+                $model->score_give_settings = '';
             }
 
             if(!$model->save()){

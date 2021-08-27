@@ -85,9 +85,21 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
 
         //为用户生成礼包信息
         $query = GiftpacksDetailForm::availableItemsQuery($giftpacks);
-        $selects = ["s.mch_id", "gpi.id", "gpi.store_id", "gpi.item_price", "gpi.usable_times", "gpi.expired_at", "gpi.max_stock"];
+        $selects = ["s.mch_id", "gpi.id", "gpi.store_id", "gpi.item_price", "gpi.usable_times", "gpi.expired_at", "gpi.limit_time", "gpi.max_stock"];
         $items = $query->asArray()->select($selects)->all();
         foreach($items as $item){
+
+            //去除过期时间的
+            $expireTime = $item['expired_at'];
+            if($expireTime > 0){
+                if($item['limit_time'] > 0){
+                    $endTime = strtotime(date("Y-m-d 00:00:00")) + intval($item['limit_time']) * 3600 * 24;
+                    if($endTime < $expireTime){
+                        $expireTime = $endTime;
+                    }
+                }
+                if($expireTime < time()) continue;
+            }
 
             //生成大礼包订单商品记录
             $otherData = [
@@ -101,7 +113,7 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
                 'pack_item_id'    => $item['id'],
                 'max_num'         => $item['usable_times'],
                 'current_num'     => $item['usable_times'],
-                'expired_at'      => $item['expired_at'],
+                'expired_at'      => $expireTime,
                 'other_json_data' => json_encode($otherData)
             ]);
             if(!$orderItem->save()){

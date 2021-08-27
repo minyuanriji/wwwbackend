@@ -16,7 +16,7 @@ echo $this->render("com-edit");
             </div>
 
             <div style="float: right">
-                <el-button type="primary" size="small" style="padding: 9px 15px !important;"  @click="">添加商品</el-button>
+                <el-button type="primary" size="small" style="padding: 9px 15px !important;"  @click="edit({})">添加商品</el-button>
             </div>
             <el-tabs v-model="activeName" @tab-click="handleClick">
 
@@ -103,7 +103,9 @@ echo $this->render("com-edit");
 
     </el-card>
 
-    <com-edit :visible="editDialogVisible" :goods-info="edittingGoods" @close="editDialogVisible = false"></com-edit>
+    <com-edit :visible="editDialogVisible" :goods-info="edittingGoods"
+        @update="update"
+        @close="editDialogVisible = false"></com-edit>
 
 </div>
 
@@ -177,6 +179,10 @@ echo $this->render("com-edit");
             pageChange(page) {
                 this.search.page = page;
                 this.loadData();
+            },
+            update(){
+                this.loadData();
+                this.editDialogVisible = false;
             }
         }
     });

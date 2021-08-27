@@ -42,10 +42,20 @@
             <el-table-column prop="item_price" label="结算价格" width="90"></el-table-column>
             <el-table-column label="有效期" width="150">
                 <template slot-scope="scope">
-                    <div v-if="scope.row.expired_at != ''">{{scope.row.expired_at}}</div>
+                    <div v-if="scope.row.expired_at != ''"  style="color:darkred">{{scope.row.expired_at}}</div>
                     <div v-else style="color:green">永久有效</div>
                 </template>
             </el-table-column>
+           <el-table-column label="时限" width="150">
+               <template slot-scope="scope">
+                   <div v-if="scope.row.expired_at == '' || scope.row.limit_time <= 0" style="color:green">
+                       不限制
+                   </div>
+                   <div v-else style="color:darkred">
+                       {{scope.row.limit_time}}天
+                   </div>
+               </template>
+           </el-table-column>
             <el-table-column prop="max_stock" label="库存" width="90">
                 <template slot-scope="scope">
                     <div>{{scope.row.order_item_num}}/{{scope.row.max_stock}}</div>

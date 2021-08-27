@@ -2,6 +2,7 @@
 namespace app\plugins\taolijin\controllers\mall;
 
 use app\plugins\Controller;
+use app\plugins\taolijin\forms\mall\TaoLiJinGoodsEditForm;
 use app\plugins\taolijin\forms\mall\TaoLiJinGoodsListForm;
 
 class GoodsController extends Controller{
@@ -21,4 +22,13 @@ class GoodsController extends Controller{
         }
     }
 
+    /**
+     * 编辑商品
+     * @return string|\yii\web\Response
+     */
+    public function actionEdit(){
+        $form = new TaoLiJinGoodsEditForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
+    }
 }

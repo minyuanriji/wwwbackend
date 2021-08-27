@@ -35,7 +35,7 @@ class QueryOrderAction extends BaseObject
         try {
             $AddcreditPlateformsInfo = AddcreditPlateforms::findOne($this->AddcreditOrder->plateform_id);
             if (!$AddcreditPlateformsInfo) {
-                throw new \Exception("无法获取ADDCREDIT ID " . $this->AddcreditOrder->plateform_id . " 平台信息", ApiCode::CODE_FAIL);
+                throw new \Exception("无法获取ADDCREDIT ID " . $this->AddcreditOrder->plateform_id . " 平台信息");
             }
             $plateforms_param = json_decode($AddcreditPlateformsInfo->json_param);
             $post_param = [
@@ -46,7 +46,7 @@ class QueryOrderAction extends BaseObject
             $response = Request::execute(Config::ORDER_QUERY, $post_param);
             $parseArray = @json_decode($response, true);
             if (!isset($parseArray['code'])) {
-                throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
+                throw new \Exception("解析数据错误");
             }
             if ($parseArray['code'] != Code::QUERY_SUCCESS) {
                 throw new \Exception(Msg::QueryMsg()[$parseArray['code']]);

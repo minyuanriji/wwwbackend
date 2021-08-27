@@ -30,7 +30,7 @@ class Request
             $error = curl_error($ch);
 
             if (!empty($error)) {
-                throw new \Exception($error, ApiCode::CODE_FAIL);
+                throw new \Exception($error);
             }
 
             return $result;

@@ -267,8 +267,7 @@ class CommonAttachment extends BaseModel
         $form->from = $from;
         $form->mall_id = $mall_id;
         $form->admin_id = $admin_id;
-//        $group_id = $group_id;
-        $form->group_id = $group_id ? $group_id : 0;
+        $form->group_id = $group_id ?: 0;
         return $form->save();
     }
 

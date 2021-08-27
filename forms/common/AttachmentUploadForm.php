@@ -205,6 +205,11 @@ class AttachmentUploadForm extends Model
                 $res = $this->saveToLocal();
             }
             if ($this->attachmentStorage) {
+                list($width, $height) = getimagesize($this->file->tempName);
+                $LocalImage = [];
+                if ($width > 3000 || $height > 3000) {
+                    $LocalImage = $this->saveToLocalThumb();
+                }
                 switch ($this->attachmentStorage->type) {
                     case 2:
                         $this->oss = OssSetting::findOne(['mall_id' => $this->mall_id, 'admin_id' => $this->admin_id, 'id' => $this->attachmentStorage->setting_id, 'is_delete' => 0]);
@@ -214,12 +219,11 @@ class AttachmentUploadForm extends Model
                         $res = $this->saveToAliOss();
                         break;
                     case 3:
-                        //'mall_id' => $this->mall_id
                         $this->cos = CosSetting::findOne(['admin_id' => $this->admin_id, 'id' => $this->attachmentStorage->setting_id, 'is_delete' => 0]);
                         if (!$this->cos) {
                             return ['code' => ApiCode::CODE_FAIL, 'msg' => '腾讯云对象储存配置错误'];
                         }
-                        $res = $this->saveToCos();
+                        $res = $this->saveToCos(0, $LocalImage);
                         break;
                     case 4:
                         $this->qiniu = QiniuSetting::findOne(['mall_id' => $this->mall_id, 'admin_id' => $this->admin_id, 'id' => $this->attachmentStorage->setting_id, 'is_delete' => 0]);
@@ -333,6 +337,64 @@ class AttachmentUploadForm extends Model
         return $result;
     }
 
+    public function saveToLocalThumb()
+    {
+        $dateFolder = date('Ymd');
+        $this->url = $this->baseWebUrl . "/" . $this->savePath . $this->saveName;
+        if (!is_dir($this->baseWebPath . $this->savePath)) {
+            if (!make_dir($this->baseWebPath . $this->savePath)) {
+                throw new \Exception('上传失败，创建文件夹失败`'
+                    . $this->baseWebPath
+                    . $this->savePath
+                    . '`，请检查目录写入权限。');
+            }
+        }
+        if (!$this->file->saveAs($this->saveFile)) {
+            if (!copy($this->file->tempName, $this->saveFile)) {
+                throw new \Exception('文件保存失败，请检查目录写入权限。');
+            }
+        }
+        if ($this->type == 'image') {
+            $this->saveThumbFolder = '/uploads/images/thumbs/' . $dateFolder . '/';
+            $saveThumbName = $this->baseWebPath . $this->saveThumbFolder . $this->saveName;
+            if (!is_dir($this->baseWebPath . $this->saveThumbFolder)) {
+                if (!make_dir($this->baseWebPath . $this->saveThumbFolder)) {
+                    throw new \Exception('上传失败，创建文件夹失败`'
+                        . $this->baseWebPath
+                        . $this->saveThumbFolder
+                        . '`，请检查目录写入权限。');
+                }
+            }
+            //裁剪图片存入本地
+            $editor = Grafika::createEditor(get_supported_image_lib());
+            /**
+             * @var ImageInterface $image
+             */
+            $editor->open($image, $this->saveFile);
+            $editor->resizeFit($image, 3000, 3000);
+            $editor->save($image, $saveThumbName);
+            $this->thumb_url = $this->baseWebUrl . $this->saveThumbFolder . $this->saveName;
+        }
+
+/*        if ($this->file->getExtension() == 'pem') {
+            $this->thumb_url = $this->savePath . $this->file->name;
+            $this->url = $this->savePath . $this->file->name;
+        }*/
+
+        $result = [
+            'url'           => $this->url,
+            'url_link'      => $this->baseWebPath . $this->savePath . $this->saveName,
+//            'extension' => $this->file->getExtension(),
+//            'size'      => $this->file->size,
+//            'type'      => $this->type,
+//            'name'      => $this->file->name,
+            'thumb_url'     => $this->thumb_url,
+            'thumb_link'    => $this->baseWebPath . $this->saveThumbFolder . $this->saveName,
+        ];
+
+        return $result;
+    }
+
     /**
      * @param $flag 0 页面上传 1 本地现有图片上传
      * @Author: 广东七件事 ganxiaohao
@@ -385,7 +447,7 @@ class AttachmentUploadForm extends Model
      * @Note:腾讯云COS
      * @return array|bool
      */
-    public function saveToCos($flag = 0)
+    public function saveToCos($flag = 0, $LocalImage = [])
     {
         $region = $this->cos->region;
         $bucket = $this->cos->bucket;
@@ -410,15 +472,26 @@ class AttachmentUploadForm extends Model
                 $name = basename($this->savePath);
                 $type = "";
             }else{
-                $tempName = $this->file->tempName;
+                if ($LocalImage) {
+                    $tempName = $LocalImage['thumb_url'];
+                    $size = filesize($LocalImage['thumb_link']);
+                } else {
+                    $tempName = $this->file->tempName;
+                    $size = $this->file->size;
+                }
                 $extension = $this->file->getExtension();
-                $size = $this->file->size;
                 $name = $this->file->name;
                 $type = $this->type;
             }
             $result = $client->upload($bucket, $key, fopen($tempName, 'rb'));
             //腾讯云对象存储报错
             if ($result) {
+                if (file_exists($LocalImage['url_link'])) {
+                    unlink($LocalImage['url_link']);
+                }
+                if (file_exists($LocalImage['thumb_link'])) {
+                    unlink($LocalImage['thumb_link']);
+                }
                 $this->url = "http://" . $result['Location'];
                 return ['url' => $this->url, 'extension' => $extension, 'size' => $size, 'thumb_url' => $this->url, 'type' => $type, 'name' => $name];
             }

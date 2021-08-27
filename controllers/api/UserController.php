@@ -210,7 +210,7 @@ class UserController extends ApiController
      */
     public function actionUpload(){
         $admin_id = 1;//\Yii::$app->user->id;前端调用借口走admin账号1
-        $params = $this->requestData;
+        /*$params = $this->requestData;
         if (!isset($params['width']) && !$params['width']) {
             return [
                 'code' => ApiCode::CODE_FAIL,
@@ -222,11 +222,11 @@ class UserController extends ApiController
                 'code' => ApiCode::CODE_FAIL,
                 'data' => '请上传图片高度'
             ];
-        }
+        }*/
         //来源1后台2前台
         $from = 2;
         $result = CommonAttachment::addAttachmentInfo($from,$this->mall_id,$admin_id);
-        if ($result && $result['code'] === 0) {
+        /*if ($result && $result['code'] === 0) {
             list($width, $height) = getimagesize($result['data']['thumb_url']);
             if ($width + $height > $params['width'] + $params['height']) {
                 return [
@@ -234,7 +234,7 @@ class UserController extends ApiController
                     'data' => '请上传小于'. $params['width'] . '*' . $params['height'] . '的图片'
                 ];
             }
-        }
+        }*/
         return $result;
     }
 

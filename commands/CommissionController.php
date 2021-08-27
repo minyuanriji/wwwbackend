@@ -13,10 +13,10 @@ class CommissionController extends BaseCommandController{
 
     const ERR_CODE_NOT_FOUND_PARENTS = 50001;
 
-    /*public function  actionRegionGoods ()
+    public function  actionRegionGoods ()
     {
         (new RegionGoodsAction(null,null))->run();
-    }*/
+    }
 
     public function actions(){
         return [

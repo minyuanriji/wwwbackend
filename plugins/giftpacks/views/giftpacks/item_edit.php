@@ -108,6 +108,11 @@
                 <el-form-item label="到期时间" v-if="!no_expire">
                     <el-date-picker v-model="formData.expired_at" type="date" placeholder="选择日期"></el-date-picker>
                 </el-form-item>
+                <el-form-item label="时限" v-if="!no_expire">
+                    <el-input style="width:150px" v-model="formData.limit_time">
+                        <template slot="append">天</template>
+                    </el-input>
+                </el-form-item>
 
             </div>
 
@@ -131,7 +136,7 @@
             btnLoading: false,
             no_limit: false,
             no_expire: false,
-            formData: {goods_id:0},
+            formData: {goods_id:0, limit_time:0},
             rules: {
                 name: [
                     {required: true, message: '商品名称不能为空', trigger: 'change'}
@@ -222,6 +227,7 @@
                         store_name   : '',
                         goods_price  : 0,
                         goods_id     : 0,
+                        limit_time   : 0,
                         expired_at   : '',
                         max_stock    : 0,
                         usable_times : 1

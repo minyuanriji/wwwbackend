@@ -96,6 +96,7 @@ class Integral extends BaseActiveRecord
      * @return void
      */
     public static function addIntegralPlan($user_id,$integral_setting,$desc='',$ctype=0,$parentid=0){
+
         try{
             $model = new self();
             $model->loadDefaultValues();

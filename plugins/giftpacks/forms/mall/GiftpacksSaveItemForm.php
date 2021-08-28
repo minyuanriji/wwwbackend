@@ -19,11 +19,13 @@ class GiftpacksSaveItemForm extends BaseModel{
     public $expired_at;
     public $max_stock;
     public $usable_times;
+    public $limit_time;
 
     public function rules(){
         return [
             [['name', 'cover_pic', 'item_price', 'pack_id', 'store_id',
-              'goods_id', 'expired_at', 'max_stock', 'usable_times'], 'required']
+              'goods_id', 'expired_at', 'max_stock', 'usable_times'], 'required'],
+            [['limit_time'], 'safe']
         ];
     }
 
@@ -63,14 +65,15 @@ class GiftpacksSaveItemForm extends BaseModel{
                 throw new \Exception("总结算价不能大于大礼包价：" . $giftpacks->price);
             }
 
-            $item->name       = $this->name;
-            $item->cover_pic  = $this->cover_pic;
-            $item->item_price = $this->item_price;
-            $item->created_at = time();
-            $item->updated_at = time();
-            $item->expired_at = !empty($this->expired_at) ? strtotime($this->expired_at) : 0;
-            $item->max_stock  = (int)$this->max_stock;
+            $item->name         = $this->name;
+            $item->cover_pic    = $this->cover_pic;
+            $item->item_price   = $this->item_price;
+            $item->created_at   = time();
+            $item->updated_at   = time();
+            $item->expired_at   = !empty($this->expired_at) ? strtotime($this->expired_at) : 0;
+            $item->max_stock    = (int)$this->max_stock;
             $item->usable_times = (int)$this->usable_times;
+            $item->limit_time   = (int)$this->limit_time;
 
             if(!$item->save()){
                 throw new \Exception($this->responseErrorMsg($item));

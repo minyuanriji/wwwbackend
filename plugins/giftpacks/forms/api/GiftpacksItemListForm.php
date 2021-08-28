@@ -73,7 +73,14 @@ class GiftpacksItemListForm extends BaseModel{
                         $infos[] = "不限次数";
                     }
                     if($item['expired_at'] > 0){
-                        $infos[] = date("Y-m-d", $item['expired_at']) . "到期";
+                        $expireTime = $item['expired_at'];
+                        if($item['limit_time'] > 0){
+                            $endTime = strtotime(date("Y-m-d 00:00:00")) + intval($item['limit_time']) * 3600 * 24;
+                            if($endTime < $expireTime){
+                                $expireTime = $endTime;
+                            }
+                        }
+                        $infos[] = "下单后" . date("Y-m-d", $expireTime) . "失效";
                     }else{
                         $infos[] = "永久有效";
                     }

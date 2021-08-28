@@ -5,33 +5,33 @@ echo $this->render("com-ali-selects");
 <template id="com-edit">
     <div class="com-edit">
 
-        <com-ali-selects></com-ali-selects>
+        <com-ali-selects @confirm="aliDialogConfirm" @close="aliDialogClose" :visible="aliDialogVisisble"></com-ali-selects>
 
-        <el-dialog title="编辑商品" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
+        <el-dialog v-if="!aliDialogVisisble" title="编辑商品" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
             <el-form :rules="rules" ref="formData" label-width="20%" :model="formData" size="small">
                 <el-tabs v-model="activeName">
                     <el-tab-pane label="基本信息" name="first">
-                        <el-form-item :label="formData.gift_price == 'ali' ? '淘宝联盟' : '京东联盟'">
+                        <el-form-item :label="formData.ali_type == 'ali' ? '淘宝联盟' : '京东联盟'">
                             <el-card class="box-card">
                                 <el-row type="flex">
                                     <el-col :span="4">
                                         <com-image mode="aspectFill" width='80px' height='80px' :src="formData.ali_other_data.image"></com-image>
                                     </el-col>
-                                    <el-col :span="14">
-                                        <div>{{formData.ali_other_data.title}}</div>
-                                        <div>唯一编号：<span>{{formData.ali_unique_id}}</span></div>
-                                        <div>礼金面额：<span style="color:indianred">{{formData.gift_price}}元</span></div>
-                                    </el-col>
+                                    <el-col :span="14">{{formData.ali_other_data.title}}</el-col>
                                     <el-col :span="6" >
                                         <div style="display:flex;display:-webkit-flex;justify-content:center;align-items:center;height:100%;">
-                                            <el-link type="primary" icon="el-icon-edit" style="font-size:16px;">
+                                            <el-link @click="aliDialogOpen" type="primary" icon="el-icon-edit" style="font-size:16px;">
                                                 设置
                                             </el-link>
                                         </div>
                                     </el-col>
                                 </el-row>
+                                <div class="ali-info">
+                                    <span>ID：{{formData.ali_unique_id}}</span>
+                                    <span style="color:darkred">一口价：{{formData.price}}</span>
+                                    <span style="color:royalblue">佣金比：{{formData.ali_rate}}%</span>
+                                </div>
                             </el-card>
-
                         </el-form-item>
 
                         <el-form-item label="商品名称" prop="name">
@@ -94,13 +94,13 @@ echo $this->render("com-ali-selects");
                             <el-link class="box-grow-0" type="primary" style="font-size:12px" v-if='formData.video_url' :underline="false" target="_blank" :href="formData.video_url">视频链接
                             </el-link>
                         </el-form-item>
-                        <el-form-item label="商品价格" prop="price">
-                            <el-input v-model="formData.price" style="width:60%;">
+                        <el-form-item label="红包最大抵扣" prop="deduct_integral">
+                            <el-input v-model="formData.deduct_integral" style="width:60%;">
                                 <template slot="append">元</template>
                             </el-input>
                         </el-form-item>
-                        <el-form-item label="红包最大抵扣" prop="deduct_integral">
-                            <el-input v-model="formData.deduct_integral" style="width:60%;">
+                        <el-form-item label="礼金面额" prop="gift_price">
+                            <el-input v-model="formData.gift_price" style="width:60%;">
                                 <template slot="append">元</template>
                             </el-input>
                         </el-form-item>
@@ -115,7 +115,7 @@ echo $this->render("com-ali-selects");
                 </el-tabs>
             </el-form>
             <div slot="footer" style="text-align:center;padding-bottom:50px">
-                <el-button type="primary" style="margin-right:15px;">保存提交</el-button>
+                <el-button :loading="btnLoading"  @click="save" type="primary" style="margin-right:15px;">保存提交</el-button>
                 <el-button type="default" @click="close" style="margin-left:15px;">取消关闭</el-button>
             </div>
         </el-dialog>
@@ -124,6 +124,7 @@ echo $this->render("com-ali-selects");
 <script>
     function initFormData(){
         return {
+            id:0,
             name: "",
             deduct_integral: 0.00,
             price: 0.00,
@@ -136,6 +137,7 @@ echo $this->render("com-ali-selects");
             gift_price: 0.00,
             ali_type: '',
             ali_unique_id: '',
+            ali_rate: 0.00,
             ali_other_data: {image:'', title: ''}
         };
     }
@@ -148,6 +150,7 @@ echo $this->render("com-ali-selects");
         },
         data() {
             return {
+                aliDialogVisisble: false,
                 dialogTitle: "编辑商品",
                 activeName: "first",
                 dialogVisible: false,
@@ -159,8 +162,8 @@ echo $this->render("com-ali-selects");
                     deduct_integral: [
                         {required: true, message: '抵扣红包不能为空', trigger: 'change'},
                     ],
-                    price: [
-                        {required: true, message: '商品价格不能为空', trigger: 'change'},
+                    gift_price: [
+                        {required: true, message: '礼金面额不能为空', trigger: 'change'},
                     ],
                     cover_pic: [
                         {required: true, message: '封面不能为空', trigger: 'change'}
@@ -168,23 +171,60 @@ echo $this->render("com-ali-selects");
                     unit: [
                         {required: true, message: '单位不能为空', trigger: 'change'}
                     ],
-                }
+                },
+                btnLoading: false
             };
         },
         created() {
 
         },
+
         watch: {
             visible(val, oldVal){
                 this.dialogVisible = val;
             },
             goodsInfo(val, oldVal){
-                this.formData = Object.assign(this.formData, val);
+                if(typeof val['id'] == "undefined" || parseInt(val.id) <= 0){
+                    this.formData = initFormData();
+                }else{
+                    this.formData = Object.assign(this.formData, val);
+                }
+                if(this.formData.ali_unique_id == ''){
+                    this.aliDialogOpen();
+                }
             },
         },
         methods: {
-            close(){
-                this.$emit('close');
+            //选择联盟商品
+            aliDialogOpen(){
+                this.aliDialogVisisble = true;
+            },
+            //确认选择联盟商品
+            aliDialogConfirm(tab, data){
+                this.aliDialogVisisble = false;
+                this.formData.ali_type = tab;
+                if(tab == "ali"){
+                    this.formData.ali_unique_id = data.item_id;
+                    this.formData.ali_rate = data.commission_rate;
+                    this.formData.ali_other_data = {
+                        image: data.pict_url,
+                        title: data.title,
+                        origin: data
+                    }
+                    this.formData.name      = data.title;
+                    this.formData.cover_pic = data.pict_url;
+                    this.formData.price     = data.reserve_price;
+                    this.formData.pic_url   = [];
+                    var small_images = data.small_images['string'];
+                    for(var i=0; i < small_images.length; i++){
+                        this.formData.pic_url.push({pic_url: small_images[i]});
+                    }
+                }
+
+            },
+            //关闭联盟商品选择框
+            aliDialogClose(){
+                this.aliDialogVisisble = false;
             },
             // 商品轮播图
             picUrl(e) {
@@ -214,10 +254,51 @@ echo $this->render("com-ali-selects");
                     this.formData.video_url = e[0].url;
                 }
             },
+            save(){
+                this.btnLoading = true;
+                let that = this;
+                this.$refs['formData'].validate((valid) => {
+                    if (valid) {
+                        request({
+                            params: {
+                                r: 'plugin/taolijin/mall/goods/edit'
+                            },
+                            method: 'post',
+                            data: that.formData
+                        }).then(e => {
+                            that.btnLoading = false;
+                            if (e.data.code == 0) {
+                                that.$message.success(e.data.msg);
+                                that.update();
+                            } else {
+                                that.$message.error(e.data.msg);
+                            }
+                        }).catch(e => {
+                            that.$message.error(e.data.msg);
+                            that.btnLoading = false;
+                        });
+                    }
+                });
+            },
+            close(){
+                this.$emit('close');
+            },
+            update(){
+                this.$emit('update');
+            }
         }
     });
 </script>
 <style>
+.ali-info{
+    margin-top:10px;
+    height:100%;
+    display: -webkit-flex; /* Safari */
+    display: flex;
+    justify-content:flex-start
+}
+.ali-info > span:first-child{border-left:none;padding-left:0px;}
+.ali-info > span{border-left:1px solid #ddd;padding-left:10px;padding-right:10px;}
 .com-edit .add-image-btn {
     width: 100px;
     height: 100px;

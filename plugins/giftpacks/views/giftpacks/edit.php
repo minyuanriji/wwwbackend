@@ -68,7 +68,9 @@
                         </el-switch>
                     </el-form-item>
                     <el-form-item label="数量" prop="integral_give_num" v-if="formData.integral_enable">
-                        <el-input type="number" style="width:150px" v-model="formData.integral_give_num"></el-input>
+                        <el-input type="number" style="width:250px" v-model="formData.integral_give_num">
+                            <template slot="append">红包券</template>
+                        </el-input>
                     </el-form-item>
                     <el-form-item label="返积分" prop="score_enable">
                         <el-switch
@@ -76,9 +78,28 @@
                                 active-text="启用"
                                 inactive-text="关闭">
                         </el-switch>
-                    </el-form-item>
-                    <el-form-item label="数量" prop="score_give_num" v-if="formData.score_enable">
-                        <el-input type="number" style="width:150px" v-model="formData.score_give_num"></el-input>
+                        <div v-if="formData.score_enable">
+                            <el-switch v-model="formData.score_give_settings.is_permanent" :active-value="1" :inactive-value="0" active-text="永久有效" inactive-text="限时有效"></el-switch>
+
+                            <div style="margin-top:10px;width:250px">
+                                <el-input type="number" :min="0" v-model="formData.score_give_settings.integral_num" placeholder="">
+                                    <template slot="append">积分券</template>
+                                </el-input>
+                            </div>
+
+                            <div v-if="!formData.score_give_settings.is_permanent">
+                                <div style="margin-top:10px;width:250px">
+                                    <el-input type="number" :min="0" v-model="formData.score_give_settings.period" placeholder="">
+                                        <template slot="append">月</template>
+                                    </el-input>
+                                </div>
+                                <div style="margin-top:10px;width:250px">
+                                    <el-input type="number" v-model="formData.score_give_settings.expire" placeholder="" >
+                                        <template slot="append">有效期(天)</template>
+                                    </el-input>
+                                </div>
+                            </div>
+                        </div>
                     </el-form-item>
                 </el-card>
             </el-form-item>
@@ -131,7 +152,13 @@
             integral_enable: false,
             integral_give_num: 0,
             score_enable: false,
-            score_give_num: 0
+            score_give_settings: {
+                is_permanent: 0,
+                integral_num: 0,
+                period: 1,
+                period_unit: "month",
+                expire: 30
+            }
         };
     }
     const editApp = new Vue({
@@ -181,7 +208,7 @@
                     var groupEnable = row.group_enable == 1 ? true : false;
                     var integralEnable = row.integral_enable == 1 ? true : false;
                     var scoreEnable = row.score_enable == 1 ? true : false;
-                    this.formData = row;
+                    this.formData = Object.assign(initFormData(), row);
                     this.formData['group_enable']    = groupEnable;
                     this.formData['integral_enable'] = integralEnable;
                     this.formData['score_enable']    = scoreEnable;

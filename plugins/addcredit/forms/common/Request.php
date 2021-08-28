@@ -21,7 +21,7 @@ class Request
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
             curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+//            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 
@@ -30,7 +30,7 @@ class Request
             $error = curl_error($ch);
 
             if (!empty($error)) {
-                throw new \Exception($error, ApiCode::CODE_FAIL);
+                throw new \Exception($error);
             }
 
             return $result;

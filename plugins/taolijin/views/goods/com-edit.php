@@ -1,5 +1,6 @@
 <?php
 echo $this->render("com-ali-selects");
+Yii::$app->loadComponentView('com-rich-text');
 ?>
 
 <template id="com-edit">
@@ -111,7 +112,9 @@ echo $this->render("com-ali-selects");
                             <el-switch active-value="1" inactive-value="0" v-model="formData.status"></el-switch>
                         </el-form-item>
                     </el-tab-pane>
-                    <el-tab-pane label="详情" name="second">配置管理</el-tab-pane>
+                    <el-tab-pane label="详情" name="second">
+                        <com-rich-text v-model="formData.detail"></com-rich-text>
+                    </el-tab-pane>
                 </el-tabs>
             </el-form>
             <div slot="footer" style="text-align:center;padding-bottom:50px">

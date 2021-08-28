@@ -17,6 +17,7 @@ use app\plugins\diy\forms\mall\PosterForm;
 use app\plugins\diy\forms\mall\SyncTemplateTypeForm;
 use app\plugins\diy\forms\mall\TemplateEditForm;
 use app\plugins\diy\forms\mall\TemplateForm;
+use yii\base\BaseObject;
 
 class TemplateController extends Controller
 {
@@ -26,6 +27,17 @@ class TemplateController extends Controller
             $form = new TemplateForm();
             $form->attributes = \Yii::$app->request->get();
             return $this->asJson($form->search());
+        } else {
+            return $this->render('index');
+        }
+    }
+
+    public function actionSelectTemplate()
+    {
+        if (\Yii::$app->request->isAjax) {
+            $form = new TemplateForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->searchTemp());
         } else {
             return $this->render('index');
         }

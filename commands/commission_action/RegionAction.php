@@ -60,9 +60,8 @@ class RegionAction extends Action
 
             try {
                 //获取符合当前门店区域的用户
-                $region_user = $this->getRegion($checkoutOrder['mall_id'], $checkoutOrder['province_id'], $checkoutOrder['city_id'], $checkoutOrder['district_id']);
+                $region_user = $this->controller->getRegion($checkoutOrder['mall_id'], $checkoutOrder['province_id'], $checkoutOrder['city_id'], $checkoutOrder['district_id']);
                 if (!$region_user) {
-//                    $this->controller->commandOut('没有符合当前门店区域的用户');
                     continue;
                 }
 
@@ -84,7 +83,6 @@ class RegionAction extends Action
                     } else if ($value['level'] == 2) {
                         $rule_data_json['commisson_value'] = $newAreaSetting['district_price']['value'];
                     } else {
-//                        $this->controller->commandOut('该区域暂无分佣');
                         continue;
                     }
                     $price = (floatval($rule_data_json['commisson_value']) / 100) * floatval($rule_data_json['profit_price']);
@@ -125,7 +123,7 @@ class RegionAction extends Action
                                     'desc' => "来自店铺“" . $checkoutOrder['name'] . "”的区域分红记录[ID:" . $priceLog->id . "]",
                                     'flag' => 1, //到账
                                     'source_id' => $priceLog->id,
-                                    'source_type' => 'region',
+                                    'source_type' => 'region_checkout',
                                     'created_at' => time(),
                                     'updated_at' => time()
                                 ]);
@@ -158,30 +156,5 @@ class RegionAction extends Action
         }
 
         return true;
-    }
-
-    public function getRegion ($mall_id, $province_id, $city_id, $district_id)
-    {
-        $AreaAgent = AreaAgent::find()->where(['mall_id' => $mall_id, 'is_delete' => 0])
-            ->andWhere([
-                'or',
-                [
-                    'and',
-                    ['province_id' => $province_id],
-                    ['level' => 4],
-                ],
-                [
-                    'and',
-                    ['city_id' => $city_id],
-                    ['level' => 3],
-                ],
-                [
-                    'and',
-                    ['district_id' => $district_id],
-                    ['level' => 2],
-                ],
-            ])->orderBy('level DESC')->asArray()->all();
-
-        return $AreaAgent;
     }
 }

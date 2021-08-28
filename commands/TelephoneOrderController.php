@@ -19,6 +19,8 @@ class TelephoneOrderController extends BaseCommandController
 
     public function actionMaintantJob()
     {
+        $this->orderQuery();
+die;
         $this->mutiKill();
 
         echo date("Y-m-d H:i:s") . " 话费订单查询中...\n";
@@ -52,10 +54,10 @@ class TelephoneOrderController extends BaseCommandController
             try {
                 $query_res = $plate_form->query($item);
                 if (!$query_res) {
-                    throw new \Exception('未知错误！', ApiCode::CODE_FAIL);
+                    throw new \Exception('未知错误！');
                 }
                 if ($query_res->code != QueryResult::CODE_SUCC) {
-                    throw new \Exception($query_res->message, ApiCode::CODE_FAIL);
+                    throw new \Exception($query_res->message);
                 }
                 $response_content = json_decode($query_res->response_content,true);
                 try {
@@ -69,12 +71,12 @@ class TelephoneOrderController extends BaseCommandController
                                 $item->plateform_request_data = $query_res->request_data;
                                 $item->plateform_response_data = $query_res->response_content;
                                 if (!$item->save()) {
-                                    throw new \Exception("话费订单失败：" . json_encode($item->getErrors()), ApiCode::CODE_FAIL);
+                                    throw new \Exception("话费订单失败：" . json_encode($item->getErrors()));
                                 }
                             }
                             break;
                         case one_Code::PAY_STATUS_FAIL:
-                            if ($response_content['arrival'] == one_Code::COMPLETE_STATUS_REFUNDED) {
+                            if ($response_content['arrival'] == one_Code::COMPLETE_STATUS_REFUNDED || $response_content['arrival'] == one_Code::COMPLETE_STATUS_NON_ARRIVAL) {
                                 $transaction = \Yii::$app->db->beginTransaction();
                                 try {
                                     $item->pay_status = AddcreditOrder::PAY_TYPE_REFUND;
@@ -82,46 +84,31 @@ class TelephoneOrderController extends BaseCommandController
                                     $item->plateform_request_data = $query_res->request_data;
                                     $item->plateform_response_data = $query_res->response_content;
                                     if (!$item->save()) {
-                                        throw new \Exception("话费订单失败：" . json_encode($item->getErrors()), ApiCode::CODE_FAIL);
+                                        throw new \Exception("话费订单失败：" . json_encode($item->getErrors()));
                                     }
                                     $PhoneOrderRefundForm = new PhoneOrderRefundForm();
                                     $refund_res = $PhoneOrderRefundForm->save($item->mall_id, $item->id, $item->integral_deduction_price);
                                     if (isset($refund_res['code']) && $refund_res['code']) {
-                                        throw new \Exception($refund_res['msg'], ApiCode::CODE_FAIL);
+                                        throw new \Exception($refund_res['msg']);
                                     }
 
                                     //用户
                                     $user = User::findOne($item->user_id);
                                     if (!$user || $user->is_delete) {
-                                        throw new \Exception("无法获取用户信息", ApiCode::CODE_FAIL);
+                                        throw new \Exception("无法获取用户信息");
                                     }
 
                                     //返还红包
                                     $res = UserIntegralForm::PhoneBillOrderRefundAdd($user, $item->integral_deduction_price, $item->id);
                                     if ($res['code'] != ApiCode::CODE_SUCCESS) {
-                                        throw new \Exception("红包返还失败：" . $res['msg'], ApiCode::CODE_FAIL);
+                                        throw new \Exception("红包返还失败：" . $res['msg']);
                                     }
                                     $transaction->commit();
                                 } catch (\Exception $exception) {
                                     $transaction->rollBack();
                                     \Yii::error($exception->getLine().";file:".$exception->getFile());
-                                    throw new \Exception($exception->getMessage(), ApiCode::CODE_FAIL);
+                                    throw new \Exception($exception->getMessage());
                                 }
-                            }
-                            break;
-                        case one_Code::PAY_STATUS_UNPAID:
-                            //再次下单
-                            $plateform = AddcreditPlateforms::findOne($item->plateform_id);
-                            if (!$plateform) {
-                                throw new \Exception("无法获取平台信息", ApiCode::CODE_FAIL);
-                            }
-                            $plate_form = new one_PlateForm();
-                            $submit_res = $plate_form->submit($item, $plateform);
-                            if (!$submit_res) {
-                                throw new \Exception('未知错误！', ApiCode::CODE_FAIL);
-                            }
-                            if ($submit_res->code != ApiCode::CODE_SUCCESS) {
-                                throw new \Exception($submit_res->message, ApiCode::CODE_FAIL);
                             }
                             break;
                         default:
@@ -155,10 +142,10 @@ class TelephoneOrderController extends BaseCommandController
             try {
                 $query_res = $plate_form->query($item);
                 if (!$query_res) {
-                    throw new \Exception('未知错误！', ApiCode::CODE_FAIL);
+                    throw new \Exception('未知错误！');
                 }
                 if ($query_res->code != QueryResult::CODE_SUCC) {
-                    throw new \Exception($query_res->message, ApiCode::CODE_FAIL);
+                    throw new \Exception($query_res->message);
                 }
                 $response_content = json_decode($query_res->response_content);
                 try {
@@ -171,7 +158,7 @@ class TelephoneOrderController extends BaseCommandController
                             $item->plateform_request_data = $query_res->request_data;
                             $item->plateform_response_data = $query_res->response_content;
                             if (!$item->save()) {
-                                throw new \Exception("话费订单失败：" . json_encode($item->getErrors()), ApiCode::CODE_FAIL);
+                                throw new \Exception("话费订单失败：" . json_encode($item->getErrors()));
                             }
                             break;
                         case two_Code::QUERY_FAIL || two_Code::QUERY_REFUND:
@@ -182,47 +169,45 @@ class TelephoneOrderController extends BaseCommandController
                                 $item->plateform_request_data = $query_res->request_data;
                                 $item->plateform_response_data = $query_res->response_content;
                                 if (!$item->save()) {
-                                    throw new \Exception("话费订单失败：" . json_encode($item->getErrors()), ApiCode::CODE_FAIL);
+                                    throw new \Exception("话费订单失败：" . json_encode($item->getErrors()));
                                 }
                                 $PhoneOrderRefundForm = new PhoneOrderRefundForm();
                                 $refund_res = $PhoneOrderRefundForm->save($item->mall_id, $item->id, $item->integral_deduction_price);
                                 if (isset($refund_res['code']) && $refund_res['code']) {
-                                    throw new \Exception($refund_res['msg'], ApiCode::CODE_FAIL);
+                                    throw new \Exception($refund_res['msg']);
                                 }
 
                                 //用户
                                 $user = User::findOne($item->user_id);
                                 if (!$user || $user->is_delete) {
-                                    throw new \Exception("无法获取用户信息", ApiCode::CODE_FAIL);
+                                    throw new \Exception("无法获取用户信息");
                                 }
 
                                 //返还红包
                                 $res = UserIntegralForm::PhoneBillOrderRefundAdd($user, $item->integral_deduction_price, $item->id);
                                 if ($res['code'] != ApiCode::CODE_SUCCESS) {
-                                    throw new \Exception("红包返还失败：" . $res['msg'], ApiCode::CODE_FAIL);
+                                    throw new \Exception("红包返还失败：" . $res['msg']);
                                 }
                                 $transaction->commit();
                             } catch (\Exception $exception) {
                                 $transaction->rollBack();
                                 \Yii::error($exception->getLine().";file:".$exception->getFile());
-                                throw new \Exception($exception->getMessage(), ApiCode::CODE_FAIL);
+                                throw new \Exception($exception->getMessage());
                             }
                             break;
-//                        case Code::QUERY_FREQUENTLY:
-//                            throw new \Exception(Msg::QueryMsg()[$response_content->nRtn], ApiCode::CODE_FAIL);
                         case two_Code::QUERY_ORDER_EMPTY:
                             //再次下单
                             $plateform = AddcreditPlateforms::findOne($item->plateform_id);
                             if (!$plateform) {
-                                throw new \Exception("无法获取平台信息", ApiCode::CODE_FAIL);
+                                throw new \Exception("无法获取平台信息");
                             }
                             $plate_form = new two_PlateForm();
                             $submit_res = $plate_form->submit($item, $plateform);
                             if (!$submit_res) {
-                                throw new \Exception('未知错误！', ApiCode::CODE_FAIL);
+                                throw new \Exception('未知错误！');
                             }
                             if ($submit_res->code != ApiCode::CODE_SUCCESS) {
-                                throw new \Exception($submit_res->message, ApiCode::CODE_FAIL);
+                                throw new \Exception($submit_res->message);
                             }
                             break;
                         default:

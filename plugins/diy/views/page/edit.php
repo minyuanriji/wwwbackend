@@ -1,14 +1,3 @@
-<?php
-
-/**
- * Created by IntelliJ IDEA.
- * User: luwei
- * Date: 2019/4/23
- * Time: 15:14
- */
-
-/* @var $this \yii\web\View */
-?>
 <style>
     .table-body {
         padding: 20px;
@@ -213,7 +202,7 @@
                 this.template.loading = true;
                 this.$request({
                     params: {
-                        r: 'plugin/diy/mall/template/index',
+                        r: 'plugin/diy/mall/template/select-template',
                         page: this.template.page,
                     },
                 }).then(response => {

@@ -172,27 +172,6 @@ class TemplateForm extends BaseModel
 
     public function search()
     {
-        if (!$this->validate()) {
-            return $this->getErrorResponse();
-        }
-        $diy_template = DiyTemplate::find()
-            ->select('id,name')
-            ->where(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id])
-            ->orderBy('id DESC')
-            ->page($pagination, 10)
-            ->asArray()
-            ->all();
-
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'msg' => '请求成功',
-            'data' => [
-                'list' => $diy_template,
-                'pagination' => $pagination
-            ]
-        ];
-
-
         $query = DiyPage::find()->alias('p')->select('p.*')->where([
             'p.mall_id' => \Yii::$app->mall->id,
             'p.is_delete' => 0,
@@ -223,7 +202,7 @@ class TemplateForm extends BaseModel
                 'id' => $template['id'],
                 'name' => $template['title'],
                 'is_home_page' => $template['is_home_page'],
-                'created_at' => $template['created_at'],
+                'created_at' => date('Y-m-d H:i:s', $template['created_at']),
                 'userCount' => count($diyAccessLog[$template['id']]['userIds'] ?? []),
                 'accessCount' => $diyAccessLog[$template['id']]['accessCount'] ?? 0,
                 //'goodsCount' => $goodsCount,
@@ -240,6 +219,28 @@ class TemplateForm extends BaseModel
         ];
     }
 
+    public function searchTemp()
+    {
+        if (!$this->validate()) {
+            return $this->getErrorResponse();
+        }
+        $diy_template = DiyTemplate::find()
+            ->select('id,name')
+            ->where(['is_delete' => 0, 'mall_id' => \Yii::$app->mall->id])
+            ->orderBy('id DESC')
+            ->page($pagination, 10)
+            ->asArray()
+            ->all();
+
+        return [
+            'code' => ApiCode::CODE_SUCCESS,
+            'msg' => '请求成功',
+            'data' => [
+                'list' => $diy_template,
+                'pagination' => $pagination
+            ]
+        ];
+    }
 
     public function destroy($id)
     {

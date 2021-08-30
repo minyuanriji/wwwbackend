@@ -51,6 +51,10 @@ class GiftpacksListForm extends BaseModel{
                     "expire"       => 30
                 ];
                 foreach($list as &$item){
+                    $item['pic_url'] = !empty($item['pic_url']) ? @json_decode($item['pic_url'], true) : [];
+                    if(!is_array($item['pic_url'])){
+                        $item['pic_url'] = [];
+                    }
                     $item['expired_at'] = date("Y-m-d H:i:s", $item['expired_at']);
                     $item['group_expire_time'] = (int)($item['group_expire_time']/3600);
                     $item['score_give_settings'] = array_merge($scoreGiveSettings,

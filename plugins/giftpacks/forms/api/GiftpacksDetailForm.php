@@ -114,6 +114,10 @@ class GiftpacksDetailForm extends BaseModel{
         $detail['item_count']          = static::getItemCount($giftpacks);
         $detail['sold_num']            = static::soldNum($giftpacks);
 
+        $detail['pic_url']             = !empty($giftpacks->pic_url) ? json_decode($giftpacks->pic_url, true) : [];
+        $detail['detail']              = $giftpacks->detail;
+
+
         return $detail;
     }
 

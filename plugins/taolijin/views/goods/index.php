@@ -43,7 +43,8 @@ echo $this->render("com-edit");
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="price" width="110" label="价格"></el-table-column>
+                    <el-table-column prop="price" width="110" label="一口价"></el-table-column>
+                    <el-table-column prop="ali_rate" width="110" label="佣金比（%）"></el-table-column>
                     <el-table-column prop="deduct_integral" width="110" label="抵扣红包"></el-table-column>
                     <el-table-column width="110" label="状态（上下架）">
                         <template slot-scope="scope">
@@ -73,7 +74,7 @@ echo $this->render("com-edit");
                                     <img src="statics/img/mall/edit.png" alt="">
                                 </el-tooltip>
                             </el-button>
-                            <el-button @click="" type="text" circle size="mini">
+                            <el-button @click="deleteOn(scope.row)" type="text" circle size="mini">
                                 <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                     <img src="statics/img/mall/del.png" alt="">
                                 </el-tooltip>
@@ -97,7 +98,7 @@ echo $this->render("com-edit");
             </div>
 
             <div>
-                <el-button style="border:1px solid #ddd;padding: 9px 15px !important;">批量删除</el-button>
+                <el-button @click="batchDeleteOn" style="border:1px solid #ddd;padding: 9px 15px !important;">批量删除</el-button>
             </div>
         </div>
 
@@ -183,6 +184,77 @@ echo $this->render("com-edit");
             update(){
                 this.loadData();
                 this.editDialogVisible = false;
+            },
+            deleteOn(row){
+                let self = this;
+                self.$confirm('删除该条数据, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.loading = true;
+                    request({
+                        params: {
+                            r: 'plugin/taolijin/mall/goods/delete'
+                        },
+                        method: 'post',
+                        data: {
+                            id: row.id,
+                        }
+                    }).then(e => {
+                        self.loading = false;
+                        if (e.data.code === 0) {
+                            self.$message.success(e.data.msg);
+                            self.loadData();
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        self.loading = false;
+                    });
+                }).catch(() => {
+
+                });
+            },
+            batchDeleteOn(){
+
+                if(this.selections.length <= 0){
+                    this.$alert('请选择待删除记录');
+                    return;
+                }
+
+                let self = this, i, idArray = [];
+                for(i=0; i < self.selections.length; i++){
+                    idArray.push(self.selections[i].id);
+                }
+
+                this.$confirm('此操作将删除礼金商品记录，是否继续？', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.loading = true;
+                    request({
+                        params: {
+                            r: 'plugin/taolijin/mall/goods/delete'
+                        },
+                        method: 'post',
+                        data: {
+                            id: idArray.join(",")
+                        }
+                    }).then(e => {
+                        self.loading = false;
+                        if (e.data.code === 0) {
+                            self.loadData();
+                            self.$message.success(e.data.msg);
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        self.loading = false;
+                        self.$message.error("request fail");
+                    });
+                });
             }
         }
     });

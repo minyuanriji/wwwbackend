@@ -60,6 +60,20 @@ class RelationLogic extends BaseLogic
             throw new Exception('绑定的上级用户不存在'.$parent_id);
         }
 
+        $parentLink = UserRelationshipLink::findOne(["user_id" => $parent->id]);
+        if(!$parentLink){
+            throw new Exception('上级关系链异常，ID：' . $parent->id);
+        }
+
+        $userLink = UserRelationshipLink::findOne(["user_id" => $user->id]);
+        if(!$userLink){
+            throw new Exception('用户关系链异常，ID：' . $user->id);
+        }
+
+        if($parentLink->left > $userLink->left && $parentLink->right < $userLink->right){
+            throw new \Exception("上级推荐人不能变更为团队下级，必须是平级和上级");
+        }
+
         /*
         if (!$parent->is_inviter) {
             throw new Exception('绑定的上级用户没有推广资格'.$parent_id);

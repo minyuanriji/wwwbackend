@@ -1,8 +1,11 @@
+<?php
+Yii::$app->loadComponentView('com-rich-text');
+?>
 <div id="edit_app" v-cloak>
 
     <el-dialog :title="dailogTitle" :visible.sync="dialogFormVisible">
 
-        <el-form :rules="rules" ref="formData" label-width="80px" :model="formData" size="small">
+        <el-form :rules="rules" ref="formData" label-width="110px" :model="formData" size="small">
             <el-form-item label="标题" prop="title">
                 <el-input v-model="formData.title"></el-input>
             </el-form-item>
@@ -22,6 +25,36 @@
                     </el-tooltip>
                 </com-attachment>
                 <com-image mode="aspectFill" width='80px' height='80px' :src="formData.cover_pic"></com-image>
+            </el-form-item>
+            <el-form-item prop="pic_url">
+                <template slot="label">
+                    <span>轮播图(多张)</span>
+                </template>
+                <div class="pic-url-remark">
+                    建议像素750*750,可拖拽使其改变顺序，最多支持上传5张
+                </div>
+                <div flex="dir:left">
+                    <template v-if="formData.pic_url.length">
+                        <draggable v-model="formData.pic_url" flex="dif:left">
+                            <div v-for="(item,index) in formData.pic_url" :key="index" style="margin-right: 20px;position: relative;cursor: move;">
+                                <com-attachment @selected="updatePicUrl" :params="{'currentIndex': index}">
+                                    <com-image mode="aspectFill" width="100px" height='100px' :src="item.pic_url">
+                                    </com-image>
+                                </com-attachment>
+                                <el-button class="del-btn" size="mini" type="danger" icon="el-icon-close" circle @click="delPic(index)"></el-button>
+                            </div>
+                        </draggable>
+                    </template>
+                    <template v-if="formData.pic_url.length < 5">
+                        <com-attachment style="margin-bottom: 10px;" :multiple="true" :max="9" @selected="picUrl">
+                            <el-tooltip class="item" effect="dark" content="建议尺寸:750 * 750" placement="top">
+                                <div flex="main:center cross:center" class="add-image-btn">
+                                    + 添加图片
+                                </div>
+                            </el-tooltip>
+                        </com-attachment>
+                    </template>
+                </div>
             </el-form-item>
             <el-row>
                 <el-col :span="12">
@@ -125,6 +158,9 @@
                 </el-card>
             </el-form-item>
 
+            <el-form-item label="详情" prop="detail">
+                <com-rich-text v-model="formData.detail" :value="formData.detail"></com-rich-text>
+            </el-form-item>
         </el-form>
 
         <div slot="footer" class="dialog-footer">
@@ -138,6 +174,7 @@
         return {
             title: '',
             cover_pic: '',
+            pic_url: [],
             max_stock: 0,
             expired_at: '',
             price: 0,
@@ -158,7 +195,8 @@
                 period: 1,
                 period_unit: "month",
                 expire: 30
-            }
+            },
+            detail: ''
         };
     }
     const editApp = new Vue({
@@ -180,6 +218,9 @@
                 ],
                 cover_pic: [
                     {required: true, message: '封面不能为空', trigger: 'change'}
+                ],
+                pic_url: [
+                    {required: true, message: '轮播图不能为空', trigger: 'change'}
                 ],
                 max_stock: [
                     {required: true, message: '库存不能为空', trigger: 'change'}
@@ -254,10 +295,57 @@
                     }
                 });
             },
+            // 商品轮播图
+            picUrl(e) {
+                if (e.length) {
+                    let self = this;
+                    e.forEach(function(item, index) {
+                        if (self.formData.pic_url.length >= 5) {
+                            return;
+                        }
+                        self.formData.pic_url.push({
+                            id: item.id,
+                            pic_url: item.url
+                        });
+                    });
+                }
+            },
+            delPic(index) {
+                this.formData.pic_url.splice(index, 1)
+            },
+            updatePicUrl(e, params) {
+                this.formData.pic_url[params.currentIndex].id = e[0].id;
+                this.formData.pic_url[params.currentIndex].pic_url = e[0].url;
+            },
         }
     });
 </script>
 <style>
+    #edit_app .add-image-btn {
+        width: 100px;
+        height: 100px;
+        color: #419EFB;
+        border: 1px solid #e2e2e2;
+        cursor: pointer;
+    }
+    #edit_app .pic-url-remark {
+        font-size: 13px;
+        color: #c9c9c9;
+        margin-bottom: 12px;
+    }
+    #edit_app .add-image-btn {
+        width: 100px;
+        height: 100px;
+        color: #419EFB;
+        border: 1px solid #e2e2e2;
+        cursor: pointer;
+    }
+    #edit_app .del-btn {
+        position: absolute;
+        right: -8px;
+        top: -8px;
+        padding: 4px 4px;
+    }
     .form-body {
         padding: 10px 20px;
         background-color: #fff;

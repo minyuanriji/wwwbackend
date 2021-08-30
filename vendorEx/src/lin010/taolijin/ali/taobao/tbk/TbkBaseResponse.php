@@ -11,7 +11,11 @@ abstract class TbkBaseResponse{
 
     public function __construct($result){
         $this->result = $result;
-        $this->code = isset($result->code) ? $result->code : "";
-        $this->msg = isset($result->msg) ? $result->msg : "";
+        $this->setCode();
+    }
+
+    protected function setCode(){
+        $this->code = isset($this->result->code) ? $this->result->code : "";
+        $this->msg  = isset($this->result->msg) ? $this->result->msg : "";
     }
 }

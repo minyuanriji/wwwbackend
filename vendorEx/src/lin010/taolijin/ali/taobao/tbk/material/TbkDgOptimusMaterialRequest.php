@@ -4,7 +4,8 @@
 namespace lin010\taolijin\ali\taobao\tbk\material;
 
 
-use lin010\taolijin\ali\taobao\tbk\TbkBaseRequest;
+
+use lin010\taolijin\ali\taobao\tbk\abstracts\TbkBaseRequest;
 
 /**
  * 淘宝客-推广者-物料精选

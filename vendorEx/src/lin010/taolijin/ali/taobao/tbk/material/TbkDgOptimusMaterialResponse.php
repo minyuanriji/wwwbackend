@@ -2,9 +2,9 @@
 
 namespace lin010\taolijin\ali\taobao\tbk\material;
 
-use lin010\taolijin\ali\taobao\tbk\TbkBaseResponse;
+use lin010\taolijin\ali\taobao\tbk\abstracts\TbkBaseResponse;
 
-class TbkDgOptimusMaterialResponse extends TbkBaseResponse{
+class TbkDgOptimusMaterialResponse extends TbkBaseResponse {
 
     /**
      * 返回数据列表

@@ -32,6 +32,7 @@ Yii::$app->loadComponentView('com-rich-text');
                                     <span style="color:darkred">一口价：{{formData.price}}</span>
                                     <span style="color:royalblue">佣金比：{{formData.ali_rate}}%</span>
                                 </div>
+                                <div style="font-size:11px;line-height:25px;background:#f1f1f1;padding:5px 5px;margin-top:5px;border:1px solid #eee;">{{formData.ali_url}}</div>
                             </el-card>
                         </el-form-item>
 
@@ -141,7 +142,8 @@ Yii::$app->loadComponentView('com-rich-text');
             ali_type: '',
             ali_unique_id: '',
             ali_rate: 0.00,
-            ali_other_data: {image:'', title: ''}
+            ali_other_data: {image:'', title: ''},
+            ali_url: ''
         };
     }
 
@@ -206,7 +208,8 @@ Yii::$app->loadComponentView('com-rich-text');
             aliDialogConfirm(tab, data){
                 this.aliDialogVisisble = false;
                 this.formData.ali_type = tab;
-                if(tab == "ali"){
+                if(tab == "ali"){ //淘宝联盟
+                    this.formData.ali_url = data.click_url;
                     this.formData.ali_unique_id = data.item_id;
                     this.formData.ali_rate = data.commission_rate;
                     this.formData.ali_other_data = {

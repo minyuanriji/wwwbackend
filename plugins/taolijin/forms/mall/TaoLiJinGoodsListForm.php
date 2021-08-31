@@ -51,7 +51,7 @@ class TaoLiJinGoodsListForm extends BaseModel{
 
             $query->orderBy($orderBy);
 
-            $selects = ["id", "deduct_integral", "price", "status", "name", "cover_pic", "pic_url", "video_url",
+            $selects = ["id", "deduct_integral", "price", "status", "name", "cover_pic", "pic_url", "video_url", "ali_url",
                 "unit", "updated_at", "created_at", "gift_price", "ali_type", "ali_rate", "ali_unique_id", "ali_other_data"
             ];
 

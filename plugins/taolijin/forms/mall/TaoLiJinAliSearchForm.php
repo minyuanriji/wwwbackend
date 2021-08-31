@@ -4,6 +4,7 @@ namespace app\plugins\taolijin\forms\mall;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\plugins\taolijin\forms\common\AliAccForm;
 use lin010\taolijin\Ali;
 
 class TaoLiJinAliSearchForm extends BaseModel {
@@ -25,13 +26,13 @@ class TaoLiJinAliSearchForm extends BaseModel {
 
         try {
 
-            $appKey = "33062416";
-            $secretKey = "a5de1941f9aa0c70101d110128ce0729";
-            $ali = new Ali($appKey, $secretKey);
+            $acc = AliAccForm::get("ali");
+
+            $ali = new Ali($acc->app_key, $acc->secret_key);
             $res = $ali->material->optimusSearch([
                 "page_size"   => "12",
                 "page_no"     => (string)$this->page,
-                "adzone_id"   => "111611450447",
+                "adzone_id"   => $acc->adzone_id,
                 "material_id" => "13366"
             ]);
 

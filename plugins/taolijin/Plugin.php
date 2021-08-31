@@ -30,6 +30,11 @@ class Plugin extends \app\plugins\Plugin
     {
         return [
             [
+                'name' => '联盟设置',
+                'route' => 'plugin/taolijin/mall/ali/list',
+                'icon' => 'el-icon-setting'
+            ],
+            [
                 'name' => '商品管理',
                 'route' => 'plugin/taolijin/mall/goods/list',
                 'icon' => 'el-icon-setting'

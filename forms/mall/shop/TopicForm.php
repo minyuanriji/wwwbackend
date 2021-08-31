@@ -51,7 +51,7 @@ class TopicForm extends BaseModel
         return [
             [['type', 'layout', 'sort', 'read_count', 'agree_count', 'virtual_read_count', 'virtual_agree_count',
                 'virtual_favorite_count', 'is_chosen', 'is_delete', 'id'], 'integer'],
-            [['content', 'app_share_title', 'search', 'abstract'], 'string'],
+            [['content', 'app_share_title', 'search', 'abstracts'], 'string'],
             [['title', 'sub_title', 'cover_pic', 'qrcode_pic'], 'string', 'max' => 255],
             [['is_delete', 'virtual_read_count', 'read_count', 'agree_count', 'virtual_agree_count', 'layout', 'sort',
                 'virtual_favorite_count', 'is_chosen'], 'default', 'value' => 0],
@@ -85,7 +85,7 @@ class TopicForm extends BaseModel
             'qrcode_pic' => '海报图',
             'pic_list' => '多图模式  图片列表',
             'detail' => '新版专题详情',
-            'abstract' => '摘要',
+            'abstracts' => '摘要',
         ];
     }
 

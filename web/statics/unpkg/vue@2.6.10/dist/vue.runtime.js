@@ -3237,7 +3237,7 @@
     data.on = data.nativeOn;
 
     if (isTrue(Ctor.options.abstract)) {
-      // abstract components do not keep anything
+      // abstracts components do not keep anything
       // other than props & listeners & slot
 
       // work around flow
@@ -3894,7 +3894,7 @@
   function initLifecycle (vm) {
     var options = vm.$options;
 
-    // locate first non-abstract parent
+    // locate first non-abstracts parent
     var parent = options.parent;
     if (parent && !options.abstract) {
       while (parent.$options.abstract && parent.$parent) {
@@ -8022,7 +8022,7 @@
     duration: [Number, String, Object]
   };
 
-  // in case the child is also an abstract component, e.g. <keep-alive>
+  // in case the child is also an abstracts component, e.g. <keep-alive>
   // we want to recursively retrieve the real component to be rendered
   function getRealChild (vnode) {
     var compOptions = vnode && vnode.componentOptions;
@@ -8122,7 +8122,7 @@
       }
 
       // apply transition data to child
-      // use getRealChild() to ignore abstract components e.g. keep-alive
+      // use getRealChild() to ignore abstracts components e.g. keep-alive
       var child = getRealChild(rawChild);
       /* istanbul ignore if */
       if (!child) {

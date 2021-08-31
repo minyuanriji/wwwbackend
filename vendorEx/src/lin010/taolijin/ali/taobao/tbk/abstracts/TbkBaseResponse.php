@@ -1,6 +1,6 @@
 <?php
 
-namespace lin010\taolijin\ali\taobao\tbk;
+namespace lin010\taolijin\ali\taobao\tbk\abstracts;
 
 abstract class TbkBaseResponse{
 

@@ -24,13 +24,14 @@ class TaoLiJinGoodsEditForm extends BaseModel {
     public $ali_unique_id;
     public $ali_rate;
     public $ali_other_data;
+    public $ali_url;
 
     public function rules(){
         return [
             [['deduct_integral', 'price', 'name', 'cover_pic', 'unit', 'gift_price', 'ali_type',
               'ali_unique_id', 'ali_rate', 'ali_other_data'], 'required'],
             [['id'], 'integer'],
-            [['status', 'pic_url', 'video_url', 'detail'], 'safe']
+            [['status', 'pic_url', 'video_url', 'detail', 'ali_url'], 'safe']
         ];
     }
 
@@ -64,6 +65,7 @@ class TaoLiJinGoodsEditForm extends BaseModel {
             $goods->ali_unique_id   = $this->ali_unique_id;
             $goods->ali_rate        = $this->ali_rate;
             $goods->ali_other_data  = json_encode($this->ali_other_data);
+            $goods->ali_url         = $this->ali_url;
 
             if(!$goods->save()){
                 throw new \Exception($this->responseErrorMsg($goods));

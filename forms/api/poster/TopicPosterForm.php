@@ -40,7 +40,7 @@ class TopicPosterForm extends GrafikaOption implements BasePoster
             $option['look']['text'] = $read;
         }
 
-        isset($option['content']) && $option['content']['text'] = self::autowrap($option['content']['font'], 0, $this->font_path, $topic['abstract'], 670, 2);
+        isset($option['content']) && $option['content']['text'] = self::autowrap($option['content']['font'], 0, $this->font_path, $topic['abstracts'], 670, 2);
 
         if (isset($option['open_desc'])) {
             $text = imagettfbbox($option['open_desc']['font'], 0, $this->font_path, $option['open_desc']['text']);

@@ -1,16 +1,6 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * 插件核心类
- * Author: zal
- * Date: 2020-04-13
- * Time: 16:50
- */
-
 
 namespace app\plugins;
-
 
 use app\forms\OrderConfig;
 use app\handlers\orderHandler\OrderCanceledHandlerClass;
@@ -114,10 +104,6 @@ abstract class Plugin
     {
     }
 
-
-
-
-
     /**
      * @Author: 广东七件事 ganxiaohao
      * @Date: 2020-05-07
@@ -128,7 +114,6 @@ abstract class Plugin
     {
         return false;
     }
-
 
     /**
      * @Author: 广东七件事 ganxiaohao

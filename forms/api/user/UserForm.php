@@ -334,10 +334,10 @@ class UserForm extends BaseModel
             "open_type" => "navigate"
         ];
 
-        //大礼包订单
+        //本地生活订单
         $userCenter['menus'][] = [
             "icon_url"  => "https://dev.mingyuanriji.cn/web/static/gift_packs.png",
-            "name"      => "大礼包订单",
+            "name"      => "本地生活订单",
             "link_url"  => "/mch/giftbag/orderList/orderList",
             "open_type" => "navigate"
         ];

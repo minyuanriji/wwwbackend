@@ -92,34 +92,25 @@
                 <el-table-column prop="id" label="ID" width="60"></el-table-column>
                 <el-table-column prop="name" width="260" label="商城名称">
                     <template slot-scope="scope">
-                        <!--<el-button v-if="isInd && scope.row.is_disable == '0'"
-                                   @click="toEnter(scope.row)"
-                                   type="text">{{scope.row.name}}
-                        </el-button>
-                        <el-button v-else type="text" :disabled="true">{{scope.row.name}}</el-button>-->
-                        <el-button type="text" :disabled="true" style="background-color: RGB(3,197,255);color: black">商城名称：{{scope.row.name}}</el-button>
                         <div>
-                            <span>归属账号：{{scope.row.admin.username}}</span>
+                            <span style="color: RGB(242,164,48)">{{scope.row.name}}</span>
                         </div>
-
-                        <div>
-                            <span>绑定用户：{{scope.row.user[0] ? scope.row.user[0].username : ''}}</span>
-                        </div>
-
-
                     </template>
                 </el-table-column>
-                <!--<el-table-column prop="site" label="数据统计">
-                    <template slot="header" slot-scope="scope">
-                        <el-tooltip effect="dark" content="数据统计每10分钟刷新一次" placement="top">
-                            <span>数据统计<i class="el-icon-question"></i></span>
-                        </el-tooltip>
-                    </template>
+                <el-table-column width="170" prop="username" label="归属账号">
                     <template slot-scope="scope">
-                        <div>用户数: {{scope.row.count_data.user_count}}</div>
-                        <div>订单数: {{scope.row.count_data.order_count}}</div>
+                        <div>
+                            <span>{{scope.row.admin.username}}</span>
+                        </div>
                     </template>
-                </el-table-column>-->
+                </el-table-column>
+                <el-table-column width="170" prop="nickname" label="绑定用户">
+                    <template slot-scope="scope">
+                        <div>
+                            <span>{{scope.row.user[0] ? scope.row.user[0].nickname : ''}}</span>
+                        </div>
+                    </template>
+                </el-table-column>
                 <el-table-column width="170" prop="expired_at_text" label="有效期"></el-table-column>
                 <el-table-column label="操作" width="380">
                     <template slot-scope="scope">

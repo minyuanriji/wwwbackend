@@ -1,13 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * author: zal
- * Date: 2020-04-09
- * Time: 10:36
- */
-
 Yii::$app->loadComponentView('com-dialog-template');
 ?>
 

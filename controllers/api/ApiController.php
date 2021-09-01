@@ -96,7 +96,7 @@ class ApiController extends BaseController
             $path = dirname(ROOT_PATH) . "/runtime/mp-wx";
             !is_dir($path) && mkdir($path, 0755, true);
             $currentVersion = @file_get_contents("{$path}/{$appId}.version");
-            if(empty($version) || $version != trim($currentVersion)){
+            if((empty($version) || $version != trim($currentVersion))){
                 @file_put_contents("{$path}/{$appId}.debug", json_encode([
                     "version" => $version
                 ]));
@@ -431,8 +431,10 @@ class ApiController extends BaseController
         if (!$user) {
             return $this;
         }
+
         try {
             RelationLogic::bindParent($user, $parentId);
+            static::$commonData['clean_bind_parent'] = 1;
         } catch (\Exception $exception) {
             \Yii::error("apiController bindParent parent_id={$parentId} error ".$exception->getMessage());
             if(\Yii::$app->user->identity->id != $parentId){

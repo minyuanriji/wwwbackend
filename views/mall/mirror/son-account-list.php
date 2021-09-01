@@ -98,7 +98,8 @@
                         width="150px"
                 >
                     <template slot-scope="scope">
-                        <a href="#" style="text-decoration:none; color: #409EFF;" @click="toMallList(scope.row)">{{scope.row.create_app_count}}</a>
+                        {{scope.row.create_app_count}}
+<!--                        <a href="#" style="text-decoration:none; color: #409EFF;" @click="toMallList(scope.row)">{{scope.row.create_app_count}}</a>-->
                     </template>
                 </el-table-column>
                 <el-table-column

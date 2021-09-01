@@ -1,8 +1,11 @@
+<?php
+Yii::$app->loadComponentView('com-rich-text');
+?>
 <div id="edit_app" v-cloak>
 
     <el-dialog :title="dailogTitle" :visible.sync="dialogFormVisible">
 
-        <el-form :rules="rules" ref="formData" label-width="80px" :model="formData" size="small">
+        <el-form :rules="rules" ref="formData" label-width="110px" :model="formData" size="small">
             <el-form-item label="标题" prop="title">
                 <el-input v-model="formData.title"></el-input>
             </el-form-item>
@@ -22,6 +25,36 @@
                     </el-tooltip>
                 </com-attachment>
                 <com-image mode="aspectFill" width='80px' height='80px' :src="formData.cover_pic"></com-image>
+            </el-form-item>
+            <el-form-item prop="pic_url">
+                <template slot="label">
+                    <span>轮播图(多张)</span>
+                </template>
+                <div class="pic-url-remark">
+                    建议像素750*750,可拖拽使其改变顺序，最多支持上传5张
+                </div>
+                <div flex="dir:left">
+                    <template v-if="formData.pic_url.length">
+                        <draggable v-model="formData.pic_url" flex="dif:left">
+                            <div v-for="(item,index) in formData.pic_url" :key="index" style="margin-right: 20px;position: relative;cursor: move;">
+                                <com-attachment @selected="updatePicUrl" :params="{'currentIndex': index}">
+                                    <com-image mode="aspectFill" width="100px" height='100px' :src="item.pic_url">
+                                    </com-image>
+                                </com-attachment>
+                                <el-button class="del-btn" size="mini" type="danger" icon="el-icon-close" circle @click="delPic(index)"></el-button>
+                            </div>
+                        </draggable>
+                    </template>
+                    <template v-if="formData.pic_url.length < 5">
+                        <com-attachment style="margin-bottom: 10px;" :multiple="true" :max="9" @selected="picUrl">
+                            <el-tooltip class="item" effect="dark" content="建议尺寸:750 * 750" placement="top">
+                                <div flex="main:center cross:center" class="add-image-btn">
+                                    + 添加图片
+                                </div>
+                            </el-tooltip>
+                        </com-attachment>
+                    </template>
+                </div>
             </el-form-item>
             <el-row>
                 <el-col :span="12">
@@ -68,7 +101,38 @@
                         </el-switch>
                     </el-form-item>
                     <el-form-item label="数量" prop="integral_give_num" v-if="formData.integral_enable">
-                        <el-input type="number" style="width:150px" v-model="formData.integral_give_num"></el-input>
+                        <el-input type="number" style="width:250px" v-model="formData.integral_give_num">
+                            <template slot="append">红包券</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="返积分" prop="score_enable">
+                        <el-switch
+                                v-model="formData.score_enable"
+                                active-text="启用"
+                                inactive-text="关闭">
+                        </el-switch>
+                        <div v-if="formData.score_enable">
+                            <el-switch v-model="formData.score_give_settings.is_permanent" :active-value="1" :inactive-value="0" active-text="永久有效" inactive-text="限时有效"></el-switch>
+
+                            <div style="margin-top:10px;width:250px">
+                                <el-input type="number" :min="0" v-model="formData.score_give_settings.integral_num" placeholder="">
+                                    <template slot="append">积分券</template>
+                                </el-input>
+                            </div>
+
+                            <div v-if="!formData.score_give_settings.is_permanent">
+                                <div style="margin-top:10px;width:250px">
+                                    <el-input type="number" :min="0" v-model="formData.score_give_settings.period" placeholder="">
+                                        <template slot="append">月</template>
+                                    </el-input>
+                                </div>
+                                <div style="margin-top:10px;width:250px">
+                                    <el-input type="number" v-model="formData.score_give_settings.expire" placeholder="" >
+                                        <template slot="append">有效期(天)</template>
+                                    </el-input>
+                                </div>
+                            </div>
+                        </div>
                     </el-form-item>
                 </el-card>
             </el-form-item>
@@ -94,6 +158,9 @@
                 </el-card>
             </el-form-item>
 
+            <el-form-item label="详情" prop="detail">
+                <com-rich-text v-model="formData.detail" :value="formData.detail"></com-rich-text>
+            </el-form-item>
         </el-form>
 
         <div slot="footer" class="dialog-footer">
@@ -107,6 +174,7 @@
         return {
             title: '',
             cover_pic: '',
+            pic_url: [],
             max_stock: 0,
             expired_at: '',
             price: 0,
@@ -119,7 +187,16 @@
             group_expire_time: '',
             allow_currency: 'money',
             integral_enable: false,
-            integral_give_num: 0
+            integral_give_num: 0,
+            score_enable: false,
+            score_give_settings: {
+                is_permanent: 0,
+                integral_num: 0,
+                period: 1,
+                period_unit: "month",
+                expire: 30
+            },
+            detail: ''
         };
     }
     const editApp = new Vue({
@@ -141,6 +218,9 @@
                 ],
                 cover_pic: [
                     {required: true, message: '封面不能为空', trigger: 'change'}
+                ],
+                pic_url: [
+                    {required: true, message: '轮播图不能为空', trigger: 'change'}
                 ],
                 max_stock: [
                     {required: true, message: '库存不能为空', trigger: 'change'}
@@ -168,9 +248,11 @@
                 if(row != null){
                     var groupEnable = row.group_enable == 1 ? true : false;
                     var integralEnable = row.integral_enable == 1 ? true : false;
-                    this.formData = row;
-                    this.formData['group_enable'] = groupEnable;
+                    var scoreEnable = row.score_enable == 1 ? true : false;
+                    this.formData = Object.assign(initFormData(), row);
+                    this.formData['group_enable']    = groupEnable;
                     this.formData['integral_enable'] = integralEnable;
+                    this.formData['score_enable']    = scoreEnable;
                 }else{
                     this.formData = initFormData();
                 }
@@ -187,6 +269,7 @@
                         formData['integral_enable']   = formData['integral_enable'] ? 1 : 0;
                         formData['group_enable']      = formData['group_enable'] ? 1 : 0;
                         formData['group_expire_time'] = 3600 * formData['group_expire_time'];
+                        formData['score_enable']      = formData['score_enable'] ? 1 : 0;
                         request({
                             params: {
                                 r: 'plugin/giftpacks/mall/giftpacks/edit'
@@ -212,10 +295,57 @@
                     }
                 });
             },
+            // 商品轮播图
+            picUrl(e) {
+                if (e.length) {
+                    let self = this;
+                    e.forEach(function(item, index) {
+                        if (self.formData.pic_url.length >= 5) {
+                            return;
+                        }
+                        self.formData.pic_url.push({
+                            id: item.id,
+                            pic_url: item.url
+                        });
+                    });
+                }
+            },
+            delPic(index) {
+                this.formData.pic_url.splice(index, 1)
+            },
+            updatePicUrl(e, params) {
+                this.formData.pic_url[params.currentIndex].id = e[0].id;
+                this.formData.pic_url[params.currentIndex].pic_url = e[0].url;
+            },
         }
     });
 </script>
 <style>
+    #edit_app .add-image-btn {
+        width: 100px;
+        height: 100px;
+        color: #419EFB;
+        border: 1px solid #e2e2e2;
+        cursor: pointer;
+    }
+    #edit_app .pic-url-remark {
+        font-size: 13px;
+        color: #c9c9c9;
+        margin-bottom: 12px;
+    }
+    #edit_app .add-image-btn {
+        width: 100px;
+        height: 100px;
+        color: #419EFB;
+        border: 1px solid #e2e2e2;
+        cursor: pointer;
+    }
+    #edit_app .del-btn {
+        position: absolute;
+        right: -8px;
+        top: -8px;
+        padding: 4px 4px;
+    }
     .form-body {
         padding: 10px 20px;
         background-color: #fff;

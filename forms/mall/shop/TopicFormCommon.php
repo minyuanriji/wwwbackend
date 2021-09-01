@@ -68,7 +68,7 @@ class TopicFormCommon extends BaseModel
                 'read_count' => ($readCount > 10000 ? intval($readCount / 10000) . '万+' : $readCount)  . '人浏览',
                 'layout' => $topic->layout,
                 'pic_list' => $topic->pic_list ? \Yii::$app->serializer->decode($topic->pic_list) : [],
-                'abstract' => $topic->abstract,
+                'abstracts' => $topic->abstract,
             ];
             $newList[] = $newItem;
         }

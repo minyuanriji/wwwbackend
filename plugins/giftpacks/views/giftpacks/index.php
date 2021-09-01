@@ -66,8 +66,8 @@
 
                     <el-table-column label="操作">
                         <template slot-scope="scope">
-                            <el-link type="primary" underline="true" icon="el-icon-edit-outline" @click="editOn(scope.row)">编辑</el-link>&nbsp;
-                            <el-link type="danger" underline="true" icon="el-icon-delete" @click="deleteOn(scope.row)">删除</el-link>&nbsp;
+                            <el-link type="primary" :underline="true" icon="el-icon-edit-outline" @click="editOn(scope.row)">编辑</el-link>&nbsp;
+                            <el-link type="danger" :underline="true" icon="el-icon-delete" @click="deleteOn(scope.row)">删除</el-link>&nbsp;
                         </template>
                     </el-table-column>
                 </el-table>

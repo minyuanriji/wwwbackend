@@ -44,6 +44,8 @@ class GiftpacksDetailForm extends BaseModel{
 
             $detail = static::detail($giftpacks);
 
+            $groupList = [];
+
             //如果支持拼单
             $myGroup = ['has_group' => 0, 'is_owner' => 0, 'group_id' => 0];
             if($giftpacks->group_enable && !\Yii::$app->user->isGuest){
@@ -75,7 +77,7 @@ class GiftpacksDetailForm extends BaseModel{
                 'data' => [
                     'detail'     => $detail,
                     'my_group'   => $myGroup,
-                    'group_list' => $groupList
+                    'group_list' => $groupList ? $groupList : []
                 ]
             ];
         }catch (\Exception $e){
@@ -111,6 +113,10 @@ class GiftpacksDetailForm extends BaseModel{
 
         $detail['item_count']          = static::getItemCount($giftpacks);
         $detail['sold_num']            = static::soldNum($giftpacks);
+
+        $detail['pic_url']             = !empty($giftpacks->pic_url) ? json_decode($giftpacks->pic_url, true) : [];
+        $detail['detail']              = $giftpacks->detail;
+
 
         return $detail;
     }

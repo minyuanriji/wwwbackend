@@ -45,6 +45,7 @@ class CheckoutOrderQrcodeForm extends BaseModel {
                 $res = $qrCode->getQrCode(['id' => $mchModel->id], 100, $this->route);
                 $codeUrl = $res['file_path'];
             }else{
+                //$this->route = "/h5/#/mch/personalCentre/ercode/payPages/payPages";
                 $dir = "mch/checkout-order-qrcode/" . $mchModel->id . time() . '.jpg';
                 $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;           
                 $file = CommonLogic::createQrcode([], $this, $this->route . "?id=" . $mchModel->id, $dir);

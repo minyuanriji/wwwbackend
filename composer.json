@@ -44,7 +44,8 @@
 	"tencentcloud/tencentcloud-sdk-php": "dev-master",
 	"xingwenge/canal_php": "dev-master",
     "phpoffice/phpspreadsheet": "dev-master",
-    "ext-bcmath": "*"
+    "ext-bcmath": "*",
+    "lin010/taolijin": "dev-main"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",
@@ -99,18 +100,8 @@
       ]
     }
   },
-  "repositories": {
-    "0": {
-      "type": "composer",
-      "url": "https://asset-packagist.org"
-    },
-    "packagist": {
-      "type": "composer",
-      "url": "https://mirrors.aliyun.com/composer/"
-    },
-	"repos.packagist": {
-	  "type": "composer",
-      "url": "https://mirrors.tencent.com/composer/"
-	}
-  }
+  "repositories": [
+    {"type": "composer", "url": "https://mirrors.aliyun.com/composer/"},
+    {"packagist": false}
+  ]
 }

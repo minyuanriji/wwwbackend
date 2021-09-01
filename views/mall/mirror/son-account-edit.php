@@ -1,13 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * author: zal
- * Date: 2020-04-09
- * Time: 10:36
- */
-
 Yii::$app->loadComponentView('com-dialog-template');
 ?>
 
@@ -118,8 +109,7 @@ Yii::$app->loadComponentView('com-dialog-template');
                     <el-input :disabled="isDisabled" class="common-width" v-model="form.username"></el-input>
                 </el-form-item>
                 <el-form-item v-if="isShow" label="登录密码" prop="password">
-                    <el-input type="password" v-if="!show_password" class="common-width"
-                              v-model="form.password"></el-input>
+                    <el-input type="password" v-if="!show_password" class="common-width" v-model="form.password"></el-input>
                     <el-input type="text" v-if="show_password" class="common-width" v-model="form.password"></el-input>
                     <img class="show-password" v-if="show_password" @click="show_password = !show_password"
                          src="statics/img/admin/show.png" alt="">
@@ -197,6 +187,7 @@ Yii::$app->loadComponentView('com-dialog-template');
                 <el-form-item>
                     <el-button :loading="btnLoading" class="submit-btn" type="primary" @click="store('form')">保存
                     </el-button>
+                    (请前往创建子商城)
                 </el-form-item>
             </el-form>
         </div>
@@ -328,7 +319,7 @@ Yii::$app->loadComponentView('com-dialog-template');
                             self.btnLoading = false;
                             if (e.data.code === 0) {
                                 self.$message.success(e.data.msg);
-                                window.location.href = "/index.php?r=mall%2Fmirror%2Fson-account-list";
+                                window.location.href = _baseUrl + '/index.php?' + "r=mall/mirror/son-account-list";
                             } else {
                                 self.$message.error(e.data.msg);
                             }

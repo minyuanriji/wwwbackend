@@ -1,12 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: zal
- * Date: 2020-04-08
- * Time: 14:12
- */
 
 namespace app\controllers\admin;
 
@@ -48,7 +40,7 @@ class MallController extends BaseController
                 }])
                 ->with(
                     ['user' => function ($query) {
-                        $query->select('id,username');
+                        $query->select('id,username,nickname');
                     }]
                 )
 //                ->orderBy('id DESC')

@@ -26,15 +26,16 @@ class IntegralController extends ApiController
      * 红包券管理中心页面
      * @Author bing
      * @DateTime 2020-10-13 09:58:24
-     * @return void
+     * @return
      * @copyright: Copyright (c) 2020 广东七件事集团
      */
     public function actionCenter()
     {
         $reques_data = $this->requestData;
         $type = $reques_data['type'] ?? Integral::TYPE_ALWAYS;
-        if (!in_array($type, [Integral::TYPE_ALWAYS, Integral::TYPE_DYNAMIC]))
+        if (!in_array($type, [Integral::TYPE_ALWAYS, Integral::TYPE_DYNAMIC])){
             return $this->error('type参数错误');
+        }
         $controller_type = $reques_data['controller_type'] ?? 0;
         $user_id = Yii::$app->user->id ?? 0;
         //查询用户的红包券、积分券余额

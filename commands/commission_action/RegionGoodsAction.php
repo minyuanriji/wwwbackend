@@ -67,7 +67,9 @@ class RegionGoodsAction extends Action
         //获取省市区分佣比列
         $AreaSetting = AreaSetting::find()->select('key,value')->where(['is_delete' => 0])->asArray()->all();
         if (!$AreaSetting) {
-            return false;
+            //更新为已处理
+            OrderDetail::updateAll(["region_commission_status" => 1], ["id" => $orderDetailData['order_detail_id']]);
+            return true;
         }
         $newAreaSetting = array_combine(array_column($AreaSetting, 'key'), $AreaSetting);
         if ($orderDetailData['address']) {
@@ -78,10 +80,14 @@ class RegionGoodsAction extends Action
                 $city_id     = $DistrictArr->getId($address[1], 'city');
                 $district_id = $DistrictArr->getId($address[2], 'district');
             } else {
-                return false;
+                //更新为已处理
+                OrderDetail::updateAll(["region_commission_status" => 1], ["id" => $orderDetailData['order_detail_id']]);
+                return true;
             }
         } else {
-            return false;
+            //更新为已处理
+            OrderDetail::updateAll(["region_commission_status" => 1], ["id" => $orderDetailData['order_detail_id']]);
+            return true;
         }
 
         //获取符合当前门店区域的用户

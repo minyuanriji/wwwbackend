@@ -87,7 +87,9 @@ class RegionGoodsAction extends Action
         //获取符合当前门店区域的用户
         $region_user = $this->controller->getRegion($orderDetailData['mall_id'], $province_id, $city_id, $district_id);
         if (!$region_user) {
-            return false;
+            //更新为已处理
+            OrderDetail::updateAll(["region_commission_status" => 1], ["id" => $orderDetailData['order_detail_id']]);
+            return true;
         }
 
         /**

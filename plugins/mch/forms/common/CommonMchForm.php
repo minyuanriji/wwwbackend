@@ -40,6 +40,12 @@ class CommonMchForm extends BaseModel
             ->with('user', 'store', 'category')
             ->page($pagination)->asArray()->all();
 
+        if($list){
+            foreach($list as &$item){
+                $item['name'] = $item['store']['name'];
+            }
+        }
+
         return [
             'list' => $list,
             'pagination' => $pagination

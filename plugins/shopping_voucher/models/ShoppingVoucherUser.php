@@ -1,24 +1,30 @@
 <?php
+
 namespace app\plugins\Shopping_voucher\models;
 
 use app\models\BaseActiveRecord;
 
-class ShoppingVoucherLog extends BaseActiveRecord{
+class ShoppingVoucherUser extends BaseActiveRecord {
 
     /**
      * {@inheritdoc}
      */
     public static function tableName(){
-        return '{{%plugin_shopping_voucher_log}}';
+        return '{{%plugin_shopping_voucher_user}}';
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function rules(){
         return [
-            [['mall_id', 'user_id', 'type', 'current_money', 'money',
-              'desc', 'source_id', 'source_type', 'created_at', 'updated_at'], 'required']
+            [['mall_id', 'user_id', 'money', 'created_at', 'updated_at'], 'required']
         ];
     }
+
+
+
+
+
+
 }

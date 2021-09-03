@@ -49,6 +49,9 @@ use app\models\User;
 use app\models\UserAddress;
 use app\models\UserCoupon;
 use app\plugins\mch\models\Mch;
+use app\plugins\Shopping_voucher\models\ShoppingVoucherTargetGoods;
+use app\plugins\Shopping_voucher\models\ShoppingVoucherUser;
+use app\plugins\shopping_voucher\target_services\ShoppingVoucherGoodsService;
 use app\services\Order\AttrGoodsService;
 use app\services\Order\CouponService;
 use app\services\Order\FullReliefPriceService;
@@ -703,6 +706,60 @@ class OrderSubmitForm extends BaseModel
 
         }
 
+        //使用购物券
+        $userRemainingShoppingVoucher = ShoppingVoucherUser::find()->where([
+            "user_id" => \Yii::$app->user->id
+        ])->select("money")->scalar();
+        $shoppingVoucherUseData = ["total" => $userRemainingShoppingVoucher, 'decode_price' => 0, 'use_num' => 0];
+        $shoppingVoucherUseData['use'] = isset($this->form_data['use_shopping_voucher']) && $this->form_data['use_shopping_voucher'] == 1;
+        foreach ($listData as &$item) {
+            $item['shopping_voucher_use_num'] = 0;
+            $item['shopping_voucher_decode_price'] = 0;
+            foreach($item['goods_list'] as &$goodsItem){
+                $goodsItem['use_shopping_voucher'] = 0;
+                $goodsItem['use_shopping_voucher_decode_price'] = 0;
+                $goodsItem['use_shopping_voucher_num'] = 0;
+                //如果用户选择使用购物券按支付
+                if($goodsItem['total_price'] > 0 && $shoppingVoucherUseData['use']){
+                    $voucherGoods = ShoppingVoucherTargetGoods::findOne([
+                        "goods_id"  => $goodsItem['id'],
+                        "is_delete" => 0
+                    ]);
+                    if(!$voucherGoods)
+                        continue;
+
+                    $goodsItem['use_shopping_voucher'] = 1;
+
+                    //计算购物券价与商品价格比例
+                    $ratio = $voucherGoods->voucher_price/$goodsItem['total_original_price'];
+                    if(($userRemainingShoppingVoucher/$ratio) > $goodsItem['total_price']){
+                        $needNum = floatval($goodsItem['total_price']) * $ratio;
+                        $goodsItem['use_shopping_voucher_decode_price'] = $goodsItem['total_price'];
+                        $userRemainingShoppingVoucher -= $needNum;
+                        $goodsItem['use_shopping_voucher_num'] = $needNum;
+                        $goodsItem['total_price'] = 0;
+                    }else{
+                        $decodePrice = ($userRemainingShoppingVoucher/$ratio);
+                        $goodsItem['total_price'] -= $decodePrice;
+                        $goodsItem['use_shopping_voucher_decode_price'] = $decodePrice;
+                        $goodsItem['use_shopping_voucher_num'] = $userRemainingShoppingVoucher;
+                        $userRemainingShoppingVoucher = 0;
+                    }
+                }
+                $item['shopping_voucher_decode_price'] += $goodsItem['use_shopping_voucher_decode_price'];
+                $item['shopping_voucher_use_num'] += $goodsItem['use_shopping_voucher_num'];
+            }
+            $item['total_goods_price'] -= $item['shopping_voucher_decode_price'];
+            $item['total_price'] -= $item['shopping_voucher_decode_price'];
+
+            $shoppingVoucherUseData['use_num'] += $item['shopping_voucher_use_num'];
+            $shoppingVoucherUseData['decode_price'] += $item['shopping_voucher_decode_price'];
+
+            $item['total_goods_price'] = round($item['total_goods_price'], 2);
+            $item['total_price'] = round($item['total_price'], 2);
+        }
+        $shoppingVoucherUseData['remaining'] = $userRemainingShoppingVoucher;
+
         $total_price        = 0;
         $totalOriginalPrice = 0;
         foreach ($listData as &$priceItem) {
@@ -832,6 +889,9 @@ class OrderSubmitForm extends BaseModel
             }
         }
 
+        //购物券开关
+        $shoppingVoucherUseData['enable'] = true;
+
         return [
             'is_need_address'     => $is_need_address ? 1 : 0,
             'list'                => $listData,
@@ -847,6 +907,7 @@ class OrderSubmitForm extends BaseModel
             'hasCity'             => $hasCity,
             'score_enable'        => $score_enable,
             'integral_enable'     => $integral_enable, //红包券
+            'shopping_voucher'    => $shoppingVoucherUseData,
             'form_data'           => [
                 'sign'             => isset($this->form_data['sign'])            ? $this->form_data['sign'] : null,
                 'related_id'       => isset($this->form_data['related_id'])      ? $this->form_data['related_id'] : null,

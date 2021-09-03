@@ -8,6 +8,7 @@ use app\handlers\RelationHandler;
 use app\plugins\boss\models\Boss;
 use app\plugins\boss\models\BossAwardMember;
 use app\plugins\boss\models\BossAwardSentLog;
+use app\plugins\Shopping_voucher\models\ShoppingVoucherUser;
 use app\services\wechat\WechatTemplateService;
 use Yii;
 
@@ -650,5 +651,19 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
             'name'  => $userLevel != null ? $userLevel['name'] : "",
             'icon'  => $userLevel != null ? $userLevel['icon'] : ""
         ];
+    }
+
+    public function getShoppingVoucherUser(){
+        $voucherUser = ShoppingVoucherUser::findOne(["user_id" => $this->id]);
+        if(!$voucherUser){
+            $voucherUser = new ShoppingVoucherUser([
+                "mall_id"    => $this->mall_id,
+                "user_id"    => $this->id,
+                "money"      => 0,
+                "created_at" => time(),
+                "updated_at" => time()
+            ]);
+        }
+        return $voucherUser;
     }
 }

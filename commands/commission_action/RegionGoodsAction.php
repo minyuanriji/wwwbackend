@@ -2,8 +2,7 @@
 
 namespace app\commands\commission_action;
 
-use app\commands\CommissionController;
-use app\models\DistrictArr;
+use app\helpers\CityHelper;
 use app\models\IncomeLog;
 use app\models\OrderDetail;
 use app\models\User;
@@ -75,10 +74,7 @@ class RegionGoodsAction extends Action
         if ($orderDetailData['address']) {
             $address = explode(' ', $orderDetailData['address']);
             if ($address) {
-                $DistrictArr = new DistrictArr();
-                $province_id = $DistrictArr->getId($address[0]);
-                $city_id     = $DistrictArr->getId($address[1], 'city');
-                $district_id = $DistrictArr->getId($address[2], 'district');
+                $CityHelper = CityHelper::likeSearch($address[0], $address[1], $address[2]);
             } else {
                 //更新为已处理
                 OrderDetail::updateAll(["region_commission_status" => 1], ["id" => $orderDetailData['order_detail_id']]);
@@ -91,7 +87,8 @@ class RegionGoodsAction extends Action
         }
 
         //获取符合当前门店区域的用户
-        $region_user = $this->controller->getRegion($orderDetailData['mall_id'], $province_id, $city_id, $district_id);
+        $region_user = $this->controller->getRegion($orderDetailData['mall_id'], $CityHelper['province_id'], $CityHelper['city_id'], $CityHelper['district_id']);
+
         if (!$region_user) {
             //更新为已处理
             OrderDetail::updateAll(["region_commission_status" => 1], ["id" => $orderDetailData['order_detail_id']]);

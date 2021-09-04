@@ -5,7 +5,7 @@ namespace app\plugins\shopping_voucher\forms\mall;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\User;
-use app\plugins\Shopping_voucher\models\ShoppingVoucherLog;
+use app\plugins\shopping_voucher\models\ShoppingVoucherLog;
 
 class ShoppingVoucherLogListForm extends BaseModel{
 

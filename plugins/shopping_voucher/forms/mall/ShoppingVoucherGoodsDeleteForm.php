@@ -4,7 +4,7 @@ namespace app\plugins\shopping_voucher\forms\mall;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
-use app\plugins\Shopping_voucher\models\ShoppingVoucherTargetGoods;
+use app\plugins\shopping_voucher\models\ShoppingVoucherTargetGoods;
 
 class ShoppingVoucherGoodsDeleteForm extends BaseModel{
 

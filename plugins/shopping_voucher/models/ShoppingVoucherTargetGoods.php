@@ -1,5 +1,5 @@
 <?php
-namespace app\plugins\Shopping_voucher\models;
+namespace app\plugins\shopping_voucher\models;
 
 use app\models\BaseActiveRecord;
 

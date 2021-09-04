@@ -17,7 +17,7 @@ class UserShoppingVoucherListForm extends BaseModel {
     public function rules(){
         return [
             [['page', 'type'], 'integer'],
-            [['scene'], 'string']
+            [['scene', 'created_at'], 'string']
         ];
     }
 

@@ -6,8 +6,8 @@ use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
-use app\plugins\Shopping_voucher\models\ShoppingVoucherFromStore;
-use app\plugins\Shopping_voucher\models\ShoppingVoucherSendLog;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
+use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 use yii\base\Action;
 
 class MchCheckoutOrderSendAction extends Action{

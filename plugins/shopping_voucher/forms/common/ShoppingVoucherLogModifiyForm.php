@@ -4,8 +4,8 @@ namespace app\plugins\shopping_voucher\forms\common;
 
 use app\models\BaseModel;
 use app\models\User;
-use app\plugins\Shopping_voucher\models\ShoppingVoucherLog;
-use app\plugins\Shopping_voucher\models\ShoppingVoucherUser;
+use app\plugins\shopping_voucher\models\ShoppingVoucherLog;
+use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
 
 class ShoppingVoucherLogModifiyForm extends BaseModel{
 

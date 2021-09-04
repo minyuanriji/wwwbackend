@@ -8,7 +8,7 @@ use app\handlers\RelationHandler;
 use app\plugins\boss\models\Boss;
 use app\plugins\boss\models\BossAwardMember;
 use app\plugins\boss\models\BossAwardSentLog;
-use app\plugins\Shopping_voucher\models\ShoppingVoucherUser;
+use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
 use app\services\wechat\WechatTemplateService;
 use Yii;
 

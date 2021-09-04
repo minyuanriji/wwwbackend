@@ -15,11 +15,13 @@ class FromStoreEditForm extends BaseModel{
     public $give_value;
     public $name;
     public $cover_url;
+    public $start_at;
 
     public function rules(){
         return [
             [['mch_id', 'store_id', 'give_type', 'give_value', 'name', 'cover_url'], 'required'],
-            [['id', 'mch_id', 'store_id'], 'integer']
+            [['id', 'mch_id', 'store_id'], 'integer'],
+            [['start_at'], 'string']
         ];
     }
 
@@ -61,6 +63,7 @@ class FromStoreEditForm extends BaseModel{
             $fromStore->updated_at = time();
             $fromStore->name       = $this->name;
             $fromStore->cover_url  = $this->cover_url;
+            $fromStore->start_at   = strtotime($this->start_at);
 
             if(!$fromStore->save()){
                 throw new \Exception($this->responseErrorMsg($fromStore));

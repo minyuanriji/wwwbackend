@@ -49,6 +49,10 @@ use app\models\User;
 use app\models\UserAddress;
 use app\models\UserCoupon;
 use app\plugins\mch\models\Mch;
+use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
+use app\plugins\shopping_voucher\models\ShoppingVoucherTargetGoods;
+use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
+use app\plugins\shopping_voucher\target_services\ShoppingVoucherGoodsService;
 use app\services\Order\AttrGoodsService;
 use app\services\Order\CouponService;
 use app\services\Order\FullReliefPriceService;
@@ -303,23 +307,27 @@ class OrderSubmitForm extends BaseModel
             $event_data = array();//事件参数
             foreach ($data['list'] as $orderItem) {
                 $order = new Order();
-                $order->mall_id                     = \Yii::$app->mall->id;
-                $order->user_id                     = $user->getId();
-                $order->order_no                    = Order::getOrderNo('S');;
-                $order->total_price                 = $orderItem['total_price'];
-                $order->total_pay_price             = $orderItem['total_price'];
-                $order->express_original_price      = $orderItem['express_price'];
-                $order->express_price               = $orderItem['express_price'];
-                $order->total_goods_price           = $orderItem['total_goods_price'];
-                $order->total_goods_original_price  = $orderItem['total_goods_original_price'];
-                $order->member_discount_price       = $orderItem['member_discount'];
-                $order->use_user_coupon_id          = 0;
-                $order->coupon_discount_price       = 0;
-                $order->use_score                   = $orderItem['score']['use'] ? $orderItem['score']['use_num'] : 0;
+                $order->mall_id                       = \Yii::$app->mall->id;
+                $order->user_id                       = $user->getId();
+                $order->order_no                      = Order::getOrderNo('S');;
+                $order->total_price                   = $orderItem['total_price'];
+                $order->total_pay_price               = $orderItem['total_price'];
+                $order->express_original_price        = $orderItem['express_price'];
+                $order->express_price                 = $orderItem['express_price'];
+                $order->total_goods_price             = $orderItem['total_goods_price'];
+                $order->total_goods_original_price    = $orderItem['total_goods_original_price'];
+                $order->member_discount_price         = $orderItem['member_discount'];
+                $order->use_user_coupon_id            = 0;
+                $order->coupon_discount_price         = 0;
+                $order->use_score                     = $orderItem['score']['use'] ? $orderItem['score']['use_num'] : 0;
                 //积分抵扣
-                $order->score_deduction_price       = $orderItem['score']['use'] ? $orderItem['score']['deduction_price'] : 0;
+                $order->score_deduction_price         = $orderItem['score']['use'] ? $orderItem['score']['deduction_price'] : 0;
                 //红包券抵扣
-                $order->integral_deduction_price    = $orderItem['integral']['use'] ? $orderItem['integral']['integral_deduction_price'] : 0;
+                $order->integral_deduction_price      = $orderItem['integral']['use'] ? $orderItem['integral']['integral_deduction_price'] : 0;
+
+                //购物券抵扣
+                $order->shopping_voucher_use_num      = $orderItem['shopping_voucher_use_num'];
+                $order->shopping_voucher_decode_price = $orderItem['shopping_voucher_decode_price'];
 
                 $order->name                        = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
                 $order->mobile                      = !empty($data['user_address']['mobile']) ? $data['user_address']['mobile'] : "";
@@ -421,6 +429,18 @@ class OrderSubmitForm extends BaseModel
                     if ($userCoupon->update(true, ['is_use']) === false) {
                         return $this->returnApiResultData(ApiCode::CODE_FAIL,'优惠券状态更新失败。');
                     }
+                }
+
+
+                //扣除购物券
+                if($order->shopping_voucher_use_num > 0){
+                    $modifyForm = new ShoppingVoucherLogModifiyForm([
+                        "money"       => $order->shopping_voucher_use_num,
+                        "desc"        => "订单(" . $order->id. ")创建扣除购物券：" . $order->shopping_voucher_use_num,
+                        "source_id"   => $order->id,
+                        "source_type" => "target_order"
+                    ]);
+                    $modifyForm->sub($user);
                 }
 
                 // 扣除积分
@@ -703,6 +723,60 @@ class OrderSubmitForm extends BaseModel
 
         }
 
+        //使用购物券
+        $userRemainingShoppingVoucher = (float)ShoppingVoucherUser::find()->where([
+            "user_id" => \Yii::$app->user->id
+        ])->select("money")->scalar();
+        $shoppingVoucherUseData = ["total" => $userRemainingShoppingVoucher, 'decode_price' => 0, 'use_num' => 0];
+        $shoppingVoucherUseData['use'] = isset($this->form_data['use_shopping_voucher']) && $this->form_data['use_shopping_voucher'] == 1;
+        foreach ($listData as &$item) {
+            $item['shopping_voucher_use_num'] = 0;
+            $item['shopping_voucher_decode_price'] = 0;
+            foreach($item['goods_list'] as &$goodsItem){
+                $goodsItem['use_shopping_voucher'] = 0;
+                $goodsItem['use_shopping_voucher_decode_price'] = 0;
+                $goodsItem['use_shopping_voucher_num'] = 0;
+                //如果用户选择使用购物券按支付
+                if($goodsItem['total_price'] > 0 && $shoppingVoucherUseData['use']){
+                    $voucherGoods = ShoppingVoucherTargetGoods::findOne([
+                        "goods_id"  => $goodsItem['id'],
+                        "is_delete" => 0
+                    ]);
+                    if(!$voucherGoods)
+                        continue;
+
+                    $goodsItem['use_shopping_voucher'] = 1;
+
+                    //计算购物券价与商品价格比例
+                    $ratio = $voucherGoods->voucher_price/$goodsItem['total_original_price'];
+                    if(($userRemainingShoppingVoucher/$ratio) > $goodsItem['total_price']){
+                        $needNum = floatval($goodsItem['total_price']) * $ratio;
+                        $goodsItem['use_shopping_voucher_decode_price'] = $goodsItem['total_price'];
+                        $userRemainingShoppingVoucher -= $needNum;
+                        $goodsItem['use_shopping_voucher_num'] = $needNum;
+                        $goodsItem['total_price'] = 0;
+                    }else{
+                        $decodePrice = ($userRemainingShoppingVoucher/$ratio);
+                        $goodsItem['total_price'] -= $decodePrice;
+                        $goodsItem['use_shopping_voucher_decode_price'] = $decodePrice;
+                        $goodsItem['use_shopping_voucher_num'] = $userRemainingShoppingVoucher;
+                        $userRemainingShoppingVoucher = 0;
+                    }
+                }
+                $item['shopping_voucher_decode_price'] += $goodsItem['use_shopping_voucher_decode_price'];
+                $item['shopping_voucher_use_num'] += $goodsItem['use_shopping_voucher_num'];
+            }
+            $item['total_goods_price'] -= $item['shopping_voucher_decode_price'];
+            $item['total_price'] -= $item['shopping_voucher_decode_price'];
+
+            $shoppingVoucherUseData['use_num'] += $item['shopping_voucher_use_num'];
+            $shoppingVoucherUseData['decode_price'] += $item['shopping_voucher_decode_price'];
+
+            $item['total_goods_price'] = round($item['total_goods_price'], 2);
+            $item['total_price'] = round($item['total_price'], 2);
+        }
+        $shoppingVoucherUseData['remaining'] = $userRemainingShoppingVoucher;
+
         $total_price        = 0;
         $totalOriginalPrice = 0;
         foreach ($listData as &$priceItem) {
@@ -832,6 +906,9 @@ class OrderSubmitForm extends BaseModel
             }
         }
 
+        //购物券开关
+        $shoppingVoucherUseData['enable'] = true;
+
         return [
             'is_need_address'     => $is_need_address ? 1 : 0,
             'list'                => $listData,
@@ -847,6 +924,7 @@ class OrderSubmitForm extends BaseModel
             'hasCity'             => $hasCity,
             'score_enable'        => $score_enable,
             'integral_enable'     => $integral_enable, //红包券
+            'shopping_voucher'    => $shoppingVoucherUseData,
             'form_data'           => [
                 'sign'             => isset($this->form_data['sign'])            ? $this->form_data['sign'] : null,
                 'related_id'       => isset($this->form_data['related_id'])      ? $this->form_data['related_id'] : null,
@@ -2523,6 +2601,10 @@ class OrderSubmitForm extends BaseModel
         //红包券抵扣
         $orderDetail->integral_price       = $goodsItem['integral_price'];
         $orderDetail->integral_fee_rate    = $goodsItem['integral_fee_rate'];
+
+        //购物券抵扣
+        $orderDetail->shopping_voucher_decode_price = $goodsItem['use_shopping_voucher_decode_price'];
+        $orderDetail->shopping_voucher_num = $goodsItem['use_shopping_voucher_num'];
 
         //满减金额
         $orderDetail->full_relief_price = $goodsItem['actual_full_relief_price'];

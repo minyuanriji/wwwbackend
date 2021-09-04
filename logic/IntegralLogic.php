@@ -10,12 +10,41 @@ use app\models\IntegralRecord;
 use app\models\Order;
 use app\models\User;
 use app\models\OrderDetail;
+use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
 use Exception;
 use Yii;
 use app\controllers\business\OrderCommon;
 
 class IntegralLogic
 {
+
+    /**
+     * 订单取消返还购物券
+     * @param $order
+     * @return void
+     */
+    public function refundShoppingVoucher($order)
+    {
+        $trans = Yii::$app->db->beginTransaction();
+        try {
+            if($order->shopping_voucher_use_num > 0){
+                $user = User::findOne($order->user_id);
+                $modifyForm = new ShoppingVoucherLogModifiyForm([
+                    "money"       => $order->shopping_voucher_use_num,
+                    "desc"        => '订单(' . $order->id . ')取消，返还购物券' . $order->shopping_voucher_use_num,
+                    "source_id"   => $order->id,
+                    "source_type" => "from_order_cancel"
+                ]);
+                $modifyForm->add($user);
+            }
+            $trans->commit();
+        }catch (\Exception $e){
+            Yii::error('取消订单返还购物券失败' . PHP_EOL . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL . "message:" . $e->getMessage());
+            $trans->rollBack();
+            throw $e;
+        }
+    }
+
     /**
      * 订单取消返还红包券/积分券
      * @Author bing

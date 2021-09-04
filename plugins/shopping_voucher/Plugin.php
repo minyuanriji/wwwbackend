@@ -32,51 +32,30 @@ class Plugin extends \app\plugins\Plugin
         return [
             [
                 'name' => '购物券记录',
-                'route' => 'plugin/shopping_voucher/mall/voucher/voucher-log',
+                'route' => 'plugin/shopping_voucher/mall/shopping-voucher-log/list',
                 'icon' => 'el-icon-setting',
-                'action' => [
-                ]
+                'action' => []
             ],
             [
-                'name' => '商品管理',
-                'route' => 'plugin/shopping_voucher/mall/goods/list',
+                'name' => '来源设置',
+                'route' => 'plugin/shopping_voucher/mall/from-store/list',
                 'icon' => 'el-icon-setting',
-                'action' => [
-                    [
-                        'name' => '爆品管理',
-                        'route' => 'plugin/shopping_voucher/mall/store/goods-list',
-                        'action' => [
-                            [
-                                'name' => '核销记录',
-                                'route' => 'plugin/shopping_voucher/mall/store/clerk-logs-list',
-                            ]
-                        ]
-                    ]
-                ]
+                'action' => []
             ],
             [
-                'name' => '商户管理',
-                'route' => 'plugin/shopping_voucher/mall/store/list',
+                'name' => '消费场景',
+                'route' => 'plugin/shopping_voucher/mall/target-goods/list',
                 'icon' => 'el-icon-setting',
                 'action' => [
-                    [
-                        'name' => '爆品管理',
-                        'route' => 'plugin/shopping_voucher/mall/store/goods-list',
-                        'action' => [
-                            [
-                                'name' => '核销记录',
-                                'route' => 'plugin/shopping_voucher/mall/store/clerk-logs-list',
-                            ]
-                        ]
-                    ]
+
                 ]
-            ],
+            ]
         ];
     }
 
     public function getIndexRoute()
     {
-        return 'plugin/shopping_voucher/mall/voucher/voucher-log';
+        return $this->getMenus()[0]['route'];
     }
 
 

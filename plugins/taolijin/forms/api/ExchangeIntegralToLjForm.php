@@ -50,64 +50,63 @@ class ExchangeIntegralToLjForm extends BaseModel{
                 "status"       => "unused"
             ];
             $exchangeLog = TaolijinExchangeLog::findOne($uniqueData);
-            if($exchangeLog){
-                throw new \Exception("请勿重复下单操作");
-            }
+            if(!$exchangeLog){
 
-            $exchangeLog = new TaolijinExchangeLog(array_merge($uniqueData, [
-                "integral_num" => $goods->deduct_integral,
-                "gift_price"   => $goods->gift_price,
-                "updated_at"   => time(),
-                "created_at"   => time()
-            ]));
-            if(!$exchangeLog->save()){
-                throw new \Exception($this->responseErrorMsg($exchangeLog));
-            }
-
-            //扣取红包
-            if($user->static_integral < $goods->deduct_integral){
-                throw new \Exception("红包不足");
-            }
-            $modifyForm = new UserIntegralModifyForm([
-                "type"        => 2,
-                "integral"    => $goods->deduct_integral,
-                "desc"        => "礼金商品兑换，扣除红包",
-                "source_id"   => $exchangeLog->id,
-                "source_type" => "tlj_exchange",
-                "is_manual"   => 0
-            ]);
-            $modifyForm->modify($user);
-
-            $acc = AliAccForm::get($goods->ali_type);
-
-            if($goods->ali_type == "ali"){ //阿里联盟
-
-                $ali = new Ali($acc->app_key, $acc->secret_key);
-
-                $response = $ali->tlj->vegasTljCreate([
-                    "adzone_id"                => $acc->adzone_id, //妈妈广告位Id
-                    "send_start_time"          => date("Y-m-d H:i:s"),
-                    "per_face"                 => $goods->gift_price,
-                    "security_switch"          => "true",
-                    "user_total_win_num_limit" => "1",
-                    "name"                     => "补商会红包抵扣",
-                    "total_num"                => "1",
-                    "item_id"                  => $goods->ali_unique_id
-                ]);
-                if($response->code){
-                    throw new \Exception($response->msg);
-                }
-
-                $modelData = $response->getModelData();
-
-                $exchangeLog->rights_id = $modelData['rights_id'];
-                $exchangeLog->result_data = json_encode($modelData);
+                $exchangeLog = new TaolijinExchangeLog(array_merge($uniqueData, [
+                    "integral_num" => $goods->deduct_integral,
+                    "gift_price"   => $goods->gift_price,
+                    "updated_at"   => time(),
+                    "created_at"   => time()
+                ]));
                 if(!$exchangeLog->save()){
                     throw new \Exception($this->responseErrorMsg($exchangeLog));
                 }
 
-            }else{
-                throw new \Exception("联盟类型错误");
+                //扣取红包
+                if($user->static_integral < $goods->deduct_integral){
+                    throw new \Exception("红包不足");
+                }
+                $modifyForm = new UserIntegralModifyForm([
+                    "type"        => 2,
+                    "integral"    => $goods->deduct_integral,
+                    "desc"        => "礼金商品兑换，扣除红包",
+                    "source_id"   => $exchangeLog->id,
+                    "source_type" => "tlj_exchange",
+                    "is_manual"   => 0
+                ]);
+                $modifyForm->modify($user);
+
+                $acc = AliAccForm::get($goods->ali_type);
+
+                if($goods->ali_type == "ali"){ //阿里联盟
+
+                    $ali = new Ali($acc->app_key, $acc->secret_key);
+
+                    $response = $ali->tlj->vegasTljCreate([
+                        "adzone_id"                => $acc->adzone_id, //妈妈广告位Id
+                        "send_start_time"          => date("Y-m-d H:i:s"),
+                        "per_face"                 => $goods->gift_price,
+                        "security_switch"          => "true",
+                        "user_total_win_num_limit" => "1",
+                        "name"                     => "补商会红包抵扣",
+                        "total_num"                => "1",
+                        "item_id"                  => $goods->ali_unique_id
+                    ]);
+                    if($response->code){
+                        throw new \Exception($response->msg);
+                    }
+
+                    $modelData = $response->getModelData();
+
+                    $exchangeLog->rights_id = $modelData['rights_id'];
+                    $exchangeLog->result_data = json_encode($modelData);
+                    if(!$exchangeLog->save()){
+                        throw new \Exception($this->responseErrorMsg($exchangeLog));
+                    }
+
+                }else{
+                    throw new \Exception("联盟类型错误");
+                }
             }
 
             $t->commit();

@@ -192,6 +192,7 @@ class UserForm extends BaseModel
             'total_income' => $user->total_income,
             'static_integral' => $user->static_integral ?? 0,
             'dynamic_integral' => $user->dynamic_integral ?? 0,
+            'shopping_voucher' => (float)$user->shoppingVoucherUser->money,
             'favorite' => $favoriteCount ?? '0',
             //'footprint' => FootprintGoodsLog::find()->where(['user_id' => $user->id, 'is_delete' => 0])->count() ?? '0',
             'identity' => [

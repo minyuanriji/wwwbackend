@@ -35,8 +35,15 @@ class ExchangeGetUrlForm extends BaseModel{
 
             $acc = AliAccForm::get($goods->ali_type);
 
-            $data = ["tlj_send_url" => "", "spread_url" => "", "ali_type" => $goods->ali_type];
-            if($goods->ali_type == "ali"){ //淘宝联盟
+            $data = ["tlj_send_url" => "http://xxxxx.com", "spread_url" => "http://xxxxx.com", "ali_type" => $goods->ali_type];
+            return [
+                "code" => ApiCode::CODE_SUCCESS,
+                "data" => $data
+            ];
+
+            if(false && $goods->ali_type == "ali"){ //淘宝联盟
+                //$ali = new Ali($acc->app_key, $acc->secret_key);
+                //$test = $ali->item->convert($goods->ali_unique_id, $acc->adzone_id, "ab123");
 
                 //如果有待使用礼金，返回礼金领取链接
                 $exchangeLog = TaolijinExchangeLog::findOne([
@@ -50,7 +57,7 @@ class ExchangeGetUrlForm extends BaseModel{
                     $data['tlj_send_url'] = isset($resultData['send_url']) ? $resultData['send_url'] : "http://";
                 }
 
-                $ali = new Ali($acc->app_key, $acc->secret_key);
+
                 $data['spread_url'] = $ali->spread->toShort($goods->ali_url); //长链转短链
             }else{
                 throw new \Exception("联盟类型错误");

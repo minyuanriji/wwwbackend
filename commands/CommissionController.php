@@ -63,7 +63,7 @@ class CommissionController extends BaseCommandController{
      * @return mixed
      */
     public function calculateCheckoutOrderProfitPrice($order_price, $transfer_rate, $integral_fee_rate = 0){
-        return max(0, $order_price * ($transfer_rate/100 - 0.1 + $integral_fee_rate/100) * 0.6);
+        return max(0, $order_price * ($transfer_rate/100 - 0.1 + $integral_fee_rate/100) * 0.5);
     }
 
     /**

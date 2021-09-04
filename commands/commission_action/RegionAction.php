@@ -118,7 +118,7 @@ class RegionAction extends Action
                                     'mall_id' => $checkoutOrder['mall_id'],
                                     'user_id' => $value['user_id'],
                                     'type' => 1,
-                                    'money' => $user->total_income,
+                                    'money' => $user->income + $user->income_frozen,
                                     'income' => $priceLog->price,
                                     'desc' => "来自店铺“" . $checkoutOrder['name'] . "”的区域分红记录[ID:" . $priceLog->id . "]",
                                     'flag' => 1, //到账

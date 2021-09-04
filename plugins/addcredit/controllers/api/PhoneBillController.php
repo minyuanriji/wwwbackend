@@ -3,6 +3,7 @@
 namespace app\plugins\addcredit\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
+use app\helpers\CityHelper;
 use app\plugins\addcredit\forms\api\order\OrderForm;
 use app\plugins\addcredit\forms\api\order\RechargeRecordForm;
 use app\plugins\ApiController;
@@ -41,19 +42,6 @@ class PhoneBillController extends ApiController
      * @return \yii\web\Response
      */
     public function actionPrepaidRefill()
-    {
-        $form = new PhoneOrderPayForm();
-        $form->attributes = $this->requestData;
-        return $this->asJson($form->pay());
-    }
-
-    /**
-     * 去支付  废弃
-     * order_no         订单号
-     * order_price      订单金额
-     * @return \yii\web\Response
-     */
-    public function actionPrepaidRefillOld()
     {
         $form = new PhoneOrderPayForm();
         $form->attributes = $this->requestData;

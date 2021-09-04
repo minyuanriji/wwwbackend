@@ -49,6 +49,7 @@
                         <div>订单金额：<b style="color:#cc3311">{{scope.row.order_price}}元</b></div>
                         <div>扣除红包：<b style="color:#cc3311">{{scope.row.integral_deduction_price}}</b></div>
                         <div>实际支付费用：<b style="color:#cc3311">{{scope.row.pay_price}}元</b></div>
+                        <div>入住时间：<span style="color: rgb(240,167,50)">{{scope.row.date}}</span></div>
                     </template>
                 </el-table-column>
 

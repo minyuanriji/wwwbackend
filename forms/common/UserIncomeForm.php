@@ -170,7 +170,7 @@ class UserIncomeForm extends BaseModel{
 
     protected static function change(User $user, $price, $type, $flag, $source_type, $source_id, $desc = null, $is_manual = 0){
 
-        $totalIncome = floatval($user->total_income);
+        $totalIncome = floatval($user->income + $user->income_frozen);
 
         if($type == 1){ //收入
             $user->total_income = $totalIncome + $price;

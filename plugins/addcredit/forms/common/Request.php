@@ -7,21 +7,21 @@ use app\core\ApiCode;
 class Request
 {
 
-    private static $devUrl = "http://94.74.98.124:9999";
+    private static $devUrl = "http://weixin.kuaichongbei.com/yrapi.php/index/";
 
-    public static function execute($url, $post_param)
+    public static function execute($url, $params)
     {
         try {
             $headers = [
-                'Content-Type: application/json'
+                'Content-Type：application/x-www-form-urlencoded'
             ];
             $ch = curl_init(static::$devUrl . $url);
             curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_param);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
             curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-//            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 
@@ -42,16 +42,22 @@ class Request
         }
     }
 
-    public static function http_get($url)
+    public static function http_get($url, $params)
     {
+        $headers = [
+            'Content-Type：application/x-www-form-urlencoded'
+        ];
         //1. 初始化
         $ch = curl_init();
         //1.2 设置请求的url地址
-        curl_setopt($ch, CURLOPT_URL, static::$devUrl . $url);
+        curl_setopt($ch, CURLOPT_URL, static::$devUrl . $url . "?" . $params);
         //1.6 请求头关闭
         curl_setopt($ch, CURLOPT_HEADER, 0);
         //1.5 请求得到的结果不直接输出，而是以字符串结果返回
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
         //1.7 设置请求超时时间,单位为秒
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         //1.8 设置浏览器型号,可要可不要

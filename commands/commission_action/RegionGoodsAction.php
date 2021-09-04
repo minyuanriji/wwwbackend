@@ -186,7 +186,7 @@ class RegionGoodsAction extends Action
                 $rule_data_json['agent_level'] = $value['level'];
                 //生成分佣记录
                 if ($price > 0) {
-                    $newPriceLogFunc($value['user_id'], $price, $user->total_income, $rule_data_json, $orderDetailData);
+                    $newPriceLogFunc($value['user_id'], $price, $user->income + $user->income_frozen, $rule_data_json, $orderDetailData);
                 }
             }
         } catch (\Exception $e) {

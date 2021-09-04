@@ -11,6 +11,8 @@ class UserShoppingVoucherListForm extends BaseModel {
     public $page;
     public $scene;
     public $type;
+    public $created_at;
+
 
     public function rules(){
         return [
@@ -35,24 +37,41 @@ class UserShoppingVoucherListForm extends BaseModel {
                 $query->andWhere(["type" => $this->type]);
             }
 
+            if ($this->created_at) {
+                $query->andWhere('FROM_UNIXTIME(created_at,"%Y年%m月")="' . $this->created_at . '"');
+            }
+
             if($this->scene){
                 $query->andWhere(["source_type" => $this->scene]);
             }
 
             $selects = ["id", "type", "current_money", "money", "desc", "source_type", "created_at"];
+
+            $incomeQuery = clone $query;
+            $income = $incomeQuery->andWhere(['type' => 1])->sum('integral');
+
+            $expenditureQuery = clone $query;
+            $expenditure = $expenditureQuery->andWhere(['type' => 2])->sum('integral');
+
             $list = $query->select($selects)->page($pagination, 10, max(1, (int)$this->page))
                 ->asArray()->all();
 
             if($list){
                 foreach($list as &$item){
-                    $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
+                    $item['created_at'] = date("m月d日 H:i", $item['created_at']);
+                    $item['money'] = sprintf("%.2f", $item['money']);
+                    $item['income'] = sprintf("%.2f", $item['income']);
                 }
             }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'list'       => $list ? $list : [],
+                    'list'       => $list ?: [],
+                    'detailed_count'    => [
+                        'income'        => $income ?: 0,
+                        'expenditure'   => $expenditure ?: 0,
+                    ],
                     'pagination' => $pagination
                 ]
             ];

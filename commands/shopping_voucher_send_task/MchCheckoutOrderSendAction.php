@@ -78,7 +78,7 @@ class MchCheckoutOrderSendAction extends Action{
         $query->andWhere([
             "AND",
             "svsl.id IS NULL",
-            [">", "mco.created_at", "svfs.start_at"],
+            "mco.created_at>svfs.start_at",
             "mco.pay_price > 0",
             ["mco.is_pay" => 1],
             ["mco.is_delete" => 0]
@@ -86,6 +86,7 @@ class MchCheckoutOrderSendAction extends Action{
         $query->orderBy("mco.updated_at ASC");
 
         $selects = ["mco.id", "mco.mall_id", "mco.pay_user_id", "mco.pay_price", "mco.mch_id", "mco.store_id", "svfs.give_type", "svfs.give_value"];
+
         $checkOrders = $query->select($selects)->asArray()->limit(10)->all();
 
         if(!$checkOrders)

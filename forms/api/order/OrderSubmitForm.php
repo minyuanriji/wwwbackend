@@ -724,7 +724,7 @@ class OrderSubmitForm extends BaseModel
         }
 
         //使用购物券
-        $userRemainingShoppingVoucher = ShoppingVoucherUser::find()->where([
+        $userRemainingShoppingVoucher = (float)ShoppingVoucherUser::find()->where([
             "user_id" => \Yii::$app->user->id
         ])->select("money")->scalar();
         $shoppingVoucherUseData = ["total" => $userRemainingShoppingVoucher, 'decode_price' => 0, 'use_num' => 0];

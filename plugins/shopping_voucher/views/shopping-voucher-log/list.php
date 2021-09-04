@@ -14,28 +14,29 @@
                             end-placeholder="结束日期">
             </el-date-picker>
             <div class="input-item">
-                <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称、手机号搜索" v-model="keyword" clearable @clear="search">
+                <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称、手机号搜索" v-model="searchData.keyword" clearable @clear="search">
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
-            <el-table :data="form" border style="width: 100%" v-loading="listLoading">
+            <el-table :data="list" border style="width: 100%" v-loading="loading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
                 <el-table-column label="用户信息" width="280">
                     <template slot-scope="scope">
                         <com-image mode="aspectFill" style="float: left;margin-right: 8px"
-                                   :src="scope.row.user.avatar_url"></com-image>
-                        <div>{{scope.row.user.nickname}}</div>
+                                   :src="scope.row.avatar_url"></com-image>
+                        <div>{{scope.row.nickname}}</div>
+                        <div>ID:{{scope.row.user_id}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column label="收支情况(购物券)" width="150">
+                <el-table-column label="收支情况" width="150">
                     <template slot-scope="scope">
-                        <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.change_voucher}}</div>
-                        <div style="font-size: 18px;color: #F6AA5A" v-if="scope.row.type == 2">-{{scope.row.change_voucher}}</div>
+                        <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.money}}</div>
+                        <div style="font-size: 18px;color: #F6AA5A" v-if="scope.row.type == 2">-{{scope.row.money}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="current_voucher" label="当前购物券（变动前）" width="200"></el-table-column>
+                <el-table-column prop="current_money" label="当前购物券（变动前）" width="200"></el-table-column>
                 <el-table-column prop="desc" label="说明" width="400"></el-table-column>
-                <el-table-column prop="scope" label="添加时间">
+                <el-table-column prop="scope" label="日期">
                        <template slot-scope="scope">
                            {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
                        </template>
@@ -64,33 +65,23 @@
             return {
                 searchData: {
                     keyword: '',
-                    date: '',
                     start_date: '',
                     end_at: '',
                 },
                 date: '',
-                keyword: '',
-                form: [],
+                list: [],
                 pagination: null,
-                listLoading: false,
+                loading: false,
 
             };
         },
         methods: {
-            exportConfirm() {
-                this.searchData.keyword = this.keyword;
-                this.searchData.start_date = this.date[0];
-                this.searchData.end_date = this.date[1];
-            },
             pageChange(currentPage) {
                 this.page = currentPage;
                 this.getList();
             },
             search() {
                 this.page = 1;
-                if (this.date == null) {
-                    this.date = ''
-                }
                 this.getList();
             },
             selectDateTime(e) {
@@ -107,31 +98,26 @@
 
             getList() {
                 let params = {
-                    r: 'plugin/shopping_voucher/mall/voucher/voucher-log',
+                    r: 'plugin/shopping_voucher/mall/shopping-voucher-log/list',
                     page: this.page,
-                    date: this.date,
-                    keyword: this.keyword,
+                    start_date: this.searchData.start_date,
+                    end_date: this.searchData.end_date,
+                    keyword: this.searchData.keyword,
                 };
-                if (this.date) {
-                    Object.assign(params, {
-                        start_date: this.date[0],
-                        end_date: this.date[1],
-                    });
-                }
                 request({
                     params,
                 }).then(e => {
                     if (e.data.code === 0) {
-                        this.form = e.data.data.list;
+                        this.list = e.data.data.list;
                         this.pagination = e.data.data.pagination;
                     } else {
                         this.$message.error(e.data.msg);
                     }
-                    this.listLoading = false;
+                    this.loading = false;
                 }).catch(e => {
-                    this.listLoading = false;
+                    this.loading = false;
                 });
-                this.listLoading = true;
+                this.loading = true;
             },
         },
     mounted: function() {

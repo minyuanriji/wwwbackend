@@ -40,7 +40,7 @@ class ExchangeGetUrlForm extends BaseModel{
                 "code" => ApiCode::CODE_SUCCESS,
                 "data" => $data
             ];
-            
+
             if(false && $goods->ali_type == "ali"){ //淘宝联盟
                 //$ali = new Ali($acc->app_key, $acc->secret_key);
                 //$test = $ali->item->convert($goods->ali_unique_id, $acc->adzone_id, "ab123");

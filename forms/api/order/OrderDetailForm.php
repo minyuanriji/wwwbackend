@@ -64,21 +64,22 @@ class OrderDetailForm extends BaseModel
             $orderRefund = new OrderRefund();
             //订单详情数据
             $detail = $orderDetailData = [];
-            $detail["id"]                         = intval($order["id"]);
-            $detail["status"]                     = intval($order["status"]);
-            $detail["order_no"]                   = $order["order_no"];
-            $detail["express_no"]                 = $order["express_no"];
-            $detail["total_pay_price"]            = $order["total_pay_price"];
-            $detail["total_goods_original_price"] = $order["total_goods_original_price"];
-            $detail["express_price"]              = $order["express_price"];
-            $detail["coupon_discount_price"]      = $order["coupon_discount_price"];
-            $detail["score_deduction_price"]      = $order["score_deduction_price"];
-            $detail["name"]                       = $order["name"];
-            $detail["mobile"]                     = $order["mobile"];
-            $detail["address"]                    = $order["address"];
-            $detail["remark"]                     = $order["remark"];
-            $detail["is_pay"]                     = intval($order["is_pay"]);
-            $detail['order_type']                 = $order['order_type'];
+            $detail["id"]                            = intval($order["id"]);
+            $detail["status"]                        = intval($order["status"]);
+            $detail["order_no"]                      = $order["order_no"];
+            $detail["express_no"]                    = $order["express_no"];
+            $detail["total_pay_price"]               = $order["total_pay_price"];
+            $detail["total_goods_original_price"]    = $order["total_goods_original_price"];
+            $detail["express_price"]                 = $order["express_price"];
+            $detail["coupon_discount_price"]         = $order["coupon_discount_price"];
+            $detail["score_deduction_price"]         = $order["integral_deduction_price"];
+            $detail["shopping_voucher_decode_price"] = $order["shopping_voucher_decode_price"];
+            $detail["name"]                          = $order["name"];
+            $detail["mobile"]                        = $order["mobile"];
+            $detail["address"]                       = $order["address"];
+            $detail["remark"]                        = $order["remark"];
+            $detail["is_pay"]                        = intval($order["is_pay"]);
+            $detail['order_type']                    = $order['order_type'];
 
             $orderModel = new Order();
             // 订单状态

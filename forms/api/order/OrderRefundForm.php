@@ -93,6 +93,7 @@ class OrderRefundForm extends BaseModel
                 $data["refund_total_price"] = $data_arr['total_price'];
                 $data["use_score"] = $data_arr['use_score'];
                 $data["integral_deduction_price"] = $data_arr['integral_deduction_price'];
+                $data["shopping_voucher_num"] = $data_arr['shopping_voucher_use_num'];
                 $data["order_detail_id"] = $this->order_detail_id;
                 $data["goods_info"] = $goodsInfo;
                 $data["type_list"] = $cannotrefund_str;// OrderRefund::$refund_type_array;

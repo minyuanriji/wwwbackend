@@ -44,6 +44,11 @@ echo $this->render("com-edit");
                     </template>
                 </el-table-column>
                 <el-table-column prop="give_value" label="赠送比例（%）" width="200"></el-table-column>
+                <el-table-column prop="scope" width="200" label="启动时间">
+                    <template slot-scope="scope">
+                        {{scope.row.start_at}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="scope" width="150" label="添加时间">
                     <template slot-scope="scope">
                         {{scope.row.created_at|dateTimeFormat('Y-m-d')}}

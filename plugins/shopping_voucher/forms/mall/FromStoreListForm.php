@@ -40,6 +40,12 @@ class FromStoreListForm extends BaseModel {
 
             $list = $query->page($pagination, $this->limit, $this->page)->asArray()->all();
 
+            if($list){
+                foreach($list as &$item){
+                    $item['start_at'] = date("Y-m-d H:i:s", $item['start_at'] ? $item['start_at'] : time());
+                }
+            }
+
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
                 'list'       => $list ? $list : [],
                 'pagination' => $pagination

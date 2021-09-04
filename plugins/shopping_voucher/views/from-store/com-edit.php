@@ -24,6 +24,9 @@ Yii::$app->loadComponentView('store/com-dialog-select');
                         <template slot="append">%</template>
                     </el-input>
                 </el-form-item>
+                <el-form-item label="启动日期" prop="start_at">
+                    <el-date-picker v-model="formData.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                </el-form-item>
             </el-form>
 
             <div slot="footer" class="dialog-footer">
@@ -46,7 +49,8 @@ Yii::$app->loadComponentView('store/com-dialog-select');
             give_type: 1,
             give_value:0,
             name: '',
-            cover_url: ''
+            cover_url: '',
+            start_at: ''
         };
     }
 

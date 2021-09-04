@@ -49,7 +49,7 @@ class Hotel3rAction extends Action{
             }
 
             //计算利润
-            $profit = max(0, $hotelOrder->order_price * ($hotel->transfer_rate/100 - 0.1) * 0.6);
+            $profit = max(0, $hotelOrder->order_price * ($hotel->transfer_rate/100 - 0.1) * 0.5);
             if($profit <= 0){
                 $hotelOrder->commission_3r_status = 1;
                 throw new \Exception("利润小或等于0无法分佣");

@@ -66,23 +66,27 @@ class GiftpacksGroupPaidProcessForm extends BaseModel{
      * @param User $user
      * @param Giftpacks $giftpacks
      * @param GiftpacksGroup $group
+     * @param GiftpacksGroupPayOrder $payOrder
      * @throws \Exception
      */
-    public function doProcess(User $user, Giftpacks $giftpacks, GiftpacksGroup $group){
+    public function doProcess(User $user, Giftpacks $giftpacks, GiftpacksGroup $group, $payOrder = null){
 
         if(!$this->validate()){
             throw new \Exception($this->responseErrorMsg());
         }
 
         //支付信息判断
-        $payOrder = GiftpacksGroupPayOrder::findOne([
-            "mall_id"    => $giftpacks->mall_id,
-            "user_id"    => $user->id,
-            "group_id"   => $group->id
-        ]);
         if(!$payOrder){
-            throw new \Exception("无法获取到支付记录信息");
+            $payOrder = GiftpacksGroupPayOrder::findOne([
+                "mall_id"    => $giftpacks->mall_id,
+                "user_id"    => $user->id,
+                "group_id"   => $group->id
+            ]);
+            if(!$payOrder){
+                throw new \Exception("无法获取到支付记录信息");
+            }
         }
+
         if($payOrder->pay_status != "unpaid"){
             throw new \Exception("请勿重复支付操作");
         }

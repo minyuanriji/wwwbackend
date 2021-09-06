@@ -2,10 +2,10 @@
 
 namespace app\forms\api\payCenter\paymentOrderPrepare;
 
-use app\forms\api\payCenter\notifyProcess\EfpsGiftpacksOrderPaidNotifyProcessForm;
 use app\models\User;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksOrder;
+use app\plugins\giftpacks\paid_notify\EfpsGiftpacksOrderPaidNotifyProcess;
 
 class GiftpacksOrderPrepareForm extends BasePrepareForm {
 
@@ -87,7 +87,7 @@ class GiftpacksOrderPrepareForm extends BasePrepareForm {
 
         $orderArray['total_amount'] = $giftpacksOrder->order_price;
         $orderArray['content'] = "大礼包订单[ID:".$this->order_id."]";
-        $orderArray['notify_class'] = EfpsGiftpacksOrderPaidNotifyProcessForm::class;
+        $orderArray['notify_class'] = EfpsGiftpacksOrderPaidNotifyProcess::class;
         $orderArray['list'] = [
             [
                 'amount'   => $giftpacksOrder->order_price,

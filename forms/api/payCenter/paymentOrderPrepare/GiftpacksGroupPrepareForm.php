@@ -5,9 +5,9 @@ namespace app\forms\api\payCenter\paymentOrderPrepare;
 
 
 use app\forms\api\payCenter\giftpacks\CommonPayGroup;
-use app\forms\api\payCenter\notifyProcess\EfpsGiftpacksGroupPaidNotifyProcessForm;
 use app\models\User;
 use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
+use app\plugins\giftpacks\paid_notify\EfpsGiftpacksGroupPaidNotifyProcess;
 
 class GiftpacksGroupPrepareForm extends BasePrepareForm {
 
@@ -59,7 +59,7 @@ class GiftpacksGroupPrepareForm extends BasePrepareForm {
         $orderArray = [
             'total_amount' => $giftpacks->group_price,
             'content'      => $desc,
-            'notify_class' => EfpsGiftpacksGroupPaidNotifyProcessForm::class
+            'notify_class' => EfpsGiftpacksGroupPaidNotifyProcess::class
         ];
         $orderArray['list'] = [
             ['amount' => $giftpacks->group_price, 'title' => $desc, 'order_no' => $payOrder->order_sn]

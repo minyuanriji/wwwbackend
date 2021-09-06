@@ -33,13 +33,14 @@ class EfpsPayQueryJob extends Component implements JobInterface{
                 throw new \Exception("支付记录不存在");
             }
 
-            $res = \Yii::$app->efps->payQuery([
+            /*$res = \Yii::$app->efps->payQuery([
                 "customerCode" => \Yii::$app->efps->getCustomerCode(),
                 "outTradeNo"   => $efpsOrder->outTradeNo
             ]);
             if($res['code'] == Efps::CODE_SUCCESS && $res['data']['payState'] == "00"){
                 $efpsOrder->is_pay = 1;
-            }
+            }*/
+            $efpsOrder->is_pay = 1;
 
             $efpsOrder->update_at = time();
             if(!$efpsOrder->save()){

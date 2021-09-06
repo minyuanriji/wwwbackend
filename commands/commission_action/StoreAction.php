@@ -119,7 +119,7 @@ class StoreAction extends Action{
                             if(!$priceLog->save()){
                                 throw new \Exception(json_encode($priceLog->getErrors()));
                             }
-                            $this->controller->commandOut("生成分佣记录 [ID:".$priceLog->id."]");
+                            $this->controller->commandOut("[StoreAction]生成分佣记录 [ID:".$priceLog->id."]");
 
                             //收入记录
                             $incomeLog = new IncomeLog([

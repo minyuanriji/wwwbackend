@@ -209,7 +209,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
             ];
             $voucherGoods = ShoppingVoucherTargetGoods::findOne([
                 "is_delete" => 0,
-                "goods_id"  => 0
+                "goods_id"  => $this->id
             ]);
             if($voucherGoods){
                 $info['shopping_voucher']['is_shopping_voucher_goods'] = 1;

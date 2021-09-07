@@ -33,6 +33,20 @@ class Plugin extends \app\plugins\Plugin{
 
                 ]
             ],
+            [
+                'name' => '订单管理',
+                'route' => 'plugin/giftpacks/mall/giftpacks-order/index',
+                'icon' => 'el-icon-setting',
+                'action' => [
+                ]
+            ],
+            [
+                'name' => '拼团订单',
+                'route' => 'plugin/giftpacks/mall/giftpacks-group-order/group-index',
+                'icon' => 'el-icon-setting',
+                'action' => [
+                ]
+            ],
         ];
     }
 

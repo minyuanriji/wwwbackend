@@ -15,7 +15,7 @@ class EfpsPaymentOrder extends BaseActiveRecord {
             [['outTradeNo', 'payment_order_union_id', 'customerCode', 'payAmount',
               'payCurrency', 'orderInfo', 'payAPI', 'payMethod', 'notifyUrl',
               'transactionStartTime', 'nonceStr', 'update_at', 'is_pay'], 'required'],
-            [['redirectUrl'], 'safe']
+            [['redirectUrl', 'do_query_count'], 'safe']
         ]);
     }
 }

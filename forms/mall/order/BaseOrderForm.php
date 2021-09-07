@@ -30,6 +30,7 @@ use app\models\PaymentOrderUnion;
 use app\models\Store;
 use app\models\User;
 use app\plugins\advance\models\AdvanceOrder;
+use app\plugins\commission\models\CommissionGoodsPriceLog;
 use yii\db\Query;
 use app\services\mall\order\OrderSendService;
 use app\models\mysql\UserAddress;
@@ -149,6 +150,8 @@ abstract class BaseOrderForm extends BaseModel
             $query->andWhere(['!=', 'o.is_recycle', '1']);
         }
 
+        $Statistics[0] =  $this->Statistics($query);
+
         $list = $query->page($pagination)
             ->orderBy($this->order_by . 'o.created_at DESC')
             ->select(['o.*', 'u.nickname'])
@@ -266,6 +269,13 @@ abstract class BaseOrderForm extends BaseModel
             // 电子面单列表
             $item['new_express_single'] = $order->getExpressSingleList($item);
             $item["created_at"] = date("Y-m-d H:i:s",$item["created_at"]);
+
+            $item['share_profit'] = CommissionGoodsPriceLog::find()->alias('cg')
+                ->leftJoin(["u" => User::tableName()], "cg.user_id = u.id")
+                ->where(['order_id' => $item['id']])
+                ->select(['cg.id', 'cg.user_id','cg.price', 'cg.status', 'u.nickname'])
+                ->asArray()
+                ->all();
         }
 
         $menuList        = \Yii::$app->role->getDistributionMenu();
@@ -280,7 +290,8 @@ abstract class BaseOrderForm extends BaseModel
                 'list' => $list,
                 'express_list' => Express::getExpressList(),
                 'export_list' => $this->getFieldsList(),
-                'plugins' => $menuList
+                'plugins' => $menuList,
+                'Statistics' => $Statistics,
             ]
         ];
     }
@@ -758,5 +769,36 @@ abstract class BaseOrderForm extends BaseModel
         }
 
         return $isConfirmOrder;
+    }
+
+    //统计
+    public function Statistics ($query)
+    {
+        $Array = [];
+        //总金额
+        $TotalAmountQuery = clone $query;
+        $Array['TotalAmount'] = $TotalAmountQuery->sum('total_price');
+
+        //实际支付金额
+        $ActualPaymentQuery = clone $query;
+        $Array['ActualPayment'] = $ActualPaymentQuery->sum('total_pay_price');
+
+        //总件数
+        $TotalItemQuery = clone $query;
+        $Array['TotalItem'] = $TotalItemQuery->leftJoin(["od" => OrderDetail::tableName()], "od.order_id = o.id")->sum('od.num');
+
+        //红包抵扣金额
+        $RedAmountQuery = clone $query;
+        $Array['RedAmount'] = $RedAmountQuery->sum('integral_deduction_price');
+
+        //积分抵扣金额
+        $integralQuery = clone $query;
+        $Array['integral'] = $integralQuery->sum('use_score');
+
+        //购物券抵扣金额
+        $ShoppingVoucherQuery = clone $query;
+        $Array['ShoppingVoucher'] = $ShoppingVoucherQuery->sum('shopping_voucher_use_num');
+
+        return $Array;
     }
 }

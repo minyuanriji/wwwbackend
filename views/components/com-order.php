@@ -172,6 +172,14 @@ Yii::$app->loadComponentView('order/com-city');
         border-right: 1px solid #EBEEF5;
     }
 
+    .com-order-list .share-benefit {
+        display: flex;
+        align-items: center;
+        width: 15%;
+        text-align: center;
+        border-right: 1px solid #EBEEF5;
+    }
+
     .com-order-list .goods-item .goods {
         position: relative;
         padding: 20px;
@@ -385,6 +393,17 @@ Yii::$app->loadComponentView('order/com-city');
                     :order="newOrder">
             </com-city>
 
+            <div>
+                <el-table :data="Statistics" style="width: 100%;">
+                    <el-table-column prop="TotalAmount" label="总金额"></el-table-column>
+                    <el-table-column prop="ActualPayment" label="实际支付金额"></el-table-column>
+                    <el-table-column prop="TotalItem" label="总件数"></el-table-column>
+                    <el-table-column prop="RedAmount" label="红包抵扣金额"></el-table-column>
+                    <el-table-column prop="integral" label="积分抵扣金额"></el-table-column>
+                    <el-table-column prop="ShoppingVoucher" label="购物券抵扣金额"></el-table-column>
+                </el-table>
+            </div>
+
             <div class="com-order-title">
                 <div v-for="(item,index) in orderTitle" :key="index" :style="{width: item.width}">{{item.name}}</div>
             </div>
@@ -499,6 +518,7 @@ Yii::$app->loadComponentView('order/com-city');
                             </el-tooltip>
                         </el-button>
                     </div>
+
                     <div class="com-order-body">
                         <!-- 订单信息 -->
                         <div class="goods-item" :style="{width: orderTitle[0].width}">
@@ -533,12 +553,18 @@ Yii::$app->loadComponentView('order/com-city');
                                             <span style="margin-right: 10px;">
                                                 <slot name="attr" :item="item">
                                                     规格：
-                                                <el-tag size="mini"
+                                                <el-tooltip effect="dark" placement="top" v-for="attr in goods.attr_list" :key="attr.id">
+                                                    <template slot="content">
+                                                        <div style="width: 320px;">{{attr.attr_group_name}}:{{attr.attr_name}}</div>
+                                                    </template>
+                                                    <com-ellipsis :line="2" style="color: #1ed0ff">{{attr.attr_group_name}}:{{attr.attr_name}}</com-ellipsis>
+                                                </el-tooltip>
+                                                <!--<el-tag size="mini"
                                                         style="margin-right: 5px;"
                                                         v-for="attr in goods.attr_list"
                                                         :key="attr.id">
                                                     {{attr.attr_group_name}}:{{attr.attr_name}}
-                                                </el-tag>
+                                                </el-tag>-->
                                                 </slot>
                                             </span>
                                         </div>
@@ -565,6 +591,7 @@ Yii::$app->loadComponentView('order/com-city');
                                 </div>
                             </div>
                         </div>
+
                         <div flex="cross:center" class="com-order-info" :style="{width:orderTitle[1].width}">
                             <div flex="dir:top">
                                 <div>
@@ -621,6 +648,9 @@ Yii::$app->loadComponentView('order/com-city');
                                 <div>
                                     (<span style="color: red">红包抵扣</span><span style="color: #909399">￥{{item.integral_deduction_price}})</span>
                                 </div>
+                                <div>
+                                    (<span style="color: red">购物券抵扣</span><span style="color: #909399">￥{{item.shopping_voucher_decode_price}})</span>
+                                </div>
                                 <div class="express-price">
                                     <span>
                                         <span style="color: #909399">(含运费￥{{item.express_price}})</span>
@@ -645,7 +675,23 @@ Yii::$app->loadComponentView('order/com-city');
                                 </div>
                             </div>
                         </div>
-                        <div v-if="isShowAction" class="com-order-info" :style="{width:orderTitle[2].width}"
+
+                        <div class="share-benefit" :style="{width:orderTitle[2].width}"
+                             style="padding: 10px 0;border-right: 1px solid #EBEEF5;">
+                            <template>
+                                <ul class="infinite-list" v-infinite-scroll="load" style="">
+                                    <li v-for="(nav,index) in item.share_profit" class="infinite-list-item" style="font-size:1px;text-align: left;margin: 10px;">
+                                        昵称：{{nav.nickname}}(ID:{{nav.user_id}})
+                                        <span style="margin-left: 10px;">佣金：{{ nav.price }}</span>
+                                        <span v-if="nav.status == -1">状态：无效</span>
+                                        <span v-if="nav.status == 0">状态：待结算</span>
+                                        <span v-if="nav.status == 1">状态：已结算</span>
+                                    </li>
+                                </ul>
+                            </template>
+                        </div>
+
+                        <div v-if="isShowAction" class="com-order-info" :style="{width:orderTitle[3].width}"
                              style="padding: 10px;border-right: 0;">
                             <div flex="wrap:wrap cross:center">
                                 <!-- 结束 -->
@@ -758,6 +804,7 @@ Yii::$app->loadComponentView('order/com-city');
                         <!--目前用于分销-->
                         <slot name="orderAction" :order="item"></slot>
                     </div>
+
                     <div class="card-footer">
                         <template v-if="item.send_type == 1">
                             <div flex="cross:center">
@@ -867,9 +914,10 @@ Yii::$app->loadComponentView('order/com-city');
                 type: Array,
                 default: function () {
                     return [
-                        {width: '60%', name: '订单信息'},
-                        {width: '20%', name: '实付金额'},
-                        {width: '20%', name: '操作'}
+                        {width: '40%', name: '订单信息'},
+                        {width: '10%', name: '实付金额'},
+                        {width: '35%', name: '分润信息'},
+                        {width: '15%', name: '操作'}
                     ]
                 }
             },
@@ -1038,11 +1086,13 @@ Yii::$app->loadComponentView('order/com-city');
         },
         data() {
             return {
+                count: 10,
                 search: {},
                 submitLoading: false,
                 // 新的
                 loading: false,
                 list: [],
+                Statistics : [],
                 pagination: null,
                 newOrder: {},// 传给各子组件的订单信息
                 addressVisible: false,// 修改收货地址
@@ -1089,6 +1139,9 @@ Yii::$app->loadComponentView('order/com-city');
             this.getList();
         },
         methods: {
+            load () {
+                //this.count += 2
+            },
             // 关闭弹出框
             closeDialog() {
                 this.submitLoading = false;
@@ -1203,6 +1256,7 @@ Yii::$app->loadComponentView('order/com-city');
                 }).catch(() => {
                 });
             },
+
             changeGoods(e) {
                 this.editGoodsPriceVisible = true;
                 this.editGoodsForm.total_price = e.total_original_price;
@@ -1343,6 +1397,7 @@ Yii::$app->loadComponentView('order/com-city');
                         this.export_list = e.data.data.export_list;
                         this.pagination = e.data.data.pagination;
                         this.plugins = e.data.data.plugins;
+                        this.Statistics = e.data.data.Statistics;
                     }
                 }).catch(e => {
                 });

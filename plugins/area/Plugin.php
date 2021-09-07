@@ -47,19 +47,19 @@ class Plugin extends \app\plugins\Plugin
                 'icon' => 'el-icon-setting',
 
             ],
-            [
+            /*[
                 'name' => '申请列表',
                 'route' => 'plugin/area/mall/area/apply',
                 'icon' => 'el-icon-setting',
 
-            ],
+            ],*/
             [
                 'name' => '基础配置',
                 'route' => 'plugin/area/mall/area/setting',
                 'icon' => 'el-icon-setting',
 
             ],
-            [
+            /*[
                 'name' => '提成明细',
                 'route' => 'plugin/area/mall/area/income-list',
                 'icon' => 'el-icon-setting',
@@ -69,7 +69,7 @@ class Plugin extends \app\plugins\Plugin
                         'route' => 'plugin/area/mall/area/income-detail',
                     ],
                 ]
-            ],
+            ],*/
         ];
     }
 

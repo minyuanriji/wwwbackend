@@ -2503,9 +2503,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             },
             //检查是否积分全额抵扣
             checkFullForeheadScore() {
-                if (this.ruleForm.forehead_score == 99999999 &&
-                    this.ruleForm.accumulative == 1
-                ) {
+                if (this.ruleForm.forehead_score == 99999999 && this.ruleForm.accumulative == 1) {
                     this.ruleForm.full_forehead_score = 1;
                 }
             },

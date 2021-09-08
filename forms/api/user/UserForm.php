@@ -335,6 +335,14 @@ class UserForm extends BaseModel
             "open_type" => "navigate"
         ];
 
+        //酒店
+        $userCenter['menus'][] = [
+            "icon_url"  => "https://dev.mingyuanriji.cn/web/static/hotel-orders.png",
+            "name"      => "酒店",
+            "link_url"  => "/hotel/Home/Home",
+            "open_type" => "navigate"
+        ];
+
         //本地生活订单
         $userCenter['menus'][] = [
             "icon_url"  => "https://dev.mingyuanriji.cn/web/static/gift_packs.png",

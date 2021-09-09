@@ -40,9 +40,21 @@ class StoreScanCodeLogListForm extends BaseModel
             'cc.mall_id' => \Yii::$app->mall->id,
         ])->joinwith(['user' => function ($query) {
             if ($this->keyword) {
-                $query->where(['like', 'nickname', $this->keyword]);
+                //$query->where(['like', 'nickname', $this->keyword]);
             }
         }])->orderBy('id desc');
+        $query->innerJoin(["u" => User::tableName()], "u.id=cc.user_id");
+        $query->innerJoin(["co" => MchCheckoutOrder::tableName()], "co.id=cc.checkout_order_id");
+        $query->innerJoin(["s" => Store::tableName()], "s.mch_id=co.mch_id");
+
+        if($this->keyword){
+            $query->andWhere([
+                "OR",
+                ["LIKE", "u.nickname", $this->keyword],
+                ["LIKE", "s.name", $this->keyword],
+                ["s.mch_id" => (int)$this->keyword]
+            ]);
+        }
 
         if ($this->start_date && $this->end_date) {
             $query->andWhere(['<', 'cc.created_at', strtotime($this->end_date)])
@@ -53,7 +65,7 @@ class StoreScanCodeLogListForm extends BaseModel
         } else {
             $query->andWhere(['cc.status' => $this->status]);
         }
-        $list = $query->page($pagination, $this->limit)->asArray()->all();
+        $list = $query->select(["cc.*"])->page($pagination, $this->limit)->asArray()->all();
         if ($list) {
             foreach ($list as &$item) {
                 $item['order_no']       = '';
@@ -75,7 +87,7 @@ class StoreScanCodeLogListForm extends BaseModel
                     $user = User::findOne($mch_checkout_order->pay_user_id);
                     $item['pay_user_name'] = $user ? $user->nickname : '';
 
-                    $store = Store::findOne($mch_checkout_order->mch_id);
+                    $store = Store::findOne(["mch_id" => $mch_checkout_order->mch_id]);
                     if ($store) {
                         $item['store_name'] = $store->name;
                         $item['store_url'] = $store->cover_url;

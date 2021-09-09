@@ -1130,6 +1130,10 @@ Yii::$app->loadComponentView('order/com-city');
                 this.search.keyword_1 = '4';
                 this.search.keyword = getQuery('user_id')
             }
+            if (getQuery('order_no')) {
+                this.search.keyword_1 = '1';
+                this.search.keyword = getQuery('order_no')
+            }
             if (getQuery('clerk_id') > 0) {
                 this.search.clerk_id = getQuery('clerk_id');
             }

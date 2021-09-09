@@ -30,7 +30,13 @@ class Plugin extends \app\plugins\Plugin{
                 'route' => 'plugin/finance_analysis/mall/finance/analysis',
                 'icon' => 'el-icon-setting',
                 'action' => []
-            ]
+            ],
+            [
+                'name' => '财务明细',
+                'route' => 'plugin/finance_analysis/mall/finance/finance-details',
+                'icon' => 'el-icon-setting',
+                'action' => []
+            ],
         ];
     }
 

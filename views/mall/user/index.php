@@ -44,9 +44,11 @@
                 <el-table-column prop="user_id" label="ID" width="100"></el-table-column>
                 <el-table-column label="头像" width="280">
                     <template slot-scope="scope">
-                        <com-image mode="aspectFill" style="float: left;margin-right: 8px"
-                                   :src="scope.row.avatar_url"></com-image>
-                        <div>{{scope.row.nickname}}</div>
+                        <div  @click="$navigate({r: 'plugin/finance_analysis/mall/finance/finance-details', user_id:scope.row.user_id})">
+                            <com-image mode="aspectFill" style="float: left;margin-right: 8px"
+                                       :src="scope.row.avatar_url"></com-image>
+                        </div>
+                        <div @click="$navigate({r: 'plugin/finance_analysis/mall/finance/finance-details', user_id:scope.row.user_id})">{{scope.row.nickname}}</div>
                         <img class="platform-img" v-if="scope.row.platform == 'mp-wx'" src="statics/img/mall/wx.png"
                              alt="">
                         <img class="platform-img" v-if="scope.row.platform == 'wechat'" src="statics/img/mall/wx.png"

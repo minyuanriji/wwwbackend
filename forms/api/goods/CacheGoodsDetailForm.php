@@ -21,6 +21,7 @@ use app\models\GoodsFootmark;
 use app\models\GoodsService;
 use app\models\Option;
 use app\models\UserCoupon;
+use app\plugins\shopping_voucher\models\ShoppingVoucherTargetGoods;
 use app\services\Goods\PriceDisplayService;
 
 class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
@@ -197,6 +198,25 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                     }
                 } else {
                     $is_buy_power = 1;
+                }
+            }
+
+            //判断是否是购物券商品
+            $info['shopping_voucher'] = [
+                "is_shopping_voucher_goods" => 0,
+                'user_shopping_voucher'     => 0,
+                'voucher_price'             => 0
+            ];
+            $voucherGoods = ShoppingVoucherTargetGoods::findOne([
+                "is_delete" => 0,
+                "goods_id"  => $this->id
+            ]);
+            if($voucherGoods){
+                $info['shopping_voucher']['is_shopping_voucher_goods'] = 1;
+                $info['shopping_voucher']['voucher_price'] = $voucherGoods->voucher_price;
+                if(!\Yii::$app->user->isGuest){
+                    $user = \Yii::$app->user->getIdentity();
+                    $info['shopping_voucher']['user_shopping_voucher'] = $user ? $user->shoppingVoucherUser->money : 0;
                 }
             }
 

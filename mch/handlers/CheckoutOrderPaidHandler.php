@@ -5,11 +5,13 @@ namespace app\mch\handlers;
 use app\core\ApiCode;
 use app\forms\common\WebSocketRequestForm;
 use app\helpers\tencent_cloud\TencentCloudAudioHelper;
+use app\logic\RelationLogic;
 use app\mch\events\CheckoutOrderPaidEvent;
 use app\mch\forms\order\CheckoutOrderDeductIntegralForm;
 use app\models\Mall;
 use app\forms\efps\distribute\EfpsDistributeForm;
 use app\models\Store;
+use app\models\User;
 use app\plugins\mch\models\Mch;
 
 class CheckoutOrderPaidHandler {
@@ -27,6 +29,8 @@ class CheckoutOrderPaidHandler {
 
         \Yii::$app->setMallId($mall->id);
         \Yii::$app->setMall($mall);
+
+        $status = 0;
 
         if(!$checkoutOrder->is_pay){
 
@@ -71,10 +75,22 @@ class CheckoutOrderPaidHandler {
 
                 $t->commit();
 
+                $status = 1;
+
                 static::voiceNotify($mch->mobile, "补商汇到账" . $checkoutOrder->order_price . "元");
             }catch (\Exception $e){
                 $t->rollBack();
                 throw new \Exception($e->getMessage());
+            }
+        }
+
+        //如果支付用户没有上级，设置用户的上级为商家所绑定的小程序用户
+        if($status){
+            $payUser = User::findOne($checkoutOrder->pay_user_id);
+            try {
+                RelationLogic::bindParent($payUser, $mch->user_id);
+            }catch (\Exception $e){
+
             }
         }
     }

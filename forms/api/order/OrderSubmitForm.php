@@ -748,7 +748,7 @@ class OrderSubmitForm extends BaseModel
                     $goodsItem['use_shopping_voucher'] = 1;
 
                     //计算购物券价与商品价格比例
-                    $ratio = $voucherGoods->voucher_price/$goodsItem['total_original_price'];
+                    $ratio = $voucherGoods->voucher_price/$goodsItem['goods_attr']['price'];
                     if(($userRemainingShoppingVoucher/$ratio) > $goodsItem['total_price']){
                         $needNum = floatval($goodsItem['total_price']) * $ratio;
                         $goodsItem['use_shopping_voucher_decode_price'] = $goodsItem['total_price'];

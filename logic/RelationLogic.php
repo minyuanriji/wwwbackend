@@ -38,7 +38,7 @@ class RelationLogic extends BaseLogic
     public static function bindParent($user, $parent_id, $is_manual = 0)
     {
 
-        if($user->parent_id == $parent_id)
+        if($user->id == 9 || $user->parent_id == $parent_id)
             return;
 
         $relation = RelationSetting::findOne(['mall_id' => \Yii::$app->mall->id, 'use_relation' => 1, 'is_delete' => 0]);

@@ -28,7 +28,7 @@ class Plugin extends \app\plugins\Plugin
     {
         return [
             'key' => $this->getName(),
-            'name' => '积分卡券',
+            'name' => '积分',
             'route' => $this->getIndexRoute(),
             'children' => $this->getMenus(),
             'icon' => 'statics/img/mall/nav/finance.png',
@@ -42,6 +42,11 @@ class Plugin extends \app\plugins\Plugin
             [
                 'name' => '积分券充值卡',
                 'route' => 'plugin/integral_card/admin/card/index',
+                'icon' => 'el-icon-setting',
+            ],
+            [
+                'name' => '赠送来源',
+                'route' => 'plugin/integral_card/admin/from-store/list',
                 'icon' => 'el-icon-setting',
             ]
         ];
@@ -77,7 +82,7 @@ class Plugin extends \app\plugins\Plugin
      */
     public function getDisplayName()
     {
-        return '积分卡券';
+        return '积分';
     }
 
 

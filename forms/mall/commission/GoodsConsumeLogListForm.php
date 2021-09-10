@@ -35,9 +35,19 @@ class GoodsConsumeLogListForm extends BaseModel
             'cg.mall_id' => \Yii::$app->mall->id,
         ])->joinwith(['user' => function ($query) {
             if ($this->keyword) {
-                $query->where(['like', 'nickname', $this->keyword]);
+                //$query->where(['like', 'nickname', $this->keyword]);
             }
         }])->orderBy('id desc');
+        $query->innerJoin(["g" => Goods::tableName()], "g.id=cg.goods_id");
+        $query->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");
+        $query->innerJoin(["u" => User::tableName()], "u.id=cg.user_id");
+        if($this->keyword){
+            $query->andWhere([
+                "OR",
+                ["LIKE", "u.nickname", $this->keyword],
+                ["LIKE", "gw.name", $this->keyword]
+            ]);
+        }
 
         if ($this->start_date && $this->end_date) {
             $query->andWhere(['<', 'cg.created_at', strtotime($this->end_date)])

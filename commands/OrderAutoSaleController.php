@@ -3,6 +3,7 @@ namespace app\commands;
 
 
 use app\events\OrderEvent;
+use app\logic\IntegralLogic;
 use app\models\Mall;
 use app\models\Order;
 
@@ -46,6 +47,10 @@ class OrderAutoSaleController extends BaseCommandController {
                 if (!$order->save()) {
                     throw new \Exception(json_encode($order->getErrors()));
                 }
+
+                //赠送积分
+                IntegralLogic::sendScore($order);
+
                 $event = new OrderEvent([
                     'order' => $order,
                 ]);

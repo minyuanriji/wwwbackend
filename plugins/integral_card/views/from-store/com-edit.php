@@ -29,8 +29,8 @@ Yii::$app->loadComponentView('store/com-dialog-select');
                         <el-switch v-model="formData.score_give_settings.is_permanent" :active-value="1" :inactive-value="0" active-text="永久有效" inactive-text="限时有效"></el-switch>
 
                         <div style="margin-top:10px;width:250px">
-                            <el-input type="number" :min="0" v-model="formData.score_give_settings.integral_num" placeholder="">
-                                <template slot="append">积分券</template>
+                            <el-input type="number" :min="0" :max="100" v-model="formData.rate" placeholder="">
+                                <template slot="append">%</template>
                             </el-input>
                         </div>
 

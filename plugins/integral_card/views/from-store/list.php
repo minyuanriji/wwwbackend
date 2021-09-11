@@ -48,11 +48,11 @@ echo $this->render("com-edit");
                         <span v-if="scope.row.enable_score != 1">已关闭</span>
                         <span v-else>
                             <span v-if="scope.row.score_give_settings.is_permanent == 1">
-                                永久，赠送{{scope.row.score_give_settings.integral_num}}积分
+                                永久，赠送比例{{scope.row.rate}}%
                             </span>
                             <span v-else>
-                                限时，每月{{scope.row.score_give_settings.integral_num}}积分，
-                                赠送{{scope.row.score_give_settings.period}}个月
+                                限时，赠送比例{{scope.row.rate}}%，
+                                送{{scope.row.score_give_settings.period}}个月
                             </span>
                         </span>
                     </template>

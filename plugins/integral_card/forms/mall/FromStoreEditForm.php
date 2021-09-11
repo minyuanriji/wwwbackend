@@ -16,13 +16,14 @@ class FromStoreEditForm extends BaseModel{
     public $start_at;
     public $score_enable;
     public $score_give_settings;
+    public $rate;
 
     public function rules(){
         return [
             [['mch_id', 'store_id', 'name', 'cover_url'], 'required'],
             [['id', 'mch_id', 'store_id'], 'integer'],
             [['start_at'], 'string'],
-            [['score_give_settings', 'score_enable'], 'safe']
+            [['score_give_settings', 'score_enable', 'rate'], 'safe']
         ];
     }
 
@@ -65,6 +66,7 @@ class FromStoreEditForm extends BaseModel{
             $fromStore->start_at      = strtotime($this->start_at);
             $fromStore->enable_score  = $this->score_enable == "true" ? 1 : 0;
             $fromStore->score_setting = is_array($this->score_give_settings) ? json_encode($this->score_give_settings) : '';
+            $fromStore->rate          = min(max(0, (float)$this->rate), 100);
 
             if(!$fromStore->save()){
                 throw new \Exception($this->responseErrorMsg($fromStore));

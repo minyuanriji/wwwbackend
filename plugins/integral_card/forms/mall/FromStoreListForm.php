@@ -53,6 +53,7 @@ class FromStoreListForm extends BaseModel {
                     $item['score_give_settings'] = array_merge($scoreGiveSettings,
                         !empty($item['score_setting']) ? (array)@json_decode($item['score_setting']) : []);
                     $item['score_give_settings']['is_permanent'] = (int)$item['score_give_settings']['is_permanent'];
+                    $item['rate'] = (float)$item['rate'];
                 }
             }
 

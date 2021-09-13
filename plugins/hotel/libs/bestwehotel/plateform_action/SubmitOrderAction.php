@@ -46,21 +46,16 @@ class SubmitOrderAction extends BaseObject {
             $endDay = date("Y-m-d", strtotime($this->hotelOrder->booking_start_date) + $this->hotelOrder->booking_days * 3600 * 24);
             $bookingData = @json_decode($this->hotelOrder->origin_booking_data, true);
 
-            //计算到店时间如果在 凌晨4点之前 就等于4点   18-24 之间就等于第二天凌晨4点
-            $two_four_time = date('Y-m-d H:i:s', (strtotime(date('Y-m-d',strtotime('+1 day'))) + 14400 - 1));//第二天4点
-            $lastArrTim = $this->hotelOrder->booking_arrive_date;
-            $booking_arrive_time = strtotime($lastArrTim);//到店时间
-            $eighteen_time = strtotime("18:00:00");//当天18点
-            $twenty_three_time = strtotime("23:59:59");//当天23点
-            $zero_time = strtotime("00:00:00");//当天凌晨
-            $four_time = strtotime("04:00:00");//当天4点
+            $start_time = strtotime($this->hotelOrder->booking_start_date);//入住时间
+            $arriveTime = $this->hotelOrder->booking_arrive_date;
+            $booking_arrive_time = strtotime($arriveTime);//到店时间
+            $twelve_time = $start_time + 43200;//入住时间12点
+            $six_time = $start_time + 108000;//入住时间第二天凌晨6点
 
-            if ($booking_arrive_time >= $zero_time && $booking_arrive_time <= $four_time) {
-                $lastArrTim = date('Y-m-d H:i:s', $four_time - 1);
-            }
-
-            if ($booking_arrive_time >= $eighteen_time && $twenty_three_time <= $twenty_three_time){
-                $lastArrTim = $two_four_time;
+            if ($booking_arrive_time >= $twelve_time && $booking_arrive_time <= $six_time) {
+                $lastArrTime = $arriveTime;
+            } else {
+                $lastArrTime = date('Y-m-d H:i:s',$twelve_time + 1800);
             }
 
             $requestModel = new PostOrderRequest([
@@ -73,7 +68,7 @@ class SubmitOrderAction extends BaseObject {
                 "totalRate"    => $this->hotelOrder->order_price,
                 "externalId"   => $this->hotelOrder->order_no,
                 "productCode"  => isset($bookingData['productCode']) ? $bookingData['productCode'] : '',
-                "lastArrTime"  => $lastArrTim,
+                "lastArrTime"  => $lastArrTime,
             ]);
 
             $passengers = @json_decode($this->hotelOrder->booking_passengers, true);

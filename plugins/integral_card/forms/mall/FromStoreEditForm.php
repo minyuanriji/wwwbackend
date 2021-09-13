@@ -58,6 +58,14 @@ class FromStoreEditForm extends BaseModel{
 
             }
 
+            $this->score_give_settings['integral_num'] = 0;
+            if(isset($this->score_give_settings['is_permanent']) && $this->score_give_settings['is_permanent']){
+                $this->score_give_settings['expire'] = -1;
+                $this->score_give_settings['period'] = 1;
+            }else{
+                $this->score_give_settings['expire'] = max(0, min($this->score_give_settings['expire'], 31));
+            }
+
             $fromStore->mch_id        = $this->mch_id;
             $fromStore->store_id      = $this->store_id;
             $fromStore->updated_at    = time();

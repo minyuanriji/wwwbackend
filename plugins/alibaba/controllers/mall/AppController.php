@@ -2,6 +2,7 @@
 
 namespace app\plugins\alibaba\controllers\mall;
 
+use app\plugins\alibaba\forms\mall\AlibabaAppDeleteForm;
 use app\plugins\alibaba\forms\mall\AlibabaAppEditForm;
 use app\plugins\alibaba\forms\mall\AlibabaAppListForm;
 use app\plugins\Controller;
@@ -30,5 +31,15 @@ class AppController extends Controller{
         $form = new AlibabaAppEditForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->save());
+    }
+
+    /**
+     * 删除应用
+     * @return string|\yii\web\Response
+     */
+    public function actionDelete(){
+        $form = new AlibabaAppDeleteForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->delete());
     }
 }

@@ -6,7 +6,7 @@ use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
-use app\plugins\shopping_voucher\models\ScoreFromStore;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 use yii\base\Action;
 
@@ -72,7 +72,7 @@ class MchCheckoutOrderSendAction extends Action{
     private function newAction(){
         $query = MchCheckoutOrder::find()->alias("mco");
         $query->innerJoin(["m" => Mch::tableName()], "m.id=mco.mch_id AND m.is_delete=0 AND m.review_status=1");
-        $query->innerJoin(["svfs" => ScoreFromStore::tableName()], "svfs.store_id=mco.store_id AND svfs.is_delete=0");
+        $query->innerJoin(["svfs" => ShoppingVoucherFromStore::tableName()], "svfs.store_id=mco.store_id AND svfs.is_delete=0");
         $query->leftJoin(["svsl" => ShoppingVoucherSendLog::tableName()], "svsl.source_id=mco.id AND svsl.source_type='from_mch_checkout_order'");
 
         $query->andWhere([

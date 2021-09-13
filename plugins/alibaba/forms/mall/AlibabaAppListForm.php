@@ -5,14 +5,16 @@ namespace app\plugins\alibaba\forms\mall;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\alibaba\models\AlibabaApp;
+use app\plugins\alibaba\models\AlibabaDistributionGoodsCategory;
 
 class AlibabaAppListForm extends BaseModel{
 
     public $page;
+    public $id;
 
     public function rules(){
         return [
-            [['page'], 'integer']
+            [['page', 'id'], 'integer']
         ];
     }
 
@@ -23,15 +25,26 @@ class AlibabaAppListForm extends BaseModel{
 
         try {
 
-            $query = AlibabaApp::find()->where(["is_delete" => 0]);
-            $orderBy = "id DESC";
+            $categoryNum = (int)AlibabaDistributionGoodsCategory::find()->where([
+                "is_delete" => 0
+            ])->count();
 
+            $query = AlibabaApp::find()->where(["is_delete" => 0]);
+
+            if($this->id){
+                $query->andWhere(["id" => $this->id]);
+            }
+
+            $orderBy = "id DESC";
             $query->orderBy($orderBy);
 
             $list = $query->asArray()->page($pagination, 20, $this->page)->all();
             if($list){
                 foreach($list as &$item){
                     $item['token_info'] = !empty($item['token_info']) ? @json_decode($item['token_info'], true) : [];
+                    $item['is_access_token_expired'] = !empty($item['access_token']) && $item['token_expired_at'] < time() ? true : false;
+                    $item['is_refresh_token_expired'] = !empty($item['refresh_token']) && $item['refresh_expired_at'] < time() ? true : false;
+                    $item['category_num'] = $categoryNum;
                 }
             }
 
@@ -39,7 +52,7 @@ class AlibabaAppListForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'list' => $list ? $list : [],
-                    'pagination' => $pagination,
+                    'pagination' => $pagination
                 ]
             ];
         }catch (\Exception $e){

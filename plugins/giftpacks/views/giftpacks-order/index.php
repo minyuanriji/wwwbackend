@@ -51,7 +51,8 @@
                     <el-table-column label="实付金额" width="130">
                         <template slot-scope="scope">
                             <div>红包：{{scope.row.integral_deduction_price ?? 0}}</div>
-                            <div>余额：{{scope.row.pay_price ?? 0}}</div>
+                            <div v-if="scope.row.pay_type=='balance'">账户余额：{{scope.row.pay_price ?? 0}}</div>
+                            <div v-if="scope.row.pay_type=='money'">现金：{{scope.row.pay_price ?? 0}}</div>
                         </template>
                     </el-table-column>
 

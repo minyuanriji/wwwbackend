@@ -1,23 +1,23 @@
 <?php
-Yii::$app->loadComponentView('store/com-dialog-select');
+Yii::$app->loadComponentView('store/com-shop-store-list');
 ?>
 <template id="com-edit">
     <div class="com-edit">
         <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
-            <el-form :rules="rules" ref="formData" label-width="20%" :model="formData" size="small">
+            <el-form ref="formData" label-width="20%" :model="formData" size="small">
                 <el-form-item label="选择商户" prop="mch_id">
-                    <div style="display:flex" v-if="formData.mch_id > 0" >
-                        <div style="margin-right: 10px;">
-                            <com-image mode="aspectFill" :src="formData.cover_url"></com-image>
-                        </div>
-                        <div style="justify-content:flex-start;display:flex;flex-direction:column">
-                            <div>{{formData.name}}</div>
-                            <div>ID:{{formData.mch_id}}</div>
-                        </div>
-                    </div>
-                    <com-dialog-select :multiple="false" @selected="storeSelect" title="门店选择">
+                        <el-table :data="formData.store" style="width: 100%">
+                            <el-table-column prop="mch_id" label="ID" width="180"></el-table-column>
+                            <el-table-column prop="name" label="店铺名" width="180"></el-table-column>
+                            <el-table-column prop="cover_url" label="店铺图片" width="180">
+                                <template slot-scope="scope">
+                                    <com-image mode="aspectFill" :src="scope.row.cover_url"></com-image>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    <com-shop-store-list :multiple="false" @selected="storeSelect" title="门店选择">
                         <el-button type="primary" size="small">指定门店</el-button>
-                    </com-dialog-select>
+                    </com-shop-store-list>
                 </el-form-item>
                 <el-form-item label="赠送比例" prop="give_value">
                     <el-input type="number" min="0" max="100" placeholder="请输入内容" v-model="formData.give_value" style="width:300px;">
@@ -42,16 +42,16 @@ Yii::$app->loadComponentView('store/com-dialog-select');
 
 <script>
     function initFormData(){
-        return {
-            id: 0,
-            mch_id: '',
-            store_id: '',
-            give_type: 1,
-            give_value:0,
-            name: '',
-            cover_url: '',
-            start_at: ''
-        };
+        return  [{
+                    id: 0,
+                    mch_id: '',
+                    store_id: '',
+                    give_type: 1,
+                    give_value:0,
+                    name: '',
+                    cover_url: '',
+                    start_at: ''
+                }];
     }
 
     Vue.component('com-edit', {
@@ -65,25 +65,20 @@ Yii::$app->loadComponentView('store/com-dialog-select');
                 dialogTitle: "添加商户",
                 activeName: "first",
                 dialogVisible: false,
-                formData: initFormData(),
-                rules: {
-                    mch_id: [
-                        {required: true, message: '请设置商户', trigger: 'change'},
-                    ],
-                    give_value: [
-                        {required: true, message: '请设置赠送比例', trigger: 'change'},
-                    ],
+                formData: {
+                    store:''
                 },
-                btnLoading: false
+                btnLoading: false,
+                StoreData:[],
             };
         },
         watch: {
             visible(val, oldVal){
                 this.dialogVisible = val;
             },
-            editData(val, oldVal){
+            /*editData(val, oldVal){
                 this.formData = Object.assign(initFormData(), val);
-            }
+            }*/
         },
         methods: {
             save(){
@@ -93,7 +88,7 @@ Yii::$app->loadComponentView('store/com-dialog-select');
                         that.btnLoading = true;
                         request({
                             params: {
-                                r: 'plugin/shopping_voucher/mall/from-store/edit'
+                                r: 'plugin/shopping_voucher/mall/from-store/batch-save'
                             },
                             method: 'post',
                             data: that.formData
@@ -113,10 +108,18 @@ Yii::$app->loadComponentView('store/com-dialog-select');
                 });
             },
             storeSelect(data){
-                this.formData.mch_id    = data.store.mch_id;
-                this.formData.store_id  = data.store.id;
-                this.formData.name      = data.store.name;
-                this.formData.cover_url = data.store.cover_url;
+                for (i=0;i<data.length;i++) {
+                    if(this.StoreData.indexOf(data[i])==-1){
+                        this.StoreData.push({
+                            mch_id:data[i].store.mch_id,
+                            store_id:data[i].store.id,
+                            name:data[i].store.name,
+                            cover_url:data[i].store.cover_url,
+                            give_type:1,
+                        })
+                    }
+                }
+                this.formData.store = this.StoreData;
             },
             close(){
                 this.$emit('close');

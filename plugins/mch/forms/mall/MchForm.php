@@ -3,12 +3,10 @@
 namespace app\plugins\mch\forms\mall;
 
 use app\core\ApiCode;
-use app\helpers\ArrayHelper;
 use app\models\Admin;
 use app\models\DistrictArr;
 use app\models\BaseModel;
-use app\models\EfpsMerchantMcc;
-use app\models\EfpsMchReviewInfo;
+use app\models\Store;
 use app\models\User;
 use app\plugins\mch\forms\common\CommonMchForm;
 use app\plugins\mch\models\Mch;
@@ -21,13 +19,16 @@ class MchForm extends BaseModel
     public $switch_type;
     public $password;
     public $sort;
+    public $level;
+    public $address;
 
     public function rules()
     {
         return [
             [['keyword', 'switch_type', 'password'], 'string'],
-            [['id', 'sort'], 'integer'],
+            [['id', 'sort', 'level'], 'integer'],
             [['page'], 'default', 'value' => 1],
+            [['address'], 'safe'],
         ];
     }
 
@@ -303,4 +304,59 @@ class MchForm extends BaseModel
 
         return $count;
     }
+
+    public function getMchList()
+    {
+        $query = Mch::find()->where([
+            'mall_id' => \Yii::$app->mall->id,
+            'is_delete' => 0,
+            'review_status' => 1,
+        ]);
+
+        if ($this->keyword) {
+            $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
+            $userIds = User::find()->where(['like', 'nickname', $this->keyword])->andWhere(['mall_id' => \Yii::$app->mall->id])->select('id');
+            $query->andWhere([
+                'or',
+                ['id' => $mchIds],
+                ['user_id' => $userIds],
+            ]);
+        }
+        if (is_array($this->address) && $this->address) {
+            $add_count = count($this->address);
+            if ($add_count == 1) {
+                $where = ['province_id' => $this->address[0]];
+            } elseif ($add_count == 2) {
+                $where = ['province_id' => $this->address[0], 'city_id' => $this->address[1]];
+            } elseif ($add_count == 3) {
+                $where = ['province_id' => $this->address[0], 'city_id' => $this->address[1], 'district_id' => $this->address[2]];
+            } else {
+                return $this->returnApiResultData(ApiCode::CODE_FAIL, '参数错误，请重新选择地区');
+            }
+            $mch_ids = Store::find()->where($where)->select('mch_id');
+            $query->andWhere([
+                'id' => $mch_ids,
+            ]);
+        }
+
+        $list = $query->orderBy(['sort' => SORT_ASC])
+            ->with('user', 'store', 'category')
+            ->page($pagination)->asArray()->all();
+
+        if($list){
+            foreach($list as &$item){
+                $item['name'] = $item['store']['name'];
+            }
+        }
+
+        return [
+            'code' => ApiCode::CODE_SUCCESS,
+            'msg' => '请求成功',
+            'data' => [
+                'list' => $list,
+                'pagination' => $pagination
+            ]
+        ];
+    }
+
 }

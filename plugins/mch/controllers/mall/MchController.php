@@ -158,4 +158,15 @@ class MchController extends Controller
         }
     }
 
+    public function actionMchList()
+    {
+        if (\Yii::$app->request->isAjax) {
+            $form = new MchForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->getMchList());
+        } else {
+            return $this->render('index');
+        }
+    }
+
 }

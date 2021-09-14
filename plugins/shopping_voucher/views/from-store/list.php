@@ -93,7 +93,23 @@ echo $this->render("com-edit");
     <com-edit :visible="editDialogVisible"
               :edit-data="editData"
               @close="close"
-              @update="update"></com-edit>
+              @update="update">
+    </com-edit>
+
+    <el-dialog title="修改比例" :visible.sync="dialogContent">
+        <el-form :model="ratioForm">
+            <el-form-item label="">
+                <el-input style="display: none" :readonly="true" v-model="ratioForm.id"></el-input>
+                <el-input type="number" min="0" max="100" placeholder="请输入内容" v-model="ratioForm.ratio" style="width:300px;">
+                    <template slot="append">%</template>
+                </el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogContent = false">取 消</el-button>
+            <el-button type="primary" @click="ratioSubmit" :loading="ratioLoading">确 定</el-button>
+        </div>
+    </el-dialog>
 
 </div>
 <script>
@@ -111,7 +127,9 @@ echo $this->render("com-edit");
                 list: [],
                 pagination: null,
                 loading: false,
-
+                dialogContent: false,
+                ratioForm:'',
+                ratioLoading: false,
             };
         },
         methods: {
@@ -120,8 +138,37 @@ echo $this->render("com-edit");
                 this.editDialogVisible = true;
             },
             editStore(row){
-                this.editData = row;
-                this.editDialogVisible = true;
+                this.dialogContent = true;
+                this.ratioForm = {
+                    ratio: row.ratio,
+                    id: row.id
+                }
+            },
+            ratioSubmit() {
+                this.ratioLoading = true;
+                request({
+                    params: {
+                        r: 'plugin/shopping_voucher/mall/from-store/edit-ratio',
+                    },
+                    method: 'post',
+                    data:{
+                        ratio: this.ratioForm.ratio,
+                        id: this.ratioForm.id
+                    }
+                }).then(e => {
+                    this.ratioLoading = false;
+                    if (e.data.code == 0) {
+                        this.dialogContent = false;
+                        this.getList();
+                        this.$message.success(e.data.msg);
+                    } else {
+                        this.$message.error(e.data.data.msg);
+                    }
+                }).catch(e => {
+                    this.ratioLoading = false;
+
+                    this.$message.error('未知错误');
+                });
             },
             deleteOn(row){
                 let self = this;

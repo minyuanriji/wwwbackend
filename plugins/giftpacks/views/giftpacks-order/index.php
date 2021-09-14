@@ -48,6 +48,15 @@
                         </template>
                     </el-table-column>
 
+                    <el-table-column label="支付状态" width="130">
+                        <template slot-scope="scope">
+                            <div v-if="scope.row.pay_status=='refund'" style="color: red">已退款</div>
+                            <div v-if="scope.row.pay_status=='refunding'" style="color: red">退款中</div>
+                            <div v-if="scope.row.pay_status=='paid'" style="color: green">已支付</div>
+                            <div v-if="scope.row.pay_status=='unpaid'">未支付</div>
+                        </template>
+                    </el-table-column>
+
                     <el-table-column label="实付金额" width="130">
                         <template slot-scope="scope">
                             <div>红包：{{scope.row.integral_deduction_price ?? 0}}</div>
@@ -58,8 +67,8 @@
 
                     <el-table-column label="赠送" width="150">
                         <template slot-scope="scope">
-                            <div v-if="scope.row.integral_enable == 1">红包：{{scope.row.integral_give_num}}</div>
-                            <div v-if="scope.row.score_enable == 1">
+                            <div v-if="scope.row.integral_enable == 1 && scope.row.is_integral == 1 && scope.row.pay_status == 'paid'">红包：{{scope.row.integral_give_num}}</div>
+                            <div v-if="scope.row.score_enable == 1 && scope.row.pay_status == 'paid'">
                                 <span v-if="scope.row.score_give_settings.is_permanent == 1">永久积分：{{scope.row.score_give_settings.integral_num}}</span>
                                 <span v-else>
                                     限时积分：{{scope.row.score_give_settings.integral_num}}<br/>
@@ -83,20 +92,20 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="操作">
+                    <!--<el-table-column label="操作">
                         <template slot-scope="scope">
-                            <!--<el-button @click="toDetail(scope.row.id)" type="text" circle size="mini">
+                            <el-button @click="toDetail(scope.row.id)" type="text" circle size="mini">
                                 <el-tooltip class="item" effect="dark" content="查看订单详情" placement="top">
                                     <img src="statics/img/mall/order/detail.png" alt="">
                                 </el-tooltip>
-                            </el-button>-->
-                            <!--<el-button @click="destroy(scope.row.id, scope.$index)" circle type="text" size="mini">
+                            </el-button>
+                            <el-button @click="destroy(scope.row.id, scope.$index)" circle type="text" size="mini">
                                 <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                     <img src="statics/img/mall/del.png" alt="">
                                 </el-tooltip>
-                            </el-button>-->
+                            </el-button>
                         </template>
-                    </el-table-column>
+                    </el-table-column>-->
                 </el-table>
                 <div flex="box:last cross:center">
                     <div></div>

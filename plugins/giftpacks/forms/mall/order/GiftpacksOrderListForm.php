@@ -4,6 +4,7 @@ namespace app\plugins\giftpacks\forms\mall\order;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\models\IntegralLog;
 use app\models\User;
 use app\plugins\commission\models\CommissionGiftpacksPriceLog;
 use app\plugins\giftpacks\models\Giftpacks;
@@ -75,6 +76,12 @@ class GiftpacksOrderListForm extends BaseModel
                         ->where(['order_id' => $value['id']])
                         ->select(['cg.id', 'cg.order_id', 'cg.pack_id', 'cg.user_id', 'cg.price', 'cg.status', 'u.nickname', ])
                         ->asArray()->all();
+
+                    if ($value['integral_enable']) {
+                        $value['is_integral'] = IntegralLog::findOne(['source_type' => 'giftpacks_order', 'source_id' => $value['id']]) ? 1 : 0;
+                    } else {
+                        $value['is_integral'] = 0;
+                    }
                 }
             }
 

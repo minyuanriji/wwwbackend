@@ -25,8 +25,7 @@ Yii::$app->loadPluginComponentView('area-level');
             </div>
 
             <div style="float: right">
-                <el-button type="primary" size="small" style="padding: 9px 15px !important;" @click="editClick">添加区域代理
-                </el-button>
+                <el-button type="primary" size="small" style="padding: 9px 15px !important;" @click="editClick">添加区域代理</el-button>
             </div>
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-table :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
@@ -41,7 +40,6 @@ Yii::$app->loadPluginComponentView('area-level');
 
                         </template>
                     </el-table-column>
-
                     <el-table-column label="手机号" prop="mobile">
                         <template slot-scope="scope">
                             <div>{{scope.row.userInfo.mobile}}</div>
@@ -53,17 +51,12 @@ Yii::$app->loadPluginComponentView('area-level');
                         </template>
                     </el-table-column>
                     <el-table-column label="推荐人" prop="parent_name"></el-table-column>
-
-                    <el-table-column label="区域代理等级" width="120" prop="level_name">
-                    </el-table-column>
-                    <el-table-column label="代理区域" width="120" prop="address">
-                    </el-table-column>
-                    </el-table-column>
+                    <el-table-column label="区域代理等级" width="120" prop="level_name"></el-table-column>
+                    <el-table-column label="代理区域" width="120" prop="address"></el-table-column>
                     <el-table-column label="时间" width="200">
                         <template slot-scope="scope">
                             <div>成为区域代理时间：<br>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
                         </template>
-                    </el-table-column>
                     </el-table-column>
                     <el-table-column label="备注信息" prop="remarks"></el-table-column>
                     <el-table-column label="操作" width="300px">

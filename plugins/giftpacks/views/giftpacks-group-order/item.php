@@ -29,6 +29,14 @@
                     <div v-else>团员</div>
                 </template>
             </el-table-column>
+           <el-table-column label="支付状态" width="130">
+               <template slot-scope="scope">
+                   <div v-if="scope.row.pay_status=='refund'" style="color: red">已退款</div>
+                   <div v-if="scope.row.pay_status=='refunding'" style="color: red">退款中</div>
+                   <div v-if="scope.row.pay_status=='paid'" style="color: green">已支付</div>
+                   <div v-if="scope.row.pay_status=='unpaid'">未支付</div>
+               </template>
+           </el-table-column>
            <el-table-column label="实付金额" width="130">
                <template slot-scope="scope">
                    <div>红包：{{scope.row.integral_deduction_price ?? 0}}</div>

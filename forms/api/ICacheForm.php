@@ -10,7 +10,7 @@ interface ICacheForm
     public function getSourceDataForm();
 
     /**
-     * @return string
+     * @return array
      */
     public function getCacheKey();
 }

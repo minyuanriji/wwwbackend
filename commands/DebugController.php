@@ -23,6 +23,8 @@ class DebugController extends BaseCommandController{
 
     public function actionIndex(){
 
+
+
        /* $sql = 'select * from jxmall_plugin_commission_goods_price_log where order_id IN(
                     select o.id from jxmall_order o 
                     INNER JOIN jxmall_payment_order po on po.order_no=o.order_no

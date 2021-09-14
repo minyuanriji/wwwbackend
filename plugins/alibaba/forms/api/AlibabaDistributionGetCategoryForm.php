@@ -26,6 +26,9 @@ class AlibabaDistributionGetCategoryForm extends BaseModel implements ICacheForm
             while($rows){
                 $row = array_shift($rows);
                 $data = ["ali_cat_id" => $row['ali_cat_id'], "name" => $row['name'], "cover_url" => $row['cover_url'], 'children' => []];
+                if(empty($data['cover_url'])){
+                    $data['cover_url'] = \Yii::$app->getRequest()->getHostInfo() . "/web/statics/img/mall/default_img.png";
+                }
                 if(!$row['ali_parent_id']){
                     $datas[$row["ali_cat_id"]] = $data;
                 }else{

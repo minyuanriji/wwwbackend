@@ -19,7 +19,7 @@ class ShoppingVoucherLogModifiyForm extends BaseModel{
         return [
             [['money', 'desc', 'source_id', 'source_type'], 'required'],
             [['money'], 'number', 'min' => 0],
-            [['source_id', 'type'], 'integer']
+            [['type'], 'integer']
         ];
     }
 

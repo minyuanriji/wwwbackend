@@ -42,6 +42,9 @@ class AlibabaDistributionSyncCategoryForm extends BaseModel{
             if(!$res instanceof GetCategoryListResponse){
                 throw new \Exception("返回结果异常");
             }
+            if($res->error){
+                throw new \Exception($res->error);
+            }
 
             if($res->list){
                 foreach($res->list as $item){

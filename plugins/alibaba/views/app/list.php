@@ -52,7 +52,9 @@ echo $this->render("com-category");
                         <span v-if="scope.row.type == 'distribution'" >
                             <div>名称：社交电商</div>
                             <div>类目：{{scope.row.category_num}} <el-link @click="openCategoryDialog(scope.row)" type="primary" icon="el-icon-edit">编辑</el-link></div>
-                            <div>商品：1000 <el-link type="primary" icon="el-icon-edit">编辑</el-link></div>
+                            <div>商品：1000 <el-link
+                                        @click="$navigate({r: 'plugin/alibaba/mall/distribution/goods-list', app_id: scope.row.id})"
+                                        type="primary" icon="el-icon-edit">查看</el-link></div>
                         </span>
                     </template>
                 </el-table-column>
@@ -100,6 +102,7 @@ echo $this->render("com-category");
               :edit-data="editData"
               @close="close"
               @update="update"></com-edit>
+
 
     <com-category :visible="categoryDialogVisible"
               :app-id="categoryAppId"

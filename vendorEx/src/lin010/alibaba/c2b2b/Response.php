@@ -37,6 +37,7 @@ abstract class Response
     public function setResult($content){
         $this->originResultContent = $content;
         $result = (array)@json_decode($content, true);
+
         if(isset($result['error_message'])){
             $this->setError($result['error_message'], isset($result['error_code']) ? $result['error_code'] : -1);
             return;

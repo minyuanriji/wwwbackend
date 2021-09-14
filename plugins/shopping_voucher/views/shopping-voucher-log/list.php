@@ -1,8 +1,14 @@
+<?php
+Yii::$app->loadComponentView('com-dialog-select');
+?>
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <div>
                 <span>购物券记录</span>
+                <div style="float: right;margin: -5px 0">
+                    <el-button @click="handleRecharge" type="primary" size="small">充值购物券</el-button>
+                </div>
             </div>
         </div>
         <div class="table-body">
@@ -56,6 +62,46 @@
                 </el-pagination>
             </el-col>
         </div>
+
+        <!-- 充值收益 -->
+        <el-dialog title="充值购物券" :visible.sync="dialogRecharge" width="30%">
+            <el-form :model="rechargeForm" label-width="80px" :rules="rechargeFormRules" ref="rechargeForm">
+                <el-form-item label="操作" prop="type">
+                    <el-radio v-model="rechargeForm.type" label="1">充值</el-radio>
+                    <el-radio v-model="rechargeForm.type" label="2">扣除</el-radio>
+                </el-form-item>
+                <el-form-item label="用户" prop="user_id">
+                    <el-input style="display: none;" v-model="rechargeForm.user_id"></el-input>
+                    <el-input disabled v-model="rechargeForm.nickname">
+                        <template slot="append">
+                            <el-button @click="getUsers" type="primary">选择</el-button>
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item label="数量" prop="number" size="small">
+                    <el-input type="number" v-model="rechargeForm.number"></el-input>
+                </el-form-item>
+                <el-form-item label="备注" prop="remark" size="small">
+                    <el-input v-model="rechargeForm.remark"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogRecharge = false">取消</el-button>
+                <el-button :loading="btnLoading" type="primary" @click="rechargeSubmit">充值</el-button>
+            </div>
+        </el-dialog>
+
+        <com-dialog-select
+                @close="closeDlgSelect"
+                @selected="selectUser"
+                :url="forDlgSelect.url"
+                :multiple="forDlgSelect.multiple"
+                :title="forDlgSelect.title"
+                :list-key="forDlgSelect.listKey"
+                :params="forDlgSelect.params"
+                :columns="forDlgSelect.columns"
+                :visible="forDlgSelect.visible"></com-dialog-select>
+
     </el-card>
 </div>
 <script>
@@ -63,6 +109,40 @@
         el: '#app',
         data() {
             return {
+                btnLoading: false,
+                rechargeForm: {
+                    type: "1",
+                    user_id: '',
+                    number: 0.00,
+                    nickname: '',
+                    remark: '',
+                    is_manual: 1,
+                },
+                forDlgSelect:{
+                    visible: false,
+                    multiple: false,
+                    title: "选择用户",
+                    params: {},
+                    columns: [
+                        {label:"收益", key:"total_income"},
+                        {label:"手机号", key:"mobile"},
+                        {label:"等级", key:"role_type_text"}
+                    ],
+                    listKey: 'nickname',
+                    url: "mall/user/index",
+                },
+                dialogRecharge: false,
+                rechargeFormRules: {
+                    user_id: [
+                        {required: true, message: '请选择用户', trigger: 'blur'},
+                    ],
+                    type: [
+                        {required: true, message: '操作不能为空', trigger: 'blur'},
+                    ],
+                    number: [
+                        {required: true, message: '数量不能为空', trigger: 'blur'},
+                    ]
+                },
                 searchData: {
                     keyword: '',
                     start_date: '',
@@ -76,6 +156,48 @@
             };
         },
         methods: {
+            getUsers(){
+                this.forDlgSelect.visible = true;
+            },
+            selectUser(row){
+                this.rechargeForm.user_id = row.user_id;
+                this.rechargeForm.nickname = row.nickname;
+            },
+            closeDlgSelect(){
+                this.forDlgSelect.visible = false;
+            },
+            handleRecharge() {
+                this.dialogRecharge = true;
+                this.rechargeForm.user_id = '';
+                this.rechargeForm.nickname = '';
+            },
+            rechargeSubmit(){
+                var self = this;
+                this.$refs.rechargeForm.validate((valid) => {
+                    if (valid) {
+                        let para = Object.assign({}, self.rechargeForm);
+                        self.btnLoading = true;
+                        request({
+                            params: {
+                                r: 'plugin/shopping_voucher/mall/shopping-voucher-log/recharge',
+                            },
+                            method: 'post',
+                            data: para,
+                        }).then(e => {
+                            if (e.data.code === 0) {
+                                location.reload();
+                                self.dialogRecharge = false;
+                            } else {
+                                self.$message.error(e.data.msg);
+                            }
+                            self.btnLoading = false;
+                        }).catch(e => {
+                            self.btnLoading = false;
+                        });
+                    }
+                });
+            },
+
             pageChange(currentPage) {
                 this.page = currentPage;
                 this.getList();

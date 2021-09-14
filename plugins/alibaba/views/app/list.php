@@ -1,5 +1,6 @@
 <?php
 echo $this->render("com-edit");
+echo $this->render("com-category");
 ?>
 <div id="app" v-cloak>
     <el-card class="box-card" shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
@@ -33,20 +34,28 @@ echo $this->render("com-edit");
                         <el-row :gutter="10">
                             <el-col :span="6" style="text-align: right">短时凭证：</el-col>
                             <el-col :span="18">{{scope.row.access_token}}
-                                <el-link type="primary" icon="el-icon-refresh">刷新</el-link>
+                                <span v-if="scope.row.is_access_token_expired" style="color: darkred">（已过期）</span>
+                                <el-link :href="'<?php echo \yii\helpers\Url::toRoute(["/plugin/alibaba/mall/oauth2/get-token"]);?>&id='+scope.row.id+'&from_page=app/list'" type="primary" icon="el-icon-refresh">刷新</el-link>
                             </el-col>
                         </el-row>
                         <el-row :gutter="10">
                             <el-col :span="6" style="text-align: right">长时凭证：</el-col>
                             <el-col :span="18">{{scope.row.refresh_token}}
-                                <el-link type="primary" icon="el-icon-refresh">刷新</el-link>
+                                <span v-if="scope.row.is_refresh_token_expired" style="color: darkred">（已过期）</span>
+                                <el-link :href="'<?php echo \yii\helpers\Url::toRoute(["/plugin/alibaba/mall/oauth2/refresh-token"]);?>&id='+scope.row.id+'&from_page=app/list'" type="primary" icon="el-icon-refresh">刷新</el-link>
                             </el-col>
                         </el-row>
                     </template>
                 </el-table-column>
                 <el-table-column prop="type" label="类型" width="200">
                     <template slot-scope="scope">
-                        <span v-if="scope.row.type == 'distribution'">社交电商</span>
+                        <span v-if="scope.row.type == 'distribution'" >
+                            <div>名称：社交电商</div>
+                            <div>类目：{{scope.row.category_num}} <el-link @click="openCategoryDialog(scope.row)" type="primary" icon="el-icon-edit">编辑</el-link></div>
+                            <div>商品：1000 <el-link
+                                        @click="$navigate({r: 'plugin/alibaba/mall/distribution/goods-list', app_id: scope.row.id})"
+                                        type="primary" icon="el-icon-edit">查看</el-link></div>
+                        </span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="scope" width="150" label="添加时间">
@@ -80,7 +89,6 @@ echo $this->render("com-edit");
                 <el-pagination
                     background
                     layout="prev, pager, next"
-                    @current-change="pageChange"
                     :page-size="pagination.pageSize"
                     :total="pagination.total_count"
                     style="float:right;margin:15px"
@@ -94,6 +102,11 @@ echo $this->render("com-edit");
               :edit-data="editData"
               @close="close"
               @update="update"></com-edit>
+
+
+    <com-category :visible="categoryDialogVisible"
+              :app-id="categoryAppId"
+              @close="categoryDialogVisible = false"></com-category>
 </div>
 <script>
     const app = new Vue({
@@ -102,6 +115,8 @@ echo $this->render("com-edit");
             return {
                 activeName: 'first',
                 editDialogVisible: false,
+                categoryDialogVisible: false,
+                categoryAppId: 0,
                 editData: {},
                 searchData: {
                     keyword: ''
@@ -114,6 +129,10 @@ echo $this->render("com-edit");
             };
         },
         methods: {
+            openCategoryDialog(row){
+                this.categoryDialogVisible = true;
+                this.categoryAppId = row.id;
+            },
             newApp(){
                 this.editData = {};
                 this.editDialogVisible = true;
@@ -121,6 +140,33 @@ echo $this->render("com-edit");
             editApp(row){
                 this.editData = row;
                 this.editDialogVisible = true;
+            },
+            deleteApp(row){
+                let data = {id:row.id};
+                this.$confirm('你确定要删除吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    request({
+                        params: {
+                            r: 'plugin/alibaba/mall/app/delete'
+                        },
+                        method: 'post',
+                        data: data
+                    }).then(e => {
+                        if (e.data.code === 0) {
+                            this.$message.success(e.data.msg);
+                            this.getList();
+                        } else {
+                            this.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        this.$message.error("request error");
+                    });
+                }).catch(() => {
+
+                });
             },
             getList() {
                 let params = {

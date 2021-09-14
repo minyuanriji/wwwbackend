@@ -46,7 +46,7 @@ class MchCheckoutOrderSendAction extends Action{
         ]);
         $query->orderBy("mco.updated_at ASC");
 
-        $selects = ["mco.id", "mco.mall_id", "mco.pay_user_id", "mco.pay_price", "mco.mch_id", "mco.store_id", "sfs.score_setting"];
+        $selects = ["mco.id", "mco.mall_id", "mco.pay_user_id", "mco.pay_price", "mco.mch_id", "mco.store_id", "sfs.rate", "sfs.score_setting"];
 
         $checkOrders = $query->select($selects)->asArray()->limit(10)->all();
 
@@ -75,6 +75,7 @@ class MchCheckoutOrderSendAction extends Action{
             if($sendLog->save()){
                 \Yii::$app->mall = Mall::findOne($checkOrder['mall_id']);
                 $scoreSetting = @json_decode($checkOrder['score_setting'], true);
+                $scoreSetting['integral_num'] = floatval($checkOrder['pay_price'] * ($checkOrder['rate']/100));
                 $res = Integral::addIntegralPlan($checkOrder['pay_user_id'], $scoreSetting, '商家二维码支付赠送积分券', '0');
                 $this->controller->commandOut("积分发放记录创建成功，ID:" . $sendLog->id);
             }else{

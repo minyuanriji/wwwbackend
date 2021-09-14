@@ -18,7 +18,7 @@ class ScoreFromStore extends BaseActiveRecord{
     public function rules(){
         return [
             [['mall_id', 'mch_id', 'store_id', 'created_at', 'updated_at'], 'required'],
-            [['deleted_at', 'is_delete', 'start_at', 'enable_score', 'score_setting'], 'safe']
+            [['deleted_at', 'is_delete', 'start_at', 'rate', 'enable_score', 'score_setting'], 'safe']
         ];
     }
 

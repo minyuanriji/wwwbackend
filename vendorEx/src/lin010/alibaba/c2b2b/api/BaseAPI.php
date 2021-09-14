@@ -2,6 +2,8 @@
 
 namespace lin010\alibaba\c2b2b\api;
 
+use lin010\alibaba\c2b2b\Response;
+
 abstract class BaseAPI
 {
     private $params;
@@ -22,7 +24,7 @@ abstract class BaseAPI
 
     /**
      * 获取结果对象
-     * @return string
+     * @return Response
      */
     abstract public function getResponse();
 

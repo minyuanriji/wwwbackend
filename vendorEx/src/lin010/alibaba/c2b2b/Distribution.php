@@ -38,13 +38,11 @@ class Distribution{
             if(!empty($error)){
                 throw new \Exception($error);
             }
-            $content = "";
             $response->setResult($content);
         }catch (\Exception $e){
             $response->setError($e->getMessage(), -1);
         }
-        print_r($response);
-        exit;
+
         return $response;
     }
 

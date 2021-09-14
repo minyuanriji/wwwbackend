@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\Goods;
 use app\models\GoodsWarehouse;
+use app\models\Order;
 use app\models\OrderDetail;
 use app\models\User;
 use app\plugins\commission\models\CommissionGoodsPriceLog;
@@ -38,12 +39,15 @@ class GoodsConsumeLogListForm extends BaseModel
                 //$query->where(['like', 'nickname', $this->keyword]);
             }
         }])->orderBy('id desc');
+        $query->innerJoin(["o" => Order::tableName()], "o.id=cg.order_id");
         $query->innerJoin(["g" => Goods::tableName()], "g.id=cg.goods_id");
         $query->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");
         $query->innerJoin(["u" => User::tableName()], "u.id=cg.user_id");
         if($this->keyword){
             $query->andWhere([
                 "OR",
+                ["o.order_no" => $this->keyword],
+                ["u.mobile" => $this->keyword],
                 ["LIKE", "u.nickname", $this->keyword],
                 ["LIKE", "gw.name", $this->keyword]
             ]);

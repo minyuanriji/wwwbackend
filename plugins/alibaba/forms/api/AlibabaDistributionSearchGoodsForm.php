@@ -13,11 +13,12 @@ class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm
     public $mall_id;
     public $user_id;
     public $page;
+    public $ali_cat_id;
 
     public function rules(){
         return [
             [['page'], 'required'],
-            [['mall_id', 'user_id', 'page'], 'integer']
+            [['mall_id', 'user_id', 'page', 'ali_cat_id'], 'integer']
         ];
     }
 
@@ -33,8 +34,13 @@ class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm
         try {
             $query = AlibabaDistributionGoodsList::find()->where(["is_delete" => 0]);
 
+            if($this->ali_cat_id){
+                $query->andWhere("FIND_IN_SET('{$this->ali_cat_id}', ali_category_id)");
+            }
+
             $orderBy = "id DESC";
             $query->orderBy($orderBy);
+
 
             $selects = ["id", "name", "cover_url", "price", "origin_price"];
             $list = $query->asArray()->select($selects)->page($pagination, 20, $this->page)->all();

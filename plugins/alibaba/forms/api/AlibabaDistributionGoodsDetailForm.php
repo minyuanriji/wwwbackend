@@ -39,6 +39,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             $aliInfo = (array)@json_decode($goods->ali_product_info, true);
 
             $detail['id']               = $goods->id;
+            $detail['name']             = $goods->name;
             $detail['shopping_voucher'] = $goods->price; //TODO 购物券价
             $detail['price']            = $goods->price;
             $detail['origin_price']     = $goods->origin_price;

@@ -169,6 +169,7 @@
                             <el-tab-pane label="酒店" name="RedEnvelopesHotel">
                                 <el-table :data="list.envelope_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                                    <el-table-column prop="user_id" label="用户ID" width="100"></el-table-column>
                                     <el-table-column prop="hotel_id" label="酒店ID" width="100"></el-table-column>
                                     <el-table-column prop="order_no" label="订单号" width="240"></el-table-column>
                                     <el-table-column prop="order_price" label="订单金额"  width="200"></el-table-column>
@@ -206,7 +207,7 @@
                     <div style="display: flex;justify-content: space-evenly">
                         <div class="one_class">
                             <div class="two_class">总收入</div>
-                            <div id="assets">{{000}}元</div>
+                            <div id="assets">{{list.CheckoutPrice}}元</div>
                         </div>
                         <div class="one_class">
                             <div class="two_class">已提现</div>
@@ -221,7 +222,22 @@
                 <div style="width: 100%">
                     <div style="float: left">
                         <el-tabs :tab-position="tabPosition"  @tab-click="TabClick" v-model="search.second_type">
-                            <el-tab-pane label="总收入" name="TotalRevenue"></el-tab-pane>
+                            <el-tab-pane label="总收入" name="TotalRevenue">
+                                <el-table :data="list.withdrawal_list" border style="width: 100%">
+                                    <el-table-column prop="id" label="ID" width="80"></el-table-column>
+                                    <el-table-column prop="mch_id" label="商户ID" width="80"></el-table-column>
+                                    <el-table-column prop="order_no" label="订单号" width="280"></el-table-column>
+                                    <el-table-column prop="order_price" label="订单金额" width="180"></el-table-column>
+                                    <el-table-column prop="pay_price" label="实际支付金额" width="180"></el-table-column>
+                                    <el-table-column prop="score_deduction_price" label="积分抵扣金额"  width="180"></el-table-column>
+                                    <el-table-column prop="integral_deduction_price" label="红包抵扣价"  width="180"></el-table-column>
+                                    <el-table-column prop="created_at" label="时间" width="180">
+                                        <template slot-scope="scope">
+                                            <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </el-tab-pane>
                             <el-tab-pane label="已提现" name="Withdrawal">
                                 <el-table :data="list.withdrawal_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="180"></el-table-column>
@@ -305,9 +321,9 @@
                                 <el-table :data="list.oper_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="180"></el-table-column>
                                     <el-table-column prop="user_id" label="用户ID" width="180"></el-table-column>
-                                    <el-table-column prop="current_money" label="当前购物券（变动前）" width="180"></el-table-column>
-                                    <el-table-column prop="money" label="变动购物券" width="180"></el-table-column>
-                                    <el-table-column prop="desc" label="说明"  width="180"></el-table-column>
+                                    <el-table-column prop="money" label="充值购物券" width="180"></el-table-column>
+                                    <el-table-column prop="current_money" label="充值前购物券" width="180"></el-table-column>
+                                    <el-table-column prop="desc" label="说明"  width="380"></el-table-column>
                                     <el-table-column prop="created_at" label="时间" width="180">
                                         <template slot-scope="scope">
                                             <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>

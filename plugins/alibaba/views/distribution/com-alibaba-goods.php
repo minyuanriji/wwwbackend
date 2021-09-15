@@ -61,7 +61,7 @@
             </el-table>
 
             <div style="display: flex;justify-content: space-between;margin-top:20px;">
-                <div style="margin: 7.5px 0px;"><el-button :disabled="selections.length <= 0" :loading="btnLoading" type="danger" @click="">一键添加</el-button></div>
+                <div style="margin: 7.5px 0px;"><el-button @click="aliGoodsImport" :disabled="selections.length <= 0" :loading="btnLoading" type="danger">一键添加</el-button></div>
                 <el-pagination
                         background
                         layout="prev, pager, next"
@@ -73,18 +73,8 @@
                 </el-pagination>
             </div>
 
-            <el-row>
-                <el-col :span="12">
-
-                </el-col>
-                <el-col :span="12">
-
-                </el-col>
-            </el-row>
 
         </el-dialog>
-
-
     </div>
 </template>
 
@@ -122,6 +112,33 @@
             }
         },
         methods: {
+            aliGoodsImport(){
+                if(this.selections.length <= 0){
+                    this.$message.error("请选择要添加的商品");
+                    return;
+                }
+                let that = this;
+                request({
+                    params: {
+                        r: 'plugin/alibaba/mall/distribution/ali-goods-import'
+                    },
+                    method: 'post',
+                    data: {
+                        app_id:getQuery("app_id"),
+                        goods_array:that.selections
+                    }
+                }).then(e => {
+                    that.btnLoading = false;
+                    if (e.data.code == 0) {
+                        that.$emit('import', e.data.data);
+                    } else {
+                        that.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    that.$message.error(e.data.msg);
+                    that.btnLoading = false;
+                });
+            },
             search(){
                 this.page = 1;
                 this.getList();

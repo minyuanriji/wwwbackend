@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsCategory;
+use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 
 class AlibabaAppListForm extends BaseModel{
 
@@ -45,6 +46,10 @@ class AlibabaAppListForm extends BaseModel{
                     $item['is_access_token_expired'] = !empty($item['access_token']) && $item['token_expired_at'] < time() ? true : false;
                     $item['is_refresh_token_expired'] = !empty($item['refresh_token']) && $item['refresh_expired_at'] < time() ? true : false;
                     $item['category_num'] = $categoryNum;
+                    $item['goods_num'] = (int)AlibabaDistributionGoodsList::find()->where([
+                        "is_delete" => 0,
+                        "app_id" => $item['id']
+                    ])->count();
                 }
             }
 

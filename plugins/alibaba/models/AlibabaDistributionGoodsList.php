@@ -16,7 +16,7 @@ class AlibabaDistributionGoodsList extends BaseActiveRecord{
 
     public function rules(){
         return [
-            [['mall_id', 'app_id', 'name', 'category_id', 'cover_url', 'ali_offerId', 'price', 'created_at', 'updated_at'], 'required'],
+            [['mall_id', 'app_id', 'name', 'ali_category_id', 'cover_url', 'ali_offerId', 'price', 'created_at', 'updated_at'], 'required'],
             [['is_delete'], 'safe']
         ];
     }

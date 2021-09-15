@@ -58,6 +58,7 @@ echo $this->render("com-alibaba-goods");
                     </template>
                 </el-table-column>
                 <el-table-column prop="price" width="110" label="零售价"></el-table-column>
+                <el-table-column prop="origin_price" width="110" label="划线价"></el-table-column>
                 <el-table-column width="90" label="分销价">
                     <template slot-scope="scope">
                         {{scope.row.ali_data_json.currentPrice}}
@@ -148,7 +149,7 @@ echo $this->render("com-alibaba-goods");
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column width="200" label="类目">
+                <el-table-column width="190" label="类目">
                     <template slot-scope="scope">
                         <el-cascader v-model="scope.row.ali_category_id" :options="batchSetForm.categorys"></el-cascader>
                     </template>
@@ -158,12 +159,17 @@ echo $this->render("com-alibaba-goods");
                         <el-input v-model="scope.row.price"></el-input>
                     </template>
                 </el-table-column>
-                <el-table-column width="90" label="分销价">
+                <el-table-column prop="origin_price" width="110" label="划线价">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.origin_price"></el-input>
+                    </template>
+                </el-table-column>
+                <el-table-column width="75" label="分销价">
                     <template slot-scope="scope">
                         {{scope.row.ali_data_json.currentPrice}}
                     </template>
                 </el-table-column>
-                <el-table-column width="90" label="渠道价">
+                <el-table-column width="75" label="渠道价">
                     <template slot-scope="scope">
                         {{scope.row.ali_data_json.channelPrice}}
                     </template>

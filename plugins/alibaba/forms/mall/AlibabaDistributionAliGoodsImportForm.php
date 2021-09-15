@@ -42,6 +42,7 @@ class AlibabaDistributionAliGoodsImportForm extends BaseModel{
                 $goods->updated_at      = time();
                 $goods->ali_data_json   = json_encode($info);
                 $goods->price           = $info['currentPrice'];
+                $goods->origin_price    = $info['currentPrice'];
                 $goods->ali_category_id = 0;
                 $goods->is_delete       = 0;
                 if(!$goods->save()){

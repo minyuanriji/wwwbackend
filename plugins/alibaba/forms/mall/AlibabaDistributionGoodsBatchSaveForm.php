@@ -26,7 +26,12 @@ class AlibabaDistributionGoodsBatchSaveForm extends BaseModel{
                 $goods = AlibabaDistributionGoodsList::findOne($item['id']);
                 if(!$goods) continue;
 
+                if(empty($item['ali_category_id'])){
+                    throw new \Exception("类别不能为空");
+                }
+
                 $goods->price           = $item['price'];
+                $goods->origin_price    = $item['origin_price'];
                 $goods->ali_category_id = implode(",", $item['ali_category_id']);
                 $goods->updated_at      = time();
                 if(!$goods->save()){

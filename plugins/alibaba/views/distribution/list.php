@@ -108,6 +108,7 @@ echo $this->render("com-alibaba-goods");
                         :page-size="pagination.pageSize"
                         :total="pagination.total_count"
                         style="float:right;margin:15px"
+                        @current-change="pageChange"
                         v-if="pagination">
                 </el-pagination>
             </div>
@@ -326,6 +327,10 @@ echo $this->render("com-alibaba-goods");
                 }).catch(e => {
 
                 });
+            },
+            pageChange(page){
+                this.page = page;
+                this.getList();
             },
             getList() {
                 let params = Object.assign(this.searchData, {

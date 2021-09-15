@@ -17,6 +17,16 @@ class PaymentOrderPrepareController extends ApiController{
     }
 
     /**
+     * 阿里巴巴分销订单
+     * @return \yii\web\Response
+     */
+    public function actionAlibabaDistributionOrder(){
+        $form = new \app\plugins\alibaba\forms\payCenter\AlibabaDistributionOrderPrepareForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->prepare());
+    }
+
+    /**
      * 大礼包预支付单创建
      * @return \yii\web\Response
      */

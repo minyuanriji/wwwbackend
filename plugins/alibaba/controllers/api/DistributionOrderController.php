@@ -5,6 +5,7 @@ namespace app\plugins\alibaba\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
+use app\plugins\alibaba\forms\api\AlibabaDistributionOrderDoSubmitForm;
 use app\plugins\alibaba\forms\api\AlibabaDistributionOrderPreviewForm;
 
 class DistributionOrderController extends ApiController {
@@ -15,6 +16,16 @@ class DistributionOrderController extends ApiController {
                 'class' => LoginFilter::class,
             ],
         ]);
+    }
+
+    /**
+     * 提交订单
+     * @return \yii\web\Response
+     */
+    public function actionDoSubmit(){
+        $form = new AlibabaDistributionOrderDoSubmitForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->submit());
     }
 
     /**

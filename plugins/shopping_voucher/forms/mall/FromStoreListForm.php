@@ -42,7 +42,7 @@ class FromStoreListForm extends BaseModel {
 
             if($list){
                 foreach($list as &$item){
-                    $item['start_at'] = date("Y-m-d H:i:s", $item['start_at'] ? $item['start_at'] : time());
+                    $item['start_at'] = date("Y-m-d", $item['start_at'] ? $item['start_at'] : time());
                 }
             }
 

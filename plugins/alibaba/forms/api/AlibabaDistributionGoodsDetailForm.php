@@ -38,16 +38,48 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             }
             $aliInfo = (array)@json_decode($goods->ali_product_info, true);
 
-            $detail['id']           = $goods->id;
-            $detail['price']        = $goods->price;
-            $detail['origin_price'] = $goods->origin_price;
-            $detail['images']       = isset($aliInfo['info']['image']['images']) ? $aliInfo['info']['image']['images'] : [];
-            $detail['saleInfo']     = $aliInfo['info']['saleInfo'];
-            $detail['categoryName'] = $aliInfo['info']['categoryName'];
-            $detail['mainVedio']    = $aliInfo['info']['mainVedio'];
-            $detail['attributes']   = $aliInfo['info']['attributes'];
-            $detail['shippingInfo'] = $aliInfo['info']['shippingInfo'];
-            $detail['description']  = $aliInfo['info']['description'];
+            $detail['id']               = $goods->id;
+            $detail['shopping_voucher'] = $goods->price; //TODO 购物券价
+            $detail['price']            = $goods->price;
+            $detail['origin_price']     = $goods->origin_price;
+
+            if(isset($aliInfo['info'])){
+                $detail['images']           = $aliInfo['info']['image']['images'];
+                $detail['saleInfo']         = $aliInfo['info']['saleInfo'];
+                $detail['categoryName']     = $aliInfo['info']['categoryName'];
+                $detail['mainVedio']        = $aliInfo['info']['mainVedio'];
+                $detail['shippingInfo']     = $aliInfo['info']['shippingInfo'];
+                $detail['description']      = $aliInfo['info']['description'];
+
+                $attributeGroup = [];
+                foreach($aliInfo['info']['attributes'] as $attr){
+                    if(!isset($attributeGroup[$attr['attributeID']])){
+                        $attributeGroup[$attr['attributeID']] = [
+                            "attributeID"   => $attr["attributeID"],
+                            "attributeName" => $attr['attributeName'],
+                            "isCustom"      => $attr['isCustom'],
+                            "values"        => []
+                        ];
+                    }
+                    $attributeGroup[$attr['attributeID']]['values'][] = $attr['value'];
+                }
+                $attributes = [];
+                foreach ($attributeGroup as $attr){
+                    $attributes[] = $attr;
+                }
+
+                $detail['attributes'] = $aliInfo['info']['attributes'];
+                $detail['attributes'] = $attributes;
+
+            }else{
+                $detail['images']           = [];
+                $detail['saleInfo']         = [];
+                $detail['categoryName']     = "";
+                $detail['mainVedio']        = "";
+                $detail['shippingInfo']     = [];
+                $detail['description']      = "";
+                $detail['attributes']       = [];
+            }
 
             return new APICacheDataForm([
                 "sourceData" => [

@@ -6,7 +6,6 @@ use app\models\BaseModel;
 use app\models\UserAddress;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\shopping_voucher\models\ShoppingVoucherTargetAlibabaDistributionGoods;
-use app\plugins\shopping_voucher\models\ShoppingVoucherTargetGoods;
 use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
 
 class AlibabaDistributionOrderForm extends BaseModel{
@@ -14,7 +13,6 @@ class AlibabaDistributionOrderForm extends BaseModel{
     public $list; //结构[{"goods":57,"num":1}, ...]
     public $use_shopping_voucher;
     public $use_address_id;
-    public $number;
     public $remark;
 
     public function rules(){
@@ -22,7 +20,6 @@ class AlibabaDistributionOrderForm extends BaseModel{
             [['list'], 'required'],
             [['use_address_id'], 'integer'],
             [['use_shopping_voucher'], 'number', 'min' => 0],
-            [['number'], 'number', 'min' => 1],
             [['remark'], 'safe']
         ];
     }
@@ -149,16 +146,27 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     $orderItem['shopping_voucher_use_num'] += $goodsItem['use_shopping_voucher_num'];
                 }
             }
+
             $orderItem['total_price'] -= round($orderItem['shopping_voucher_decode_price'], 2);
         }
         $mainData['shopping_voucher']['remaining'] = $userRemainingShoppingVoucher;
 
         //统计订单待支付总金额
         foreach($mainData['list'] as $orderItem){
+            $mainData['shopping_voucher']['decode_price'] += $orderItem['shopping_voucher_decode_price'];
+            $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_use_num'];
             $mainData['total_price'] += $orderItem['total_price'] + $orderItem['express_price'];
         }
         $mainData['total_price'] = round($mainData['total_price'], 2);
 
         return $mainData;
+    }
+
+    /**
+     * 生成订单号
+     * @return string
+     */
+    public static function getOrderNo(){
+        return generate_order_no("ALIS");
     }
 }

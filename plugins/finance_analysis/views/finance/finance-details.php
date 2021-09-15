@@ -45,7 +45,8 @@ Yii::$app->loadComponentView('statistics/com-search');
             <div slot="header">
                 <div>
                     <com-image mode="aspectFill" style="float: left;margin-right: 8px;width: 35px;height: 35px" :src="countUser.avatar_url"></com-image>
-                    <div style="font-size: 20px">{{countUser.nickname}}(ID:{{countUser.id}})的总资产</div>
+                    <div style="font-size: 22px">{{countUser.nickname}}(ID:{{countUser.id}})的总资产</div>
+                    <div>注册时间：{{countUser.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
                 </div>
             </div>
             <div class="num-info">

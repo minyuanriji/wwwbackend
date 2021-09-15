@@ -97,6 +97,7 @@ Yii::$app->loadComponentView('store/com-shop-store-list');
                             if (e.data.code == 0) {
                                 that.$message.success(e.data.msg);
                                 that.$emit('update');
+                                that.formData = '';
                             } else {
                                 that.$message.error(e.data.msg);
                             }

@@ -44,7 +44,7 @@ class ShoppingVoucherRechargeForm extends BaseModel{
                 "money"       => $this->number,
                 "desc"        => "管理员ID:{$adminId}操作。". $this->remark,
                 "source_id"   => $adminId . ":" . time(),
-                "source_type" => 1
+                "source_type" => 'admin'
             ]);
 
             if($this->type == 1){ //充值

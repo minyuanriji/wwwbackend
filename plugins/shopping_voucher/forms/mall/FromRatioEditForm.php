@@ -29,7 +29,7 @@ class FromRatioEditForm extends BaseModel
             if (!$fromStore) {
                 throw new \Exception("该门店不存在，异常！");
             }
-            $fromStore->give_value = $this->ratio;
+            $fromStore->give_value = $this->ratio > 100 ? 100 : $this->ratio;
             $fromStore->updated_at = time();
             if (!$fromStore->save()) {
                 throw new \Exception($this->responseErrorMsg($fromStore));

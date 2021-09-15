@@ -6,8 +6,27 @@ use app\controllers\api\ApiController;
 use app\core\ApiCode;
 use app\helpers\APICacheHelper;
 use app\plugins\alibaba\forms\api\AlibabaDistributionGetCategoryForm;
+use app\plugins\alibaba\forms\api\AlibabaDistributionSearchGoodsForm;
 
 class DistributionController extends ApiController {
+
+    /**
+     * 搜索商品
+     * @return \yii\web\Response
+     */
+    public function actionSearchGoods(){
+        $form = new AlibabaDistributionSearchGoodsForm();
+        $form->attributes = $this->requestData;
+        $form->mall_id = \Yii::$app->mall->id;
+        $form->user_id = !\Yii::$app->user->isGuest ? \Yii::$app->user->id : 0;
+
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
+    }
 
     /**
      * 获取分类

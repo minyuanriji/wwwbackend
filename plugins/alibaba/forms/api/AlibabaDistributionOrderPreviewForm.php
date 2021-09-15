@@ -19,7 +19,7 @@ class AlibabaDistributionOrderPreviewForm extends AlibabaDistributionOrderForm {
 
         try {
 
-            $orderData = $this->getOrderData();
+            $orderData = $this->getData();
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
@@ -28,7 +28,11 @@ class AlibabaDistributionOrderPreviewForm extends AlibabaDistributionOrderForm {
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg'  => $e->getMessage()
+                'msg'  => $e->getMessage(),
+                'error' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ];
         }
     }

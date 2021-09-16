@@ -16,7 +16,7 @@ class AlibabaDistributionGoodsSku extends BaseActiveRecord{
 
     public function rules(){
         return [
-            [['mall_id', 'goods_id', 'ali_sku', 'ali_sku_id', 'ali_attributes', 'ali_spec_id', 'price', 'origin_price', 'created_at', 'updated_at'], 'required'],
+            [['mall_id', 'goods_id', 'ali_sku_id', 'ali_attributes', 'ali_spec_id', 'price', 'origin_price', 'created_at', 'updated_at'], 'required'],
             [['cargo_number', 'amount_on_sale', 'ali_price', 'consign_price', 'is_delete'], 'safe']
         ];
     }

@@ -43,14 +43,11 @@ Yii::$app->loadComponentView('store/com-shop-store-list');
 <script>
     function initFormData(){
         return  [{
-                    id: 0,
                     mch_id: '',
                     store_id: '',
                     give_type: 1,
-                    give_value:0,
                     name: '',
                     cover_url: '',
-                    start_at: ''
                 }];
     }
 
@@ -66,7 +63,15 @@ Yii::$app->loadComponentView('store/com-shop-store-list');
                 activeName: "first",
                 dialogVisible: false,
                 formData: {
-                    store:''
+                    store: [
+                        {
+                            mch_id:'',
+                            store_id:'',
+                            name:'',
+                            cover_url:'',
+                            give_type:'',
+                        }
+                    ]
                 },
                 btnLoading: false,
                 StoreData:[],
@@ -77,7 +82,7 @@ Yii::$app->loadComponentView('store/com-shop-store-list');
                 this.dialogVisible = val;
             },
             /*editData(val, oldVal){
-                this.formData = Object.assign(initFormData(), val);
+                this.formData = '';//Object.assign(initFormData(), val);
             }*/
         },
         methods: {
@@ -97,7 +102,9 @@ Yii::$app->loadComponentView('store/com-shop-store-list');
                             if (e.data.code == 0) {
                                 that.$message.success(e.data.msg);
                                 that.$emit('update');
-                                that.formData = '';
+                                that.formData.store = initFormData();
+                                that.formData.give_value = '';
+                                that.formData.start_at = '';
                             } else {
                                 that.$message.error(e.data.msg);
                             }
@@ -121,6 +128,7 @@ Yii::$app->loadComponentView('store/com-shop-store-list');
                     }
                 }
                 this.formData.store = this.StoreData;
+                this.StoreData=[];
             },
             close(){
                 this.$emit('close');

@@ -15,13 +15,13 @@ class VoucherConsumptionNotification
 {
     public static function send($voucher_log)
     {
-        (new VoucherConsumptionNotificationWeTplJob([
+        /*(new VoucherConsumptionNotificationWeTplJob([
             "voucher_log" => $voucher_log
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-    //    \Yii::$app->queue->delay(0)->push(new VoucherConsumptionNotificationWeTplJob([
-  //          "voucher_log" => $voucher_log
-//        ]));
+        \Yii::$app->queue->delay(0)->push(new VoucherConsumptionNotificationWeTplJob([
+            "voucher_log" => $voucher_log
+        ]));
     }
 
     public static function sendWechatTemplate($voucher_log)

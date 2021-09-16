@@ -232,6 +232,9 @@
                 this.$emit('selected', this.multipleSelection);
                 this.visible = false;
                 this.$emit('input', this.multipleSelection);
+                this.search.keyword = '';
+                this.address = '';
+                this.level = '';
             }
         }
     });

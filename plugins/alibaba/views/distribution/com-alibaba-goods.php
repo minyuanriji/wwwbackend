@@ -30,21 +30,29 @@
 
 
             <el-table v-loading="loading" :data="list" border style="width: 100%" @selection-change="handleSelectionChange">
-                <el-table-column align='center' type="selection" width="60"></el-table-column>
+                <el-table-column width="75" >
+                    <template slot-scope="scope">
+                        <el-button @click="aliGoodsImport(scope.row)" type="text" circle size="mini">
+                            <el-tooltip class="item" effect="dark" content="选择" placement="top">
+                                <img src="statics/img/mall/plus.png" alt="">
+                            </el-tooltip>
+                        </el-button>
+                    </template>
+                </el-table-column>
                 <el-table-column label="标题" >
                     <template slot-scope="scope">
-                        <div style="padding-bottom:3px;">编号：{{scope.row.offerId}}</div>
                         <div flex="box:first">
                             <div style="padding-right: 10px;">
                                 <com-image mode="aspectFill" :src="scope.row.imgUrl"></com-image>
                             </div>
-                            <div flex="cross:top cross:center">
+                            <div>
+                                <div>编号：{{scope.row.offerId}}</div>
                                 <div flex="dir:left">
                                     <el-tooltip class="item" effect="dark" placement="top">
                                         <template slot="content">
                                             <div style="width: 320px;">{{scope.row.title}}</div>
                                         </template>
-                                        <com-ellipsis :line="2">{{scope.row.title}}</com-ellipsis>
+                                        <com-ellipsis :line="1">{{scope.row.title}}</com-ellipsis>
                                     </el-tooltip>
                                 </div>
                             </div>
@@ -58,10 +66,13 @@
                 <el-table-column prop="soldOut" width="90" label="销量"></el-table-column>
                 <el-table-column prop="profit" width="90" label="利润空间"></el-table-column>
                 <el-table-column prop="enable" width="90" label="是否有效"></el-table-column>
+
             </el-table>
 
-            <div style="display: flex;justify-content: space-between;margin-top:20px;">
+            <div v-if="!loading" style="display: flex;justify-content: space-between;margin-top:20px;">
+                <!--
                 <div style="margin: 7.5px 0px;"><el-button @click="aliGoodsImport" :disabled="selections.length <= 0" :loading="btnLoading" type="danger">一键添加</el-button></div>
+                -->
                 <el-pagination
                         background
                         layout="prev, pager, next"
@@ -112,12 +123,11 @@
             }
         },
         methods: {
-            aliGoodsImport(){
-                if(this.selections.length <= 0){
-                    this.$message.error("请选择要添加的商品");
-                    return;
-                }
+            aliGoodsImport(row){
+                let selections = [];
+                selections.push(row);
                 let that = this;
+                this.loading = true;
                 request({
                     params: {
                         r: 'plugin/alibaba/mall/distribution/ali-goods-import'
@@ -125,10 +135,10 @@
                     method: 'post',
                     data: {
                         app_id:getQuery("app_id"),
-                        goods_array:that.selections
+                        goods_array:selections
                     }
                 }).then(e => {
-                    that.btnLoading = false;
+                    that.loading = false;
                     if (e.data.code == 0) {
                         that.$emit('import', e.data.data);
                     } else {
@@ -136,7 +146,7 @@
                     }
                 }).catch(e => {
                     that.$message.error(e.data.msg);
-                    that.btnLoading = false;
+                    that.loading = false;
                 });
             },
             search(){

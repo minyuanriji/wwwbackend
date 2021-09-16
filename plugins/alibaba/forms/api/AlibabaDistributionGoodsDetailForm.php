@@ -7,6 +7,7 @@ use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
+use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
 
 class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm {
 
@@ -81,6 +82,28 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                 $detail['description']      = "";
                 $detail['attributes']       = [];
             }
+
+            //规格
+            $skuList = AlibabaDistributionGoodsSku::find()->where([
+                "goods_id"  => $goods->id,
+                "is_delete" => 0
+            ])->asArray()->all();
+            $detail['sku_infos'] = @json_decode($goods->sku_infos, true);
+            $skuValues = isset($detail['sku_infos']['values']) ? $detail['sku_infos']['values'] : [];
+            if($skuList){
+                foreach($skuList as &$skuItem){
+                    $attributes = explode(",", $skuItem['ali_attributes']);
+                    $skuItem['labels'] = [];
+                    foreach($attributes as $value){
+                        if(isset($skuValues[$value])){
+                            $skuItem['labels'][] = $skuValues[$value];
+                        }
+                    }
+                    $skuItem['labels'] = implode(",", $skuItem['labels']);
+                    //unset($skuItem['ali_attributes']);
+                }
+            }
+            $detail['sku_list'] = $skuList;
 
             return new APICacheDataForm([
                 "sourceData" => [

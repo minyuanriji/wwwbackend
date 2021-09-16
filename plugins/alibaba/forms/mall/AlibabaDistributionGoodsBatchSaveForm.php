@@ -4,11 +4,7 @@ namespace app\plugins\alibaba\forms\mall;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
-use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
-use lin010\alibaba\c2b2b\api\GetGoodsDetail;
-use lin010\alibaba\c2b2b\api\GetGoodsDetailResponse;
-use lin010\alibaba\c2b2b\Distribution;
 
 class AlibabaDistributionGoodsBatchSaveForm extends BaseModel{
 
@@ -38,27 +34,6 @@ class AlibabaDistributionGoodsBatchSaveForm extends BaseModel{
                 $goods->origin_price    = $item['origin_price'];
                 $goods->ali_category_id = implode(",", $item['ali_category_id']);
                 $goods->updated_at      = time();
-
-                //如果详情为空，通过1688接口获取商品详情
-                if(empty($goods->ali_product_info)){
-                    $app = AlibabaApp::findOne($goods->app_id);
-
-                    $distribution = new Distribution($app->app_key, $app->secret);
-                    $res = $distribution->requestWithToken(new GetGoodsDetail([
-                        "offerId" => $goods->ali_offerId
-                    ]), $app->access_token);
-                    if(!$res instanceof GetGoodsDetailResponse){
-                        throw new \Exception("[GetGoodsDetailResponse]返回结果异常");
-                    }
-                    if($res->error){
-                        throw new \Exception($res->error);
-                    }
-                    $goods->ali_product_info = json_encode([
-                        "biz" => $res->bizGroupInfos,
-                        "info" => $res->productInfo
-                    ]);
-                }
-
 
                 if(!$goods->save()){
                     throw new \Exception($this->responseErrorMsg($goods));

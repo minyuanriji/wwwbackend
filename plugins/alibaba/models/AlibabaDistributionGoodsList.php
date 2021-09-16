@@ -17,17 +17,8 @@ class AlibabaDistributionGoodsList extends BaseActiveRecord{
     public function rules(){
         return [
             [['mall_id', 'app_id', 'name', 'ali_category_id', 'cover_url', 'ali_offerId', 'price', 'origin_price', 'created_at', 'updated_at'], 'required'],
-            [['is_delete', 'ali_product_info'], 'safe']
+            [['is_delete', 'ali_product_info', 'sku_infos'], 'safe']
         ];
     }
-
-
-
-
-
-
-
-
-
 
 }

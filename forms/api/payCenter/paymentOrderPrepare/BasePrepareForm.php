@@ -4,6 +4,7 @@ namespace app\forms\api\payCenter\paymentOrderPrepare;
 
 
 use app\core\ApiCode;
+use app\logic\AppConfigLogic;
 use app\logic\OrderLogic;
 use app\models\BaseModel;
 use app\models\PaymentOrder;
@@ -100,9 +101,29 @@ abstract class BasePrepareForm extends BaseModel {
                 }
             }
 
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"", [
-                "union_id" => $paymentOrderUnion->id
-            ]);
+
+            $supportPayTypes = OrderLogic::getPaymentTypeConfig();
+            if(in_array("wechat", $supportPayTypes) && \Yii::$app->appPlatform == "h5"){
+                $supportPayTypes = array_diff($supportPayTypes, ["wechat"]);
+                if(!in_array("alipay", $supportPayTypes)){
+                    $supportPayTypes[] = "alipay";
+                }
+            }
+
+            $data = [
+                'balance'         => $user->balance,
+                'amount'          => $paymentOrderUnion->amount,
+                'orderNo'         => $unionOrderNo,
+                'supportPayTypes' => $supportPayTypes,
+            ];
+
+            $paymentConfigs = AppConfigLogic::getPaymentConfig();
+            $data["pay_password_status"] = isset($paymentConfigs["pay_password_status"]) ? $paymentConfigs["pay_password_status"] : 0;
+            $data["is_pay_password"]     = empty($user->transaction_password) ? 0 : 1;
+            $data["union_id"]            = $paymentOrderUnion->id;
+            $data["is_send"]             = 1;
+
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"", $data);
         }catch (\Exception $e){
             return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());
         }

@@ -5,12 +5,13 @@ namespace app\plugins\alibaba\forms\api;
 use app\models\BaseModel;
 use app\models\UserAddress;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
+use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
 use app\plugins\shopping_voucher\models\ShoppingVoucherTargetAlibabaDistributionGoods;
 use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
 
 class AlibabaDistributionOrderForm extends BaseModel{
 
-    public $list; //结构[{"goods":57,"num":1}, ...]
+    public $list; //结构[{"goods":57, "sku":11, "num":1}, ...]
     public $use_shopping_voucher;
     public $use_address_id;
     public $remark;
@@ -40,6 +41,21 @@ class AlibabaDistributionOrderForm extends BaseModel{
             if(!$goods || $goods->is_delete){
                 throw new \Exception("商品[ID:".$item['goods']."]已下架或不存在");
             }
+            $sku = AlibabaDistributionGoodsSku::findOne($item['sku']);
+            if(!$sku || $sku->is_delete || $sku->goods_id != $goods->id){
+                throw new \Exception("规格[ID:".$item['sku']."]不存在");
+            }
+            $skuInfos = json_decode($goods->sku_infos, true);
+            $attrs = explode(",", $sku->ali_attributes);
+            $labels = [];
+            foreach($attrs as $attr){
+                $part = explode(":", $attr);
+                if(isset($skuInfos['group'][$part[0]]) && isset($skuInfos['values'][$attr])){
+                    $labels[] = $skuInfos['group'][$part[0]]['attributeName'] . ":" . $skuInfos['values'][$attr];
+                }else{
+                    $labels[] = "-:-";
+                }
+            }
             $goodsItem = [
                 "id"          => $goods->id,
                 "mall_id"     => $goods->mall_id,
@@ -47,8 +63,11 @@ class AlibabaDistributionOrderForm extends BaseModel{
                 "name"        => $goods->name,
                 "cover_url"   => $goods->cover_url,
                 "ali_offerId" => $goods->ali_offerId,
-                "price"       => (float)$goods->price,
-                "num"         => max(1, (int)$item['num'])
+                "price"       => (float)$sku->price,
+                "num"         => max(1, (int)$item['num']),
+                "sku_id"      => $sku->id,
+                "ali_sku"     => $sku->ali_sku_id,
+                "sku_labels"  => $labels
             ];
             $goodsItem['total_original_price'] = $goodsItem['num'] * $goodsItem['price'];
             $goodsItem['total_price'] = $goodsItem['total_original_price'];

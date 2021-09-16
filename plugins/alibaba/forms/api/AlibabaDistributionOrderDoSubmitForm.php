@@ -119,15 +119,21 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
         $orderDetail->mall_id               = $order->mall_id;
         $orderDetail->order_id              = $order->id;
         $orderDetail->goods_id              = $goodsItem['id'];
+        $orderDetail->sku_id                = $goodsItem['sku_id'];
+        $orderDetail->ali_sku               = $goodsItem['ali_sku'];
+        $orderDetail->sku_labels            = json_encode($goodsItem['sku_labels']);
         $orderDetail->num                   = $goodsItem['num'];
         $orderDetail->unit_price            = $goodsItem['price'];
         $orderDetail->total_original_price  = $goodsItem['total_original_price'];
         $orderDetail->total_price           = $goodsItem['total_price'];
 
         //购物券抵扣
-        $orderDetail->shopping_voucher_decode_price = $goodsItem['use_shopping_voucher_decode_price'];
-        $orderDetail->shopping_voucher_num = $goodsItem['use_shopping_voucher_num'];
-
+        if(isset($goodsItem['use_shopping_voucher_decode_price'])){
+            $orderDetail->shopping_voucher_decode_price = $goodsItem['use_shopping_voucher_decode_price'];
+        }
+        if(isset($goodsItem['use_shopping_voucher_num'])){
+            $orderDetail->shopping_voucher_num = $goodsItem['use_shopping_voucher_num'];
+        }
         if(!$orderDetail->save()){
             throw new \Exception($this->responseErrorMsg($orderDetail));
         }

@@ -7,6 +7,8 @@ use app\core\BasePagination;
 use app\models\BaseModel;
 use app\plugins\alibaba\models\AlibabaApp;
 use lin010\alibaba\c2b2b\api\GetGoodsList;
+use lin010\alibaba\c2b2b\api\GetGoodsListForUserChoosed;
+use lin010\alibaba\c2b2b\api\GetGoodsListForUserChoosedResponse;
 use lin010\alibaba\c2b2b\api\GetGoodsListResponse;
 use lin010\alibaba\c2b2b\Distribution;
 
@@ -53,12 +55,12 @@ class AlibabaDistributionAlibabaGoodsGearchForm extends BaseModel{
                 $options['offerIds'] = $this->offerIds;
             }
 
-            $res = $distribution->requestWithToken(new GetGoodsList(array_merge([
-                "page" => $this->page,
+            $res = $distribution->requestWithToken(new GetGoodsListForUserChoosed(array_merge([
+                "pageNo" => $this->page,
                 "pageSize" => $pageSize
             ], $options)), $app->access_token);
 
-            if(!$res instanceof GetGoodsListResponse){
+            if(!$res instanceof GetGoodsListForUserChoosedResponse){
                 throw new \Exception("返回结果异常");
             }
             if($res->error){

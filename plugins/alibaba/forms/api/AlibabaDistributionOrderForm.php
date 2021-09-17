@@ -4,10 +4,16 @@ namespace app\plugins\alibaba\forms\api;
 
 use app\models\BaseModel;
 use app\models\UserAddress;
+use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
 use app\plugins\shopping_voucher\models\ShoppingVoucherTargetAlibabaDistributionGoods;
 use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
+use lin010\alibaba\c2b2b\api\GetAddress;
+use lin010\alibaba\c2b2b\api\GetAddressResponse;
+use lin010\alibaba\c2b2b\api\OrderGetPreview;
+use lin010\alibaba\c2b2b\api\OrderGetPreviewResponse;
+use lin010\alibaba\c2b2b\Distribution;
 
 class AlibabaDistributionOrderForm extends BaseModel{
 
@@ -67,6 +73,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                 "num"         => max(1, (int)$item['num']),
                 "sku_id"      => $sku->id,
                 "ali_sku"     => $sku->ali_sku_id,
+                "ali_spec_id" => $sku->ali_spec_id,
                 "sku_labels"  => $labels
             ];
             $goodsItem['total_original_price'] = $goodsItem['num'] * $goodsItem['price'];
@@ -76,12 +83,48 @@ class AlibabaDistributionOrderForm extends BaseModel{
         return $goodsList;
     }
 
+
+    /**
+     * 阿里巴巴订单预览接口
+     * @param Distribution $distribution
+     * @param string $token
+     * @param array $cargoParamList 商品信息 [['offerId' => 1, 'specId' => 'xxx', 'quantity' => 1]]
+     * @param UserAddress $userAddress
+     * @param array $aliAddrInfo
+     * @return array
+     * @throws \Exception
+     */
+    public static function getAliOrderPreviewData(Distribution $distribution, $token, $cargoParamList, UserAddress $userAddress, $aliAddrInfo){
+        $res = $distribution->requestWithToken(new OrderGetPreview([
+            "addressParam" => json_encode([
+                "fullName"     => $userAddress->name,
+                "mobile"       => $userAddress->mobile,
+                "phone"        => $userAddress->mobile,
+                "postCode"     => isset($aliAddrInfo['postCode']) ? $aliAddrInfo['postCode'] : "",
+                "cityText"     => $userAddress->city,
+                "provinceText" => $userAddress->province,
+                "areaText"     => $userAddress->district,
+                "address"      => $userAddress->detail,
+                "districtCode" => isset($aliAddrInfo['addressCode']) ? $aliAddrInfo['addressCode'] : ""
+            ]),
+            "cargoParamList" => json_encode($cargoParamList)
+        ]), $token);
+        if(!empty($res->error)){
+            throw new \Exception($res->error);
+        }
+        if(!$res instanceof OrderGetPreviewResponse){
+            throw new \Exception("返回结果异常");
+        }
+        return $res->result;
+    }
+
     /**
      * 获取订单数据
      * @return array
      * @throws \Exception
      */
     protected function getData(){
+        $mainData = [];
 
         $goodsList = $this->getGoodsList();
         if(!$goodsList){
@@ -90,14 +133,6 @@ class AlibabaDistributionOrderForm extends BaseModel{
 
         $orderItem = [];
         $orderItem["goods_list"] = $goodsList;
-
-
-        //计算订单商品初始总金额
-        $orderItem['total_price'] = 0;
-        foreach($goodsList as $goodsItem){
-            $orderItem['total_price'] += floatval($goodsItem['price'] * $goodsItem['num']);
-        }
-        $orderItem['total_goods_original_price'] = $orderItem['total_price'];
 
         //快递运费
         $userAddress = [];
@@ -109,16 +144,53 @@ class AlibabaDistributionOrderForm extends BaseModel{
                 'is_delete' => 0,
             ]);
         }
+
+        //获取第一个商品的应用ID
+        $app = AlibabaApp::findOne($goodsList[0]['app_id']);
+        $distribution = new Distribution($app->app_key, $app->secret);
+
+
+        $mainData['ali_address_info'] = [];
+        if($userAddress){
+            $mainData['user_address'] = $userAddress->getAttributes();
+            //解析1688的地址
+            $res = $distribution->requestWithToken(new GetAddress([
+                "addressInfo" => "{$userAddress->province} {$userAddress->city} {$userAddress->district}{$userAddress->detail}"
+            ]), $app->access_token);
+            if(!empty($res->error)){
+                throw new \Exception($res->error);
+            }
+            if($res instanceof GetAddressResponse){
+                $mainData['ali_address_info'] = $res->result;
+            }
+        }
+
+        //调用阿里巴巴订单预览接口计算运费
         $orderItem['express_price'] = 0;
+        if($mainData['ali_address_info']){
+            foreach($orderItem["goods_list"] as &$goodsItem){
+                $aliPreviewData = static::getAliOrderPreviewData($distribution, $app->access_token, [
+                    'offerId'   => $goodsItem['ali_offerId'],
+                    'specId'    => $goodsItem['ali_spec_id'],
+                    'quantity'  => $goodsItem['num']
+                ], $userAddress,  $mainData['ali_address_info']);
+                foreach($aliPreviewData as $previewData){
+                    $orderItem['express_price'] += floatval($previewData['sumCarriage']/100);
+                }
+            }
+        }
+
+        //计算订单商品初始总金额
+        $orderItem['total_price'] = 0;
+        foreach($goodsList as $goodsItem){
+            $orderItem['total_price'] += floatval($goodsItem['price'] * $goodsItem['num']);
+        }
+        $orderItem['total_goods_original_price'] = $orderItem['total_price'];
 
         //订单数据
-        $mainData = [];
         $mainData['total_price'] = 0;
         $mainData["remark"] = $this->remark;
         $mainData['list'] = [$orderItem];
-        if($userAddress){
-            $mainData['user_address'] = $userAddress->getAttributes();
-        }
         $mainData['user_address_enable'] = true;
         $mainData['user_address'] = $userAddress;
 
@@ -165,15 +237,35 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     $orderItem['shopping_voucher_use_num'] += $goodsItem['use_shopping_voucher_num'];
                 }
             }
-
             $orderItem['total_price'] -= round($orderItem['shopping_voucher_decode_price'], 2);
+
+            //运费抵扣
+            $orderItem['shopping_voucher_express_decode_price'] = 0;
+            $orderItem['shopping_voucher_express_use_num'] = 0;
+            if($this->use_shopping_voucher && $orderItem['express_price'] > 0){
+                $ratio = 1; //运费抵扣比例
+                $expressNeedTotalNum = $orderItem['express_price'] * (1/$ratio);
+                if($userRemainingShoppingVoucher > $expressNeedTotalNum){ //可全部抵扣运费
+                    $orderItem['shopping_voucher_express_use_num'] = $expressNeedTotalNum;
+                    $userRemainingShoppingVoucher -= $expressNeedTotalNum;
+                    $orderItem['shopping_voucher_express_decode_price'] = $orderItem['express_price'];
+                    $orderItem['express_price'] = 0;
+                }else{ //部分抵扣运费
+                    $orderItem['shopping_voucher_express_decode_price'] = $ratio * $userRemainingShoppingVoucher;
+                    $orderItem['express_price'] -= $orderItem['shopping_voucher_express_decode_price'];
+                    $userRemainingShoppingVoucher = 0;
+                }
+            }
         }
+
         $mainData['shopping_voucher']['remaining'] = $userRemainingShoppingVoucher;
 
         //统计订单待支付总金额
         foreach($mainData['list'] as $orderItem){
             $mainData['shopping_voucher']['decode_price'] += $orderItem['shopping_voucher_decode_price'];
+            $mainData['shopping_voucher']['decode_price'] += $orderItem['shopping_voucher_express_decode_price'];
             $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_use_num'];
+            $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_express_use_num'];
             $mainData['total_price'] += $orderItem['total_price'] + $orderItem['express_price'];
         }
         $mainData['total_price'] = round($mainData['total_price'], 2);

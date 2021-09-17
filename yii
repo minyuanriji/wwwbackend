@@ -7,7 +7,10 @@
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
-require(__DIR__ . '/vendor/autoload.php');
+
+$globalAutoLoader = require __DIR__ . '/vendor/autoload.php';
+require __DIR__ . '/vendorEx/autoload.php';
+
 require __DIR__ . '/config/const.php';
 
 $application = new app\core\ConsoleApplication();

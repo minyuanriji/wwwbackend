@@ -7,10 +7,15 @@ use app\models\UserAddress;
 use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
+use app\plugins\alibaba\models\AlibabaDistributionOrder;
+use app\plugins\alibaba\models\AlibabaDistributionOrderDetail;
+use app\plugins\alibaba\models\AlibabaDistributionOrderDetail1688;
 use app\plugins\shopping_voucher\models\ShoppingVoucherTargetAlibabaDistributionGoods;
 use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
 use lin010\alibaba\c2b2b\api\GetAddress;
 use lin010\alibaba\c2b2b\api\GetAddressResponse;
+use lin010\alibaba\c2b2b\api\OrderCreate;
+use lin010\alibaba\c2b2b\api\OrderCreateResponse;
 use lin010\alibaba\c2b2b\api\OrderGetPreview;
 use lin010\alibaba\c2b2b\api\OrderGetPreviewResponse;
 use lin010\alibaba\c2b2b\Distribution;
@@ -81,6 +86,88 @@ class AlibabaDistributionOrderForm extends BaseModel{
             $goodsList[] = $goodsItem;
         }
         return $goodsList;
+    }
+
+    /**
+     * 创建1688订单
+     * @param AlibabaDistributionOrder $order
+     * @param AlibabaDistributionOrderDetail $orderDetail
+     * @param UserAddress $userAddress
+     * @throws \Exception
+     */
+    public static function createAliOrder(AlibabaDistributionOrder $order, AlibabaDistributionOrderDetail $orderDetail, UserAddress $userAddress){
+        static $appList;
+        if(!isset($appList[$orderDetail->app_id])){
+            $appList[$orderDetail->app_id] = AlibabaApp::findOne($orderDetail->app_id);
+            if(!$appList[$orderDetail->app_id] || $appList[$orderDetail->app_id]->is_delete){
+                throw new \Exception("应用信息[ID:{$orderDetail->app_id}]不存在");
+            }
+        }
+        $app = $appList[$orderDetail->app_id];
+
+        $goods = AlibabaDistributionGoodsList::findOne($orderDetail->goods_id);
+        if(!$goods || $goods->is_delete){
+            throw new \Exception("商品[ID:{$orderDetail->goods_id}]不存在");
+        }
+
+        $aliAddrInfo = (array)@json_decode($order->ali_address_info, true);
+
+        $distribution = new Distribution($app->app_key, $app->secret);
+
+        $postData = [
+            "addressParam" => json_encode([
+                "fullName"     => $userAddress->name,
+                "mobile"       => $userAddress->mobile,
+                "phone"        => $userAddress->mobile,
+                "postCode"     => isset($aliAddrInfo['postCode']) ? $aliAddrInfo['postCode'] : "",
+                "cityText"     => $userAddress->city,
+                "provinceText" => $userAddress->province,
+                "areaText"     => $userAddress->district,
+                "address"      => $userAddress->detail,
+                "districtCode" => isset($aliAddrInfo['addressCode']) ? $aliAddrInfo['addressCode'] : ""
+            ]),
+            "cargoParamList" => json_encode([
+                'offerId'   => $goods->ali_offerId,
+                'specId'    => $orderDetail->ali_spec_id,
+                'quantity'  => $orderDetail->num
+            ]),
+            "outerOrderInfo" => json_encode([
+                "mediaOrderId" => $orderDetail->id,
+                "phone"        => $userAddress->mobile,
+                "offers"       => [
+                    "id"     => $goods->ali_offerId,
+                    "specId" => $orderDetail->ali_spec_id,
+                    "price"  => $orderDetail->unit_price * 100,
+                    "num"    => $orderDetail->num
+                ]
+            ])
+        ];
+        $res = $distribution->requestWithToken(new OrderCreate($postData), $app->access_token);
+        if(!empty($res->error)){
+            throw new \Exception($res->error);
+        }
+        if(!$res instanceof OrderCreateResponse){
+            throw new \Exception("返回结果异常");
+        }
+        $orderDetail1688 = new AlibabaDistributionOrderDetail1688([
+            "mall_id"          => $order->mall_id,
+            "app_id"           => $app->id,
+            "order_id"         => $order->id,
+            "order_detail_id"  => $orderDetail->id,
+            "goods_id"         => $goods->id,
+            "user_id"          => $order->user_id,
+            "ali_total_amount" => $res->totalSuccessAmount,
+            "ali_order_id"     => $res->orderId,
+            "ali_post_fee"     => $res->postFee,
+            "ali_postdata"     => json_encode($postData),
+            "created_at"       => time(),
+            "updated_at"       => time(),
+            "app_key"          => $app->app_key,
+            "status"           => "unpaid"
+        ]);
+        if(!$orderDetail1688->save()){
+            throw new \Exception(json_encode($orderDetail1688->getErrors()));
+        }
     }
 
 

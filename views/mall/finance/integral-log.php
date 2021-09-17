@@ -32,6 +32,26 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
+            <div style="margin: 30px 0">
+                <div style="display: flex;justify-content: space-evenly">
+                    <div>
+                        <div style="text-align: center">总收入</div>
+                        <div id="assets">{{Statistics.income}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">总支出</div>
+                        <div id="assets">{{Statistics.expend}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">当页收入</div>
+                        <div id="assets">{{Statistics.currentIncome}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">当页支出</div>
+                        <div id="assets">{{Statistics.currentExpend}}元</div>
+                    </div>
+                </div>
+            </div>
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
                 <el-table-column label="昵称" width="200">
@@ -169,6 +189,8 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 listLoading: false,
                 dialogIntegral: false,
                 is_manual: '',
+                Statistics: '',
+
             };
         },
         methods: {
@@ -256,7 +278,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 }).then(e => {
                     if (e.data.code === 0) {
                         this.form = e.data.data.list;
-
+                        this.Statistics = e.data.data.Statistics;
                         this.pagination = e.data.data.pagination;
                     } else {
                         this.$message.error(e.data.msg);
@@ -294,6 +316,11 @@ Yii::$app->loadComponentView('com-user-finance-stat');
         border: 1px solid #dcdfe6;
         border-right: 0;
         outline: 0;
+    }
+    #assets {
+        font-size: 18px;
+        color: #1ed0ff;
+        margin-left: 10px;
     }
 
     .input-item .el-input__inner:focus{

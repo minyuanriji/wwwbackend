@@ -40,7 +40,9 @@ class IncomeLogListForm extends BaseModel
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
-        };
+        }
+        $currentIncome = 0;
+        $currentExpend = 0;
         $query = IncomeLog::find()->alias('b')->where([
             'b.mall_id' => \Yii::$app->mall->id,
         ])->joinwith(['user' => function ($query) {
@@ -58,17 +60,29 @@ class IncomeLogListForm extends BaseModel
             $query->andWhere(['<', 'b.created_at', strtotime($this->end_date)])
                 ->andWhere(['>', 'b.created_at', strtotime($this->start_date)]);
         }
+        $incomeQuery = clone $query;
+        $income = $incomeQuery->andWhere(['b.type' => 1])->sum('b.income');
+        $expendQuery = clone $query;
+        $expend = $expendQuery->andWhere(['b.type' => 2])->sum('b.income');
         $list = $query->page($pagination, $this->limit)->asArray()->all();
-        unset($v);
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'data' => [
-                'list' => $list,
-                'pagination' => $pagination
-            ]
-        ];
-
+        if ($list) {
+            foreach ($list as $item) {
+                if ($item['type'] == 1) {
+                    $currentIncome += $item['income'];
+                } else {
+                    $currentExpend += $item['income'];
+                }
+            }
+        }
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '' ,[
+            'list' => $list,
+            'Statistics' => [
+                'income' => $income ?: 0,
+                'expend' => $expend ?: 0,
+                'currentIncome' => $currentIncome,
+                'currentExpend' => $currentExpend,
+            ],
+            'pagination' => $pagination
+        ]);
     }
-
-
 }

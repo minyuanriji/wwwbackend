@@ -345,6 +345,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     $userRemainingShoppingVoucher = 0;
                 }
             }
+            $orderItem['total_price'] -= $orderItem['shopping_voucher_express_decode_price'];
         }
 
         $mainData['shopping_voucher']['remaining'] = $userRemainingShoppingVoucher;

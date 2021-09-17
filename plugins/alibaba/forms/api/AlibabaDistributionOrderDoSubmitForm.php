@@ -39,7 +39,7 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
                 $order->order_no                      = static::getOrderNo('S');;
                 $order->total_price                   = $orderItem['total_price'];
                 $order->total_pay_price               = $orderItem['total_price'];
-                $order->total_goods_price             = $orderItem['total_price'];
+                $order->total_goods_price             = $orderItem['total_price'] - $orderItem['express_price'];
                 $order->express_original_price        = $orderItem['express_price'];
                 $order->express_price                 = $orderItem['express_price'];
                 $order->total_goods_original_price    = $orderItem['total_goods_original_price'];
@@ -68,9 +68,6 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
                 $order->token                         = \Yii::$app->security->generateRandomString();
                 $order->is_pay                        = 0;
                 $order->pay_type                      = 0;
-                $order->is_send                       = 0;
-                $order->is_confirm                    = 0;
-                $order->status                        = 0;
 
                 if (!$order->save()) {
                     throw new \Exception($this->responseErrorMsg($order));
@@ -82,10 +79,11 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
                 }
 
                 //扣除购物券
-                if($order->shopping_voucher_use_num > 0){
+                $shoppingVoucherUseNum = $order->shopping_voucher_express_use_num + $order->shopping_voucher_use_num;
+                if($shoppingVoucherUseNum > 0){
                     $modifyForm = new ShoppingVoucherLogModifiyForm([
-                        "money"       => $order->shopping_voucher_use_num,
-                        "desc"        => "订单(" . $order->id. ")创建扣除购物券：" . $order->shopping_voucher_use_num,
+                        "money"       => $shoppingVoucherUseNum,
+                        "desc"        => "订单(" . $order->id. ")创建扣除购物券：" . $shoppingVoucherUseNum,
                         "source_id"   => $order->id,
                         "source_type" => "target_alibaba_distribution_order"
                     ]);

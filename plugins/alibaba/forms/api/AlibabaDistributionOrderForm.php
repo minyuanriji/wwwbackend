@@ -273,6 +273,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             $orderItem['total_price'] += floatval($goodsItem['price'] * $goodsItem['num']);
         }
         $orderItem['total_goods_original_price'] = $orderItem['total_price'];
+        $orderItem['total_price'] += $orderItem['express_price'];
 
         //订单数据
         $mainData['total_price'] = 0;
@@ -353,7 +354,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             $mainData['shopping_voucher']['decode_price'] += $orderItem['shopping_voucher_express_decode_price'];
             $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_use_num'];
             $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_express_use_num'];
-            $mainData['total_price'] += $orderItem['total_price'] + $orderItem['express_price'];
+            $mainData['total_price'] += $orderItem['total_price'];
         }
         $mainData['total_price'] = round($mainData['total_price'], 2);
 

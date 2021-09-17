@@ -39,7 +39,7 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
                 $order->order_no                      = static::getOrderNo('S');;
                 $order->total_price                   = $orderItem['total_price'];
                 $order->total_pay_price               = $orderItem['total_price'];
-                $order->total_goods_price             = $orderItem['total_price'];
+                $order->total_goods_price             = $orderItem['total_price'] - $orderItem['express_price'];
                 $order->express_original_price        = $orderItem['express_price'];
                 $order->express_price                 = $orderItem['express_price'];
                 $order->total_goods_original_price    = $orderItem['total_goods_original_price'];

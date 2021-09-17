@@ -266,6 +266,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                 }
             }
         }
+        $orderItem['express_origin_price'] = $orderItem['express_price'];
 
         //计算订单商品初始总金额
         $orderItem['total_price'] = 0;

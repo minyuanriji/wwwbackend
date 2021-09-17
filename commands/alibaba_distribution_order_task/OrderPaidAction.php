@@ -22,6 +22,7 @@ class OrderPaidAction extends Action{
      * 阿里巴巴分销订单付款处理任务
      */
     public function run(){
+        $this->controller->commandOut(date("Y/m/d H:i:s") . " OrderPaidAction start");
         while(true){
             $orderDetail1688 = $this->getOne();
             if(!$orderDetail1688) continue;

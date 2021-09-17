@@ -26,6 +26,26 @@
                         <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
                     </el-input>
                 </div>
+                <div style="margin: 30px 0">
+                    <div style="display: flex;justify-content: space-evenly">
+                        <div>
+                            <div style="text-align: center">总申请提现金额</div>
+                            <div id="assets">{{Statistics.applyMoney}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">总实际打款（已转账）</div>
+                            <div id="assets">{{Statistics.actualMoney}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页申请提现金额</div>
+                            <div id="assets">{{Statistics.currentApply}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页实际打款（已转账）</div>
+                            <div id="assets">{{Statistics.currentActual}}元</div>
+                        </div>
+                    </div>
+                </div>
 
                 <el-table :data="list" size="small" border v-loading="loading" style="margin-top:20px;margin-bottom: 15px">
                     <el-table-column label="基本信息">
@@ -138,6 +158,7 @@
                 list: [],
                 pagination: null,
                 exportList: [],
+                Statistics: '',
             };
         },
         mounted() {
@@ -218,6 +239,7 @@
                     this.loading = false;
                     if (e.data.code == 0) {
                         this.list = e.data.data.list;
+                        this.Statistics = e.data.data.Statistics;
                         this.pagination = e.data.data.pagination;
                     } else {
                         this.$message.error(e.data.msg);
@@ -248,6 +270,11 @@
         top: 10px;
         right: 10px;
         z-index: 2;
+    }
+    #assets {
+        font-size: 18px;
+        color: #1ed0ff;
+        margin-left: 10px;
     }
 
     .table-body {

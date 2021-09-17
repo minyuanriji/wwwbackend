@@ -442,10 +442,11 @@ abstract class BaseOrderForm extends BaseModel
                 ['o.cancel_status' => 0]
             ]);
 
-        $query->keyword($this->pay_type == 0, [
-            'AND',
-            ['>','o.integral_deduction_price','0'],
-        ]);
+        $query->keyword($this->pay_type == 0, ['AND', ['>','o.integral_deduction_price','0']])//红包
+            ->keyword($this->pay_type == 1, ['o.pay_type' => 3])//余额
+            ->keyword($this->pay_type == 2, ['o.pay_type' => 1])//现金
+            ->keyword($this->pay_type == 3, ['AND', ['>','o.score_deduction_price','0']])//积分
+            ->keyword($this->pay_type == 4, ['AND', ['>','o.shopping_voucher_decode_price','0']]);//购物券
 
         if ($this->user_id) {
             $query->andWhere(['o.user_id' => $this->user_id]);

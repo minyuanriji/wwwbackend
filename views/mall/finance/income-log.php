@@ -1,13 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-13
- * Time: 14:21
- */
-
 Yii::$app->loadComponentView('com-dialog-select');
 Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
@@ -41,6 +32,26 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="keyword" clearable @clear="search">
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
+            </div>
+            <div style="margin: 30px 0">
+                <div style="display: flex;justify-content: space-evenly">
+                    <div>
+                        <div style="text-align: center">总收入</div>
+                        <div id="assets">{{Statistics.income}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">总支出</div>
+                        <div id="assets">{{Statistics.expend}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">当页收入</div>
+                        <div id="assets">{{Statistics.currentIncome}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">当页支出</div>
+                        <div id="assets">{{Statistics.currentExpend}}元</div>
+                    </div>
+                </div>
             </div>
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
@@ -173,7 +184,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 pagination: null,
                 listLoading: false,
                 dialogIncome: false,
-
+                Statistics: '',
             };
         },
         methods: {
@@ -266,7 +277,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 }).then(e => {
                     if (e.data.code === 0) {
                         this.form = e.data.data.list;
-
+                        this.Statistics = e.data.data.Statistics;
                         this.pagination = e.data.data.pagination;
                     } else {
                         this.$message.error(e.data.msg);
@@ -299,7 +310,11 @@ Yii::$app->loadComponentView('com-user-finance-stat');
     .input-item .el-input__inner {
         border-right: 0;
     }
-
+    #assets {
+        font-size: 18px;
+        color: #1ed0ff;
+        margin-left: 10px;
+    }
     .input-item .el-input__inner:hover{
         border: 1px solid #dcdfe6;
         border-right: 0;

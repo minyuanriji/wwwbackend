@@ -10,6 +10,7 @@
 
 namespace app\forms\mall\finance;
 
+use app\core\ApiCode;
 use app\helpers\SerializeHelper;
 use app\models\BaseModel;
 use app\models\Cash;
@@ -45,6 +46,8 @@ class CashListForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
+        $currentApply = 0;
+        $currentActual = 0;
         $pagination = null;
         $this->mall_id = \Yii::$app->mall->id;
         $query = Cash::find()
@@ -62,6 +65,11 @@ class CashListForm extends BaseModel
             $query->andWhere(['<', 'created_at', strtotime($this->end_date)])
                 ->andWhere(['>', 'created_at', strtotime($this->start_date)]);
         }
+
+        $applyQuery = clone $query;
+        $applyMoney = $applyQuery->sum('price');
+        $actualQuery = clone $query;
+        $actualMoney = $actualQuery->andWhere(['status' => 2])->sum('fact_price');
         $list = $query->page($pagination, $this->limit, $this->page)->all();
         $newList = [];
         /* @var Cash[] $list */
@@ -89,14 +97,22 @@ class CashListForm extends BaseModel
                     'fact_price' => round($item->fact_price, 2)
                 ],
             ];
+            $currentApply += $item->price;
+            if ($item->status == 2) {
+                $currentActual += $item->fact_price;
+            }
+
             $newList[] = $newItem;
         }
-        return [
-            'code' => 0,
-            'data' => [
-                'list' => $newList,
-                'pagination' => $pagination,
-            ]
-        ];
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
+            'list' => $newList,
+            'Statistics' => [
+                'applyMoney' => $applyMoney ?: 0,
+                'actualMoney' => $actualMoney ?: 0,
+                'currentApply' => $currentApply,
+                'currentActual' => $currentActual,
+            ],
+            'pagination' => $pagination,
+        ]);
     }
 }

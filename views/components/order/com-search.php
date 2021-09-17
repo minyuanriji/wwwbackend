@@ -93,6 +93,10 @@
                 <el-select size="small" style="width: 120px" v-model="search.pay_type" @change="toSearch"
                            placeholder="支付方式">
                     <el-option label="红包" :value="0"></el-option>
+                    <el-option label="余额" :value="1"></el-option>
+                    <el-option label="现金" :value="2"></el-option>
+                    <el-option label="积分" :value="3"></el-option>
+                    <el-option label="购物券" :value="4"></el-option>
                 </el-select>
             </div>
 

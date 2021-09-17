@@ -4,7 +4,15 @@ namespace app\plugins\alibaba\notify_class;
 
 use app\core\payment\PaymentNotify;
 use app\core\payment\PaymentOrder;
+use app\models\UserAddress;
+use app\plugins\alibaba\forms\api\AlibabaDistributionOrderForm;
+use app\plugins\alibaba\models\AlibabaApp;
+use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionOrder;
+use app\plugins\alibaba\models\AlibabaDistributionOrderDetail;
+use lin010\alibaba\c2b2b\api\OrderGetPreview;
+use lin010\alibaba\c2b2b\api\OrderGetPreviewResponse;
+use lin010\alibaba\c2b2b\Distribution;
 
 class AlibabaDistributionOrderNotifiyProcess extends PaymentNotify{
 
@@ -49,6 +57,27 @@ class AlibabaDistributionOrderNotifiyProcess extends PaymentNotify{
         }
         $order->pay_at = time();
         $order->save();
+
+        //通知阿里巴巴下单
+        $query = AlibabaDistributionOrderDetail::find()->alias("od")->where([
+            "order_id" => $order->id
+        ])->innerJoin(["a" => AlibabaApp::tableName()], "a.id=od.app_id")
+          ->innerJoin(["g" => AlibabaDistributionGoodsList::tableName()], "g.id=od.goods_id");
+        $orderDetails = $query->select(["od.*", "a.app_key", "a.secret", "a.access_token", "g.ali_offerId"])->asArray()->all();
+
+        $userAddress = UserAddress::findOne($order->address_id);
+        $aliAddress = (array)@json_decode($order->ali_address_info, true);
+
+        foreach($orderDetails as $orderDetail){
+            $distribution = new Distribution($orderDetail['app_key'], $orderDetail['secret']);
+            $previewData = AlibabaDistributionOrderForm::getAliOrderPreviewData($distribution, $orderDetail['access_token'], [
+                'offerId'   => $orderDetail['ali_offerId'],
+                'specId'    => $orderDetail['ali_spec_id'],
+                'quantity'  => $orderDetail['num']
+            ], $userAddress, $aliAddress);
+            print_r($previewData);
+            exit;
+        }
 
         return true;
     }

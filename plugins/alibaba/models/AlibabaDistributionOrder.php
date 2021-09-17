@@ -18,8 +18,8 @@ class AlibabaDistributionOrder extends BaseActiveRecord{
         return [
             [['mall_id', 'user_id', 'order_no', 'total_price', 'total_pay_price', 'express_original_price', 'express_price',
               'total_goods_price', 'total_goods_original_price', 'name', 'mobile', 'address', 'is_pay', 'pay_type',
-              'created_at', 'updated_at', 'token'], 'required'],
-            [['shopping_voucher_use_num', 'shopping_voucher_decode_price'], 'number'],
+              'created_at', 'updated_at', 'token', 'ali_address_info'], 'required'],
+            [['shopping_voucher_use_num', 'shopping_voucher_decode_price', 'shopping_voucher_express_use_num', 'shopping_voucher_express_decode_price'], 'number'],
             [['remark', 'express', 'express_no'], 'string'],
             [['is_confirm', 'is_send', 'confirm_at', 'cancel_status', 'cancel_at', 'deleted_at', 'is_delete', 'is_recycle', 'is_comment',
               'comment_at', 'sale_status', 'status', 'auto_cancel_at', 'auto_confirm_at', 'auto_sales_at', 'complete_at',

@@ -45,9 +45,12 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
                 $order->total_goods_original_price    = $orderItem['total_goods_original_price'];
 
                 //购物券抵扣
-                $order->shopping_voucher_use_num      = $orderItem['shopping_voucher_use_num'];
-                $order->shopping_voucher_decode_price = $orderItem['shopping_voucher_decode_price'];
+                $order->shopping_voucher_use_num              = $orderItem['shopping_voucher_use_num'];
+                $order->shopping_voucher_decode_price         = $orderItem['shopping_voucher_decode_price'];
+                $order->shopping_voucher_express_use_num      = $orderItem['shopping_voucher_express_use_num'];
+                $order->shopping_voucher_express_decode_price = $orderItem['shopping_voucher_express_decode_price'];
 
+                $order->ali_address_info              = @json_encode($data['ali_address_info']);
                 $order->name                          = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
                 $order->mobile                        = !empty($data['user_address']['mobile']) ? $data['user_address']['mobile'] : "";
                 $order->address                       = $data['user_address']['province']
@@ -117,8 +120,10 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
     public function extraOrderDetail(AlibabaDistributionOrder $order, $goodsItem){
         $orderDetail                        = new AlibabaDistributionOrderDetail();
         $orderDetail->mall_id               = $order->mall_id;
+        $orderDetail->app_id                = $goodsItem['app_id'];
         $orderDetail->order_id              = $order->id;
         $orderDetail->goods_id              = $goodsItem['id'];
+        $orderDetail->ali_spec_id           = $goodsItem['ali_spec_id'];
         $orderDetail->sku_id                = $goodsItem['sku_id'];
         $orderDetail->ali_sku               = $goodsItem['ali_sku'];
         $orderDetail->sku_labels            = json_encode($goodsItem['sku_labels']);

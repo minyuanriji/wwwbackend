@@ -55,12 +55,12 @@ class AlibabaDistributionAlibabaGoodsGearchForm extends BaseModel{
                 $options['offerIds'] = $this->offerIds;
             }
 
-            $res = $distribution->requestWithToken(new GetGoodsListForUserChoosed(array_merge([
-                "pageNo" => $this->page,
+            $res = $distribution->requestWithToken(new GetGoodsList(array_merge([
+                "page" => $this->page,
                 "pageSize" => $pageSize
             ], $options)), $app->access_token);
 
-            if(!$res instanceof GetGoodsListForUserChoosedResponse){
+            if(!$res instanceof GetGoodsListResponse){
                 throw new \Exception("返回结果异常");
             }
             if($res->error){

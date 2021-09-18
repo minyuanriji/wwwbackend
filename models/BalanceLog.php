@@ -16,6 +16,8 @@ use Yii;
  * @property string $custom_desc 自定义详细说明
  * @property int $created_at
  * @property string $mall_id
+ * @property string source_type
+ * @property int source_id
  */
 class BalanceLog extends BaseActiveRecord
 {
@@ -58,6 +60,8 @@ class BalanceLog extends BaseActiveRecord
             'money' => '变动金额',
             'balance' => '当前余额',
             'desc' => '变动说明',
+            'source_type' => '来源类型',
+            'source_id' => '来源表ID',
             'custom_desc' => '自定义详细说明',
             'created_at' => 'Created At',
         ];

@@ -97,17 +97,17 @@ class EfpsPayForm extends BaseModel{
                 if (!$paymentOrder->save()) {
                     throw new \Exception($paymentOrder->getFirstErrors());
                 }
-                $NotifyClass = $paymentOrder->notify_class;
-                $notifyObject = new $NotifyClass();
-                $po = new PaymentOrder([
-                    'orderNo'     => $paymentOrder->order_no,
-                    'amount'      => (float)$paymentOrder->amount,
-                    'title'       => $paymentOrder->title,
-                    'notifyClass' => $paymentOrder->notify_class,
-                    'payType'     => "balance",
+            $NotifyClass = $paymentOrder->notify_class;
+            $notifyObject = new $NotifyClass();
+            $po = new PaymentOrder([
+                'orderNo'     => $paymentOrder->order_no,
+                'amount'      => (float)$paymentOrder->amount,
+                'title'       => $paymentOrder->title,
+                'notifyClass' => $paymentOrder->notify_class,
+                'payType'     => "balance",
                 ]);
                 if ($po->amount > 0) {
-                    if (!\Yii::$app->currency->setUser($user)->balance->sub($po->amount, '账户余额支付：' . $po->amount . '元')) {
+                    if (!\Yii::$app->currency->setUser($user)->balance->sub($po->amount, '账户余额支付：' . $po->amount . '元', '', 'order', 0)) {
                         throw new \Exception('余额操作失败。');
                     }
                 }

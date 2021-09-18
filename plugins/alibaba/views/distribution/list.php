@@ -208,17 +208,17 @@ echo $this->render("com-alibaba-goods");
                     </el-table-column>
                     <el-table-column width="190" label="类目">
                         <template slot-scope="scope">
-                            <el-cascader disabled v-model="scope.row.ali_category_id" :options="batchSetForm.categorys"></el-cascader>
+                            <el-cascader v-model="scope.row.ali_category_id" :options="batchSetForm.categorys"></el-cascader>
                         </template>
                     </el-table-column>
                     <el-table-column prop="price" width="110" label="零售价">
                         <template slot-scope="scope">
-                            <el-input disabled v-model="scope.row.price"></el-input>
+                            <el-input v-model="scope.row.price"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column prop="origin_price" width="110" label="划线价">
                         <template slot-scope="scope">
-                            <el-input disabled v-model="scope.row.origin_price"></el-input>
+                            <el-input v-model="scope.row.origin_price"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column width="75" label="分销价">
@@ -272,7 +272,7 @@ echo $this->render("com-alibaba-goods");
                 </el-card>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="batchSetForm.singleEditGoods = null">取 消</el-button>
-                    <el-button :loading="batchSetForm.loading" type="primary" @click="batchSingleSetConfirm">确 定</el-button>
+                    <el-button :loading="batchSetForm.loading" type="primary" @click="singleEditConfirm">确 定</el-button>
                 </div>
             </template>
 
@@ -381,8 +381,27 @@ echo $this->render("com-alibaba-goods");
                 this.batchSetForm.singleEditGoods = [];
                 this.batchSetForm.singleEditGoods.push(row);
             },
-            batchSingleSetConfirm(){
-
+            singleEditConfirm(){
+                this.batchSetForm.loading = true;
+                request({
+                    params: {
+                        r: 'plugin/alibaba/mall/distribution/goods-save'
+                    },
+                    method: 'post',
+                    data: {
+                        goods:JSON.stringify(this.batchSetForm.singleEditGoods[0])
+                    }
+                }).then(e => {
+                    this.batchSetForm.loading = false;
+                    if (e.data.code == 0) {
+                        this.$message.success(e.data.msg);
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    this.$message.error(e.data.msg);
+                    this.batchSetForm.loading = false;
+                });
             },
             batchSetConfirm(){
                 if(this.batchSetForm.selections.length <= 0){
@@ -414,7 +433,7 @@ echo $this->render("com-alibaba-goods");
                     },
                     method: 'post',
                     data: {
-                        goods_list:this.batchSetForm.selections
+                        goods_list:JSON.stringify(this.batchSetForm.selections)
                     }
                 }).then(e => {
                     this.batchSetForm.loading = false;

@@ -12,6 +12,7 @@ use app\plugins\alibaba\forms\mall\AlibabaDistributionEditCategorySortForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionGetCategoryForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionGoodsBatchSaveForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionGoodsListForm;
+use app\plugins\alibaba\forms\mall\AlibabaDistributionGoodsSaveForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionSyncCategoryForm;
 use app\plugins\Controller;
 
@@ -23,6 +24,16 @@ class DistributionController extends Controller{
      */
     public function actionGoodsBatchSave(){
         $form = new AlibabaDistributionGoodsBatchSaveForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
+    }
+
+    /**
+     * 单个商品编辑保存
+     * @return string|\yii\web\Response
+     */
+    public function actionGoodsSave(){
+        $form = new AlibabaDistributionGoodsSaveForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->save());
     }

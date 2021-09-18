@@ -6,7 +6,7 @@ use lin010\alibaba\c2b2b\Response;
 
 abstract class BaseAPI
 {
-    private $params;
+    private $params = [];
 
     public function __construct($params = []){
         foreach($params as $key => $value){

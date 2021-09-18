@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsCategory;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
+use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
 
 class AlibabaDistributionGoodsListForm extends BaseModel{
 
@@ -35,9 +36,30 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
             $list = $query->asArray()->page($pagination, 20, $this->page)->all();
             if($list){
                 foreach($list as &$item){
+                    $skuList = AlibabaDistributionGoodsSku::find()->where([
+                        "goods_id"  => $item['id'],
+                        "is_delete" => 0
+                    ])->asArray()->all();
+                    $item['sku_infos'] = @json_decode($item['sku_infos'], true);
+                    $skuValues = isset($item['sku_infos']['values']) ? $item['sku_infos']['values'] : [];
+                    if($skuList){
+                        foreach($skuList as &$skuItem){
+                            $attributes = explode(",", $skuItem['ali_attributes']);
+                            $skuItem['ali_attributes_label'] = [];
+                            foreach($attributes as $value){
+                                if(isset($skuValues[$value])){
+                                    $skuItem['ali_attributes_label'][] = $skuValues[$value];
+                                }
+                            }
+                            $skuItem['ali_attributes_label'] = implode("，", $skuItem['ali_attributes_label']);
+                        }
+
+                    }
+                    $item['sku_list']        = $skuList;
                     $item['ali_category_id'] = explode(",", $item['ali_category_id']);
-                    $item['ali_data_json'] = @json_decode($item['ali_data_json'], true);
-                    $item['categorys'] = [];
+                    $item['ali_data_json']   = @json_decode($item['ali_data_json'], true);
+                    $item['categorys']       = [];
+
                     if($item['ali_category_id']){
                         $item['categorys'] = AlibabaDistributionGoodsCategory::find()->andWhere([
                             "AND",

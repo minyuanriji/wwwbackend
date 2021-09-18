@@ -7,6 +7,8 @@ use app\core\BasePagination;
 use app\models\BaseModel;
 use app\plugins\alibaba\models\AlibabaApp;
 use lin010\alibaba\c2b2b\api\GetGoodsList;
+use lin010\alibaba\c2b2b\api\GetGoodsListForUserChoosed;
+use lin010\alibaba\c2b2b\api\GetGoodsListForUserChoosedResponse;
 use lin010\alibaba\c2b2b\api\GetGoodsListResponse;
 use lin010\alibaba\c2b2b\Distribution;
 

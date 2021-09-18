@@ -34,6 +34,7 @@ class AlibabaDistributionGoodsBatchSaveForm extends BaseModel{
                 $goods->origin_price    = $item['origin_price'];
                 $goods->ali_category_id = implode(",", $item['ali_category_id']);
                 $goods->updated_at      = time();
+
                 if(!$goods->save()){
                     throw new \Exception($this->responseErrorMsg($goods));
                 }

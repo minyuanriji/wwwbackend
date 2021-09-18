@@ -72,7 +72,7 @@ class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm
      * @return array
      */
     public function getCacheKey(){
-        $keys = [$this->mall_id, $this->user_id];
+        $keys = [$this->mall_id, $this->user_id, $this->page, $this->ali_cat_id];
         return $keys;
     }
 }

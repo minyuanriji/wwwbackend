@@ -24,6 +24,7 @@ use app\models\PaymentRefund;
 use app\models\User;
 use app\models\RefundAddress;
 use app\events\OrderRefundEvent;
+use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
 use app\services\mall\order\OrderSaleStatusService;
 use app\services\mall\order\OrderSendService;
 use app\services\mall\order\OrderToSatusWaitReceive;
@@ -253,6 +254,10 @@ class OrderRefundForm extends BaseModel
             //退积分
             (new OrderCommon()) -> returnIntegral($orderRefund->detail,$orderRefund -> order_no);
             $this->returnScore($orderRefund->detail);
+
+            //退购物券
+            $this->returnShoppingVoucher($orderRefund);
+
             $transaction->commit();
             //更新订单售后状态,不能写在事务里
             $OrderSaleStatusService = new OrderSaleStatusService();
@@ -280,6 +285,25 @@ class OrderRefundForm extends BaseModel
         if ($order_detail->use_score == 1) {
             $user = User::findOne($order_detail->order->user_id);
             \Yii::$app->currency->setUser($user)->score->add($order_detail->use_score_price,"售后退款");
+        }
+    }
+
+    /**
+     * 退回购物券
+     * @param OrderRefund $refund
+     */
+    public function returnShoppingVoucher(OrderRefund $refund)
+    {
+        $orderDetail = $refund->detail;
+        if($orderDetail->shopping_voucher_num > 0){
+            $user = User::findOne($refund->user_id);
+            $modifyForm = new ShoppingVoucherLogModifiyForm([
+                "money"       => $orderDetail->shopping_voucher_num,
+                "desc"        => "订单退款，购物券返还",
+                "source_id"   => $refund->id,
+                "source_type" => "from_order_refund"
+            ]);
+            $modifyForm->add($user);
         }
     }
 

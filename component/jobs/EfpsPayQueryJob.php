@@ -83,7 +83,7 @@ class EfpsPayQueryJob extends Component implements JobInterface{
                         }else{
                             $paymentOrder->pay_type = 1;
                         }
-                        $paymentOrder->is_pay   = 1;
+                        $paymentOrder->is_pay = 1;
                         if (!$paymentOrder->save()) {
                             throw new \Exception($paymentOrder->getFirstErrors());
                         }

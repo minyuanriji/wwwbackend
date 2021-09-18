@@ -31,6 +31,14 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                 throw new \Exception("商品不存在");
             }
 
+            if(isset($this->goods['ali_product_info'])){
+                $description = $this->goods['ali_product_info']['info']['description'];
+                $productInfo = (array)@json_decode($goods->ali_product_info, true);
+                $productInfo['info']['description'] = $description;
+                $goods->ali_product_info = json_encode($productInfo);
+            }
+
+
             $goods->ali_category_id = implode(",", $this->goods['ali_category_id']);
             $goods->price           = $this->goods['price'];
             $goods->origin_price    = $this->goods['origin_price'];

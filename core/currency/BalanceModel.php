@@ -38,7 +38,7 @@ class BalanceModel extends BaseModel implements BaseCurrency
      * @return bool
      * @throws Exception
      */
-    public function add($price, $desc, $customDesc = '')
+    public function add($price, $desc, $customDesc = '', $source_type = '', $source_id = 0)
     {
         $this->mall = \Yii::$app->mall;
         if (!is_float($price) && !is_int($price) && !is_double($price)) {
@@ -51,7 +51,7 @@ class BalanceModel extends BaseModel implements BaseCurrency
         $userInfo->total_balance += $price;
         if ($userInfo->save()) {
             try {
-                $this->createLog(1, $price, $desc, $customDesc,$userInfo->balance);
+                $this->createLog(1, $price, $desc, $customDesc, $userInfo->balance, $source_type, $source_id);
                 $t->commit();
                 return true;
             } catch (Exception $e) {
@@ -89,7 +89,7 @@ class BalanceModel extends BaseModel implements BaseCurrency
         $user->balance -= $price;
         if ($user->save()) {
             try {
-                $this->createLog(2, $price, $desc, $customDesc,$user->balance,$source_type,$source_id);
+                $this->createLog(2, $price, $desc, $customDesc, $user->balance, $source_type, $source_id);
                 $t->commit();
                 return true;
             } catch (Exception $e) {
@@ -118,7 +118,7 @@ class BalanceModel extends BaseModel implements BaseCurrency
      * @return bool
      * @throws Exception
      */
-    public function refund($price, $desc, $customDesc = '')
+    public function refund($price, $desc, $customDesc = '', $source_type = '', $source_id = 0)
     {
         $this->mall = \Yii::$app->mall;
         if (!is_float($price) && !is_int($price) && !is_double($price)) {
@@ -130,7 +130,7 @@ class BalanceModel extends BaseModel implements BaseCurrency
         $userInfo->balance += $price;
         if ($userInfo->save()) {
             try {
-                $this->createLog(1, $price, $desc, $customDesc,$userInfo->balance);
+                $this->createLog(1, $price, $desc, $customDesc, $userInfo->balance, $source_type, $source_id);
                 $t->commit();
                 return true;
             } catch (Exception $e) {
@@ -153,7 +153,7 @@ class BalanceModel extends BaseModel implements BaseCurrency
      * @return bool
      * @throws \Exception
      */
-    private function createLog($type, $price, $desc, $customDesc,$balance = 0,$source_type = '',$source_id = 0)
+    private function createLog($type, $price, $desc, $customDesc, $balance = 0, $source_type = '', $source_id = 0)
     {
         if ($price == 0) {
             \Yii::warning('余额为' . $price . '不记录日志');
@@ -169,16 +169,16 @@ class BalanceModel extends BaseModel implements BaseCurrency
         $form->money = $price;
         $form->desc = $desc;
         $form->custom_desc = $customDesc;
-        $form->balance = $balance ==0 ? $this->user->balance : $balance;
+        $form->balance = $balance == 0 ? $this->user->balance : $balance;
         if ($source_type) {
-            $form->source_type = $customDesc;
+            $form->source_type = $source_type;
         }
         if ($source_id) {
             $form->source_id = $source_id;
         }
         if ($form->save()) {
             //触发余额变动事件
-            $event              = new BalanceEvent();
+            $event = new BalanceEvent();
             $event->balance_log = $form;
             \Yii::$app->trigger(BalanceLog::EVENT_BALANCE_CHANGE, $event);
             return true;

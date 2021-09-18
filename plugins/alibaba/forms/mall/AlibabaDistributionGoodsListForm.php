@@ -68,6 +68,7 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
                         ])->select(["name"])->asArray()->all();
                     }
 
+                    unset($item['ali_product_info']);
                 }
             }
 

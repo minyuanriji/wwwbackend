@@ -17,5 +17,8 @@ class GetGoodsDetailResponse extends Response{
     protected function setData($result){
         $this->bizGroupInfos = isset($result['bizGroupInfos']) ? $result['bizGroupInfos'] : [];
         $this->productInfo = isset($result['productInfo']) ? $result['productInfo'] : [];
+        if(!isset($this->productInfo['skuInfos'])){
+            $this->productInfo['skuInfos'] = [];
+        }
     }
 }

@@ -69,7 +69,7 @@
 
             </el-table>
 
-            <div v-if="!loading" style="display: flex;justify-content: space-between;margin-top:20px;">
+            <div style="display: flex;justify-content: space-between;margin-top:20px;">
                 <!--
                 <div style="margin: 7.5px 0px;"><el-button @click="aliGoodsImport" :disabled="selections.length <= 0" :loading="btnLoading" type="danger">一键添加</el-button></div>
                 -->

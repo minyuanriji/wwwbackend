@@ -38,7 +38,7 @@ class AlibabaDistributionAlibabaGoodsGearchForm extends BaseModel{
 
             $pageSize = 10;
 
-            $app = AlibabaApp::findOne(1);
+            $app = AlibabaApp::findOne($this->app_id);
             if(!$app || $app->is_delete){
                 throw new \Exception("应用不存在");
             }

@@ -22,7 +22,7 @@ class AlibabaDistributionGetCategoryForm extends BaseModel implements ICacheForm
             $rows = AlibabaDistributionGoodsCategory::find()->where([
                 "is_delete" => 0,
                 "mall_id" => \Yii::$app->mall->id
-            ])->orderBy("ali_parent_id ASC,sort DESC")->asArray()->all();
+            ])->orderBy("sort DESC")->asArray()->all();
             while($rows){
                 $row = array_shift($rows);
                 $data = ["ali_cat_id" => $row['ali_cat_id'], "name" => $row['name'], "cover_url" => $row['cover_url'], 'children' => []];

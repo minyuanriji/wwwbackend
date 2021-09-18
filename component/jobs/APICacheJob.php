@@ -24,6 +24,7 @@ class APICacheJob extends Component implements JobInterface
         $cacheKey = APICacheHelper::generateCacheKey($this->cacheForm);
         $dataForm = $this->cacheForm->getSourceDataForm();
         if($dataForm instanceof APICacheDataForm){
+            echo "CacheKey:{$cacheKey}\n";
             $cacheObject->set($cacheKey, $dataForm->sourceData, $dataForm->duration);
         }
     }

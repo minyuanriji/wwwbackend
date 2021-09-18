@@ -31,7 +31,7 @@ class BalanceRefund extends BaseRefund
         try {
             $user = User::find()->where(['id' => $paymentRefund->user_id, 'mall_id' => $paymentRefund->mall_id])
                 ->with('userInfo')->one();
-            $order_no = substr($paymentRefund->title, strpos($paymentRefund->title, ':'));
+            $order_no = substr($paymentRefund->title, strpos($paymentRefund->title, ':') + 1);
             $order = Order::findOne(['order_no' => $order_no]);
             if (!$order) throw new Exception('订单不存在！');
             $orderRefund = OrderRefund::findOne(['order_id' => $order->id]);

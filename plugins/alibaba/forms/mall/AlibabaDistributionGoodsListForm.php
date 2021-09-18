@@ -4,6 +4,7 @@ namespace app\plugins\alibaba\forms\mall;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsCategory;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
@@ -15,7 +16,6 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
 
     public function rules(){
         return [
-            [['app_id'], 'required'],
             [['page', 'app_id'], 'integer']
         ];
     }
@@ -28,9 +28,20 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
 
         try {
 
-            $query = AlibabaDistributionGoodsList::find()->where(["is_delete" => 0]);
+            $query = AlibabaDistributionGoodsList::find()->alias("g");
+            $query->innerJoin(["a" => AlibabaApp::tableName()], "a.id=g.app_id");
 
-            $orderBy = "id DESC";
+            $query->where([
+                "g.is_delete" => 0,
+                "a.is_delete" => 0,
+                "a.type"      => "distribution"
+            ]);
+
+            if($this->app_id){
+                $query->andWhere(["g.app_id" => $this->app_id]);
+            }
+
+            $orderBy = "g.id DESC";
             $query->orderBy($orderBy);
 
             $list = $query->asArray()->page($pagination, 20, $this->page)->all();
@@ -68,6 +79,9 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
                         ])->select(["name"])->asArray()->all();
                     }
 
+                    $item['ali_product_info'] = (array)@json_decode($item['ali_product_info'], true);
+
+                    //unset($item['ali_product_info']);
                 }
             }
 

@@ -94,7 +94,7 @@ Yii::$app->loadComponentView('goods/com-dialog-select');
                     if (valid) {
                         request({
                             params: {
-                                r: 'plugin/shopping_voucher/mall/target-goods/edit'
+                                r: 'plugin/shopping_voucher/mall/target-alibaba-distribution-goods/edit'
                             },
                             method: 'post',
                             data: that.formData

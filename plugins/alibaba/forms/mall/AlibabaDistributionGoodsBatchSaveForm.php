@@ -22,12 +22,13 @@ class AlibabaDistributionGoodsBatchSaveForm extends BaseModel{
         }
 
         try {
-            foreach($this->goods_list as $item){
+            $this->goods_list = json_decode($this->goods_list, true);
+            foreach($this->goods_list as $key => $item){
                 $goods = AlibabaDistributionGoodsList::findOne($item['id']);
                 if(!$goods) continue;
 
                 if(empty($item['ali_category_id'])){
-                    throw new \Exception("类别不能为空");
+                    throw new \Exception("{$key}[ID:".$item['id']."]类别不能为空");
                 }
 
                 $goods->price           = $item['price'];

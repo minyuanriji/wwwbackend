@@ -20,7 +20,7 @@ echo $this->render("../com/com-tab-target");
             </div>
             <el-table :data="list" border style="width: 100%" v-loading="loading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column sortable="custom" label="商品名称" width="350">
+                <el-table-column sortable="custom" label="商品名称" >
                     <template slot-scope="scope">
                         <div flex="box:first">
                             <div style="padding-right: 10px;">
@@ -50,7 +50,7 @@ echo $this->render("../com/com-tab-target");
                         {{scope.row.updated_at|dateTimeFormat('Y-m-d')}}
                     </template>
                 </el-table-column>
-                <el-table-column label="操作">
+                <el-table-column label="操作" width="150">
                     <template slot-scope="scope">
                         <el-button @click="editGoods(scope.row)" type="text" circle size="mini">
                             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -92,7 +92,7 @@ echo $this->render("../com/com-tab-target");
         el: '#app',
         data() {
             return {
-                activeName: 'goods',
+                activeName: '1688_distribution',
                 editDialogVisible: false,
                 editData: {},
                 searchData: {
@@ -124,7 +124,7 @@ echo $this->render("../com/com-tab-target");
                     self.loading = true;
                     request({
                         params: {
-                            r: 'plugin/shopping_voucher/mall/target-goods/delete'
+                            r: 'plugin/shopping_voucher/mall/target-alibaba-distribution-goods/delete'
                         },
                         method: 'post',
                         data: {
@@ -155,7 +155,7 @@ echo $this->render("../com/com-tab-target");
             },
             getList() {
                 let params = {
-                    r: 'plugin/shopping_voucher/mall/target-goods/list',
+                    r: 'plugin/shopping_voucher/mall/target-alibaba-distribution-goods/list',
                     page: this.page,
                     keyword: this.searchData.keyword,
                 };

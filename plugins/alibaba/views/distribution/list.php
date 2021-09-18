@@ -1,5 +1,6 @@
 <?php
 echo $this->render("com-alibaba-goods");
+Yii::$app->loadComponentView('com-rich-text');
 ?>
 <div id="app" v-cloak>
     <el-card class="box-card" shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
@@ -81,7 +82,11 @@ echo $this->render("com-alibaba-goods");
                 </el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
-
+                        <el-button @click="editIt(scope.row)" type="text" circle size="mini">
+                            <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                <img src="statics/img/mall/edit.png" alt="">
+                            </el-tooltip>
+                        </el-button>
                         <el-button @click="deleteIt(scope.row)" type="text" circle size="mini">
                             <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                 <img src="statics/img/mall/del.png" alt="">
@@ -170,6 +175,7 @@ echo $this->render("com-alibaba-goods");
                     </el-table-column>
                     <el-table-column label="操作" width="75" >
                         <template slot-scope="scope">
+
                             <el-button @click="batchSingleEdit(scope.row)" type="text" circle size="mini">
                                 <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                                     <img src="statics/img/mall/edit.png" alt="">
@@ -208,17 +214,17 @@ echo $this->render("com-alibaba-goods");
                     </el-table-column>
                     <el-table-column width="190" label="类目">
                         <template slot-scope="scope">
-                            <el-cascader disabled v-model="scope.row.ali_category_id" :options="batchSetForm.categorys"></el-cascader>
+                            <el-cascader v-model="scope.row.ali_category_id" :options="batchSetForm.categorys"></el-cascader>
                         </template>
                     </el-table-column>
                     <el-table-column prop="price" width="110" label="零售价">
                         <template slot-scope="scope">
-                            <el-input disabled v-model="scope.row.price"></el-input>
+                            <el-input v-model="scope.row.price"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column prop="origin_price" width="110" label="划线价">
                         <template slot-scope="scope">
-                            <el-input disabled v-model="scope.row.origin_price"></el-input>
+                            <el-input v-model="scope.row.origin_price"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column width="75" label="分销价">
@@ -272,10 +278,27 @@ echo $this->render("com-alibaba-goods");
                 </el-card>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="batchSetForm.singleEditGoods = null">取 消</el-button>
-                    <el-button :loading="batchSetForm.loading" type="primary" @click="batchSingleSetConfirm">确 定</el-button>
+                    <el-button :loading="batchSetForm.loading" type="primary" @click="singleEditConfirm">确 定</el-button>
                 </div>
             </template>
 
+        </el-dialog>
+
+
+        <el-dialog title="编辑商品" :visible.sync="editGoods.dialogVisible" :close-on-click-modal="false">
+            <el-form :rules="editGoods.rules" ref="editGoodsFormData" label-width="20%" :model="editGoods.formData" size="small">
+                <el-form-item label="标题" prop="name">
+                    <el-input v-model="editGoods.formData.name" style="width:60%"></el-input>
+                </el-form-item>
+                <el-form-item label="详情" prop="detail">
+                    <com-rich-text v-model="editGoods.formData.ali_product_info.info.description" :value="editGoods.formData.ali_product_info.info.description"></com-rich-text>
+                </el-form-item>
+            </el-form>
+
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="editGoods.dialogVisible=false">取 消</el-button>
+                <el-button :loading="editGoods.btnLoading" type="primary" @click="editSaveConfirm">确 定</el-button>
+            </div>
         </el-dialog>
 
     </el-card>
@@ -306,12 +329,27 @@ echo $this->render("com-alibaba-goods");
                     singleSetSel: 'price',
                     singleSetValue: 0,
                     singleEditGoods: null
+                },
+
+                editGoods:{
+                    dialogVisible: false,
+                    btnLoading: false,
+                    formData:{
+                        name:"",
+                        ali_product_info:{
+                            info:{
+                                description:""
+                            }
+                        }
+                    }
                 }
-
-
             };
         },
         methods: {
+            editIt(row){
+                this.editGoods.dialogVisible = true;
+                this.editGoods.formData = row;
+            },
             handleSelectionChange(selection) {
                 this.batchSetForm.selections = selection;
             },
@@ -381,8 +419,46 @@ echo $this->render("com-alibaba-goods");
                 this.batchSetForm.singleEditGoods = [];
                 this.batchSetForm.singleEditGoods.push(row);
             },
-            batchSingleSetConfirm(){
-
+            editSaveConfirm(){
+                let that = this;
+                this.editGoods.btnLoading = true;
+                this.editSave(this.editGoods.formData, function(e){
+                    this.editGoods.btnLoading = false;
+                    if (e.data.code == 0) {
+                        that.$message.success(e.data.msg);
+                    } else {
+                        that.$message.error(e.data.msg);
+                    }
+                });
+            },
+            editSave(goods, fn){
+                request({
+                    params: {
+                        r: 'plugin/alibaba/mall/distribution/goods-save'
+                    },
+                    method: 'post',
+                    data: {
+                        goods:JSON.stringify(goods)
+                    }
+                }).then(e => {
+                    if(typeof fn == "function"){
+                        fn.call(this, e);
+                    }
+                }).catch(e => {
+                    this.$message.error(e.data.msg);
+                });
+            },
+            singleEditConfirm(){
+                let that = this;
+                this.batchSetForm.loading = true;
+                this.editSave(this.batchSetForm.singleEditGoods[0], function(e){
+                    that.batchSetForm.loading = false;
+                    if (e.data.code == 0) {
+                        that.$message.success(e.data.msg);
+                    } else {
+                        that.$message.error(e.data.msg);
+                    }
+                });
             },
             batchSetConfirm(){
                 if(this.batchSetForm.selections.length <= 0){
@@ -414,7 +490,7 @@ echo $this->render("com-alibaba-goods");
                     },
                     method: 'post',
                     data: {
-                        goods_list:this.batchSetForm.selections
+                        goods_list:JSON.stringify(this.batchSetForm.selections)
                     }
                 }).then(e => {
                     this.batchSetForm.loading = false;

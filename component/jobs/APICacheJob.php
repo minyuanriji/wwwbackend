@@ -23,8 +23,13 @@ class APICacheJob extends Component implements JobInterface
         $cacheObject = \Yii::$app->getCache();
         $cacheKey = APICacheHelper::generateCacheKey($this->cacheForm);
         $dataForm = $this->cacheForm->getSourceDataForm();
+        echo get_class($this->cacheForm) . ":";
         if($dataForm instanceof APICacheDataForm){
+            echo $cacheKey;
             $cacheObject->set($cacheKey, $dataForm->sourceData, $dataForm->duration);
+        }else{
+            echo "error:" . @json_encode($dataForm);
         }
+        echo "\n";
     }
 }

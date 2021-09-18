@@ -48,7 +48,7 @@ class BalanceLogListForm extends BaseModel
         try {
             $currentIncome = 0;
             $currentExpend = 0;
-            if ($this->type) {
+            if ($this->type && $this->level && $this->address) {
                 $paymentQuery = PaymentOrder::find()->alias('po')->where(['po.is_pay' => 1, 'po.pay_type' => 3]);
             } else {
                 $query = BalanceLog::find()->alias('b')->where([

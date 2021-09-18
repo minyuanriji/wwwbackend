@@ -1,10 +1,4 @@
 <?php
-/**
-  * @link:http://www.gdqijianshi.com/
- * copyright: Copyright (c) 2020 广东七件事集团
- * author: xay
- */
-
 Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
 <style>
@@ -62,8 +56,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             <div>
                 <span>余额收支</span>
                 <div style="float: right;margin: -5px 0">
-                    <com-export-dialog :field_list='export_list' :params="searchData"
-                                       @selected="exportConfirm"></com-export-dialog>
+                    <com-export-dialog :field_list='export_list' :params="searchData" @selected="exportConfirm"></com-export-dialog>
                 </div>
             </div>
         </div>

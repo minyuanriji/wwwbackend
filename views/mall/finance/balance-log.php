@@ -19,6 +19,12 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                     end-placeholder="结束日期">
                     </el-date-picker>
                 </div>
+                <div style="width: 15%">
+                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="keyword" clearable
+                              @clear="search">
+                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                    </el-input>
+                </div>
                 <div style="width: 16%">
                     类型
                     <el-select size="small" v-model="type" @change='searchType' class="select" placeholder="请选择类型">
@@ -26,7 +32,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                         <el-option key="mch" label="商家" value="mch"></el-option>
                     </el-select>
                 </div>
-                <div style="width: 16%">
+                <div style="width: 16%" v-if="levelShow">
                     等级
                     <el-select size="small" v-model="level" placeholder="请选择区域等级" @change="levelChange">
                         <el-option
@@ -45,12 +51,6 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                 :props="props"
                                 v-model="address">
                         </el-cascader>
-                </div>
-                <div style="width: 15%">
-                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="keyword" clearable
-                              @clear="search">
-                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-                    </el-input>
                 </div>
             </div>
             <div style="margin: 30px 0">
@@ -168,6 +168,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     label: 'name',
                     children: 'list'
                 },
+                levelShow:false,
             };
         },
         methods: {
@@ -187,7 +188,10 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 }
                 this.getList();
             },
-            searchType() {
+            searchType(e) {
+                if (e) {
+                    this.levelShow=true;
+                }
                 this.page = 1;
                 this.getList();
             },

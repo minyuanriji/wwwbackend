@@ -73,15 +73,19 @@ class BalanceForm extends BaseModel
                 \Yii::$app->currency->setUser($user)->balance->add(
                     (float)$this->price,
                     $desc,
-                    json_encode($custom_desc)
+                    json_encode($custom_desc),
+                    'admin',
+                    $admin->id
                 );
             } else {
                 $desc = "管理员： " . $admin->username . " 后台操作账号："
-                    . $user->nickname . " 余额扣除：" . $this->price . " 元";
+                    . $user->nickname . " 余额扣除：" . $this->price . "元";
                 \Yii::$app->currency->setUser($user)->balance->sub(
                     (float)$this->price,
                     $desc,
-                    json_encode($custom_desc)
+                    json_encode($custom_desc),
+                    'admin',
+                    $admin->id
                 );
             }
 

@@ -165,7 +165,9 @@ class CashEditForm extends BaseModel
                     \Yii::$app->currency->setUser($mchCash->mch->user)->balance->add(
                         round($mchCash->fact_price, 2),
                         '商户提现到余额',
-                        \Yii::$app->serializer->encode($mchCash)
+                        \Yii::$app->serializer->encode($mchCash),
+                        'mch_cash',
+                        $mchCash->id
                     );
                 } elseif ($mchCash->type == 'wx' || $mchCash->type == 'alipay' || $mchCash->type == 'bank') {
                     throw new \Exception('未定义的提现方式');

@@ -342,6 +342,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                 }else{ //部分抵扣运费
                     $orderItem['shopping_voucher_express_decode_price'] = $ratio * $userRemainingShoppingVoucher;
                     $orderItem['express_price'] -= $orderItem['shopping_voucher_express_decode_price'];
+                    $orderItem['shopping_voucher_express_use_num'] = $userRemainingShoppingVoucher;
                     $userRemainingShoppingVoucher = 0;
                 }
             }

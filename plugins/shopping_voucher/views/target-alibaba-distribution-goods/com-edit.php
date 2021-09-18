@@ -15,7 +15,7 @@ Yii::$app->loadComponentView('goods/com-dialog-select');
                             <div>ID:{{formData.goods_id}}</div>
                         </div>
                     </div>
-                    <com-dialog-select :multiple="false" @selected="goodsSelect" title="商品选择">
+                    <com-dialog-select  url="plugin/alibaba/mall/distribution/search-goods-sku"  :multiple="false" @selected="goodsSelect" title="商品选择">
                         <el-button type="primary" size="small">指定商品</el-button>
                     </com-dialog-select>
                 </el-form-item>
@@ -42,6 +42,7 @@ Yii::$app->loadComponentView('goods/com-dialog-select');
         return {
             id: 0,
             goods_id: 0,
+            sku_id: 0,
             name: '',
             cover_pic: '',
             voucher_price: 0.00
@@ -81,11 +82,12 @@ Yii::$app->loadComponentView('goods/com-dialog-select');
             }
         },
         methods: {
-            goodsSelect(goods){
-                this.formData.goods_id = goods.id;
-                this.formData.name = goods.name;
-                this.formData.cover_pic = goods.goodsWarehouse.cover_pic;
-                this.formData.voucher_price = goods.price;
+            goodsSelect(sku){
+                this.formData.goods_id      = sku.goods_id;
+                this.formData.sku_id        = sku.id;
+                this.formData.name          = sku.name;
+                this.formData.cover_pic     = sku.cover_url;
+                this.formData.voucher_price = sku.price;
             },
             save(){
                 this.btnLoading = true;

@@ -13,10 +13,21 @@ use app\plugins\alibaba\forms\mall\AlibabaDistributionGetCategoryForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionGoodsBatchSaveForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionGoodsListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionGoodsSaveForm;
+use app\plugins\alibaba\forms\mall\AlibabaDistributionGoodsSkuListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionSyncCategoryForm;
 use app\plugins\Controller;
 
 class DistributionController extends Controller{
+
+    /**
+     * 搜索商品规格
+     * @return string|\yii\web\Response
+     */
+    public function actionSearchGoodsSku(){
+        $form = new AlibabaDistributionGoodsSkuListForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->getList());
+    }
 
     /**
      * 商品批量编辑保存

@@ -98,7 +98,7 @@ class EfpsPayForm extends BaseModel{
                 if (!$paymentOrder->save()) {
                     throw new \Exception($paymentOrder->getFirstErrors());
                 }
-                if (strpos($paymentOrder->title, 'M')) {
+                if (strpos($paymentOrder->order_no, "S")) {
                     $mchOrder = MchCheckoutOrder::findOne(['order_no' => $paymentOrder->order_no]);
                     if (!$mchOrder) throw new \Exception('商家扫码订单不存在！');
                     $store = Store::findOne(['mch_id' => $mchOrder->mch_id]);

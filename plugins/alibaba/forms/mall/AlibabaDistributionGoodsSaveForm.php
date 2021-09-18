@@ -32,7 +32,7 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
             }
 
             if(isset($this->goods['ali_product_info'])){
-                $this->goods['ali_product_info'] = (array)@json_decode($this->goods['ali_product_info']);
+                $this->goods['ali_product_info'] = (array)@json_decode($this->goods['ali_product_info'], true);
                 $description = $this->goods['ali_product_info']['info']['description'];
                 $productInfo = (array)@json_decode($goods->ali_product_info, true);
                 $productInfo['info']['description'] = $description;

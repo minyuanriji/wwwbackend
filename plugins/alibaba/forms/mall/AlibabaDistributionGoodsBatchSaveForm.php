@@ -31,10 +31,12 @@ class AlibabaDistributionGoodsBatchSaveForm extends BaseModel{
                     throw new \Exception("{$key}[ID:".$item['id']."]类别不能为空");
                 }
 
-                $goods->price           = $item['price'];
-                $goods->origin_price    = $item['origin_price'];
-                $goods->ali_category_id = implode(",", $item['ali_category_id']);
-                $goods->updated_at      = time();
+                $goods->price_rate        = $item['price_rate'];
+                $goods->price             = $item['price'];
+                $goods->origin_price      = $item['origin_price'];
+                $goods->origin_price_rate = $item['origin_price_rate'];
+                $goods->ali_category_id   = implode(",", $item['ali_category_id']);
+                $goods->updated_at        = time();
 
                 if(!$goods->save()){
                     throw new \Exception($this->responseErrorMsg($goods));

@@ -332,7 +332,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             $orderItem['shopping_voucher_express_decode_price'] = 0;
             $orderItem['shopping_voucher_express_use_num'] = 0;
             if($this->use_shopping_voucher && $orderItem['express_price'] > 0){
-                $ratio = 1; //运费抵扣比例
+                $ratio = 0.2; //运费抵扣比例
                 $expressNeedTotalNum = $orderItem['express_price'] * (1/$ratio);
                 if($userRemainingShoppingVoucher > $expressNeedTotalNum){ //可全部抵扣运费
                     $orderItem['shopping_voucher_express_use_num'] = $expressNeedTotalNum;

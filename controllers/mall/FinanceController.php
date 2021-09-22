@@ -64,7 +64,7 @@ class FinanceController extends MallController
      * @Author: 广东七件事 ganxiaohao
      * @Date: 2020-05-15
      * @Time: 9:58
-     * @Note:体现记录
+     * @Note:用户提现记录
      * @return string|\yii\web\Response
      */
     public function actionCash()

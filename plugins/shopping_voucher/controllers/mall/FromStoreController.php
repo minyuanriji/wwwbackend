@@ -5,6 +5,8 @@ namespace app\plugins\shopping_voucher\controllers\mall;
 use app\plugins\Controller;
 use app\plugins\shopping_voucher\forms\mall\FromStoreDeleteForm;
 use app\plugins\shopping_voucher\forms\mall\FromStoreEditForm;
+use app\plugins\shopping_voucher\forms\mall\FromStoreBatchSaveForm;
+use app\plugins\shopping_voucher\forms\mall\FromRatioEditForm;
 use app\plugins\shopping_voucher\forms\mall\FromStoreListForm;
 
 class FromStoreController extends Controller{
@@ -30,6 +32,26 @@ class FromStoreController extends Controller{
      */
     public function actionEdit(){
         $form = new FromStoreEditForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
+    }
+
+    /**
+     * 批量保存
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionBatchSave(){
+        $form = new FromStoreBatchSaveForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
+    }
+
+    /**
+     * 编辑
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionEditRatio(){
+        $form = new FromRatioEditForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->save());
     }

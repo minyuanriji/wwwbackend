@@ -493,7 +493,7 @@ Yii::$app->loadComponentView('order/com-city');
                                 v-if="item.sale_status == 0 && item.is_pay == 1"
                                 style="right: 100px"
                                 class="com-order-del"
-                                @click="moveCloserAfterSale(item)"
+                                @click="moveCloserAfterSale(item, goods.id)"
                                 type="text">
                             <el-tooltip class="item" effect="dark" content="申请售后" placement="top">
                                 <img src="statics/img/mall/order/sales-service.png" alt="">
@@ -525,13 +525,13 @@ Yii::$app->loadComponentView('order/com-city');
                             <div class="goods" v-for="goods in item.detail">
                                 <img :src="goods.goods_info && goods.goods_info.goods_attr && goods.goods_info.goods_attr.pic_url ? goods.goods_info.goods_attr.pic_url : goods.goods_info.goods_attr.cover_pic"
                                      class="goods-image">
+
                                 <span v-if="goods.refund_status == '11' || goods.refund_status == '10' || goods.refund_status == '12'"
                                       class="com-order-refund-status">售后中</span>
 
                                 <span v-else-if="goods.refund_status == '20'" class="com-order-refund-status">已退款</span>
 
                                 <span v-else-if="goods.refund_status == '21'" class="com-order-refund-status">已拒绝</span>
-
                                 <div flex="dir:left">
                                     <div class="goods-info">
                                         <div class="goods-name">
@@ -586,7 +586,21 @@ Yii::$app->loadComponentView('order/com-city');
                                                 <img src="statics/img/mall/order/edit.png" alt="">
                                             </el-button>
                                         </div>
-                                        <div flex="cross:center main:center">数量：x {{goods.num}}</div>
+                                        <div flex="cross:center main:center">
+                                            <div>数量：x {{goods.num}}</div>
+                                            <div>
+                                                <el-button
+                                                        v-if="goods.is_refund == 0 && item.is_pay == 1 && goods.refund_status == 0"
+                                                        style=""
+                                                        class="com-order-del"
+                                                        @click="moveCloserAfterSale(item, goods.id)"
+                                                        type="text">
+                                                    <el-tooltip class="item" effect="dark" content="申请售后" placement="top">
+                                                        <img src="statics/img/mall/order/sales-service.png" alt="">
+                                                    </el-tooltip>
+                                                </el-button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1509,12 +1523,12 @@ Yii::$app->loadComponentView('order/com-city');
                 });
             },
             // 移近申请售后
-            moveCloserAfterSale(e) {
+            moveCloserAfterSale(e,detail_id) {
                 let text = "是否申请售后?"
                 let para = {
                     integral_score_price: e.score_deduction_price,
                     is_receipt: e.is_confirm,
-                    order_detail_id: e.detail[0].id,
+                    order_detail_id: detail_id,
                     pic_list: '',
                     reason: '',
                     refund_price: e.total_goods_price,

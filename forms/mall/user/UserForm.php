@@ -458,7 +458,7 @@ class UserForm extends BaseModel
 
         foreach ($list as &$v) {
             $v['info_desc'] = json_decode($v['custom_desc'], true);
-        };
+        }
         unset($v);
 
         return [

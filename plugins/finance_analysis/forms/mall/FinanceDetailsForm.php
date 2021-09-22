@@ -57,7 +57,7 @@ class FinanceDetailsForm extends BaseModel
 
         //获取现有、总金额（不随时间变化）
         $countQuery = clone $query;
-        $select = ["u.id", "u.nickname", "u.avatar_url", "u.total_score", "u.score", "u.static_score", "u.balance", "u.total_balance", "u.static_integral", "u.role_type", "u.total_income", "u.income", "u.income_frozen", "psvu.money"];
+        $select = ["u.id", "u.nickname", "u.avatar_url", "u.total_score", "u.score", "u.static_score", "u.balance", "u.total_balance", "u.static_integral", "u.role_type", "u.total_income", "u.income", "u.income_frozen", "u.created_at", "psvu.money"];
         $countUser = $countQuery->select($select)->leftJoin(['psvu' => ShoppingVoucherUser::tableName()], "psvu.user_id=u.id")->asArray()->one();
 
         //获取某个时间段金额

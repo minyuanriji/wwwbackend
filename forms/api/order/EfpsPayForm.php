@@ -8,7 +8,9 @@ use app\core\payment\PaymentOrder;
 use app\logic\AppConfigLogic;
 use app\models\BaseModel;
 use app\models\EfpsPaymentOrder;
+use app\models\Order;
 use app\models\PaymentOrderUnion;
+use app\models\Store;
 use app\models\User;
 use app\models\UserInfo;
 use app\plugins\mch\models\MchCheckoutOrder;
@@ -91,12 +93,27 @@ class EfpsPayForm extends BaseModel{
             }
 
             foreach ($paymentOrders as $paymentOrder) {
-
                 $paymentOrder->is_pay   = 1;
                 $paymentOrder->pay_type = 3;
                 if (!$paymentOrder->save()) {
                     throw new \Exception($paymentOrder->getFirstErrors());
                 }
+                if (strpos($paymentOrder->order_no, "S")) {
+                    $mchOrder = MchCheckoutOrder::findOne(['order_no' => $paymentOrder->order_no]);
+                    if (!$mchOrder) throw new \Exception('商家扫码订单不存在！');
+                    $store = Store::findOne(['mch_id' => $mchOrder->mch_id]);
+                    if (!$store) throw new \Exception('商户不存在！');
+                    $desc = '来自扫码商家' . " ‘" . $store->name . "‘ 账户余额支付：" . (float)$paymentOrder->amount . '元';
+                    $source_type = 'mch_checkout_order';
+                    $source_id = $mchOrder->id;
+                } else {
+                    $order = Order::findOne(['order_no' => $paymentOrder->order_no]);
+                    if (!$order) throw new \Exception('订单不存在！');
+                    $desc = '来自订单商品' . " ‘" . $paymentOrder->title . "‘ 账户余额支付：" . (float)$paymentOrder->amount . '元';
+                    $source_type = 'order';
+                    $source_id = $order->id;
+                }
+
                 $NotifyClass = $paymentOrder->notify_class;
                 $notifyObject = new $NotifyClass();
                 $po = new PaymentOrder([
@@ -105,17 +122,23 @@ class EfpsPayForm extends BaseModel{
                     'title'       => $paymentOrder->title,
                     'notifyClass' => $paymentOrder->notify_class,
                     'payType'     => "balance",
-                ]);
-                if ($po->amount > 0) {
-                    if (!\Yii::$app->currency->setUser($user)->balance->sub($po->amount, '账户余额支付：' . $po->amount . '元')) {
-                        throw new \Exception('余额操作失败。');
+                    ]);
+                    if ($po->amount > 0) {
+                        if (!\Yii::$app->currency->setUser($user)->balance->sub(
+                            $po->amount,
+                            $desc,
+                            '',
+                            $source_type,
+                            $source_id
+                        )) {
+                            throw new \Exception('余额操作失败。');
+                        }
                     }
-                }
-                try {
-                    $notifyObject->notify($po);
-                } catch (\Exception $e) {
-                    return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
-                }
+                    try {
+                        $notifyObject->notify($po);
+                    } catch (\Exception $e) {
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
+                    }
             }
             $t->commit();
 

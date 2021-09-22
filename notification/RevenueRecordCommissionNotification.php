@@ -11,13 +11,13 @@ class RevenueRecordCommissionNotification
 {
     public static function send($income_log)
     {
-        (new RevenueRecordCommissionNotificationWeTplJob([
+        /*(new RevenueRecordCommissionNotificationWeTplJob([
             "income_log" => $income_log
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-    //    \Yii::$app->queue->delay(0)->push(new RevenueRecordCommissionNotificationWeTplJob([
-  //          "income_log" => $income_log
-//        ]));
+        \Yii::$app->queue->delay(0)->push(new RevenueRecordCommissionNotificationWeTplJob([
+            "income_log" => $income_log
+        ]));
     }
 
     public static function sendWechatTemplate($income_log)

@@ -1,12 +1,4 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Author: zal
- * Date: 2020-04-16
- * Time: 17:16
- */
-
 Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
 
@@ -14,8 +6,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
         <el-form size="small" class="export-btn" :inline="true" :model="search">
             <el-form-item>
-                <com-export-dialog :field_list='exportList' :params="search" @selected="confirmSubmit">
-                </com-export-dialog>
+                <com-export-dialog :field_list='exportList' :params="search" @selected="confirmSubmit"></com-export-dialog>
             </el-form-item>
         </el-form>
         <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -36,6 +27,26 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入昵称搜索" v-model="search.keyword" clearable @clear="goSearch">
                         <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
                     </el-input>
+                </div>
+                <div style="margin: 30px 0">
+                    <div style="display: flex;justify-content: space-evenly">
+                        <div>
+                            <div style="text-align: center">总申请提现金额</div>
+                            <div id="assets">{{Statistics.applyMoney}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">总实际打款（已打款）</div>
+                            <div id="assets">{{Statistics.actualMoney}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页申请提现金额</div>
+                            <div id="assets">{{Statistics.currentApply}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页实际打款（已打款）</div>
+                            <div id="assets">{{Statistics.currentActual}}元</div>
+                        </div>
+                    </div>
                 </div>
                 <el-table :data="list" size="small" border v-loading="loading" style="margin-top:20px;margin-bottom: 15px">
                     <el-table-column label="基本信息">
@@ -159,6 +170,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 list: [],
                 pagination: null,
                 exportList: [],
+                Statistics: '',
             };
         },
         mounted() {
@@ -204,6 +216,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     this.loading = false;
                     if (e.data.code == 0) {
                         this.list = e.data.data.list;
+                        this.Statistics = e.data.data.Statistics;
                         this.pagination = e.data.data.pagination;
 
                     } else {
@@ -295,6 +308,12 @@ Yii::$app->loadComponentView('com-user-finance-stat');
         height: 56px;
         line-height: 56px;
         background-color: #fff;
+    }
+
+    #assets {
+        font-size: 18px;
+        color: #1ed0ff;
+        margin-left: 10px;
     }
 
     .export-btn {

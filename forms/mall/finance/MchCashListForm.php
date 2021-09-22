@@ -31,7 +31,8 @@ class MchCashListForm extends BaseModel{
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-
+        $currentApply = 0;
+        $currentActual = 0;
         $query = MchCash::find()->alias("mc");
         $query->leftJoin(["eto" => EfpsTransferOrder::tableName()], "mc.order_no=eto.outTradeNo");
         $query->leftJoin(["s" => Store::tableName()], "s.mch_id=mc.mch_id");
@@ -66,20 +67,31 @@ class MchCashListForm extends BaseModel{
             $query->andWhere(["mc.transfer_status" => 2]);
         }
 
+        $applyQuery = clone $query;
+        $applyMoney = $applyQuery->sum('mc.money');
+        $actualQuery = clone $query;
+        $actualMoney = $actualQuery->andWhere(['mc.transfer_status' => 1])->sum('mc.fact_price');
         $list = $query->asArray()->page($pagination, $this->limit, $this->page)->all();
         if($list){
             foreach($list as &$item){
                 $typeData = @json_decode($item['type_data'], true);
                 $item = array_merge($item, is_array($typeData) ? $typeData : []);
+                $currentApply += $item['money'];
+                if ($item['transfer_status'] == 1) {
+                    $currentActual += $item['fact_price'];
+                }
             }
         }
 
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'data' => [
-                'list'       => $list ? $list : [],
-                'pagination' => $pagination,
-            ]
-        ];
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
+            'list'       => $list ?: [],
+            'Statistics' => [
+                'applyMoney' => $applyMoney ?: 0,
+                'actualMoney' => $actualMoney ?: 0,
+                'currentApply' => $currentApply,
+                'currentActual' => $currentActual,
+            ],
+            'pagination' => $pagination,
+        ]);
     }
 }

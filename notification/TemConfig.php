@@ -315,4 +315,45 @@ class TemConfig
 
      * */
     const IncomeArrival = '-fSmrfitWwJn1Lgr488aaJ2Q3BOAccuD3kHuHdi7BpE';
+
+    /*  @todo 	订单支付成功提醒
+
+        恭喜您！购买的商品已支付成功，请留意物流信息哦！么么哒！~~
+        订单编号：201807011745324648
+        商品名称：加硬快递纸箱
+        订单总价：1.00元
+        订单状态：已支付
+        下单时间：2018年7月22日 10:10
+        欢迎您的到来！
+
+        {{first.DATA}}
+        订单编号：{{keyword1.DATA}}
+        商品名称：{{keyword2.DATA}}
+        订单总价：{{keyword3.DATA}}
+        订单状态：{{keyword4.DATA}}
+        下单时间：{{keyword5.DATA}}
+        {{remark.DATA}}
+
+     * */
+    const STORE_PAY = 'zkMsjE9-pjgANoP5JsKAAFPpx2zi37q-0bLYy348wN4';
+
+    /*  @todo 	订单支付成功提醒
+
+        尊敬的会员，您好！您已消费成功，详情如下：
+        消费门店：积上下沙商贸城店
+        消费金额：2538元
+        获得积分：3538分
+        消费时间：42018年3月28日
+        当前可用积分：51338分
+        欢迎您再次光临！
+
+        {{first.DATA}}
+        消费门店：{{keyword1.DATA}}
+        消费金额：{{keyword2.DATA}}
+        获得积分：{{keyword3.DATA}}
+        消费时间：{{keyword4.DATA}}
+        当前可用积分：{{keyword5.DATA}}
+        {{remark.DATA}}
+     * */
+    const VOUCHER_ORDER_PAY = 'Z3yCFkv5uZAuKFMUfCP05Z3B_TSLa4tznFgnb7ir6U8';
 }

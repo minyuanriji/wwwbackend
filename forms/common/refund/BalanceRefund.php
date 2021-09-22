@@ -12,6 +12,8 @@ namespace app\forms\common\refund;
 
 
 use app\core\payment\PaymentException;
+use app\models\Order;
+use app\models\OrderRefund;
 use app\models\User;
 use yii\db\Exception;
 
@@ -29,7 +31,12 @@ class BalanceRefund extends BaseRefund
         try {
             $user = User::find()->where(['id' => $paymentRefund->user_id, 'mall_id' => $paymentRefund->mall_id])
                 ->with('userInfo')->one();
-            \Yii::$app->currency->setUser($user)->balance->refund(floatval($paymentRefund->amount), '订单退款');
+            $order_no = substr($paymentRefund->title, strpos($paymentRefund->title, ':') + 1);
+            $order = Order::findOne(['order_no' => $order_no]);
+            if (!$order) throw new Exception('订单不存在！');
+            $orderRefund = OrderRefund::findOne(['order_id' => $order->id]);
+            if (!$orderRefund) throw new Exception('退款订单不存在！');
+            \Yii::$app->currency->setUser($user)->balance->refund(floatval($paymentRefund->amount), '订单退款', '', 'order_refund', $orderRefund->id);
             $paymentRefund->is_pay = 1;
             $paymentRefund->pay_type = 3;
             if (!$paymentRefund->save()) {

@@ -206,7 +206,7 @@ class CashForm extends BaseModel
                 "mall" => \Yii::$app->mall,
                 "user" => $user
             ]);
-            $balanceModel->add((float)$cash->fact_price, '收益提现');
+            $balanceModel->add((float)$cash->fact_price, '用户收益提现', '', 'user_cash', $cash->id);
 
         }elseif($cash->type == "bank"){
             $res = EfpsCashTransfer::transfer($cash);

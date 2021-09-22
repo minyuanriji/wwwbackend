@@ -29,7 +29,8 @@ class IntegralLogListForm extends BaseModel{
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-
+        $currentIncome = 0;
+        $currentExpend = 0;
         $query = IntegralLog::find()->alias('il')->where([
             'il.mall_id' => \Yii::$app->mall->id,
         ])->orderBy('il.id desc');
@@ -58,15 +59,29 @@ class IntegralLogListForm extends BaseModel{
         $selects = ["il.*", "u.nickname"];
 
         $query->select($selects);
-
+        $incomeQuery = clone $query;
+        $income = $incomeQuery->andWhere(['il.type' => 1])->sum('il.integral');
+        $expendQuery = clone $query;
+        $expend = $expendQuery->andWhere(['il.type' => 2])->sum('il.integral');
         $list = $query->page($pagination, $this->limit)->asArray()->all();
-
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'data' => [
-                'list' => $list,
-                'pagination' => $pagination
-            ]
-        ];
+        if ($list) {
+            foreach ($list as $item) {
+                if ($item['type'] == 1) {
+                    $currentIncome += $item['integral'];
+                } else {
+                    $currentExpend += $item['integral'];
+                }
+            }
+        }
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '' ,[
+            'list' => $list,
+            'Statistics' => [
+                'income' => $income ?: 0,
+                'expend' => $expend ?: 0,
+                'currentIncome' => $currentIncome,
+                'currentExpend' => $currentExpend,
+            ],
+            'pagination' => $pagination
+        ]);
     }
 }

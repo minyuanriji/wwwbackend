@@ -6,8 +6,15 @@ use app\core\ApiCode;
 use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
 use app\models\BaseModel;
+use app\models\UserAddress;
+use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
+use app\plugins\shopping_voucher\models\ShoppingVoucherTargetAlibabaDistributionGoods;
+use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
+use lin010\alibaba\c2b2b\api\GetAddress;
+use lin010\alibaba\c2b2b\api\GetAddressResponse;
+use lin010\alibaba\c2b2b\Distribution;
 
 class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm {
 
@@ -22,6 +29,70 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
         ];
     }
 
+    /**
+     * 获取购物券抵扣价格
+     * @param AlibabaDistributionGoodsList $goods
+     * @param integer $skuId 规格ID
+     * @param string $spec 阿里巴巴规格
+     * @param float $price 价格
+     * @param integer $num 数量
+     * @return float 如果返回-1不支持购物券抵扣
+     */
+    public static function getShoppingVoucherDecodeNeedNumber(AlibabaDistributionGoodsList $goods, $skuId, $spec, $price, $num){
+        static $voucherGoodsList = null, $expressPrice = 0;
+        if($voucherGoodsList === null){
+            $rows = ShoppingVoucherTargetAlibabaDistributionGoods::find()->where([
+                "goods_id"  => $goods->id,
+                "is_delete" => 0
+            ])->select(["goods_id", "sku_id", "voucher_price"])->asArray()->all();
+            $voucherGoodsList = [];
+            foreach($rows as $row){
+                $voucherGoodsList[$goods->id . ":" . $row['sku_id']] = $row['voucher_price'];
+            }
+        }
+
+        $number = -1; //需要的购物券数量
+        if($price > 0 && isset($voucherGoodsList[$goods->id . ":" . $skuId])){
+            $voucherPrice = $voucherGoodsList[$goods->id . ":" . $skuId];
+            $ratio = $voucherPrice/$price; //购物券价与商品价格比例
+            $number = floatval($price) * $ratio * $num;
+
+            //获取用户默认的收货地址
+            $userAddress = UserAddress::getUserAddressDefault([
+                'user_id'   => \Yii::$app->user->id,
+                'is_delete' => 0,
+            ]);
+
+            //通过1688接口获取到运费
+            if($expressPrice <= 0){
+                $app = AlibabaApp::findOne($goods->app_id);
+                $distribution = new Distribution($app->app_key, $app->secret);
+
+                //解析1688的地址
+                $res = $distribution->requestWithToken(new GetAddress([
+                    "addressInfo" => "{$userAddress->province} {$userAddress->city} {$userAddress->district}{$userAddress->detail}"
+                ]), $app->access_token);
+                if(empty($res->error)){
+                    //1688预览订单接口获取运费信息
+                    $aliPreviewData = AlibabaDistributionOrderForm::getAliOrderPreviewData($distribution, $app->access_token, [
+                        'offerId'   => $goods->ali_offerId,
+                        'specId'    => $spec,
+                        'quantity'  => $num
+                    ], $userAddress,  $res->result);
+
+                    if(is_array($aliPreviewData) && count($aliPreviewData) > 0){
+                        foreach($aliPreviewData as $previewData){
+                            $expressPrice += floatval($previewData['sumCarriage']/100);
+                        }
+                    }
+                }
+            }
+
+            $number += $expressPrice * (1/AlibabaDistributionOrderForm::getShoppingVoucherDecodeExpressRate());
+        }
+   
+        return $number;
+    }
 
     /**
      * @return APICacheDataForm
@@ -41,7 +112,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
 
             $detail['id']               = $goods->id;
             $detail['name']             = $goods->name;
-            $detail['shopping_voucher'] = $goods->price; //TODO 购物券价
+            $detail['shopping_voucher'] = static::getShoppingVoucherDecodeNeedNumber($goods, 0, '', $goods->price, 1);
             $detail['price']            = $goods->price;
             $detail['origin_price']     = $goods->origin_price;
             if(isset($aliInfo['info'])){
@@ -114,6 +185,12 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             if(empty($detail['sku_infos'])){
                 $detail['sku_infos'] = static::getDefaultSkuInfos($goods);
                 $detail['sku_list'] = static::getDefaultSkuList($goods);
+            }
+
+            //计算各个规格使用购物券兑换的价格
+            foreach($detail['sku_list'] as &$skuItem){
+                $skuItem['shopping_voucher'] = static::getShoppingVoucherDecodeNeedNumber($goods,
+                    $skuItem['id'] == "DEF" ? 0 : $skuItem['id'], $skuItem['ali_spec_id'], $skuItem['price'], 1);
             }
 
             return new APICacheDataForm([

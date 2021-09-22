@@ -105,31 +105,30 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                         throw new \Exception($this->responseErrorMsg($shoppingVoucheGoods));
                     }
                 }
-            }else{ //无规格商品
-                //加入购物券消费场景
-                $shoppingVoucheGoods = ShoppingVoucherTargetAlibabaDistributionGoods::findOne([
-                    "goods_id" => $goods->id,
-                    "sku_id"   => 0,
-                ]);
-                if(!$shoppingVoucheGoods){
-                    $shoppingVoucheGoods = new ShoppingVoucherTargetAlibabaDistributionGoods([
-                        "mall_id"    => $goods->mall_id,
-                        "goods_id"   => $goods->id,
-                        "sku_id"     => 0,
-                        "created_at" => time(),
-                    ]);
-                }
-                $shoppingVoucheGoods->name          = $goods->name;
-                $shoppingVoucheGoods->cover_pic     = $goods->cover_url;
-                $shoppingVoucheGoods->voucher_price = $goods->price;
-                $shoppingVoucheGoods->updated_at    = time();
-                $shoppingVoucheGoods->deleted_at    = 0;
-                $shoppingVoucheGoods->is_delete     = 0;
-                if(!$shoppingVoucheGoods->save()){
-                    throw new \Exception($this->responseErrorMsg($shoppingVoucheGoods));
-                }
             }
 
+            //加入购物券消费场景（针对默认规格）
+            $shoppingVoucheGoods = ShoppingVoucherTargetAlibabaDistributionGoods::findOne([
+                "goods_id" => $goods->id,
+                "sku_id"   => 0,
+            ]);
+            if(!$shoppingVoucheGoods){
+                $shoppingVoucheGoods = new ShoppingVoucherTargetAlibabaDistributionGoods([
+                    "mall_id"    => $goods->mall_id,
+                    "goods_id"   => $goods->id,
+                    "sku_id"     => 0,
+                    "created_at" => time(),
+                ]);
+            }
+            $shoppingVoucheGoods->name          = $goods->name;
+            $shoppingVoucheGoods->cover_pic     = $goods->cover_url;
+            $shoppingVoucheGoods->voucher_price = $goods->price;
+            $shoppingVoucheGoods->updated_at    = time();
+            $shoppingVoucheGoods->deleted_at    = 0;
+            $shoppingVoucheGoods->is_delete     = 0;
+            if(!$shoppingVoucheGoods->save()){
+                throw new \Exception($this->responseErrorMsg($shoppingVoucheGoods));
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

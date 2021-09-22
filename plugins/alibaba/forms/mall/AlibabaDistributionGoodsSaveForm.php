@@ -30,19 +30,22 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
             if(!$goods){
                 throw new \Exception("商品不存在");
             }
-
             if(isset($this->goods['ali_product_info'])){
-                $this->goods['ali_product_info'] = (array)@json_decode($this->goods['ali_product_info'], true);
+                if(!is_array($this->goods['ali_product_info'])){
+                    $this->goods['ali_product_info'] = (array)@json_decode($this->goods['ali_product_info'], true);
+                }
                 $description = $this->goods['ali_product_info']['info']['description'];
                 $productInfo = (array)@json_decode($goods->ali_product_info, true);
                 $productInfo['info']['description'] = $description;
                 $goods->ali_product_info = json_encode($productInfo);
             }
 
-            $goods->ali_category_id = implode(",", $this->goods['ali_category_id']);
-            $goods->price           = $this->goods['price'];
-            $goods->origin_price    = $this->goods['origin_price'];
-            $goods->updated_at      = time();
+            $goods->ali_category_id   = implode(",", $this->goods['ali_category_id']);
+            $goods->price             = $this->goods['price'];
+            $goods->price_rate        = $this->goods['price_rate'];
+            $goods->origin_price      = $this->goods['origin_price'];
+            $goods->origin_price_rate = $this->goods['origin_price_rate'];
+            $goods->updated_at        = time();
             if(!$goods->save()){
                 throw new \Exception($this->responseErrorMsg($goods));
             }

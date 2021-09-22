@@ -12,9 +12,10 @@ class APICacheHelper{
 
     /**
      * @param ICacheForm $cacheForm
+     * @param boolean $forceDb
      * @return array
      */
-    public static function get(ICacheForm $cacheForm){
+    public static function get(ICacheForm $cacheForm, $forceDb = false){
 
         if($cacheForm instanceof BaseModel){
             $cacheForm->base_mall_id = \Yii::$app->mall->id;
@@ -28,7 +29,7 @@ class APICacheHelper{
 
             $cacheObject = \Yii::$app->getCache();
             $cacheData = $cacheObject->get($cacheKey);
-            if(!$cacheData || (defined('ENV') && ENV != "pro")){
+            if($forceDb || !$cacheData || (defined('ENV') && ENV != "pro")){
                 $dataForm = $cacheForm->getSourceDataForm();
                 if($dataForm instanceof APICacheDataForm){
                     $cacheObject->set($cacheKey, $dataForm->sourceData, $dataForm->duration);

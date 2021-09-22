@@ -3,12 +3,18 @@ namespace app\forms\mall\finance;
 
 
 use app\core\ApiCode;
+use app\forms\mall\export\MchCashListExport;
+use app\helpers\CityHelper;
 use app\models\BaseModel;
 use app\models\EfpsTransferOrder;
+use app\models\Order;
 use app\models\Store;
 use app\models\User;
+use app\plugins\commission\models\CommissionCheckoutPriceLog;
+use app\plugins\commission\models\CommissionGoodsPriceLog;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCash;
+use app\plugins\mch\models\MchCheckoutOrder;
 
 class MchCashListForm extends BaseModel{
 
@@ -18,11 +24,16 @@ class MchCashListForm extends BaseModel{
     public $end_date;
     public $keyword;
     public $status;
+    public $level;
+    public $address;
+    public $flag;
+    public $fields;
 
     public function rules(){
         return [
-            [['page', 'limit'], 'integer'],
-            [['keyword', 'start_date', 'end_date', 'status'], 'trim'],
+            [['page', 'limit', 'level'], 'integer'],
+            [['keyword', 'start_date', 'end_date', 'status', 'flag'], 'trim'],
+            [['address', 'fields'], 'safe'],
         ];
     }
 
@@ -41,15 +52,14 @@ class MchCashListForm extends BaseModel{
             "mc.status", "mc.transfer_status", "m.account_money", "mc.order_no", "mc.service_fee_rate", "mc.updated_at",
             "eto.remark", "mc.content", "mc.type_data"]);
 
-        if ($this->keyword ) {
-           $query = $query->andWhere(["IN", "s.name", $this->keyword]);
-        }
-        if ($this->start_date && $this->end_date) {
-            $query->andWhere(['<', 'mc.created_at', strtotime($this->end_date)])
-                ->andWhere(['>', 'mc.created_at', strtotime($this->start_date)]);
+        if ($this->keyword) {
+            $query->andWhere(["like", "s.name", $this->keyword]);
         }
 
-        $query->orderBy(['mc.created_at' => SORT_DESC]);
+        if ($this->start_date && $this->end_date) {
+            $query->andWhere(['<', 'mc.updated_at', strtotime($this->end_date)])
+                ->andWhere(['>', 'mc.updated_at', strtotime($this->start_date)]);
+        }
 
         if($this->status == "no_confirm"){
             $query->andWhere(["mc.status" => 0]);
@@ -67,11 +77,33 @@ class MchCashListForm extends BaseModel{
             $query->andWhere(["mc.transfer_status" => 2]);
         }
 
+        if ($this->level && $this->address) {
+            if (is_string($this->address)) {
+                $this->address = explode(',', $this->address);
+            }
+            $where = [];
+            if ($this->level == 1) {
+                $where = ['s.province_id' => $this->address[0]];
+            } elseif ($this->level == 2) {
+                $where = ['s.province_id' => $this->address[0], 's.city_id' => $this->address[1]];
+            } elseif ($this->level == 3) {
+                $where = ['s.province_id' => $this->address[0], 's.city_id' => $this->address[1], 's.district_id' => $this->address[2]];
+            }
+            $query->andWhere($where);
+        }
+
+        if ($this->flag == "EXPORT") {
+            $new_query = clone $query;
+            $exp = new MchCashListExport();
+            $exp->fieldsKeyList = $this->fields;
+            $exp->export($new_query, 'mc.');
+            return false;
+        }
         $applyQuery = clone $query;
         $applyMoney = $applyQuery->sum('mc.money');
         $actualQuery = clone $query;
         $actualMoney = $actualQuery->andWhere(['mc.transfer_status' => 1])->sum('mc.fact_price');
-        $list = $query->asArray()->page($pagination, $this->limit, $this->page)->all();
+        $list = $query->orderBy(['mc.created_at' => SORT_DESC])->page($pagination, $this->limit, $this->page)->asArray()->all();
         if($list){
             foreach($list as &$item){
                 $typeData = @json_decode($item['type_data'], true);
@@ -85,11 +117,12 @@ class MchCashListForm extends BaseModel{
 
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
             'list'       => $list ?: [],
+            'export_list' => (new MchCashListExport())->fieldsList(),
             'Statistics' => [
                 'applyMoney' => $applyMoney ?: 0,
                 'actualMoney' => $actualMoney ?: 0,
-                'currentApply' => $currentApply,
-                'currentActual' => $currentActual,
+                'currentApply' => round($currentApply, 2),
+                'currentActual' => round($currentActual, 2),
             ],
             'pagination' => $pagination,
         ]);

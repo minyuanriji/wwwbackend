@@ -33,8 +33,8 @@
                 </el-input>
             </div>
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
-                <el-table-column prop="id" label="ID" width="60"></el-table-column>
-                <el-table-column label="会员信息" width="200">
+                <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                <el-table-column label="会员信息" width="300">
                     <template slot-scope="scope">
                         <com-image style="float: left;margin-right: 5px;" mode="aspectFill" :src="scope.row.user.avatar_url"></com-image>
                         <div v-if=scope.row.user.nickname>{{scope.row.user.nickname}}</div>
@@ -47,24 +47,24 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="integral_num" label="积分券数量"></el-table-column>
-                <el-table-column  label="积分券类型">
+                <el-table-column prop="integral_num" label="积分券数量"  width="150"></el-table-column>
+                <el-table-column  label="积分券类型"  width="150">
                     <template slot-scope="scope">
                             <div size="small">{{getTypeName(scope.row.type)}}</div>
                         </template>
                 </el-table-column>
-                <el-table-column label="周期">
+                <el-table-column label="周期"  width="100">
 				    <template slot-scope="scope">
 				        <div size="small">{{scope.row.period}}{{scope.row.period_unit=="month"?'月':'周'}}</div>
 					</template>
 				</el-table-column>
                 </el-table-column>
-                <el-table-column label="已发放周期">
+                <el-table-column label="已发放周期"  width="150">
                     <template slot-scope="scope">
 				        <div size="small">{{scope.row.finish_period}}{{scope.row.period_unit=="month"?'月':'周'}}</div>
 					</template>
                 </el-table-column>
-                <el-table-column label="状态">
+                <el-table-column label="状态"  width="150">
 				    <template slot-scope="scope">
 				        <div size="small">{{getStatusName(scope.row.status)}}</div>
                     </template>

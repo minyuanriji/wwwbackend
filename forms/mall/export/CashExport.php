@@ -1,26 +1,14 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * 导出余额变动日志
- * Author: zal
- * Date: 2020-04-16
- * Time: 09:45
- */
 
 namespace app\forms\mall\export;
 
 use app\core\CsvExport;
 
-class BalanceLogExport extends BaseExport
+class CashExport extends BaseExport
 {
     public function fieldsList()
     {
         return [
-            [
-                'key' => 'platform',
-                'value' => '所属平台',
-            ],
             [
                 'key' => 'user_id',
                 'value' => '用户ID',
@@ -34,20 +22,44 @@ class BalanceLogExport extends BaseExport
                 'value' => '用户手机号',
             ],
             [
-                'key' => 'type',
-                'value' => '金额类型',
+                'key' => 'account_holder',
+                'value' => '开户人',
             ],
             [
-                'key' => 'money',
-                'value' => '金额',
+                'key' => 'bank_no',
+                'value' => '银行卡号',
+            ],
+            [
+                'key' => 'bank_deposit',
+                'value' => '开户行',
+            ],
+            [
+                'key' => 'apply_money',
+                'value' => '申请提现金额',
+            ],
+            [
+                'key' => 'service_charge',
+                'value' => '手续费',
+            ],
+            [
+                'key' => 'actual_money',
+                'value' => '实际打款金额',
+            ],
+            [
+                'key' => 'type',
+                'value' => '状态',
             ],
             [
                 'key' => 'created_at',
-                'value' => '支付日期',
+                'value' => '申请时间',
             ],
             [
-                'key' => 'desc',
-                'value' => '说明',
+                'key' => 'pay_time',
+                'value' => '打款时间',
+            ],
+            [
+                'key' => 'remarks',
+                'value' => '备注',
             ],
         ];
     }
@@ -55,12 +67,12 @@ class BalanceLogExport extends BaseExport
     public function export($query, $alias = '')
     {
         $orderBy = $alias . 'created_at';
-        $list = $query->orderBy($orderBy)->with(['user.userInfo'])->asArray()->all();
+        $list = $query->orderBy($orderBy)->asArray()->all();
         $this->transform($list);
         $this->getFields();
         $dataList = $this->getDataList();
 
-        $fileName = '余额记录' . date('YmdHis');
+        $fileName = '用户提现记录' . date('YmdHis');
         (new CsvExport())->export($dataList, $this->fieldsNameList, $fileName);
     }
 
@@ -71,11 +83,10 @@ class BalanceLogExport extends BaseExport
         foreach ($list as $item) {
             $arr = [];
             $arr['number'] = $number++;
-            $arr['platform'] = $this->getPlatform($item['user']['userInfo']['platform']);
             $arr['desc'] = $item['desc'];
-            $arr['nickname'] = $item['user']['nickname'];
-            $arr['user_id'] = $item['user']['id'];
-            $arr['mobile'] = $item['user']['mobile'];
+            $arr['nickname'] = $item['nickname'];
+            $arr['user_id'] = $item['uid'];
+            $arr['mobile'] = $item['mobile'];
             $arr['money'] = (float)$item['money'];
             $arr['created_at'] = $this->getDateTime($item['created_at']);
             $arr['type'] = $item['type'] == 1 ? '收入' : '支出';

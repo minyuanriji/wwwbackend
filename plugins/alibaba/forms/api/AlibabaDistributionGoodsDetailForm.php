@@ -90,7 +90,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
 
             $number += $expressPrice * (1/AlibabaDistributionOrderForm::getShoppingVoucherDecodeExpressRate());
         }
-   
+
         return $number;
     }
 
@@ -182,7 +182,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             }
 
             //无规格商品处理
-            if(empty($detail['sku_infos'])){
+            if(empty($detail['sku_infos']['group'])){
                 $detail['sku_infos'] = static::getDefaultSkuInfos($goods);
                 $detail['sku_list'] = static::getDefaultSkuList($goods);
             }

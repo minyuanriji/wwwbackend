@@ -210,6 +210,7 @@ class UserForm extends BaseModel
                 }
             }
         }
+
         $query = User::find()->alias('u')->where([
             'u.is_delete' => 0,
             'u.mall_id' => $mall_id

@@ -109,3 +109,4 @@ class GiftpacksOrderClerkQrCodeForm extends BaseModel{
         }
     }
 }
+

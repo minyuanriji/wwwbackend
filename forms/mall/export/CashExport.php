@@ -3,6 +3,7 @@
 namespace app\forms\mall\export;
 
 use app\core\CsvExport;
+use app\helpers\SerializeHelper;
 
 class CashExport extends BaseExport
 {
@@ -68,6 +69,12 @@ class CashExport extends BaseExport
     {
         $orderBy = $alias . 'created_at';
         $list = $query->orderBy($orderBy)->asArray()->all();
+        if ($list) {
+            foreach ($list as &$item){
+                $item['extra'] = $item['extra'] ? SerializeHelper::decode($item['extra']) : [];
+                $item['content'] = $item['content'] ? SerializeHelper::decode($item['content']):[];
+            }
+        }
         $this->transform($list);
         $this->getFields();
         $dataList = $this->getDataList();
@@ -83,13 +90,31 @@ class CashExport extends BaseExport
         foreach ($list as $item) {
             $arr = [];
             $arr['number'] = $number++;
-            $arr['desc'] = $item['desc'];
+            $arr['user_id'] = $item['user_id'];
             $arr['nickname'] = $item['nickname'];
-            $arr['user_id'] = $item['uid'];
             $arr['mobile'] = $item['mobile'];
-            $arr['money'] = (float)$item['money'];
+            $arr['account_holder'] = $item['extra']['name'];
+            $arr['bank_no'] = $item['extra']['bank_account'];
+            $arr['bank_deposit'] = $item['extra']['bank_name'];
+            $arr['apply_money'] = round($item['price'], 2);
+            $arr['service_charge'] = round($item['price'] * $item['service_fee_rate'] / 100, 2);
+            $arr['actual_money'] = round($item['fact_price'], 2);
+            if ($item['status'] == 1) {
+                $remarks = $item['content']['validate_content'];
+                $type = '待打款';
+            } elseif ($item['status'] == 2) {
+                $remarks = $item['content']['remittance_content'];
+                $type = '已打款';
+            } elseif ($item['status'] == 3) {
+                $remarks = $item['content']['reject_content'];
+                $type = '已驳回';
+            } elseif ($item['status'] == 0) {
+                $type = '待审核';
+            }
+            $arr['type'] = $type;
             $arr['created_at'] = $this->getDateTime($item['created_at']);
-            $arr['type'] = $item['type'] == 1 ? '收入' : '支出';
+            $arr['pay_time'] = $this->getDateTime($item['updated_at']);
+            $arr['remarks'] = $remarks;
             $newList[] = $arr;
         }
 

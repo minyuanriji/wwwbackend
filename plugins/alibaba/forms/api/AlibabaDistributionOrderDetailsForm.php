@@ -44,7 +44,8 @@ class AlibabaDistributionOrderDetailsForm extends BaseModel
                     $item['sku_labels'] = json_decode($item['sku_labels'], true);
                 }
             }
-
+            $order['created_at'] = date('Y-m-d H:i:s', $order['created_at']);
+            $order['pay_at'] = date('Y-m-d H:i:s', $order['pay_at']);
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'', $order);
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($e));

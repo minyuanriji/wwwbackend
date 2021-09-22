@@ -105,7 +105,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                  <el-table-column label="备注">
                         <template slot-scope="scope">
                             <div v-if="scope.row.status == 1 || scope.row.status == 2">审核备注:{{scope.row.content.validate_content}}</div>
-                         <div v-if="scope.row.status == 2">打款备注:{{scope.row.content.remittance_content}}</div>
+                            <div v-if="scope.row.status == 2">打款备注:{{scope.row.content.remittance_content}}</div>
                             <div v-if="scope.row.status == 3">驳回备注:{{scope.row.content.reject_content}}</div>
                         </template>
                     </el-table-column>
@@ -181,21 +181,18 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             this.loadData();
         },
         methods: {
-
             goSearch() {
                 if (this.date == null) {
                     this.date = ''
                 }
                 this.loadData(this.activeName, 1)
             },
-
             exportConfirm() {
                 this.searchData.keyword = this.search.keyword;
                 this.searchData.start_date = this.search.start_date;
                 this.searchData.end_date = this.search.end_date;
-                this.searchData.status = this.status;
+                this.searchData.status = this.search.status;
             },
-
             selectDateTime(e) {
                 if (e != null) {
                     this.search.start_date = e[0];
@@ -206,7 +203,6 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 }
                 this.goSearch();
             },
-
             confirmSubmit() {
                 this.search.status = this.activeName
             },

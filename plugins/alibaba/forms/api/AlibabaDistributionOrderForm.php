@@ -316,9 +316,11 @@ class AlibabaDistributionOrderForm extends BaseModel{
             "use_num"      => 0
         ];
         foreach($mainData['list'] as &$orderItem){
+            $orderItem['if_shopping_voucher_need_total_num'] = 0;
             $orderItem['shopping_voucher_use_num'] = 0;
             $orderItem['shopping_voucher_decode_price'] = 0;
             foreach($orderItem['goods_list'] as &$goodsItem){
+                $goodsItem['if_shopping_voucher_need_total_num'] = 0;
                 $goodsItem['use_shopping_voucher'] = 0;
                 if($this->use_shopping_voucher && $goodsItem['total_price'] > 0){
                     $voucherGoods = ShoppingVoucherTargetAlibabaDistributionGoods::findOne([
@@ -330,8 +332,9 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     $goodsItem['use_shopping_voucher'] = 1;
                     //计算购物券价与商品价格比例
                     $ratio = $voucherGoods->voucher_price/$goodsItem['price'];
+                    $goodsItem['if_shopping_voucher_need_total_num'] = floatval($goodsItem['total_price']) * $ratio;
                     if(($userRemainingShoppingVoucher/$ratio) > $goodsItem['total_price']){
-                        $needNum = floatval($goodsItem['total_price']) * $ratio;
+                        $needNum = $goodsItem['if_shopping_voucher_need_total_num'];
                         $goodsItem['use_shopping_voucher_decode_price'] = $goodsItem['total_price'];
                         $userRemainingShoppingVoucher -= $needNum;
                         $goodsItem['use_shopping_voucher_num'] = $needNum;
@@ -346,6 +349,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     $orderItem['shopping_voucher_decode_price'] += $goodsItem['use_shopping_voucher_decode_price'];
                     $orderItem['shopping_voucher_use_num'] += $goodsItem['use_shopping_voucher_num'];
                 }
+                $orderItem['if_shopping_voucher_need_total_num'] += $goodsItem['if_shopping_voucher_need_total_num'];
             }
             $orderItem['total_price'] -= round($orderItem['shopping_voucher_decode_price'], 2);
 
@@ -366,6 +370,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     $orderItem['shopping_voucher_express_use_num'] = $userRemainingShoppingVoucher;
                     $userRemainingShoppingVoucher = 0;
                 }
+                $orderItem['if_shopping_voucher_need_total_num'] += $expressNeedTotalNum;
             }
             $orderItem['total_price'] -= $orderItem['shopping_voucher_express_decode_price'];
         }

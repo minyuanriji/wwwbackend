@@ -2,6 +2,7 @@
 
 namespace app\plugins\alibaba\forms\api;
 
+use app\controllers\api\ApiController;
 use app\core\ApiCode;
 use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
@@ -62,6 +63,30 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                 'user_id'   => \Yii::$app->user->id,
                 'is_delete' => 0,
             ]);
+            if(!$userAddress){ //如果获取不到用户收货地址，使用定位地址
+                if(!empty(ApiController::$commonData['city_data']['province'])){
+                    $addrInfo = [
+                        "province" => ApiController::$commonData['city_data']['province'],
+                        "city"     => ApiController::$commonData['city_data']['city'],
+                        "district" => ApiController::$commonData['city_data']['district'],
+                        "mobile"   => "",
+                        "detail"   => ApiController::$commonData['city_data']['street'],
+                    ];
+                }else{
+                    $addrInfo = [
+                        "province" => "广东省",
+                        "city"     => "广州市",
+                        "district" => "白云区",
+                        "mobile"   => "",
+                        "detail"   => "鹤龙一路",
+                    ];
+                }
+                $userAddress = new UserAddress();
+                $userAddress->load(["UserAddress" => array_merge([
+                    "user_id" => \Yii::$app->user->id,
+                    "name"    => "用户" . \Yii::$app->user->id
+                ], $addrInfo)]);
+            }
 
             //通过1688接口获取到运费
             if($expressPrice <= 0){

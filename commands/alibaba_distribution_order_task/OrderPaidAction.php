@@ -42,7 +42,8 @@ class OrderPaidAction extends Action{
                 $orderDetail1688->do_error = $e->getMessage();
                 $orderDetail1688->try_count += 1;
                 if($orderDetail1688->try_count > 3){ //错误次数超过3次，执行订单退款
-                    $this->doRefund($orderDetail1688);
+                    //$this->doRefund($orderDetail1688);
+                    $orderDetail1688->save();
                 }else{
                     $orderDetail1688->save();
                 }

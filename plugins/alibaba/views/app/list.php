@@ -69,6 +69,7 @@ echo $this->render("com-category");
                 </el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
+                        <!--
                         <el-button @click="editApp(scope.row)" type="text" circle size="mini">
                             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                                 <img src="statics/img/mall/edit.png" alt="">
@@ -79,6 +80,7 @@ echo $this->render("com-category");
                                 <img src="statics/img/mall/del.png" alt="">
                             </el-tooltip>
                         </el-button>
+                        -->
                     </template>
                 </el-table-column>
             </el-table>

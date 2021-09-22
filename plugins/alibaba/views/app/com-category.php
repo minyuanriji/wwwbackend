@@ -8,7 +8,9 @@
                     <div style="margin-bottom:20px;">{{syncMessage}}</div>
                 </template>
 
-                <el-button @click="doSync" :loading="syncStatus"  type="danger" style="margin-bottom:20px;">{{syncStatus ? "同步中" : "一键同步"}}</el-button>
+                <!--
+                <el-button  @click="doSync" :loading="syncStatus"  type="danger" style="margin-bottom:20px;">{{syncStatus ? "同步中" : "一键同步"}}</el-button>
+                -->
 
                 <div style="margin-bottom:20px;" v-if="search.parent.name != ''">
                     <el-tag @close="searchClean" closable>{{search.parent.name}}</el-tag>

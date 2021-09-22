@@ -56,6 +56,7 @@ class DistributionController extends ApiController {
         $form = new AlibabaDistributionGetCategoryForm();
         $form->attributes = $this->requestData;
         $form->mall_id = \Yii::$app->mall->id;
+        $form->host_info = \Yii::$app->getRequest()->getHostInfo();
 
         $res = APICacheHelper::get($form);
         if($res['code'] == ApiCode::CODE_SUCCESS){

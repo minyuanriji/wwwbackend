@@ -1,30 +1,37 @@
-
+<?php
+Yii::$app->loadComponentView('goods/com-dialog-select');
+?>
 <template id="com-edit">
     <div class="com-edit">
         <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
             <el-form :rules="rules" ref="formData" label-width="20%" :model="formData" size="small">
-                <el-form-item label="应用名称" prop="name">
-                    <el-input v-model="formData.name" style="width:350px"></el-input>
+                <el-form-item label="选择商品" prop="goods_id">
+                    <div style="display:flex" v-if="formData.goods_id > 0" >
+                        <div style="margin-right: 10px;">
+                            <com-image mode="aspectFill" :src="formData.cover_pic"></com-image>
+                        </div>
+                        <div style="justify-content:flex-start;display:flex;flex-direction:column">
+                            <div>{{formData.name}}</div>
+                            <div>ID:{{formData.goods_id}}</div>
+                        </div>
+                    </div>
+                    <com-dialog-select  url="plugin/alibaba/mall/distribution/search-goods-sku"  :multiple="false" @selected="goodsSelect" title="商品选择">
+                        <el-button type="primary" size="small">指定商品</el-button>
+                    </com-dialog-select>
                 </el-form-item>
-                <el-form-item label="类型" prop="type">
-                    <el-select v-model="formData.type" placeholder="请选择">
-                        <el-option label="社交电商" value="distribution"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="APP KEY" prop="app_key">
-                    <el-input v-model="formData.app_key" style="width:350px"></el-input>
-                </el-form-item>
-                <el-form-item label="SECRET" prop="secret">
-                    <el-input v-model="formData.secret" style="width:350px"></el-input>
+                <el-form-item label="购物券价" prop="voucher_price">
+                    <el-input v-model="formData.voucher_price" style="width:35%;">
+                        <template slot="append">元</template>
+                    </el-input>
                 </el-form-item>
             </el-form>
-
             <div slot="footer" class="dialog-footer">
                 <el-button @click="close">取 消</el-button>
                 <el-button :loading="btnLoading" type="primary" @click="save">确 定</el-button>
             </div>
 
         </el-dialog>
+
 
 
     </div>
@@ -34,10 +41,11 @@
     function initFormData(){
         return {
             id: 0,
+            goods_id: 0,
+            sku_id: 0,
             name: '',
-            type: '',
-            app_key: '',
-            secret: ''
+            cover_pic: '',
+            voucher_price: 0.00
         };
     }
 
@@ -49,22 +57,17 @@
         },
         data() {
             return {
-                dialogTitle: "添加应用",
+                dialogTitle: "添加商品",
                 activeName: "first",
                 dialogVisible: false,
+                selectGoodsDialogVisible: false,
                 formData: initFormData(),
                 rules: {
-                    name: [
-                        {required: true, message: '应用名称不能为空', trigger: 'change'},
+                    goods_id: [
+                        {required: true, message: '请设置商品', trigger: 'change'},
                     ],
-                    type: [
-                        {required: true, message: '类型不能为空', trigger: 'change'},
-                    ],
-                    app_key: [
-                        {required: true, message: 'APP KEY不能为空', trigger: 'change'},
-                    ],
-                    secret: [
-                        {required: true, message: 'SECRET不能为空', trigger: 'change'},
+                    voucher_price: [
+                        {required: true, message: '请设置购物券价格', trigger: 'change'},
                     ]
                 },
                 btnLoading: false
@@ -79,14 +82,21 @@
             }
         },
         methods: {
+            goodsSelect(sku){
+                this.formData.goods_id      = sku.goods_id;
+                this.formData.sku_id        = sku.id;
+                this.formData.name          = sku.name;
+                this.formData.cover_pic     = sku.cover_url;
+                this.formData.voucher_price = sku.price;
+            },
             save(){
+                this.btnLoading = true;
                 let that = this;
                 this.$refs['formData'].validate((valid) => {
                     if (valid) {
-                        that.btnLoading = true;
                         request({
                             params: {
-                                r: 'plugin/alibaba/mall/app/edit'
+                                r: 'plugin/shopping_voucher/mall/target-alibaba-distribution-goods/edit'
                             },
                             method: 'post',
                             data: that.formData

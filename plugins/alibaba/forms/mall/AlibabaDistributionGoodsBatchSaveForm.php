@@ -22,18 +22,21 @@ class AlibabaDistributionGoodsBatchSaveForm extends BaseModel{
         }
 
         try {
-            foreach($this->goods_list as $item){
+            $this->goods_list = json_decode($this->goods_list, true);
+            foreach($this->goods_list as $key => $item){
                 $goods = AlibabaDistributionGoodsList::findOne($item['id']);
                 if(!$goods) continue;
 
                 if(empty($item['ali_category_id'])){
-                    throw new \Exception("类别不能为空");
+                    throw new \Exception("{$key}[ID:".$item['id']."]类别不能为空");
                 }
 
-                $goods->price           = $item['price'];
-                $goods->origin_price    = $item['origin_price'];
-                $goods->ali_category_id = implode(",", $item['ali_category_id']);
-                $goods->updated_at      = time();
+                $goods->price_rate        = $item['price_rate'];
+                $goods->price             = $item['price'];
+                $goods->origin_price      = $item['origin_price'];
+                $goods->origin_price_rate = $item['origin_price_rate'];
+                $goods->ali_category_id   = implode(",", $item['ali_category_id']);
+                $goods->updated_at        = time();
 
                 if(!$goods->save()){
                     throw new \Exception($this->responseErrorMsg($goods));

@@ -11,23 +11,23 @@ use app\plugins\alibaba\models\AlibabaDistributionGoodsCategory;
 class AlibabaDistributionGetCategoryForm extends BaseModel implements ICacheForm {
 
     public $mall_id;
+    public $host_info;
 
     /**
      * @return APICacheDataForm
      */
     public function getSourceDataForm(){
         try {
-
             $datas = [];
             $rows = AlibabaDistributionGoodsCategory::find()->where([
                 "is_delete" => 0,
-                "mall_id" => \Yii::$app->mall->id
-            ])->orderBy("ali_parent_id ASC,sort DESC")->asArray()->all();
+                "mall_id" => $this->mall_id
+            ])->orderBy("sort DESC")->asArray()->all();
             while($rows){
                 $row = array_shift($rows);
                 $data = ["ali_cat_id" => $row['ali_cat_id'], "name" => $row['name'], "cover_url" => $row['cover_url'], 'children' => []];
                 if(empty($data['cover_url'])){
-                    $data['cover_url'] = \Yii::$app->getRequest()->getHostInfo() . "/web/statics/img/mall/default_img.png";
+                    $data['cover_url'] =  $this->host_info . "/web/statics/img/mall/default_img.png";
                 }
                 if(!$row['ali_parent_id']){
                     $datas[$row["ali_cat_id"]] = $data;
@@ -61,6 +61,6 @@ class AlibabaDistributionGetCategoryForm extends BaseModel implements ICacheForm
      * @return array
      */
     public function getCacheKey(){
-        return [];
+        return ['host_info'];
     }
 }

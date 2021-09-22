@@ -58,14 +58,16 @@ class AlibabaDistributionAliGoodsImportForm extends BaseModel{
                     ]));
                 }
 
-                $goods->name            = $info['title'];
-                $goods->cover_url       = $info['imgUrl'];
-                $goods->updated_at      = time();
-                $goods->ali_data_json   = json_encode($info);
-                $goods->price           = $info['currentPrice'];
-                $goods->origin_price    = $info['currentPrice'];
-                $goods->ali_category_id = 0;
-                $goods->is_delete       = 0;
+                $goods->name              = $info['title'];
+                $goods->cover_url         = $info['imgUrl'];
+                $goods->updated_at        = time();
+                $goods->ali_data_json     = json_encode($info);
+                $goods->price             = $info['currentPrice'];
+                $goods->price_rate        = 1000;
+                $goods->origin_price_rate = 1000;
+                $goods->origin_price      = $info['currentPrice'];
+                $goods->ali_category_id   = 0;
+                $goods->is_delete         = 0;
                 $goods->ali_product_info = json_encode([
                     "biz" => $res->bizGroupInfos,
                     "info" => $res->productInfo
@@ -160,7 +162,11 @@ class AlibabaDistributionAliGoodsImportForm extends BaseModel{
             $t->rollBack();
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg'  => $e->getMessage()
+                'msg'  => $e->getMessage(),
+                'error' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ];
         }
     }

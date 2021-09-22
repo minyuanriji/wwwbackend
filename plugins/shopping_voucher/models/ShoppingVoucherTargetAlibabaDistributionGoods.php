@@ -21,7 +21,7 @@ class ShoppingVoucherTargetAlibabaDistributionGoods extends BaseActiveRecord{
             [['mall_id','goods_id','created_at', 'updated_at', 'deleted_at'], 'integer'],
             [['is_delete'],'in','range' => [0,1]],
             [['name', 'cover_pic'], 'string'],
-            [['voucher_price'], 'number']
+            [['voucher_price','sku_id'], 'number']
         ];
     }
 

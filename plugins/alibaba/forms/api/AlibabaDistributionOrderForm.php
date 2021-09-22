@@ -37,6 +37,14 @@ class AlibabaDistributionOrderForm extends BaseModel{
     }
 
     /**
+     * 使用购物券抵扣运费的比例
+     * @return float
+     */
+    public static function getShoppingVoucherDecodeExpressRate(){
+        return 0.2;
+    }
+
+    /**
      * 获取商品列表信息
      * @return array
      * @throws \Exception
@@ -52,21 +60,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             if(!$goods || $goods->is_delete){
                 throw new \Exception("商品[ID:".$item['goods']."]已下架或不存在");
             }
-            $sku = AlibabaDistributionGoodsSku::findOne($item['sku']);
-            if(!$sku || $sku->is_delete || $sku->goods_id != $goods->id){
-                throw new \Exception("规格[ID:".$item['sku']."]不存在");
-            }
-            $skuInfos = json_decode($goods->sku_infos, true);
-            $attrs = explode(",", $sku->ali_attributes);
-            $labels = [];
-            foreach($attrs as $attr){
-                $part = explode(":", $attr);
-                if(isset($skuInfos['group'][$part[0]]) && isset($skuInfos['values'][$attr])){
-                    $labels[] = $skuInfos['group'][$part[0]]['attributeName'] . ":" . $skuInfos['values'][$attr];
-                }else{
-                    $labels[] = "-:-";
-                }
-            }
+
             $goodsItem = [
                 "id"          => $goods->id,
                 "mall_id"     => $goods->mall_id,
@@ -74,13 +68,39 @@ class AlibabaDistributionOrderForm extends BaseModel{
                 "name"        => $goods->name,
                 "cover_url"   => $goods->cover_url,
                 "ali_offerId" => $goods->ali_offerId,
-                "price"       => (float)$sku->price,
-                "num"         => max(1, (int)$item['num']),
-                "sku_id"      => $sku->id,
-                "ali_sku"     => $sku->ali_sku_id,
-                "ali_spec_id" => $sku->ali_spec_id,
-                "sku_labels"  => $labels
+                "num"         => max(1, (int)$item['num'])
             ];
+
+            $skuInfos = @json_decode($goods->sku_infos, true);
+            if((empty($skuInfos) || empty($skuInfos['group'])) && $item['sku'] == "DEF"){ //无规格商品
+                $goodsItem['ali_sku']     = 0;
+                $goodsItem['ali_spec_id'] = '';
+                $goodsItem['price']       = (float)$goods->price;
+                $goodsItem['sku_id']      = 0;
+                $goodsItem['sku_labels']  = ['默认规格'];
+            }else{
+                $sku = AlibabaDistributionGoodsSku::findOne($item['sku']);
+                if(!$sku || $sku->is_delete || $sku->goods_id != $goods->id){
+                    throw new \Exception("规格[ID:".$item['sku']."]不存在");
+                }
+
+                $attrs = explode(",", $sku->ali_attributes);
+                $labels = [];
+                foreach($attrs as $attr){
+                    $part = explode(":", $attr);
+                    if(isset($skuInfos['group'][$part[0]]) && isset($skuInfos['values'][$attr])){
+                        $labels[] = $skuInfos['group'][$part[0]]['attributeName'] . ":" . $skuInfos['values'][$attr];
+                    }else{
+                        $labels[] = "-:-";
+                    }
+                }
+                $goodsItem['ali_sku']     = $sku->ali_sku_id;
+                $goodsItem['ali_spec_id'] = $sku->ali_spec_id;
+                $goodsItem['price']       = (float)$sku->price;
+                $goodsItem['sku_id']      = $sku->id;
+                $goodsItem['sku_labels']  = $labels;
+            }
+
             $goodsItem['total_original_price'] = $goodsItem['num'] * $goodsItem['price'];
             $goodsItem['total_price'] = $goodsItem['total_original_price'];
             $goodsList[] = $goodsItem;
@@ -303,6 +323,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                 if($this->use_shopping_voucher && $goodsItem['total_price'] > 0){
                     $voucherGoods = ShoppingVoucherTargetAlibabaDistributionGoods::findOne([
                         "goods_id"  => $goodsItem['id'],
+                        "sku_id"    => (int)$goodsItem['sku_id'],
                         "is_delete" => 0
                     ]);
                     if(!$voucherGoods) continue;
@@ -332,7 +353,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             $orderItem['shopping_voucher_express_decode_price'] = 0;
             $orderItem['shopping_voucher_express_use_num'] = 0;
             if($this->use_shopping_voucher && $orderItem['express_price'] > 0){
-                $ratio = 1; //运费抵扣比例
+                $ratio = static::getShoppingVoucherDecodeExpressRate(); //运费抵扣比例
                 $expressNeedTotalNum = $orderItem['express_price'] * (1/$ratio);
                 if($userRemainingShoppingVoucher > $expressNeedTotalNum){ //可全部抵扣运费
                     $orderItem['shopping_voucher_express_use_num'] = $expressNeedTotalNum;
@@ -342,13 +363,15 @@ class AlibabaDistributionOrderForm extends BaseModel{
                 }else{ //部分抵扣运费
                     $orderItem['shopping_voucher_express_decode_price'] = $ratio * $userRemainingShoppingVoucher;
                     $orderItem['express_price'] -= $orderItem['shopping_voucher_express_decode_price'];
+                    $orderItem['shopping_voucher_express_use_num'] = $userRemainingShoppingVoucher;
                     $userRemainingShoppingVoucher = 0;
                 }
             }
             $orderItem['total_price'] -= $orderItem['shopping_voucher_express_decode_price'];
         }
 
-        $mainData['shopping_voucher']['remaining'] = $userRemainingShoppingVoucher;
+        $mainData['shopping_voucher']['use_num'] = round($mainData['shopping_voucher']['use_num'], 2);
+        $mainData['shopping_voucher']['remaining'] = round($userRemainingShoppingVoucher, 2);
 
         //统计订单待支付总金额
         foreach($mainData['list'] as $orderItem){
@@ -357,6 +380,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_use_num'];
             $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_express_use_num'];
             $mainData['total_price'] += $orderItem['total_price'];
+            $orderItem['total_goods_original_price'] = round($orderItem['total_goods_original_price'], 2);
         }
         $mainData['total_price'] = round($mainData['total_price'], 2);
 

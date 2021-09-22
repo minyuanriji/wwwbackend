@@ -30,6 +30,9 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
             if(!$goods){
                 throw new \Exception("商品不存在");
             }
+            if(empty($this->goods['ali_category_id'])){
+                throw new \Exception("请设置类目");
+            }
             if(isset($this->goods['ali_product_info'])){
                 if(!is_array($this->goods['ali_product_info'])){
                     $this->goods['ali_product_info'] = (array)@json_decode($this->goods['ali_product_info'], true);
@@ -50,35 +53,40 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                 throw new \Exception($this->responseErrorMsg($goods));
             }
 
-            foreach($this->goods['sku_list'] as $skuInfo){
-                $sku = AlibabaDistributionGoodsSku::findOne([
-                    "ali_sku_id" => $skuInfo['ali_sku_id']
-                ]);
-                if(!$sku){
-                    $sku = new AlibabaDistributionGoodsSku([
-                        "ali_sku_id" => $skuInfo['ali_sku_id'],
-                        "goods_id"   => $goods->id,
-                        "mall_id"    => \Yii::$app->mall->id,
-                        "created_at" => time()
+            if($this->goods['sku_list']){
+                foreach($this->goods['sku_list'] as $skuInfo){
+                    $sku = AlibabaDistributionGoodsSku::findOne([
+                        "ali_sku_id" => $skuInfo['ali_sku_id']
                     ]);
-                    $sku->ali_spec_id          = $skuInfo['ali_spec_id'];
-                    $sku->cargo_number         = $skuInfo['cargo_number'];
-                    $sku->amount_on_sale       = $skuInfo['amount_on_sale'];
-                    $sku->ali_price            = $skuInfo['ali_price'];
-                    $sku->consign_price        = $skuInfo['consign_price'];
-                    $sku->is_delete            = 0;
-                    $sku->ali_attributes_label = $skuInfo['ali_attributes_label'];
-                }
+                    if(!$sku){
+                        $sku = new AlibabaDistributionGoodsSku([
+                            "ali_sku_id" => $skuInfo['ali_sku_id'],
+                            "goods_id"   => $goods->id,
+                            "mall_id"    => \Yii::$app->mall->id,
+                            "created_at" => time()
+                        ]);
+                        $sku->ali_spec_id          = $skuInfo['ali_spec_id'];
+                        $sku->cargo_number         = $skuInfo['cargo_number'];
+                        $sku->amount_on_sale       = $skuInfo['amount_on_sale'];
+                        $sku->ali_price            = $skuInfo['ali_price'];
+                        $sku->consign_price        = $skuInfo['consign_price'];
+                        $sku->is_delete            = 0;
+                        $sku->ali_attributes_label = $skuInfo['ali_attributes_label'];
+                    }
 
-                $sku->price          = $skuInfo['price'];
-                $sku->origin_price   = $skuInfo['origin_price'];
-                $sku->updated_at     = time();
-                $sku->is_delete      = 0;
+                    $sku->price          = $skuInfo['price'];
+                    $sku->origin_price   = $skuInfo['origin_price'];
+                    $sku->updated_at     = time();
+                    $sku->is_delete      = 0;
 
-                if(!$sku->save()){
-                    throw new \Exception($this->responseErrorMsg($sku));
+                    if(!$sku->save()){
+                        throw new \Exception($this->responseErrorMsg($sku));
+                    }
                 }
+            }else{
+
             }
+
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

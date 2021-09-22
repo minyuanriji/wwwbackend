@@ -17,10 +17,10 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
     public function rules()
     {
         return [
-            [['mall_id', 'app_id', 'order_id', 'sku_id', 'ali_spec_id', 'ali_sku', 'goods_id', 'num', 'unit_price', 'total_original_price', 'total_price', 'created_at', 'updated_at'], 'required'],
+            [['mall_id', 'app_id', 'order_id', 'goods_id', 'num', 'unit_price', 'total_original_price', 'total_price', 'created_at', 'updated_at'], 'required'],
             [['is_delete', 'deleted_at', 'is_refund'], 'integer'],
             [['shopping_voucher_decode_price', 'shopping_voucher_num'], 'number', 'min' => 0],
-            [['sku_labels', 'refund_status'], 'safe']
+            [['sku_labels', 'refund_status', 'sku_id', 'ali_spec_id', 'ali_sku'], 'safe']
         ];
     }
 

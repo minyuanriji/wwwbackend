@@ -44,12 +44,11 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             $detail['shopping_voucher'] = $goods->price; //TODO 购物券价
             $detail['price']            = $goods->price;
             $detail['origin_price']     = $goods->origin_price;
-
             if(isset($aliInfo['info'])){
                 $detail['images']           = $aliInfo['info']['image']['images'];
                 $detail['saleInfo']         = $aliInfo['info']['saleInfo'];
                 $detail['categoryName']     = $aliInfo['info']['categoryName'];
-                $detail['mainVedio']        = $aliInfo['info']['mainVedio'];
+                $detail['mainVedio']        = isset($aliInfo['info']['mainVedio']) ? $aliInfo['info']['mainVedio'] : '';
                 $detail['shippingInfo']     = $aliInfo['info']['shippingInfo'];
                 $detail['description']      = $aliInfo['info']['description'];
 
@@ -84,26 +83,38 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             }
 
             //规格
+            $selects = ["id", "goods_id", "ali_sku_id", "ali_attributes", "ali_spec_id", "price", "origin_price"];
             $skuList = AlibabaDistributionGoodsSku::find()->where([
                 "goods_id"  => $goods->id,
                 "is_delete" => 0
-            ])->asArray()->all();
+            ])->select($selects)->asArray()->all();
             $detail['sku_infos'] = @json_decode($goods->sku_infos, true);
-            $skuValues = isset($detail['sku_infos']['values']) ? $detail['sku_infos']['values'] : [];
-            if($skuList){
-                foreach($skuList as &$skuItem){
-                    $attributes = explode(",", $skuItem['ali_attributes']);
-                    $skuItem['labels'] = [];
-                    foreach($attributes as $value){
-                        if(isset($skuValues[$value])){
-                            $skuItem['labels'][] = $skuValues[$value];
+            $detail['sku_list'] = [];
+            if(!empty($detail['sku_infos']['group'])){
+                $skuValues = isset($detail['sku_infos']['values']) ? $detail['sku_infos']['values'] : [];
+                if($skuList){
+                    foreach($skuList as &$skuItem){
+                        $attributes = explode(",", $skuItem['ali_attributes']);
+                        $skuItem['labels'] = [];
+                        foreach($attributes as $value){
+                            if(isset($skuValues[$value])){
+                                $skuItem['labels'][] = $skuValues[$value];
+                            }
                         }
+                        $skuItem['labels'] = implode(",", $skuItem['labels']);
+                        //unset($skuItem['ali_attributes']);
                     }
-                    $skuItem['labels'] = implode(",", $skuItem['labels']);
-                    //unset($skuItem['ali_attributes']);
                 }
+                $detail['sku_list'] = is_array($skuList) ? $skuList : [];
+            }else{
+                $detail['sku_infos'] = [];
             }
-            $detail['sku_list'] = $skuList;
+
+            //无规格商品处理
+            if(empty($detail['sku_infos'])){
+                $detail['sku_infos'] = static::getDefaultSkuInfos($goods);
+                $detail['sku_list'] = static::getDefaultSkuList($goods);
+            }
 
             return new APICacheDataForm([
                 "sourceData" => [
@@ -120,6 +131,37 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             ];
         }
     }
+
+    /**
+     * 获取默认规格组
+     * @params AlibabaDistributionGoodsList $goods
+     * @return array
+     */
+    public static function getDefaultSkuInfos(AlibabaDistributionGoodsList $goods){
+        $skuInfos['group']['DEF'] = ['attributeID' => 'DEF', 'skuImageUrl' => '', 'attributeName' => '默认'];
+        $skuInfos['values']['DEF:0'] = '默认';
+        return $skuInfos;
+    }
+
+    /**
+     * 获取默认规格列表
+     * @params AlibabaDistributionGoodsList $goods
+     * @return array
+     */
+    public static function getDefaultSkuList(AlibabaDistributionGoodsList $goods){
+        $item = [
+            'id' => 'DEF',
+            'goods_id' => $goods->id,
+            'ali_sku_id' => 'DEF',
+            'ali_attributes' => 'DEF:0',
+            'ali_spec_id' => '-1',
+            'price' => $goods->price,
+            'origin_price' => $goods->origin_price,
+            'labels' => '默认'
+        ];
+        return [$item];
+    }
+
 
     /**
      * @return array

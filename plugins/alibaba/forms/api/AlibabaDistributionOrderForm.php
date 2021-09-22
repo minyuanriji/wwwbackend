@@ -41,7 +41,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
      * @return float
      */
     public static function getShoppingVoucherDecodeExpressRate(){
-        return 0.2;
+        return 0.1;
     }
 
     /**

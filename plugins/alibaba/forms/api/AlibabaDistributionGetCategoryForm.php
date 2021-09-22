@@ -38,6 +38,8 @@ class AlibabaDistributionGetCategoryForm extends BaseModel implements ICacheForm
 
             $_datas = [];
             foreach($datas as $item){
+                if(!isset($item['ali_cat_id']))
+                    continue;
                 $_datas[] = $item;
             }
             $datas = $_datas;

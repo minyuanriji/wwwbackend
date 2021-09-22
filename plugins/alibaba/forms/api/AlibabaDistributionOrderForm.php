@@ -37,6 +37,14 @@ class AlibabaDistributionOrderForm extends BaseModel{
     }
 
     /**
+     * 使用购物券抵扣运费的比例
+     * @return float
+     */
+    public static function getShoppingVoucherDecodeExpressRate(){
+        return 0.2;
+    }
+
+    /**
      * 获取商品列表信息
      * @return array
      * @throws \Exception
@@ -315,6 +323,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                 if($this->use_shopping_voucher && $goodsItem['total_price'] > 0){
                     $voucherGoods = ShoppingVoucherTargetAlibabaDistributionGoods::findOne([
                         "goods_id"  => $goodsItem['id'],
+                        "sku_id"    => (int)$goodsItem['sku_id'],
                         "is_delete" => 0
                     ]);
                     if(!$voucherGoods) continue;
@@ -344,7 +353,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             $orderItem['shopping_voucher_express_decode_price'] = 0;
             $orderItem['shopping_voucher_express_use_num'] = 0;
             if($this->use_shopping_voucher && $orderItem['express_price'] > 0){
-                $ratio = 0.2; //运费抵扣比例
+                $ratio = static::getShoppingVoucherDecodeExpressRate(); //运费抵扣比例
                 $expressNeedTotalNum = $orderItem['express_price'] * (1/$ratio);
                 if($userRemainingShoppingVoucher > $expressNeedTotalNum){ //可全部抵扣运费
                     $orderItem['shopping_voucher_express_use_num'] = $expressNeedTotalNum;

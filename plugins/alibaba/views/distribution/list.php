@@ -59,9 +59,13 @@ Yii::$app->loadComponentView('com-rich-text');
                     </template>
                 </el-table-column>
                 <el-table-column prop="price_rate" width="110" label="零售比（%）"></el-table-column>
+                <!--
                 <el-table-column prop="origin_price_rate" width="110" label="划线比（%）"></el-table-column>
+                -->
                 <el-table-column prop="price" width="110" label="零售价"></el-table-column>
+                <!--
                 <el-table-column prop="origin_price" width="110" label="划线价"></el-table-column>
+                -->
                 <el-table-column width="90" label="分销价">
                     <template slot-scope="scope">
                         {{scope.row.ali_data_json.currentPrice}}
@@ -157,8 +161,10 @@ Yii::$app->loadComponentView('com-rich-text');
                     </el-table-column>
                     <el-table-column prop="price_rate" width="110" label="零售比（%）"></el-table-column>
                     <el-table-column prop="price" width="110" label="零售价"></el-table-column>
+                    <!--
                     <el-table-column prop="origin_price_rate" width="110" label="划线比（%）"></el-table-column>
                     <el-table-column prop="origin_price" width="110" label="划线价"></el-table-column>
+                    -->
                     <el-table-column width="75" label="分销价">
                         <template slot-scope="scope">
                             {{scope.row.ali_data_json.currentPrice}}
@@ -215,24 +221,28 @@ Yii::$app->loadComponentView('com-rich-text');
                     </el-table-column>
                     <el-table-column prop="price_rate" width="110" label="零售比（%）">
                         <template slot-scope="scope">
-                            <el-input @blur="priceRateChanged(scope.row)" type="number" min="100" v-model="scope.row.price_rate"></el-input>
+                            <el-input v-focus @blur="priceRateChanged(scope.row)" type="number" min="100" v-model="scope.row.price_rate"></el-input>
                         </template>
                     </el-table-column>
+                    <!--
                     <el-table-column prop="origin_price_rate" width="110" label="划线比（%）">
                         <template slot-scope="scope">
                             <el-input @blur="originOriceRateChanged(scope.row)" type="number" min="100" v-model="scope.row.origin_price_rate"></el-input>
                         </template>
                     </el-table-column>
+                    -->
                     <el-table-column prop="price" width="110" label="零售价">
                         <template slot-scope="scope">
                             <el-input disabled v-model="scope.row.price"></el-input>
                         </template>
                     </el-table-column>
+                    <!--
                     <el-table-column prop="origin_price" width="110" label="划线价">
                         <template slot-scope="scope">
                             <el-input disabled v-model="scope.row.origin_price"></el-input>
                         </template>
                     </el-table-column>
+                    -->
                     <el-table-column width="75" label="分销价">
                         <template slot-scope="scope">
                             {{scope.row.ali_data_json.currentPrice}}
@@ -265,11 +275,13 @@ Yii::$app->loadComponentView('com-rich-text');
                                 <el-input disabled v-model="scope.row.price"></el-input>
                             </template>
                         </el-table-column>
+                        <!--
                         <el-table-column prop="origin_price" width="110" label="划线价">
                             <template slot-scope="scope">
                                 <el-input disabled v-model="scope.row.origin_price"></el-input>
                             </template>
                         </el-table-column>
+                        -->
                         <el-table-column width="110" label="分销价">
                             <template slot-scope="scope">
                                 {{scope.row.ali_price}}
@@ -576,6 +588,13 @@ Yii::$app->loadComponentView('com-rich-text');
                     this.loading = false;
                 });
                 this.loading = true;
+            }
+        },
+        directives:{
+            focus:{
+                inserted:function(el){
+                    el.querySelector('input').focus();
+                }
             }
         },
         mounted: function() {

@@ -7,6 +7,7 @@ use app\controllers\api\filters\LoginFilter;
 use app\plugins\alibaba\forms\api\AlibabaDistributionOrderDoSubmitForm;
 use app\plugins\alibaba\forms\api\AlibabaDistributionOrderListForm;
 use app\plugins\alibaba\forms\api\AlibabaDistributionOrderDetailsForm;
+use app\plugins\alibaba\forms\api\AlibabaDistributionOrderLogisticsForm;
 use app\plugins\alibaba\forms\api\AlibabaDistributionOrderPreviewForm;
 
 class DistributionOrderController extends ApiController {
@@ -57,5 +58,15 @@ class DistributionOrderController extends ApiController {
         $form = new AlibabaDistributionOrderDetailsForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->getOrderDetails());
+    }
+
+    /**
+     * 物流信息
+     * @return \yii\web\Response
+     */
+    public function actionLogistics(){
+        $form = new AlibabaDistributionOrderLogisticsForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->get());
     }
 }

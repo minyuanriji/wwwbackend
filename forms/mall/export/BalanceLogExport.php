@@ -52,9 +52,10 @@ class BalanceLogExport extends BaseExport
         ];
     }
 
-    public function export($query)
+    public function export($query, $alias = '')
     {
-        $list = $query->orderBy('created_at')->with(['user.userInfo'])->asArray()->all();
+        $orderBy = $alias . 'created_at';
+        $list = $query->orderBy($orderBy)->with(['user.userInfo'])->asArray()->all();
         $this->transform($list);
         $this->getFields();
         $dataList = $this->getDataList();

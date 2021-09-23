@@ -13,25 +13,42 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             </div>
         </div>
         <div class="table-body">
-            类型筛选
-                <el-select style="width: 120px;" size="small" v-model="is_manual" @change='search'>
-                    <el-option key="all" label="全部" value=""></el-option>
-                    <el-option key="1" label="管理员操作" value="1"></el-option>
-                    <el-option key="0" label="系统操作" value="0"></el-option>
-                </el-select>
-
-            <el-date-picker size="small" v-model="date" type="datetimerange"
-                            style="float: left"
-                            value-format="yyyy-MM-dd HH:mm:ss"
-                            range-separator="至" start-placeholder="开始日期"
-                            @change="selectDateTime"
-                            end-placeholder="结束日期">
-            </el-date-picker>
-            <div class="input-item">
-                <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="keyword" clearable @clear="search">
-                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-                </el-input>
+            <div style="display: flex;justify-content: space-evenly">
+                <div style="width: 25%">
+                    <el-date-picker size="small" v-model="date" type="datetimerange"
+                                    style="float: left"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    range-separator="至" start-placeholder="开始日期"
+                                    @change="selectDateTime"
+                                    end-placeholder="结束日期">
+                    </el-date-picker>
+                </div>
+                <div style="width: 15%">
+                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="keyword" clearable @clear="search">
+                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                    </el-input>
+                </div>
+                <div style="width: 18%">
+                    类型
+                    <el-tooltip class="item" effect="dark" content="只有选择订单或者商家扫码类型，才能筛选省市区" placement="bottom">
+                        <i class="el-icon-question"></i>
+                    </el-tooltip>
+                    <el-select style="width: 120px;" size="small" v-model="source_type" @change='search'>
+                        <el-option key="" label="全部" value=""></el-option>
+                        <el-option key="order" label="订单" value="order"></el-option>
+                        <el-option key="order_refund" label="订单退款" value="order_refund"></el-option>
+                        <el-option key="mch_checkout_order" label="商家扫码" value="mch_checkout_order"></el-option>
+                        <el-option key="admin" label="管理员操作" value="admin"></el-option>
+                        <el-option key="hotel_order" label="酒店订单" value="hotel_order"></el-option>
+                        <el-option key="hotel_order_refund" label="酒店订单退款" value="hotel_order_refund"></el-option>
+                        <el-option key="giftpacks_order" label="大礼包订单" value="giftpacks_order"></el-option>
+                        <el-option key="giftpacks_group_payorder" label="大礼包拼单" value="giftpacks_group_payorder"></el-option>
+                        <el-option key="giftpacks_group_pay_order_refund" label="大礼包拼单退款" value="giftpacks_group_pay_order_refund"></el-option>
+                        <el-option key="tlj_exchange" label="礼金商品兑换" value="tlj_exchange"></el-option>
+                    </el-select>
+                </div>
             </div>
+
             <div style="margin: 30px 0">
                 <div style="display: flex;justify-content: space-evenly">
                     <div>
@@ -54,30 +71,25 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             </div>
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column label="昵称" width="200">
+                <el-table-column label="昵称">
                     <template slot-scope="scope">
                         <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
                             {{scope.row.nickname}}
                         </com-user-finance-stat>
                     </template>
                 </el-table-column>
-                <el-table-column label="变动红包" width="150">
+                <el-table-column label="变动红包">
                     <template slot-scope="scope">
                         <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.integral}}</div>
                         <div style="font-size: 18px;color: #F6AA5A" v-if="scope.row.type == 2">-{{scope.row.integral}}</div>
                     </template>
                 </el-table-column>
-
-                <el-table-column label="当前红包数"  prop="current_integral" width="130">
-                </el-table-column>
-                <el-table-column prop="desc" label="说明" width="400"></el-table-column>
+                <el-table-column label="当前红包数"  prop="current_integral"></el-table-column>
+                <el-table-column prop="desc" label="说明" width="450"></el-table-column>
                 <el-table-column prop="scope" width="180" label="充值时间">
-
                        <template slot-scope="scope">
                            {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
-
                        </template>
-
                 </el-table-column>
             </el-table>
 
@@ -149,6 +161,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     nickname: '',
                     remark: '',
                     is_manual: 1,
+                    source_type:''
                 },
                 forDlgSelect:{
                     visible: false,
@@ -181,6 +194,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     start_date: '',
                     end_at: '',
                     is_manual: '',
+                    source_type:''
                 },
                 date: '',
                 keyword: '',
@@ -189,8 +203,8 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 listLoading: false,
                 dialogIntegral: false,
                 is_manual: '',
+                source_type:'',
                 Statistics: '',
-
             };
         },
         methods: {
@@ -239,7 +253,8 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 this.page = currentPage;
                 this.getList();
             },
-            search() {
+            search(e) {
+                console.log(e);
                 this.page = 1;
                 if (this.date == null) {
                     this.date = ''
@@ -266,6 +281,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     user_id: getQuery('user_id'),
                     keyword: this.keyword,
                     is_manual: this.is_manual,
+                    source_type: this.source_type,
                 };
                 if (this.date) {
                     Object.assign(params, {

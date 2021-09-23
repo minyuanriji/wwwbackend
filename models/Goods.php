@@ -472,3 +472,4 @@ class Goods extends BaseActiveRecord
         return $setting ?? null;
     }
 }
+

@@ -33,8 +33,8 @@
                 </el-input>
             </div>
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
-                <el-table-column prop="id" label="ID" width="60"></el-table-column>
-                <el-table-column label="会员信息" width="200">
+                <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                <el-table-column label="会员信息" width="260">
                     <template slot-scope="scope">
                         <com-image style="float: left;margin-right: 5px;" mode="aspectFill" :src="scope.row.user.avatar_url"></com-image>
                         <div v-if=scope.row.user.nickname>{{scope.row.user.nickname}}</div>
@@ -69,7 +69,7 @@
 				        <div size="small">{{getStatusName(scope.row.status)}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="desc" label="描述"></el-table-column>
+                <el-table-column prop="desc" label="描述" width="260"></el-table-column>
                 <el-table-column  label="下次发放时间">
                     <template slot-scope="scope">
                         <div size="small" v-if="scope.row.next_publish_time > 0">{{scope.row.next_publish_time|dateTimeFormat('Y-m-d H:i:s')}}</div>

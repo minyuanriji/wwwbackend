@@ -8,31 +8,73 @@ Yii::$app->loadComponentView('com-user-finance-stat');
         <div slot="header">
             <div>
                 <span>收益记录</span>
-                <div style="float: right;margin: -5px 0">
+                <div style="float: right;margin-right: 10px">
+                    <com-export-dialog :field_list='export_list' :params="searchData" @selected="exportConfirm"></com-export-dialog>
+                </div>
+                <div style="float: right;margin-right: 10px">
                     <el-button @click="handleIncome" type="primary" size="small">收益充值</el-button>
                 </div>
             </div>
         </div>
         <div class="table-body">
-                类型筛选
-                <el-select style="width: 120px;" size="small" v-model="is_manual" @change='search'>
-                    <el-option key="all" label="全部" value=""></el-option>
-                    <el-option key="1" label="管理员操作" value="1"></el-option>
-                    <el-option key="0" label="系统操作" value="0"></el-option>
-                </el-select>
-
-            <el-date-picker size="small" v-model="date" type="datetimerange"
-                            style="float: left"
-                            value-format="yyyy-MM-dd HH:mm:ss"
-                            range-separator="至" start-placeholder="开始日期"
-                            @change="selectDateTime"
-                            end-placeholder="结束日期">
-            </el-date-picker>
-            <div class="input-item">
-                <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="keyword" clearable @clear="search">
-                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-                </el-input>
+            <div style="display: flex;justify-content: space-evenly;">
+                <div style="width: 25%">
+                    <el-date-picker size="small" v-model="date" type="datetimerange"
+                                    style="float: left"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    range-separator="至" start-placeholder="开始日期"
+                                    @change="selectDateTime"
+                                    end-placeholder="结束日期">
+                    </el-date-picker>
+                </div>
+                <div style="width: 15%">
+                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称、手机号搜索" v-model="keyword" clearable @clear="search">
+                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                    </el-input>
+                </div>
+                <div style="width: 18%">
+                    类型
+                    <el-tooltip class="item" effect="dark" content="只有选择订单或者商家扫码类型，才能筛选省市区" placement="bottom">
+                        <i class="el-icon-question"></i>
+                    </el-tooltip>
+                    <el-select size="small" v-model="type" @change='searchType' class="select" placeholder="请选择类型">
+                        <el-option key="" label="全部" value=""></el-option>
+                        <el-option key="goods" label="商品分佣" value="goods"></el-option>
+                        <el-option key="checkout" label="结账单收入" value="checkout"></el-option>
+                        <el-option key="cash" label="提现" value="cash"></el-option>
+                        <el-option key="admin" label="管理员操作" value="admin"></el-option>
+                        <el-option key="store" label="推荐门店分佣" value="store"></el-option>
+                        <el-option key="migrate" label="旧商城迁移" value="migrate"></el-option>
+                        <el-option key="boss" label="股东分红" value="boss"></el-option>
+                        <el-option key="hotel_commission" label="推荐酒店分佣" value="hotel_commission"></el-option>
+                        <el-option key="hotel_3r_commission" label="酒店消费分佣" value="hotel_3r_commission"></el-option>
+                        <el-option key="giftpacks_commission" label="大礼包分佣" value="giftpacks_commission"></el-option>
+                        <el-option key="region_goods" label="区域商品分红分佣" value="region_goods"></el-option>
+                        <el-option key="region_checkout" label="区域门店扫码分红" value="region_checkout"></el-option>
+                    </el-select>
+                </div>
+                <div style="width: 16%"  v-if="levelShow">
+                    等级
+                    <el-select size="small" v-model="level" placeholder="请选择区域等级" @change="levelChange">
+                        <el-option
+                                v-for="item in level_list"
+                                :label="item.name"
+                                :value="item.level">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div style="width: 20%" v-if="level>0">
+                    省市区
+                    <el-cascader
+                            size="small"
+                            @change="addressChange"
+                            :options="district"
+                            :props="props"
+                            v-model="address">
+                    </el-cascader>
+                </div>
             </div>
+
             <div style="margin: 30px 0">
                 <div style="display: flex;justify-content: space-evenly">
                     <div>
@@ -53,12 +95,13 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     </div>
                 </div>
             </div>
+
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column prop="user.nickname" label="昵称">
+                <el-table-column prop="nickname" label="昵称">
                     <template slot-scope="scope">
-                        <com-user-finance-stat :user-id="parseInt(scope.row.user.id)">
-                            {{scope.row.user.nickname}}
+                        <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
+                            {{scope.row.nickname}}
                         </com-user-finance-stat>
                     </template>
                 </el-table-column>
@@ -70,7 +113,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 </el-table-column>
                 <el-table-column label="总收益"  prop="money" width="130">
                 </el-table-column>
-                <el-table-column prop="desc" label="说明" width="400"></el-table-column>
+                <el-table-column prop="desc" label="说明" width="700"></el-table-column>
                 <el-table-column prop="scope" width="180" label="收益时间">
                        <template slot-scope="scope">
                            {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
@@ -175,7 +218,9 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     date: '',
                     start_date: '',
                     end_at: '',
-                    is_manual: '',
+                    type: '',
+                    level: '',
+                    address: null,
                 },
                 date: '',
                 keyword: '',
@@ -185,6 +230,35 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 listLoading: false,
                 dialogIncome: false,
                 Statistics: '',
+                type: '',
+                level_list: [
+                    {
+                        name: '省',
+                        level: 1
+                    },
+                    {
+                        name: '市',
+                        level: 2
+                    },
+                    {
+                        name: '区',
+                        level: 3
+                    },
+                ],
+                level: '',
+                address: null,
+                district: [],
+                town_list: [],
+                province_id: 0,
+                city_id: 0,
+                district_id: 0,
+                props: {
+                    value: 'id',
+                    label: 'name',
+                    children: 'list'
+                },
+                levelShow:false,
+                export_list: [],
             };
         },
         methods: {
@@ -233,6 +307,9 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 this.searchData.keyword = this.keyword;
                 this.searchData.start_date = this.date[0];
                 this.searchData.end_date = this.date[1];
+                this.searchData.type = this.type;
+                this.searchData.level = this.level;
+                this.searchData.address = this.address;
             },
             pageChange(currentPage) {
                 this.page = currentPage;
@@ -256,7 +333,6 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 this.page = 1;
                 this.search();
             },
-
             getList() {
                 let params = {
                     r: 'mall/finance/income-log',
@@ -264,7 +340,9 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     date: this.date,
                     user_id: getQuery('user_id'),
                     keyword: this.keyword,
-                    is_manual: this.is_manual,
+                    type: this.type,
+                    level: this.level,
+                    address: this.address,
                 };
                 if (this.date) {
                     Object.assign(params, {
@@ -279,6 +357,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                         this.form = e.data.data.list;
                         this.Statistics = e.data.data.Statistics;
                         this.pagination = e.data.data.pagination;
+                        this.export_list = e.data.data.export_list;
                     } else {
                         this.$message.error(e.data.msg);
                     }
@@ -287,6 +366,47 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     this.listLoading = false;
                 });
                 this.listLoading = true;
+            },
+            searchType(e) {
+                if (e == 'goods' || e == 'checkout') {
+                    this.levelShow=true;
+                } else {
+                    this.levelShow=false;
+                    this.level='';
+                }
+                this.page = 1;
+                this.getList();
+            },
+            levelChange(e) {
+                this.getDistrict(e);
+            },
+            // 获取省市区列表
+            getDistrict(level) {
+                if (level == 1) {
+                    level1 = 1;
+                } else if (level == 2) {
+                    level1 = 2;
+                } else if (level == 3) {
+                    level1 = 3;
+                } else {
+                    level1 = 4;
+                }
+                request({
+                    params: {
+                        r: 'district/index',
+                        level: level1
+                    },
+                }).then(e => {
+                    if (e.data.code == 0) {
+                        this.district = e.data.data.district;
+                    }
+                }).catch(e => {
+                });
+            },
+            addressChange(e) {
+                this.town_list = []
+                this.page = 1;
+                this.getList();
             },
         },
     mounted: function() {

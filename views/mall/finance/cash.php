@@ -3,25 +3,23 @@ Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
 
 <div id="app" v-cloak>
-    <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
-        <el-form size="small" class="export-btn" :inline="true" :model="search">
-            <el-form-item>
-                <com-export-dialog :field_list='exportList' :params="search" @selected="confirmSubmit"></com-export-dialog>
-            </el-form-item>
-        </el-form>
+    <el-card shadow="never" style="border:0;" body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
         <el-tabs v-model="activeName" @tab-click="handleClick">
             <el-tab-pane label="全部" name="-1"></el-tab-pane>
             <el-tab-pane label="未审核" name="0"></el-tab-pane>
             <el-tab-pane label="待打款" name="1"></el-tab-pane>
             <el-tab-pane label="已打款" name="2"></el-tab-pane>
             <el-tab-pane label="驳回" name="3"></el-tab-pane>
+            <com-export-dialog :field_list='exportList' :params="searchData" @selected="exportConfirm"></com-export-dialog>
+
             <div class="table-body">
+                <div style="float: left;margin-top: 5px">打款时间：</div>
                 <el-date-picker size="small" v-model="date" type="datetimerange"
-                                style="float: left"
-                                value-format="yyyy-MM-dd HH:mm:ss"
-                                range-separator="至" start-placeholder="开始日期"
-                                @change="selectDateTime"
-                                end-placeholder="结束日期">
+                                     style="float: left"
+                                     value-format="yyyy-MM-dd HH:mm:ss"
+                                     range-separator="至" start-placeholder="开始日期"
+                                     @change="selectDateTime"
+                                     end-placeholder="结束日期">
                 </el-date-picker>
                 <div class="input-item" style="margin-left:15px;display:inline-block;width:300px;">
                     <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入昵称搜索" v-model="search.keyword" clearable @clear="goSearch">
@@ -107,7 +105,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                  <el-table-column label="备注">
                         <template slot-scope="scope">
                             <div v-if="scope.row.status == 1 || scope.row.status == 2">审核备注:{{scope.row.content.validate_content}}</div>
-                         <div v-if="scope.row.status == 2">打款备注:{{scope.row.content.remittance_content}}</div>
+                            <div v-if="scope.row.status == 2">打款备注:{{scope.row.content.remittance_content}}</div>
                             <div v-if="scope.row.status == 3">驳回备注:{{scope.row.content.reject_content}}</div>
                         </template>
                     </el-table-column>
@@ -171,20 +169,30 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 pagination: null,
                 exportList: [],
                 Statistics: '',
+                searchData: {
+                    keyword: '',
+                    start_date: '',
+                    end_date: '',
+                    status: '',
+                },
             };
         },
         mounted() {
             this.loadData();
         },
         methods: {
-
             goSearch() {
                 if (this.date == null) {
                     this.date = ''
                 }
                 this.loadData(this.activeName, 1)
             },
-
+            exportConfirm() {
+                this.searchData.keyword = this.search.keyword;
+                this.searchData.start_date = this.search.start_date;
+                this.searchData.end_date = this.search.end_date;
+                this.searchData.status = this.search.status;
+            },
             selectDateTime(e) {
                 if (e != null) {
                     this.search.start_date = e[0];
@@ -195,7 +203,6 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 }
                 this.goSearch();
             },
-
             confirmSubmit() {
                 this.search.status = this.activeName
             },
@@ -218,7 +225,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                         this.list = e.data.data.list;
                         this.Statistics = e.data.data.Statistics;
                         this.pagination = e.data.data.pagination;
-
+                        this.exportList = e.data.data.export_list;
                     } else {
                         this.$message.error(e.data.msg);
                     }

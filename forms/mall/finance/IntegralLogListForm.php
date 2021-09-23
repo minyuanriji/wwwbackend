@@ -1,14 +1,14 @@
 <?php
-namespace app\forms\mall\finance;
 
+namespace app\forms\mall\finance;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\IntegralLog;
 use app\models\User;
 
-class IntegralLogListForm extends BaseModel{
-
+class IntegralLogListForm extends BaseModel
+{
     public $page;
     public $limit;
     public $start_date;
@@ -16,16 +16,19 @@ class IntegralLogListForm extends BaseModel{
     public $keyword;
     public $user_id;
     public $is_manual;
+    public $source_type;
 
-    public function rules(){
+    public function rules()
+    {
         return [
             [['page', 'limit', 'user_id'], 'integer'],
-            [['keyword', 'start_date', 'end_date'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'source_type'], 'trim'],
             [['is_manual',], 'safe'],
         ];
     }
-    public function getList(){
 
+    public function getList()
+    {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
@@ -34,16 +37,17 @@ class IntegralLogListForm extends BaseModel{
         $query = IntegralLog::find()->alias('il')->where([
             'il.mall_id' => \Yii::$app->mall->id,
         ])->orderBy('il.id desc');
-        $query->innerJoin(["u" => User::tableName()], "u.id=il.user_id");
+        $query->innerJoin(["u" => User::tableName()], "u.id=il.user_id")
+            ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
         if ($this->user_id) {
             $query->andWhere(['il.user_id' => $this->user_id]);
         }
 
-        if(!empty($this->keyword)){
+        if (!empty($this->keyword)) {
             $query->andWhere([
                 "OR",
-                "u.nickname LIKE '%".$this->keyword."%'"
+                "u.nickname LIKE '%" . $this->keyword . "%'"
             ]);
         }
 
@@ -73,7 +77,7 @@ class IntegralLogListForm extends BaseModel{
                 }
             }
         }
-        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '' ,[
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
             'list' => $list,
             'Statistics' => [
                 'income' => $income ?: 0,

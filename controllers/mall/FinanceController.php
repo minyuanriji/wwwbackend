@@ -69,17 +69,22 @@ class FinanceController extends MallController
      */
     public function actionCash()
     {
-
         if (\Yii::$app->request->isAjax) {
-            if (\Yii::$app->request->isPost) {
-            } else {
+            $form = new CashListForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->search());
+        } else {
+            if (\Yii::$app->request->post('flag') === 'EXPORT') {
+                $fields = explode(',', \Yii::$app->request->post('fields'));
                 $form = new CashListForm();
-                $form->attributes = \Yii::$app->request->get();
-                return $this->asJson($form->search());
+                $form->attributes = \Yii::$app->request->post();
+                $form->fields = $fields;
+                $form->search();
+                return false;
+            } else {
+                return $this->render('cash');
             }
         }
-
-        return $this->render('cash');
     }
 
 
@@ -121,7 +126,16 @@ class FinanceController extends MallController
             $form->attributes = \Yii::$app->request->get();
             return $this->asJson($form->getList());
         } else {
-            return $this->render('balance-log');
+            if (\Yii::$app->request->post('flag') === 'EXPORT') {
+                $fields = explode(',', \Yii::$app->request->post('fields'));
+                $form = new BalanceLogListForm();
+                $form->attributes = \Yii::$app->request->post();
+                $form->fields = $fields;
+                $form->getList();
+                return false;
+            } else {
+                return $this->render('balance-log');
+            }
         }
     }
 
@@ -159,7 +173,16 @@ class FinanceController extends MallController
             $form->attributes = \Yii::$app->request->get();
             return $this->asJson($form->getList());
         } else {
-            return $this->render('income-log');
+            if (\Yii::$app->request->post('flag') === 'EXPORT') {
+                $fields = explode(',', \Yii::$app->request->post('fields'));
+                $form = new IncomeLogListForm();
+                $form->attributes = \Yii::$app->request->post();
+                $form->fields = $fields;
+                $form->getList();
+                return false;
+            } else {
+                return $this->render('income-log');
+            }
         }
     }
 

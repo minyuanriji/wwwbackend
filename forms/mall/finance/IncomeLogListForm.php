@@ -93,6 +93,7 @@ class IncomeLogListForm extends BaseModel
                     ->andWhere($where);
             }
         }
+        $query->select(['b.*','u.id as uid','u.nickname','u.mobile']);
         $incomeQuery = clone $query;
         $income = $incomeQuery->andWhere(['b.type' => 1])->sum('b.income');
         $expendQuery = clone $query;
@@ -104,7 +105,7 @@ class IncomeLogListForm extends BaseModel
             $exp->export($new_query, 'b.');
             return false;
         }
-        $list = $query->select(['b.*','u.id as uid','u.nickname'])->page($pagination, $this->limit)->orderBy('b.id desc')->asArray()->all();
+        $list = $query->page($pagination, $this->limit)->orderBy('b.id desc')->asArray()->all();
         if ($list) {
             foreach ($list as $item) {
                 if ($item['type'] == 1) {
@@ -120,8 +121,8 @@ class IncomeLogListForm extends BaseModel
             'Statistics' => [
                 'income' => $income ?: 0,
                 'expend' => $expend ?: 0,
-                'currentIncome' => $currentIncome,
-                'currentExpend' => $currentExpend,
+                'currentIncome' => round($currentIncome, 2),
+                'currentExpend' => round($currentExpend, 2),
             ],
             'pagination' => $pagination
         ]);

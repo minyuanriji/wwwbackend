@@ -1,20 +1,11 @@
-<?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-13
- * Time: 14:21
- */
-?>
-
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <div>
                 <span>积分记录</span>
-
+                <div style="float: right;">
+                    <com-export-dialog :field_list='export_list' :params="searchData" @selected="exportConfirm"></com-export-dialog>
+                </div>
             </div>
         </div>
         <div class="table-body">
@@ -25,14 +16,31 @@
                             @change="selectDateTime"
                             end-placeholder="结束日期">
             </el-date-picker>
-            <div class="input-item">
+            <div class="input-item" style="float: left">
                 <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称、手机号搜索" v-model="keyword" clearable @clear="search">
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
+            <div style="float: left; margin-left: 15px">
+                类型
+                <el-tooltip class="item" effect="dark" content="只有选择订单或者商家扫码类型，才能筛选省市区" placement="bottom">
+                    <i class="el-icon-question"></i>
+                </el-tooltip>
+                <el-select style="width: 120px;" size="small" v-model="source_type" @change='typeChange'>
+                    <el-option key="" label="全部" value=""></el-option>
+                    <el-option key="order" label="订单" value="order"></el-option>
+                    <el-option key="order_cancellation" label="订单取消" value="order_cancellation"></el-option>
+                    <el-option key="sign_in" label="签到" value="sign_in"></el-option>
+                    <el-option key="admin" label="管理员操作" value="admin"></el-option>
+                    <el-option key="give" label="下单赠送积分" value="give"></el-option>
+                    <el-option key="new_user" label="新人领积分" value="new_user"></el-option>
+                    <el-option key="giftpacks_order" label="大礼包订单增送" value="giftpacks_order"></el-option>
+                    <el-option key="from_mch_checkout_order" label="商家扫码赠送" value="from_mch_checkout_order"></el-option>
+                </el-select>
+            </div>
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column prop="user.nickname" label="昵称"></el-table-column>
+                <el-table-column prop="nickname" label="昵称"></el-table-column>
                 <el-table-column label="收支情况(积分)" width="150">
                     <template slot-scope="scope">
                         <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.score}}</div>
@@ -52,13 +60,9 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="scope" width="180" label="充值时间">
-
                        <template slot-scope="scope">
                            {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
-
                        </template>
-
-
                 </el-table-column>
             </el-table>
 
@@ -87,13 +91,15 @@
                     date: '',
                     start_date: '',
                     end_at: '',
+                    source_type: '',
                 },
                 date: '',
                 keyword: '',
                 form: [],
                 pagination: null,
                 listLoading: false,
-
+                export_list: [],
+                source_type:'',
             };
         },
         methods: {
@@ -101,6 +107,7 @@
                 this.searchData.keyword = this.keyword;
                 this.searchData.start_date = this.date[0];
                 this.searchData.end_date = this.date[1];
+                this.searchData.source_type = this.source_type;
             },
             pageChange(currentPage) {
                 this.page = currentPage;
@@ -125,6 +132,18 @@
                 this.search();
             },
 
+            typeChange(e) {
+                console.log(e);
+                this.page = 1;
+                this.form = '';
+                this.pagination = '';
+                this.export_list = [];
+                if (this.date == null) {
+                    this.date = ''
+                }
+                this.getList();
+            },
+
             getList() {
                 let params = {
                     r: 'mall/finance/score-log',
@@ -132,6 +151,7 @@
                     date: this.date,
                     user_id: getQuery('user_id'),
                     keyword: this.keyword,
+                    source_type: this.source_type,
                 };
                 if (this.date) {
                     Object.assign(params, {
@@ -144,7 +164,7 @@
                 }).then(e => {
                     if (e.data.code === 0) {
                         this.form = e.data.data.list;
-
+                        this.export_list = e.data.data.export_list;
                         this.pagination = e.data.data.pagination;
                     } else {
                         this.$message.error(e.data.msg);

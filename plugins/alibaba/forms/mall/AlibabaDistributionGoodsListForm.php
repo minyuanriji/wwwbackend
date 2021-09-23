@@ -13,10 +13,12 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
 
     public $page;
     public $app_id;
+    public $keyword;
 
     public function rules(){
         return [
-            [['page', 'app_id'], 'integer']
+            [['page', 'app_id'], 'integer'],
+            [['keyword'], 'string'],
         ];
     }
 
@@ -39,6 +41,9 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
 
             if($this->app_id){
                 $query->andWhere(["g.app_id" => $this->app_id]);
+            }
+            if ($this->keyword) {
+                $query->andWhere(['like','g.name',$this->keyword]);
             }
 
             $orderBy = "g.id DESC";

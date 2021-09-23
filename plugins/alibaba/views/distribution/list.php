@@ -572,6 +572,7 @@ Yii::$app->loadComponentView('com-rich-text');
                 let params = Object.assign(this.searchData, {
                     r: 'plugin/alibaba/mall/distribution/goods-list',
                     page: this.page,
+                    keyword: this.searchData.keyword,
                     app_id:getQuery("app_id")
                 });
                 request({

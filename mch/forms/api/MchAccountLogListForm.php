@@ -43,7 +43,7 @@ class MchAccountLogListForm extends BaseModel{
             $query->andWhere('FROM_UNIXTIME(mal.created_at,"%Y年%m月")="'.$this->created_at.'"');
         }
 
-        $list = $query->page($pagination, 5)
+        $list = $query->page($pagination, 10)
                       ->orderBy(['mal.created_at' => SORT_DESC])
                       ->asArray()
                       ->all();

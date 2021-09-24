@@ -7,6 +7,7 @@ use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
+use app\plugins\shopping_voucher\models\ShoppingVoucherTargetAlibabaDistributionGoods;
 
 class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm {
 
@@ -32,21 +33,22 @@ class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm
         }
 
         try {
-            $query = AlibabaDistributionGoodsList::find()->where(["is_delete" => 0]);
+            $query = AlibabaDistributionGoodsList::find()->alias("g")->where(["g.is_delete" => 0]);
+            $query->leftJoin(["s" => ShoppingVoucherTargetAlibabaDistributionGoods::tableName()], "s.goods_id=g.id AND s.sku_id=0");
 
             if($this->ali_cat_id){
-                $query->andWhere("FIND_IN_SET('{$this->ali_cat_id}', ali_category_id)");
+                $query->andWhere("FIND_IN_SET('{$this->ali_cat_id}', g.ali_category_id)");
             }
 
-            $orderBy = "id DESC";
+            $orderBy = "g.id DESC";
             $query->orderBy($orderBy);
 
 
-            $selects = ["id", "name", "cover_url", "price", "origin_price"];
+            $selects = ["g.id", "g.name", "g.cover_url", "g.price", "g.origin_price", "g.freight_price", "s.voucher_price"];
             $list = $query->asArray()->select($selects)->page($pagination, 20, $this->page)->all();
             if($list){
                 foreach($list as &$item){
-
+                    $item['price'] = $item['price'] + (float)$item['freight_price'] * (1/AlibabaDistributionOrderForm::getShoppingVoucherDecodeExpressRate());
                 }
             }
 

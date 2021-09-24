@@ -160,6 +160,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             foreach($detail['sku_list'] as &$skuItem){
                 $skuItem['shopping_voucher'] = $skuItem['freight_price'] * (1/$expressRate) + static::getShoppingVoucherDecodeNeedNumber($goods,
                     $skuItem['id'] == "DEF" ? 0 : $skuItem['id'],  $skuItem['price'], 1);
+                $skuItem['shopping_voucher'] = round($skuItem['shopping_voucher'], 2);
             }
 
             return new APICacheDataForm([

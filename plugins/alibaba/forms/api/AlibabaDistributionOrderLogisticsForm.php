@@ -65,25 +65,35 @@ class AlibabaDistributionOrderLogisticsForm extends BaseModel{
                 "express_code"  => $this->getExpressCode($distribution, $app->access_token, $res->result['logisticsCompanyName']),
                 "customer_name" => $res->result['receiver']['receiverName']
             ]);
-            $res = $form->search();
-            print_r($res);
-            exit;
 
+            return $form->search();
         }catch (\Exception $e){
             return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($e));
         }
     }
 
+    /**
+     * 查询快递编码
+     * @param Distribution $distribution
+     * @param $token
+     * @param $name
+     * @return mixed|null
+     */
     private function getExpressCode(Distribution $distribution, $token, $name){
         $expressList = Express::getExpressList();
-        $name = preg_replace("/快递|速递|快运|速运/", "", $name);
-        echo $name;exit;
-        /*echo $name;exit;
-        foreach(LogisticCompanyList::$datas as $data){
-            print_r($data);
-            exit;
-        }*/
-        return "YD";
+        $pattern = "/(快递|速递|快运|速运)/";
+        if(preg_match($pattern, $name, $matches)){
+            $tail = $matches[1];
+            $str = preg_replace($pattern, "", $name);
+            $similars = [];
+            foreach($expressList as $item){
+                if(strpos($item['name'], $str) !== FALSE){
+                    $similars[] = $item;
+                }
+            }
+            return !empty($similars) ? $similars[0]['code'] : null;
+        }
+        return null;
     }
 
 }

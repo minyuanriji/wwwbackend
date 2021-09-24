@@ -46,6 +46,7 @@ class AlibabaDistributionOrderDetailsForm extends BaseModel{
             $order = AlibabaDistributionOrder::findOne($detail1688->order_id);
 
             $data = $order->getAttributes();
+            $data['id'] = $this->order_id;
             $data['detail'] = AlibabaDistributionOrderDetail::find()->where(['id' => $detail1688->order_detail_id, 'is_delete' => 0])->asArray()->all();
             $data['shopping_voucher_num'] = $data['shopping_voucher_express_use_num'];
             if ($data['detail']) {
@@ -91,8 +92,7 @@ class AlibabaDistributionOrderDetailsForm extends BaseModel{
         if(!$res instanceof GetOrderInfoResponse){
             throw new \Exception("[GetOrderInfoResponse]返回结果异常");
         }
-
-        $info['status'] = $res->result['baseInfo']['status'];
+        $info['status'] = isset($res->result['baseInfo']) ? $res->result['baseInfo']['status'] : "-1";
         $allStatusTexts = [
             'waitbuyerpay'     => '未付款',
             'waitsellersend'   => '待发货',
@@ -102,7 +102,7 @@ class AlibabaDistributionOrderDetailsForm extends BaseModel{
             'cancel'           => '已取消',
             'terminated'       => '交易终止'
         ];
-        $info['status_text'] = !empty($data['status']) && isset($allStatusTexts[$data['status']]) ? $allStatusTexts[$data['status']] : "未知错误";
+        $info['status_text'] = !empty($info['status']) && isset($allStatusTexts[$info['status']]) ? $allStatusTexts[$info['status']] : "未知错误";
 
         return $info;
     }

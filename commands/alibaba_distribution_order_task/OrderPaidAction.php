@@ -32,6 +32,7 @@ class OrderPaidAction extends Action{
             try {
                 $this->doPaid($orderDetail1688);
                 $t->commit();
+                $this->controller->commandOut("1688订单[ID:".$orderDetail1688->id."]支付成功");
             }catch (\Exception $e){
                 $t->rollBack();
                 $this->controller->commandOut(implode("\n", [$e->getMessage(), "File:" . $e->getFile(), "Line:" . $e->getLine()]));
@@ -43,6 +44,7 @@ class OrderPaidAction extends Action{
                 $orderDetail1688->try_count += 1;
                 if($orderDetail1688->try_count > 3){ //错误次数超过3次，执行订单退款
                     //$this->doRefund($orderDetail1688);
+                    $orderDetail1688->status = "invalid";
                     $orderDetail1688->save();
                 }else{
                     $orderDetail1688->save();
@@ -97,8 +99,8 @@ class OrderPaidAction extends Action{
         if(!$res instanceof OrderProtocolPayResponse){
             throw new \Exception("[OrderProtocolPayResponse]返回结果异常");
         }
-        if(!$res->success){
-            throw new \Exception($res->message . " " . $res->code);
+        if($res->code != 4005 && !$res->success){
+            throw new \Exception($res->message . " " . $res->code . ":" . $res->originResultContent);
         }
     }
 

@@ -50,6 +50,7 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
             $goods->price_rate        = $this->goods['price_rate'];
             $goods->origin_price      = $this->goods['origin_price'];
             $goods->origin_price_rate = $this->goods['origin_price_rate'];
+            $goods->freight_price     = $this->goods['freight_price'];
             $goods->updated_at        = time();
             if(!$goods->save()){
                 throw new \Exception($this->responseErrorMsg($goods));
@@ -76,6 +77,7 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                     }
                     $sku->price          = $skuInfo['price'];
                     $sku->origin_price   = $skuInfo['origin_price'];
+                    $sku->freight_price  = $skuInfo['freight_price'];
                     $sku->updated_at     = time();
                     $sku->is_delete      = 0;
 

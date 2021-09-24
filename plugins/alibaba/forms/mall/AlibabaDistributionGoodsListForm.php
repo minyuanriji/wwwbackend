@@ -47,6 +47,7 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
             $list = $query->asArray()->page($pagination, 20, $this->page)->all();
             if($list){
                 foreach($list as &$item){
+                    $item['free_edit'] = 0;
                     $skuList = AlibabaDistributionGoodsSku::find()->where([
                         "goods_id"  => $item['id'],
                         "is_delete" => 0
@@ -62,6 +63,7 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
                                     $skuItem['ali_attributes_label'][] = $skuValues[$value];
                                 }
                             }
+                            $skuItem['free_edit'] = 0;
                             $skuItem['ali_attributes_label'] = implode("，", $skuItem['ali_attributes_label']);
                         }
 

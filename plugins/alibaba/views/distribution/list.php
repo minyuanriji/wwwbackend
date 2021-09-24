@@ -124,7 +124,7 @@ Yii::$app->loadComponentView('com-rich-text');
                            @import="aliGoodsImport"
                            :visible="aliGoodsDialogVisible"></com-alibaba-goods>
 
-        <el-dialog title="批量设置" :visible.sync="batchSetForm.dialogVisible" :close-on-click-modal="false">
+        <el-dialog width="70%" title="批量设置" :visible.sync="batchSetForm.dialogVisible" :close-on-click-modal="false">
 
             <template v-if="batchSetForm.singleEditGoods == null">
                 <div style="display: flex;">
@@ -159,18 +159,35 @@ Yii::$app->loadComponentView('com-rich-text');
                             <el-cascader v-model="scope.row.ali_category_id" :options="batchSetForm.categorys"></el-cascader>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="price_rate" width="110" label="零售比（%）"></el-table-column>
-                    <el-table-column prop="price" width="110" label="零售价"></el-table-column>
+                    <el-table-column width="110" label="零售比（%）">
+                        <template slot-scope="scope">
+                            {{scope.row.price_rate}}
+                        </template>
+                    </el-table-column>
+                    <el-table-column width="110" label="零售价">
+                        <template slot-scope="scope">
+                            {{scope.row.price}}
+                        </template>
+                    </el-table-column>
                     <!--
-                    <el-table-column prop="origin_price_rate" width="110" label="划线比（%）"></el-table-column>
-                    <el-table-column prop="origin_price" width="110" label="划线价"></el-table-column>
-                    -->
-                    <el-table-column width="75" label="分销价">
+                   <el-table-column prop="freight_price_rate" width="100" label="运费比（%）"></el-table-column>
+                   -->
+                   <el-table-column width="110" label="平台运费">
+                       <template slot-scope="scope">
+                           {{scope.row.freight_price}}
+                       </template>
+                   </el-table-column>
+                   <!--
+                   <el-table-column prop="origin_price_rate" width="110" label="划线比（%）"></el-table-column>
+                   <el-table-column prop="origin_price" width="110" label="划线价"></el-table-column>
+                   -->
+                    <el-table-column width="110" label="分销价">
                         <template slot-scope="scope">
                             {{scope.row.ali_data_json.currentPrice}}
                         </template>
                     </el-table-column>
-                    <el-table-column width="75" label="渠道价">
+                    <el-table-column prop="ali_freight_price" width="100" label="1688运费"></el-table-column>
+                    <el-table-column width="110" label="渠道价">
                         <template slot-scope="scope">
                             {{scope.row.ali_data_json.channelPrice}}
                         </template>
@@ -221,7 +238,7 @@ Yii::$app->loadComponentView('com-rich-text');
                     </el-table-column>
                     <el-table-column prop="price_rate" width="110" label="零售比（%）">
                         <template slot-scope="scope">
-                            <el-input v-focus @blur="priceRateChanged(scope.row)" type="number" min="100" v-model="scope.row.price_rate"></el-input>
+                            <el-input :disabled="scope.row.free_edit == 1" v-focus @blur="priceRateChanged(scope.row)" type="number" min="100" v-model="scope.row.price_rate"></el-input>
                         </template>
                     </el-table-column>
                     <!--
@@ -233,7 +250,7 @@ Yii::$app->loadComponentView('com-rich-text');
                     -->
                     <el-table-column prop="price" width="110" label="零售价">
                         <template slot-scope="scope">
-                            <el-input disabled v-model="scope.row.price"></el-input>
+                            <el-input :disabled="scope.row.free_edit == 0" v-model="scope.row.price"></el-input>
                         </template>
                     </el-table-column>
                     <!--
@@ -243,16 +260,31 @@ Yii::$app->loadComponentView('com-rich-text');
                         </template>
                     </el-table-column>
                     -->
-                    <el-table-column width="75" label="分销价">
+                    <!--
+                    <el-table-column prop="freight_price_rate" width="110" label="运费比（%）">
+                        <template slot-scope="scope">
+                            <el-input :disabled="scope.row.free_edit == 1" v-model="scope.row.freight_price_rate"></el-input>
+                        </template>
+                    </el-table-column>
+                    -->
+                    <el-table-column prop="freight_price" width="110" label="平台运费">
+                        <template slot-scope="scope">
+                            <el-input v-model="scope.row.freight_price"></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column width="100" label="分销价">
                         <template slot-scope="scope">
                             {{scope.row.ali_data_json.currentPrice}}
                         </template>
                     </el-table-column>
-                    <el-table-column width="75" label="渠道价">
+                    <el-table-column prop="ali_freight_price" width="100" label="1688运费"></el-table-column>
+                    <el-table-column width="100" label="渠道价">
                         <template slot-scope="scope">
                             {{scope.row.ali_data_json.channelPrice}}
                         </template>
                     </el-table-column>
+
+
                 </el-table>
 
                 <el-card class="box-card" style="margin-top:20px;">
@@ -260,8 +292,11 @@ Yii::$app->loadComponentView('com-rich-text');
                     <div style="display:flex;">
                         <el-input placeholder="请输入内容" v-model="batchSetForm.singleSetValue" style="width:300px;" class="input-with-select">
                             <el-select v-model="batchSetForm.singleSetSel" slot="prepend" placeholder="请选择" style="width:90px;">
+                                <el-option value="freight_price" label="运费"></el-option>
+                                <!--
                                 <el-option value="price" label="零售价"></el-option>
                                 <el-option value="origin_price" label="划线价"></el-option>
+                                -->
                             </el-select>
                             <el-button @click="batchSingleSetInput" slot="append">修改</el-button>
                         </el-input>
@@ -272,9 +307,15 @@ Yii::$app->loadComponentView('com-rich-text');
                         <el-table-column prop="ali_attributes_label" label="规格属性"></el-table-column>
                         <el-table-column prop="price" width="110" label="零售价">
                             <template slot-scope="scope">
-                                <el-input disabled v-model="scope.row.price"></el-input>
+                                <el-input :disabled="scope.row.free_edit == 0" v-model="scope.row.price"></el-input>
                             </template>
                         </el-table-column>
+                        <el-table-column prop="freight_price" width="110" label="平台运费">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.freight_price"></el-input>
+                            </template>
+                        </el-table-column>
+
                         <!--
                         <el-table-column prop="origin_price" width="110" label="划线价">
                             <template slot-scope="scope">
@@ -292,6 +333,8 @@ Yii::$app->loadComponentView('com-rich-text');
                                 {{scope.row.amount_on_sale}}
                             </template>
                         </el-table-column>
+
+
                     </el-table>
                 </el-card>
                 <div slot="footer" class="dialog-footer">
@@ -344,7 +387,7 @@ Yii::$app->loadComponentView('com-rich-text');
                     categorys: [],
                     loading: false,
                     selections: [],
-                    singleSetSel: 'price',
+                    singleSetSel: 'freight_price',
                     singleSetValue: 0,
                     singleEditGoods: null
                 },
@@ -440,6 +483,10 @@ Yii::$app->loadComponentView('com-rich-text');
             batchSingleSetInput(){
                 let i;
                 for(i=0; i < this.batchSetForm.singleEditGoods[0].sku_list.length; i++){
+                    if(this.batchSetForm.singleSetSel == 'freight_price'){
+                        this.batchSetForm.singleEditGoods[0].sku_list[i]['freight_price'] = this.batchSetForm.singleSetValue;
+                        continue;
+                    }
                     if(this.batchSetForm.singleSetSel == 'price'){
                         this.batchSetForm.singleEditGoods[0].sku_list[i]['price'] = this.batchSetForm.singleSetValue;
                     }else{

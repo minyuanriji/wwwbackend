@@ -1,6 +1,6 @@
 <template id="com-alibaba-goods">
     <div class="com-alibaba-goods">
-        <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
+        <el-dialog width="65%" :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
 
             <el-tabs v-model="searchData.biztype"   @tab-click="search">
                 <el-tab-pane label="生产加工" name="1"></el-tab-pane>

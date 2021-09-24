@@ -12,12 +12,8 @@ use app\plugins\alibaba\models\AlibabaDistributionOrderDetail;
 use app\plugins\alibaba\models\AlibabaDistributionOrderDetail1688;
 use app\plugins\shopping_voucher\models\ShoppingVoucherTargetAlibabaDistributionGoods;
 use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
-use lin010\alibaba\c2b2b\api\GetAddress;
-use lin010\alibaba\c2b2b\api\GetAddressResponse;
 use lin010\alibaba\c2b2b\api\OrderCreate;
 use lin010\alibaba\c2b2b\api\OrderCreateResponse;
-use lin010\alibaba\c2b2b\api\OrderGetPreview;
-use lin010\alibaba\c2b2b\api\OrderGetPreviewResponse;
 use lin010\alibaba\c2b2b\Distribution;
 
 class AlibabaDistributionOrderForm extends BaseModel{
@@ -73,11 +69,12 @@ class AlibabaDistributionOrderForm extends BaseModel{
 
             $skuInfos = @json_decode($goods->sku_infos, true);
             if((empty($skuInfos) || empty($skuInfos['group'])) && $item['sku'] == "DEF"){ //无规格商品
-                $goodsItem['ali_sku']     = 0;
-                $goodsItem['ali_spec_id'] = '';
-                $goodsItem['price']       = (float)$goods->price;
-                $goodsItem['sku_id']      = 0;
-                $goodsItem['sku_labels']  = ['默认规格'];
+                $goodsItem['ali_sku']       = 0;
+                $goodsItem['ali_spec_id']   = '';
+                $goodsItem['price']         = (float)$goods->price;
+                $goodsItem['freight_price'] = (float)$goods->freight_price;
+                $goodsItem['sku_id']        = 0;
+                $goodsItem['sku_labels']    = ['默认规格'];
             }else{
                 $sku = AlibabaDistributionGoodsSku::findOne($item['sku']);
                 if(!$sku || $sku->is_delete || $sku->goods_id != $goods->id){
@@ -94,11 +91,12 @@ class AlibabaDistributionOrderForm extends BaseModel{
                         $labels[] = "-:-";
                     }
                 }
-                $goodsItem['ali_sku']     = $sku->ali_sku_id;
-                $goodsItem['ali_spec_id'] = $sku->ali_spec_id;
-                $goodsItem['price']       = (float)$sku->price;
-                $goodsItem['sku_id']      = $sku->id;
-                $goodsItem['sku_labels']  = $labels;
+                $goodsItem['ali_sku']       = $sku->ali_sku_id;
+                $goodsItem['ali_spec_id']   = $sku->ali_spec_id;
+                $goodsItem['price']         = (float)$sku->price;
+                $goodsItem['freight_price'] = (float)$sku->freight_price;
+                $goodsItem['sku_id']        = $sku->id;
+                $goodsItem['sku_labels']    = $labels;
             }
 
             $goodsItem['total_original_price'] = $goodsItem['num'] * $goodsItem['price'];
@@ -190,41 +188,6 @@ class AlibabaDistributionOrderForm extends BaseModel{
         }
     }
 
-
-    /**
-     * 阿里巴巴订单预览接口
-     * @param Distribution $distribution
-     * @param string $token
-     * @param array $cargoParamList 商品信息 [['offerId' => 1, 'specId' => 'xxx', 'quantity' => 1]]
-     * @param UserAddress $userAddress
-     * @param array $aliAddrInfo
-     * @return array
-     * @throws \Exception
-     */
-    public static function getAliOrderPreviewData(Distribution $distribution, $token, $cargoParamList, UserAddress $userAddress, $aliAddrInfo){
-        $res = $distribution->requestWithToken(new OrderGetPreview([
-            "addressParam" => json_encode([
-                "fullName"     => $userAddress->name,
-                "mobile"       => $userAddress->mobile,
-                "phone"        => $userAddress->mobile,
-                "postCode"     => isset($aliAddrInfo['postCode']) ? $aliAddrInfo['postCode'] : "",
-                "cityText"     => $userAddress->city,
-                "provinceText" => $userAddress->province,
-                "areaText"     => $userAddress->district,
-                "address"      => $userAddress->detail,
-                "districtCode" => isset($aliAddrInfo['addressCode']) ? $aliAddrInfo['addressCode'] : ""
-            ]),
-            "cargoParamList" => json_encode($cargoParamList)
-        ]), $token);
-        if(!empty($res->error)){
-            throw new \Exception($res->error);
-        }
-        if(!$res instanceof OrderGetPreviewResponse){
-            throw new \Exception("返回结果异常");
-        }
-        return $res->result;
-    }
-
     /**
      * 获取订单数据
      * @return array
@@ -242,7 +205,6 @@ class AlibabaDistributionOrderForm extends BaseModel{
         $orderItem["goods_list"] = $goodsList;
 
         //快递运费
-        $userAddress = [];
         if($this->use_address_id){
             $userAddress = UserAddress::findOne($this->use_address_id);
         }else{
@@ -252,39 +214,10 @@ class AlibabaDistributionOrderForm extends BaseModel{
             ]);
         }
 
-        //获取第一个商品的应用ID
-        $app = AlibabaApp::findOne($goodsList[0]['app_id']);
-        $distribution = new Distribution($app->app_key, $app->secret);
-
-
-        $mainData['ali_address_info'] = [];
-        if($userAddress){
-            $mainData['user_address'] = $userAddress->getAttributes();
-            //解析1688的地址
-            $res = $distribution->requestWithToken(new GetAddress([
-                "addressInfo" => "{$userAddress->province} {$userAddress->city} {$userAddress->district}{$userAddress->detail}"
-            ]), $app->access_token);
-            if(!empty($res->error)){
-                throw new \Exception($res->error);
-            }
-            if($res instanceof GetAddressResponse){
-                $mainData['ali_address_info'] = $res->result;
-            }
-        }
-
-        //调用阿里巴巴订单预览接口计算运费
+        //计算运费
         $orderItem['express_price'] = 0;
-        if($mainData['ali_address_info']){
-            foreach($orderItem["goods_list"] as &$goodsItem){
-                $aliPreviewData = static::getAliOrderPreviewData($distribution, $app->access_token, [
-                    'offerId'   => $goodsItem['ali_offerId'],
-                    'specId'    => $goodsItem['ali_spec_id'],
-                    'quantity'  => $goodsItem['num']
-                ], $userAddress,  $mainData['ali_address_info']);
-                foreach($aliPreviewData as $previewData){
-                    $orderItem['express_price'] += floatval($previewData['sumCarriage']/100);
-                }
-            }
+        foreach($orderItem["goods_list"] as &$goodsItem){
+            $orderItem['express_price'] += $goodsItem['freight_price'];
         }
         $orderItem['express_origin_price'] = $orderItem['express_price'];
 

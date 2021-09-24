@@ -6,6 +6,7 @@ use lin010\alibaba\c2b2b\Response;
 
 class GetLogisticsInfoResponse extends Response{
 
+    public $result;
 
     /**
      * 设置数据
@@ -13,7 +14,10 @@ class GetLogisticsInfoResponse extends Response{
      * @return void
      */
     protected function setData($result) {
-        print_r($result);
-        exit;
+        if(isset($result['success']) && $result['success'] == 1){
+            $this->result = $result['result'][0];
+        }else{
+            $this->setError("查询失败");
+        }
     }
 }

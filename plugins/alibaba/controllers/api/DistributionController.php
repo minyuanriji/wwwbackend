@@ -39,7 +39,7 @@ class DistributionController extends ApiController {
         $form->mall_id = \Yii::$app->mall->id;
         $form->user_id = !\Yii::$app->user->isGuest ? \Yii::$app->user->id : 0;
 
-        $res = APICacheHelper::get($form);
+        $res = APICacheHelper::get($form, true);
         if($res['code'] == ApiCode::CODE_SUCCESS){
             $res = $res['data'];
         }

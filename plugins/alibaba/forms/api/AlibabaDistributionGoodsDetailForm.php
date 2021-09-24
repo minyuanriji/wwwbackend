@@ -148,7 +148,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                 $detail['sku_list'] = is_array($skuList) ? $skuList : [];
             }else{
                 $detail['sku_infos'] = [];
-            } 
+            }
 
             //无规格商品处理
             if(empty($detail['sku_infos']['group'])){

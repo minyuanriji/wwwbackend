@@ -11,12 +11,8 @@ echo $this->render("com-wrong-report");
             <span>财务概况</span>
         </div>
         <div class="table-body">
-
             <com-analysis-income></com-analysis-income>
-
-
         </div>
-
         <div style="margin-top:20px;">
             <com-wrong-report></com-wrong-report>
         </div>

@@ -1,3 +1,6 @@
+<?php
+Yii::$app->loadComponentView('com-user-finance-stat');
+?>
 <template id="com-analysis-income">
     <div class="com-analysis-income">
         <div flex="cross:center" >
@@ -87,9 +90,16 @@
                     </div>
                     <div v-if="red_tab_index" style="float: left;width: 90%">
                         <el-table :data="list.income_list" border style="width: 100%">
-                            <el-table-column prop="id" label="ID" width="180"></el-table-column>
-                            <el-table-column prop="income" label="收益" width="180"></el-table-column>
-                            <el-table-column prop="money" label="变动金额" width="180"></el-table-column>
+                            <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                            <el-table-column prop="user_id" label="用户信息" width="380">
+                                <template slot-scope="scope">
+                                    <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
+                                        <div>{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
+                                    </com-user-finance-stat>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="income" label="收益" width="120"></el-table-column>
+                            <el-table-column prop="money" label="变动金额" width="150"></el-table-column>
                             <el-table-column prop="desc" label="说明"  width="650"></el-table-column>
                             <el-table-column prop="created_at" label="时间">
                                 <template slot-scope="scope">
@@ -136,6 +146,13 @@
                             <el-tab-pane label="商品" name="RedEnvelopesGoods">
                                 <el-table :data="list.envelope_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                                    <el-table-column prop="user_id" label="用户信息" width="380">
+                                        <template slot-scope="scope">
+                                            <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
+                                                <div>{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
+                                            </com-user-finance-stat>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="order_no" label="订单号（点击可跳转订单）" width="240">
                                         <template slot-scope="scope">
                                            <button @click="$navigate({r: 'mall/order/index', order_no:scope.row.order_no, keyword_1:1})">{{scope.row.order_no}}</button>
@@ -154,9 +171,16 @@
                             <el-tab-pane label="商家" name="RedEnvelopesMch">
                                 <el-table :data="list.envelope_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                                    <el-table-column prop="pay_user_id" label="用户信息" width="380">
+                                        <template slot-scope="scope">
+                                            <com-user-finance-stat :user-id="parseInt(scope.row.pay_user_id)">
+                                                <div>{{scope.row.nickname}}(ID:{{scope.row.pay_user_id}})</div>
+                                            </com-user-finance-stat>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="mch_id" label="商户ID" width="100"></el-table-column>
                                     <el-table-column prop="order_no" label="订单号" width="240"></el-table-column>
-                                    <el-table-column prop="order_price" label="订单金额"  width="200"></el-table-column>
+                                    <el-table-column prop="order_price" label="订单金额"  width="150"></el-table-column>
                                     <el-table-column prop="pay_price" label="实际支付总费用"  width="200"></el-table-column>
                                     <el-table-column prop="integral_deduction_price" label="红包抵扣价"  width="180"></el-table-column>
                                     <el-table-column prop="created_at" label="时间"  width="180">
@@ -169,11 +193,18 @@
                             <el-tab-pane label="酒店" name="RedEnvelopesHotel">
                                 <el-table :data="list.envelope_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                                    <el-table-column prop="user_id" label="用户信息" width="380">
+                                        <template slot-scope="scope">
+                                            <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
+                                                <div>{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
+                                            </com-user-finance-stat>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="user_id" label="用户ID" width="100"></el-table-column>
                                     <el-table-column prop="hotel_id" label="酒店ID" width="100"></el-table-column>
                                     <el-table-column prop="order_no" label="订单号" width="240"></el-table-column>
-                                    <el-table-column prop="order_price" label="订单金额"  width="200"></el-table-column>
-                                    <el-table-column prop="pay_price" label="实际支付总费用"  width="200"></el-table-column>
+                                    <el-table-column prop="order_price" label="订单金额"  width="150"></el-table-column>
+                                    <el-table-column prop="pay_price" label="实际支付总费用"  width="150"></el-table-column>
                                     <el-table-column prop="integral_deduction_price" label="红包抵扣价"  width="180"></el-table-column>
                                     <el-table-column prop="created_at" label="时间"  width="180">
                                         <template slot-scope="scope">
@@ -185,6 +216,13 @@
                             <el-tab-pane label="大礼包" name="RedEnvelopesGiftBag">
                                 <el-table :data="list.envelope_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                                    <el-table-column prop="user_id" label="用户信息" width="380">
+                                        <template slot-scope="scope">
+                                            <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
+                                                <div>{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
+                                            </com-user-finance-stat>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="pack_id" label="礼包ID" width="100"></el-table-column>
                                     <el-table-column prop="order_sn" label="订单号" width="240"></el-table-column>
                                     <el-table-column prop="order_price" label="订单金额"  width="200"></el-table-column>
@@ -225,12 +263,19 @@
                             <el-tab-pane label="总收入" name="TotalRevenue">
                                 <el-table :data="list.withdrawal_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="80"></el-table-column>
+                                    <el-table-column prop="pay_user_id" label="用户信息" width="380">
+                                        <template slot-scope="scope">
+                                            <com-user-finance-stat :user-id="parseInt(scope.row.pay_user_id)">
+                                                <div>{{scope.row.nickname}}(ID:{{scope.row.pay_user_id}})</div>
+                                            </com-user-finance-stat>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="mch_id" label="商户ID" width="80"></el-table-column>
                                     <el-table-column prop="order_no" label="订单号" width="280"></el-table-column>
-                                    <el-table-column prop="order_price" label="订单金额" width="180"></el-table-column>
+                                    <el-table-column prop="order_price" label="订单金额" width="150"></el-table-column>
                                     <el-table-column prop="pay_price" label="实际支付金额" width="180"></el-table-column>
                                     <el-table-column prop="score_deduction_price" label="积分抵扣金额"  width="180"></el-table-column>
-                                    <el-table-column prop="integral_deduction_price" label="红包抵扣价"  width="180"></el-table-column>
+                                    <el-table-column prop="integral_deduction_price" label="红包抵扣价"  width="130"></el-table-column>
                                     <el-table-column prop="created_at" label="时间" width="180">
                                         <template slot-scope="scope">
                                             <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
@@ -241,7 +286,11 @@
                             <el-tab-pane label="已提现" name="Withdrawal">
                                 <el-table :data="list.withdrawal_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="180"></el-table-column>
-                                    <el-table-column prop="mch_id" label="商户ID" width="180"></el-table-column>
+                                    <el-table-column prop="mch_id" label="商户信息" width="380">
+                                        <template slot-scope="scope">
+                                            <div>{{scope.row.name}}(ID:{{scope.row.mch_id}})</div>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="fact_price" label="实际到账" width="180"></el-table-column>
                                     <el-table-column prop="service_fee_rate" label="提现手续费"  width="180"></el-table-column>
                                     <el-table-column prop="content" label="说明"  width="180"></el-table-column>
@@ -254,7 +303,11 @@
                             </el-tab-pane>
                             <el-tab-pane label="未提现" name="NoCashWithdrawal">
                                 <el-table :data="list.withdrawal_list" border style="width: 100%">
-                                    <el-table-column prop="id" label="商户ID" width="180"></el-table-column>
+                                    <el-table-column prop="id" label="商户信息" width="380">
+                                        <template slot-scope="scope">
+                                            <div>{{scope.row.name}}(ID:{{scope.row.id}})</div>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="user_id" label="用户ID" width="180"></el-table-column>
                                     <el-table-column prop="account_money" label="账户余额" width="180"></el-table-column>
                                     <el-table-column prop="created_at" label="时间" width="180">
@@ -292,7 +345,13 @@
                             <el-tab-pane label="红包" name="envelopes">
                                 <el-table :data="list.oper_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="180"></el-table-column>
-                                    <el-table-column prop="user_id" label="用户ID" width="180"></el-table-column>
+                                    <el-table-column prop="id" label="用户信息" width="380">
+                                        <template slot-scope="scope">
+                                            <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
+                                                <div>{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
+                                            </com-user-finance-stat>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="integral" label="变动红包" width="180"></el-table-column>
                                     <el-table-column prop="current_integral" label="当前红包"  width="180"></el-table-column>
                                     <el-table-column prop="desc" label="说明"  width="380"></el-table-column>
@@ -306,7 +365,13 @@
                             <el-tab-pane label="收益" name="NoCashWithdrawal">
                                 <el-table :data="list.oper_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                                    <el-table-column prop="user_id" label="用户ID" width="100"></el-table-column>
+                                    <el-table-column prop="id" label="用户信息" width="380">
+                                        <template slot-scope="scope">
+                                            <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
+                                                <div>{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
+                                            </com-user-finance-stat>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="income" label="收益" width="180"></el-table-column>
                                     <el-table-column prop="money" label="变动金额" width="180"></el-table-column>
                                     <el-table-column prop="desc" label="说明"  width="500"></el-table-column>
@@ -320,7 +385,13 @@
                             <el-tab-pane label="购物券" name="ShoppingVoucher">
                                 <el-table :data="list.oper_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="180"></el-table-column>
-                                    <el-table-column prop="user_id" label="用户ID" width="180"></el-table-column>
+                                    <el-table-column prop="id" label="用户信息" width="380">
+                                        <template slot-scope="scope">
+                                            <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
+                                                <div>{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
+                                            </com-user-finance-stat>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column prop="money" label="充值购物券" width="180"></el-table-column>
                                     <el-table-column prop="current_money" label="充值前购物券" width="180"></el-table-column>
                                     <el-table-column prop="desc" label="说明"  width="380"></el-table-column>

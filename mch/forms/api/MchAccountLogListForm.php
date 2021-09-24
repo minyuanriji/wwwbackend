@@ -10,9 +10,11 @@ class MchAccountLogListForm extends BaseModel{
     public $mch_id;
     public $type;
     public $created_at;
+    public $page;
 
     public function rules(){
         return [
+            [['page'], 'integer'],
             [['mch_id'], 'required'],
             [['type','created_at'], 'string']
         ];

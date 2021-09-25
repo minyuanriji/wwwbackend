@@ -49,12 +49,10 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 <el-table :data="list" size="small" border v-loading="loading" style="margin-top:20px;margin-bottom: 15px">
                     <el-table-column label="基本信息">
                         <template slot-scope="scope">
-                                <com-image mode="aspectFill" :src="scope.row.user.avatar" style="float: left;margin-right: 10px"></com-image>
-
+                            <com-image mode="aspectFill" :src="scope.row.user.avatar" style="float: left;margin-right: 10px"></com-image>
                             <com-user-finance-stat :user-id="parseInt(scope.row.user_id)">
                                 {{scope.row.user.nickname}}
                             </com-user-finance-stat>
-
                             <img src="statics/img/mall/wx.png" v-if="scope.row.user.platform == 'wxapp'" alt="">
                             <img src="statics/img/mall/ali.png" v-else-if="scope.row.user.platform == 'aliapp'" alt="">
                             <img src="statics/img/mall/toutiao.png" v-else-if="scope.row.user.platform == 'ttapp'" alt="">

@@ -55,7 +55,7 @@ class CashListForm extends BaseModel
             ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]])
             ->keyword($this->status >= 0, ['c.status' => $this->status])
             ->keyword($this->user_id, ['c.user_id' => $this->user_id])
-            ->select('c.*,u.*');
+            ->select('c.*,u.nickname,u.mobile,u.avatar_url');
 
         $query->orderBy(['c.status' => SORT_ASC, 'c.created_at' => SORT_DESC]);
         if ($this->keyword) {

@@ -96,7 +96,7 @@ class ApiController extends BaseController
             $path = dirname(ROOT_PATH) . "/runtime/mp-wx";
             !is_dir($path) && mkdir($path, 0755, true);
             $currentVersion = @file_get_contents("{$path}/{$appId}.version");
-            if((empty($version) || $version != trim($currentVersion))){
+            if(false && (empty($version) || $version != trim($currentVersion))){
                 @file_put_contents("{$path}/{$appId}.debug", json_encode([
                     "version" => $version
                 ]));

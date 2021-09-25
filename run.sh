@@ -6,7 +6,7 @@ phpexe="/www/server/php/73/bin/php";
 chmod a+x "$basepath/yii"
 
 
-command1="add-queue-task/execute"
+#command1="add-queue-task/execute"
 #command2="user-relationship-link/maintant-job"
 #command3="commission/maintant-job"
 #command4="efps-transfer/maintant-job"

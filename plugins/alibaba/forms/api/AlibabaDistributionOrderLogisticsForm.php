@@ -84,7 +84,8 @@ class AlibabaDistributionOrderLogisticsForm extends BaseModel{
         $pattern = "/(快递|速递|快运|速运)/";
         if(preg_match($pattern, $name, $matches)){
             $tail = $matches[1];
-            $str = preg_replace($pattern, "", $name);
+            $str = substr($name, 0, strpos($name, $matches[1]));
+            //$str = preg_replace($pattern, "", $name);
             $similars = [];
             foreach($expressList as $item){
                 if(strpos($item['name'], $str) !== FALSE){

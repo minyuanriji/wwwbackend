@@ -41,10 +41,10 @@ class AlibabaDistributionOrderLogisticsForm extends BaseModel{
             }
 
             $app = AlibabaApp::findOne($detail1688->app_id);
-            $app->app_key = "9949219";
+            /*$app->app_key = "9949219";
             $app->secret = "VCzUExEsGEt";
             $app->access_token = "dc7fde2f-f52c-4547-be45-d7f29012df32";
-            $detail1688->ali_order_id = "2127541537039809970";
+            $detail1688->ali_order_id = "2127541537039809970";*/
 
             $distribution = new Distribution($app->app_key, $app->secret);
             $res = $distribution->requestWithToken(new GetLogisticsInfo([

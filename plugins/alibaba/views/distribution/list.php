@@ -28,7 +28,7 @@ Yii::$app->loadComponentView('com-rich-text');
                 <el-button type="primary"  @click="aliGoodsDialogVisible = true">添加商品</el-button>
             </div>
 
-            <el-table :data="list" border style="width: 100%" v-loading="loading" @selection-change="handleSelectionChange">
+            <el-table  @sort-change="sortReload"  :data="list" border style="width: 100%" v-loading="loading" @selection-change="handleSelectionChange">
                 <el-table-column align='center' type="selection" width="60"></el-table-column>
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
                 <el-table-column label="类目" width="200">
@@ -58,7 +58,7 @@ Yii::$app->loadComponentView('com-rich-text');
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="price_rate" width="110" label="零售比（%）"></el-table-column>
+                <el-table-column prop="price_rate"  sortable="custom"  width="110" label="零售比（%）"></el-table-column>
                 <!--
                 <el-table-column prop="origin_price_rate" width="110" label="划线比（%）"></el-table-column>
                 -->
@@ -330,7 +330,9 @@ Yii::$app->loadComponentView('com-rich-text');
                 aliGoodsDialogVisible: false,
                 activeName: 'first',
                 searchData: {
-                    keyword: ''
+                    keyword: '',
+                    sort_prop: '',
+                    sort_type: '',
                 },
                 date: '',
                 list: [],
@@ -364,6 +366,12 @@ Yii::$app->loadComponentView('com-rich-text');
             };
         },
         methods: {
+            sortReload(column){
+                console.log(column);
+                this.searchData.sort_prop = column.prop;
+                this.searchData.sort_type = column.order == "descending" ? 'DESC' : 'ASC';
+                this.getList();
+            },
             priceRateChanged(row){
                 let rate = (parseFloat(row['price_rate'])/100);
                 row['price'] = rate * parseFloat(row['ali_data_json']['currentPrice']);

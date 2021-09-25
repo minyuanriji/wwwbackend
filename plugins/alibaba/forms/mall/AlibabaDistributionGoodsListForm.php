@@ -14,11 +14,13 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
     public $page;
     public $app_id;
     public $keyword;
+    public $sort_prop;
+    public $sort_type;
 
     public function rules(){
         return [
             [['page', 'app_id'], 'integer'],
-            [['keyword'], 'string'],
+            [['keyword', 'sort_type', 'sort_prop'], 'string'],
         ];
     }
 
@@ -46,7 +48,11 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
                 $query->andWhere(['like','g.name',$this->keyword]);
             }
 
-            $orderBy = "g.id DESC";
+            if ($this->sort_prop && $this->sort_type) {
+                $orderBy = 'g.' . $this->sort_prop . ($this->sort_type ? ' ' . $this->sort_type : ' DESC');
+            } else {
+                $orderBy = "g.id DESC";
+            }
             $query->orderBy($orderBy);
 
             $list = $query->asArray()->page($pagination, 20, $this->page)->all();

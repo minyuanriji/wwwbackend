@@ -34,6 +34,7 @@ class AlibabaDistributionOrderListForm extends BaseModel{
             return $this->returnApiResultData();
         }
 
+
         try {
             $query = AlibabaDistributionOrderDetail1688::find()->alias("od1688");
             $query->innerJoin(["od" => AlibabaDistributionOrderDetail::tableName()], "od.id=od1688.order_detail_id");
@@ -46,12 +47,13 @@ class AlibabaDistributionOrderListForm extends BaseModel{
             ]);
             $query->select(["od1688.id", "g.cover_url", "g.name", "o.shopping_voucher_express_use_num", "od.num", "od.shopping_voucher_num", "od.sku_labels"]);
 
-            $list = $query->asArray()->orderBy("o.id DESC")->page($pagination, $this->limit)->all();
+            $list = $query->asArray()->orderBy("o.id DESC")->page($pagination, $this->limit, $this->page)->all();
 
             if ($list) {
                 foreach ($list as &$item) {
                     $item['sku_labels'] = $item['sku_labels'] ? @json_decode($item['sku_labels'], true) : [];
                 }
+
             }
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'', [
                 'list' => $list,

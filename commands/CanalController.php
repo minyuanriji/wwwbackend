@@ -19,11 +19,13 @@ class CanalController extends Controller
 
     public function actionIndex()
     {
+        echo date("Y-m-d H:i:s") . " Canal守候程序启动...完成\n";
+
         try {
             $client = CanalConnectorFactory::createClient(CanalClient::TYPE_SOCKET_CLUE);
             # $client = CanalConnectorFactory::createClient(CanalClient::TYPE_SWOOLE);
 
-            $client->connect("81.71.7.222", 11111);
+            $client->connect("111.230.197.124", 11111);
             $client->checkValid();
 
             $client->subscribe("1001", "example", "myrj.*");
@@ -100,7 +102,7 @@ class CanalController extends Controller
                                 ];
                             }
                             if(method_exists($tableClass, "update")){
-                                echo "Run update:" . $tableClassName . "\n";
+                                echo "Table:{$tableName},Run update:" . $tableClassName . "\n";
                                 $tableClass->update($mixDatas);
                             }
                         }

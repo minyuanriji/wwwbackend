@@ -114,9 +114,9 @@ class ApiController extends BaseController
                 $curl->setOpt(CURLOPT_SSL_VERIFYHOST, false);
                 $curl->setOpt(CURLOPT_CONNECTTIMEOUT, 10);
                 $curl->setOpt(CURLOPT_TIMEOUT, 15);
-                //$curl->post($url, $this->requestData);
-                //header('Content-Type:application/json; charset=utf-8');
-                //die($curl->getResponse());
+                $curl->post($url, $this->requestData);
+                header('Content-Type:application/json; charset=utf-8');
+                die($curl->getResponse());
             }
         }
 

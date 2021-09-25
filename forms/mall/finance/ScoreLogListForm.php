@@ -1,20 +1,13 @@
 <?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-13
- * Time: 14:32
- */
 
 namespace app\forms\mall\finance;
 
-
 use app\core\ApiCode;
+use app\forms\mall\export\ScoreLogExport;
 use app\helpers\SerializeHelper;
 use app\models\BaseModel;
 use app\models\ScoreLog;
+use app\models\User;
 
 class ScoreLogListForm extends BaseModel
 {
@@ -24,12 +17,17 @@ class ScoreLogListForm extends BaseModel
     public $end_date;
     public $keyword;
     public $user_id;
+    public $source_type;
+    public $flag;
+    public $fields;
 
     public function rules()
     {
         return [
             [['page', 'limit', 'user_id'], 'integer'],
-            [['keyword', 'start_date', 'end_date'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'source_type', 'flag'], 'trim'],
+            [['fields'], 'safe'],
+
         ];
     }
     public function getList()
@@ -37,32 +35,77 @@ class ScoreLogListForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
+
         $query = ScoreLog::find()->alias('b')->where([
             'b.mall_id' => \Yii::$app->mall->id,
-        ])->joinwith(['user' => function ($query) {
-            if ($this->keyword) {
-                $query->andWhere(['or', ['like', 'mobile', $this->keyword], ['like', 'nickname', $this->keyword]]);
-            }
-        }])->orderBy('id desc');
+        ])->innerJoin(["u" => User::tableName()], "u.id=b.user_id")
+          ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]])
+          ->select(["b.*", "u.nickname", "u.mobile"]);
+
+        if (!empty($this->keyword)) {
+            $query->andWhere([
+                "OR",
+                "u.nickname LIKE '%" . $this->keyword . "%'",
+                "u.mobile LIKE '%" . $this->keyword . "%'",
+            ]);
+        }
+
         if ($this->user_id) {
             $query->andWhere(['b.user_id' => $this->user_id]);
         }
+
         if ($this->start_date && $this->end_date) {
             $query->andWhere(['<', 'b.created_at', strtotime($this->end_date)])
                 ->andWhere(['>', 'b.created_at', strtotime($this->start_date)]);
         }
-        $list = $query->page($pagination, $this->limit)->asArray()->all();
-        foreach ($list as &$v) {
-            $v['info_desc'] = $v['custom_desc'] ? SerializeHelper::decode($v['custom_desc']) : [];
+
+        if ($this->source_type) {
+            switch ($this->source_type)
+            {
+                case 'order':
+                    $query->andWhere(['and', ['b.source_type' => 'normal'], ['like', 'b.desc', '下单积分抵扣']]);
+                    break;
+                case 'order_cancellation':
+                    $query->andWhere(['and', ['b.source_type' => 'normal'], ['like', 'b.desc', '商品订单取消']]);
+                    break;
+                case 'sign_in':
+                    $query->andWhere(['and', ['b.source_type' => 'normal'], ['like', 'b.desc', '签到赠送积分']]);
+                    break;
+                case 'admin':
+                    $query->andWhere(['and', ['b.source_type' => 'normal'], ['like', 'b.desc', '管理员']]);
+                    break;
+                case 'give':
+                    $query->andWhere(['and', ['b.source_type' => 'normal'], ['like', 'b.desc', '订单购买赠送']]);
+                    break;
+                default:
+                    $query->andWhere(['b.source_type' => $this->source_type]);
+            }
         }
-        unset($v);
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'data' => [
-                'list' => $list,
-                'pagination' => $pagination
-            ]
-        ];
+
+        if ($this->flag == "EXPORT") {
+            $new_query = clone $query;
+            $exp = new ScoreLogExport();
+            $exp->fieldsKeyList = $this->fields;
+            $exp->export($new_query, 'b.');
+            return false;
+        }
+
+        $list = $query->orderBy('b.id desc')->page($pagination, $this->limit)->asArray()->all();
+
+        if ($list) {
+            foreach ($list as &$v) {
+                if ($v['source_type'] != 'giftpacks_order') {
+                    $v['info_desc'] = $v['custom_desc'] ? SerializeHelper::decode($v['custom_desc']) : [];
+                }
+            }
+            unset($v);
+        }
+
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
+            'list' => $list,
+            'export_list' => (new ScoreLogExport())->fieldsList(),
+            'pagination' => $pagination
+        ]);
 
     }
 

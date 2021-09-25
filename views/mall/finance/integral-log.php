@@ -7,7 +7,10 @@ Yii::$app->loadComponentView('com-user-finance-stat');
         <div slot="header">
             <div>
                 <span>红包记录</span>
-                <div style="float: right;margin: -5px 0">
+                <div style="float: right;">
+                    <com-export-dialog :field_list='export_list' :params="searchData" @selected="exportConfirm"></com-export-dialog>
+                </div>
+                <div style="float: right;margin-right: 20px" >
                     <el-button @click="handleIntegral" type="primary" size="small">红包充值</el-button>
                 </div>
             </div>
@@ -36,7 +39,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     <el-select style="width: 120px;" size="small" v-model="source_type" @change='search'>
                         <el-option key="" label="全部" value=""></el-option>
                         <el-option key="order" label="订单" value="order"></el-option>
-                        <el-option key="order_refund" label="订单退款" value="order_refund"></el-option>
+<!--                        <el-option key="order_refund" label="订单退款" value="order_refund"></el-option>-->
                         <el-option key="mch_checkout_order" label="商家扫码" value="mch_checkout_order"></el-option>
                         <el-option key="admin" label="管理员操作" value="admin"></el-option>
                         <el-option key="hotel_order" label="酒店订单" value="hotel_order"></el-option>
@@ -96,12 +99,11 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             <!--工具条 批量操作和分页-->
             <el-col :span="24" class="toolbar">
                 <el-pagination
-                        background
-                        layout="prev, pager, next"
                         @current-change="pageChange"
                         :page-size="pagination.pageSize"
+                        layout="prev, pager, next, jumper"
                         :total="pagination.total_count"
-                        style="float:right;margin:15px"
+                        style="text-align: center;margin-top: 20px;"
                         v-if="pagination">
                 </el-pagination>
             </el-col>
@@ -160,7 +162,6 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     price: 0.00,
                     nickname: '',
                     remark: '',
-                    is_manual: 1,
                     source_type:''
                 },
                 forDlgSelect:{
@@ -192,8 +193,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     keyword: '',
                     date: '',
                     start_date: '',
-                    end_at: '',
-                    is_manual: '',
+                    end_date: '',
                     source_type:''
                 },
                 date: '',
@@ -202,9 +202,10 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 pagination: null,
                 listLoading: false,
                 dialogIntegral: false,
-                is_manual: '',
                 source_type:'',
                 Statistics: '',
+                page: 1,
+                export_list: [],
             };
         },
         methods: {
@@ -256,6 +257,10 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             search(e) {
                 console.log(e);
                 this.page = 1;
+                this.form = '';
+                this.Statistics = '';
+                this.pagination = '';
+                this.export_list = [];
                 if (this.date == null) {
                     this.date = ''
                 }
@@ -272,7 +277,13 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 this.page = 1;
                 this.search();
             },
-
+            exportConfirm() {
+                this.searchData.keyword = this.keyword;
+                this.searchData.date = this.date;
+                this.searchData.start_date = this.date[0];
+                this.searchData.end_date = this.date[1];
+                this.searchData.source_type = this.source_type;
+            },
             getList() {
                 let params = {
                     r: 'mall/finance/integral-log',
@@ -280,7 +291,6 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     date: this.date,
                     user_id: getQuery('user_id'),
                     keyword: this.keyword,
-                    is_manual: this.is_manual,
                     source_type: this.source_type,
                 };
                 if (this.date) {
@@ -295,6 +305,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     if (e.data.code === 0) {
                         this.form = e.data.data.list;
                         this.Statistics = e.data.data.Statistics;
+                        this.export_list = e.data.data.export_list;
                         this.pagination = e.data.data.pagination;
                     } else {
                         this.$message.error(e.data.msg);

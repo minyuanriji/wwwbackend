@@ -154,7 +154,16 @@ class FinanceController extends MallController
             $form->attributes = \Yii::$app->request->get();
             return $this->asJson($form->getList());
         } else {
-            return $this->render('score-log');
+            if (\Yii::$app->request->post('flag') === 'EXPORT') {
+                $fields = explode(',', \Yii::$app->request->post('fields'));
+                $form = new ScoreLogListForm();
+                $form->attributes = \Yii::$app->request->post();
+                $form->fields = $fields;
+                $form->getList();
+                return false;
+            } else {
+                return $this->render('score-log');
+            }
         }
     }
 
@@ -430,7 +439,16 @@ class FinanceController extends MallController
             $form->attributes = \Yii::$app->request->get();
             return $this->asJson($form->getList());
         } else {
-            return $this->render('integral-log');
+            if (\Yii::$app->request->post('flag') === 'EXPORT') {
+                $fields = explode(',', \Yii::$app->request->post('fields'));
+                $form = new IntegralLogListForm();
+                $form->attributes = \Yii::$app->request->post();
+                $form->fields = $fields;
+                $form->getList();
+                return false;
+            } else {
+                return $this->render('integral-log');
+            }
         }
     }
 

@@ -10,9 +10,11 @@ class MchAccountLogListForm extends BaseModel{
     public $mch_id;
     public $type;
     public $created_at;
+    public $page;
 
     public function rules(){
         return [
+            [['page'], 'integer'],
             [['mch_id'], 'required'],
             [['type','created_at'], 'string']
         ];
@@ -41,7 +43,7 @@ class MchAccountLogListForm extends BaseModel{
             $query->andWhere('FROM_UNIXTIME(mal.created_at,"%Y年%m月")="'.$this->created_at.'"');
         }
 
-        $list = $query->page($pagination)
+        $list = $query->page($pagination, 10, $this->page)
                       ->orderBy(['mal.created_at' => SORT_DESC])
                       ->asArray()
                       ->all();

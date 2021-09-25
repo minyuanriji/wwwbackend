@@ -3,6 +3,7 @@
 namespace app\forms\mall\finance;
 
 use app\core\ApiCode;
+use app\forms\mall\export\IntegralLogExport;
 use app\models\BaseModel;
 use app\models\IntegralLog;
 use app\models\User;
@@ -15,15 +16,17 @@ class IntegralLogListForm extends BaseModel
     public $end_date;
     public $keyword;
     public $user_id;
-    public $is_manual;
     public $source_type;
+    public $flag;
+    public $fields;
 
     public function rules()
     {
         return [
             [['page', 'limit', 'user_id'], 'integer'],
-            [['keyword', 'start_date', 'end_date', 'source_type'], 'trim'],
-            [['is_manual',], 'safe'],
+            [['keyword', 'start_date', 'end_date', 'source_type', 'flag'], 'trim'],
+            [['fields'], 'safe'],
+
         ];
     }
 
@@ -51,8 +54,18 @@ class IntegralLogListForm extends BaseModel
             ]);
         }
 
-        if ($this->is_manual != '') {
-            $query->andWhere(['il.is_manual' => $this->is_manual]);
+        if ($this->source_type) {
+            switch ($this->source_type)
+            {
+                case 'order':
+                    $query->andWhere(['and', ['il.source_type' => 'record'], ['like', 'il.desc', '订单']]);
+                    break;
+                case 'mch_checkout_order':
+                    $query->andWhere(['and', ['il.source_type' => 'record'], ['like', 'il.desc', '商家']]);
+                    break;
+                default:
+                    $query->andWhere(['il.source_type' => $this->source_type]);
+            }
         }
 
         if ($this->start_date && $this->end_date) {
@@ -60,9 +73,14 @@ class IntegralLogListForm extends BaseModel
                 ->andWhere(['>', 'il.created_at', strtotime($this->start_date)]);
         }
 
-        $selects = ["il.*", "u.nickname"];
-
-        $query->select($selects);
+        $query->select(["il.*", "u.nickname", "u.mobile"]);
+        if ($this->flag == "EXPORT") {
+            $new_query = clone $query;
+            $exp = new IntegralLogExport();
+            $exp->fieldsKeyList = $this->fields;
+            $exp->export($new_query, 'il.');
+            return false;
+        }
         $incomeQuery = clone $query;
         $income = $incomeQuery->andWhere(['il.type' => 1])->sum('il.integral');
         $expendQuery = clone $query;
@@ -79,6 +97,7 @@ class IntegralLogListForm extends BaseModel
         }
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
             'list' => $list,
+            'export_list' => (new IntegralLogExport())->fieldsList(),
             'Statistics' => [
                 'income' => $income ?: 0,
                 'expend' => $expend ?: 0,

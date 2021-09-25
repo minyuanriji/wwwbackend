@@ -9,6 +9,7 @@ use app\models\Goods;
 use app\models\IncomeLog;
 use app\models\IntegralLog;
 use app\models\OrderDetail;
+use app\models\Store;
 use app\models\User;
 use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
 use app\plugins\giftpacks\models\GiftpacksOrder;
@@ -53,7 +54,8 @@ class FinanceIncomeStatForm extends BaseModel
                 case 'TotalRevenue':
                     $IncomeQuery = IncomeLog::find()->alias('i')
                                 ->innerJoin(['u' => User::tableName()], 'u.id=i.user_id')
-                                ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', null], ['u.is_delete' => 0], ['i.is_delete' => 0], ['i.mall_id' => \Yii::$app->mall->id]]);
+                                ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', null], ['u.is_delete' => 0], ['i.is_delete' => 0], ['i.mall_id' => \Yii::$app->mall->id]])
+                                ->select(['i.*', 'u.nickname']);
 
                     $this->mergeWhere($IncomeQuery, $dayStartTime, $dayEndTime, $timeStart, 'i');
                     $FrozenQuery = clone $IncomeQuery;
@@ -100,13 +102,19 @@ class FinanceIncomeStatForm extends BaseModel
                                     ['o.is_recycle' => 0],
                                     ['>', 'o.integral_deduction_price' , 0],
                                     ['o.mall_id' => \Yii::$app->mall->id],
-                                ]);
+                                ])
+                                ->select(['o.*', 'u.nickname']);
                     $this->mergeWhere($orderQuery, $dayStartTime, $dayEndTime, $timeStart, 'o');
                     $list['order_envelope'] = $orderQuery->sum('o.integral_deduction_price') ?: 0;
                     //已经使用的红包--商家
-                    $MchQuery = MchCheckoutOrder::find()->where(array_merge($mall_id, ['is_pay' => 1]))->andWhere(['>','integral_deduction_price',0]);
-                    $this->mergeWhere($MchQuery, $dayStartTime, $dayEndTime, $timeStart);
-                    $list['mch_envelope'] = $MchQuery->sum('integral_deduction_price') ?: 0;
+                    $MchQuery = MchCheckoutOrder::find()->alias('mco')
+                        ->innerJoin(['u' => User::tableName()], 'u.id=mco.pay_user_id')
+                        ->where(['mco.mall_id' => \Yii::$app->mall->id, 'mco.is_pay' => 1])
+                        ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', null], ['>', 'mco.integral_deduction_price', 0]])
+                        ->select(['mco.*', 'u.nickname']);
+
+                    $this->mergeWhere($MchQuery, $dayStartTime, $dayEndTime, $timeStart, 'mco');
+                    $list['mch_envelope'] = $MchQuery->sum('mco.integral_deduction_price') ?: 0;
 
                     //已经使用的红包--酒店
                     $HotelQuery = HotelOrder::find()->alias('h')
@@ -120,14 +128,20 @@ class FinanceIncomeStatForm extends BaseModel
                             ['h.pay_type' => 'integral'],
                             ['>', 'h.integral_deduction_price', 0],
                             ['h.mall_id' => \Yii::$app->mall->id],
-                        ]);
+                        ])
+                        ->select(['h.*', 'u.nickname']);
                     $this->mergeWhere($HotelQuery, $dayStartTime, $dayEndTime, $timeStart, 'h');
                     $list['hotel_envelope'] = $HotelQuery->sum('h.integral_deduction_price') ?: 0;
 
                     //已经使用的红包--大礼包
-                    $GiftQuery = GiftpacksOrder::find()->where(array_merge($mall_id, ['pay_status' => 'paid', 'pay_type' => 'integral']))->andWhere(['>','integral_deduction_price',0]);
-                    $this->mergeWhere($GiftQuery, $dayStartTime, $dayEndTime, $timeStart);
-                    $list['gift_envelope'] = $GiftQuery->sum('integral_deduction_price') ?: 0;
+                    $GiftQuery = GiftpacksOrder::find()->alias('go')
+                        ->innerJoin(['u' => User::tableName()], 'u.id=go.user_id')
+                        ->where(['go.mall_id' => \Yii::$app->mall->id, 'go.pay_status' => 'paid', 'go.pay_type' => 'integral'])
+                        ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', null], ['>', 'go.integral_deduction_price', 0]])
+                        ->select(['go.*', 'u.nickname']);
+                    $this->mergeWhere($GiftQuery, $dayStartTime, $dayEndTime, $timeStart, 'go');
+                    $list['gift_envelope'] = $GiftQuery->sum('go.integral_deduction_price') ?: 0;
+
                     $GiftGroupQuery = GiftpacksGroupPayOrder::find()->where(array_merge($mall_id, ['pay_status' => 'paid', 'pay_type' => 'integral']))->andWhere(['>','integral_deduction_price',0]);
                     if (!empty($this->date_start) && !empty($this->date_end)) {
                         $GiftGroupQuery->andWhere([
@@ -151,13 +165,13 @@ class FinanceIncomeStatForm extends BaseModel
                             $list['envelope_list'] = $orderQuery->page($Pagination, $this->limit)->orderBy('o.id DESC')->asArray()->all();
                             break;
                         case 'RedEnvelopesMch':
-                            $list['envelope_list'] = $MchQuery->page($Pagination, $this->limit)->orderBy('id DESC')->asArray()->all();
+                            $list['envelope_list'] = $MchQuery->page($Pagination, $this->limit)->orderBy('mco.id DESC')->asArray()->all();
                             break;
                         case 'RedEnvelopesHotel':
                             $list['envelope_list'] = $HotelQuery->page($Pagination, $this->limit)->orderBy('h.id DESC')->asArray()->all();
                             break;
                         case 'RedEnvelopesGiftBag':
-                            $list['envelope_list'] = $GiftQuery->page($Pagination, $this->limit)->orderBy('id DESC')->asArray()->all();
+                            $list['envelope_list'] = $GiftQuery->page($Pagination, $this->limit)->orderBy('go.id DESC')->asArray()->all();
                             break;
                         default;
                     }
@@ -165,32 +179,54 @@ class FinanceIncomeStatForm extends BaseModel
                 //商户
                 case 'Merchant':
                     //总收入
-                    $mchCheckoutQuery = MchCheckoutOrder::find()->where(array_merge($mall_id, ['is_pay' => 1]));
+                    $mchCheckoutQuery = MchCheckoutOrder::find()->alias('mco')
+                        ->innerJoin(['u' => User::tableName()], 'u.id=mco.pay_user_id')
+                        ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', null], ['u.is_delete' => 0], ['mco.is_pay' => 1], ['mco.mall_id' => \Yii::$app->mall->id]])
+                        ->select(['mco.*', 'u.nickname']);
                     $this->mergeWhere($mchCheckoutQuery, $dayStartTime, $dayEndTime, $timeStart);
-                    $list['CheckoutPrice'] = $mchCheckoutQuery->sum('order_price') ?: 0;
+                    $list['CheckoutPrice'] = $mchCheckoutQuery->sum('mco.order_price') ?: 0;
+
                     //商户  --- 已提现
-                    $MchCashQuery = MchCash::find()->where(["status" => 1, "transfer_status" => 1, "is_delete" => 0, "type" => "efps_bank"]);
-                    $this->mergeWhere($MchCashQuery, $dayStartTime, $dayEndTime, $timeStart);
-                    $list['withdrawn_cash'] = $MchCashQuery->sum('money') ?: 0;
+                    $MchCashQuery = MchCash::find()->alias('mc')
+                        ->leftJoin(['s' => Store::tableName()], 's.mch_id=mc.mch_id')
+                        ->where(["mc.status" => 1, "mc.transfer_status" => 1, "mc.is_delete" => 0, "mc.type" => "efps_bank", "mc.mall_id" => \Yii::$app->mall->id])
+                        ->select('mc.*, s.name');
+                    $this->mergeWhere($MchCashQuery, $dayStartTime, $dayEndTime, $timeStart, 'mc');
+                    $list['withdrawn_cash'] = $MchCashQuery->sum('mc.money') ?: 0;
+
                     //商户  --- 未提现
-                    $MchNotQuery = Mch::find()->where(array_merge($mall_id, ['review_status' => 1, 'status' => 1, 'is_delete' => 0]))->andWhere(['>','account_money',0]);
-                    $this->mergeWhere($MchNotQuery, $dayStartTime, $dayEndTime, $timeStart);
-                    $list['No_cash_withdrawal'] = $MchNotQuery->sum('account_money') ?: 0;
+                    $MchNotQuery = Mch::find()->alias('m')
+                        ->leftJoin(['s' => Store::tableName()], 's.mch_id=m.id')
+                        ->where(['m.review_status' => 1, 'm.status' => 1, 'm.is_delete' => 0, "m.mall_id" => \Yii::$app->mall->id])
+                        ->andWhere(['>', 'm.account_money', 0])
+                        ->select('m.*, s.name');
+                    $this->mergeWhere($MchNotQuery, $dayStartTime, $dayEndTime, $timeStart, 'm');
+                    $list['No_cash_withdrawal'] = $MchNotQuery->sum('m.account_money') ?: 0;
 
                     if ($this->second_type == 'Withdrawal') { //--- 已提现
-                        $list['withdrawal_list'] = $MchCashQuery->page($Pagination, $this->limit)->orderBy('id DESC')->asArray()->all();
+                        $list['withdrawal_list'] = $MchCashQuery->page($Pagination, $this->limit)->orderBy('mc.id DESC')->asArray()->all();
                     } elseif($this->second_type == 'NoCashWithdrawal') { //未提现
-                        $list['withdrawal_list'] = $MchNotQuery->page($Pagination, $this->limit)->orderBy('account_money DESC')->asArray()->all();
+                        $list['withdrawal_list'] = $MchNotQuery->page($Pagination, $this->limit)->orderBy('m.account_money DESC')->asArray()->all();
                     } elseif($this->second_type == 'TotalRevenue') { //总收入
-                        $list['withdrawal_list'] = $mchCheckoutQuery->page($Pagination, $this->limit)->orderBy('id DESC')->asArray()->all();
+                        $list['withdrawal_list'] = $mchCheckoutQuery->page($Pagination, $this->limit)->orderBy('mco.id DESC')->asArray()->all();
                     }
                     break;
                 //管理员充值
                 case 'adminRecharge':
                     //管理员操作  --- 红包
                     $IntAdminQuery = IntegralLog::find()->alias('i')
-                                ->innerJoin(['u' => User::tableName()], 'u.id=i.user_id')
-                                ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', null], ['u.is_delete' => 0], ['i.is_manual' => 1], ['i.type' => 1], ['i.source_type' => 'admin'], ['i.mall_id' => \Yii::$app->mall->id]]);
+                        ->innerJoin(['u' => User::tableName()], 'u.id=i.user_id')
+                        ->andWhere([
+                            'and',
+                            ['<>', 'u.mobile', ''],
+                            ['IS NOT', 'u.mobile', null],
+                            ['u.is_delete' => 0],
+                            ['i.is_manual' => 1],
+                            ['i.type' => 1],
+                            ['i.source_type' => 'admin'],
+                            ['i.mall_id' => \Yii::$app->mall->id]])
+                        ->select('i.*, u.nickname');
+
                     if (!empty($this->date_start) && !empty($this->date_end)) {
                         $IntAdminQuery->andWhere([
                             "AND",
@@ -205,14 +241,32 @@ class FinanceIncomeStatForm extends BaseModel
                     //收益
                     $IncomeQuery = IncomeLog::find()->alias('i')
                         ->innerJoin(['u' => User::tableName()], 'u.id=i.user_id')
-                        ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', null], ['u.is_delete' => 0], ['i.is_delete' => 0], ['i.source_type' => 'admin'], ['i.is_manual' => 1], ['i.type' => 1], ['i.mall_id' => \Yii::$app->mall->id]]);
+                        ->andWhere([
+                            'and',
+                            ['<>', 'u.mobile', ''],
+                            ['IS NOT', 'u.mobile', null],
+                            ['u.is_delete' => 0],
+                            ['i.is_delete' => 0],
+                            ['i.source_type' => 'admin'],
+                            ['i.is_manual' => 1],
+                            ['i.type' => 1],
+                            ['i.mall_id' => \Yii::$app->mall->id]])
+                        ->select('i.*, u.nickname');
                     $this->mergeWhere($IncomeQuery, $dayStartTime, $dayEndTime, $timeStart, 'i');
                     $list['Income'] = $IncomeQuery->sum('i.income') ?: 0;
 
                     //购物券
                     $shopQuery = ShoppingVoucherLog::find()->alias('s')
                         ->innerJoin(['u' => User::tableName()], 'u.id=s.user_id')
-                        ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', null], ['u.is_delete' => 0], ['s.type' => 1], ['s.source_type' => 'admin'], ['s.mall_id' => \Yii::$app->mall->id]]);
+                        ->andWhere([
+                            'and',
+                            ['<>', 'u.mobile', ''],
+                            ['IS NOT', 'u.mobile', null],
+                            ['u.is_delete' => 0],
+                            ['s.type' => 1],
+                            ['s.source_type' => 'admin'],
+                            ['s.mall_id' => \Yii::$app->mall->id]])
+                        ->select('s.*, u.nickname');
                     $this->mergeWhere($shopQuery, $dayStartTime, $dayEndTime, $timeStart, 's');
                     $list['ShoppingVoucher'] = $shopQuery->sum('s.money') ?: 0;
 

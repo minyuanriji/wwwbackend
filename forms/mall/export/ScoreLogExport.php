@@ -4,7 +4,7 @@ namespace app\forms\mall\export;
 
 use app\core\CsvExport;
 
-class IncomeLogExport extends BaseExport
+class ScoreLogExport extends BaseExport
 {
     public function fieldsList()
     {
@@ -22,20 +22,20 @@ class IncomeLogExport extends BaseExport
                 'value' => '用户手机号',
             ],
             [
+                'key' => 'score',
+                'value' => '积分',
+            ],
+            [
                 'key' => 'type',
-                'value' => '金额类型',
-            ],
-            [
-                'key' => 'money',
-                'value' => '金额',
-            ],
-            [
-                'key' => 'created_at',
-                'value' => '支付日期',
+                'value' => '状态',
             ],
             [
                 'key' => 'desc',
                 'value' => '说明',
+            ],
+            [
+                'key' => 'created_at',
+                'value' => '充值日期',
             ],
         ];
     }
@@ -48,7 +48,7 @@ class IncomeLogExport extends BaseExport
         $this->getFields();
         $dataList = $this->getDataList();
 
-        $fileName = '用户收益记录' . date('YmdHis');
+        $fileName = '用户积分记录' . date('YmdHis');
         (new CsvExport())->export($dataList, $this->fieldsNameList, $fileName);
     }
 
@@ -59,16 +59,15 @@ class IncomeLogExport extends BaseExport
         foreach ($list as $item) {
             $arr = [];
             $arr['number'] = $number++;
-            $arr['desc'] = $item['desc'];
+            $arr['user_id'] = $item['user_id'];
             $arr['nickname'] = $item['nickname'];
-            $arr['user_id'] = $item['uid'];
             $arr['mobile'] = $item['mobile'];
-            $arr['money'] = (float)$item['money'];
-            $arr['created_at'] = $this->getDateTime($item['created_at']);
+            $arr['score'] = $item['score'];
             $arr['type'] = $item['type'] == 1 ? '收入' : '支出';
+            $arr['desc'] = $item['desc'];
+            $arr['created_at'] = $this->getDateTime($item['created_at']);
             $newList[] = $arr;
         }
-
         $this->dataList = $newList;
     }
 }

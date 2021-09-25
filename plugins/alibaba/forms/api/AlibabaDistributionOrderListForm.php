@@ -37,7 +37,7 @@ class AlibabaDistributionOrderListForm extends BaseModel
                 ->leftJoin(['aog' => AlibabaDistributionGoodsList::tableName()], 'aog.id=aod.goods_id')
                 ->where(['ao.mall_id' => \Yii::$app->mall->id, 'ao.user_id' => \Yii::$app->user->id, 'ao.is_delete' => 0])
                 ->select(['ao.*','aod.*', 'aog.name', 'aog.cover_url'])
-                ->page($pagination, $this->limit)
+                ->page($pagination, $this->limit, $this->page)
                 ->orderBy('ao.id DESC')
                 ->asArray()
                 ->all();

@@ -13,7 +13,7 @@ class InviterInfoForm extends BaseModel{
             $headers = \Yii::$app->request->headers;
             $parentId = !empty($headers['x-parent-id']) ? (int)$headers['x-parent-id'] : 0;
             if (!$parentId || $parentId == -1) {
-                $post = \Yii::$app->request->post();
+                $post = \Yii::$app->request->get();
                 $parentId = !empty($post['x_parent_id']) ? (int)$post['x_parent_id'] : 0;
             }
             $parent = User::findOne($parentId);

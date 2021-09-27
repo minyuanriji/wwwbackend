@@ -76,12 +76,14 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                         $sku->consign_price        = $skuInfo['consign_price'];
                         $sku->is_delete            = 0;
                     }
-                    $sku->price          = $skuInfo['price'];
+
                     $sku->origin_price   = $skuInfo['origin_price'];
                     $sku->freight_price  = $skuInfo['freight_price'];
                     $sku->updated_at     = time();
                     $sku->is_delete      = 0;
-                    $sku->ali_num        = $skuInfo['ali_num'];
+                    $sku->ali_num        = max(1, $skuInfo['ali_num']);
+                    $sku->price          = floatval($goods->price_rate)/100 * $sku->ali_price * $sku->ali_num;
+                    //$sku->price          = $skuInfo['price'];
                     $sku->name           = $skuInfo['name'];
 
                     if(!$sku->save()){

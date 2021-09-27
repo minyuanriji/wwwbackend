@@ -70,6 +70,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             $skuInfos = @json_decode($goods->sku_infos, true);
             if((empty($skuInfos) || empty($skuInfos['group'])) && $item['sku'] == "DEF"){ //无规格商品
                 $goodsItem['ali_sku']       = 0;
+                $goodsItem['ali_num']       = 1;
                 $goodsItem['ali_spec_id']   = '';
                 $goodsItem['price']         = (float)$goods->price;
                 $goodsItem['freight_price'] = (float)$goods->freight_price;
@@ -92,11 +93,12 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     }
                 }
                 $goodsItem['ali_sku']       = $sku->ali_sku_id;
+                $goodsItem['ali_num']       = $sku->ali_num;
                 $goodsItem['ali_spec_id']   = $sku->ali_spec_id;
                 $goodsItem['price']         = (float)$sku->price;
                 $goodsItem['freight_price'] = (float)$sku->freight_price;
                 $goodsItem['sku_id']        = $sku->id;
-                $goodsItem['sku_labels']    = $labels;
+                $goodsItem['sku_labels']    = !empty($sku->name) ? [$sku->name] : $labels;
             }
 
             $goodsItem['total_original_price'] = $goodsItem['num'] * $goodsItem['price'];
@@ -147,7 +149,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             "cargoParamList" => json_encode([
                 'offerId'   => $goods->ali_offerId,
                 'specId'    => $orderDetail->ali_spec_id,
-                'quantity'  => $orderDetail->num
+                'quantity'  => $orderDetail->ali_num
             ]),
             "outerOrderInfo" => json_encode([
                 "mediaOrderId" => $orderDetail->id,
@@ -156,7 +158,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     "id"     => $goods->ali_offerId,
                     "specId" => $orderDetail->ali_spec_id,
                     "price"  => $orderDetail->unit_price * 100,
-                    "num"    => $orderDetail->num
+                    "num"    => $orderDetail->ali_num
                 ]
             ])
         ];

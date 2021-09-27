@@ -314,7 +314,11 @@ Yii::$app->loadComponentView('com-rich-text');
 
                     <el-table :data="batchSetForm.singleEditGoods[0].sku_list" height="500" border style="margin-top:20px;width: 100%">
                         <el-table-column prop="ali_sku_id" label="规格ID" width="150"></el-table-column>
-                        <el-table-column prop="ali_attributes_label" label="规格属性"></el-table-column>
+                        <el-table-column prop="ali_attributes_label" label="规格属性">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.name"></el-input>
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="price" width="110" label="零售价">
                             <template slot-scope="scope">
                                 <el-input :disabled="scope.row.free_edit == 0" v-model="scope.row.price"></el-input>
@@ -325,9 +329,9 @@ Yii::$app->loadComponentView('com-rich-text');
                                 <el-input v-model="scope.row.freight_price"></el-input>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="ali_num" width="110" label="数量">
+                        <el-table-column prop="ali_num" width="110" label="份数">
                             <template slot-scope="scope">
-                                <el-input type="number" min="1" v-model="scope.row.ali_num"></el-input>
+                                <el-input @input="priceRateChanged(batchSetForm.singleEditGoods[0])" @blur="priceRateChanged(batchSetForm.singleEditGoods[0])" type="number" min="1" v-model="scope.row.ali_num"></el-input>
                             </template>
                         </el-table-column>
                         <!--
@@ -339,7 +343,8 @@ Yii::$app->loadComponentView('com-rich-text');
                         -->
                         <el-table-column width="110" label="分销价">
                             <template slot-scope="scope">
-                                {{scope.row.ali_price}}
+                                <div>单价：{{scope.row.ali_price}}</div>
+                                <div>小计：{{scope.row.ali_num * scope.row.ali_price}}</div>
                             </template>
                         </el-table-column>
                         <el-table-column width="110" label="销量">
@@ -483,10 +488,11 @@ Yii::$app->loadComponentView('com-rich-text');
                 this.getList();
             },
             priceRateChanged(row){
-                let rate = (parseFloat(row['price_rate'])/100);
+                let rate = (parseFloat(row['price_rate'])/100), ali_num;
                 row['price'] = rate * parseFloat(row['ali_data_json']['currentPrice']);
                 for(var i=0; i < row.sku_list.length; i++){
-                    row['sku_list'][i]['price'] = rate * parseFloat(row['sku_list'][i]['ali_price']);
+                    ali_num = !isNaN(row['sku_list'][i]['ali_num']) && parseInt(row['sku_list'][i]['ali_num']) > 0 ? parseInt(row['sku_list'][i]['ali_num']) : 1;
+                    row['sku_list'][i]['price'] = rate * parseFloat(row['sku_list'][i]['ali_price']) * ali_num;
                 }
             },
             originOriceRateChanged(row){

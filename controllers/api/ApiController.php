@@ -424,6 +424,7 @@ class ApiController extends BaseController
             return $this;
         }
         $parentId = empty($headers['x-parent-id']) ? null : $headers['x-parent-id'];
+
         if (!$parentId) {
             return $this;
         }

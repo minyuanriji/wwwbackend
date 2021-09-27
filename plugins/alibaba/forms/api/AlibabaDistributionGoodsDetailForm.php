@@ -116,7 +116,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             }
 
             //规格
-            $selects = ["id", "goods_id", "ali_sku_id", "ali_attributes", "ali_spec_id", "price", "origin_price", "freight_price"];
+            $selects = ["id", "goods_id", "ali_sku_id", "ali_attributes", "ali_spec_id", "name", "price", "origin_price", "freight_price"];
             $skuList = AlibabaDistributionGoodsSku::find()->where([
                 "goods_id"  => $goods->id,
                 "is_delete" => 0
@@ -134,7 +134,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                                 $skuItem['labels'][] = $skuValues[$value];
                             }
                         }
-                        $skuItem['labels'] = implode(",", $skuItem['labels']);
+                        $skuItem['labels'] = !empty($skuItem['name']) ? $skuItem['name'] : implode(",", $skuItem['labels']);
                         //unset($skuItem['ali_attributes']);
                     }
                 }

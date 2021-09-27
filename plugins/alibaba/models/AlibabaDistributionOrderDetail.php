@@ -20,7 +20,7 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
             [['mall_id', 'app_id', 'order_id', 'goods_id', 'num', 'unit_price', 'total_original_price', 'total_price', 'created_at', 'updated_at'], 'required'],
             [['is_delete', 'deleted_at', 'is_refund'], 'integer'],
             [['shopping_voucher_decode_price', 'shopping_voucher_num'], 'number', 'min' => 0],
-            [['sku_labels', 'refund_status', 'sku_id', 'ali_spec_id', 'ali_sku'], 'safe']
+            [['sku_labels', 'refund_status', 'ali_num', 'sku_id', 'ali_spec_id', 'ali_sku'], 'safe']
         ];
     }
 

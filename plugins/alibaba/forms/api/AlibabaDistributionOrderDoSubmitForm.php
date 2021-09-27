@@ -139,6 +139,7 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
         $orderDetail->ali_sku               = $goodsItem['ali_sku'];
         $orderDetail->sku_labels            = json_encode($goodsItem['sku_labels']);
         $orderDetail->num                   = $goodsItem['num'];
+        $orderDetail->ali_num               = $goodsItem['ali_num'] * $goodsItem['num'];
         $orderDetail->unit_price            = $goodsItem['price'];
         $orderDetail->total_original_price  = $goodsItem['total_original_price'];
         $orderDetail->total_price           = $goodsItem['total_price'];

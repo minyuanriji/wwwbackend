@@ -206,6 +206,6 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
             throw new \Exception($res->error);
         }
 
-        
+
     }
 }

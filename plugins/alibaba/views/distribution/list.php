@@ -315,7 +315,11 @@ Yii::$app->loadComponentView('com-rich-text');
                                 <el-input v-model="scope.row.freight_price"></el-input>
                             </template>
                         </el-table-column>
-
+                        <el-table-column prop="ali_num" width="110" label="数量">
+                            <template slot-scope="scope">
+                                <el-input type="number" min="1" v-model="scope.row.ali_num"></el-input>
+                            </template>
+                        </el-table-column>
                         <!--
                         <el-table-column prop="origin_price" width="110" label="划线价">
                             <template slot-scope="scope">

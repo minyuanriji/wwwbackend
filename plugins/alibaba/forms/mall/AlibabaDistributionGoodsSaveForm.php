@@ -81,6 +81,8 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                     $sku->freight_price  = $skuInfo['freight_price'];
                     $sku->updated_at     = time();
                     $sku->is_delete      = 0;
+                    $sku->ali_num        = $skuInfo['ali_num'];
+                    $sku->name           = $skuInfo['name'];
 
                     if(!$sku->save()){
                         throw new \Exception($this->responseErrorMsg($sku));

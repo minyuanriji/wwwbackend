@@ -284,6 +284,16 @@ Yii::$app->loadComponentView('com-rich-text');
                         </template>
                     </el-table-column>
 
+                    <el-table-column label="操作" width="110">
+                        <template slot-scope="scope">
+                            <el-button @click="editIt(scope.row)" type="text" circle size="mini">
+                                <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                    <img src="statics/img/mall/edit.png" alt="">
+                                </el-tooltip>
+                            </el-button>
+                        </template>
+                    </el-table-column>
+
 
                 </el-table>
 
@@ -338,6 +348,15 @@ Yii::$app->loadComponentView('com-rich-text');
                             </template>
                         </el-table-column>
 
+                        <el-table-column label="操作" width="110">
+                            <template slot-scope="scope">
+                                <el-button @click="skuDelete(scope.row.id, scope.$index)" type="text" circle size="mini">
+                                    <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                        <img src="statics/img/mall/del.png" alt="">
+                                    </el-tooltip>
+                                </el-button>
+                            </template>
+                        </el-table-column>
 
                     </el-table>
                 </el-card>
@@ -499,6 +518,32 @@ Yii::$app->loadComponentView('com-rich-text');
                     ids.push(this.batchSetForm.selections[i].id);
                 }
                 this.deleteWithIds(ids);
+            },
+            skuDelete(id, index){
+                this.$confirm('你确定要删除吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    request({
+                        params: {
+                            r: 'plugin/alibaba/mall/distribution/delete-sku'
+                        },
+                        method: 'post',
+                        data: {id:id}
+                    }).then(e => {
+                        if (e.data.code == 0) {
+                            this.$message.success(e.data.msg);
+                            this.batchSetForm.singleEditGoods[0].sku_list.splice(index, 1)
+                        } else {
+                            this.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        this.$message.error(e.data.msg);
+                    });
+                }).catch(() => {
+
+                });
             },
             deleteIt(row){
                 let ids = [];

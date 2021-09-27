@@ -7,6 +7,7 @@ use app\plugins\alibaba\forms\mall\AlibabaDistributionAliGoodsImportForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionCategoryListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionDeleteCategoryForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionDeleteGoodsForm;
+use app\plugins\alibaba\forms\mall\AlibabaDistributionDeleteSkuForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionEditCategoryForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionEditCategorySortForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionGetCategoryForm;
@@ -148,6 +149,16 @@ class DistributionController extends Controller{
      */
     public function actionDeleteCategory(){
         $form = new AlibabaDistributionDeleteCategoryForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->delete());
+    }
+
+    /**
+     * 删除规格
+     * @return string|\yii\web\Response
+     */
+    public function actionDeleteSku(){
+        $form = new AlibabaDistributionDeleteSkuForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->delete());
     }

@@ -351,6 +351,27 @@ Yii::$app->loadComponentView('com-rich-text');
                 <el-form-item label="标题" prop="name">
                     <el-input v-model="editGoods.formData.name" style="width:60%"></el-input>
                 </el-form-item>
+                <el-form-item label="轮播图" prop="name">
+                    <template v-if="editGoods.formData.ali_product_info.info.image.images.length">
+                        <draggable v-model="editGoods.formData.ali_product_info.info.image.images" flex="dif:left">
+                            <div v-for="(item,index) in editGoods.formData.ali_product_info.info.image.images" :key="index" style="margin-right: 20px;position: relative;cursor: move;">
+                                <com-attachment @selected="updatePicUrl" :params="{'currentIndex': index}">
+                                    <com-image mode="aspectFill" width="100px" height='100px' :src="item"></com-image>
+                                </com-attachment>
+                                <el-button class="del-btn" size="mini" type="danger" icon="el-icon-close" circle @click="delPic(index)"></el-button>
+                            </div>
+                        </draggable>
+                    </template>
+                    <template v-if="editGoods.formData.ali_product_info.info.image.images.length < 5">
+                        <com-attachment style="margin-bottom: 10px;" :multiple="true" :max="9" @selected="picUrl">
+                            <el-tooltip class="item" effect="dark" content="建议尺寸:750 * 750" placement="top">
+                                <div flex="main:center cross:center" class="add-image-btn">
+                                    + 添加图片
+                                </div>
+                            </el-tooltip>
+                        </com-attachment>
+                    </template>
+                </el-form-item>
                 <el-form-item label="详情" prop="detail">
                     <com-rich-text v-model="editGoods.formData.ali_product_info.info.description" :value="editGoods.formData.ali_product_info.info.description"></com-rich-text>
                 </el-form-item>
@@ -401,7 +422,10 @@ Yii::$app->loadComponentView('com-rich-text');
                         name:"",
                         ali_product_info:{
                             info:{
-                                description:""
+                                description:"",
+                                image:{
+                                    images:[]
+                                }
                             }
                         }
                     }
@@ -409,6 +433,26 @@ Yii::$app->loadComponentView('com-rich-text');
             };
         },
         methods: {
+            updatePicUrl(e, params) {
+                this.editGoods.formData.ali_product_info.info.image.images[params.currentIndex] = e[0].url;
+            },
+            // 商品轮播图
+            picUrl(e) {
+                if (e.length) {
+                    let self = this;
+                    e.forEach(function(item) {
+                        if (self.editGoods.formData.ali_product_info.info.image.images.length >= 5) {
+                            return;
+                        }
+                        self.editGoods.formData.ali_product_info.info.image.images.push(
+                            item.url
+                        );
+                    });
+                }
+            },
+            delPic(index) {
+                this.editGoods.formData.ali_product_info.info.image.images.splice(index, 1)
+            },
             sortReload(column){
                 console.log(column);
                 this.searchData.sort_prop = column.prop;
@@ -668,7 +712,15 @@ Yii::$app->loadComponentView('com-rich-text');
     .input-item {
         display: inline-block;
         width: 250px;
-        margin: 0 0 20px 0px;
+        margin: 0 0 20px 0;
+    }
+
+    .add-image-btn {
+        width: 100px;
+        height: 100px;
+        color: #419EFB;
+        border: 1px solid #e2e2e2;
+        cursor: pointer;
     }
 
 </style>

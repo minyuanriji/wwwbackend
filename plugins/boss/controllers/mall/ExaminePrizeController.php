@@ -2,6 +2,7 @@
 
 namespace app\plugins\boss\controllers\mall;
 
+use app\plugins\boss\forms\mall\BossAwardsExamineDeleteForm;
 use app\plugins\boss\forms\mall\BossAwardsExamineListForm;
 use app\plugins\Controller;
 
@@ -35,6 +36,19 @@ class ExaminePrizeController extends Controller
             }
         }
         return $this->render('edit');
+    }
+
+    /**
+     * @Note:审核列表
+     * @return string|\yii\web\Response
+     */
+    public function actionDoDelete()
+    {
+        if (\Yii::$app->request->isAjax) {
+            $form = new BossAwardsExamineDeleteForm();
+            $form->attributes = \Yii::$app->request->post();
+            return $this->asJson($form->doDelete());
+        }
     }
 
 }

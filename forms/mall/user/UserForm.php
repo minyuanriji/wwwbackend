@@ -529,20 +529,20 @@ class UserForm extends BaseModel
             return $this->responseErrorInfo();
         }
         if ($this->type == 'add') {
-            $query = Boss::find()->where([
-                'is_delete' => 0,
-                'mall_id' => \Yii::$app->mall->id,
+            $query = Boss::find()->alias('b')->where([
+                'b.is_delete' => 0,
+                'b.mall_id' => \Yii::$app->mall->id,
             ]);
             $query->with(['bossLevel' => function ($query) {
                 $query->select('id,name');
             }]);
-            $select = "id,user_id,level_id";
+            $select = "b.id,b.user_id,b.level_id";
         } elseif ($this->type == 'show') {
-            $query = BossAwardMember::find()->where([
-                'award_id' => $this->award_id,
-                'mall_id' => \Yii::$app->mall->id,
+            $query = BossAwardMember::find()->alias('b')->where([
+                'b.award_id' => $this->award_id,
+                'b.mall_id' => \Yii::$app->mall->id,
             ]);
-            $select = "id,user_id";
+            $select = "b.id,b.user_id";
         } else {
             return [
                 'code' => ApiCode::CODE_FAIL,
@@ -550,41 +550,30 @@ class UserForm extends BaseModel
             ];
         }
 
-        $query->with(['user' => function ($query) {
-            $query->select('id,nickname')
-                ->keyword($this->keyword, [
-                    'OR',
-                    ['like', 'nickname', $this->keyword],
-                    ['like', 'id', $this->keyword],
-                ]);
-        }]);
+        $query->innerJoin(['u' => User::tableName()], 'u.id=b.user_id');
 
-        $list = $query
-            ->select($select)
-            ->page($pagination)
-            ->orderBy('id DESC')
+        $select .= ',u.id as uid,u.nickname';
+
+        if ($this->keyword) {
+            $query->andWhere(['or', ['like', 'u.nickname', $this->keyword]]);
+        }
+
+        $list = $query->select($select)->page($pagination)
+            ->orderBy('b.id DESC')
             ->asArray()
             ->all();
         if ($list) {
             foreach ($list as $key => $value) {
-                if (isset($value['user'])) {
-                    $list[$key]['nickname'] = $value['user'][0]['nickname'];
-                    unset($list[$key]['user']);
-                }
                 if (isset($value['bossLevel'])) {
                     $list[$key]['level_name'] = $value['bossLevel'][0]['name'];
                     unset($list[$key]['bossLevel']);
                 }
             }
         }
-
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'data' => [
-                'list' => $list,
-                'pagination' => $pagination,
-            ]
-        ];
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
+            'list' => $list,
+            'pagination' => $pagination
+        ]);
     }
 
     //获取团队订单数、总金额

@@ -18,7 +18,8 @@ class OrderCreateResponse extends Response {
     protected function setData($result){
         $result = isset($result['result']) ? $result['result'] : [];
         if(!isset($result['orderId'])){
-            throw new \Exception("无法获取“orderId”参数");
+            $this->setError("无法获取“orderId”参数");
+            return;
         }
         $this->orderId = $result['orderId'];
         $this->totalSuccessAmount = $result['totalSuccessAmount'];

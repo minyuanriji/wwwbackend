@@ -5,7 +5,7 @@
                 <el-form-item label="用户昵称">
                     <el-autocomplete size="small" v-model="edit.nickname" value-key="nickname"
                                      @keyup.enter.native="keyUp"
-                                     :fetch-suggestions="querySearchAsync" placeholder="请输入用户昵称"
+                                     :fetch-suggestions="querySearchAsync" placeholder="请输入用户昵称、手机号"
                                      @select="bossClick">
                     </el-autocomplete>
                 </el-form-item>

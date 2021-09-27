@@ -30,6 +30,7 @@ use app\models\UserInfo;
 use app\models\UserRelationshipLink;
 use app\plugins\boss\models\Boss;
 use app\plugins\boss\models\BossAwardMember;
+use app\plugins\boss\models\BossLevel;
 use yii\helpers\ArrayHelper;
 
 class UserForm extends BaseModel
@@ -533,10 +534,8 @@ class UserForm extends BaseModel
                 'b.is_delete' => 0,
                 'b.mall_id' => \Yii::$app->mall->id,
             ]);
-            $query->with(['bossLevel' => function ($query) {
-                $query->select('id,name');
-            }]);
-            $select = "b.id,b.user_id,b.level_id";
+            $query->leftJoin(['bl' => BossLevel::tableName()], 'b.level_id=bl.id');
+            $select = "b.id,b.user_id,b.level_id,bl.name as level_name";
         } elseif ($this->type == 'show') {
             $query = BossAwardMember::find()->alias('b')->where([
                 'b.award_id' => $this->award_id,
@@ -544,32 +543,22 @@ class UserForm extends BaseModel
             ]);
             $select = "b.id,b.user_id";
         } else {
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => '请传入参数'
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, '请传入参数');
         }
 
         $query->innerJoin(['u' => User::tableName()], 'u.id=b.user_id');
 
         $select .= ',u.id as uid,u.nickname';
 
-        if ($this->keyword) {
+        if ($this->keyword)
             $query->andWhere(['or', ['like', 'u.nickname', $this->keyword]]);
-        }
+
 
         $list = $query->select($select)->page($pagination)
             ->orderBy('b.id DESC')
             ->asArray()
             ->all();
-        if ($list) {
-            foreach ($list as $key => $value) {
-                if (isset($value['bossLevel'])) {
-                    $list[$key]['level_name'] = $value['bossLevel'][0]['name'];
-                    unset($list[$key]['bossLevel']);
-                }
-            }
-        }
+
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
             'list' => $list,
             'pagination' => $pagination

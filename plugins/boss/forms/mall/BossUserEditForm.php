@@ -42,10 +42,10 @@ class BossUserEditForm extends BaseModel
             return $this->responseErrorInfo();
         }
         $list = User::find()->alias('u')
-            ->where(['u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id,])
+            ->where(['u.is_delete' => 0, 'u.mall_id' => \Yii::$app->mall->id])
+            ->andWhere(['or', ['like', 'u.nickname', $this->keyword], ['like', 'u.mobile', $this->keyword]])
 //            ->andWhere(['u.is_inviter' => 1])
-            ->keyword($this->keyword !== '', ['like', 'u.nickname', $this->keyword])
-            ->apiPage(20)->select('u.id,u.nickname')->all();
+            ->apiPage()->select('u.id,u.nickname')->all();
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '',

@@ -7,16 +7,9 @@ use app\core\ApiCode;
 use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
 use app\models\BaseModel;
-use app\models\UserAddress;
-use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
-use app\plugins\alibaba\models\AlibabaDistributionOrder;
 use app\plugins\shopping_voucher\models\ShoppingVoucherTargetAlibabaDistributionGoods;
-use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
-use lin010\alibaba\c2b2b\api\GetAddress;
-use lin010\alibaba\c2b2b\api\GetAddressResponse;
-use lin010\alibaba\c2b2b\Distribution;
 
 class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm {
 

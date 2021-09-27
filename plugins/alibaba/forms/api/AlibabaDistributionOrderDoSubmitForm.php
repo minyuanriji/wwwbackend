@@ -4,9 +4,18 @@ namespace app\plugins\alibaba\forms\api;
 
 use app\core\ApiCode;
 use app\models\User;
+use app\models\UserAddress;
+use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionOrder;
 use app\plugins\alibaba\models\AlibabaDistributionOrderDetail;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
+use lin010\alibaba\c2b2b\api\GetAddress;
+use lin010\alibaba\c2b2b\api\GetAddressResponse;
+use lin010\alibaba\c2b2b\api\GetGoodsDetail;
+use lin010\alibaba\c2b2b\api\GetGoodsDetailResponse;
+use lin010\alibaba\c2b2b\api\OrderGetPreview;
+use lin010\alibaba\c2b2b\api\OrderGetPreviewResponse;
+use lin010\alibaba\c2b2b\Distribution;
 
 class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm {
 
@@ -63,7 +72,7 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
                                                         . ' '
                                                         . $data['user_address']['detail'];
                 $order->address_id                    = $data['user_address']['id'];
-                $order->province_id                   = $data['user_address']['province'];
+                $order->province_id                   = $data['user_address']['province_id'];
                 $order->remark                        = $this->remark;
                 $order->token                         = \Yii::$app->security->generateRandomString();
                 $order->is_pay                        = 0;
@@ -116,6 +125,10 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
      * @throws \yii\db\StaleObjectException
      */
     public function extraOrderDetail(AlibabaDistributionOrder $order, $goodsItem){
+
+        //检查阿里巴巴商品是否可以下单
+        $this->validateAliGoods($order, $goodsItem);
+
         $orderDetail                        = new AlibabaDistributionOrderDetail();
         $orderDetail->mall_id               = $order->mall_id;
         $orderDetail->app_id                = $goodsItem['app_id'];
@@ -140,5 +153,59 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
         if(!$orderDetail->save()){
             throw new \Exception($this->responseErrorMsg($orderDetail));
         }
+    }
+
+    /**
+     * 检查阿里巴巴商品是否能下单
+     * @param AlibabaDistributionOrder $order
+     * @param $goodsItem
+     * @throws \Exception
+     */
+    private function validateAliGoods(AlibabaDistributionOrder $order, $goodsItem){
+
+        $app = AlibabaApp::findOne($goodsItem['app_id']);
+        $distribution = new Distribution($app->app_key, $app->secret);
+        $userAddress = UserAddress::findOne($order->address_id);
+
+        //解析1688的地址
+        $res = $distribution->requestWithToken(new GetAddress([
+            "addressInfo" => "{$userAddress->province} {$userAddress->city} {$userAddress->detail}"
+        ]), $app->access_token);
+        if(!empty($res->error)){
+            throw new \Exception($res->error);
+        }
+        if(!$res instanceof GetAddressResponse){
+            throw new \Exception("[GetAddressResponse]返回结果异常");
+        }
+
+        $aliAddrInfo = (array)@json_decode($res->result, true);
+
+        $res = $distribution->requestWithToken(new OrderGetPreview([
+            "addressParam" => json_encode([
+                "fullName"     => $order->name,
+                "mobile"       => $order->mobile,
+                "phone"        => $order->mobile,
+                "postCode"     => isset($aliAddrInfo['postCode']) ? $aliAddrInfo['postCode'] : "",
+                "cityText"     => $userAddress->city,
+                "provinceText" => $userAddress->province,
+                "areaText"     => $userAddress->district,
+                "address"      => $userAddress->detail,
+                "districtCode" => isset($aliAddrInfo['addressCode']) ? $aliAddrInfo['addressCode'] : ""
+            ]),
+            "cargoParamList" => json_encode([
+                'offerId'   => $goodsItem['ali_offerId'],
+                'specId'    => $goodsItem['ali_spec_id'],
+                'quantity'  => $goodsItem['num']
+            ])
+        ]), $app->access_token);
+        if(!$res instanceof OrderGetPreviewResponse){
+            throw new \Exception("[OrderGetPreviewResponse]返回结果异常");
+        }
+
+        if(!empty($res->error)){
+            throw new \Exception($res->error);
+        }
+
+        
     }
 }

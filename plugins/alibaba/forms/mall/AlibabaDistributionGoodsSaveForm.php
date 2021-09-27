@@ -41,6 +41,7 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                 $description = $this->goods['ali_product_info']['info']['description'];
                 $productInfo = (array)@json_decode($goods->ali_product_info, true);
                 $productInfo['info']['description'] = $description;
+                $productInfo['info']['image'] = $this->goods['ali_product_info']['info']['image'];
                 $goods->ali_product_info = json_encode($productInfo);
             }
 

@@ -30,7 +30,7 @@
                         </el-form-item>
 
                         <el-form-item prop="period_unit" label="结算周期类型">
-                            <el-col :span="8">
+                            <el-col :span="10">
                                 <el-radio-group v-model="ruleForm.period_unit" size="small">
                                     <el-radio :label="0" border>天</el-radio>
                                     <el-radio :label="1" border>周</el-radio>

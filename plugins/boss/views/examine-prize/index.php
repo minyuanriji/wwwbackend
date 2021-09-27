@@ -76,6 +76,12 @@
                             </el-tooltip>
                         </el-button>
 
+                        <el-button circle size="mini" type="text" @click="doDelete(scope.row.id)">
+                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                <img src="statics/img/mall/del.png" alt="">
+                            </el-tooltip>
+                        </el-button>
+
                     </template>
                 </el-table-column>
 
@@ -243,10 +249,10 @@
                 console.log("测试")
             },
 
-            //删除奖池
-            prizeDelete(row, index) {
+            //删除
+            doDelete(id) {
                 let self = this;
-                self.$confirm('删除该奖池, 是否继续?', '提示', {
+                self.$confirm('是否删除', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
@@ -254,17 +260,17 @@
                     self.listLoading = true;
                     request({
                         params: {
-                            r: 'plugin/boss/mall/prize/delete',
+                            r: 'plugin/boss/mall/examine-prize/do-delete',
                         },
                         method: 'post',
                         data: {
-                            id: row.id,
+                            id: id
                         }
                     }).then(e => {
                         self.listLoading = false;
                         if (e.data.code === 0) {
                             self.$message.success(e.data.msg);
-                            self.list.splice(index, 1);
+                            this.getList();
                         } else {
                             self.$message.error(e.data.msg);
                         }

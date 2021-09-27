@@ -410,24 +410,16 @@ class BossAwardsListForm extends BaseModel
         try {
             //查看奖金池
             $query = BossAwards::find();
-            $query->andWhere([
+            $boss_awards_data = $query->andWhere([
                 "AND",
                 ["id" => $id],
                 ["is_delete" => 0],
-            ]);
-            $boss_awards_data = $query->asArray()->one();
-            if(!$boss_awards_data){
-                return [
-                    'code' => ApiCode::CODE_FAIL,
-                    'msg' => '该奖金池不存在，请联系技术人员！'
-                ];
-            }
-            if(!$boss_awards_data['status']){
-                return [
-                    'code' => ApiCode::CODE_FAIL,
-                    'msg' => '奖金池未开启，请先开启。'
-                ];
-            }
+            ])->asArray()->one();
+            if(!$boss_awards_data)
+                throw new \Exception('该奖金池不存在，请联系技术人员！');
+
+            if(!$boss_awards_data['status'])
+                throw new \Exception('奖金池未开启，请先开启。');
 
             $each_log_form = new BossAwardsEachLogForm();
             $sent_log_form = new BossAwardsSentLogForm();
@@ -435,36 +427,25 @@ class BossAwardsListForm extends BaseModel
             $time = time();
             $each_log_data = [];
 
-            if ($boss_awards_data['money'] <= 0) {
-                return [
-                    'code' => ApiCode::CODE_FAIL,
-                    'msg' => $boss_awards_data['name'] . "奖金池金额不足：" . date("Y-m-d H:i:s", $time)
-                ];
-            }
+            if ($boss_awards_data['money'] <= 0)
+                throw new \Exception($boss_awards_data['name'] . "奖金池金额不足：" . date("Y-m-d H:i:s", $time));
 
             //查询当前奖池需要发放人员
             $boss_data = [];
             if ($boss_awards_data['level_id'] && is_string($boss_awards_data['level_id'])) {
                 $level_ids = json_decode($boss_awards_data['level_id'],true);
-                $boss_data = Boss::find()
-                    ->select('id,user_id,level_id')
+                $boss_data = Boss::find()->select('id,user_id,level_id')
                     ->andWhere(['and', ['in','level_id',$level_ids], ['is_delete' => 0]])
                     ->asArray()
                     ->all();
             }
 
-            $awards_member_data = BossAwardMember::find()
-                ->select('user_id')
+            $awards_member_data = BossAwardMember::find()->select('user_id')
                 ->andWhere(['award_id' => $boss_awards_data['id']])
-                ->asArray()
-                ->all();
+                ->asArray()->all();
 
-            if (!$awards_member_data && !$boss_data) {
-                return [
-                    'code' => ApiCode::CODE_FAIL,
-                    'msg' => $boss_awards_data['name'] . "奖金池暂无分红股东" . date("Y-m-d H:i:s", $time)
-                ];
-            }
+            if (!$awards_member_data && !$boss_data)
+                throw new \Exception($boss_awards_data['name'] . "奖金池暂无分红股东" . date("Y-m-d H:i:s", $time));
 
             $awards_member_data = array_merge_recursive($awards_member_data, $boss_data);
 
@@ -485,13 +466,8 @@ class BossAwardsListForm extends BaseModel
                 if ($boss_awards_data['automatic_audit']) {
                     //修改奖池金额
                     $award_res = $boss_awards_model->updateAll(['money' => $boss_awards_data['money'] - $price],['id' => $boss_awards_data['id']]);
-                    if (!$award_res) {
-                        $trans->rollBack();
-                        return [
-                            'code' => ApiCode::CODE_FAIL,
-                            'msg' => $boss_awards_data['name'] . "修改奖池金额失败" . date("Y-m-d H:i:s", $time)
-                        ];
-                    }
+                    if (!$award_res)
+                        throw new \Exception($boss_awards_data['name'] . "修改奖池金额失败" . date("Y-m-d H:i:s", $time));
 
                     $each_log_data['actual_money'] = $price;
                     $each_log_data['money_after'] = $boss_awards_data['money'] - $price;
@@ -510,16 +486,11 @@ class BossAwardsListForm extends BaseModel
                     "sent_time"         => $next_time,
                 ]);
                 $each_res = $each_log_form->save($each_log_data);
-                if (!isset($each_res['code']) || $each_res['code']) {
-                    $trans->rollBack();
-                    return [
-                        'code' => ApiCode::CODE_FAIL,
-                        'msg' => $boss_awards_data['name'] . "奖金池添加每期记录失败" . date("Y-m-d H:i:s", $time)
-                    ];
-                }
+                if (!isset($each_res['code']) || $each_res['code'])
+                    throw new \Exception($boss_awards_data['name'] . "奖金池添加每期记录失败" . date("Y-m-d H:i:s", $time));
 
                 //添加每人每期发放记录
-                foreach ($user_ids as $sent_key => $sent_val)
+                foreach ($user_ids as $sent_val)
                 {
                     $sent_log_data = [
                         "each_id"       => $each_res['data'],
@@ -538,43 +509,26 @@ class BossAwardsListForm extends BaseModel
                     }
                     $sent_res = $sent_log_form->save($sent_log_data);
 
-                    if (!isset($sent_res['code']) || $sent_res['code']) {
-                        $trans->rollBack();
-                        return [
-                            'code' => ApiCode::CODE_FAIL,
-                            'msg' => $boss_awards_data['name'] . "奖金池". $sent_val ."用户添加记录失败" . date("Y-m-d H:i:s", $time)
-                        ];
-                    }
+                    if (!isset($sent_res['code']) || $sent_res['code'])
+                        throw new \Exception($boss_awards_data['name'] . "奖金池". $sent_val ."用户添加记录失败" . date("Y-m-d H:i:s", $time));
 
                     if ($boss_awards_data['automatic_audit']) {
                         //修改用户金额
                         $user = User::findOne((int)$sent_val);
-                        if (!$user || $user->is_delete) {
-                            $trans->rollBack();
-                            return [
-                                'code' => ApiCode::CODE_FAIL,
-                                'msg' => $boss_awards_data['name'] . "奖金池". $sent_val ."用户添加记录失败" . date("Y-m-d H:i:s", $time)
-                            ];
-                        }
+                        if (!$user || $user->is_delete)
+                            throw new \Exception($boss_awards_data['name'] . "奖金池". $sent_val ."用户添加记录失败" . date("Y-m-d H:i:s", $time));
+
                         UserIncomeForm::bossAdd($user, $per_person, $sent_res['data'],'来自股东分红' . $boss_awards_data['name'] . "第" . $next_time . '期');
 
                         //修改股东总分红记录
                         $boss = Boss::findOne(['user_id' => $sent_val, 'is_delete' => 0]);
-                        if(!$boss){
-                            $trans->rollBack();
-                            return [
-                                'code' => ApiCode::CODE_FAIL,
-                                'msg' => $boss_awards_data['name'] . "股东不存在"
-                            ];
-                        }
+                        if(!$boss)
+                            throw new \Exception($boss_awards_data['name'] . "股东不存在");
+
                         $boss->total_price = $boss->total_price + $per_person;
-                        if (!$boss->save()) {
-                            $trans->rollBack();
-                            return [
-                                'code' => ApiCode::CODE_FAIL,
-                                'msg' => $boss_awards_data['name'] . "奖金池" . $sent_val . "修改股东总分红记录失败"
-                            ];
-                        }
+                        if (!$boss->save())
+                            throw new \Exception($boss_awards_data['name'] . "奖金池" . $sent_val . "修改股东总分红记录失败");
+
                     }
                 }
 
@@ -587,21 +541,12 @@ class BossAwardsListForm extends BaseModel
 
             } catch (\Exception $e){
                 $trans->rollBack();
-                return [
-                    'code' => ApiCode::CODE_FAIL,
-                    'msg' => $e->getMessage()
-                ];
+                return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
             }
             $trans->commit();
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => "成功"
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS);
         } catch (\Exception $e){
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => $e->getMessage()
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
     }
 }

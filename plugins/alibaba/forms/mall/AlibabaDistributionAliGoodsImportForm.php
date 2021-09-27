@@ -176,6 +176,7 @@ class AlibabaDistributionAliGoodsImportForm extends BaseModel{
 
                 $insertData = $goods->getAttributes();
                 $insertData['ali_data_json']   = $info;
+                $insertData['ali_product_info']= json_decode($insertData['ali_product_info'], true);
                 $insertData['sku_list']        = $skuList;
                 $insertData['free_edit']       = 0;
                 $insertData['ali_category_id'] = explode(",", $goods->ali_category_id);

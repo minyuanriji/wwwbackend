@@ -281,7 +281,7 @@ class UserForm extends BaseModel
         }
 
         $userCenter['order_bar2'][0]['num'] = $userCenter['order_bar2'][0]['text'];
-        $userCenter['order_bar'][] = $userCenter['order_bar2'][0];
+//        $userCenter['order_bar'][] = $userCenter['order_bar2'][0];
 
         unset($userCenter['order_bar2']);
 
@@ -326,22 +326,6 @@ class UserForm extends BaseModel
                 ];
             }
         }
-
-        //酒店订单
-        $userCenter['menus'][] = [
-            "icon_url"  => "https://dev.mingyuanriji.cn/web/static/hotel-orders.png",
-            "name"      => "酒店",
-            "link_url"  => "/mch/hotel/orderList/orderList",
-            "open_type" => "navigate"
-        ];
-
-        //本地生活订单
-        $userCenter['menus'][] = [
-            "icon_url"  => "https://dev.mingyuanriji.cn/web/static/gift_packs.png",
-            "name"      => "本地生活订单",
-            "link_url"  => "/mch/giftbag/orderList/orderList",
-            "open_type" => "navigate"
-        ];
 
         //商家入驻
         if (YII_WEIXIN_APPLETS == 'true') {

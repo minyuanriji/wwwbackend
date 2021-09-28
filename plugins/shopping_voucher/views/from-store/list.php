@@ -232,7 +232,6 @@ echo $this->render("com-edit");
             },
             update(){
                 this.getList();
-                this.close();
             },
             close(){
                 this.editDialogVisible = false;

@@ -78,8 +78,11 @@ class HotelSearchDoForm extends HotelSearchForm{
                             $result = $classObject->getBookingList($hotel, $hotelPlateform, $content['attrs']['start_date'], $content['attrs']['days']);
                             if(!$result instanceof BookingListResult)
                                 continue;
-                            if($result->code != BookingListResult::CODE_SUCC)
+                            if($result->code != BookingListResult::CODE_SUCC){
+                                echo $result->message . "\n";
                                 continue;
+                            }
+
                             $bookings = $result->getAll();
                             if($bookings && count($bookings) > 0){
                                 $founds[] = $hotel->id;

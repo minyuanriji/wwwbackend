@@ -34,6 +34,11 @@ class Plugin extends \app\plugins\Plugin
                 'route' => 'plugin/alibaba/mall/app/list',
                 'icon' => 'el-icon-setting'
             ],
+            [
+                'name' => '订单管理',
+                'route' => 'plugin/alibaba/mall/order/index',
+                'icon' => 'el-icon-setting'
+            ],
         ];
     }
 

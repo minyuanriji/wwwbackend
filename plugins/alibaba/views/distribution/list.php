@@ -42,9 +42,13 @@ Yii::$app->loadComponentView('com-rich-text');
                     <template slot-scope="scope">
                         <div style="padding-bottom:3px;">编号：{{scope.row.ali_offerId}}</div>
                         <div flex="box:first">
-                            <div style="padding-right: 10px;">
-                                <com-image mode="aspectFill" :src="scope.row.cover_url"></com-image>
-                            </div>
+                            <el-popover placement="top-start"  trigger="hover">
+                                <el-image :src="scope.row.cover_url" style="width:350px;"></el-image>
+                                <el-image slot="reference" style="width: 50px; height: 50px"
+                                          :src="scope.row.cover_url"
+                                          :preview-src-list="[scope.row.cover_url]">
+                                </el-image>
+                            </el-popover>
                             <div flex="cross:top cross:center">
                                 <div flex="dir:left">
                                     <el-tooltip class="item" effect="dark" placement="top">
@@ -379,6 +383,7 @@ Yii::$app->loadComponentView('com-rich-text');
                 <el-form-item label="标题" prop="name">
                     <el-input v-model="editGoods.formData.name" style="width:60%"></el-input>
                 </el-form-item>
+                <!--
                 <el-form-item label="封面" prop="editGoods.formData.cover_url">
                     <com-attachment :multiple="false" :max="1" v-model="editGoods.formData.cover_url">
                         <el-tooltip class="item"
@@ -390,6 +395,7 @@ Yii::$app->loadComponentView('com-rich-text');
                     </com-attachment>
                     <com-image mode="aspectFill" width='80px' height='80px' :src="editGoods.formData.cover_url"></com-image>
                 </el-form-item>
+                -->
                 <el-form-item label="轮播图" prop="name">
                     <template v-if="editGoods.formData.ali_product_info.info.image.images.length">
                         <draggable v-model="editGoods.formData.ali_product_info.info.image.images" flex="dif:left">

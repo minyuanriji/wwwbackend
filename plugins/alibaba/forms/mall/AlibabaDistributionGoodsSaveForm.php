@@ -34,6 +34,7 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
             if(empty($this->goods['ali_category_id'])){
                 throw new \Exception("请设置类目");
             }
+            $images = [];
             if(isset($this->goods['ali_product_info'])){
                 if(!is_array($this->goods['ali_product_info'])){
                     $this->goods['ali_product_info'] = (array)@json_decode($this->goods['ali_product_info'], true);
@@ -42,11 +43,13 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                 $productInfo = (array)@json_decode($goods->ali_product_info, true);
                 $productInfo['info']['description'] = $description;
                 $productInfo['info']['image'] = $this->goods['ali_product_info']['info']['image'];
+                $images = $productInfo['info']['image']['images'];
                 $goods->ali_product_info = json_encode($productInfo);
             }
 
+            //获取第一张图片作为轮播图
+            $goods->cover_url         = !empty($images) ? $images[0] : $goods->cover_url;
             $goods->name              = $this->goods['name'];
-            $goods->cover_url         = $this->goods['cover_url'];
             $goods->ali_category_id   = implode(",", $this->goods['ali_category_id']);
             $goods->price             = $this->goods['price'];
             $goods->price_rate        = $this->goods['price_rate'];

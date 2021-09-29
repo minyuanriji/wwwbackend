@@ -14,7 +14,7 @@ use app\plugins\commission\models\CommissionGiftpacksPriceLog;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 
-class AlibabaDistributionOrderListForm extends BaseModel
+class AlibabaDistributionOrderRefundListForm extends BaseModel
 {
     public $page;
     public $keyword;
@@ -39,11 +39,12 @@ class AlibabaDistributionOrderListForm extends BaseModel
 
         try {
 
-            $query = AlibabaDistributionOrder::find()->alias('ao')->where(["ao.is_delete" => 0, "ao.is_recycle" => 0])
-                ->leftJoin(["ad" => AlibabaDistributionOrderDetail::tableName()], "ad.order_id = ao.id")
+            $query = AlibabaDistributionOrderDetail::find()->alias('ad')
+                ->innerJoin(["ao" => AlibabaDistributionOrder::tableName()], "ad.order_id = ao.id")
                 ->leftJoin(["ag" => AlibabaDistributionGoodsList::tableName()], "ag.id = ad.goods_id")
                 ->leftJoin(["u" => User::tableName()], "ao.user_id = u.id");
 
+            $query->where(["ao.is_delete" => 0, "ao.is_recycle" => 0]);
             if (!empty($this->keyword)) {
                 $query->andWhere([
                     'or',
@@ -58,15 +59,13 @@ class AlibabaDistributionOrderListForm extends BaseModel
             if ($this->start_time && $this->end_time) {
                 $query->andWhere([
                     'and',
-                    ['>=', 'ao.pay_at', strtotime($this->start_time)],
-                    ['<=', 'ao.pay_at', strtotime($this->end_time)],
+                    ['>=', 'ad.updated_at', strtotime($this->start_time)],
+                    ['<=', 'ad.updated_at', strtotime($this->end_time)],
                 ]);
             }
 
             if ($this->status) {
-                $query->keyword($this->status == 'paid', ['ao.is_pay' => 1, 'ao.sale_status' => 0, 'ad.is_refund' => 0, "ad.refund_status" => 'none'])
-                    ->keyword($this->status == 'unpaid', ['ao.is_pay' => 0])
-                    ->keyword($this->status == 'closed', ['ao.is_closed' => 1]);
+                $query->andWhere(['ad.refund_status' => $this->status]);
             }
 
             $select = ['ao.*', "ag.name as goods_name", "ag.cover_url", 'ad.*', "u.nickname"];

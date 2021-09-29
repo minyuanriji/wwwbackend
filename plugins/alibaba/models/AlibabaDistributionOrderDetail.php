@@ -31,7 +31,7 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
      * @throws \yii\db\Exception
      */
     public function agreeRefund($trans = false, $desc = ""){
-        if($this->refund_status != "none")
+        if($this->refund_status != "apply")
             return;
 
         $trans && ($t = \Yii::$app->db->beginTransaction());

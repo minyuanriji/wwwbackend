@@ -1,11 +1,12 @@
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
         <el-tabs v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane label="全部" name="all"></el-tab-pane>
-            <el-tab-pane label="支付成功" name="paid"></el-tab-pane>
-            <el-tab-pane label="未支付" name="unpaid"></el-tab-pane>
+            <el-tab-pane label="申请中" name="apply"></el-tab-pane>
+            <el-tab-pane label="已同意" name="agree"></el-tab-pane>
+            <el-tab-pane label="已拒绝" name="refused"></el-tab-pane>
+            <el-tab-pane label="已完成" name="finished"></el-tab-pane>
             <div class="table-body">
-                <span style="height: 32px;">支付时间：</span>
+                <span style="height: 32px;">申请时间：</span>
                 <el-date-picker
                         class="item-box"
                         size="small"
@@ -55,15 +56,13 @@
                     <el-table-column label="支付状态" width="130">
                         <template slot-scope="scope">
                             <div v-if="scope.row.refund_status=='finished' && scope.row.is_refund == 1" style="color: red">已退款</div>
-                            <div v-if="scope.row.refund_status=='apply'" style="color: red">退款中</div>
+                            <div v-if="scope.row.refund_status=='apply'" style="color: red">申请中</div>
                             <div v-if="scope.row.refund_status=='agree'" style="color: red">同意退款</div>
                             <div v-if="scope.row.refund_status=='refused'" style="color: red">拒绝退款</div>
-                            <div v-if="scope.row.is_pay == 1 && scope.row.is_refund == 0 && scope.row.refund_status=='none'" style="color: green">已支付</div>
-                            <div v-if="scope.row.is_pay == 0">未支付</div>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="实付金额" width="130">
+                    <el-table-column label="退款金额" width="130">
                         <template slot-scope="scope">
                             <div v-if="scope.row.is_pay==1">
                                 <div v-if="scope.row.pay_type==1">现金：{{scope.row.total_price ?? 0}}</div>
@@ -85,28 +84,27 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="收件信息" width="420">
+                    <el-table-column label="操作">
                         <template slot-scope="scope">
-                            <div>收件人：{{ scope.row.name }}</div>
-                            <div>手机号：{{ scope.row.mobile }}</div>
-                            <div>收件人地址：{{ scope.row.address }}</div>
+                            <el-button @click="apply(scope.row, 'agree')" v-if="activeName == 'apply'" size="mini" circle style="margin-top: 10px">
+                                <el-tooltip class="item" effect="dark" content="同意" placement="top">
+                                    <img src="statics/img/mall/pass.png" alt="">
+                                </el-tooltip>
+                            </el-button>
+
+                            <el-button @click="apply(scope.row, 'refused')" v-if="activeName == 'apply'" size="mini" circle style="margin-left: 10px;margin-top: 10px">
+                                <el-tooltip class="item" effect="dark" content="拒绝" placement="top">
+                                    <img src="statics/img/mall/nopass.png" alt="">
+                                </el-tooltip>
+                            </el-button>
+
+                            <el-button @click="apply(scope.row, 'paid')" v-if="activeName == 'agree'" size="mini" circle style="margin-top: 10px">
+                                <el-tooltip class="item" effect="dark" content="打款" placement="top">
+                                    <img src="statics/img/mall/pay.png" alt="">
+                                </el-tooltip>
+                            </el-button>
                         </template>
                     </el-table-column>
-
-                    <!--<el-table-column label="操作">
-                        <template slot-scope="scope">
-                            <el-button @click="toDetail(scope.row.id)" type="text" circle size="mini">
-                                <el-tooltip class="item" effect="dark" content="查看订单详情" placement="top">
-                                    <img src="statics/img/mall/order/detail.png" alt="">
-                                </el-tooltip>
-                            </el-button>
-                            <el-button @click="destroy(scope.row.id, scope.$index)" circle type="text" size="mini">
-                                <el-tooltip class="item" effect="dark" content="删除" placement="top">
-                                    <img src="statics/img/mall/del.png" alt="">
-                                </el-tooltip>
-                            </el-button>
-                        </template>
-                    </el-table-column>-->
                 </el-table>
                 <div flex="box:last cross:center">
                     <div></div>
@@ -133,13 +131,13 @@
                 passengersData: [],
                 search: {
                     keyword: '',
-                    status: 'all',
+                    status: 'apply',
                     start_time: '',
                     end_time: '',
                     time: null,
                 },
                 loading: false,
-                activeName: 'all',
+                activeName: 'apply',
                 list: [],
                 pagination: null,
                 exportList: [],
@@ -161,11 +159,11 @@
                 this.loadData();
             },
 
-            loadData(status = 'all', page = 1) {
+            loadData(status = 'apply', page = 1) {
                 this.loading = true;
                 request({
                     params: {
-                        r: 'plugin/alibaba/mall/order/index',
+                        r: 'plugin/alibaba/mall/order/refund-list',
                         status: status,
                         page: page,
                         keyword: this.search.keyword,
@@ -209,6 +207,44 @@
                     r: 'plugin/baopin/mall/store/goods-list',
                     id: id
                 })
+            },
+
+            apply(row, act) {
+                this.$prompt('请输入备注', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '执行中...';
+                            request({
+                                params: {
+                                    r: 'plugin/alibaba/mall/order/apply',
+                                },
+                                method: 'post',
+                                data: {
+                                    id: row.id,
+                                    act: act,
+                                    content: instance.inputValue,
+                                }
+                            }).then(e => {
+                                instance.confirmButtonLoading = false;
+                                if (e.data.code === 0) {
+                                    this.loadData(this.activeName);
+                                    done();
+                                } else {
+                                    instance.confirmButtonText = '确定';
+                                    this.$message.error(e.data.msg);
+                                }
+                            }).catch(e => {
+                                done();
+                                instance.confirmButtonLoading = false;
+                            });
+                        }else{
+                            done();
+                        }
+                    }
+                });
             },
         }
     })

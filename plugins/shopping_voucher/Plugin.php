@@ -31,6 +31,12 @@ class Plugin extends \app\plugins\Plugin
     {
         return [
             [
+                'name' => '数据概况',
+                'route' => 'plugin/shopping_voucher/mall/stat/index',
+                'icon' => 'el-icon-setting',
+                'action' => []
+            ],
+            [
                 'name' => '购物券记录',
                 'route' => 'plugin/shopping_voucher/mall/shopping-voucher-log/list',
                 'icon' => 'el-icon-setting',

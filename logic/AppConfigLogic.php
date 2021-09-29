@@ -107,10 +107,10 @@ class AppConfigLogic
         unset($item);
         $arr = [];
         foreach ($option['order_bar'] as $k => $item) {
-            $item['link_url'] = '/pages/order/list?status=' . $k;
+            /*$item['link_url'] = '/pages/order/list?status=' . $k;
             if ((int)$k + 1 === 5) {
                 $item['link_url'] = '/pages/order/refund/list';
-            }
+            }*/
             $item['open_type'] = PickLinkForm::OPEN_TYPE_NAVIGATE;
             $arr[] = $item;
         }

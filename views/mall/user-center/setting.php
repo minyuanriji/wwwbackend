@@ -1,13 +1,3 @@
-<?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-06
- * Time: 10:55
- */
-?>
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;"
              v-loading="cardLoading">
@@ -113,7 +103,7 @@
                         </div>
 
 
-                        <div style="width: 93%;margin: 0px auto;border-radius: 5px;overflow: hidden;">
+                        <div style="width: 93%;margin: 0 auto;border-radius: 5px;overflow: hidden;">
                             <div class="menu-title" style="display: flex;justify-content: space-between">
                                 {{ruleForm.user_tool_menu_title}}
                                 <div><img :src="more_png" alt="" style="width: 10px;height: 10px"></div>
@@ -209,18 +199,18 @@
                                        :src="ruleForm.member_pic_url">
                             </com-image>
                         </el-form-item>
-<!--                        <el-form-item label="会员中心背景图" prop="member_bg_pic_url">-->
-<!--                            <com-attachment :multiple="false" :max="1" @selected="memberBgPicUrl">-->
-<!--                                <el-tooltip class="item" effect="dark" content="建议尺寸:660*320" placement="top">-->
-<!--                                    <el-button size="mini">选择文件</el-button>-->
-<!--                                </el-tooltip>-->
-<!--                            </com-attachment>-->
-<!--                            <com-image width="80px"-->
-<!--                                       height="80px"-->
-<!--                                       mode="aspectFill"-->
-<!--                                       :src="ruleForm.member_bg_pic_url">-->
-<!--                            </com-image>-->
-<!--                        </el-form-item>-->
+<!--                        <el-form-item label="会员中心背景图" prop="member_bg_pic_url">
+                            <com-attachment :multiple="false" :max="1" @selected="memberBgPicUrl">
+                                <el-tooltip class="item" effect="dark" content="建议尺寸:660*320" placement="top">
+                                    <el-button size="mini">选择文件</el-button>
+                                </el-tooltip>
+                            </com-attachment>
+                            <com-image width="80px"
+                                       height="80px"
+                                       mode="aspectFill"
+                                       :src="ruleForm.member_bg_pic_url">
+                            </com-image>
+                        </el-form-item>-->
                         <el-form-item label="头像样式">
                             <el-radio v-model="ruleForm.top_style" label="1">头像靠左</el-radio>
                             <el-radio v-model="ruleForm.top_style" label="2">头像居中</el-radio>
@@ -239,32 +229,32 @@
                             </com-image>
                         </el-form-item>
                     </el-card>
-<!--                    <el-card shadow="never" style="margin-bottom: 20px;min-width:500px" body-style="padding-right:30%">-->
-<!--                        <div slot="header">-->
-<!--                            <span>收藏足迹栏</span>-->
-<!--                        </div>-->
-<!--                        <el-form-item label="收藏足迹栏显示状态">-->
-<!--                            <el-switch-->
-<!--                                    v-model="ruleForm.is_foot_bar_status"-->
-<!--                                    active-value="1"-->
-<!--                                    inactive-value="0">-->
-<!--                            </el-switch>-->
-<!--                        </el-form-item>-->
-<!--                        <el-form-item v-if="ruleForm.is_foot_bar_status == 1" label="收藏足迹栏">-->
-<!--                            <div flex="box:mean" style="flex-wrap: wrap">-->
-<!--                                <div style="max-width: 134.16px" v-for="(item, index) in ruleForm.foot_bar"-->
-<!--                                     @click="openDialogForm(item,index, 4)"-->
-<!--                                     class="order-box"-->
-<!--                                     flex="dir:top box:mean main:center cross:center">-->
-<!--                                    <div flex="cross:center">-->
-<!--                                        <com-image width="30px" height="30px" mode="aspectFill" :src="item.icon_url">-->
-<!--                                        </com-image>-->
-<!--                                    </div>-->
-<!--                                    <div>{{item.name}}</div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </el-form-item>-->
-<!--                    </el-card>-->
+<!--                    <el-card shadow="never" style="margin-bottom: 20px;min-width:500px" body-style="padding-right:30%">
+                        <div slot="header">
+                            <span>收藏足迹栏</span>
+                        </div>
+                        <el-form-item label="收藏足迹栏显示状态">
+                            <el-switch
+                                    v-model="ruleForm.is_foot_bar_status"
+                                    active-value="1"
+                                    inactive-value="0">
+                            </el-switch>
+                        </el-form-item>
+                        <el-form-item v-if="ruleForm.is_foot_bar_status == 1" label="收藏足迹栏">
+                            <div flex="box:mean" style="flex-wrap: wrap">
+                                <div style="max-width: 134.16px" v-for="(item, index) in ruleForm.foot_bar"
+                                     @click="openDialogForm(item,index, 4)"
+                                     class="order-box"
+                                     flex="dir:top box:mean main:center cross:center">
+                                    <div flex="cross:center">
+                                        <com-image width="30px" height="30px" mode="aspectFill" :src="item.icon_url">
+                                        </com-image>
+                                    </div>
+                                    <div>{{item.name}}</div>
+                                </div>
+                            </div>
+                        </el-form-item>
+                    </el-card>-->
                     <el-card shadow="never" style="margin-bottom: 20px;min-width:500px" body-style="padding-right:30%">
                         <div slot="header">
                             <span>订单栏设置</span>
@@ -290,7 +280,7 @@
                                 </div>
                             </div>
                         </el-form-item>
-                        <el-form-item v-if="ruleForm.is_order_bar_status == 1" label="订单栏-2">
+                        <!--<el-form-item v-if="ruleForm.is_order_bar_status == 1" label="订单栏-2">
                             <div flex="box:mean" style="flex-wrap: wrap">
                                 <div v-for="(item, index) in ruleForm.order_bar2"
                                      @click="openDialogForm(item,index, 6)"
@@ -303,36 +293,36 @@
                                     <div>{{item.name}}</div>
                                 </div>
                             </div>
-                        </el-form-item>
+                        </el-form-item>-->
                     </el-card>
 
-<!--                    <el-card shadow="never" style="margin-bottom: 20px;min-width:500px" body-style="padding-right:30%">-->
-<!--                        <div slot="header">-->
-<!--                            <span>账户栏设置</span>-->
-<!--                        </div>-->
-<!--                        <el-form-item label="显示状态">-->
-<!--                            <el-switch-->
-<!--                                    v-model="ruleForm.account_bar.status"-->
-<!--                                    active-value="1"-->
-<!--                                    inactive-value="0">-->
-<!--                            </el-switch>-->
-<!--                        </el-form-item>-->
-<!--                        <el-form-item label="我的账户">-->
-<!--                            <div flex="box:mean">-->
-<!--                                <div v-for="(item, index) in ruleForm.account_bar"-->
-<!--                                     v-if="index != 'status'"-->
-<!--                                     @click="openDialogForm(item, index, 2)"-->
-<!--                                     class="order-box"-->
-<!--                                     flex="dir:top box:mean main:center cross:center">-->
-<!--                                    <div flex="cross:center">-->
-<!--                                        <com-image width="21px" height="21px" mode="aspectFill" :src="item.icon">-->
-<!--                                        </com-image>-->
-<!--                                    </div>-->
-<!--                                    <div>{{item.text}}</div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </el-form-item>-->
-<!--                    </el-card>-->
+<!--                    <el-card shadow="never" style="margin-bottom: 20px;min-width:500px" body-style="padding-right:30%">
+                        <div slot="header">
+                            <span>账户栏设置</span>
+                        </div>
+                        <el-form-item label="显示状态">
+                            <el-switch
+                                    v-model="ruleForm.account_bar.status"
+                                    active-value="1"
+                                    inactive-value="0">
+                            </el-switch>
+                        </el-form-item>
+                        <el-form-item label="我的账户">
+                            <div flex="box:mean">
+                                <div v-for="(item, index) in ruleForm.account_bar"
+                                     v-if="index != 'status'"
+                                     @click="openDialogForm(item, index, 2)"
+                                     class="order-box"
+                                     flex="dir:top box:mean main:center cross:center">
+                                    <div flex="cross:center">
+                                        <com-image width="21px" height="21px" mode="aspectFill" :src="item.icon">
+                                        </com-image>
+                                    </div>
+                                    <div>{{item.text}}</div>
+                                </div>
+                            </div>
+                        </el-form-item>
+                    </el-card>-->
 
                     <el-card shadow="never" style="margin-bottom: 20px;min-width:500px" body-style="padding-right:30%">
                         <div slot="header">
@@ -461,7 +451,7 @@
             <el-form @submit.native.prevent :model="dialogForm" label-width="120px" size="small">
                 <template v-if="dialogFormType ===  1 || dialogFormType === 6 || dialogFormType === 4">
                     <el-form-item label="名称">
-                        <el-tag type="info">{{dialogForm.name}}</el-tag>
+                        <el-input v-model="dialogForm.name" placeholder=""></el-input>
                     </el-form-item>
 
                     <el-form-item label="图标" prop="icon_url">
@@ -482,7 +472,7 @@
                         </com-image>
                     </el-form-item>
                     <el-form-item label="路由">
-                        <el-input v-if="dialogFormType === 6" v-model="dialogForm.link_url" placeholder="输入路由"></el-input>
+                        <el-input v-if="dialogFormType === 1 || dialogFormType === 6" v-model="dialogForm.link_url" placeholder="输入路由"></el-input>
                     </el-form-item>
                 </template>
 
@@ -548,7 +538,7 @@
                     menu_title: '营销功能',
                     menu_style: '1',
                     menus: [],
-                    order_bar2: [
+                    /*order_bar2: [
                         {
                             id: 6,
                             name: '待使用',
@@ -556,7 +546,7 @@
                             link_url: '',
                             open_type: 'navigate'
                         }
-                    ],
+                    ],*/
                     order_bar: [
                         {
                             id: 1,
@@ -696,9 +686,9 @@
                     self.cardLoading = false;
                     if (e.data.code == 0) {
                         if (e.data.data.detail) {
-                            if(typeof e.data.data.detail['order_bar2'] == "undefined"){
+                            /*if(typeof e.data.data.detail['order_bar2'] == "undefined"){
                                 e.data.data.detail['order_bar2'] = self.ruleForm.order_bar2;
-                            }
+                            }*/
                             self.ruleForm = e.data.data.detail;
                         }
                     } else {
@@ -798,9 +788,9 @@
                 if (this.dialogFormType == 1) {
                     this.ruleForm.order_bar[this.dialogFormIndex] = this.dialogForm;
                 }
-                if (this.dialogFormType == 6) {
+                /*if (this.dialogFormType == 6) {
                     this.ruleForm.order_bar2[this.dialogFormIndex] = this.dialogForm;
-                }
+                }*/
                 if (this.dialogFormType == 2) {
                     this.ruleForm.account_bar[this.dialogFormIndex].text = this.dialogForm.name;
                     this.ruleForm.account_bar[this.dialogFormIndex].icon = this.dialogForm.icon_url;

@@ -111,6 +111,7 @@ class GetMchsForm extends BaseModel implements ICacheForm {
             'm.mall_id'       => \Yii::$app->mall->id,
             'm.is_delete'     => 0,
             'm.review_status' => Mch::REVIEW_STATUS_CHECKED,
+            'm.status'        => 1,
         ])->alias("m");
 
         $query->leftJoin("{{%store}} ss", "ss.mch_id=m.id");

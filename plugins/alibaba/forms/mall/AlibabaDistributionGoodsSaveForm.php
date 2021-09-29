@@ -46,6 +46,7 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
             }
 
             $goods->name              = $this->goods['name'];
+            $goods->cover_url         = $this->goods['cover_url'];
             $goods->ali_category_id   = implode(",", $this->goods['ali_category_id']);
             $goods->price             = $this->goods['price'];
             $goods->price_rate        = $this->goods['price_rate'];

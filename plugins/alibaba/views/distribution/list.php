@@ -379,6 +379,17 @@ Yii::$app->loadComponentView('com-rich-text');
                 <el-form-item label="标题" prop="name">
                     <el-input v-model="editGoods.formData.name" style="width:60%"></el-input>
                 </el-form-item>
+                <el-form-item label="封面" prop="editGoods.formData.cover_url">
+                    <com-attachment :multiple="false" :max="1" v-model="editGoods.formData.cover_url">
+                        <el-tooltip class="item"
+                                    effect="dark"
+                                    content="建议尺寸:240 * 240"
+                                    placement="top">
+                            <el-button size="mini">选择文件</el-button>
+                        </el-tooltip>
+                    </com-attachment>
+                    <com-image mode="aspectFill" width='80px' height='80px' :src="editGoods.formData.cover_url"></com-image>
+                </el-form-item>
                 <el-form-item label="轮播图" prop="name">
                     <template v-if="editGoods.formData.ali_product_info.info.image.images.length">
                         <draggable v-model="editGoods.formData.ali_product_info.info.image.images" flex="dif:left">

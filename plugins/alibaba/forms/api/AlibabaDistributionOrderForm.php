@@ -219,7 +219,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
         //计算运费
         $orderItem['express_price'] = 0;
         foreach($orderItem["goods_list"] as &$goodsItem){
-            $orderItem['express_price'] += $goodsItem['freight_price'];
+            $orderItem['express_price'] = max($goodsItem['freight_price'], $orderItem['express_price']);
         }
         $orderItem['express_origin_price'] = $orderItem['express_price'];
 

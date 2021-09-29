@@ -158,7 +158,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
 
             //规格分组
             $detail['sku_group_list'] = $this->skuGroupList($detail['sku_infos'], $detail['sku_list']);
-    
+
             return new APICacheDataForm([
                 "sourceData" => [
                     'code' => ApiCode::CODE_SUCCESS,

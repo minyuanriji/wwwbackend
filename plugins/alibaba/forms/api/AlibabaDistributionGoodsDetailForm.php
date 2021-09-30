@@ -227,7 +227,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                 foreach($item['sku_list'] as &$sku){
                     $names = [];
                     foreach(explode(",", $sku['ali_attributes']) as $valueId){
-                        if($valueId == $item['value_id']) continue;
+                        //if($valueId == $item['value_id']) continue;
                         $names[] = $skuInfos['values'][$valueId];
                     }
                     $sku['name'] = $sku['labels'] = implode("/", $names);

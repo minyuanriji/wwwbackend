@@ -188,54 +188,69 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
     private function skuGroupList(&$skuInfos, $skuList){
         $skuInfos['group']  = isset($skuInfos['group']) && is_array($skuInfos['group']) ? $skuInfos['group'] : [];
         $skuInfos['values'] = isset($skuInfos['values']) && is_array($skuInfos['values']) ? $skuInfos['values'] : [];
-
-        $attrNames = [];
-        foreach($skuInfos['group'] as $attr){
-            $attrNames[$attr['attributeID']] = $attr['attributeName'];
-        }
-
-        $groupValues = [];
-        foreach($skuInfos['values'] as $key => $value){
-            $part = explode(":", $key);
-            if(!isset($groupValues[$part[0]])){
-                $groupValues[$part[0]] = [];
+        if($skuInfos['group'] <= 1){ //只有一种规格的情况
+            $groupList = [];
+            if(count($skuInfos['group']) == 1){
+                $groups = $skuInfos['group'];
+                $group = array_shift($groups);
+                $groupList = [
+                    'value_name' => $group['attributeName'],
+                    'sku_list' => $skuList
+                ];
             }
-            if(!in_array($key, $groupValues[$part[0]])){
-                $groupValues[$part[0]][] = $key;
+        }else{
+            $attrNames = [];
+            foreach($skuInfos['group'] as $attr){
+                $attrNames[$attr['attributeID']] = $attr['attributeName'];
             }
-        }
-        $groupValues = array_slice($groupValues, 0, 1);
-        //把每个规格加入到各个类目下
-        foreach($groupValues as $attrId => $values){
-            $arr = [];
-            foreach($values as $valueId){
-                $item['value_id']   = $valueId;
-                $item['value_name'] = $skuInfos['values'][$valueId];
-                $item['sku_list']   = [];
-                foreach($skuList as $skuItem){
-                    if(strpos($skuItem['ali_attributes'], $valueId) === false)
-                        continue;
-                    $item['sku_list'][] = $skuItem;
+
+            $groupValues = [];
+            foreach($skuInfos['values'] as $key => $value){
+                $part = explode(":", $key);
+                if(!isset($groupValues[$part[0]])){
+                    $groupValues[$part[0]] = [];
                 }
-                $arr[] = $item;
+                if(!in_array($key, $groupValues[$part[0]])){
+                    $groupValues[$part[0]][] = $key;
+                }
             }
-            $groupValues[$attrId] = $arr;
-        }
-        //设置下类目下规格名称
-        foreach($groupValues as &$groupArr){
-            foreach($groupArr as &$item){
-                foreach($item['sku_list'] as &$sku){
-                    $names = [];
-                    foreach(explode(",", $sku['ali_attributes']) as $valueId){
-                        //if($valueId == $item['value_id']) continue;
-                        $names[] = $skuInfos['values'][$valueId];
+            $groupValues = array_slice($groupValues, 0, 1);
+            //把每个规格加入到各个类目下
+            foreach($groupValues as $attrId => $values){
+                $arr = [];
+                foreach($values as $valueId){
+                    //$item['value_id']   = $valueId;
+                    $item['value_name'] = $skuInfos['values'][$valueId];
+                    $item['sku_list']   = [];
+                    foreach($skuList as $skuItem){
+                        if(strpos($skuItem['ali_attributes'], $valueId) === false)
+                            continue;
+                        $item['sku_list'][] = $skuItem;
                     }
-                    $sku['name'] = $sku['labels'] = implode("/", $names);
-                    $sku['num']  = 0;
+                    $arr[] = $item;
+                }
+                $groupValues[$attrId] = $arr;
+            }
+            //设置下类目下规格名称
+            foreach($groupValues as &$groupArr){
+                foreach($groupArr as &$item){
+                    foreach($item['sku_list'] as &$sku){
+                        $names = [];
+                        foreach(explode(",", $sku['ali_attributes']) as $valueId){
+                            if($valueId == $item['value_id']) continue;
+                            $names[] = $skuInfos['values'][$valueId];
+                        }
+                        $sku['name'] = $sku['labels'] = implode("/", $names);
+                        $sku['num']  = 0;
+                    }
                 }
             }
+
+            $groupList = !empty($groupValues) ? $groupValues[0] : [];
         }
-        return !empty($groupValues) ? $groupValues[0] : [];
+
+
+        return $groupList;
     }
 
     /**

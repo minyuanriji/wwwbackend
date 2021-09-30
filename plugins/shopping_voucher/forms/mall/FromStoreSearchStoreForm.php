@@ -13,6 +13,7 @@ use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 
 class FromStoreSearchStoreForm extends BaseModel {
 
+    public $parent;
     public $id;
     public $name;
     public $district;
@@ -28,6 +29,7 @@ class FromStoreSearchStoreForm extends BaseModel {
     public function rules(){
         return [
             [['id', 'page'], 'integer'],
+            [['parent'], 'trim'],
             [['income_unit', 'cash_unit'], 'string'],
             [['name','district', 'date', 'income_min', 'cash_min', 'transfer_rate_max', 'transfer_rate_min'], 'safe']
         ];
@@ -50,6 +52,16 @@ class FromStoreSearchStoreForm extends BaseModel {
                 "m.review_status" => 1,
                 "m.is_delete" => 0
             ]);
+
+            //推荐人
+            if($this->parent){
+                $query->andWhere([
+                    "OR",
+                    ["p.id" => (int)$this->parent],
+                    ["LIKE", "p.nickname", $this->parent],
+                    ["LIKE", "p.mobile", $this->parent]
+                ]);
+            }
 
             //指定商户ID
             if($this->id){

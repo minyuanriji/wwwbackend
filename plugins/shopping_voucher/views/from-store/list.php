@@ -13,17 +13,79 @@ echo $this->render("com-edit");
         <div class="table-body">
             <el-alert title="说明：用户通过扫商户二维码进行付款，成功后可获得赠送购物券" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
 
-            <div class="input-item">
-                <el-input @keyup.enter.native="search" placeholder="请输入关键词搜索" v-model="searchData.keyword" clearable @clear="search">
-                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-                </el-input>
+            <div style="">
+                <el-button size="big" type="primary" @click="newStore">添加商户</el-button>
             </div>
-            <div style="float: right">
-                <el-button type="primary" style="padding: 9px 15px !important;"  @click="newStore">添加商户</el-button>
-            </div>
+
+            <el-card class="box-card" style="margin-top:20px;margin-bottom:20px;">
+                <el-form label-width="15%" size="small">
+                    <el-form-item label="推荐人">
+                        <el-input style="width:300px;" placeholder="ID/昵称/手机号" v-model="searchData.parent" clearable >
+                            <!--
+                            <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                            -->
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="关键词">
+                        <el-input style="width:300px;" placeholder="请输入关键词搜索" v-model="searchData.keyword" clearable>
+                            <!--
+                            <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                            -->
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="地区">
+                        <el-cascader
+                                :options="district"
+                                :props="props"
+                                v-model="searchData.district"
+                                clearable>
+                        </el-cascader>
+                    </el-form-item>
+                    <el-form-item label="日期">
+                        <el-date-picker
+                                v-model="searchData.date"
+                                type="datetimerange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="赠送比例">
+                        <el-input type="number" min="0" placeholder="最小值" v-model="searchData.give_value_min" style="width:100px;"></el-input>
+                        <span style="margin-left:10px;margin-right:10px;">至</span>
+                        <el-input type="number" min="0" placeholder="最大值" v-model="searchData.give_value_max" style="width:100px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="折扣">
+                        <el-input type="number" min="0" placeholder="最小值" v-model="searchData.transfer_rate_min" style="width:100px;"></el-input>
+                        <span style="margin-left:10px;margin-right:10px;">至</span>
+                        <el-input type="number" min="0" placeholder="最大值" v-model="searchData.transfer_rate_max" style="width:100px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="收入统计">
+                        <el-date-picker
+                                v-model="searchData.income_stat_date"
+                                type="datetimerange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期">
+                   </el-form-item>
+                    <el-form-item label="赠送购物券统计">
+                        <el-date-picker
+                                v-model="searchData.send_stat_date"
+                                type="datetimerange"
+                                range-separator="至"
+                                start-placeholder="开始日期"
+                                end-placeholder="结束日期">
+                    </el-form-item>
+                    <el-form-item >
+                        <el-button @click="search" size="big" icon="el-icon-search" type="primary">点击搜索</el-button>
+                    </el-form-item>
+                </el-form>
+
+            </el-card>
+
             <el-table :data="list" border style="width: 100%" v-loading="loading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column sortable="custom" label="商户名称" width="350">
+                <el-table-column sortable="custom" label="商户名称" width="300">
                     <template slot-scope="scope">
                         <div flex="box:first">
                             <div style="padding-right: 10px;">
@@ -43,18 +105,37 @@ echo $this->render("com-edit");
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="give_value" label="赠送比例（%）" width="200"></el-table-column>
-                <el-table-column prop="scope" width="200" label="启动时间">
+                <el-table-column prop="give_value" label="赠送比例/折扣" width="130">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.give_value}}%</div>
+                        <div style="color:darkred">折扣：{{scope.row.transfer_rate}}折</div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="total_income" label="总收入" width="110"></el-table-column>
+                <el-table-column prop="total_send" label="总送出" width="110"></el-table-column>
+                <el-table-column prop="parent_nickname" label="推荐人" width="150"></el-table-column>
+                <el-table-column label="手机/地址" width="180">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.mobile}}</div>
+                        <el-tooltip class="item" effect="dark" placement="top">
+                            <template slot="content">
+                                {{scope.row.province}} {{scope.row.city}} {{scope.row.district}}{{scope.row.address}}
+                            </template>
+                            <com-ellipsis :line="1">{{scope.row.province}} {{scope.row.city}} {{scope.row.district}}{{scope.row.address}}</com-ellipsis>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="scope" width="110" label="启动时间">
                     <template slot-scope="scope">
                         {{scope.row.start_at}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="scope" width="150" label="添加时间">
+                <el-table-column prop="scope" width="110" label="添加时间">
                     <template slot-scope="scope">
                         {{scope.row.created_at|dateTimeFormat('Y-m-d')}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="scope" width="150" label="更新时间">
+                <el-table-column prop="scope" width="110" label="更新时间">
                     <template slot-scope="scope">
                         {{scope.row.updated_at|dateTimeFormat('Y-m-d')}}
                     </template>
@@ -121,8 +202,29 @@ echo $this->render("com-edit");
                 editDialogVisible: false,
                 editData: {},
                 searchData: {
-                    keyword: ''
+                    parent: '',
+                    keyword: '',
+                    district: '',
+                    date: '',
+                    income_unit: 'day',
+                    income_min: '',
+                    cash_unit: 'day',
+                    cash_min: '',
+                    page: 1,
+                    transfer_rate_min:'',
+                    transfer_rate_max: '',
+                    give_value_min: '',
+                    give_value_max: '',
+                    income_stat_date: '',
+                    send_stat_date: ''
                 },
+                props: {
+                    value: 'id',
+                    label: 'name',
+                    children: 'list',
+                    checkStrictly: true
+                },
+                district: [],
                 date: '',
                 list: [],
                 pagination: null,
@@ -210,13 +312,12 @@ echo $this->render("com-edit");
                 this.getList();
             },
             getList() {
-                let params = {
-                    r: 'plugin/shopping_voucher/mall/from-store/list',
-                    page: this.page,
-                    keyword: this.searchData.keyword,
-                };
+                let params = Object.assign({
+                    r: 'plugin/shopping_voucher/mall/from-store/list'
+                }, this.searchData);
+                params['page'] = this.page;
                 request({
-                    params,
+                    params
                 }).then(e => {
                     if (e.data.code === 0) {
                         this.list = e.data.data.list;
@@ -235,10 +336,26 @@ echo $this->render("com-edit");
             },
             close(){
                 this.editDialogVisible = false;
+            },
+            // 获取省市区列表
+            getDistrict() {
+                request({
+                    params: {
+                        r: 'district/index',
+                        level: 3
+                    },
+                }).then(e => {
+                    if (e.data.code == 0) {
+                        this.district = e.data.data.district;
+                    }
+                }).catch(e => {
+
+                });
             }
         },
         mounted: function() {
             this.getList();
+            this.getDistrict();
         }
     });
 </script>
@@ -286,9 +403,4 @@ echo $this->render("com-edit");
         margin: 0;
     }
 
-    .table-body .el-button {
-        padding: 0!important;
-        border: 0;
-        margin: 0 5px;
-    }
 </style>

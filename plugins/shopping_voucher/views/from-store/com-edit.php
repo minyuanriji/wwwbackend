@@ -6,7 +6,13 @@
         <el-dialog width="70%" :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
 
             <el-form label-width="15%" size="small">
-
+                <el-form-item label="推荐人">
+                    <el-input :disabled="searchStatus==1" style="width:300px;" placeholder="ID/昵称/手机号" v-model="searchForm.parent" clearable >
+                        <!--
+                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                        -->
+                    </el-input>
+                </el-form-item>
                 <el-form-item label="ID">
                     <el-input :disabled="searchStatus==1" type="number" min="0" placeholder="按商户ID精确搜索" v-model="searchForm.id" style="width:300px;"></el-input>
                 </el-form-item>
@@ -75,7 +81,12 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="id" label="ID" width="90"> </el-table-column>
+                    <el-table-column label="当前赠送比例/折扣" width="150">
+                        <template slot-scope="scope">
+                            <div>{{scope.row.give_value ? (scope.row.give_value+"%") : "-"}}</div>
+                            <div style="color:darkred">折扣：{{scope.row.transfer_rate}}折</div>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="手机/地址" width="260">
                         <template slot-scope="scope">
                             <div>{{scope.row.mobile}}</div>
@@ -88,10 +99,10 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="account_money" label="账户余额" width="150"> </el-table-column>
-                    <el-table-column label="推荐人/折扣" width="150">
+                    <el-table-column label="推荐人" width="150">
                         <template slot-scope="scope">
                             <com-ellipsis :line="1">{{scope.row.parent_nickname}}</com-ellipsis>
-                            <div style="color:darkred">折扣：{{scope.row.transfer_rate}}折</div>
+
                         </template>
                     </el-table-column>
                     <el-table-column prop="created_at" label="入驻时间" width="150"> </el-table-column>
@@ -156,6 +167,7 @@
                 activeName: "first",
                 dialogVisible: false,
                 searchForm:{
+                    parent: '',
                     id: '',
                     name:'',
                     district: '',

@@ -188,7 +188,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
     private function skuGroupList(&$skuInfos, $skuList){
         $skuInfos['group']  = isset($skuInfos['group']) && is_array($skuInfos['group']) ? $skuInfos['group'] : [];
         $skuInfos['values'] = isset($skuInfos['values']) && is_array($skuInfos['values']) ? $skuInfos['values'] : [];
-        if($skuInfos['group'] <= 1){ //只有一种规格的情况
+        if(count($skuInfos['group']) <= 1){ //只有一种规格的情况
             $groupList = [];
             if(count($skuInfos['group']) == 1){
                 $groups = $skuInfos['group'];

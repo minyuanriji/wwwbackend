@@ -74,9 +74,11 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
 
             $detail['id']               = $goods->id;
             $detail['name']             = $goods->name;
-            $detail['shopping_voucher'] = $goods->freight_price * (1/$expressRate) + static::getShoppingVoucherDecodeNeedNumber($goods, 0,  $goods->price, 1);
+            $detail['freight_price']    = $goods->freight_price * (1/$expressRate);
+            $detail['shopping_voucher'] = $detail['freight_price'] + static::getShoppingVoucherDecodeNeedNumber($goods, 0,  $goods->price, 1);
             $detail['price']            = $goods->price;
             $detail['origin_price']     = $goods->origin_price;
+
             if(isset($aliInfo['info'])){
                 $detail['images']           = $aliInfo['info']['image']['images'];
                 $detail['saleInfo']         = $aliInfo['info']['saleInfo'];
@@ -150,7 +152,6 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             }
 
             //计算各个规格使用购物券兑换的价格
-            $detail['freight_price'] = $goods->freight_price * (1/$expressRate);
             foreach($detail['sku_list'] as &$skuItem){
                 $skuItem['freight_price'] = $skuItem['freight_price'] * (1/$expressRate);
                 $detail['freight_price']  = max($detail['freight_price'] , $skuItem['freight_price']);

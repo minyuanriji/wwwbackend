@@ -9,6 +9,7 @@ use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchAccountLog;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 
 class FromStoreSearchStoreForm extends BaseModel {
 
@@ -21,14 +22,14 @@ class FromStoreSearchStoreForm extends BaseModel {
     public $cash_unit;
     public $cash_min;
     public $page;
-    public $transfer_rate_unit;
+    public $transfer_rate_max;
     public $transfer_rate_min;
 
     public function rules(){
         return [
             [['id', 'page'], 'integer'],
-            [['income_unit', 'cash_unit', 'transfer_rate_unit'], 'string'],
-            [['name','district', 'date', 'income_min', 'cash_min', 'transfer_rate_min'], 'safe']
+            [['income_unit', 'cash_unit'], 'string'],
+            [['name','district', 'date', 'income_min', 'cash_min', 'transfer_rate_max', 'transfer_rate_min'], 'safe']
         ];
     }
 
@@ -43,6 +44,7 @@ class FromStoreSearchStoreForm extends BaseModel {
             $query->innerJoin(["s" => Store::tableName()], "s.mch_id=m.id");
             $query->innerJoin(["u" => User::tableName()], "u.id=m.user_id");
             $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
+            $query->leftJoin(["ss" => ShoppingVoucherFromStore::tableName()], "s.id=ss.store_id");
             $query->orderBy("m.id DESC");
             $query->where([
                 "m.review_status" => 1,
@@ -77,17 +79,17 @@ class FromStoreSearchStoreForm extends BaseModel {
                     ["<", "m.created_at", strtotime($this->date[1])]
                 ]);
             }
-            //折扣
+            //最小折扣
             if(is_numeric($this->transfer_rate_min) && $this->transfer_rate_min >= 0){
                 $val = 100 - ($this->transfer_rate_min/10) * 100;
-                if($this->transfer_rate_unit == ">"){
-                    $query->andWhere([">", "m.transfer_rate", $val]);
-                }elseif($this->transfer_rate_unit == "<"){
-                    $query->andWhere(["<", "m.transfer_rate", $val]);
-                }else{
-                    $query->andWhere(["m.transfer_rate" => $val]);
-                }
+                $query->andWhere(["<=", "m.transfer_rate", $val]);
             }
+            //最大折扣
+            if(is_numeric($this->transfer_rate_max) && $this->transfer_rate_max >= 0){
+                $val = 100 - ($this->transfer_rate_max/10) * 100;
+                $query->andWhere([">=", "m.transfer_rate", $val]);
+            }
+
             //收入
             if(is_numeric($this->income_min) && $this->income_min >= 0){
                 if($this->income_unit == "day"){ //日收入（前一日）
@@ -121,6 +123,7 @@ class FromStoreSearchStoreForm extends BaseModel {
 
             $selects = ["m.id", "s.mall_id", "s.id as store_id",  "s.name", "s.cover_url", "s.mobile", "s.address", "s.province_id", "s.city_id", "s.district_id",
                 "m.created_at", "m.account_money", "m.transfer_rate", "p.nickname as parent_nickname"];
+            $selects = array_merge($selects, ["ss.give_value", "ss.give_type"]);
 
             $query->select($selects);
 

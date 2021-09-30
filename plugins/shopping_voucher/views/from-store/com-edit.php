@@ -33,12 +33,9 @@
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item label="折扣">
-                    <el-select :disabled="searchStatus==1"  v-model="searchForm.transfer_rate_unit" placeholder="请选择" style="width:130px;">
-                        <el-option value=">" label="大于"></el-option>
-                        <el-option value="=" label="等于"></el-option>
-                        <el-option value="<" label="小于"></el-option>
-                    </el-select>
-                    <el-input :disabled="searchStatus==1" type="number" min="0" placeholder="最小值" v-model="searchForm.transfer_rate_min" style="width:200px;"></el-input>
+                    <el-input :disabled="searchStatus==1" type="number" min="0" placeholder="最小值" v-model="searchForm.transfer_rate_min" style="width:100px;"></el-input>
+                    <span style="margin-left:10px;margin-right:10px;">至</span>
+                    <el-input :disabled="searchStatus==1" type="number" min="0" placeholder="最大值" v-model="searchForm.transfer_rate_max" style="width:100px;"></el-input>
                 </el-form-item>
                 <el-form-item label="收入">
                     <el-select :disabled="searchStatus==1"  v-model="searchForm.income_unit" placeholder="请选择" style="width:130px;">
@@ -78,6 +75,7 @@
                             </div>
                         </template>
                     </el-table-column>
+                    <el-table-column prop="id" label="ID" width="90"> </el-table-column>
                     <el-table-column label="手机/地址" width="260">
                         <template slot-scope="scope">
                             <div>{{scope.row.mobile}}</div>
@@ -167,8 +165,8 @@
                     cash_unit: 'day',
                     cash_min: '',
                     page: 1,
-                    transfer_rate_unit: '=',
-                    transfer_rate_min:''
+                    transfer_rate_min:'',
+                    transfer_rate_max: ''
                 },
                 searchStatus: 0,
                 searchLoading: false,
@@ -226,6 +224,7 @@
                 let params = Object.assign({
                     r: 'plugin/shopping_voucher/mall/from-store/search-store'
                 }, this.searchForm);
+                params['page'] = 1;
                 this.searchStatus=1;
                 this.searchLoading=true;
                 request({

@@ -4,6 +4,7 @@ namespace app\plugins\alibaba\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
+use app\plugins\alibaba\forms\api\AlibabaDistributionOrderRefundApplyForm;
 use app\plugins\alibaba\forms\api\AlibabaDistributionOrderRefundReasonsForm;
 
 class DistributionOrderRefundController extends ApiController {
@@ -14,6 +15,16 @@ class DistributionOrderRefundController extends ApiController {
                 'class' => LoginFilter::class,
             ],
         ]);
+    }
+
+    /**
+     * 退款申请
+     * @return \yii\web\Response
+     */
+    public function actionApply(){
+        $form = new AlibabaDistributionOrderRefundApplyForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->doApply());
     }
 
     /**

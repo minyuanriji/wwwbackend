@@ -25,14 +25,47 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
     }
 
     /**
+     * 申请退款
+     * @param $data
+     * @throws \Exception
+     */
+    public function applyRefund($data){
+        if($this->refund_status != "none"){
+            throw new \Exception("当前状态无法申请退款");
+        }
+
+        $order = $this->order;
+        if(!$order || $order->is_delete || !$order->is_pay){
+            throw new \Exception("订单不存在或未支付");
+        }
+
+        $data['apply_time'] = date("Y-m-d H:i:s", time());
+        try {
+            $this->refund_status    = "apply";
+            $this->refund_json_data = json_encode($data);
+            if(!$this->save()){
+                throw new \Exception(json_encode($this->getErrors()));
+            }
+        }catch (\Exception $e){
+            throw $e;
+        }
+    }
+
+    /**
      * 同意退款
      * @param boolean $trans
      * @param string $desc
      * @throws \yii\db\Exception
      */
     public function agreeRefund($trans = false, $desc = ""){
-        if($this->refund_status != "apply")
-            return;
+        if($this->refund_status != "apply"){
+            throw new \Exception("只有申请中状态才允许同意退款操作");
+        }
+
+        $order = $this->order;
+        if(!$order || $order->is_delete || $order->is_pay){
+            throw new \Exception("订单不存在或未支付");
+        }
 
         $trans && ($t = \Yii::$app->db->beginTransaction());
         try {
@@ -42,7 +75,7 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
                 throw new \Exception(json_encode($this->getErrors()));
             }
 
-            $order = $this->order;
+
 
             //判断如果所有商品都申请了退款，退还运费
             $existCount = (int)static::find()->where([

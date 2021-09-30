@@ -1,3 +1,6 @@
+<?php
+echo $this->render("com-refund-agree");
+?>
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
         <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -42,7 +45,7 @@
                                 <com-image style="float: left;margin-right: 10px;height: 80px;width: 80px"
                                            :src="scope.row.cover_url"></com-image>
                                 <div style="margin: 10px 0">{{ scope.row.goods_name }}（ID：{{scope.row.goods_id}}）</div>
-                                小计：<span style="font-size: 16px;color: red">{{ scope.row.unit_price }}</span>
+                                小计：<span style="color: red">{{ scope.row.unit_price }}</span>
                                 <span style="margin-left: 30px">数量：×
                                     <span style="font-size: 16px;color: green">{{scope.row.num}}</span>
                                 </span>
@@ -68,12 +71,12 @@
                                 <div v-if="scope.row.pay_type==1">现金：{{scope.row.total_price ?? 0}}</div>
                                 <div v-if="scope.row.pay_type==2">货到付款</div>
                                 <div v-if="scope.row.pay_type==3">购物券：
-                                    <span style="font-size: 16px;color: red">
+                                    <span >
                                     {{scope.row.shopping_voucher_decode_price ?? 0}}
                                 </span>
                                 </div>
-                                <div>运费：<span style="font-size: 16px;color: #13ce66">{{ scope.row.shopping_voucher_express_use_num }}</span></div>
-                                <div>总计：<span style="font-size: 22px">{{ scope.row.total_shopping_voucher_price }}</span></div>
+                                <div>运费：<span>{{ scope.row.shopping_voucher_express_use_num }}</span></div>
+                                <div>总计：<span>{{ scope.row.total_shopping_voucher_price }}</span></div>
                             </div>
                         </template>
                     </el-table-column>
@@ -84,21 +87,22 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="操作">
+                    <el-table-column label="操作" width="230">
                         <template slot-scope="scope">
-                            <el-button @click="apply(scope.row, 'agree')" v-if="activeName == 'apply'" size="mini" circle style="margin-top: 10px">
+
+                            <el-button @click="agree(scope.row)" type="text"  v-if="activeName == 'apply'" size="mini" circle >
                                 <el-tooltip class="item" effect="dark" content="同意" placement="top">
                                     <img src="statics/img/mall/pass.png" alt="">
                                 </el-tooltip>
                             </el-button>
 
-                            <el-button @click="apply(scope.row, 'refused')" v-if="activeName == 'apply'" size="mini" circle style="margin-left: 10px;margin-top: 10px">
+                            <el-button @click="apply(scope.row, 'refused')" type="text"  v-if="activeName == 'apply'" size="mini" circle>
                                 <el-tooltip class="item" effect="dark" content="拒绝" placement="top">
                                     <img src="statics/img/mall/nopass.png" alt="">
                                 </el-tooltip>
                             </el-button>
 
-                            <el-button @click="apply(scope.row, 'paid')" v-if="activeName == 'agree'" size="mini" circle style="margin-top: 10px">
+                            <el-button @click="apply(scope.row, 'paid')" type="text"  v-if="activeName == 'agree'" size="mini" circle>
                                 <el-tooltip class="item" effect="dark" content="打款" placement="top">
                                     <img src="statics/img/mall/pay.png" alt="">
                                 </el-tooltip>
@@ -122,6 +126,8 @@
             </div>
         </el-tabs>
     </el-card>
+
+    <com-refund-agree :visible="agreeEdit.dialogVisible" @close="agreeEdit.dialogVisible=false"></com-refund-agree>
 </div>
 <script>
     const app = new Vue({
@@ -141,12 +147,19 @@
                 list: [],
                 pagination: null,
                 exportList: [],
+                agreeEdit: {
+                    dialogVisible: false
+                }
             };
         },
         mounted() {
             this.loadData();
         },
         methods: {
+            //同意退款操作
+            agree(row){
+                this.agreeEdit.dialogVisible = true;
+            },
             // 日期搜索
             changeTime() {
                 if (this.search.time) {
@@ -254,13 +267,6 @@
         margin-top: 10px;
         margin-right: 40px;
     }
-    .el-tabs__header {
-        padding: 0 20px;
-        height: 56px;
-        line-height: 56px;
-        background-color: #fff;
-    }
-
     .com-order-user {
         margin-left: 30px;
     }
@@ -269,21 +275,10 @@
         color: #909399;
     }
 
-    .export-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 2;
-    }
 
     .table-body {
         padding: 20px;
         background-color: #fff;
     }
 
-    .table-body .el-button {
-        padding: 0!important;
-        border: 0;
-        margin: 0 5px;
-    }
 </style>

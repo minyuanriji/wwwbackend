@@ -315,13 +315,16 @@ class AlibabaDistributionOrderForm extends BaseModel{
         $mainData['shopping_voucher']['remaining'] = round($userRemainingShoppingVoucher, 2);
 
         //统计订单待支付总金额
-        foreach($mainData['list'] as $orderItem){
+        foreach($mainData['list'] as &$orderItem){
             $mainData['shopping_voucher']['decode_price'] += $orderItem['shopping_voucher_decode_price'];
             $mainData['shopping_voucher']['decode_price'] += $orderItem['shopping_voucher_express_decode_price'];
             $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_use_num'];
             $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_express_use_num'];
             $mainData['total_price'] += $orderItem['total_price'];
+            $orderItem['total_price'] = round($orderItem['total_price'], 2);
             $orderItem['total_goods_original_price'] = round($orderItem['total_goods_original_price'], 2);
+            $orderItem['if_shopping_voucher_need_total_num'] = round($orderItem['if_shopping_voucher_need_total_num'], 2);
+            $orderItem['shopping_voucher_express_use_num'] = round($orderItem['shopping_voucher_express_use_num'], 2);
         }
         $mainData['total_price'] = round($mainData['total_price'], 2);
 

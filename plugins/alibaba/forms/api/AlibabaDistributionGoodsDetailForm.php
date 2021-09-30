@@ -74,7 +74,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
 
             $detail['id']               = $goods->id;
             $detail['name']             = $goods->name;
-            $detail['freight_price']    = $goods->freight_price * (1/$expressRate);
+            $detail['freight_price']    = round($goods->freight_price * (1/$expressRate), 2);
             $detail['shopping_voucher'] = round($detail['freight_price'] + static::getShoppingVoucherDecodeNeedNumber($goods, 0,  $goods->price, 1), 2);
             $detail['price']            = $goods->price;
             $detail['origin_price']     = $goods->origin_price;

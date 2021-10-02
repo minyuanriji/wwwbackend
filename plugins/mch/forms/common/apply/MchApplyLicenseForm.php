@@ -23,9 +23,9 @@ class MchApplyLicenseForm extends BaseModel{
 
     public function rules(){
         return [
-            [['user_id', 'license_name', 'license_pic', 'cor_realname', 'cor_num', 'cor_pic1', 'cor_pic2'], 'required'],//'license_num'
+            [['user_id', 'license_name', 'license_pic'], 'required'],//'license_num'
             [['user_id'], 'integer'],
-            [['settle_num', 'settle_realname', 'settle_bank', 'settle_discount'], 'safe']
+            [['settle_num', 'settle_realname', 'settle_bank', 'settle_discount', 'cor_realname', 'cor_num', 'cor_pic1', 'cor_pic2'], 'safe']
         ];
     }
 

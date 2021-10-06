@@ -161,7 +161,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     "num"    => $orderDetail->ali_num
                 ]
             ]),
-            "message" => "发货不要放任何单据，有任何问题先不发货，不打客户收货电话，打这个电话13536992449/020-31923526"
+            "message" => "发货不要放任何收据清单、产品价格，因为我们是分销商，不要直接联系客户，有任何问题请与我们联系，不要直接打客户电话，打这个电话13536992449/020-31923526"
         ];
         $res = $distribution->requestWithToken(new OrderCreate($postData), $app->access_token);
         if(!empty($res->error)){

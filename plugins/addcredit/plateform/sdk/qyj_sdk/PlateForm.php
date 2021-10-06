@@ -30,10 +30,10 @@ class PlateForm implements IOrder
         ]))->run();
     }
 
-    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform)
+    public function submit($qyj_order_num, AddcreditPlateforms $plateform)
     {
         return (new SubmitOrderAction([
-            'AddcreditOrder'    => $orderModel,
+            'qyj_order_num'    => $qyj_order_num,
             'AddcreditPlateforms' => $plateform,
         ]))->run();
     }

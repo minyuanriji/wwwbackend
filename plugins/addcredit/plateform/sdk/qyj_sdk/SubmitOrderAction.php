@@ -3,6 +3,7 @@
 namespace app\plugins\addcredit\plateform\sdk\qyj_sdk;
 
 use app\core\ApiCode;
+use app\plugins\addcredit\forms\common\AccessToken;
 use app\plugins\addcredit\forms\common\Request;
 use app\plugins\addcredit\plateform\result\SubmitResult;
 use app\plugins\addcredit\forms\common\TelType;
@@ -10,7 +11,7 @@ use yii\base\BaseObject;
 
 class SubmitOrderAction extends BaseObject
 {
-    public $AddcreditOrder;
+    public $qyj_order_num;
     public $AddcreditPlateforms;
 
     /**
@@ -41,36 +42,29 @@ class SubmitOrderAction extends BaseObject
             $plateforms_param = json_decode($this->AddcreditPlateforms->json_param,true);
 //            $teltype = (new TelType())->getPhoneType($this->AddcreditOrder->mobile);
             $param = [
-                'out_trade_num'    => $this->AddcreditOrder->order_no,
-                'product_id'       => 1,
-                'account'          => $this->AddcreditOrder->mobile,
-                'userid'           => $plateforms_param['id'],
-                'notify_url'       => '',
-                'amount'           => '',
-                'apikey'           => $plateforms_param['secret_key'],
+                'app_id'    => $plateforms_param['id'],
+                'order_num' => $this->qyj_order_num,
+                'sign'      => strtolower(md5($plateforms_param['id'] . "!@#" . $plateforms_param['secret_key'])),
             ];
-            ksort($param);
-            $sign_str = http_build_query($param);
-            $sign = strtoupper(md5($sign_str));
-            $param['sign'] = $sign;
-            $sign_str .= "&sign=" . $sign;
-            $response = Request::http_get(Config::PHONE_BILL_SUBMIT, $sign_str);
+            $cacheKey = md5($plateforms_param['id'] . $plateforms_param['secret_key']);
+            $token = AccessToken::getAccessToken($cacheKey, $plateforms_param['id'], $plateforms_param['secret_key']);
+            if (!$token || $token['code'] == ApiCode::CODE_FAIL) {
+                throw new \Exception($token['msg'] ?? '获取access_token失败');
+            }
+            $response = Request::execute(Config::PHONE_BILL_SUBMIT, $param, $token);
             $parseArray = json_decode($response, true);
-            if (!isset($parseArray['errno'])) {
+            if (!isset($parseArray['code'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
             }
 
-            if ($parseArray['errno'] != Code::ORDER_SUCCESS) {
-                if (isset($parseArray['errmsg'])) {
-                    throw new \Exception($parseArray['errmsg']);
-                } else {
-                    throw new \Exception("未知错误 " . $parseArray['errno']);
-                }
+            if ($parseArray['code'] != Code::OVERALL_SITUATION_SUCCESS) {
+                throw new \Exception($parseArray['message']);
             }
-            $SubmitResult->code = $parseArray['errno'];
+
+            $SubmitResult->code = SubmitResult::CODE_SUCC;
             $SubmitResult->response_content = $response;
             $SubmitResult->request_data = json_encode($param);
-            $SubmitResult->message = $parseArray['errmsg'];
+            $SubmitResult->message = $parseArray['message'];
         } catch (\Exception $e) {
             $SubmitResult->code = SubmitResult::CODE_FAIL;
             $SubmitResult->message = $e->getMessage();

@@ -11,13 +11,13 @@ class Config
     const GET_GOODS_DETAIL = "/produce/getrechargedetail";
 
     //商品下单接口
-    const CREATE_ORDER = "/produce/createorder";
+    const CREATE_ORDER      = "/produce/createorder";
 
-    //下单请求
-    const PHONE_BILL_SUBMIT = "recharge";
+    //支付接口
+    const PHONE_BILL_SUBMIT = "/produce/recharge";
 
     //订单查询
-    const ORDER_QUERY       = "check";
+    const ORDER_QUERY       = "/produce/orderinfo";
 
     //查询用户信息
     const BALANCE_QUERY     = "user";

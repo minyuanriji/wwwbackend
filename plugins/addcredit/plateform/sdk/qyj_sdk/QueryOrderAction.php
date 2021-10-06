@@ -3,6 +3,7 @@
 namespace app\plugins\addcredit\plateform\sdk\qyj_sdk;
 
 use app\core\ApiCode;
+use app\plugins\addcredit\forms\common\AccessToken;
 use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\addcredit\forms\common\Request;
 use app\plugins\addcredit\plateform\result\QueryResult;
@@ -32,25 +33,29 @@ class QueryOrderAction extends BaseObject
         try {
             $AddcreditPlateformsInfo = AddcreditPlateforms::findOne($this->AddcreditOrder->plateform_id);
             if (!$AddcreditPlateformsInfo) {
-                throw new \Exception("无法获取ADDCREDIT ID " . $this->AddcreditOrder->plateform_id . " 平台信息", ApiCode::CODE_FAIL);
+                throw new \Exception("无法获取ADDCREDIT ID " . $this->AddcreditOrder->plateform_id . " 平台信息");
             }
-            $plateforms_param = json_decode($AddcreditPlateformsInfo->json_param);
+            $plateforms_param = json_decode($AddcreditPlateformsInfo->json_param, true);
             $post_param = [
-                'userid'         => $plateforms_param->id,
-                'no'             => $this->AddcreditOrder->order_no,
-                'apikey'         => $plateforms_param->secret_key,
+                'app_id'       => $plateforms_param['id'],
+                'order_num'    => $this->AddcreditOrder->qyj_order_num,
+                'sign'         => strtolower(md5($plateforms_param['id'] . "!@#" . $plateforms_param['secret_key']))
             ];
-            ksort($post_param);
-            $sign_str = http_build_query($post_param);
-            $sign = strtoupper(md5($sign_str));
-            $post_param['sign'] = $sign;
-            $sign_str .= "&sign=" . $sign;
-            $response = Request::http_get(Config::ORDER_QUERY, $sign_str);
-            print_r($response);die;
+            $cacheKey = md5($this->params['orderInfo']['appId'] . $plateforms_param['secret_key']);
+            $token = AccessToken::getAccessToken($cacheKey, $this->params['orderInfo']['appId'], $plateforms_param['secret_key']);
+            if (!$token || $token['code'] == ApiCode::CODE_FAIL) {
+                throw new \Exception($token['msg'] ?? '获取access_token失败');
+            }
+            $response = Request::execute(Config::ORDER_QUERY, $post_param, $token);
             $parseArray = json_decode($response, true);
             if (!isset($parseArray['code'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
             }
+
+            if ($parseArray['code'] != Code::OVERALL_SITUATION_SUCCESS) {
+                throw new \Exception($parseArray['msg']);
+            }
+
             $QueryResult->code = QueryResult::CODE_SUCC;
             $QueryResult->response_content = $response;
             $QueryResult->request_data = json_encode($post_param);

@@ -7,16 +7,8 @@ class Code
     //1、全局成功状态码
         const OVERALL_SITUATION_SUCCESS = 200;
 
-    //1、充值请求状态码
-        // 订单创建成功
-        const ORDER_SUCCESS = 0;
-
-    //2、查单状态码
-        // 查询成功
-        const QUERY_SUCCESS     = 0;
-        const QUERY_FAIL        = 5;
-        const QUERY_REFUND      = 4;
-        const QUERY_ORDER_EMPTY = 5005;
+    //2、支付结果状态码
+        const PAY_STATUS_SUCCESS = 1;
 
     //3、获取余额状态码
         //查询成功

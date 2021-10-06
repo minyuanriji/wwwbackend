@@ -85,6 +85,7 @@ class PhoneOrderSubmitForm extends BaseModel
             }
             $order->plateform_request_data = $createOrder->request_data;
             $order->plateform_response_data = $createOrder->response_content;
+            $order->qyj_order_num = $createOrder->response_content->data;
             if(!$order->save()){
                 throw new \Exception($this->responseErrorMsg($order));
             }
@@ -94,7 +95,7 @@ class PhoneOrderSubmitForm extends BaseModel
                 'data'  => [
                     "order_id"    => $order->id,
                     "order_no"    => $order->order_no,
-                    "qyj_order_no"=> $createOrder->response_content->data,
+                    "qyj_order_num"=> $createOrder->response_content->data,
                     "order_price" => round($order->order_price, 2)
                 ]
             ];

@@ -36,11 +36,11 @@ interface IOrder
 
     /**
      * 提交订单
-     * @param AddcreditOrder $orderModel
+     * @param $qyj_order_num
      * @param AddcreditPlateforms $plateform
      * @return SubmitResult
      */
-    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform);
+    public function submit($qyj_order_num, AddcreditPlateforms $plateform);
 
     /**
      * 查询订单

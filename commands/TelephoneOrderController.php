@@ -8,16 +8,13 @@ use app\models\User;
 use app\plugins\addcredit\forms\api\order\PhoneOrderRefundForm;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\plateform\result\QueryResult;
-use app\plugins\addcredit\plateform\sdk\k_default\Code as one_Code;
-use app\plugins\addcredit\plateform\sdk\kcb_sdk\PlateForm as kcb_PlateForm;
+use app\plugins\addcredit\plateform\sdk\qyj_sdk\Code;
+use app\plugins\addcredit\plateform\sdk\qyj_sdk\PlateForm;
 
 class TelephoneOrderController extends BaseCommandController
 {
-
     public function actionMaintantJob()
-    {die;
-        $this->orderQuery();
-
+    {
         $this->mutiKill();
 
         echo date("Y-m-d H:i:s") . " 话费订单查询中...\n";
@@ -25,9 +22,7 @@ class TelephoneOrderController extends BaseCommandController
         while (true) {
             $this->sleep(1);
             try {
-
                 $this->orderQuery();
-
             } catch (\Exception $e) {
                 $this->commandOut($e->getMessage());
             }
@@ -45,7 +40,7 @@ class TelephoneOrderController extends BaseCommandController
 
         if (!$orderList) return false;
 
-        $plate_form = new kcb_PlateForm();
+        $plate_form = new PlateForm();
         foreach ($orderList as $item)
         {
             try {
@@ -62,8 +57,8 @@ class TelephoneOrderController extends BaseCommandController
                     $item->updated_at = time();
                     switch ($response_content['status'])
                     {
-                        case one_Code::PAY_STATUS_PAID:
-                            if ($response_content['arrival'] == one_Code::COMPLETE_STATUS_RECEIVED) {
+                        case Code::PAY_STATUS_SUCCESS:
+                            if ($response_content['arrival'] == Code::COMPLETE_STATUS_RECEIVED) {
                                 $item->order_status = AddcreditOrder::ORDER_STATUS_SUC;
                                 $item->plateform_request_data = $query_res->request_data;
                                 $item->plateform_response_data = $query_res->response_content;
@@ -72,8 +67,8 @@ class TelephoneOrderController extends BaseCommandController
                                 }
                             }
                             break;
-                        case one_Code::PAY_STATUS_FAIL:
-                            if ($response_content['arrival'] == one_Code::COMPLETE_STATUS_REFUNDED || $response_content['arrival'] == one_Code::COMPLETE_STATUS_NON_ARRIVAL) {
+                        case Code::PAY_STATUS_FAIL:
+                            if ($response_content['arrival'] == Code::COMPLETE_STATUS_REFUNDED || $response_content['arrival'] == Code::COMPLETE_STATUS_NON_ARRIVAL) {
                                 $transaction = \Yii::$app->db->beginTransaction();
                                 try {
                                     $item->pay_status = AddcreditOrder::PAY_TYPE_REFUND;

@@ -194,8 +194,10 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                 $groups = $skuInfos['group'];
                 $group = array_shift($groups);
                 $groupList = [
-                    'value_name' => $group['attributeName'],
-                    'sku_list' => $skuList
+                    [
+                        'value_name' => $group['attributeName'],
+                        'sku_list' => $skuList
+                    ]
                 ];
             }
         }else{
@@ -237,11 +239,12 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                     foreach($item['sku_list'] as &$sku){
                         $names = [];
                         foreach(explode(",", $sku['ali_attributes']) as $valueId){
-                            if($valueId == $item['value_id']) continue;
                             $names[] = $skuInfos['values'][$valueId];
                         }
-                        $sku['name'] = $sku['labels'] = implode("/", $names);
-                        $sku['num']  = 0;
+                        $sku['labels'] = implode("/", $names);
+                        if(empty($sku['name'])){
+                            $sku['labels'] = implode("/", $names);
+                        }
                     }
                 }
             }
@@ -249,6 +252,13 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             $groupList = !empty($groupValues) ? $groupValues[0] : [];
         }
 
+        //其它设置
+        foreach($groupList as &$item) {
+            foreach($item['sku_list'] as &$sku){
+                $sku['name'] = empty($sku['name']) ? $sku['labels'] : $sku['name'];
+                $sku['num'] = 0;
+            }
+        }
 
         return $groupList;
     }

@@ -32,7 +32,7 @@
             <span></span>
         </div>
         <div class="form-body">
-            <el-form :model="form" label-width="100px" :rules="FormRules" ref="form" v-loading="listLoading">
+            <el-form :model="form" label-width="120px" :rules="FormRules" ref="form" v-loading="listLoading">
                 <el-form-item label="用户">
                     <com-image width="80px" height="80px" mode="aspectFill" :src="form.avatar"></com-image>
                 </el-form-item>
@@ -62,10 +62,15 @@
                                      @select="inviterClick"></el-autocomplete>
                 </el-form-item>
 
+                <el-form-item label="锁定上下级关系" prop="is_lianc">
+                    <el-switch v-model="form.lock_parent" :active-value="1" :inactive-value="0"></el-switch>
+                    <span class="tip">开启可锁定上下级不变</span>
+                </el-form-item>
+
                 <el-form-item label="联创合伙人" prop="is_lianc">
                     <el-switch v-model="form.is_lianc" :active-value="1" :inactive-value="0"></el-switch>
                     <span class="tip">开启可设置商品归属</span>
-               </el-form-item>
+                </el-form-item>
 
                 <!-- --- -->
                 <el-form-item label="加入黑名单" prop="is_blacklist">

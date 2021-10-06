@@ -7,14 +7,17 @@ use app\core\ApiCode;
 class Request
 {
 
-    private static $devUrl = "http://weixin.kuaichongbei.com/yrapi.php/index/";
+    private static $devUrl = "http://api.qyjs.top/";
 
-    public static function execute($url, $params)
+    public static function execute($url, $params, $AccessToken = '', $content_type = 'application/x-www-form-urlencoded')
     {
         try {
             $headers = [
-                'Content-Type：application/x-www-form-urlencoded'
+                'Content-Type：' . $content_type,
             ];
+            if ($AccessToken) {
+                $headers[] = ['Authorization：Bearer ' . $AccessToken];
+            }
             $ch = curl_init(static::$devUrl . $url);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
@@ -42,11 +45,14 @@ class Request
         }
     }
 
-    public static function http_get($url, $params)
+    public static function http_get($url, $params, $AccessToken = '', $content_type = 'application/x-www-form-urlencoded')
     {
         $headers = [
-            'Content-Type：application/x-www-form-urlencoded'
+            'Content-Type：' . $content_type,
         ];
+        if ($AccessToken) {
+            $headers[] = ['Authorization：Bearer ' . $AccessToken];
+        }
         //1. 初始化
         $ch = curl_init();
         //1.2 设置请求的url地址

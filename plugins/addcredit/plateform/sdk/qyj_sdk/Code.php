@@ -1,9 +1,11 @@
 <?php
 
-namespace app\plugins\addcredit\plateform\sdk\two_sdk;
+namespace app\plugins\addcredit\plateform\sdk\qyj_sdk;
 
 class Code
 {
+    //1、全局成功状态码
+        const OVERALL_SITUATION_SUCCESS = 200;
 
     //1、充值请求状态码
         // 订单创建成功

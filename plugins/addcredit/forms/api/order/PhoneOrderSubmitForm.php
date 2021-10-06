@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
+use app\plugins\addcredit\plateform\sdk\qyj_sdk\PlateForm;
 use app\plugins\sign_in\models\User;
 
 class PhoneOrderSubmitForm extends BaseModel
@@ -15,10 +16,12 @@ class PhoneOrderSubmitForm extends BaseModel
     public $mobile;
     public $order_price;
     public $integral_deduction_price;
+    public $gid;
+    public $specId;
 
     public function rules(){
         return [
-            [['plateform_id','mobile', 'order_price', 'integral_deduction_price'], 'required'],
+            [['plateform_id', 'mobile', 'order_price', 'integral_deduction_price', 'gid', 'specId'], 'required'],
         ];
     }
 
@@ -65,11 +68,33 @@ class PhoneOrderSubmitForm extends BaseModel
                 throw new \Exception($this->responseErrorMsg($order));
             }
 
+            $PlateForm = new PlateForm();
+            $jsonParam = json_decode($plate->json_param, true);
+            $params['orderInfo'] = [
+                'appId' => $jsonParam['id'],
+                'gid' => $this->gid,
+                'outOrderNum' => $order->order_no,
+                'rechargeAccount' => $this->mobile,
+                'sign' => strtolower(md5($jsonParam['id'] . "!@#" . $jsonParam['secret_key'])),
+                'specId' => $this->specId,
+                'app_key' => $jsonParam['secret_key'],
+            ];
+            $createOrder = $PlateForm->getCreateOrder($params);
+            if ($createOrder->code == ApiCode::CODE_FAIL) {
+                throw new \Exception($createOrder->message);
+            }
+            $order->plateform_request_data = $createOrder->request_data;
+            $order->plateform_response_data = $createOrder->response_content;
+            if(!$order->save()){
+                throw new \Exception($this->responseErrorMsg($order));
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data'  => [
                     "order_id"    => $order->id,
                     "order_no"    => $order->order_no,
+                    "qyj_order_no"=> $createOrder->response_content->data,
                     "order_price" => round($order->order_price, 2)
                 ]
             ];

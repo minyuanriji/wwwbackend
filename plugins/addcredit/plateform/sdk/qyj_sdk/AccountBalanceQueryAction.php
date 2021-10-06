@@ -1,6 +1,6 @@
 <?php
 
-namespace app\plugins\addcredit\plateform\sdk\two_sdk;
+namespace app\plugins\addcredit\plateform\sdk\qyj_sdk;
 
 use app\core\ApiCode;
 use app\plugins\addcredit\forms\common\Request;
@@ -12,12 +12,32 @@ class AccountBalanceQueryAction extends BaseObject
 {
     public $plateforms_params;
 
+    /**
+     * 第三方需要参数
+     *  userid	    String	    是	账号ID
+        sign	    string	    是	签名
+     *
+        返回结果：字段名	    变量名	    必填	    描述
+                id          string      true    userid
+                username    string      true    名称
+                balance     string      true    余额
+     * */
     public function run ()
     {
         $BalanceQueryResult = new BalanceQueryResult();
         try {
-            $response = Request::http_get(Config::BALANCE_QUERY . "?szAgentId=" . $this->plateforms_params['id'] . "&szVerifyString=" . md5("szAgentId=". $this->plateforms_params['id'] . "&szKey=" . $this->plateforms_params['secret_key']) . "&szFormat=JSON");
-            $parseArray = @json_decode($response, true);
+            $param = [
+                'userid'           => $this->plateforms_params['id'],
+                'apikey'           => $this->plateforms_params['secret_key'],
+            ];
+            ksort($param);
+            $sign_str = http_build_query($param);
+            $sign = strtoupper(md5($sign_str));
+            $param['sign'] = $sign;
+            $sign_str .= "&sign=" . $sign;
+            $response = Request::http_get(Config::BALANCE_QUERY, $sign_str);
+            $parseArray = json_decode($response, true);
+            print_r($response);die;
             if (!isset($parseArray['nRtn'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
             }

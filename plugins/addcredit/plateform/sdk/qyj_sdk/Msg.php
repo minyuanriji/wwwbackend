@@ -1,6 +1,6 @@
 <?php
 
-namespace app\plugins\addcredit\plateform\sdk\kcb_sdk;
+namespace app\plugins\addcredit\plateform\sdk\qyj_sdk;
 
 class Msg
 {

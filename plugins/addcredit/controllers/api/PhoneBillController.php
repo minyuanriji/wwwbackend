@@ -3,7 +3,6 @@
 namespace app\plugins\addcredit\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
-use app\helpers\CityHelper;
 use app\plugins\addcredit\forms\api\order\OrderForm;
 use app\plugins\addcredit\forms\api\order\RechargeRecordForm;
 use app\plugins\ApiController;

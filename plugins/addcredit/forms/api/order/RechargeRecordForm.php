@@ -3,12 +3,10 @@
 namespace app\plugins\addcredit\forms\api\order;
 
 use app\core\ApiCode;
-use app\forms\common\UserIntegralForm;
 use app\models\BaseModel;
-use app\models\User;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
-use app\plugins\addcredit\plateform\sdk\k_default\PlateForm;
+use app\plugins\addcredit\plateform\sdk\qyj_sdk\PlateForm;
 
 class RechargeRecordForm extends BaseModel
 {
@@ -83,31 +81,23 @@ class RechargeRecordForm extends BaseModel
         if (!$plateforms) {
             throw new \Exception('平台不存在！',ApiCode::CODE_FAIL);
         }
-        return [
-            [
-                'redbag_num' => 30 + 30 * $plateforms->ratio / 100,
-                'price' => 30,
-            ],
-            [
-                'redbag_num' => 50 + 50 * $plateforms->ratio / 100,
-                'price' => 50,
-            ],
-            [
-                'redbag_num' => 100 + 100 * $plateforms->ratio / 100,
-                'price' => 100,
-            ],
-            [
-                'redbag_num' => 200 + 200 * $plateforms->ratio / 100,
-                'price' => 200,
-            ],
-            [
-                'redbag_num' => 300 + 300 * $plateforms->ratio / 100,
-                'price' => 300,
-            ],
-            [
-                'redbag_num' => 500 + 500 * $plateforms->ratio / 100,
-                'price' => 500,
-            ],
-        ];
+
+        $PlateForm = new PlateForm();
+        $goodsDetail = $PlateForm->getGoodsDetail($plateforms);
+        if ($goodsDetail->code == ApiCode::CODE_FAIL) {
+            throw new \Exception($goodsDetail->message);
+        }
+
+        $goodsData = json_decode($goodsDetail->response_content, true);
+        $goodsList = [];
+        foreach ($goodsData['data']['spec'] as $item) {
+            $goodsList[] = [
+                'redbag_num' => $item['official_price'] + $item['official_price'] * $plateforms->ratio / 100,
+                'price' => $item['official_price'],
+                'gid' => $goodsData['data']['g_id'],
+                'specId' => $item['spec_id'],
+            ];
+        }
+        return $goodsList;
     }
 }

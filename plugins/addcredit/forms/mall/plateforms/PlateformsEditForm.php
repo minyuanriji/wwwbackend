@@ -6,6 +6,8 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\GoodsService;
 use app\plugins\addcredit\models\AddcreditPlateforms;
+use app\plugins\addcredit\plateform\sdk\qyj_sdk\AccessTokenAction;
+use app\plugins\addcredit\plateform\sdk\qyj_sdk\PlateForm;
 
 class PlateformsEditForm extends BaseModel
 {
@@ -36,10 +38,7 @@ class PlateformsEditForm extends BaseModel
             if ($this->id) {
                 $plateforms = AddcreditPlateforms::findOne(['id' => $this->id]);
                 if (!$plateforms) {
-                    return [
-                        'code' => ApiCode::CODE_FAIL,
-                        'msg' => '数据异常,该条数据不存在',
-                    ];
+                    throw new \Exception('数据异常,该条数据不存在');
                 }
             } else {
                 $plateforms = new AddcreditPlateforms();
@@ -52,21 +51,12 @@ class PlateformsEditForm extends BaseModel
             $plateforms->parent_id = $this->parent_id;
             $plateforms->transfer_rate = $this->transfer_rate;
             $plateforms->json_param = json_encode(['id' => $this->cyd_id, 'secret_key' => $this->secret_key]);
-            if ($plateforms->save()) {
-                return [
-                    'code' => ApiCode::CODE_SUCCESS,
-                    'msg' => '保存成功',
-                ];
+            if (!$plateforms->save()) {
+                throw new \Exception('保存失败');
             }
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => '保存失败',
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '保存成功');
         } catch (\Exception $e) {
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => $e->getMessage(),
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
     }
 }

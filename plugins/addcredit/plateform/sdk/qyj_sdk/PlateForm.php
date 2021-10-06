@@ -1,6 +1,6 @@
 <?php
 
-namespace app\plugins\addcredit\plateform\sdk\k_default;
+namespace app\plugins\addcredit\plateform\sdk\qyj_sdk;
 
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
@@ -8,6 +8,27 @@ use app\plugins\addcredit\plateform\IOrder;
 
 class PlateForm implements IOrder
 {
+    public function getAccessToken($app_id, $app_key)
+    {
+        return (new AccessTokenAction([
+            'app_id' => $app_id,
+            'app_key' => $app_key,
+        ]))->run();
+    }
+
+    public function getGoodsDetail(AddcreditPlateforms $plateform)
+    {
+        return (new GoodsDetailAction([
+            'AddcreditPlateforms' => $plateform,
+        ]))->run();
+    }
+
+    public function getCreateOrder($params)
+    {
+        return (new CreateOrderAction([
+            'params' => $params,
+        ]))->run();
+    }
 
     public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform)
     {

@@ -74,6 +74,9 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
                                     $skuItem['ali_attributes_label'][] = $skuValues[$value];
                                 }
                             }
+                            if(empty($skuItem['name'])){
+                                $skuItem['name'] = implode("，", $skuItem['ali_attributes_label']);
+                            }
                             $skuItem['free_edit'] = 0;
                             $skuItem['ali_attributes_label'] = implode("，", $skuItem['ali_attributes_label']);
                         }

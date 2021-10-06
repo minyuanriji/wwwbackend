@@ -7,16 +7,9 @@ use app\core\ApiCode;
 use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
 use app\models\BaseModel;
-use app\models\UserAddress;
-use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
-use app\plugins\alibaba\models\AlibabaDistributionOrder;
 use app\plugins\shopping_voucher\models\ShoppingVoucherTargetAlibabaDistributionGoods;
-use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
-use lin010\alibaba\c2b2b\api\GetAddress;
-use lin010\alibaba\c2b2b\api\GetAddressResponse;
-use lin010\alibaba\c2b2b\Distribution;
 
 class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm {
 
@@ -81,9 +74,11 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
 
             $detail['id']               = $goods->id;
             $detail['name']             = $goods->name;
-            $detail['shopping_voucher'] = $goods->freight_price * (1/$expressRate) + static::getShoppingVoucherDecodeNeedNumber($goods, 0,  $goods->price, 1);
+            $detail['freight_price']    = round($goods->freight_price * (1/$expressRate), 2);
+            $detail['shopping_voucher'] = round($detail['freight_price'] + static::getShoppingVoucherDecodeNeedNumber($goods, 0,  $goods->price, 1), 2);
             $detail['price']            = $goods->price;
             $detail['origin_price']     = $goods->origin_price;
+
             if(isset($aliInfo['info'])){
                 $detail['images']           = $aliInfo['info']['image']['images'];
                 $detail['saleInfo']         = $aliInfo['info']['saleInfo'];
@@ -123,7 +118,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             }
 
             //规格
-            $selects = ["id", "goods_id", "ali_sku_id", "ali_attributes", "ali_spec_id", "price", "origin_price", "freight_price"];
+            $selects = ["id", "goods_id", "ali_sku_id", "ali_attributes", "ali_spec_id", "name", "price", "origin_price", "freight_price"];
             $skuList = AlibabaDistributionGoodsSku::find()->where([
                 "goods_id"  => $goods->id,
                 "is_delete" => 0
@@ -141,7 +136,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                                 $skuItem['labels'][] = $skuValues[$value];
                             }
                         }
-                        $skuItem['labels'] = implode(",", $skuItem['labels']);
+                        $skuItem['labels'] = !empty($skuItem['name']) ? $skuItem['name'] : implode(",", $skuItem['labels']);
                         //unset($skuItem['ali_attributes']);
                     }
                 }
@@ -158,10 +153,15 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
 
             //计算各个规格使用购物券兑换的价格
             foreach($detail['sku_list'] as &$skuItem){
-                $skuItem['shopping_voucher'] = $skuItem['freight_price'] * (1/$expressRate) + static::getShoppingVoucherDecodeNeedNumber($goods,
+                $skuItem['freight_price'] = round($skuItem['freight_price'] * (1/$expressRate), 2);
+                $detail['freight_price']  = max($detail['freight_price'] , $skuItem['freight_price']);
+                $skuItem['shopping_voucher'] = static::getShoppingVoucherDecodeNeedNumber($goods,
                     $skuItem['id'] == "DEF" ? 0 : $skuItem['id'],  $skuItem['price'], 1);
                 $skuItem['shopping_voucher'] = round($skuItem['shopping_voucher'], 2);
             }
+
+            //规格分组
+            $detail['sku_group_list'] = $this->skuGroupList($detail['sku_infos'], $detail['sku_list']);
 
             return new APICacheDataForm([
                 "sourceData" => [
@@ -177,6 +177,80 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                 'msg'  => $e->getMessage()
             ];
         }
+    }
+
+    /**
+     * 规格分组
+     * @param $skuInfos
+     * @param $skuList
+     * @return array
+     */
+    private function skuGroupList(&$skuInfos, $skuList){
+        $skuInfos['group']  = isset($skuInfos['group']) && is_array($skuInfos['group']) ? $skuInfos['group'] : [];
+        $skuInfos['values'] = isset($skuInfos['values']) && is_array($skuInfos['values']) ? $skuInfos['values'] : [];
+        if(count($skuInfos['group']) <= 1){ //只有一种规格的情况
+            $groupList = [];
+            if(count($skuInfos['group']) == 1){
+                $groups = $skuInfos['group'];
+                $group = array_shift($groups);
+                $groupList = [
+                    'value_name' => $group['attributeName'],
+                    'sku_list' => $skuList
+                ];
+            }
+        }else{
+            $attrNames = [];
+            foreach($skuInfos['group'] as $attr){
+                $attrNames[$attr['attributeID']] = $attr['attributeName'];
+            }
+
+            $groupValues = [];
+            foreach($skuInfos['values'] as $key => $value){
+                $part = explode(":", $key);
+                if(!isset($groupValues[$part[0]])){
+                    $groupValues[$part[0]] = [];
+                }
+                if(!in_array($key, $groupValues[$part[0]])){
+                    $groupValues[$part[0]][] = $key;
+                }
+            }
+            $groupValues = array_slice($groupValues, 0, 1);
+            //把每个规格加入到各个类目下
+            foreach($groupValues as $attrId => $values){
+                $arr = [];
+                foreach($values as $valueId){
+                    //$item['value_id']   = $valueId;
+                    $item['value_name'] = $skuInfos['values'][$valueId];
+                    $item['sku_list']   = [];
+                    foreach($skuList as $skuItem){
+                        if(strpos($skuItem['ali_attributes'], $valueId) === false)
+                            continue;
+                        $item['sku_list'][] = $skuItem;
+                    }
+                    $arr[] = $item;
+                }
+                $groupValues[$attrId] = $arr;
+            }
+            //设置下类目下规格名称
+            foreach($groupValues as &$groupArr){
+                foreach($groupArr as &$item){
+                    foreach($item['sku_list'] as &$sku){
+                        $names = [];
+                        foreach(explode(",", $sku['ali_attributes']) as $valueId){
+                            if($valueId == $item['value_id']) continue;
+                            $names[] = $skuInfos['values'][$valueId];
+                        }
+                        $sku['name'] = $sku['labels'] = implode("/", $names);
+                        $sku['num']  = 0;
+                    }
+                }
+            }
+
+            $groupList = !empty($groupValues) ? $groupValues[0] : [];
+        }
+
+
+        return $groupList;
     }
 
     /**

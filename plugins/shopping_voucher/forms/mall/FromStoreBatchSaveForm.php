@@ -6,59 +6,75 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 
-class FromStoreBatchSaveForm extends BaseModel
-{
-    public $store;
+class FromStoreBatchSaveForm extends BaseModel{
+
+    public $list;
+    public $is_all;
+    public $do_page;
+    public $do_search;
+    public $give_type;
     public $give_value;
     public $start_at;
 
-    public function rules()
-    {
+    public function rules(){
         return [
-            [['store', 'give_value'], 'required'],
-            [['start_at'], 'string']
+            [['is_all', 'give_type', 'give_value', 'start_at'], 'required'],
+            [['do_page'], 'integer'],
+            [['list', 'do_search'], 'safe'],
         ];
     }
 
-    public function save()
-    {
+    public function save(){
+
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-        $add_id = [];
+
         try {
-            if (is_array($this->store)) {
-                foreach ($this->store as $value) {
-                    $fromStore = ShoppingVoucherFromStore::findOne(['mch_id' => $value['mch_id'], 'store_id' => $value['store_id']]);
-                    if ($fromStore) {
-                        if (!$fromStore->is_delete) {
-                            $add_id[] = $fromStore->mch_id;
-                        } else {
-                            $fromStore->is_delete = 0;
-                        }
-                    } else {
-                        $fromStore = new ShoppingVoucherFromStore([
-                            "mall_id" => \Yii::$app->mall->id,
+
+            if($this->is_all){
+                $form = new FromStoreSearchStoreForm();
+                $form->attributes = $this->do_search;
+                $form->page = $this->do_page;
+                $res = $form->getList();
+                if($res['code'] != ApiCode::CODE_SUCCESS){
+                    throw new \Exception($res['msg']);
+                }
+                $list = $res['data']['list'];
+            }else{
+                $list = $this->list;
+            }
+
+            if($list){
+                foreach($list as $item){
+                    $model = ShoppingVoucherFromStore::findOne([
+                        "mall_id" => $item['mall_id'],
+                        "store_id" => $item['store_id']
+                    ]);
+                    if(!$model){
+                        $model = new ShoppingVoucherFromStore([
+                            "mall_id"    => $item['mall_id'],
+                            "mch_id"     => $item['id'],
+                            "store_id"   => $item['store_id'],
                             "created_at" => time()
                         ]);
-                        $fromStore->mch_id = $value['mch_id'];
-                        $fromStore->store_id = $value['store_id'];
-                        $fromStore->give_type = 1;
-                        $fromStore->give_value = max(min($this->give_value, 100), 0);
-                        $fromStore->name = $value['name'];
-                        $fromStore->cover_url = $value['cover_url'];
-                        $fromStore->start_at = strtotime($this->start_at);
                     }
-                    $fromStore->updated_at = time();
-                    if (!$fromStore->save()) {
-                        throw new \Exception($this->responseErrorMsg($fromStore));
+                    $model->give_type = 1;
+                    $model->give_value = max(0, min(100, $this->give_value));
+                    $model->updated_at = time();
+                    $model->is_delete = 0;
+                    $model->name = $item['name'];
+                    $model->cover_url = $item['cover_url'];
+                    $model->start_at = max(time(), strtotime($this->start_at));
+                    if(!$model->save()){
+                        throw new \Exception($this->responseErrorMsg($model));
                     }
                 }
             }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '保存成功!(' . implode(',', $add_id) . ')已添加',
+                'data' => [],
             ];
         } catch (\Exception $e) {
             return [

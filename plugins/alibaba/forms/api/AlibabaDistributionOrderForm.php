@@ -70,6 +70,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             $skuInfos = @json_decode($goods->sku_infos, true);
             if((empty($skuInfos) || empty($skuInfos['group'])) && $item['sku'] == "DEF"){ //无规格商品
                 $goodsItem['ali_sku']       = 0;
+                $goodsItem['ali_num']       = 1;
                 $goodsItem['ali_spec_id']   = '';
                 $goodsItem['price']         = (float)$goods->price;
                 $goodsItem['freight_price'] = (float)$goods->freight_price;
@@ -92,11 +93,12 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     }
                 }
                 $goodsItem['ali_sku']       = $sku->ali_sku_id;
+                $goodsItem['ali_num']       = $sku->ali_num;
                 $goodsItem['ali_spec_id']   = $sku->ali_spec_id;
                 $goodsItem['price']         = (float)$sku->price;
                 $goodsItem['freight_price'] = (float)$sku->freight_price;
                 $goodsItem['sku_id']        = $sku->id;
-                $goodsItem['sku_labels']    = $labels;
+                $goodsItem['sku_labels']    = !empty($sku->name) ? [$sku->name] : $labels;
             }
 
             $goodsItem['total_original_price'] = $goodsItem['num'] * $goodsItem['price'];
@@ -147,7 +149,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             "cargoParamList" => json_encode([
                 'offerId'   => $goods->ali_offerId,
                 'specId'    => $orderDetail->ali_spec_id,
-                'quantity'  => $orderDetail->num
+                'quantity'  => $orderDetail->ali_num
             ]),
             "outerOrderInfo" => json_encode([
                 "mediaOrderId" => $orderDetail->id,
@@ -156,9 +158,10 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     "id"     => $goods->ali_offerId,
                     "specId" => $orderDetail->ali_spec_id,
                     "price"  => $orderDetail->unit_price * 100,
-                    "num"    => $orderDetail->num
+                    "num"    => $orderDetail->ali_num
                 ]
-            ])
+            ]),
+            "message" => "发货不要放任何单据，有任何问题先不发货，不打客户收货电话，打这个电话13536992449/020-31923526"
         ];
         $res = $distribution->requestWithToken(new OrderCreate($postData), $app->access_token);
         if(!empty($res->error)){
@@ -217,7 +220,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
         //计算运费
         $orderItem['express_price'] = 0;
         foreach($orderItem["goods_list"] as &$goodsItem){
-            $orderItem['express_price'] += $goodsItem['freight_price'];
+            $orderItem['express_price'] = max($goodsItem['freight_price'], $orderItem['express_price']);
         }
         $orderItem['express_origin_price'] = $orderItem['express_price'];
 
@@ -312,13 +315,16 @@ class AlibabaDistributionOrderForm extends BaseModel{
         $mainData['shopping_voucher']['remaining'] = round($userRemainingShoppingVoucher, 2);
 
         //统计订单待支付总金额
-        foreach($mainData['list'] as $orderItem){
+        foreach($mainData['list'] as &$orderItem){
             $mainData['shopping_voucher']['decode_price'] += $orderItem['shopping_voucher_decode_price'];
             $mainData['shopping_voucher']['decode_price'] += $orderItem['shopping_voucher_express_decode_price'];
             $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_use_num'];
             $mainData['shopping_voucher']['use_num'] += $orderItem['shopping_voucher_express_use_num'];
             $mainData['total_price'] += $orderItem['total_price'];
+            $orderItem['total_price'] = round($orderItem['total_price'], 2);
             $orderItem['total_goods_original_price'] = round($orderItem['total_goods_original_price'], 2);
+            $orderItem['if_shopping_voucher_need_total_num'] = round($orderItem['if_shopping_voucher_need_total_num'], 2);
+            $orderItem['shopping_voucher_express_use_num'] = round($orderItem['shopping_voucher_express_use_num'], 2);
         }
         $mainData['total_price'] = round($mainData['total_price'], 2);
 

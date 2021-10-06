@@ -34,6 +34,7 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
             if(empty($this->goods['ali_category_id'])){
                 throw new \Exception("请设置类目");
             }
+            $images = [];
             if(isset($this->goods['ali_product_info'])){
                 if(!is_array($this->goods['ali_product_info'])){
                     $this->goods['ali_product_info'] = (array)@json_decode($this->goods['ali_product_info'], true);
@@ -42,9 +43,12 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                 $productInfo = (array)@json_decode($goods->ali_product_info, true);
                 $productInfo['info']['description'] = $description;
                 $productInfo['info']['image'] = $this->goods['ali_product_info']['info']['image'];
+                $images = $productInfo['info']['image']['images'];
                 $goods->ali_product_info = json_encode($productInfo);
             }
 
+            //获取第一张图片作为轮播图
+            $goods->cover_url         = !empty($images) ? $images[0] : $goods->cover_url;
             $goods->name              = $this->goods['name'];
             $goods->ali_category_id   = implode(",", $this->goods['ali_category_id']);
             $goods->price             = $this->goods['price'];
@@ -76,11 +80,15 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                         $sku->consign_price        = $skuInfo['consign_price'];
                         $sku->is_delete            = 0;
                     }
-                    $sku->price          = $skuInfo['price'];
+
                     $sku->origin_price   = $skuInfo['origin_price'];
                     $sku->freight_price  = $skuInfo['freight_price'];
                     $sku->updated_at     = time();
                     $sku->is_delete      = 0;
+                    $sku->ali_num        = max(1, $skuInfo['ali_num']);
+                    $sku->price          = floatval($goods->price_rate)/100 * $sku->ali_price * $sku->ali_num;
+                    //$sku->price          = $skuInfo['price'];
+                    $sku->name           = $skuInfo['name'];
 
                     if(!$sku->save()){
                         throw new \Exception($this->responseErrorMsg($sku));

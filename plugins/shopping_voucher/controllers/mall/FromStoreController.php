@@ -8,8 +8,10 @@ use app\plugins\shopping_voucher\forms\mall\FromStoreEditForm;
 use app\plugins\shopping_voucher\forms\mall\FromStoreBatchSaveForm;
 use app\plugins\shopping_voucher\forms\mall\FromRatioEditForm;
 use app\plugins\shopping_voucher\forms\mall\FromStoreListForm;
+use app\plugins\shopping_voucher\forms\mall\FromStoreSearchStoreForm;
 
 class FromStoreController extends Controller{
+
 
     /**
      * 店铺列表
@@ -37,16 +39,6 @@ class FromStoreController extends Controller{
     }
 
     /**
-     * 批量保存
-     * @return bool|string|\yii\web\Response
-     */
-    public function actionBatchSave(){
-        $form = new FromStoreBatchSaveForm();
-        $form->attributes = \Yii::$app->request->post();
-        return $this->asJson($form->save());
-    }
-
-    /**
      * 编辑
      * @return bool|string|\yii\web\Response
      */
@@ -64,5 +56,25 @@ class FromStoreController extends Controller{
         $form = new FromStoreDeleteForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->delete());
+    }
+
+    /**
+     * 搜索店铺
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionSearchStore(){
+        $form = new FromStoreSearchStoreForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->getList());
+    }
+
+    /**
+     * 批量保存
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionBatchSave(){
+        $form = new FromStoreBatchSaveForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
     }
 }

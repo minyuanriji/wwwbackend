@@ -33,14 +33,14 @@ echo $this->render("com-category");
                     <template slot-scope="scope">
                         <el-row :gutter="10">
                             <el-col :span="6" style="text-align: right">短时凭证：</el-col>
-                            <el-col :span="18">{{scope.row.access_token}}
+                            <el-col :span="18">******
                                 <span v-if="scope.row.is_access_token_expired" style="color: darkred">（已过期）</span>
                                 <el-link :href="'<?php echo \yii\helpers\Url::toRoute(["/plugin/alibaba/mall/oauth2/get-token"]);?>&id='+scope.row.id+'&from_page=app/list'" type="primary" icon="el-icon-refresh">刷新</el-link>
                             </el-col>
                         </el-row>
                         <el-row :gutter="10">
                             <el-col :span="6" style="text-align: right">长时凭证：</el-col>
-                            <el-col :span="18">{{scope.row.refresh_token}}
+                            <el-col :span="18">******
                                 <span v-if="scope.row.is_refresh_token_expired" style="color: darkred">（已过期）</span>
                                 <el-link :href="'<?php echo \yii\helpers\Url::toRoute(["/plugin/alibaba/mall/oauth2/refresh-token"]);?>&id='+scope.row.id+'&from_page=app/list'" type="primary" icon="el-icon-refresh">刷新</el-link>
                             </el-col>

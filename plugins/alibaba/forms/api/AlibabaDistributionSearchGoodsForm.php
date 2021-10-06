@@ -49,6 +49,7 @@ class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm
             if($list){
                 foreach($list as &$item){
                     $item['price'] = $item['price'] + (float)$item['freight_price'] * (1/AlibabaDistributionOrderForm::getShoppingVoucherDecodeExpressRate());
+                    $item['price'] = round($item['price'], 2);
                 }
             }
 

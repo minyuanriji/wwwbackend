@@ -157,6 +157,8 @@ class AlibabaDistributionAliGoodsImportForm extends BaseModel{
                     $sku->updated_at     = time();
                     $sku->is_delete      = 0;
                     $sku->ali_attributes = implode(",", $attributes);
+                    $sku->ali_num        = 1;
+                    $sku->name           = implode("，", $labels);
 
                     if(!$sku->save()){
                         throw new \Exception($this->responseErrorMsg($sku));
@@ -166,6 +168,8 @@ class AlibabaDistributionAliGoodsImportForm extends BaseModel{
                     $skuAttr['ali_attributes_label'] = implode("，", $labels);
                     $skuAttr['free_edit'] = 0;
                     $skuList[] = $skuAttr;
+
+
                 }
 
 

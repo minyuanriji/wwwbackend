@@ -10,7 +10,7 @@ class HotelTaskController extends BaseCommandController {
 
     public $tasks = [
         ["num" => 1,  "name" => "Query", "action" => "query"],
-        ["num" => 50, "name" => "Search", "action" => "search"]
+        ["num" => 25, "name" => "Search", "action" => "search"]
     ];
 
     public function actions(){

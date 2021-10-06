@@ -242,7 +242,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                             $names[] = $skuInfos['values'][$valueId];
                         }
                         $sku['labels'] = implode("/", $names);
-                        if(empty($sku['name'])){ 
+                        if(empty($sku['name'])){
                             $sku['labels'] = implode("/", $names);
                         }
                     }

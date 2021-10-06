@@ -9,7 +9,7 @@ class GetGoodsListForUserChoosed extends BaseAPI{
      * @return array
      */
     public static function paramKeys(){
-        return ["pageNo", "pageSize"];
+        return ["pageNo", "pageSize", "groupId"];
     }
 
     /**
@@ -25,7 +25,7 @@ class GetGoodsListForUserChoosed extends BaseAPI{
      * @return string
      */
     public function getPath(){
-        return "com.alibaba.p4p/alibaba.cps.op.listCybUserGroup";
+        return "com.alibaba.p4p/alibaba.cps.op.listCybUserGroupFeed";
     }
 
     /**

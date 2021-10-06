@@ -3,6 +3,7 @@
 namespace app\plugins\alibaba\controllers\mall;
 
 use app\plugins\alibaba\forms\mall\AlibabaDistributionAlibabaGoodsGearchForm;
+use app\plugins\alibaba\forms\mall\AlibabaDistributionAlibabaGroupGearchForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionAliGoodsImportForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionCategoryListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionDeleteCategoryForm;
@@ -91,6 +92,16 @@ class DistributionController extends Controller{
         } else {
             return $this->render('list');
         }
+    }
+
+    /**
+     * 阿里巴巴选品库分组搜索
+     * @return string|\yii\web\Response
+     */
+    public function actionAlibabaGroupSearch(){
+        $form = new AlibabaDistributionAlibabaGroupGearchForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->getList());
     }
 
     /**

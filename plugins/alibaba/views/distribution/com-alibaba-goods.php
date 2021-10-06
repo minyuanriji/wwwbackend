@@ -184,6 +184,8 @@
             },
             search(){
                 this.page = 1;
+                this.list = [];
+                this.pagination = null;
                 this.getList();
             },
             pageChange(page){

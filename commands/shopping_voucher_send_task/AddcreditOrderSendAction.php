@@ -79,6 +79,7 @@ class AddcreditOrderSendAction extends Action{
         $query->andWhere([
             "AND",
             "ao.pay_price > 0",
+            "svfa.id IS NULL",
             ["ao.pay_status" => 'paid']
         ]);
         $query->orderBy("ao.updated_at ASC");

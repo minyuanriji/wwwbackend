@@ -102,7 +102,6 @@
                     <el-table-column label="推荐人" width="150">
                         <template slot-scope="scope">
                             <com-ellipsis :line="1">{{scope.row.parent_nickname}}</com-ellipsis>
-
                         </template>
                     </el-table-column>
                     <el-table-column prop="created_at" label="入驻时间" width="150"> </el-table-column>

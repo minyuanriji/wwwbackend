@@ -17,10 +17,11 @@ class HotelOrderPreviewForm extends BaseModel{
     public $start_date;
     public $days;
     public $num;
+    public $use_integral;
 
     public function rules(){
         return [
-            [['unique_id', 'num', 'product_code', 'start_date', 'days'], 'required'],
+            [['unique_id', 'num', 'product_code', 'start_date', 'days', 'use_integral'], 'required'],
             [['days', 'num'], 'integer', 'min' => 1]
         ];
     }
@@ -53,8 +54,12 @@ class HotelOrderPreviewForm extends BaseModel{
             //计算订单价格
             $orderPrice = $this->days * $this->num * $bookingItem['product_price'];
 
-            //用红包抵扣需要的数量
-            $integralPrice = OrderHelper::getIntegralPrice($orderPrice);
+            //如果使用红包抵扣
+            $integralDeductionPrice = 0;
+            if($this->use_integral){
+                $integralDeductionPrice = $user->static_integral > $orderPrice ? $orderPrice : $user->static_integral;
+                $orderPrice = max(0, $orderPrice - $integralDeductionPrice);
+            }
 
             //用户最近入住酒店信息
             $user_hotel_info = $this->getUserHotelOrderInfo($user->id);
@@ -67,16 +72,17 @@ class HotelOrderPreviewForm extends BaseModel{
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'order_price'       => floatval($orderPrice),
-                    'integral_price'    => floatval($integralPrice),
-                    'user_integral'     => floatval($user->static_integral),
-                    'num'               => intval($this->num),
-                    'start_day'         => $this->start_date,
-                    'end_day'           => $endDay,
-                    'days'              => (int)$this->days,
-                    'hotel_info'        => ApiHotelHelper::format($hotel),
-                    'booking_item'      => $bookingItem,
-                    'hotel_order_info'  => $booking_passengers
+                    'order_price'              => floatval($orderPrice),
+                    'user_total_integral'      => floatval($user->static_integral),
+                    'use_integral'             => (int)$this->use_integral,
+                    'integral_deduction_price' => $integralDeductionPrice,
+                    'num'                      => intval($this->num),
+                    'start_day'                => $this->start_date,
+                    'end_day'                  => $endDay,
+                    'days'                     => (int)$this->days,
+                    'hotel_info'               => ApiHotelHelper::format($hotel),
+                    'booking_item'             => $bookingItem,
+                    'hotel_order_info'         => $booking_passengers
                 ]
             ];
         }catch (\Exception $e){

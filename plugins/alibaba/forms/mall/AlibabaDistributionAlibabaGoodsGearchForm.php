@@ -19,11 +19,12 @@ class AlibabaDistributionAlibabaGoodsGearchForm extends BaseModel{
     public $biztype;
     public $keyword;
     public $offerIds;
+    public $groupId;
 
     public function rules(){
         return [
             [['app_id'], 'required'],
-            [['page', 'app_id'], 'integer'],
+            [['page', 'app_id', 'groupId'], 'integer'],
             [['biztype', 'keyword', 'offerIds'], 'safe']
         ];
     }
@@ -45,14 +46,34 @@ class AlibabaDistributionAlibabaGoodsGearchForm extends BaseModel{
             $distribution = new Distribution($app->app_key, $app->secret);
 
             $options = [];
-            if($this->biztype){
-                $options['biztype'] = $this->biztype;
-            }
             if($this->keyword){
                 $options['keyWords'] = $this->keyword;
             }
-            if($this->offerIds){
-                $options['offerIds'] = $this->offerIds;
+
+            $totalCount = 0;
+            if($this->biztype && $this->biztype == "my"){ //个人选品库
+                $res = $distribution->requestWithToken(new GetGoodsListForUserChoosed([
+                    "pageNo"   => $this->page,
+                    "pageSize" => $pageSize,
+                    "groupId"  => $this->groupId
+                ]), $app->access_token);
+                if(!$res instanceof GetGoodsListForUserChoosedResponse){
+                    throw new \Exception("[GetGoodsListForUserChoosedResponse]返回结果异常");
+                }
+                if($res->error){
+                    throw new \Exception($res->error);
+                }
+                $totalCount = $res->totalCount;
+
+                $offerIds = [];
+                foreach($res->rows as $row){
+                    $offerIds[] = $row['feedId'];
+                }
+                $options['offerIds'] = $offerIds ? implode(",", $offerIds) : "-1";
+            }
+
+            if($this->biztype){
+                $options['biztype'] = $this->biztype;
             }
 
             $res = $distribution->requestWithToken(new GetGoodsList(array_merge([
@@ -61,13 +82,16 @@ class AlibabaDistributionAlibabaGoodsGearchForm extends BaseModel{
             ], $options)), $app->access_token);
 
             if(!$res instanceof GetGoodsListResponse){
-                throw new \Exception("返回结果异常");
+                throw new \Exception("[GetGoodsListResponse]返回结果异常");
             }
             if($res->error){
                 throw new \Exception($res->error);
             }
 
             $list = $res->goodsList;
+
+            $totalCount = $totalCount ? $totalCount : $res->totalCount;
+
             if($list){
                 foreach($list as &$item){
                     $item['enable'] = (int)$item['enable'];
@@ -76,7 +100,7 @@ class AlibabaDistributionAlibabaGoodsGearchForm extends BaseModel{
                 }
             }
 
-            $pagination = new BasePagination(['totalCount' => $res->totalCount, 'pageSize' => $pageSize, 'page' => $this->page]);
+            $pagination = new BasePagination(['totalCount' => $totalCount, 'pageSize' => $pageSize, 'page' => $this->page]);
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

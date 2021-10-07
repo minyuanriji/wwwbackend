@@ -2,72 +2,96 @@
     <div class="com-alibaba-goods">
         <el-dialog width="65%" :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
 
-            <el-tabs v-model="searchData.biztype"   @tab-click="search">
+
+            <el-tabs v-if="!loading"  v-model="searchData.biztype" @tab-click="switchTab">
+                <el-tab-pane label="选品库" name="my"></el-tab-pane>
                 <el-tab-pane label="生产加工" name="1"></el-tab-pane>
                 <el-tab-pane label="经销批发" name="2"></el-tab-pane>
                 <el-tab-pane label="招商代理" name="3"></el-tab-pane>
                 <el-tab-pane label="商业服务" name="4"></el-tab-pane>
             </el-tabs>
 
-            <div style="margin-top:6px;">
+            <template v-if="searchData.biztype=='my' && searchData.groupId==''">
+                <el-table key="group_data" v-loading="loading" :data="list" style="width: 100%" @selection-change="handleSelectionChange">
+                    <el-table-column prop="id" width="110" label="ID"></el-table-column>
+                    <el-table-column prop="title" width="200" label="标题"></el-table-column>
+                    <el-table-column prop="feedCount" width="150" label="商品（件）"></el-table-column>
+                    <el-table-column prop="createTime" width="150" label="日期"></el-table-column>
+                    <el-table-column label="操作">
+                        <template slot-scope="scope">
+                            <el-button @click="groupInto(scope.row)" type="text" circle size="mini">
+                                <el-tooltip class="item" effect="dark" content="选择" placement="top">
+                                    <img src="statics/img/mall/pass.png" alt="">
+                                </el-tooltip>
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </template>
+            <template v-else>
+                <div style="margin-top:6px;" v-if="!loading" >
 
-                <el-select v-model="searchData.mode" placeholder="请选择" size="small" style="width:90px;">
-                    <el-option value="0" label="关键词"></el-option>
-                    <el-option value="1" label="编号"></el-option>
-                </el-select>
+                    <el-tag v-if="searchData.groupId!=''"  type="danger">
+                        {{groupData.title}}
+                    </el-tag>
 
-                <div class="input-item" style="width:350px;">
-                    <el-input v-if="searchData.mode == 0" @keyup.enter.native="search" size="small" placeholder="请输入关键词搜索" v-model="searchData.keyword"
-                              clearable @clear="search">
-                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-                    </el-input>
-                    <el-input v-if="searchData.mode == 1" @keyup.enter.native="search" size="small" placeholder="请输入商品id搜索，多个id用逗号分割" v-model="searchData.offerIds"
-                              clearable @clear="search">
-                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-                    </el-input>
+                    <el-select v-model="searchData.mode" placeholder="请选择" size="small" style="width:90px;">
+                        <el-option value="0" label="关键词"></el-option>
+                        <el-option value="1" label="编号"></el-option>
+                    </el-select>
+
+                    <div class="input-item" style="width:350px;">
+                        <el-input v-if="searchData.mode == 0" @keyup.enter.native="search" size="small" placeholder="请输入关键词搜索" v-model="searchData.keyword"
+                                  clearable @clear="search">
+                            <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                        </el-input>
+                        <el-input v-if="searchData.mode == 1" @keyup.enter.native="search" size="small" placeholder="请输入商品id搜索，多个id用逗号分割" v-model="searchData.offerIds"
+                                  clearable @clear="search">
+                            <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                        </el-input>
+                    </div>
                 </div>
-            </div>
-
-
-            <el-table v-loading="loading" :data="list" border style="width: 100%" @selection-change="handleSelectionChange">
-                <el-table-column width="75" >
-                    <template slot-scope="scope">
-                        <el-button @click="aliGoodsImport(scope.row)" type="text" circle size="mini">
-                            <el-tooltip class="item" effect="dark" content="选择" placement="top">
-                                <img src="statics/img/mall/plus.png" alt="">
-                            </el-tooltip>
-                        </el-button>
-                    </template>
-                </el-table-column>
-                <el-table-column label="标题" >
-                    <template slot-scope="scope">
-                        <div flex="box:first">
-                            <div style="padding-right: 10px;">
-                                <com-image mode="aspectFill" :src="scope.row.imgUrl"></com-image>
-                            </div>
-                            <div>
-                                <div>编号：{{scope.row.offerId}}</div>
-                                <div flex="dir:left">
-                                    <el-tooltip class="item" effect="dark" placement="top">
-                                        <template slot="content">
-                                            <div style="width: 320px;">{{scope.row.title}}</div>
-                                        </template>
-                                        <com-ellipsis :line="1">{{scope.row.title}}</com-ellipsis>
-                                    </el-tooltip>
+                <el-table key="goods_data" v-loading="loading" :data="list" border style="width: 100%" @selection-change="handleSelectionChange">
+                    <el-table-column width="75" >
+                        <template slot-scope="scope">
+                            <el-button @click="aliGoodsImport(scope.row)" type="text" circle size="mini">
+                                <el-tooltip class="item" effect="dark" content="选择" placement="top">
+                                    <img src="statics/img/mall/plus.png" alt="">
+                                </el-tooltip>
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="标题" >
+                        <template slot-scope="scope">
+                            <div flex="box:first">
+                                <div style="padding-right: 10px;">
+                                    <com-image mode="aspectFill" :src="scope.row.imgUrl"></com-image>
+                                </div>
+                                <div>
+                                    <div>编号：{{scope.row.offerId}}</div>
+                                    <div flex="dir:left">
+                                        <el-tooltip class="item" effect="dark" placement="top">
+                                            <template slot="content">
+                                                <div style="width: 320px;">{{scope.row.title}}</div>
+                                            </template>
+                                            <com-ellipsis :line="1">{{scope.row.title}}</com-ellipsis>
+                                        </el-tooltip>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                    </template>
-                </el-table-column>
-                <el-table-column prop="currentPrice" width="90" label="分销价"></el-table-column>
-                <el-table-column prop="channelPrice" width="90" label="渠道价"></el-table-column>
-                <el-table-column prop="superBuyerPrice" width="90" label="超买价"></el-table-column>
-                <el-table-column prop="soldOut" width="90" label="销量"></el-table-column>
-                <el-table-column prop="profit" width="90" label="利润空间"></el-table-column>
-                <el-table-column prop="enable" width="90" label="是否有效"></el-table-column>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="currentPrice" width="90" label="分销价"></el-table-column>
+                    <el-table-column prop="channelPrice" width="90" label="渠道价"></el-table-column>
+                    <el-table-column prop="superBuyerPrice" width="90" label="超买价"></el-table-column>
+                    <el-table-column prop="soldOut" width="90" label="销量"></el-table-column>
+                    <el-table-column prop="profit" width="90" label="利润空间"></el-table-column>
+                    <el-table-column prop="enable" width="90" label="是否有效"></el-table-column>
 
-            </el-table>
+                </el-table>
+            </template>
+
 
             <div style="display: flex;justify-content: space-between;margin-top:20px;">
                 <!--
@@ -83,7 +107,6 @@
                         v-if="pagination">
                 </el-pagination>
             </div>
-
 
         </el-dialog>
     </div>
@@ -102,11 +125,13 @@
                 dialogVisible: false,
                 btnLoading: false,
                 searchData: {
-                    biztype: "1",
+                    biztype: "my",
                     keyword: "",
                     mode: "0",
-                    offerIds: ''
+                    offerIds: '',
+                    groupId: ''
                 },
+                groupData:{title:''},
                 page: 1,
                 list: [],
                 pagination: null,
@@ -149,8 +174,21 @@
                     that.loading = false;
                 });
             },
+            switchTab(){
+                if(this.searchData.biztype == "my"){
+                    this.searchData.groupId = '';
+                }
+                this.search();
+            },
+            groupInto(row){
+                this.searchData.groupId = row.id;
+                this.groupData = row;
+                this.search();
+            },
             search(){
                 this.page = 1;
+                this.list = [];
+                this.pagination = null;
                 this.getList();
             },
             pageChange(page){
@@ -167,10 +205,14 @@
                     this.searchData.keyword = '';
                 }
                 let params = Object.assign(this.searchData, {
-                    r: 'plugin/alibaba/mall/distribution/alibaba-goods-search',
                     page: this.page,
                     app_id:getQuery("app_id")
                 });
+                if(this.searchData.biztype == "my" && this.searchData.groupId == ''){
+                    params['r'] = 'plugin/alibaba/mall/distribution/alibaba-group-search';
+                }else{
+                    params['r'] = 'plugin/alibaba/mall/distribution/alibaba-goods-search';
+                }
                 this.loading = true;
                 request({
                     params

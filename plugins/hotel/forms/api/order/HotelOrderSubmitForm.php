@@ -3,7 +3,9 @@ namespace app\plugins\hotel\forms\api\order;
 
 
 use app\core\ApiCode;
+use app\forms\common\UserIntegralModifyForm;
 use app\helpers\CommonHelper;
+use app\models\User;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelPlateforms;
 
@@ -25,6 +27,12 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
 
         $trans = \Yii::$app->db->beginTransaction();
         try {
+
+            //用户
+            $user = User::findOne(\Yii::$app->user->id);
+            if(!$user || $user->is_delete){
+                throw new \Exception("无法获取用户信息");
+            }
 
             $this->validateStartDate();
 
@@ -50,29 +58,49 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
             //计算订单价格
             $orderPrice = $this->days * $this->num * $bookingItem['product_price'];
 
+            //如果使用红包抵扣
+            $integralDeductionPrice = 0;
+            if($this->use_integral){
+                $integralDeductionPrice = $user->static_integral > $orderPrice ? $orderPrice : $user->static_integral;
+                $orderPrice = max(0, $orderPrice - $integralDeductionPrice);
+            }
+
             //生成订单
             $order = new HotelOrder([
-                "mall_id"             => \Yii::$app->mall->id,
-                "hotel_id"            => $hotel->id,
-                "user_id"             => \Yii::$app->user->id,
-                "product_code"        => $this->product_code,
-                "unique_id"           => $this->unique_id,
-                "order_no"            => "HO" . date("ymdHis") . rand(100, 999),
-                "order_status"        => "unpaid",
-                "order_price"         => $orderPrice,
-                "booking_num"         => $this->num,
-                "booking_start_date"  => $this->start_date,
-                "booking_days"        => $this->days,
-                "real_booking_days"   => $this->days,
-                "booking_passengers"  => $this->passengers,
-                "booking_arrive_date" => date("Y-m-d H:i:s", strtotime($this->arrive_date)),
-                "created_at"          => time(),
-                "updated_at"          => time(),
-                "pay_status"          => "unpaid",
-                "origin_booking_data" => json_encode($bookingItem['origin_data'])
+                "mall_id"                  => \Yii::$app->mall->id,
+                "hotel_id"                 => $hotel->id,
+                "user_id"                  => \Yii::$app->user->id,
+                "product_code"             => $this->product_code,
+                "unique_id"                => $this->unique_id,
+                "order_no"                 => "HO" . date("ymdHis") . rand(100, 999),
+                "order_status"             => "unpaid",
+                "order_price"              => $orderPrice,
+                "booking_num"              => $this->num,
+                "booking_start_date"       => $this->start_date,
+                "booking_days"             => $this->days,
+                "real_booking_days"        => $this->days,
+                "booking_passengers"       => $this->passengers,
+                "booking_arrive_date"      => date("Y-m-d H:i:s", strtotime($this->arrive_date)),
+                "created_at"               => time(),
+                "updated_at"               => time(),
+                "pay_status"               => "unpaid",
+                "integral_deduction_price" => floatval($integralDeductionPrice),
+                "origin_booking_data"      => json_encode($bookingItem['origin_data'])
             ]);
             if(!$order->save()){
                 throw new \Exception($this->responseErrorMsg($order));
+            }
+
+            //扣除用户红包
+            if($integralDeductionPrice > 0){
+                $modifyForm = new UserIntegralModifyForm([
+                    "type"        => 2,
+                    "integral"    => $integralDeductionPrice,
+                    "desc"        => "酒店订单红包抵扣",
+                    "source_id"   => $order->id,
+                    "source_type" => "hotel_order"
+                ]);
+                $modifyForm->modify($user);
             }
 
             //关联平台
@@ -93,8 +121,9 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data'  => [
-                    "order_no"    => $order->order_no,
-                    "order_price" => round($order->order_price, 2)
+                    "order_no"                 => $order->order_no,
+                    "order_price"              => round($order->order_price, 2),
+                    "integral_deduction_price" => $integralDeductionPrice
                 ]
             ];
         }catch (\Exception $e){

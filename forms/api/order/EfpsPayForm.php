@@ -13,6 +13,7 @@ use app\models\PaymentOrderUnion;
 use app\models\Store;
 use app\models\User;
 use app\models\UserInfo;
+use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\alibaba\models\AlibabaDistributionOrder;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\mch\models\MchCheckoutOrder;
@@ -119,6 +120,12 @@ class EfpsPayForm extends BaseModel{
                     if (!$order) throw new \Exception('订单不存在！');
                     $desc = '支付酒店订单';
                     $source_type = 'hotel_order';
+                    $source_id   = $order->id;
+                }elseif(substr($paymentOrder->order_no, 0, 2) == "HF"){
+                    $order = AddcreditOrder::findOne(['order_no' => $paymentOrder->order_no]);
+                    if (!$order) throw new \Exception('订单不存在！');
+                    $desc = '支付话费订单';
+                    $source_type = 'addcredit_order';
                     $source_id   = $order->id;
                 }else {
                     $order = Order::findOne(['order_no' => $paymentOrder->order_no]);

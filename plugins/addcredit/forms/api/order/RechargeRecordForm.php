@@ -84,29 +84,59 @@ class RechargeRecordForm extends BaseModel
             throw new \Exception('平台不存在！',ApiCode::CODE_FAIL);
         }
         return [
-            [
-                'redbag_num' => 30 + 30 * $plateforms->ratio / 100,
-                'price' => 30,
+            'FastCharging' => [
+                [
+                    'redbag_num' => 10 + 10 * $plateforms->ratio / 100,
+                    'price' => 10,
+                    'product_id' => 10,
+                ],
+                [
+                    'redbag_num' => 20 + 20 * $plateforms->ratio / 100,
+                    'price' => 20,
+                    'product_id' => 28,
+                ],
+                [
+                    'redbag_num' => 30 + 30 * $plateforms->ratio / 100,
+                    'price' => 30,
+                    'product_id' => 123,
+                ],
+                [
+                    'redbag_num' => 50 + 50 * $plateforms->ratio / 100,
+                    'price' => 50,
+                    'product_id' => 124,
+                ],
+                [
+                    'redbag_num' => 100 + 100 * $plateforms->ratio / 100,
+                    'price' => 100,
+                    'product_id' => 125,
+                ],
+                [
+                    'redbag_num' => 200 + 200 * $plateforms->ratio / 100,
+                    'price' => 200,
+                    'product_id' => 126,
+                ],
             ],
-            [
-                'redbag_num' => 50 + 50 * $plateforms->ratio / 100,
-                'price' => 50,
-            ],
-            [
-                'redbag_num' => 100 + 100 * $plateforms->ratio / 100,
-                'price' => 100,
-            ],
-            [
-                'redbag_num' => 200 + 200 * $plateforms->ratio / 100,
-                'price' => 200,
-            ],
-            [
-                'redbag_num' => 300 + 300 * $plateforms->ratio / 100,
-                'price' => 300,
-            ],
-            [
-                'redbag_num' => 500 + 500 * $plateforms->ratio / 100,
-                'price' => 500,
+            'SlowCharge' => [
+                [
+                    'redbag_num' => 30 + 30 * $plateforms->ratio / 100,
+                    'price' => 30,
+                    'product_id' => 86,
+                ],
+                [
+                    'redbag_num' => 50 + 50 * $plateforms->ratio / 100,
+                    'price' => 50,
+                    'product_id' => 83,
+                ],
+                [
+                    'redbag_num' => 100 + 100 * $plateforms->ratio / 100,
+                    'price' => 100,
+                    'product_id' => 84,
+                ],
+                [
+                    'redbag_num' => 200 + 200 * $plateforms->ratio / 100,
+                    'price' => 200,
+                    'product_id' => 85,
+                ],
             ],
         ];
     }

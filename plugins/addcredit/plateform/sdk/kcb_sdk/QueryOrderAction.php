@@ -32,20 +32,22 @@ class QueryOrderAction extends BaseObject
         try {
             $AddcreditPlateformsInfo = AddcreditPlateforms::findOne($this->AddcreditOrder->plateform_id);
             if (!$AddcreditPlateformsInfo) {
-                throw new \Exception("无法获取ADDCREDIT ID " . $this->AddcreditOrder->plateform_id . " 平台信息", ApiCode::CODE_FAIL);
+                throw new \Exception("无法获取ADDCREDIT ID:" . $this->AddcreditOrder->plateform_id . " 平台信息", ApiCode::CODE_FAIL);
             }
-            $plateforms_param = json_decode($AddcreditPlateformsInfo->json_param);
+            $plateforms_param = json_decode($AddcreditPlateformsInfo->json_param, true);
             $post_param = [
                 'userid'         => $plateforms_param->id,
-                'no'             => $this->AddcreditOrder->order_no,
-                'apikey'         => $plateforms_param->secret_key,
+                'out_trade_nums' => $this->AddcreditOrder->order_no,
             ];
             ksort($post_param);
-            $sign_str = http_build_query($post_param);
+            $param_str = '';
+            foreach ($post_param as $key => $item) {
+                $param_str .= $key . '=' . $item . '&';
+            }
+            $sign_str = $param_str . '&apikey=' . $plateforms_param['secret_key'];
             $sign = strtoupper(md5($sign_str));
-            $post_param['sign'] = $sign;
-            $sign_str .= "&sign=" . $sign;
-            $response = Request::http_get(Config::ORDER_QUERY, $sign_str);
+            $param_str .= '&sign=' . $sign;
+            $response = Request::http_get(Config::ORDER_QUERY. "?" . $param_str);
             print_r($response);die;
             $parseArray = json_decode($response, true);
             if (!isset($parseArray['code'])) {

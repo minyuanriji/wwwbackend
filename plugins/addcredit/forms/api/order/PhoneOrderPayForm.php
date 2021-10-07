@@ -33,37 +33,37 @@ class PhoneOrderPayForm extends BaseModel
         try {
             $addcredit_order = AddcreditOrder::findOne(["order_no" => $this->order_no]);
             if (!$addcredit_order) {
-                throw new \Exception("订单不存在", ApiCode::CODE_FAIL);
+                throw new \Exception("订单不存在");
             }
 
             if ($addcredit_order->pay_status != 'unpaid') {
-                throw new \Exception("订单状态错误！", ApiCode::CODE_FAIL);
+                throw new \Exception("订单状态错误！");
             }
 
             //用户
             $user = User::findOne($addcredit_order->user_id);
             if (!$user || $user->is_delete) {
-                throw new \Exception("无法获取用户信息", ApiCode::CODE_FAIL);
+                throw new \Exception("无法获取用户信息");
             }
 
             if ($user->static_integral < $this->order_price) {
-                throw new \Exception("红包数量不足", ApiCode::CODE_FAIL);
+                throw new \Exception("红包数量不足");
             }
 
             //平台下单
             $plateform = AddcreditPlateforms::findOne($addcredit_order->plateform_id);
             if (!$plateform) {
-                throw new \Exception("无法获取平台信息", ApiCode::CODE_FAIL);
+                throw new \Exception("无法获取平台信息");
             }
 
             $plate_form = new kcb_PlateForm();
             $submit_res = $plate_form->submit($addcredit_order, $plateform);
 
             if (!$submit_res) {
-                throw new \Exception('未知错误！', ApiCode::CODE_FAIL);
+                throw new \Exception('未知错误！');
             }
             if ($submit_res->code != ApiCode::CODE_SUCCESS) {
-                throw new \Exception($submit_res->message, ApiCode::CODE_FAIL);
+                throw new \Exception($submit_res->message);
             }
 
             //更新订单状态为已支付
@@ -79,20 +79,14 @@ class PhoneOrderPayForm extends BaseModel
             //扣取红包
             $res = UserIntegralForm::PhoneBillOrderPaySub($addcredit_order, $user, $addcredit_order->integral_deduction_price);
             if ($res['code'] != ApiCode::CODE_SUCCESS) {
-                throw new \Exception("红包扣取失败：" . $res['msg'], ApiCode::CODE_FAIL);
+                throw new \Exception("红包扣取失败：" . $res['msg']);
             }
 
             $transaction->commit();
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '支付成功'
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '支付成功');
         } catch (\Exception $e) {
             $transaction->rollBack();
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => $e->getMessage()
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
     }
 

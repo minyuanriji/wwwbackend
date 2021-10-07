@@ -19,7 +19,7 @@
                 activeName: "",
                 tabList: [
                     {key:"store", label: "商户列表", r:"plugin/shopping_voucher/mall/from-store/list"},
-                    {key: "1688_distribution", label: "1688分销商品", r:""}
+                    {key: "hotel", label: "酒店列表", r:"plugin/shopping_voucher/mall/from-hotel/list"}
                 ]
             };
         },

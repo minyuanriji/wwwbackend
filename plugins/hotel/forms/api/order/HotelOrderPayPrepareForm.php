@@ -58,9 +58,10 @@ class HotelOrderPayPrepareForm extends BasePrepareForm {
         }
 
         foreach($orders as $order){
-            $orderArray['total_amount'] += $order->order_price;
+            $orderNeedPay = $order->order_price - $order->integral_deduction_price;
+            $orderArray['total_amount'] += $orderNeedPay;
             $orderArray['list'][] = [
-                'amount'   => $order->order_price,
+                'amount'   => $orderNeedPay,
                 'title'    => $order->order_no,
                 'order_no' => $order->order_no
             ];

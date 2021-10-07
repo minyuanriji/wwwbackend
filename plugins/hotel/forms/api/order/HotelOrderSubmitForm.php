@@ -56,13 +56,13 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
             }
 
             //计算订单价格
-            $orderPrice = $this->days * $this->num * $bookingItem['product_price'];
+            $orderNeedPay = $orderPrice = $this->days * $this->num * $bookingItem['product_price'];
 
             //如果使用红包抵扣
             $integralDeductionPrice = 0;
             if($this->use_integral){
                 $integralDeductionPrice = $user->static_integral > $orderPrice ? $orderPrice : $user->static_integral;
-                $orderPrice = max(0, $orderPrice - $integralDeductionPrice);
+                $orderNeedPay = max(0, $orderPrice - $integralDeductionPrice);
             }
 
             //生成订单
@@ -122,7 +122,7 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
                 'code' => ApiCode::CODE_SUCCESS,
                 'data'  => [
                     "order_no"                 => $order->order_no,
-                    "order_price"              => round($order->order_price, 2),
+                    "order_price"              => round($orderNeedPay, 2),
                     "integral_deduction_price" => $integralDeductionPrice
                 ]
             ];

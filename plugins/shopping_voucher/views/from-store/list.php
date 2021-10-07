@@ -1,14 +1,11 @@
 <?php
 echo $this->render("com-edit");
+echo $this->render("../com/com-tab-from");
 ?>
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
 
-        <div style="background: white;margin-bottom: 20px;padding-left:20px;">
-            <el-tabs v-model="activeName">
-                <el-tab-pane label="商户列表" name="first"></el-tab-pane>
-            </el-tabs>
-        </div>
+        <com-tab-from :current="activeName"></com-tab-from>
 
         <div class="table-body">
             <el-alert title="说明：用户通过扫商户二维码进行付款，成功后可获得赠送购物券" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
@@ -198,7 +195,7 @@ echo $this->render("com-edit");
         el: '#app',
         data() {
             return {
-                activeName: 'first',
+                activeName: 'store',
                 editDialogVisible: false,
                 editData: {},
                 searchData: {

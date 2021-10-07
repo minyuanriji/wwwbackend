@@ -42,7 +42,7 @@ class SubmitOrderAction extends BaseObject
 //            $teltype = (new TelType())->getPhoneType($this->AddcreditOrder->mobile);
             $param = [
                 'out_trade_num'    => $this->AddcreditOrder->order_no,
-                'product_id'       => 1,
+                'product_id'       => $this->AddcreditOrder->product_id,
                 'account'          => $this->AddcreditOrder->mobile,
                 'userid'           => $plateforms_param['id'],
                 'notify_url'       => $this->getNotifyUrl('telephone.php'),

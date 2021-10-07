@@ -9,7 +9,7 @@ class GetGoodsListForUserChoosed extends BaseAPI{
      * @return array
      */
     public static function paramKeys(){
-        return ["pageNo", "pageSize", "groupId"];
+        return ["pageNo", "pageSize", "groupId", "title"];
     }
 
     /**

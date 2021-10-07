@@ -116,7 +116,7 @@ class MchApplyBasicForm extends BaseModel{
 
     private function setPos(){
         $hostInfo = \Yii::$app->getRequest()->getHostInfo();
-        $hostInfo = "https://dev.mingyuanriji.cn";
+        //$hostInfo = "https://dev.mingyuanriji.cn";
 
         if(PoiHelper::isPoi($this->store_longitude, $this->store_latitude)){
             //通过坐标获取地址信息

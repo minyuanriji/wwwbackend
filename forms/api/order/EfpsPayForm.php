@@ -217,24 +217,35 @@ class EfpsPayForm extends BaseModel{
                     "goodsList"    => []
                 ];
                 foreach($paymentOrders as $paymentOrder){
-                    if(substr($paymentOrder->order_no, 0, 2) == "MS"){ //商家结账单
+                    /*if(substr($paymentOrder->order_no, 0, 2) == "MS") { //商家结账单
                         $checkoutOrder = MchCheckoutOrder::findOne([
                             "order_no" => $paymentOrder->order_no
                         ]);
-                        if(!$checkoutOrder){
+                        if (!$checkoutOrder) {
                             throw new \Exception("订单不存在");
                         }
                         $mchStore = $checkoutOrder->mchStore;
-                        if(!$mchStore){
+                        if (!$mchStore) {
                             throw new \Exception("无法获取店铺信息");
                         }
                         $orderInfo['goodsList'][] = [
                             "goodsId" => (string)$mchStore->mch_id,
-                            "name"    => $mchStore->name,
-                            "price"   => $checkoutOrder->order_price * 100,
-                            "number"  => "1",
-                            "amount"  => (string)$checkoutOrder->order_price * 100
+                            "name" => $mchStore->name,
+                            "price" => $checkoutOrder->order_price * 100,
+                            "number" => "1",
+                            "amount" => (string)$checkoutOrder->order_price * 100
                         ];
+                    }elseif(substr($paymentOrder->order_no, 0, 4) == "ALIS") {
+                        $order = AlibabaDistributionOrder::findOne(['order_no' => $paymentOrder->order_no]);
+                        if (!$order){
+                            throw new \Exception('订单不存在！');
+                        }
+                    }elseif(substr($paymentOrder->order_no, 0, 2) == "HO"){
+                        $order = HotelOrder::findOne(['order_no' => $paymentOrder->order_no]);
+                        if (!$order){
+                            throw new \Exception('订单不存在！');
+                        }
+
                     }else{
                         $order = $paymentOrder->order;
                         if(!$order){
@@ -251,7 +262,14 @@ class EfpsPayForm extends BaseModel{
                                 "amount"  => (string)$detail->total_price * 100
                             ];
                         }
-                    }
+                    }*/
+                    $orderInfo['goodsList'][] = [
+                        "goodsId" => (string)$paymentOrder->id,
+                        "name"    => $paymentOrder->order_no,
+                        "price"   => $paymentOrder->amount * 100,
+                        "number"  => "1",
+                        "amount"  => (string)$paymentOrder->amount * 100
+                    ];
                 }
                 $efpsPaymentOrder->orderInfo = json_encode($orderInfo);
             }

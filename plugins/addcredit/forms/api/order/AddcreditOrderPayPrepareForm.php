@@ -5,7 +5,7 @@ namespace app\plugins\addcredit\forms\api\order;
 use app\forms\api\payCenter\paymentOrderPrepare\BasePrepareForm;
 use app\models\User;
 use app\plugins\addcredit\models\AddcreditOrder;
-use app\plugins\Addcredit\forms\common\AddcreditOrderPaidNotifyProcess;
+use app\plugins\addcredit\forms\common\AddcreditOrderPaidNotifyProcess;
 use app\plugins\hotel\models\HotelOrder;
 
 class AddcreditOrderPayPrepareForm extends BasePrepareForm {

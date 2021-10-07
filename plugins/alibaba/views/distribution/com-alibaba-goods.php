@@ -2,7 +2,8 @@
     <div class="com-alibaba-goods">
         <el-dialog width="65%" :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
 
-            <el-tabs v-model="searchData.biztype" @tab-click="switchTab">
+
+            <el-tabs v-if="!loading"  v-model="searchData.biztype" @tab-click="switchTab">
                 <el-tab-pane label="选品库" name="my"></el-tab-pane>
                 <el-tab-pane label="生产加工" name="1"></el-tab-pane>
                 <el-tab-pane label="经销批发" name="2"></el-tab-pane>
@@ -28,9 +29,9 @@
                 </el-table>
             </template>
             <template v-else>
-                <div style="margin-top:6px;">
+                <div style="margin-top:6px;" v-if="!loading" >
 
-                    <el-tag v-if="searchData.groupId!=''" closable type="danger">
+                    <el-tag v-if="searchData.groupId!=''"  type="danger">
                         {{groupData.title}}
                     </el-tag>
 
@@ -130,6 +131,7 @@
                     offerIds: '',
                     groupId: ''
                 },
+                groupData:{title:''},
                 page: 1,
                 list: [],
                 pagination: null,
@@ -180,6 +182,7 @@
             },
             groupInto(row){
                 this.searchData.groupId = row.id;
+                this.groupData = row;
                 this.search();
             },
             search(){

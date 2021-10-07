@@ -13,5 +13,11 @@ class Config
     //查询用户信息
     const BALANCE_QUERY     = "user";
 
+    //快充产品ID
+    const FAST_CHARGING      = [10, 28, 123, 124, 125, 126];
+
+    //慢充产品ID
+    const SLOW_CHARGE        = [83, 84, 85, 86];
+
 
 }

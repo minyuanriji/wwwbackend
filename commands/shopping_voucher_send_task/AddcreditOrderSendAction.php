@@ -5,10 +5,12 @@ namespace app\commands\shopping_voucher_send_task;
 use app\models\User;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
-use app\plugins\hotel\models\HotelOrder;
+use app\plugins\addcredit\plateform\sdk\kcb_sdk\Config;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromAddcredit;
 use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 use yii\base\Action;
+use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
+
 
 class AddcreditOrderSendAction extends Action{
 
@@ -31,33 +33,10 @@ class AddcreditOrderSendAction extends Action{
      * @return void
      */
     private function sendAction(){
-        $query = ShoppingVoucherSendLog::find()->alias("l")->limit(10)->asArray()->where(["l.status" => "waiting", "l.source_type" => "from_hotel_order"]);
-        $query->innerJoin(["ho" => HotelOrder::tableName()], "ho.id=l.source_id");
-        $query->andWhere("(UNIX_TIMESTAMP(ho.booking_start_date) + ho.booking_days * 3600 * 24) < '".time()."'");
-
-        //把非入驻成功状态的订单全部取消掉
-        $cloneQuery = clone $query;
-        $cloneQuery->andWhere([
-            "OR",
-            "ho.pay_status <> 'paid'",
-            "ho.order_status NOT IN('success', 'unconfirmed', 'finished')"
-        ]);
-        $invalidIds = $cloneQuery->select(["l.id"])->column();
-        while($invalidIds){
-            ShoppingVoucherSendLog::updateAll(["status" => "invalid"], "id IN(".implode(",", $invalidIds).")");
-            $invalidIds = $cloneQuery->select(["l.id"])->column();
-        }
-
-        //取出正常记录进行发放
-        $cloneQuery = clone $query;
-        $cloneQuery->andWhere([
-            "AND",
-            "ho.pay_status='paid'",
-            "ho.order_status IN('success', 'unconfirmed', 'finished')"
-        ]);
-        $sendLogs = $query->select(["l.id", "l.user_id", "l.source_id", "l.source_type", "l.money"])
-            ->orderBy("l.updated_at ASC")
-            ->all();
+        $sendLogs = ShoppingVoucherSendLog::find()->where(["status" => "waiting", "source_type" => "from_addcredit_order"])
+            ->select(["id", "user_id", "source_id", "source_type", "money"])
+            ->orderBy("updated_at ASC")
+            ->asArray()->limit(10)->all();
         $sendLogIds = [];
         foreach($sendLogs as $sendLog){
             try {
@@ -67,7 +46,7 @@ class AddcreditOrderSendAction extends Action{
                 }
                 $modifyForm = new ShoppingVoucherLogModifiyForm([
                     "money"       => $sendLog['money'],
-                    "desc"        => "酒店预订消费获得赠送购物券",
+                    "desc"        => "话费充值获得赠送购物券",
                     "source_id"   => $sendLog['source_id'],
                     "source_type" => $sendLog['source_type']
                 ]);
@@ -96,8 +75,7 @@ class AddcreditOrderSendAction extends Action{
         $query = AddcreditOrder::find()->alias("ao");
         $query->leftJoin(["apf" => AddcreditPlateforms::tableName()], "ao.plateform_id=apf.id");
         $query->innerJoin(["svfa" => ShoppingVoucherFromAddcredit::tableName()], "(svfa.sdk_key=apf.sdk_dir) AND svfa.is_delete=0");
-        $query->leftJoin(["svfa" => ShoppingVoucherSendLog::tableName()], "svfa.source_id=ao.id AND svfa.source_type='from_addcredit_order'");
-
+        $query->leftJoin(["svs" => ShoppingVoucherSendLog::tableName()], "svs.source_id=ao.id AND svs.source_type='from_addcredit_order'");
         $query->andWhere([
             "AND",
             "ao.pay_price > 0",
@@ -105,7 +83,7 @@ class AddcreditOrderSendAction extends Action{
         ]);
         $query->orderBy("ao.updated_at ASC");
 
-        $selects = ["ao.id", "ao.mall_id", "ao.user_id", "ao.integral_deduction_price", "svfa.param_data_json"];
+        $selects = ["ao.id", "ao.mall_id", "ao.mobile", "ao.user_id", "ao.pay_price", "svfa.param_data_json", 'ao.product_id'];
 
         $AddcreditOrder = $query->select($selects)->asArray()->limit(10)->all();
         if(!$AddcreditOrder)
@@ -118,19 +96,40 @@ class AddcreditOrderSendAction extends Action{
         AddcreditOrder::updateAll(["updated_at" => time()], "id IN (".implode(",", $AddcreditOrderIds).")");
 
         foreach($AddcreditOrder as $value){
+            $ruleData = json_decode($value['param_data_json'], true);
+            $mobile_count = AddcreditOrder::find()->where(['mobile' => $value['mobile'], 'pay_status' => 'paid'])->count();
+            if (in_array($value['product_id'], Config::FAST_CHARGING)) {
+                $charge = 1;
+            } else {
+                $charge = 0;
+            }
+            if ($mobile_count > 1) {
+                if ($charge) {
+                    $ratio = $ruleData['fast_follow_give'];
+                } else {
+                    $ratio = $ruleData['slow_follow_give'];
+                }
+            } else {
+                if ($charge) {
+                    $ratio = $ruleData['fast_one_give'];
+                } else {
+                    $ratio = $ruleData['slow_one_give'];
+                }
+            }
 
-            $money = $hotelOrder['pay_price'] * (floatval($hotelOrder['give_value'])/100);
+
+            $money = $value['pay_price'] * (floatval($ratio)/100);
 
             $sendLog = new ShoppingVoucherSendLog([
-                "mall_id"     => $hotelOrder['mall_id'],
-                "user_id"     => $hotelOrder['user_id'],
-                "source_id"   => $hotelOrder['id'],
-                "source_type" => "from_hotel_order",
+                "mall_id"     => $value['mall_id'],
+                "user_id"     => $value['user_id'],
+                "source_id"   => $value['id'],
+                "source_type" => "from_addcredit_order",
                 "status"      => "waiting",
                 "money"       => $money,
                 "created_at"  => time(),
                 "updated_at"  => time(),
-                "data_json"   => json_encode($hotelOrder)
+                "data_json"   => json_encode($value)
             ]);
 
             if($sendLog->save()){

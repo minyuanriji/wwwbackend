@@ -31,7 +31,7 @@
             <template v-else>
                 <div style="margin-top:6px;" v-if="!loading" >
 
-                    <el-tag v-if="searchData.groupId!=''"  type="danger">
+                    <el-tag v-if="searchData.biztype=='my' && searchData.groupId!=''"  type="danger">
                         {{groupData.title}}
                     </el-tag>
 
@@ -104,7 +104,7 @@
                         :total="pagination.total_count"
                         style="float:right;margin:15px"
                         @current-change="pageChange"
-                        v-if="pagination">
+                        v-if="pagination && pagination.pageSize > 1">
                 </el-pagination>
             </div>
 

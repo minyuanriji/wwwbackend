@@ -46,16 +46,14 @@ class AlibabaDistributionAlibabaGoodsGearchForm extends BaseModel{
             $distribution = new Distribution($app->app_key, $app->secret);
 
             $options = [];
-            if($this->keyword){
-                $options['keyWords'] = $this->keyword;
-            }
 
             $totalCount = 0;
             if($this->biztype && $this->biztype == "my"){ //个人选品库
                 $res = $distribution->requestWithToken(new GetGoodsListForUserChoosed([
                     "pageNo"   => $this->page,
                     "pageSize" => $pageSize,
-                    "groupId"  => $this->groupId
+                    "groupId"  => $this->groupId,
+                    "title"    => $this->keyword ? $this->keyword : ""
                 ]), $app->access_token);
                 if(!$res instanceof GetGoodsListForUserChoosedResponse){
                     throw new \Exception("[GetGoodsListForUserChoosedResponse]返回结果异常");
@@ -70,14 +68,18 @@ class AlibabaDistributionAlibabaGoodsGearchForm extends BaseModel{
                     $offerIds[] = $row['feedId'];
                 }
                 $options['offerIds'] = $offerIds ? implode(",", $offerIds) : "-1";
-            }
-
-            if($this->biztype){
-                $options['biztype'] = $this->biztype;
+                $options['page'] = 1;
+            }else{
+                $options['page'] = $this->page;
+                if($this->biztype){
+                    $options['biztype'] = $this->biztype;
+                }
+                if($this->keyword){
+                    $options['keyWords'] = $this->keyword;
+                }
             }
 
             $res = $distribution->requestWithToken(new GetGoodsList(array_merge([
-                "page" => $this->page,
                 "pageSize" => $pageSize
             ], $options)), $app->access_token);
 

@@ -10,7 +10,7 @@ echo $this->render("../com/com-tab-from");
             <el-alert title="说明：话费充值，成功后可获得赠送购物券" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
 
             <el-tabs v-model="search.type" @tab-click="tab_assets">
-                <el-tab-pane label="快充呗" name="kbc"></el-tab-pane>
+                <el-tab-pane label="快充呗" name="kcb"></el-tab-pane>
             </el-tabs>
 
             <div class="form-body" v-if="tab_index==0">
@@ -71,7 +71,7 @@ echo $this->render("../com/com-tab-from");
                 ratioLoading: false,
                 // 搜索内容
                 search: {
-                    type: 'kbc',
+                    type: 'kcb',
                 },
             };
         },

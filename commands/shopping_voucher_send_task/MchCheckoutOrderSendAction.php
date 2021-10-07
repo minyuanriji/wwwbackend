@@ -31,7 +31,7 @@ class MchCheckoutOrderSendAction extends Action{
      * @return void
      */
     private function sendAction(){
-        $sendLogs = ShoppingVoucherSendLog::find()->where(["status" => "waiting"])
+        $sendLogs = ShoppingVoucherSendLog::find()->where(["status" => "waiting", "source_type" => "from_mch_checkout_order"])
                     ->select(["id", "user_id", "source_id", "source_type", "money"])
                     ->orderBy("updated_at ASC")
                     ->asArray()->limit(10)->all();

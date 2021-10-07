@@ -7,7 +7,9 @@ class ShoppingVoucherSendTaskController extends BaseCommandController {
 
     public function actions(){
         return [
-            'mco' => 'app\commands\shopping_voucher_send_task\MchCheckoutOrderSendAction'
+            'mco' => 'app\commands\shopping_voucher_send_task\MchCheckoutOrderSendAction',
+            'ho' => 'app\commands\shopping_voucher_send_task\HotelOrderSendAction',
+            'hf' => 'app\commands\shopping_voucher_send_task\AddcreditOrderSendAction'
         ];
     }
 

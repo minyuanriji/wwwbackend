@@ -11,20 +11,23 @@ echo $this->render("../com/com-tab-from");
 
             <el-tabs v-model="activeName2" type="border-card">
                 <el-tab-pane label="通用配置" name="first">
-                    <el-form label-width="120px">
+                    <el-form ref="commonSetForm" :model="commonSet" :rules="commFormRule" label-width="120px">
                         <el-form-item label="是否开启">
-                            <el-switch v-model="commonSet.is_allow" active-text="是" inactive-text="否"></el-switch>
+                            <el-switch v-model="commonSet.is_open" active-text="是" inactive-text="否"></el-switch>
                         </el-form-item>
-                        <template v-if="commonSet.is_allow">
-                            <el-form-item label="赠送比例" prop="commonSet.give_value">
-                                <el-input :disabled="formProgressData.loading" type="number" min="0" max="100" placeholder="请输入内容" v-model="formData.give_value" style="width:260px;">
+                        <template v-if="commonSet.is_open">
+                            <el-form-item label="赠送比例" prop="give_value">
+                                <el-input  type="number" min="0" max="100" placeholder="请输入内容" v-model="commonSet.give_value" style="width:260px;">
                                     <template slot="append">%</template>
                                 </el-input>
                             </el-form-item>
                             <el-form-item label="启动日期" prop="start_at">
-                                <el-date-picker :disabled="formProgressData.loading" v-model="formData.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                                <el-date-picker v-model="commonSet.start_at" type="date" placeholder="选择日期"></el-date-picker>
                             </el-form-item>
                         </template>
+                        <el-form-item >
+                            <el-button :loading="loading" type="primary" @click="saveCommon">确 定</el-button>
+                        </el-form-item>
                     </el-form>
 
                 </el-tab-pane>
@@ -119,73 +122,60 @@ echo $this->render("../com/com-tab-from");
                 activeName2: 'first',
                 editDialogVisible: false,
                 editData: {},
-                searchData: {},
-                props: {
-                    value: 'id',
-                    label: 'name',
-                    children: 'list',
-                    checkStrictly: true
-                },
-                district: [],
-                date: '',
                 list: [],
+                page:1,
                 pagination: null,
                 loading: false,
+                searchData: {},
                 commonSet:{
-                    is_open:false
+                    is_open:false,
+                    give_value: '',
+                    start_at: ''
+                },
+                commFormRule:{
+                    give_value: [
+                        {required: true, message: '赠送比例不能为空', trigger: 'change'},
+                    ],
+                    start_at:[
+                        {required: true, message: '启动日期不能为空', trigger: 'change'},
+                    ]
                 }
             };
         },
         methods: {
-            newStore(){
-                this.editData = {};
-                this.editDialogVisible = true;
-            },
-            editStore(row){
-                this.dialogContent = true;
-                this.ratioForm = {
-                    ratio: row.ratio,
-                    id: row.id
+            switchChanged(){
+                if(!this.commonSet.is_open){
+                    this.saveCommon();
                 }
             },
-            deleteOn(row){
-                let self = this;
-                self.$confirm('删除该条数据, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    self.loading = true;
-                    request({
-                        params: {
-                            r: 'plugin/shopping_voucher/mall/from-hotel/delete'
-                        },
-                        method: 'post',
-                        data: {
-                            id: row.id,
-                        }
-                    }).then(e => {
-                        self.loading = false;
-                        if (e.data.code === 0) {
-                            self.$message.success(e.data.msg);
-                            self.getList();
-                        } else {
-                            self.$message.error(e.data.msg);
-                        }
-                    }).catch(e => {
-                        self.loading = false;
-                    });
-                }).catch(() => {
-
+            saveCommon(){
+                let that = this;
+                this.$refs['commonSetForm'].validate((valid) => {
+                    if (valid) {
+                        that.loading = true;
+                        request({
+                            params: {
+                                r: "plugin/shopping_voucher/mall/from-hotel/save-common"
+                            },
+                            method: "post",
+                            data: {
+                                is_open:that.commonSet.is_open ? 1 : 0,
+                                give_value:that.commonSet.give_value,
+                                start_at:that.commonSet.start_at
+                            }
+                        }).then(e => {
+                            that.loading = false;
+                            if (e.data.code == 0) {
+                                that.$message.success(e.data.msg);
+                            } else {
+                                that.$message.error(e.data.msg);
+                            }
+                        }).catch(e => {
+                            that.$message.error('请求失败！');
+                            that.loading = true;
+                        });
+                    }
                 });
-            },
-            pageChange(currentPage) {
-                this.page = currentPage;
-                this.getList();
-            },
-            search() {
-                this.page = 1;
-                this.getList();
             },
             getList() {
                 let params = Object.assign({
@@ -198,6 +188,10 @@ echo $this->render("../com/com-tab-from");
                     if (e.data.code === 0) {
                         this.list = e.data.data.list;
                         this.pagination = e.data.data.pagination;
+                        let commonData = e.data.data.commonData;
+                        this.commonSet.is_open    = commonData.is_open == 1 ? true : false;
+                        this.commonSet.give_value = commonData.give_value;
+                        this.commonSet.start_at   = commonData.start_at;
                     } else {
                         this.$message.error(e.data.msg);
                     }
@@ -206,32 +200,10 @@ echo $this->render("../com/com-tab-from");
                     this.loading = false;
                 });
                 this.loading = true;
-            },
-            update(){
-                this.getList();
-            },
-            close(){
-                this.editDialogVisible = false;
-            },
-            // 获取省市区列表
-            getDistrict() {
-                request({
-                    params: {
-                        r: 'district/index',
-                        level: 3
-                    },
-                }).then(e => {
-                    if (e.data.code == 0) {
-                        this.district = e.data.data.district;
-                    }
-                }).catch(e => {
-
-                });
             }
         },
         mounted: function() {
             this.getList();
-            this.getDistrict();
         }
     });
 </script>

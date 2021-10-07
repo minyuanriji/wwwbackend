@@ -32,16 +32,16 @@ class HotelOrderPaidNotifyProcess extends PaymentNotify{
             throw new \Exception("无法获取平台信息");
         }
 
-        //TODO 第一次调用第三方平台下单接口
+        //第一次调用第三方平台下单接口
         if($plateform->source_code == $plateform->plateform_code){
-            /*$res = OrderHelper::submitPlateformOrder($hotelOrder, $plateform);
+            $res = OrderHelper::submitPlateformOrder($hotelOrder, $plateform);
             if($res['code'] != ApiCode::CODE_SUCCESS){
                 throw new \Exception($res['msg']);
             }
             $plateform->plateform_code = $res['data']['plateform_order_no'];
             if(!$plateform->save()){
                 throw new \Exception(json_encode($plateform->getErrors()));
-            }*/
+            }
         }
 
         //更新订单
@@ -59,9 +59,7 @@ class HotelOrderPaidNotifyProcess extends PaymentNotify{
                 break;
         }
 
-        //TODO 测试 后面要改回来
-        $hotelOrder->order_status = "success";
-        //$hotelOrder->order_status = "unconfirmed";
+        $hotelOrder->order_status = "unconfirmed";
         $hotelOrder->pay_status   = "paid";
         $hotelOrder->pay_at       = date("Y-m-d H:i:s");
         $hotelOrder->pay_price    = $paymentOrder->amount;

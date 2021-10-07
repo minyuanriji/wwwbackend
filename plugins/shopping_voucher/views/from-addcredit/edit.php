@@ -15,6 +15,9 @@ echo $this->render("../com/com-tab-from");
 
             <div class="form-body" v-if="tab_index==0">
                 <el-form :model="ruleForm" size="small" ref="ruleForm" label-width="120px">
+                    <el-form-item prop="id" label="ID" style="display: none">
+                        <el-input v-model="ruleForm.id"></el-input>
+                    </el-form-item>
                     快充：
                     <el-form-item label="第一次赠送" prop="fast_one_give">
                         <el-input type="number" v-model="ruleForm.fast_one_give" style="width: 200px;">
@@ -56,6 +59,7 @@ echo $this->render("../com/com-tab-from");
                     slow_one_give: 0,
                     slow_follow_give: 0,
                     sdk_key: '',
+                    id: 0,
                 },
                 tab_index:0,
                 activeName: 'addcredit',

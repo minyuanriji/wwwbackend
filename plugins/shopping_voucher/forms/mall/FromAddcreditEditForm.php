@@ -19,7 +19,7 @@ class FromAddcreditEditForm extends BaseModel
     {
         return [
             [['sdk_key'], 'required'],
-            [['fast_one_give', 'fast_follow_give', 'slow_one_give','slow_follow_give'], 'integer'],
+            [['fast_one_give', 'fast_follow_give', 'slow_one_give','slow_follow_give', 'id'], 'integer'],
         ];
     }
 
@@ -29,8 +29,8 @@ class FromAddcreditEditForm extends BaseModel
             return $this->responseErrorInfo();
         }
         try {
-            if ($this->sdk_key) {
-                $FromAddcredit = ShoppingVoucherFromAddcredit::findOne(['sdk_key' => $this->sdk_key, 'mall_id' => \Yii::$app->mall->id]);
+            if ($this->id) {
+                $FromAddcredit = ShoppingVoucherFromAddcredit::findOne(['id' => $this->id]);
                 if (!$FromAddcredit) {
                     throw new \Exception('数据异常,该条数据不存在');
                 }

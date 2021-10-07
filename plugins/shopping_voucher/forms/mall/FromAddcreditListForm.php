@@ -31,9 +31,11 @@ class FromAddcreditListForm extends BaseModel
                     'fast_follow_give' => 0,
                     'slow_one_give' => 0,
                     'slow_follow_give' => 0,
+                    'id' => 0,
                 ];
             } else {
                 $result = json_decode($FromAddcredit->param_data_json,true);
+                $result['id'] = $FromAddcredit->id;
             }
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', $result);
         } catch (\Exception $e) {

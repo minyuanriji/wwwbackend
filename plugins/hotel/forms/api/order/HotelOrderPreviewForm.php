@@ -52,13 +52,13 @@ class HotelOrderPreviewForm extends BaseModel{
             $endDay = date("Y-m-d", strtotime($this->start_date) + $this->days * 3600 * 24);
 
             //计算订单价格
-            $payPrice = $orderPrice = $this->days * $this->num * $bookingItem['product_price'];
+            $orderPrice = $this->days * $this->num * $bookingItem['product_price'];
 
             //如果使用红包抵扣
             $integralDeductionPrice = 0;
             if($this->use_integral){
-                $integralDeductionPrice = $user->static_integral > $payPrice ? $payPrice : $user->static_integral;
-                $payPrice = max(0, $payPrice - $integralDeductionPrice);
+                $integralDeductionPrice = $user->static_integral > $orderPrice ? $orderPrice : $user->static_integral;
+                $orderPrice = max(0, $orderPrice - $integralDeductionPrice);
             }
 
             //用户最近入住酒店信息
@@ -73,7 +73,6 @@ class HotelOrderPreviewForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'order_price'              => floatval($orderPrice),
-                    'pay_price'                => floatval($payPrice),
                     'user_total_integral'      => floatval($user->static_integral),
                     'use_integral'             => (int)$this->use_integral,
                     'integral_deduction_price' => $integralDeductionPrice,

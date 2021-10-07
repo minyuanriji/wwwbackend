@@ -14,6 +14,7 @@ use app\models\Store;
 use app\models\User;
 use app\models\UserInfo;
 use app\plugins\alibaba\models\AlibabaDistributionOrder;
+use app\plugins\hotel\models\HotelOrder;
 use app\plugins\mch\models\MchCheckoutOrder;
 
 class EfpsPayForm extends BaseModel{
@@ -104,15 +105,21 @@ class EfpsPayForm extends BaseModel{
                     if (!$mchOrder) throw new \Exception('商家扫码订单不存在！');
                     $store = Store::findOne(['mch_id' => $mchOrder->mch_id]);
                     if (!$store) throw new \Exception('商户不存在！');
-                    $desc = '来自扫码商家' . " ‘" . $store->name . "‘ 账户余额支付：" . (float)$paymentOrder->amount . '元';
+                    $desc = '支付商家二维码';
                     $source_type = 'mch_checkout_order';
                     $source_id = $mchOrder->id;
-                } elseif(substr($paymentOrder->order_no, 0, 4) == "ALIS"){
+                } elseif(substr($paymentOrder->order_no, 0, 4) == "ALIS") {
                     $order = AlibabaDistributionOrder::findOne(['order_no' => $paymentOrder->order_no]);
                     if (!$order) throw new \Exception('订单不存在！');
-                    $desc = '来自1688分销订单商品' . " ‘" . $paymentOrder->title . "‘ 账户余额支付：" . (float)$paymentOrder->amount . '元';
+                    $desc = '支付1688分销订单';
                     $source_type = '1688_distribution_order';
                     $source_id = $order->id;
+                }elseif(substr($paymentOrder->order_no, 0, 2) == "HO"){
+                    $order = HotelOrder::findOne(['order_no' => $paymentOrder->order_no]);
+                    if (!$order) throw new \Exception('订单不存在！');
+                    $desc = '支付酒店订单';
+                    $source_type = 'hotel_order';
+                    $source_id   = $order->id;
                 }else {
                     $order = Order::findOne(['order_no' => $paymentOrder->order_no]);
                     if (!$order) throw new \Exception('订单不存在！');

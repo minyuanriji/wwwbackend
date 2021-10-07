@@ -54,6 +54,7 @@ class UserForm extends BaseModel
     public $is_change_name = 0;
     public $search;
     public $is_lianc = 0;
+    public $lock_parent = 0;
 
     public function rules()
     {
@@ -63,7 +64,7 @@ class UserForm extends BaseModel
             [['id', 'member_level', 'user_id', 'award_id', 'status', 'is_admin'], 'integer'],
             [['keyword'], 'string', 'max' => 255],
             [['page_size'], 'default', 'value' => 10],
-            [['fields', 'is_lianc'], 'safe'],
+            [['fields', 'is_lianc', 'lock_parent'], 'safe'],
             [['keyword', 'platform'], 'default', 'value' => ''],
             [['is_change_name'], 'boolean'],
             [['role_type', 'search'], 'string']
@@ -355,7 +356,8 @@ class UserForm extends BaseModel
             'created_at' => date("Y-m-d H:i:s", $user->created_at),
             'parent_id' => $user->parent_id,
             'is_examine' => $user->is_examine,
-            'is_lianc' => (int)$user->is_lianc
+            'is_lianc' => (int)$user->is_lianc,
+            'lock_parent' => (int)$user->lock_parent,
         ];
 
         $mall_members = MemberLevel::findAll(['mall_id' => \Yii::$app->mall->id, 'status' => 1, 'is_delete' => 0]);

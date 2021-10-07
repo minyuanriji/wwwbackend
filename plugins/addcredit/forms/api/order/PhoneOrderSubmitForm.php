@@ -10,7 +10,6 @@ use app\plugins\sign_in\models\User;
 
 class PhoneOrderSubmitForm extends BaseModel
 {
-
     public $plateform_id;
     public $mobile;
     public $order_price;

@@ -3,7 +3,7 @@
  * 话费异步通知类
  */
 
-$_GET['r'] = 'api/pay-notify/wechat';
+$_GET['r'] = '';
 
 error_reporting(E_ALL);
 

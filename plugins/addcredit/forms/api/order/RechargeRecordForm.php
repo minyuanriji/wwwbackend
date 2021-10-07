@@ -3,12 +3,9 @@
 namespace app\plugins\addcredit\forms\api\order;
 
 use app\core\ApiCode;
-use app\forms\common\UserIntegralForm;
 use app\models\BaseModel;
-use app\models\User;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
-use app\plugins\addcredit\plateform\sdk\k_default\PlateForm;
 
 class RechargeRecordForm extends BaseModel
 {

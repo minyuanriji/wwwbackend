@@ -42,7 +42,7 @@ class SubmitOrderAction extends BaseObject
 //            $teltype = (new TelType())->getPhoneType($this->AddcreditOrder->mobile);
             $param = [
                 'out_trade_num'    => $this->AddcreditOrder->order_no,
-                'product_id'       => $this->AddcreditOrder->product_id,
+                'product_id'       => 1,
                 'account'          => $this->AddcreditOrder->mobile,
                 'userid'           => $plateforms_param['id'],
                 'notify_url'       => $this->getNotifyUrl('telephone.php'),
@@ -55,12 +55,13 @@ class SubmitOrderAction extends BaseObject
             }
             $sign_str = $param_str . 'apikey=' . $plateforms_param['secret_key'];
             $sign = strtoupper(md5($sign_str));
-            $param_str .= '&sign=' . $sign;
-            $response = Request::http_get(Config::PHONE_BILL_SUBMIT . "?" . $param_str);
+            $param_str .= "&sign=" . $sign;
+            $response = Request::http_get(Config::PHONE_BILL_SUBMIT . '?' . $param_str);
             $parseArray = json_decode($response, true);
             if (!isset($parseArray['errno'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
             }
+
             if ($parseArray['errno'] != Code::ORDER_SUCCESS) {
                 if (isset($parseArray['errmsg'])) {
                     throw new \Exception($parseArray['errmsg']);

@@ -18,7 +18,6 @@ class AddcreditPlateforms extends BaseActiveRecord
     {
         return [
             [['mall_id', 'name', 'sdk_dir', 'created_at', 'updated_at'], 'required'],
-            [[], 'safe']
         ];
     }
 }

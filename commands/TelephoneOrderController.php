@@ -8,12 +8,11 @@ use app\models\User;
 use app\plugins\addcredit\forms\api\order\PhoneOrderRefundForm;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\plateform\result\QueryResult;
-use app\plugins\addcredit\plateform\sdk\k_default\Code as one_Code;
+use app\plugins\addcredit\plateform\sdk\kcb_sdk\Code;
 use app\plugins\addcredit\plateform\sdk\kcb_sdk\PlateForm as kcb_PlateForm;
 
 class TelephoneOrderController extends BaseCommandController
 {
-
     public function actionMaintantJob()
     {
         $this->orderQuery();
@@ -25,9 +24,7 @@ class TelephoneOrderController extends BaseCommandController
         while (true) {
             $this->sleep(1);
             try {
-
                 $this->orderQuery();
-
             } catch (\Exception $e) {
                 $this->commandOut($e->getMessage());
             }
@@ -60,20 +57,18 @@ class TelephoneOrderController extends BaseCommandController
                 try {
                     //成功，处理状态
                     $item->updated_at = time();
-                    switch ($response_content['status'])
-                    {
-                        case one_Code::PAY_STATUS_PAID:
-                            if ($response_content['arrival'] == one_Code::COMPLETE_STATUS_RECEIVED) {
+                    if (isset($response_content['data'])) {
+                        switch ($response_content['data'][0]['state'])
+                        {
+                            case Code::QUERY_SUCCESS:
                                 $item->order_status = AddcreditOrder::ORDER_STATUS_SUC;
                                 $item->plateform_request_data = $query_res->request_data;
                                 $item->plateform_response_data = $query_res->response_content;
                                 if (!$item->save()) {
                                     throw new \Exception("话费订单失败：" . json_encode($item->getErrors()));
                                 }
-                            }
-                            break;
-                        case one_Code::PAY_STATUS_FAIL:
-                            if ($response_content['arrival'] == one_Code::COMPLETE_STATUS_REFUNDED || $response_content['arrival'] == one_Code::COMPLETE_STATUS_NON_ARRIVAL) {
+                                break;
+                            case Code::QUERY_FAIL:
                                 $transaction = \Yii::$app->db->beginTransaction();
                                 try {
                                     $item->pay_status = AddcreditOrder::PAY_TYPE_REFUND;
@@ -106,12 +101,11 @@ class TelephoneOrderController extends BaseCommandController
                                     \Yii::error($exception->getLine().";file:".$exception->getFile());
                                     throw new \Exception($exception->getMessage());
                                 }
-                            }
-                            break;
-                        default:
-                            break;
+                                break;
+                            default:
+                                break;
+                        }
                     }
-
                 } catch (\Exception $e) {
                     $this->commandOut($e->getMessage());
                 }

@@ -8,12 +8,13 @@ use app\plugins\shopping_voucher\models\ShoppingVoucherFromHotel;
 
 class FromHotelCommonSaveForm extends BaseModel{
 
+    public $is_open;
     public $give_value;
     public $start_at;
 
     public function rules(){
         return [
-            [['give_value', 'start_at'], 'required']
+            [['is_open', 'give_value', 'start_at'], 'required']
         ];
     }
 
@@ -37,7 +38,7 @@ class FromHotelCommonSaveForm extends BaseModel{
             $fromHotel->give_type = 1;
             $fromHotel->give_value = max(0, min(100, $this->give_value));
             $fromHotel->updated_at = time();
-            $fromHotel->is_delete  = 0;
+            $fromHotel->is_delete  = $this->is_open ? 0 : 1;
             $fromHotel->start_at   = max(time(), strtotime($this->start_at));
             if(!$fromHotel->save()){
                 throw new \Exception($this->responseErrorMsg($fromHotel));

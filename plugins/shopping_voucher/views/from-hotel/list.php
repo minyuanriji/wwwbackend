@@ -13,9 +13,9 @@ echo $this->render("../com/com-tab-from");
                 <el-tab-pane label="通用配置" name="first">
                     <el-form ref="commonSetForm" :model="commonSet" :rules="commFormRule" label-width="120px">
                         <el-form-item label="是否开启">
-                            <el-switch v-model="commonSet.is_allow" active-text="是" inactive-text="否"></el-switch>
+                            <el-switch v-model="commonSet.is_open" active-text="是" inactive-text="否"></el-switch>
                         </el-form-item>
-                        <template v-if="commonSet.is_allow">
+                        <template v-if="commonSet.is_open">
                             <el-form-item label="赠送比例" prop="give_value">
                                 <el-input  type="number" min="0" max="100" placeholder="请输入内容" v-model="commonSet.give_value" style="width:260px;">
                                     <template slot="append">%</template>
@@ -24,10 +24,10 @@ echo $this->render("../com/com-tab-from");
                             <el-form-item label="启动日期" prop="start_at">
                                 <el-date-picker v-model="commonSet.start_at" type="date" placeholder="选择日期"></el-date-picker>
                             </el-form-item>
-                            <el-form-item >
-                                <el-button :loading="loading" type="primary" @click="saveCommon">确 定</el-button>
-                            </el-form-item>
                         </template>
+                        <el-form-item >
+                            <el-button :loading="loading" type="primary" @click="saveCommon">确 定</el-button>
+                        </el-form-item>
                     </el-form>
 
                 </el-tab-pane>
@@ -123,8 +123,10 @@ echo $this->render("../com/com-tab-from");
                 editDialogVisible: false,
                 editData: {},
                 list: [],
+                page:1,
                 pagination: null,
                 loading: false,
+                searchData: {},
                 commonSet:{
                     is_open:false,
                     give_value: '',
@@ -141,6 +143,11 @@ echo $this->render("../com/com-tab-from");
             };
         },
         methods: {
+            switchChanged(){
+                if(!this.commonSet.is_open){
+                    this.saveCommon();
+                }
+            },
             saveCommon(){
                 let that = this;
                 this.$refs['commonSetForm'].validate((valid) => {
@@ -152,6 +159,7 @@ echo $this->render("../com/com-tab-from");
                             },
                             method: "post",
                             data: {
+                                is_open:that.commonSet.is_open ? 1 : 0,
                                 give_value:that.commonSet.give_value,
                                 start_at:that.commonSet.start_at
                             }
@@ -168,9 +176,35 @@ echo $this->render("../com/com-tab-from");
                         });
                     }
                 });
+            },
+            getList() {
+                let params = Object.assign({
+                    r: 'plugin/shopping_voucher/mall/from-hotel/list'
+                }, this.searchData);
+                params['page'] = this.page;
+                request({
+                    params
+                }).then(e => {
+                    if (e.data.code === 0) {
+                        this.list = e.data.data.list;
+                        this.pagination = e.data.data.pagination;
+                        let commonData = e.data.data.commonData;
+                        this.commonSet.is_open    = commonData.is_open == 1 ? true : false;
+                        this.commonSet.give_value = commonData.give_value;
+                        this.commonSet.start_at   = commonData.start_at;
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                    this.loading = false;
+                }).catch(e => {
+                    this.loading = false;
+                });
+                this.loading = true;
             }
         },
-        mounted: function() {}
+        mounted: function() {
+            this.getList();
+        }
     });
 </script>
 

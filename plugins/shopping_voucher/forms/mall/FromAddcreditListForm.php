@@ -26,9 +26,15 @@ class FromAddcreditListForm extends BaseModel
         try {
             $FromAddcredit = ShoppingVoucherFromAddcredit::findOne(['sdk_key' => $this->sdk_key]);
             if (!$FromAddcredit) {
-                throw new \Exception('数据异常,该条数据不存在');
+                $result = [
+                    'fast_one_give' => 0,
+                    'fast_follow_give' => 0,
+                    'slow_one_give' => 0,
+                    'slow_follow_give' => 0,
+                ];
+            } else {
+                $result = json_decode($FromAddcredit->param_data_json,true);
             }
-            $result = json_decode($FromAddcredit->param_data_json,true);
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', $result);
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());

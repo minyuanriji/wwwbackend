@@ -3,7 +3,9 @@ namespace app\plugins\hotel\forms\api\user_center;
 
 
 use app\core\ApiCode;
+use app\forms\common\UserIntegralModifyForm;
 use app\models\BaseModel;
+use app\models\User;
 use app\plugins\hotel\helpers\OrderHelper;
 use app\plugins\hotel\models\HotelOrder;
 
@@ -22,6 +24,7 @@ class UserCenterCancelOrderForm extends BaseModel {
             return $this->responseErrorInfo();
         }
 
+        $t = \Yii::$app->db->beginTransaction();
         try {
 
             //获取订单详情
@@ -41,11 +44,27 @@ class UserCenterCancelOrderForm extends BaseModel {
                 throw new \Exception($this->responseErrorMsg($hotelOrder));
             }
 
+            $user = User::findOne($hotelOrder->user_id);
+
+            //返还红包
+            if($hotelOrder->integral_deduction_price){
+                $modifyForm = new UserIntegralModifyForm([
+                    "type"        => 1,
+                    "integral"    => $hotelOrder->integral_deduction_price,
+                    "desc"        => "订单取消退还红包",
+                    "source_id"   => $hotelOrder->id,
+                    "source_type" => "hotel_order_cancel"
+                ]);
+                $modifyForm->modify($user);
+            }
+
+            $t->commit();
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg'  => "操作成功"
             ];
         }catch (\Exception $e){
+            $t->rollBack();
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg'  => $e->getMessage()

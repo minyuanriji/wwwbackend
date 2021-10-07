@@ -168,15 +168,8 @@ class HotelOrderRefundActionForm extends BaseModel {
 
         $applyOrder->status = "paid";
         $order->pay_status = "refund"; //设置订单为已退款
-        if($order->pay_type == "integral"){ //红包退款
-            $applyOrder->refund_price = $order->integral_deduction_price; //设置退款红包数量
-            $res = UserIntegralForm::hotelOrderRefundAdd($applyOrder, $user);
-            if($res['code'] != ApiCode::CODE_SUCCESS){
-                throw new \Exception($res['msg']);
-            }
-        }else{
-            throw new \Exception("暂未支持除红包支付外的退款");
-        }
+
+        throw new \Exception("退款功能已关闭，请联系客服");
     }
 
 

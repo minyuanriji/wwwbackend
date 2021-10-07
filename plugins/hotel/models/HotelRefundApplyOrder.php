@@ -20,7 +20,7 @@ class HotelRefundApplyOrder extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mall_id', 'order_id', 'status', 'created_at', 'updated_at'], 'required'],
+            [['mall_id', 'refund_price', 'refund_integral', 'refund_balance', 'order_id', 'status', 'created_at', 'updated_at'], 'required'],
             [['remark'], 'safe']
         ];
     }

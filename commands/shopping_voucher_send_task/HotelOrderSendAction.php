@@ -32,7 +32,7 @@ class HotelOrderSendAction extends Action{
     private function sendAction(){
         $query = ShoppingVoucherSendLog::find()->alias("l")->limit(10)->asArray()->where(["l.status" => "waiting", "l.source_type" => "from_hotel_order"]);
         $query->innerJoin(["ho" => HotelOrder::tableName()], "ho.id=l.source_id");
-        $query->andWhere("(UNIX_TIMESTAMP(ho.booking_start_date) + ho.booking_days * 3600 * 24) < '".time()."'");
+        //TODO $query->andWhere("(UNIX_TIMESTAMP(ho.booking_start_date) + ho.booking_days * 3600 * 24) < '".time()."'");
 
         //把非入驻成功状态的订单全部取消掉
         $cloneQuery = clone $query;

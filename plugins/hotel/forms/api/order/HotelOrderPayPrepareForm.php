@@ -2,9 +2,7 @@
 namespace app\plugins\hotel\forms\api\order;
 
 
-use app\core\ApiCode;
 use app\forms\api\payCenter\paymentOrderPrepare\BasePrepareForm;
-use app\forms\common\UserIntegralForm;
 use app\models\User;
 use app\plugins\hotel\forms\common\HotelOrderPaidNotifyProcess;
 use app\plugins\hotel\helpers\OrderHelper;

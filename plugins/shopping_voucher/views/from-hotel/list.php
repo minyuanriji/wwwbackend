@@ -16,7 +16,14 @@ echo $this->render("../com/com-tab-from");
                             <el-switch v-model="commonSet.is_allow" active-text="是" inactive-text="否"></el-switch>
                         </el-form-item>
                         <template v-if="commonSet.is_allow">
-                            
+                            <el-form-item label="赠送比例" prop="commonSet.give_value">
+                                <el-input :disabled="formProgressData.loading" type="number" min="0" max="100" placeholder="请输入内容" v-model="formData.give_value" style="width:260px;">
+                                    <template slot="append">%</template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="启动日期" prop="start_at">
+                                <el-date-picker :disabled="formProgressData.loading" v-model="formData.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                            </el-form-item>
                         </template>
                     </el-form>
 

@@ -4,7 +4,7 @@ namespace app\plugins\hotel\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
 use app\plugins\ApiController;
-use app\plugins\hotel\forms\api\order\HotelOrderIntegralDirectPayForm;
+use app\plugins\hotel\forms\api\order\HotelOrderPayPrepareForm;
 use app\plugins\hotel\forms\api\order\HotelOrderPreviewForm;
 use app\plugins\hotel\forms\api\order\HotelOrderQueryStatusForm;
 use app\plugins\hotel\forms\api\order\HotelOrderSubmitForm;
@@ -40,13 +40,13 @@ class OrderController extends ApiController{
     }
 
     /**
-     * 使用红包直接支付
+     * 支付预处理
      * @return \yii\web\Response
      */
-    public function actionIntegralDirectPay(){
-        $form = new HotelOrderIntegralDirectPayForm();
+    public function actionPayPrepare(){
+        $form = new HotelOrderPayPrepareForm();
         $form->attributes = $this->requestData;
-        return $this->asJson($form->pay());
+        return $this->asJson($form->prepare());
     }
 
     /**

@@ -97,6 +97,9 @@ class AddcreditOrderSendAction extends Action{
 
         foreach($AddcreditOrder as $value){
             $ruleData = json_decode($value['param_data_json'], true);
+            if (!$ruleData) {
+                continue;
+            }
             $mobile_count = AddcreditOrder::find()->where(['mobile' => $value['mobile'], 'pay_status' => 'paid'])->count();
             if (in_array($value['product_id'], Config::FAST_CHARGING)) {
                 $charge = 1;

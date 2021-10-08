@@ -32,31 +32,23 @@ class UserCenterOrderRefundApplyForm extends BaseModel {
 
             $isRefundable = OrderHelper::isRefundable($hotelOrder);
             if(!$isRefundable){
-                throw new \Exception("订单无法退款");
+                throw new \Exception("当前状态无法申请退款");
             }
 
-            $plateform = $hotelOrder->getPlateform();
-            if(!$plateform){
-                throw new \Exception("无法获取平台信息");
-            }
-
-            //订单状态：0待确认 1预订成功 2已取消 3预订未到 4已入住 5已完成 6确认失败
-            $res = OrderHelper::queryPlateformOrder($hotelOrder, $plateform);
+            //退款申请
+            $refundForm = new HotelOrderRefundActionForm([
+                "order_id" => $hotelOrder->id,
+                "mall_id"  => \Yii::$app->mall->id,
+                "action"   => "apply"
+            ]);
+            $res = $refundForm->refund($hotelOrder);
             if($res['code'] != ApiCode::CODE_SUCCESS){
                 throw new \Exception($res['msg']);
             }
-            $orderState = $res['data']['order_state'];
-            if(in_array($orderState, [0, 1, 6])){
-                $res = OrderHelper::plateformOrderRefundApply($hotelOrder, $plateform);
-                if($res['code'] != ApiCode::CODE_SUCCESS){
-                    throw new \Exception($res['msg']);
-                }
-            }elseif(in_array($orderState, [3, 4, 5])){
-                throw new \Exception("预订未到、已入住、已完成等状态无法取消");
-            }
+
 
             //开始退款+退还红包、余额
-            $refundForm = new HotelOrderRefundActionForm([
+            /*$refundForm = new HotelOrderRefundActionForm([
                 "order_id" => $hotelOrder->id,
                 "mall_id"  => \Yii::$app->mall->id,
                 "action"   => "paid"
@@ -64,11 +56,11 @@ class UserCenterOrderRefundApplyForm extends BaseModel {
             $res = $refundForm->refund($hotelOrder);
             if($res['code'] != ApiCode::CODE_SUCCESS){
                 throw new \Exception($res['msg']);
-            }
+            }*/
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg'  => '退款成功'
+                'msg'  => '申请退款成功'
             ];
         }catch (\Exception $e){
             return [

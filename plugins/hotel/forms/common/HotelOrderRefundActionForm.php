@@ -3,9 +3,9 @@ namespace app\plugins\hotel\forms\common;
 
 
 use app\core\ApiCode;
-use app\forms\common\UserIntegralForm;
 use app\models\BaseModel;
 use app\models\User;
+use app\plugins\hotel\helpers\OrderHelper;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\hotel\models\HotelRefundApplyOrder;
 
@@ -52,23 +52,31 @@ class HotelOrderRefundActionForm extends BaseModel {
                 throw new \Exception("无效操作 " . $this->action);
             }
 
-            $applyOrder = null;
-
             //申请操作
-            $order->pay_status = "refunding";
-            if(in_array($this->action, ["apply", "confirm", "refuse", "paid"])){
+            if($this->action == "apply"){
+                if($order->pay_status != "paid"){
+                    throw new \Exception("当前状态无法申请退款");
+                }
+                $order->pay_status = "refunding";
                 $applyOrder = $this->apply();
+            }else{
+                $applyOrder = HotelRefundApplyOrder::findOne([
+                    "order_id" => $this->order_id
+                ]);
             }
 
+            if(!$applyOrder){
+                throw new \Exception("退款申请记录不存在");
+            }
+
+            $applyOrder->updated_at = time();
             if(!empty($this->remark)){
                 $applyOrder->remark = $this->remark;
             }
 
-            $applyOrder->updated_at = time();
-
             //确认操作
-            if(in_array($this->action, ["confirm", "refuse", "paid"])){
-                $this->confirm($applyOrder);
+            if($this->action == "confirm"){
+                $this->confirm($order, $applyOrder);
             }
 
             //拒绝操作
@@ -133,11 +141,34 @@ class HotelOrderRefundActionForm extends BaseModel {
      * 确认操作
      * @return array
      */
-    private function confirm(HotelRefundApplyOrder $applyOrder){
+    private function confirm(HotelOrder $hotelOrder, HotelRefundApplyOrder $applyOrder){
         if($this->action == "confirmed" && $applyOrder->status != "unconfirmed"){
             throw new \Exception("非申请状态无法执行确认操作");
         }
         $applyOrder->status = "confirmed";
+
+        $plateform = $hotelOrder->getPlateform();
+        if(!$plateform){
+            throw new \Exception("无法获取平台信息");
+        }
+
+        //查询订单
+        $res = OrderHelper::queryPlateformOrder($hotelOrder, $plateform);
+        if($res['code'] != ApiCode::CODE_SUCCESS){
+            throw new \Exception($res['msg']);
+        }
+
+        //是否可以退款
+        //订单状态：0待确认 1预订成功 2已取消 3预订未到 4已入住 5已完成 6确认失败
+        $orderState = $res['data']['order_state'];
+        if(in_array($orderState, [0, 1, 6])){
+            $res = OrderHelper::plateformOrderRefundApply($hotelOrder, $plateform);
+            if($res['code'] != ApiCode::CODE_SUCCESS){
+                throw new \Exception($res['msg']);
+            }
+        }elseif(in_array($orderState, [3, 4, 5])){
+            throw new \Exception("预订未到、已入住、已完成等状态无法取消");
+        }
     }
 
     /**
@@ -149,7 +180,6 @@ class HotelOrderRefundActionForm extends BaseModel {
             throw new \Exception("非确认状态无法执行拒绝操作");
         }
         $applyOrder->status = "refused";
-        $order->pay_status = "paid";
     }
 
     /**

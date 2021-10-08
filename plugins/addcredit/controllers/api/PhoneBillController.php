@@ -3,7 +3,7 @@
 namespace app\plugins\addcredit\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
-use app\helpers\CityHelper;
+use app\plugins\addcredit\forms\api\order\AddcreditOrderPayPrepareForm;
 use app\plugins\addcredit\forms\api\order\OrderForm;
 use app\plugins\addcredit\forms\api\order\RechargeRecordForm;
 use app\plugins\ApiController;
@@ -70,6 +70,16 @@ class PhoneBillController extends ApiController
         $form = new OrderForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->OrderStatus());
+    }
+
+    /**
+     * 支付预处理
+     * @return \yii\web\Response
+     */
+    public function actionPayPrepare(){
+        $form = new AddcreditOrderPayPrepareForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->prepare());
     }
 
 }

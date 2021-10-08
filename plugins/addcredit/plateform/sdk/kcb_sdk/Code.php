@@ -11,10 +11,9 @@ class Code
 
     //2、查单状态码
         // 查询成功
-        const QUERY_SUCCESS     = 0;
-        const QUERY_FAIL        = 5;
-        const QUERY_REFUND      = 4;
-        const QUERY_ORDER_EMPTY = 5005;
+        const QUERY_RECHARGING = 0;
+        const QUERY_SUCCESS    = 1;
+        const QUERY_FAIL       = 2;
 
     //3、获取余额状态码
         //查询成功

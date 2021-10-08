@@ -101,8 +101,8 @@ class IntegralLogListForm extends BaseModel
             'Statistics' => [
                 'income' => $income ?: 0,
                 'expend' => $expend ?: 0,
-                'currentIncome' => $currentIncome,
-                'currentExpend' => $currentExpend,
+                'currentIncome' => round($currentIncome, 2),
+                'currentExpend' => round($currentExpend, 2),
             ],
             'pagination' => $pagination
         ]);

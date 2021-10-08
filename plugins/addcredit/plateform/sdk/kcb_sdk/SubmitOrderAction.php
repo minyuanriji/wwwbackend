@@ -21,7 +21,7 @@ class SubmitOrderAction extends BaseObject
         userid          number      是  代理商账号ID，通过客服获取
         notify_url	    String      是	回调地址，用于接收充值状态回调
         amount	        String	    是	q币自定义面值
-        sign	        String	    是	签名      sign = md5(mch_id + platform_no + amount + no + notify_url + 商户密钥) (全部转大写)
+        sign	        String	    是	签名
      *
     返回结果：字段名	    变量名	    必填	    描述
             errno       string      true    错误码，0代表成功，非0代表提交失败
@@ -42,19 +42,21 @@ class SubmitOrderAction extends BaseObject
 //            $teltype = (new TelType())->getPhoneType($this->AddcreditOrder->mobile);
             $param = [
                 'out_trade_num'    => $this->AddcreditOrder->order_no,
-                'product_id'       => 1,
+                'product_id'       => $this->AddcreditOrder->product_id,
                 'account'          => $this->AddcreditOrder->mobile,
                 'userid'           => $plateforms_param['id'],
-                'notify_url'       => '',
-                'amount'           => '',
-                'apikey'           => $plateforms_param['secret_key'],
+                'notify_url'       => $this->getNotifyUrl('telephone.php'),
+                'amount'           => 0,
             ];
             ksort($param);
-            $sign_str = http_build_query($param);
+            $param_str = '';
+            foreach ($param as $key => $item) {
+                $param_str .= $key . '=' . $item . '&';
+            }
+            $sign_str = $param_str . 'apikey=' . $plateforms_param['secret_key'];
             $sign = strtoupper(md5($sign_str));
-            $param['sign'] = $sign;
-            $sign_str .= "&sign=" . $sign;
-            $response = Request::http_get(Config::PHONE_BILL_SUBMIT, $sign_str);
+            $param_str .= "&sign=" . $sign;
+            $response = Request::http_get(Config::PHONE_BILL_SUBMIT . '?' . $param_str);
             $parseArray = json_decode($response, true);
             if (!isset($parseArray['errno'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
@@ -76,5 +78,16 @@ class SubmitOrderAction extends BaseObject
             $SubmitResult->message = $e->getMessage();
         }
         return $SubmitResult;
+    }
+
+    private function getNotifyUrl($file)
+    {
+        $protocol = env('PAY_NOTIFY_PROTOCOL');
+        $url = \Yii::$app->request->hostInfo . \Yii::$app->request->baseUrl . '/pay-notify/' . $file;
+        if ($protocol) {
+            $url = str_replace('http://', ($protocol . '://'), $url);
+            $url = str_replace('https://', ($protocol . '://'), $url);
+        }
+        return $url;
     }
 }

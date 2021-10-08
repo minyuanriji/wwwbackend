@@ -48,6 +48,20 @@ class PhoneOrderPayForm extends BaseModel
                 throw new \Exception("红包数量不足");
             }
 
+            //扣取红包
+            $res = UserIntegralForm::PhoneBillOrderPaySub($addcredit_order, $user, $addcredit_order->integral_deduction_price);
+            if ($res['code'] != ApiCode::CODE_SUCCESS) {
+                throw new \Exception("红包扣取失败：" . $res['msg']);
+            }
+
+            //更新订单状态为已支付
+            $addcredit_order->order_status = "processing";
+            $addcredit_order->pay_status = "paid";
+            $addcredit_order->pay_at = time();
+            if (!$addcredit_order->save()) {
+                throw new \Exception($this->responseErrorMsg($addcredit_order));
+            }
+
             //平台下单
             $plateform = AddcreditPlateforms::findOne($addcredit_order->plateform_id);
             if (!$plateform) {
@@ -63,23 +77,11 @@ class PhoneOrderPayForm extends BaseModel
             if ($submit_res->code != ApiCode::CODE_SUCCESS) {
                 throw new \Exception($submit_res->message);
             }
-
-            //更新订单状态为已支付
-            $addcredit_order->order_status = "processing";
-            $addcredit_order->pay_status = "paid";
-            $addcredit_order->pay_at = time();
             $addcredit_order->plateform_request_data = $submit_res->request_data;
             $addcredit_order->plateform_response_data = $submit_res->response_content;
             if (!$addcredit_order->save()) {
                 throw new \Exception($this->responseErrorMsg($addcredit_order));
             }
-
-            //扣取红包
-            $res = UserIntegralForm::PhoneBillOrderPaySub($addcredit_order, $user, $addcredit_order->integral_deduction_price);
-            if ($res['code'] != ApiCode::CODE_SUCCESS) {
-                throw new \Exception("红包扣取失败：" . $res['msg']);
-            }
-
             $transaction->commit();
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '支付成功');
         } catch (\Exception $e) {

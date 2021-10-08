@@ -62,7 +62,7 @@ class RechargeRecordForm extends BaseModel
         }
         return [
             'FastCharging' => [
-                [
+                /*[
                     'redbag_num' => 10 + 10 * $plateforms->ratio / 100,
                     'price' => 10,
                     'product_id' => 10,
@@ -71,7 +71,7 @@ class RechargeRecordForm extends BaseModel
                     'redbag_num' => 20 + 20 * $plateforms->ratio / 100,
                     'price' => 20,
                     'product_id' => 28,
-                ],
+                ],*/
                 [
                     'redbag_num' => 30 + 30 * $plateforms->ratio / 100,
                     'price' => 30,

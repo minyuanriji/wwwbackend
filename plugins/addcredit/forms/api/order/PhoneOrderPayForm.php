@@ -69,7 +69,7 @@ class PhoneOrderPayForm extends BaseModel
             }
 
             $plate_form = new kcb_PlateForm();
-            $submit_res = $plate_form->submit($addcredit_order, $plateform);
+            $submit_res = $plate_form->submit($addcredit_order, $plateform, false);
 
             if (!$submit_res) {
                 throw new \Exception('未知错误！');

@@ -43,11 +43,10 @@ class RechargeRecordForm extends BaseModel
                     "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at",
                 ]);
             if ($this->recharge_time) {
-                $query->andWhere("DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d') = $this->recharge_time");
+                $query->andWhere('FROM_UNIXTIME(created_at,"%Y-%m-%d")="' . $this->recharge_time . '"');
             }
 
             $result = $query->orderBy('created_at DESC')->page($pagination, 10)->asArray()->all();
-
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => $result,

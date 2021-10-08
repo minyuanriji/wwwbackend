@@ -3,7 +3,10 @@ namespace app\plugins\hotel\forms\common;
 
 
 use app\core\ApiCode;
+use app\forms\common\UserIntegralModifyForm;
+use app\helpers\PaymentRefundHelper;
 use app\models\BaseModel;
+use app\models\PaymentOrder;
 use app\models\User;
 use app\plugins\hotel\helpers\OrderHelper;
 use app\plugins\hotel\models\HotelOrder;
@@ -146,7 +149,6 @@ class HotelOrderRefundActionForm extends BaseModel {
             throw new \Exception("非申请状态无法执行确认操作");
         }
         $applyOrder->status = "confirmed";
-
         $plateform = $hotelOrder->getPlateform();
         if(!$plateform){
             throw new \Exception("无法获取平台信息");
@@ -179,6 +181,7 @@ class HotelOrderRefundActionForm extends BaseModel {
         if($this->action == "refused" && $applyOrder->status != "confirmed"){
             throw new \Exception("非确认状态无法执行拒绝操作");
         }
+        $order->order_status = "refused";
         $applyOrder->status = "refused";
     }
 
@@ -186,20 +189,37 @@ class HotelOrderRefundActionForm extends BaseModel {
      * 退款操作
      * @return array
      */
-    private function paid(HotelRefundApplyOrder $applyOrder, HotelOrder $order){
+    private function paid(HotelRefundApplyOrder $applyOrder, HotelOrder $hotelOrder){
         if($this->action == "paid" && $applyOrder->status != "confirmed"){
             throw new \Exception("非确认状态无法执行打款操作");
         }
 
-        $user = User::findOne($order->user_id);
+        $user = User::findOne($hotelOrder->user_id);
         if(!$user || $user->is_delete){
-            throw new \Exception("用户[ID:".$order->user_id."]不存在");
+            throw new \Exception("用户[ID:".$hotelOrder->user_id."]不存在");
         }
 
         $applyOrder->status = "paid";
-        $order->pay_status = "refund"; //设置订单为已退款
+        $hotelOrder->pay_status = "refund"; //设置订单为已退款
 
-        throw new \Exception("退款功能已关闭，请联系客服");
+        if($hotelOrder->integral_deduction_price > 0){ //退红包
+            $modifyForm = new UserIntegralModifyForm([
+                "type"        => 1,
+                "integral"    => $hotelOrder->integral_deduction_price,
+                "desc"        => "酒店预订单退款，返还红包",
+                "source_id"   => $applyOrder->id,
+                "source_type" => "hotel_order_refund"
+            ]);
+            $modifyForm->modify($user);
+            $applyOrder->refund_integral = $hotelOrder->integral_deduction_price;
+        }elseif($hotelOrder->pay_type == "balance"){ //退余额
+            $applyOrder->refund_balance = $hotelOrder->pay_price;
+        }else{ //退现金
+            $applyOrder->refund_price = $hotelOrder->pay_price;
+        }
+
+        $payment = PaymentOrder::findOne(["order_no" => $hotelOrder->order_no]);
+        $payment && PaymentRefundHelper::doRefund($user, $payment, "hotel_order_refund", $applyOrder->id, "酒店预订单退款");
     }
 
 

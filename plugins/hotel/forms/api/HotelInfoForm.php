@@ -5,8 +5,6 @@ namespace app\plugins\hotel\forms\api;
 use app\core\ApiCode;
 use app\helpers\CityHelper;
 use app\models\BaseModel;
-use app\plugins\hotel\helpers\ApiHotelHelper;
-use app\plugins\hotel\models\Hotels;
 
 class HotelInfoForm extends BaseModel
 {
@@ -17,7 +15,8 @@ class HotelInfoForm extends BaseModel
     public function rules()
     {
         return [
-            [['longitude', 'latitude', 'city_name'], 'string']
+            [['city_name'], 'string'],
+            [['longitude', 'latitude'], 'safe'],
         ];
     }
 

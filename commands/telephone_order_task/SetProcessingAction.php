@@ -37,13 +37,11 @@ class SetProcessingAction extends Action{
                         if (!$plateform) {
                             throw new \Exception("无法获取平台信息");
                         }
-                        $addcreditOrder->order_no = substr(md5(uniqid()), -4) . date("ymdhis") . rand(100000, 999999);
 
-                        $platForm = new kcb_PlateForm();
-                        $res = $platForm->submit($addcreditOrder, $plateform, false);
+                        $addcreditOrder->order_no = substr(md5(uniqid()), -4) . date("ymdhis") . rand(100000, 999999);
                         $model = new AddcreditOrderThirdParty([
-                            "mall_id"         => $row['mall_id'],
-                            "order_id"        => $row['id'],
+                            "mall_id"         => $addcreditOrder->mall_id,
+                            "order_id"        => $addcreditOrder->id,
                             "process_status"  => "processing",
                             "unique_order_no" => $addcreditOrder->order_no,
                             "created_at"      => time()
@@ -51,6 +49,10 @@ class SetProcessingAction extends Action{
                         if (!$model->save()) {
                             $this->controller->commandOut(json_encode($model->getErrors()));
                         }
+
+                        $platForm = new kcb_PlateForm();
+                        $res = $platForm->submit($addcreditOrder, $plateform, false);
+
                         $this->controller->commandOut("话费订单[ID:".$row['id']."]待处理任务添加成功");
                     }
                 }

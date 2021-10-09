@@ -76,7 +76,20 @@ class DoProcessingAction extends Action{
 
             //判断是否充值成功
             $content = json_decode($res->response_content,true);
-            if(!isset($content['data']) || empty($content['data']) || $content['data'][0]['state'] != Code::QUERY_SUCCESS){
+            $isRecharging = $isSuccess = false;
+            if(isset($content['errmsg']) && $content['errmsg'] == "ok"){
+                if(isset($content['data']) && !empty($content['data'])){
+                    $isRecharging = $content['data'][0]['state'] == Code::QUERY_RECHARGING;
+                    $isSuccess = $content['data'][0]['state'] == Code::QUERY_SUCCESS;
+                }
+            }
+
+            if($isRecharging){ //还在充值中
+                $t->rollBack();
+                return;
+            }
+
+            if(!$isSuccess){ //充值失败
                 throw new \Exception(isset($content['errmsg']) ? $content['errmsg'] : json_encode($content));
             }
 
@@ -103,12 +116,10 @@ class DoProcessingAction extends Action{
             $model->process_status = "fail";
             $model->save();
 
-            //如果失败次数超过3次，就不再处理
-            /*if($order && $order->request_num > 3){
-                $order->order_status = "fail";
-                $order->updated_at = time();
-            }
-            $order->save();*/
+            //更新订单状态为失败
+            $order->order_status = "fail";
+            $order->updated_at = time();
+            $order->save();
 
             $this->controller->commandOut($errContent);
         }

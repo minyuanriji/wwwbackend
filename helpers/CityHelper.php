@@ -213,13 +213,14 @@ class CityHelper{
             }
         }
         if ($newCityId > 0) {
-            foreach($arrs as $arr){
+            foreach($arrs as $key => $arr){
                 if($arr['parent_id'] == $newCityId){
-                    $data[] = $arr['name'];
+                    $data[$key]['id'] = $arr['id'];
+                    $data[$key]['name'] = $arr['name'];
                 }
             }
         }
-        return ['city_id' => $newCityId, 'district' => $data, 'level' => $level];
+        return ['city_id' => $newCityId, 'district' => array_values($data), 'level' => $level];
     }
 
 }

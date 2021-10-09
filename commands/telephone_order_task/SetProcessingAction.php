@@ -31,6 +31,10 @@ class SetProcessingAction extends Action{
                     foreach ($rows as $row) {
 
                         $addcreditOrder = AddcreditOrder::findOne($row['id']);
+                        $addcreditOrder->request_num += 1;
+                        if(!$addcreditOrder->save()){
+                            throw new \Exception(json_encode($addcreditOrder->getErrors()));
+                        }
 
                         //平台下单
                         $plateform = AddcreditPlateforms::findOne($addcreditOrder->plateform_id);
@@ -47,7 +51,7 @@ class SetProcessingAction extends Action{
                             "created_at"      => time()
                         ]);
                         if (!$model->save()) {
-                            $this->controller->commandOut(json_encode($model->getErrors()));
+                            throw new \Exception(json_encode($model->getErrors()));
                         }
 
                         $platForm = new kcb_PlateForm();

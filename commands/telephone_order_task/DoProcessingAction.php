@@ -108,7 +108,6 @@ class DoProcessingAction extends Action{
             $model->save();
 
             //如果失败次数超过3次，就不再处理
-            $order->request_num += 1;
             if($order && $order->request_num > 3){
                 $order->order_status = "fail";
                 $order->updated_at = time();

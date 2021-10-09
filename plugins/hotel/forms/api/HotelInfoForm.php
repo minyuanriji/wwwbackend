@@ -38,24 +38,30 @@ class HotelInfoForm extends BaseModel
 
             if (!empty($this->city_name)) {
                 $cityName = $this->city_name;
+                $cityLike = true;
             } else {
                 $CityInfo = CityHelper::getCityInfo($this->latitude, $this->longitude);
                 if(isset($CityInfo['status']) && $CityInfo['status'] == 0){
                     $cityName = $CityInfo['result']['address_component']['city'];
+                    $cityLike = false;
                 } else {
                     $cityName = '';
+                    $cityLike = false;
                 }
             }
 
-            $district = CityHelper::getDistrictName($cityName);
+            $district = CityHelper::getDistrictName($cityName, $cityLike);
             if ($district) {
                 $resultData['district'] = $district['district'];
                 $resultData['city_id'] = $district['city_id'];
+                $resultData['level'] = $district['level'];
             } else {
                 $resultData['district'] = [];
                 $resultData['city_id'] = [];
+                $resultData['level'] = [];
             }
 
+            $resultData['city_name'] = $cityName;
             return  $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', $resultData);
         } catch (\Exception $e) {
             return [

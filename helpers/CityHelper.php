@@ -175,26 +175,51 @@ class CityHelper{
      * 通过市名获取下级县
      * @param $name2 市名
      */
-    public static function getDistrictName($cityName)
+    public static function getDistrictName($cityName, $cityLike)
     {
         if (empty($cityName))
             return false;
 
         $data = [];
+        $newCityId = 0;
+        $level = '';
         $arrs = DistrictData::getArr();
-        foreach($arrs as $arr){
-            if($arr['level'] == "city" && $arr['name'] == $cityName){
-                $city_id = $arr['id'];
+        if ($cityLike) {
+            foreach($arrs as $arr){
+                if($arr['level'] == "district" && strpos($arr['name'], $cityName) === 0){
+                    $district_id = $arr['id'];
+                    $level = $arr['level'];
+                    break;
+                }
+            }
+            if (!$district_id) {
+                foreach($arrs as $arr){
+                    if($arr['level'] == "city" && strpos($arr['name'], $cityName) === 0){
+                        $newCityId = $arr['id'];
+                        $level = $arr['level'];
+                        break;
+                    }
+                }
+            } else {
+                $newCityId = $district_id;
+            }
+        } else {
+            foreach($arrs as $arr){
+                if($arr['level'] == "city" && $arr['name'] == $cityName){
+                    $newCityId = $arr['id'];
+                    $level = $arr['level'];
+                    break;
+                }
             }
         }
-        if ($city_id > 0) {
+        if ($newCityId > 0) {
             foreach($arrs as $arr){
-                if($arr['parent_id'] == $city_id){
+                if($arr['parent_id'] == $newCityId){
                     $data[] = $arr['name'];
                 }
             }
         }
-        return ['city_id' => $city_id, 'district' => $data];
+        return ['city_id' => $newCityId, 'district' => $data, 'level' => $level];
     }
 
 }

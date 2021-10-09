@@ -215,6 +215,7 @@ class CityHelper{
         if ($newCityId > 0) {
             foreach($arrs as $key => $arr){
                 if($arr['parent_id'] == $newCityId){
+                    $data[$key]['parent_id'] = $newCityId;
                     $data[$key]['id'] = $arr['id'];
                     $data[$key]['name'] = $arr['name'];
                 }

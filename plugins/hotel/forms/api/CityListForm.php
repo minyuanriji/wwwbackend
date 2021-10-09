@@ -12,7 +12,7 @@ class CityListForm extends BaseModel
 {
     public function getList()
     {
-        $key = 'Hotel_City_List';
+        $key = 'Hotel_City_List1';
         $cache = \Yii::$app->getCache();
         $resultArray = $cache->get($key);
         if (!$resultArray) {
@@ -42,7 +42,7 @@ class CityListForm extends BaseModel
 
         foreach( $list as $key => $val ){
             // 添加 # 分组，用来 存放 首字母不能 转为 大写英文的 数据
-            $resault['#'] = array();
+//            $resault['#'] = array();
             // 首字母 转 大写英文
             $letter = strtoupper( substr($val[$field], 0, 1) );
             // 是否 大写 英文 字母
@@ -59,9 +59,9 @@ class CityListForm extends BaseModel
         // 依据 键名 字母 排序，该函数 返回 boolean
         ksort($resault);
         // 将 # 分组 放到 最后
-        $arr_last = $resault['#'];
-        unset($resault['#']);
-        $resault['#'] = $arr_last;
+//        $arr_last = $resault['#'];
+//        unset($resault['#']);
+//        $resault['#'] = $arr_last;
 
         return $resault;
     }

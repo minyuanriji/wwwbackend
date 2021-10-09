@@ -43,7 +43,7 @@ class SetProcessingAction extends Action{
                             throw new \Exception("无法获取平台信息");
                         }
 
-                        $addcreditOrder->order_no = substr(md5(uniqid()), -4) . date("ymdhis") . rand(100000, 999999);
+                        //$addcreditOrder->order_no = substr(md5(uniqid()), -4) . date("ymdhis") . rand(100000, 999999);
                         $model = new AddcreditOrderThirdParty([
                             "mall_id"         => $addcreditOrder->mall_id,
                             "order_id"        => $addcreditOrder->id,

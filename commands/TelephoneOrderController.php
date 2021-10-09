@@ -101,7 +101,7 @@ class TelephoneOrderController extends BaseCommandController
                                         \Yii::error($exception->getLine().";file:".$exception->getFile());
                                         throw new \Exception($exception->getMessage());
                                     }
-                                } elseif ($item->pay_price > 0) {
+                                }/* elseif ($item->pay_price > 0) {
 
                                     if ($item->request_num >= 3) {
                                         //退款
@@ -134,7 +134,7 @@ class TelephoneOrderController extends BaseCommandController
                                             throw new \Exception($this->responseErrorMsg($item));
                                         }
                                     }
-                                }
+                                }*/
                                 break;
                             default:
                                 break;

@@ -146,4 +146,55 @@ class CityHelper{
         static::$province_name = "";
     }
 
+    /*
+     * 通过经纬度获取城市信息
+     * */
+    public static function getCityInfo ($latitude, $longitude)
+    {
+        if (empty($latitude) || empty($longitude))
+            return false;
+
+        $key = \Yii::$app->params['qqMapApiKey'];
+        $url = "https://apis.map.qq.com/ws/geocoder/v1/?location=".$latitude.",".$longitude."&key={$key}&get_poi=1";
+        $hostInfo = "https://www.mingyuanriji.cn";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_REFERER, $hostInfo);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        $result = @curl_exec($ch);
+        @curl_close($ch);
+
+        $data = !empty($result) ? json_decode($result, true) : null;
+
+        return $data;
+    }
+
+    /**
+     * 通过市名获取下级县
+     * @param $name2 市名
+     */
+    public static function getDistrictName($cityName)
+    {
+        if (empty($cityName))
+            return false;
+
+        $data = [];
+        $arrs = DistrictData::getArr();
+        foreach($arrs as $arr){
+            if($arr['level'] == "city" && $arr['name'] == $cityName){
+                $city_id = $arr['id'];
+            }
+        }
+        if ($city_id > 0) {
+            foreach($arrs as $arr){
+                if($arr['parent_id'] == $city_id){
+                    $data[] = $arr['name'];
+                }
+            }
+        }
+        return ['city_id' => $city_id, 'district' => $data];
+    }
+
 }

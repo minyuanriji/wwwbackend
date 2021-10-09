@@ -176,10 +176,10 @@ class IdentityController extends ApiController
                 if ($mall) {
                     $recommend_id = $mall->user_id;
                 } else {
-                    $recommend_id = 9;
+                    //$recommend_id = 9;
                 }
             } else {
-                $recommend_id = 9;
+                //$recommend_id = 9;
             }
         }
         return $smsForm->bind($recommend_id,$stands_mall_id);
@@ -192,7 +192,7 @@ class IdentityController extends ApiController
     {
         $wechatForm = new WechatForm();
         $wechatForm->attributes = $this->requestData;
-        $parent_user_id = !empty($this->requestData['parent_user_id']) ? $this->requestData['parent_user_id'] : 9;
+        $parent_user_id = !empty($this->requestData['parent_user_id']) ? $this->requestData['parent_user_id'] : 0;
         $parent_source = !empty($this->requestData['parent_source']) ? $this->requestData['parent_source'] : null;
         $headers = \Yii::$app->request->headers;
         $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 5;

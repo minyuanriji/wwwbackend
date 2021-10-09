@@ -37,7 +37,7 @@ class RelationLogic extends BaseLogic
      */
     public static function bindParent($user, $parent_id, $is_manual = 0)
     {
-        if($user->id == 9 || $user->parent_id == $parent_id || $user->lock_parent)
+        if($user->parent_id == $parent_id || $user->lock_parent)
             return;
 
         $relation = RelationSetting::findOne(['mall_id' => \Yii::$app->mall->id, 'use_relation' => 1, 'is_delete' => 0]);
@@ -45,7 +45,7 @@ class RelationLogic extends BaseLogic
             throw new Exception('未启用关系链'.$parent_id);
         }
 
-        if($user->parent_id && $user->parent_id != 9){
+        if($user->parent_id){
             throw new Exception('用户已存在上级');
         }
 

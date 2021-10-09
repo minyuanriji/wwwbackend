@@ -49,7 +49,7 @@ class SetProcessingAction extends Action{
                             "order_id"        => $addcreditOrder->id,
                             "process_status"  => "processing",
                             "unique_order_no" => $addcreditOrder->order_no,
-                            "created_at"      => time()
+                            "created_at"      => (time() + 15 * 60)
                         ]);
                         if (!$model->save()) {
                             throw new \Exception(json_encode($model->getErrors()));

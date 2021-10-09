@@ -16,6 +16,7 @@ class DoProcessingAction extends Action{
         while (true){
             try {
                 $models = AddcreditOrderThirdParty::find()->where(["process_status" => 'processing'])
+                            ->andWhere("created_at < '".time()."'")
                             ->orderBy("updated_at ASC")->limit(10)->all();
                 if($models){
                     $ids = [];
@@ -63,6 +64,7 @@ class DoProcessingAction extends Action{
             }
 
             //查询平台状态
+            $order->order_no = $model->unique_order_no;
             $plateForm = new kcb_PlateForm();
             $res = $plateForm->query($order);
             if(!$res) {

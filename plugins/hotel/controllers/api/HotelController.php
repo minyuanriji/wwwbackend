@@ -4,6 +4,7 @@ namespace app\plugins\hotel\controllers\api;
 use app\core\ApiCode;
 use app\helpers\APICacheHelper;
 use app\plugins\ApiController;
+use app\plugins\hotel\forms\api\CityListForm;
 use app\plugins\hotel\forms\api\HotelDetailForm;
 use app\plugins\hotel\forms\api\HotelInfoForm;
 use app\plugins\hotel\forms\api\HotelSearchPrepareForm;
@@ -52,5 +53,14 @@ class HotelController extends ApiController{
         $form = new HotelInfoForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->getInfo());
+    }
+
+    /*
+     * 获取城市列表
+     * */
+    public function actionCityList ()
+    {
+        $form = new CityListForm();
+        return $this->asJson($form->getList());
     }
 }

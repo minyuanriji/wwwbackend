@@ -175,7 +175,7 @@ class CityHelper{
      * 通过市名获取下级县
      * @param $name2 市名
      */
-    public static function getDistrictName($cityName, $cityLike)
+    public static function getDistrictName($cityName)
     {
         if (empty($cityName))
             return false;
@@ -184,32 +184,11 @@ class CityHelper{
         $newCityId = 0;
         $level = '';
         $arrs = DistrictData::getArr();
-        if ($cityLike) {
-            foreach($arrs as $arr){
-                if($arr['level'] == "district" && strpos($arr['name'], $cityName) === 0){
-                    $district_id = $arr['id'];
-                    $level = $arr['level'];
-                    break;
-                }
-            }
-            if (!$district_id) {
-                foreach($arrs as $arr){
-                    if($arr['level'] == "city" && strpos($arr['name'], $cityName) === 0){
-                        $newCityId = $arr['id'];
-                        $level = $arr['level'];
-                        break;
-                    }
-                }
-            } else {
-                $newCityId = $district_id;
-            }
-        } else {
-            foreach($arrs as $arr){
-                if($arr['level'] == "city" && $arr['name'] == $cityName){
-                    $newCityId = $arr['id'];
-                    $level = $arr['level'];
-                    break;
-                }
+        foreach($arrs as $arr){
+            if($arr['level'] == "city" && $arr['name'] == $cityName){
+                $newCityId = $arr['id'];
+                $level = $arr['level'];
+                break;
             }
         }
         if ($newCityId > 0) {

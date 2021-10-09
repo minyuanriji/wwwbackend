@@ -80,11 +80,20 @@ class HotelSearchPrepareForm extends HotelSearchForm {
             }else{
                 $districtArr = DistrictData::getArr();
                 $city = isset($districtArr[$this->city_id]) ? $districtArr[$this->city_id] : null;
-                if(!$city || $city['level'] != "city"){
-                    throw new \Exception("城市信息选择错误");
+                if ($city && $city['level'] == "district") {
+                    $districtParent = $districtArr[$city['parent_id']];
+                    if (!$districtParent || $districtParent['level'] != "city") {
+                        throw new \Exception("城市信息选择错误");
+                    }
+                    $newCity = $districtParent;
+                } else {
+                    if(!$city || $city['level'] != "city"){
+                        throw new \Exception("城市信息选择错误");
+                    }
+                    $newCity = $city;
                 }
-                $cityId = $city['id'];
-                $provinceId = $city['parent_id'];
+                $cityId = $newCity['id'];
+                $provinceId = $newCity['parent_id'];
             }
 
             if(!$provinceId || !$cityId){

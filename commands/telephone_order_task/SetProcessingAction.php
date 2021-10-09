@@ -23,6 +23,7 @@ class SetProcessingAction extends Action{
                 ]);
                 $query->leftJoin(["otp" => AddcreditOrderThirdParty::tableName()], "otp.order_id=o.id AND (otp.process_status='processing' OR otp.process_status='success')");
                 $query->andWhere("otp.id IS NULL");
+                $query->andWhere("o.request_num <= 3");
                 $query->andWhere("o.created_at > '".strtotime(self::VER_START_TIME)."'");
 
                 $query->select(["o.id"]);

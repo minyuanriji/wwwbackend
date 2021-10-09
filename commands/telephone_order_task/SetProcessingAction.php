@@ -25,25 +25,22 @@ class SetProcessingAction extends Action{
                 $query->andWhere("otp.id IS NULL");
                 $query->andWhere("o.created_at > '".strtotime(self::VER_START_TIME)."'");
 
-                $query->select(["o.*"]);
+                $query->select(["o.id"]);
                 $rows = $query->asArray()->limit(10)->all();
                 if ($rows) {
                     foreach ($rows as $row) {
 
-                        $addcreditOrder = new AddcreditOrder();
-                        $addcreditOrder->load(["AddcreditOrder" => $row]);
+                        $addcreditOrder = AddcreditOrder::findOne($row['id']);
 
                         //平台下单
                         $plateform = AddcreditPlateforms::findOne($row['plateform_id']);
                         if (!$plateform) {
                             throw new \Exception("无法获取平台信息");
                         }
-
                         $addcreditOrder->order_no = substr(md5(uniqid()), -4) . date("ymdhis") . rand(100000, 999999);
 
                         $platForm = new kcb_PlateForm();
                         $res = $platForm->submit($addcreditOrder, $plateform, false);
-
                         $model = new AddcreditOrderThirdParty([
                             "mall_id"         => $row['mall_id'],
                             "order_id"        => $row['id'],

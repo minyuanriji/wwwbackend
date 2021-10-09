@@ -29,12 +29,21 @@ class HotelInfoForm extends BaseModel
         try {
             //获取首页轮播图
             $resultData['banner'] = [
-                'https://www.mingyuanriji.cn/web//uploads/images/original/20210922/679cb9aa849b5828c15e22fabb67726c.jpg',
-                'https://www.mingyuanriji.cn/web//uploads/images/original/20210508/dacd08c809c1314a6c4071d45ca7b567.jpg',
+                [
+                    'img' => 'https://www.mingyuanriji.cn/web//uploads/images/original/20210922/679cb9aa849b5828c15e22fabb67726c.jpg',
+                    'link' => '',
+                ],
+                [
+                    'img' => 'https://www.mingyuanriji.cn/web//uploads/images/original/20210508/dacd08c809c1314a6c4071d45ca7b567.jpg',
+                    'link' => '',
+                ],
             ];
 
             //获取首页广告
-            $resultData['advert'] = 'https://www.mingyuanriji.cn/web//uploads/images/original/20210818/db01559d840db23c955f9ce686ad1384.jpg';
+            $resultData['advert'] = [
+                'img' => 'https://www.mingyuanriji.cn/web//uploads/images/original/20210818/db01559d840db23c955f9ce686ad1384.jpg',
+                'link' => '',
+            ];
 
             if (!empty($this->city_name)) {
                 $cityName = $this->city_name;

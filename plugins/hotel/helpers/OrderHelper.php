@@ -64,7 +64,7 @@ class OrderHelper{
      */
     public static function getOrderRealStatus($order_status, $pay_status, $created_at, $start_date, $days){
         $endTime = strtotime($start_date) + $days * 3600 * 24;
-        $texts = ["finished" => "已结束", "fail" => "预订失败", "refund" => "已退款", "refunding" => "退款中", "confirmed" => "已确认", "cancel" => "已取消", "expired" => "已失效", "unpaid" => "未支付", "unconfirmed" => "待确认"];
+        $texts = ["finished" => "已结束", "fail" => "预订失败", "refund" => "已退款", "refunding" => "退款中", "refused" => "拒绝退款", "confirmed" => "已确认", "cancel" => "已取消", "expired" => "已失效", "unpaid" => "未支付", "unconfirmed" => "待确认"];
         $info = ['text' => '', 'status' => 'none'];
         if($pay_status == "paid"){ //已支付
             if($order_status == "unconfirmed"){ //未确认
@@ -81,7 +81,7 @@ class OrderHelper{
                 $info['status'] = $order_status;
             }
         }elseif($pay_status == "refunding"){ //退款中
-            $info['status'] = $pay_status;
+            $info['status'] = $order_status == 'refused' ? $order_status : $pay_status;
         }elseif($pay_status == "refund"){ //已退款
             $info['status'] = $pay_status;
         }else{

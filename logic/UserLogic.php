@@ -127,8 +127,6 @@ class UserLogic
                     if(!$parentLink){
                         throw new Exception("推荐人关系链异常");
                     }
-                }else{
-                    throw new Exception("未选择推荐人");
                 }
                 if ($user->save() === false) {
                     \Yii::error("userRegister ".var_export($user->getErrors(),true));

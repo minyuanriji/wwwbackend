@@ -9,11 +9,12 @@ use app\plugins\addcredit\plateform\IOrder;
 class PlateForm implements IOrder
 {
 
-    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform)
+    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform, $requestNum)
     {
         return (new SubmitOrderAction([
             'AddcreditOrder'    => $orderModel,
             'AddcreditPlateforms' => $plateform,
+            'requestNum' => $requestNum,
         ]))->run();
     }
 

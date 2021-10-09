@@ -13,9 +13,10 @@ interface IOrder
      * 提交订单
      * @param AddcreditOrder $orderModel
      * @param AddcreditPlateforms $plateform
+     * @param $requestNum
      * @return SubmitResult
      */
-    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform);
+    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform, $requestNum);
 
     /**
      * 查询订单

@@ -7,6 +7,7 @@ use app\forms\common\UserIntegralForm;
 use app\models\User;
 use app\plugins\addcredit\forms\api\order\PhoneOrderRefundForm;
 use app\plugins\addcredit\models\AddcreditOrder;
+use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\addcredit\plateform\result\QueryResult;
 use app\plugins\addcredit\plateform\sdk\kcb_sdk\Code;
 use app\plugins\addcredit\plateform\sdk\kcb_sdk\PlateForm as kcb_PlateForm;
@@ -99,6 +100,39 @@ class TelephoneOrderController extends BaseCommandController
                                         $transaction->rollBack();
                                         \Yii::error($exception->getLine().";file:".$exception->getFile());
                                         throw new \Exception($exception->getMessage());
+                                    }
+                                } elseif ($item->pay_price > 0) {
+
+                                    if ($item->request_num >= 3) {
+                                        //退款
+                                        $item->order_status = AddcreditOrder::ORDER_STATUS_FAIL;
+                                        $item->pay_status = AddcreditOrder::PAY_TYPE_REF;
+                                        $item->plateform_request_data = $query_res->request_data;
+                                        $item->plateform_response_data = $query_res->response_content;
+                                        if (!$item->save()) {
+                                            throw new \Exception("话费订单失败：" . json_encode($item->getErrors()));
+                                        }
+                                    } else {
+                                        //平台下单
+                                        $plateform = AddcreditPlateforms::findOne($item->plateform_id);
+                                        if (!$plateform) {
+                                            throw new \Exception("无法获取平台信息");
+                                        }
+                                        $plate_form = new kcb_PlateForm();
+                                        $submit_res = $plate_form->submit($item, $plateform, true);
+
+                                        if (!$submit_res) {
+                                            throw new \Exception('未知错误！');
+                                        }
+                                        if ($submit_res->code != ApiCode::CODE_SUCCESS) {
+                                            throw new \Exception($submit_res->message);
+                                        }
+                                        $item->request_num += 1;
+                                        $item->plateform_request_data = $submit_res->request_data;
+                                        $item->plateform_response_data = $submit_res->response_content;
+                                        if (!$item->save()) {
+                                            throw new \Exception($this->responseErrorMsg($item));
+                                        }
                                     }
                                 }
                                 break;

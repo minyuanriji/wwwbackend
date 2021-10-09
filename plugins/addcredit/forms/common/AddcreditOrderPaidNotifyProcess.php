@@ -34,7 +34,7 @@ class AddcreditOrderPaidNotifyProcess extends PaymentNotify{
         }
 
         $plate_form = new kcb_PlateForm();
-        $submit_res = $plate_form->submit($AddcreditOrder, $plateform);
+        $submit_res = $plate_form->submit($AddcreditOrder, $plateform, false);
 
         if (!$submit_res) {
             throw new \Exception('未知错误！');

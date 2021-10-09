@@ -6,12 +6,14 @@ use app\core\ApiCode;
 use app\plugins\addcredit\forms\common\Request;
 use app\plugins\addcredit\plateform\result\SubmitResult;
 use app\plugins\addcredit\forms\common\TelType;
+use app\plugins\shopping_voucher\models\AddcreditOrderThirdParty;
 use yii\base\BaseObject;
 
 class SubmitOrderAction extends BaseObject
 {
     public $AddcreditOrder;
     public $AddcreditPlateforms;
+    public $requestNum;
 
     /**
      * 第三方需要参数
@@ -39,13 +41,17 @@ class SubmitOrderAction extends BaseObject
         $SubmitResult = new SubmitResult();
         try {
             $plateforms_param = json_decode($this->AddcreditPlateforms->json_param,true);
-//            $teltype = (new TelType())->getPhoneType($this->AddcreditOrder->mobile);
+            if ($this->requestNum) {
+                $orderNo = "THF" . $this->AddcreditOrder->plateform_id . date("ymdHis") . rand(100, 999);
+            } else {
+                $orderNo = $this->AddcreditOrder->order_no;
+            }
             $param = [
-                'out_trade_num'    => $this->AddcreditOrder->order_no,
+                'out_trade_num'    => $orderNo,
                 'product_id'       => $this->AddcreditOrder->product_id,
                 'account'          => $this->AddcreditOrder->mobile,
                 'userid'           => $plateforms_param['id'],
-                'notify_url'       => $this->getNotifyUrl('telephone.php'),
+                'notify_url'       => "https://www.mingyuanriji.cn/web/pay-notify/telephone.php",
                 'amount'           => 0,
             ];
             ksort($param);
@@ -67,6 +73,18 @@ class SubmitOrderAction extends BaseObject
                     throw new \Exception($parseArray['errmsg']);
                 } else {
                     throw new \Exception("未知错误 " . $parseArray['errno']);
+                }
+            }
+            if ($this->requestNum) {
+                $AddcreditOrderThirdParty = new AddcreditOrderThirdParty([
+                    'mall_id'                   => $this->AddcreditOrder->mall_id,
+                    'order_id'                  => $this->AddcreditOrder->id,
+                    'unique_order_no'           => $orderNo,
+                    'plateform_request_data'    => json_encode($param),
+                    'plateform_response_data'   => $response,
+                ]);
+                if (!$AddcreditOrderThirdParty->save()) {
+                    throw new \Exception($AddcreditOrderThirdParty->getErrorMessage());
                 }
             }
             $SubmitResult->code = $parseArray['errno'];

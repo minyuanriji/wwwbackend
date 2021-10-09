@@ -33,7 +33,7 @@ class SetProcessingAction extends Action{
                         $addcreditOrder = AddcreditOrder::findOne($row['id']);
 
                         //平台下单
-                        $plateform = AddcreditPlateforms::findOne($row['plateform_id']);
+                        $plateform = AddcreditPlateforms::findOne($addcreditOrder->plateform_id);
                         if (!$plateform) {
                             throw new \Exception("无法获取平台信息");
                         }

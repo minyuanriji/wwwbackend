@@ -52,12 +52,6 @@ class DoProcessingAction extends Action{
             }
 
             //先假设充值是成功的
-            $order->order_status = "success";
-            $order->updated_at = time();
-            if(!$order->save()){
-                throw new \Exception(json_encode($order->getErrors()));
-            }
-
             $model->process_status = "success";
             if(!$model->save()){
                 throw new \Exception(json_encode($model->getErrors()));

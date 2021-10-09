@@ -32,6 +32,7 @@ class SetProcessingAction extends Action{
                     foreach ($rows as $row) {
 
                         $addcreditOrder = AddcreditOrder::findOne($row['id']);
+                        $addcreditOrder->order_status = "success";
                         $addcreditOrder->request_num += 1;
                         if(!$addcreditOrder->save()){
                             throw new \Exception(json_encode($addcreditOrder->getErrors()));

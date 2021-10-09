@@ -78,19 +78,10 @@ class PlateformsForm extends BaseModel
         ])->asArray()->one();
         if ($detail) {
             $json_param = json_decode($detail['json_param'],true);
-            $detail['cyd_id'] = $json_param['id'];
-            $detail['secret_key'] = $json_param['secret_key'];
+            $detail['cyd_id'] = isset($json_param['id']) ? $json_param['id'] : "";
+            $detail['secret_key'] = isset($json_param['secret_key']) ? $json_param['secret_key'] : "";
             $user = User::findOne($detail['parent_id']);
-            if (!$user) {
-                throw new \Exception('用户不存在', ApiCode::CODE_FAIL);
-            }
-            $detail['parent_name'] = $user->nickname;
-            if (!$user) {
-                return [
-                    'code' => ApiCode::CODE_FAIL,
-                    'msg' => '数据为空',
-                ];
-            }
+            $detail['parent_name'] = $user ? $user->nickname : "";
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',

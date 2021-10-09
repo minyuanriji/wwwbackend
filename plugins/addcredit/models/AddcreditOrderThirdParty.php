@@ -1,5 +1,6 @@
 <?php
-namespace app\plugins\shopping_voucher\models;
+
+namespace app\plugins\addcredit\models;
 
 use app\models\BaseActiveRecord;
 
@@ -17,8 +18,8 @@ class AddcreditOrderThirdParty extends BaseActiveRecord{
      */
     public function rules(){
         return [
-            [['mall_id', 'order_id', 'unique_order_no', 'created_at'], 'required'],
-            [['plateform_request_data', 'plateform_response_data'], 'safe']
+            [['mall_id', 'order_id', 'process_status', 'unique_order_no', 'created_at'], 'required'],
+            [['plateform_request_data', 'plateform_response_data', 'updated_at', 'remark'], 'safe']
         ];
     }
 

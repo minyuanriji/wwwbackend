@@ -128,7 +128,7 @@ class Plugin extends \app\plugins\Plugin
 
     public function handler()
     {
-
+        return $this;
     }
 
     /**

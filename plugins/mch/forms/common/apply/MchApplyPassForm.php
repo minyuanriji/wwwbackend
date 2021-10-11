@@ -11,12 +11,12 @@ use app\plugins\mch\forms\api\MchApplyOperationLogSaveForm;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
 use app\plugins\mch\models\MchApplyOperationLog;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 
 class MchApplyPassForm extends BaseModel{
 
     public $id;
     public $bind_mobile;
-
 
     public function rules(){
         return [
@@ -61,7 +61,7 @@ class MchApplyPassForm extends BaseModel{
             $mch = $this->saveMch($applyModel, $user);
 
             //保存门店数据
-            $this->saveStore($applyModel, $mch);
+            $store = $this->saveStore($applyModel, $mch);
 
             //保存易票联信息
             $this->saveEfps($applyModel, $mch);
@@ -81,7 +81,11 @@ class MchApplyPassForm extends BaseModel{
             if ($operation_save['code'] != ApiCode::CODE_SUCCESS)
                 throw new \Exception(isset($operation_save['msg']) ? $operation_save['msg'] : $operation_save['message']);
 
+            //设置二维码支付完成操作处理
+            static::setCheckoutOrderPaidAction($mch, $store);
+
             $trans->commit();
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg'  => '操作成功'
@@ -92,6 +96,56 @@ class MchApplyPassForm extends BaseModel{
                 'code' => ApiCode::CODE_FAIL,
                 'msg'  => $e->getMessage()
             ];
+        }
+    }
+
+    /**
+     * 设置二维码支付后操作
+     * @param Mch $mch
+     * @param Store $store
+     * @throws \Exception
+     */
+    public static function setCheckoutOrderPaidAction(Mch $mch, Store $store){
+
+        //设置购物券赠送比例
+        $value = (100 - $mch->transfer_rate)/10;
+        if($value <= 8){ //8折以下都是100%
+            $giveValue = 100;
+        }elseif($value > 8 && $value <= 8.5){ //8折-8.5折，70%
+            $x = (1 - 0.7)/(8.5-8) * ($value - 8);
+            $giveValue = intval((1 - $x) * 100);
+        }elseif($value > 8.5 && $value <= 9){ //8.5-9折，50%
+            $x = (0.7 - 0.5)/(9-8.5) * ($value - 8.5);
+            $giveValue = intval((0.7 - $x) * 100);
+        }elseif($value > 9 && $value <= 9.5){ //9折-9.5折，30%
+            $x = (0.5 - 0.3)/(9.5-9) * ($value - 9);
+            $giveValue = intval((0.5 - $x) * 100);
+        }else{
+            $giveValue = 0;
+        }
+        if($giveValue > 0){
+            $model = ShoppingVoucherFromStore::findOne([
+                "mall_id"  => $mch->mall_id,
+                "store_id" => $store->id
+            ]);
+            if(!$model){
+                $model = new ShoppingVoucherFromStore([
+                    "mall_id"    => $mch->mall_id,
+                    "mch_id"     => $mch->id,
+                    "store_id"   => $store->id,
+                    "created_at" => time()
+                ]);
+            }
+            $model->give_type  = 1;
+            $model->give_value = max(0, min(100, $giveValue));
+            $model->updated_at = time();
+            $model->is_delete  = 0;
+            $model->name       = $store->name;
+            $model->cover_url  = $store->cover_url;
+            $model->start_at   = time();
+            if(!$model->save()){
+                throw new \Exception(json_encode($model->getErrors()));
+            }
         }
     }
 

@@ -6,6 +6,7 @@ use app\plugins\alibaba\forms\mall\AlibabaDistributionAlibabaGoodsGearchForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionAlibabaGroupGearchForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionAliGoodsImportForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionCategoryListForm;
+use app\plugins\alibaba\forms\mall\AlibabaDistributionCopySkuForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionDeleteCategoryForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionDeleteGoodsForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionDeleteSkuForm;
@@ -172,5 +173,15 @@ class DistributionController extends Controller{
         $form = new AlibabaDistributionDeleteSkuForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->delete());
+    }
+
+    /**
+     * 复制规格
+     * @return string|\yii\web\Response
+     */
+    public function actionCopySku(){
+        $form = new AlibabaDistributionCopySkuForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->copy());
     }
 }

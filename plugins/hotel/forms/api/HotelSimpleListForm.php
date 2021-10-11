@@ -18,11 +18,13 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
     public $lat;
     public $search_id;
     public $city_id;
+    public $order_by_name;
+    public $sort_type;
 
     public function rules(){
         return [
             [['page', 'city_id'], 'integer'],
-            [['lng', 'lat', 'search_id'], 'string']
+            [['lng', 'lat', 'search_id', 'order_by_name', 'sort_type'], 'string']
         ];
     }
 
@@ -127,8 +129,12 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
         $selects = ["ho.id", "ho.thumb_url", "ho.name", "ho.type", "ho.cmt_grade", "ho.cmt_num", "ho.price"];
         $selects[] = "ST_Distance_sphere(point(ho.tx_lng, ho.tx_lat), point(".$this->lng.", ".$this->lat.")) as distance_mi";
 
-        $query->orderBy("distance_mi ASC");
-        $query->select($selects);;
+        $order_by = "distance_mi ASC";
+        if ($this->order_by_name && $this->sort_type) {
+            $order_by = $this->order_by_name . " " . $this->sort_type;
+        }
+        $query->orderBy($order_by);
+        $query->select($selects);
 
         return $query;
     }

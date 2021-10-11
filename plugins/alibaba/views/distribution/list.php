@@ -323,7 +323,7 @@ Yii::$app->loadComponentView('com-rich-text');
                                 <el-input v-model="scope.row.name"></el-input>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="price" width="110" label="零售价">
+                        <el-table-column prop="price" width="120" label="零售价">
                             <template slot-scope="scope">
                                 <el-input :disabled="scope.row.free_edit == 0" v-model="scope.row.price"></el-input>
                             </template>
@@ -357,8 +357,13 @@ Yii::$app->loadComponentView('com-rich-text');
                             </template>
                         </el-table-column>
 
-                        <el-table-column label="操作" width="110">
+                        <el-table-column label="操作" width="150">
                             <template slot-scope="scope">
+                                <el-button @click="skuCopy(scope.row, scope.$index)" type="text" circle size="mini">
+                                    <el-tooltip class="item" effect="dark" content="复制" placement="top">
+                                        <img src="statics/img/mall/copy1.png" alt="">
+                                    </el-tooltip>
+                                </el-button>
                                 <el-button @click="skuDelete(scope.row.id, scope.$index)" type="text" circle size="mini">
                                     <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                         <img src="statics/img/mall/del.png" alt="">
@@ -558,6 +563,38 @@ Yii::$app->loadComponentView('com-rich-text');
                         if (e.data.code == 0) {
                             this.$message.success(e.data.msg);
                             this.batchSetForm.singleEditGoods[0].sku_list.splice(index, 1)
+                        } else {
+                            this.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        this.$message.error(e.data.msg);
+                    });
+                }).catch(() => {
+
+                });
+            },
+            skuCopy(data, index){
+                console.log(data);
+                this.$confirm('你确定要复制吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    request({
+                        params: {
+                            r: 'plugin/alibaba/mall/distribution/copy-sku'
+                        },
+                        method: 'post',
+                        data: data
+                    }).then(e => {
+                        if (e.data.code == 0) {
+                            this.$message.success(e.data.msg);
+                            var sku_data = '';
+                            sku_data = e.data.data;
+                            sku_data.ali_attributes_label = data.ali_attributes_label;
+                            sku_data.free_edit = data.free_edit;
+                            this.batchSetForm.singleEditGoods[0].sku_list.splice(index+1, 0, sku_data);
+                            console.log(this.batchSetForm.singleEditGoods[0].sku_list)
                         } else {
                             this.$message.error(e.data.msg);
                         }

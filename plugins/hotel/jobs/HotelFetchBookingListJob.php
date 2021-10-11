@@ -48,7 +48,7 @@ class HotelFetchBookingListJob extends BaseObject implements JobInterface{
         foreach($bookingListItems as $bookingListItem){
             $arr = ArrayHelper::toArray($bookingListItem);
             $arr['product_thumb'] = !empty($arr['product_thumb']) ? $arr['product_thumb'] : $this->hotel->thumb_url;
-            $arr['product_num'] = $arr['product_num'] >= 0 ?: 0;
+            $arr['product_num'] = max($arr['product_num'], 0);
             $bookingList[] = $arr;
         }
 

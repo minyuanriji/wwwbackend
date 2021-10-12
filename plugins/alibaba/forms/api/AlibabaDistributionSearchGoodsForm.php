@@ -42,7 +42,7 @@ class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm
             }
 
             if ($this->recommend) {
-                $query->andWhere(['g.recommend' => $this->recommend]);
+                $query->andWhere(['g.is_recommend' => $this->recommend]);
             }
 
             $orderBy = "g.id DESC";

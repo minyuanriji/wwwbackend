@@ -27,6 +27,8 @@ class MchCheckoutOrder extends BaseActiveRecord
 
     /** @var string 结账单支付 */
     const EVENT_PAYED = 'checkoutOrderPayed';
+
+    const IS_PAY = 1;
     /**
      * 1
      * {@inheritdoc}

@@ -14,13 +14,13 @@ class MchCheckoutOrderPaySuccessNotification
 
     public static function send(MchCheckoutOrder $mchCheckoutOrder)
     {
-        (new MchCheckoutOrderPaySuccessNotificationWeTplJob([
+        /*(new MchCheckoutOrderPaySuccessNotificationWeTplJob([
             "mchCheckoutOrder" => $mchCheckoutOrder
-        ]))->execute(null);
+        ]))->execute(null);*/
 
-        /*\Yii::$app->queue->delay(0)->push(new MchCheckoutOrderPaySuccessNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new MchCheckoutOrderPaySuccessNotificationWeTplJob([
             "mchCheckoutOrder" => $mchCheckoutOrder
-        ]));*/
+        ]));
     }
 
     public static function sendWechatTemplate(MchCheckoutOrder $mchCheckoutOrder)
@@ -39,7 +39,7 @@ class MchCheckoutOrderPaySuccessNotification
 
         $template_id = TemConfig::IncomeArrival;
         $data = [
-            'first'     => '收益到账通知：',
+            'first'     => '',
             'keyword1'  => $mchCheckoutOrder->order_price * (100 - $mchResult['transfer_rate']) / 100,
             'keyword2'  => $mchResult['name'],
             'keyword3'  => date('Y-m-d H:i:s', $mchCheckoutOrder->pay_at),

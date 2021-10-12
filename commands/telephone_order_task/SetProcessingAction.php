@@ -23,37 +23,42 @@ class SetProcessingAction extends Action{
                 ]);
                 $query->leftJoin(["otp" => AddcreditOrderThirdParty::tableName()], "otp.order_id=o.id AND (otp.process_status='processing' OR otp.process_status='success')");
                 $query->andWhere("otp.id IS NULL");
+                $query->andWhere("o.request_num <= 3");
                 $query->andWhere("o.created_at > '".strtotime(self::VER_START_TIME)."'");
 
-                $query->select(["o.*"]);
+                $query->select(["o.id"]);
                 $rows = $query->asArray()->limit(10)->all();
                 if ($rows) {
                     foreach ($rows as $row) {
 
-                        $addcreditOrder = new AddcreditOrder();
-                        $addcreditOrder->load(["AddcreditOrder" => $row]);
+                        $addcreditOrder = AddcreditOrder::findOne($row['id']);
+                        $addcreditOrder->order_status = "success";
+                        $addcreditOrder->request_num += 1;
+                        if(!$addcreditOrder->save()){
+                            throw new \Exception(json_encode($addcreditOrder->getErrors()));
+                        }
 
                         //平台下单
-                        $plateform = AddcreditPlateforms::findOne($row['plateform_id']);
+                        $plateform = AddcreditPlateforms::findOne($addcreditOrder->plateform_id);
                         if (!$plateform) {
                             throw new \Exception("无法获取平台信息");
                         }
 
-                        $addcreditOrder->order_no = substr(md5(uniqid()), -4) . date("ymdhis") . rand(100000, 999999);
+                        //$addcreditOrder->order_no = substr(md5(uniqid()), -4) . date("ymdhis") . rand(100000, 999999);
+                        $model = new AddcreditOrderThirdParty([
+                            "mall_id"         => $addcreditOrder->mall_id,
+                            "order_id"        => $addcreditOrder->id,
+                            "process_status"  => "processing",
+                            "unique_order_no" => $addcreditOrder->order_no,
+                            "created_at"      => (time() + 15 * 60)
+                        ]);
+                        if (!$model->save()) {
+                            throw new \Exception(json_encode($model->getErrors()));
+                        }
 
                         $platForm = new kcb_PlateForm();
                         $res = $platForm->submit($addcreditOrder, $plateform, false);
 
-                        $model = new AddcreditOrderThirdParty([
-                            "mall_id"         => $row['mall_id'],
-                            "order_id"        => $row['id'],
-                            "process_status"  => "processing",
-                            "unique_order_no" => $addcreditOrder->order_no,
-                            "created_at"      => time()
-                        ]);
-                        if (!$model->save()) {
-                            $this->controller->commandOut(json_encode($model->getErrors()));
-                        }
                         $this->controller->commandOut("话费订单[ID:".$row['id']."]待处理任务添加成功");
                     }
                 }

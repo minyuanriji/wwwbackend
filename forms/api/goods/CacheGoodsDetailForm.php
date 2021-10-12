@@ -187,8 +187,8 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
 
             //判断是否可以购买
             $is_buy_power = 0;
-            if ($login_user_id = \Yii::$app->user->id) {
-                $user = \app\models\User::findOne($login_user_id);
+            if ($this->user_id) {
+                $user = \app\models\User::findOne($this->user_id);
                 if ($goods->purchase_permission) {
                     $purchase_permission = json_decode($goods->purchase_permission,true);
                     if($user && !$user->is_delete){
@@ -214,8 +214,8 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
             if($voucherGoods){
                 $info['shopping_voucher']['is_shopping_voucher_goods'] = 1;
                 $info['shopping_voucher']['voucher_price'] = $voucherGoods->voucher_price;
-                if(!\Yii::$app->user->isGuest){
-                    $user = \Yii::$app->user->getIdentity();
+                if($this->user_id){
+                    $user = \app\models\User::findOne($this->user_id);
                     $info['shopping_voucher']['user_shopping_voucher'] = $user ? $user->shoppingVoucherUser->money : 0;
                 }
             }

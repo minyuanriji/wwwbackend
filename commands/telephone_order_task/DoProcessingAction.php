@@ -16,6 +16,7 @@ class DoProcessingAction extends Action{
         while (true){
             try {
                 $models = AddcreditOrderThirdParty::find()->where(["process_status" => 'processing'])
+                            ->andWhere("created_at < '".time()."'")
                             ->orderBy("updated_at ASC")->limit(10)->all();
                 if($models){
                     $ids = [];
@@ -51,18 +52,13 @@ class DoProcessingAction extends Action{
             }
 
             //先假设充值是成功的
-            $order->order_status = "success";
-            $order->updated_at = time();
-            if(!$order->save()){
-                throw new \Exception(json_encode($order->getErrors()));
-            }
-
             $model->process_status = "success";
             if(!$model->save()){
                 throw new \Exception(json_encode($model->getErrors()));
             }
 
             //查询平台状态
+            $order->order_no = $model->unique_order_no;
             $plateForm = new kcb_PlateForm();
             $res = $plateForm->query($order);
             if(!$res) {
@@ -80,7 +76,20 @@ class DoProcessingAction extends Action{
 
             //判断是否充值成功
             $content = json_decode($res->response_content,true);
-            if(!isset($content['data']) || empty($content['data']) || $content['data'][0]['state'] != Code::QUERY_SUCCESS){
+            $isRecharging = $isSuccess = false;
+            if(isset($content['errmsg']) && $content['errmsg'] == "ok"){
+                if(isset($content['data']) && !empty($content['data'])){
+                    $isRecharging = $content['data'][0]['state'] == Code::QUERY_RECHARGING;
+                    $isSuccess = $content['data'][0]['state'] == Code::QUERY_SUCCESS;
+                }
+            }
+
+            if($isRecharging){ //还在充值中
+                $t->rollBack();
+                return;
+            }
+
+            if(!$isSuccess){ //充值失败
                 throw new \Exception(isset($content['errmsg']) ? $content['errmsg'] : json_encode($content));
             }
 
@@ -107,12 +116,10 @@ class DoProcessingAction extends Action{
             $model->process_status = "fail";
             $model->save();
 
-            //如果失败次数超过3次，就不再处理
-            if($order && $order->request_num > 3){
-                $order->order_status = "fail";
-                $order->updated_at = time();
-                $order->save();
-            }
+            //更新订单状态为失败
+            $order->order_status = "fail";
+            $order->updated_at = time();
+            $order->save();
 
             $this->controller->commandOut($errContent);
         }

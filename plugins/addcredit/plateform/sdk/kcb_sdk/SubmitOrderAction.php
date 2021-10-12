@@ -41,11 +41,7 @@ class SubmitOrderAction extends BaseObject
         $SubmitResult = new SubmitResult();
         try {
             $plateforms_param = json_decode($this->AddcreditPlateforms->json_param,true);
-            if ($this->requestNum) {
-                $orderNo = "THF" . $this->AddcreditOrder->plateform_id . date("ymdHis") . rand(100, 999);
-            } else {
-                $orderNo = $this->AddcreditOrder->order_no;
-            }
+            $orderNo = $this->AddcreditOrder->order_no;
             $param = [
                 'out_trade_num'    => $orderNo,
                 'product_id'       => $this->AddcreditOrder->product_id,
@@ -63,6 +59,9 @@ class SubmitOrderAction extends BaseObject
             $sign = strtoupper(md5($sign_str));
             $param_str .= "&sign=" . $sign;
             $response = Request::http_get(Config::PHONE_BILL_SUBMIT . '?' . $param_str);
+
+            $SubmitResult->request_data = json_encode($param);
+
             $parseArray = json_decode($response, true);
             if (!isset($parseArray['errno'])) {
                 throw new \Exception("解析数据错误", ApiCode::CODE_FAIL);
@@ -75,21 +74,9 @@ class SubmitOrderAction extends BaseObject
                     throw new \Exception("未知错误 " . $parseArray['errno']);
                 }
             }
-            if ($this->requestNum) {
-                $AddcreditOrderThirdParty = new AddcreditOrderThirdParty([
-                    'mall_id'                   => $this->AddcreditOrder->mall_id,
-                    'order_id'                  => $this->AddcreditOrder->id,
-                    'unique_order_no'           => $orderNo,
-                    'plateform_request_data'    => json_encode($param),
-                    'plateform_response_data'   => $response,
-                ]);
-                if (!$AddcreditOrderThirdParty->save()) {
-                    throw new \Exception($AddcreditOrderThirdParty->getErrorMessage());
-                }
-            }
+
             $SubmitResult->code = $parseArray['errno'];
             $SubmitResult->response_content = $response;
-            $SubmitResult->request_data = json_encode($param);
             $SubmitResult->message = $parseArray['errmsg'];
         } catch (\Exception $e) {
             $SubmitResult->code = SubmitResult::CODE_FAIL;

@@ -228,7 +228,7 @@ class WechatForm extends BaseModel
                 $user_data = (new UserMode()) -> getOneUserParent($returnData['access_token']);
                 if(!$user_data['parent_id'] || ($user_data['parent_id'] == 9)){
                     try{
-                        (new UserMode()) -> updateUsers(['parent_id' => $parent_user_id],$user_data['id']);
+                        //(new UserMode()) -> updateUsers(['parent_id' => $parent_user_id],$user_data['id']);
                     }catch (\Exception $e){
 
                     }

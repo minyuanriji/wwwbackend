@@ -62,6 +62,7 @@ class GetMchsForm extends BaseModel implements ICacheForm {
                 }else if($item['distance_mi'] >= 1000){
                     $item['distance_format'] = round(($item['distance_mi']/1000), 1) . "km";
                 }
+
             }
 
             if (isset($this->effect) && $this->effect == 'nearby') {
@@ -117,6 +118,7 @@ class GetMchsForm extends BaseModel implements ICacheForm {
 
         $query->leftJoin("{{%store}} ss", "ss.mch_id=m.id");
         $query->leftJoin("{{%user}} u", "u.mch_id=m.id");
+        $query->leftJoin("{{%plugin_shopping_voucher_from_store}} psvs", "psvs.mch_id=m.id");
 
         if ($this->keyword) {
             $keyword = addslashes($this->keyword);
@@ -131,7 +133,7 @@ class GetMchsForm extends BaseModel implements ICacheForm {
             $query->andWhere(["m.mch_common_cat_id" => $this->cat_id]);
         }
 
-        $selects = ["m.id", "m.mall_id", "m.status", "m.is_recommend", "m.mch_common_cat_id"];
+        $selects = ["m.id", "m.mall_id", "m.status", "m.is_recommend", "m.mch_common_cat_id", 'psvs.give_type', 'psvs.give_value'];
         $selects[] = "ST_Distance_sphere(point(longitude, latitude), point(".$this->longitude.", ".$this->latitude.")) as distance_mi";
 
         $query->select($selects);

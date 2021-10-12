@@ -14,7 +14,7 @@ class PluginMchCheckoutOrder
 
     public function update($mixDatas)
     {
-        /*foreach ($mixDatas as $mixData) {
+        foreach ($mixDatas as $mixData) {
             $condition = $mixData['condition'];
             $update = $mixData['update'];
 
@@ -24,6 +24,6 @@ class PluginMchCheckoutOrder
                     MchCheckoutOrderPaySuccessNotification::send($mchCheckoutOrder);
                 }
             }
-        }*/
+        }
     }
 }

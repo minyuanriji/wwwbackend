@@ -104,7 +104,7 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'list' => $list ? $list : [],
+                    'list' => $list ?: [],
                     'pagination' => $pagination
                 ]
             ];

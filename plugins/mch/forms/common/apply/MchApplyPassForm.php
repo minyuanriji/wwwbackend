@@ -7,6 +7,7 @@ use app\models\BaseModel;
 use app\models\EfpsMchReviewInfo;
 use app\models\Store;
 use app\models\User;
+use app\plugins\integral_card\models\ScoreFromStore;
 use app\plugins\mch\forms\api\MchApplyOperationLogSaveForm;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
@@ -146,6 +147,35 @@ class MchApplyPassForm extends BaseModel{
             if(!$model->save()){
                 throw new \Exception(json_encode($model->getErrors()));
             }
+        }
+
+        //设置积分赠送
+        $fromStore = ScoreFromStore::findOne([
+            "store_id" => $store->id
+        ]);
+        if(!$fromStore){
+            $fromStore = new ScoreFromStore([
+                "mall_id"    => $mch->mall_id,
+                "created_at" => time()
+            ]);
+        }
+
+        $scoreSetting['integral_num'] = 0;
+        $scoreSetting['expire']       = -1;
+        $scoreSetting['period']       = 1;
+
+        $fromStore->mch_id        = $mch->id;
+        $fromStore->store_id      = $store->id;
+        $fromStore->updated_at    = time();
+        $fromStore->name          = $store->name;
+        $fromStore->cover_url     = $store->cover_url;
+        $fromStore->start_at      = time();
+        $fromStore->enable_score  = 1;
+        $fromStore->score_setting = json_encode($scoreSetting) ;
+        $fromStore->rate          = 100;
+
+        if(!$fromStore->save()){
+            throw new \Exception(json_encode($fromStore->getErrors()));
         }
     }
 

@@ -42,17 +42,18 @@ class PhoneOrderSubmitForm extends BaseModel
 
             //生成订单
             $order = new AddcreditOrder([
-                "mall_id"                   => \Yii::$app->mall->id,
-                "plateform_id"              => $this->plateform_id,
-                "user_id"                   => \Yii::$app->user->id,
-                "mobile"                    => $this->mobile,
-                "order_no"                  => "HF" . $this->plateform_id . date("ymdHis") . rand(100, 999),
-                "order_price"               => $this->order_price,
-                "created_at"                => time(),
-                "updated_at"                => time(),
-                "order_status"              => 'unpaid',
-                "pay_status"                => 'unpaid',
-                "product_id"                => $this->product_id,
+                "mall_id"       => \Yii::$app->mall->id,
+                "plateform_id"  => $this->plateform_id,
+                "user_id"       => \Yii::$app->user->id,
+                "mobile"        => $this->mobile,
+                "order_no"      => "HF" . $this->plateform_id . date("ymdHis") . rand(100, 999),
+                "order_price"   => $this->order_price,
+                "created_at"    => time(),
+                "updated_at"    => time(),
+                "order_status"  => 'unpaid',
+                "pay_status"    => 'unpaid',
+                "product_id"    => $this->product_id,
+                "recharge_type" => $this->product_id <= 3 ? "fast" : "slow"
             ]);
 
             //红包

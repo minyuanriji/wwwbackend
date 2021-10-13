@@ -354,7 +354,7 @@ class UserIntegralForm extends BaseModel{
             ];
         }catch (\Exception $e){
             $t->rollBack();
-            return [
+            return [   
                 'code' => ApiCode::CODE_FAIL,
                 'msg'  => $e->getMessage()
             ];

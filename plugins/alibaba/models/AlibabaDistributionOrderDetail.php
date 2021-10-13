@@ -3,6 +3,11 @@
 namespace app\plugins\alibaba\models;
 
 use app\models\BaseActiveRecord;
+use lin010\alibaba\c2b2b\api\CreateRefund;
+use lin010\alibaba\c2b2b\api\CreateRefundResponse;
+use lin010\alibaba\c2b2b\api\GetOrderInfo;
+use lin010\alibaba\c2b2b\api\GetOrderInfoResponse;
+use lin010\alibaba\c2b2b\Distribution;
 
 class AlibabaDistributionOrderDetail extends BaseActiveRecord{
 
@@ -63,19 +68,71 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
         }
 
         $order = $this->order;
-        if(!$order || $order->is_delete || $order->is_pay){
+        if(!$order || $order->is_delete || !$order->is_pay){
             throw new \Exception("订单不存在或未支付");
         }
 
         $trans && ($t = \Yii::$app->db->beginTransaction());
         try {
+
+            //用户提交的退款申请信息
+            $refundData = @json_decode($this->refund_json_data, true);
+
+            $detail1688 = AlibabaDistributionOrderDetail1688::findOne(["order_detail_id" => $this->id]);
+            if(!$detail1688){
+                throw new \Exception("[AlibabaDistributionOrderDetail1688] 1688订单信息不存在");
+            }
+
+            //获取1688该订单信息
+            $app = AlibabaApp::findOne($detail1688->app_id);
+            $distribution = new Distribution($app->app_key, $app->secret);
+            $res = $distribution->requestWithToken(new GetOrderInfo([
+                "webSite" => "1688",
+                "orderId" => $detail1688->ali_order_id
+            ]), $app->access_token);
+            if(!$res instanceof GetOrderInfoResponse){
+                throw new \Exception("[GetOrderInfoResponse]返回结果异常");
+            }
+            if($res->error){
+                throw new \Exception($res->error);
+            }
+            $status = $res->result['baseInfo']['status'];
+            if($status != "waitsellersend"){
+                throw new \Exception("只允许已付款未发货的订单退款 [{$status}]");
+            }
+
+            //阿里巴巴提交退款申请
+            $res = $distribution->requestWithToken(new CreateRefund([
+                "orderId"        => $detail1688->ali_order_id,
+                "orderEntryIds"  => json_encode([$detail1688->ali_order_id]),
+                "disputeRequest" => "refund",
+                "applyPayment"   => $res->result['baseInfo']['totalAmount'] * 100,
+                "applyCarriage"  => 0,
+                "applyReasonId"  => isset($refundData['reason_id']) ? $refundData['reason_id'] : "",
+                "description"    => "买家申请退款：" . (isset($refundData['description']) ? $refundData['description'] : ""),
+                "goodsStatus"    => "refundWaitSellerSend"
+            ]), $app->access_token);
+            if(!$res instanceof CreateRefundResponse){
+                throw new \Exception("[CreateRefundResponse]返回结果异常");
+            }
+            if($res->error){
+                throw new \Exception($res->error);
+            }
+
+            //更新1688订单信息
+            $detail1688->ali_refund_id = $res->refundId;
+            $detail1688->ali_orderdata = json_encode($res->result);
+            $detail1688->updated_at    = time();
+            if(!$detail1688->save()){
+                throw new \Exception(json_encode($detail1688->getErrors()));
+            }
+
+            //更新订单详情，设置状态为已同意
             $this->refund_status = "agree";
             $this->updated_at    = time();
             if(!$this->save()){
                 throw new \Exception(json_encode($this->getErrors()));
             }
-
-
 
             //判断如果所有商品都申请了退款，退还运费
             $existCount = (int)static::find()->where([

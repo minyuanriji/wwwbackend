@@ -30,7 +30,7 @@ class RechargeRecordForm extends BaseModel
         try {
             $query = AddcreditOrder::find();
             $query->andWhere([
-                'plateform_id' => $this->plateforms_id,
+                //'plateform_id' => $this->plateforms_id,
                 'user_id'    => \Yii::$app->user->id,
                 'mall_id'    => \Yii::$app->mall->id
             ])

@@ -15,7 +15,11 @@ class DoProcessingAction extends Action{
         while (true){
             try {
                 $models = AddcreditOrderThirdParty::find()->where(["process_status" => 'processing'])
-                            ->andWhere("created_at < '".time()."'")
+                            ->andWhere([
+                                "AND",
+                                "created_at < '".time()."'",
+                                "next_query_time < '".time()."'"
+                            ])
                             ->orderBy("updated_at ASC")->limit(10)->all();
                 if($models){
                     $ids = [];
@@ -23,7 +27,8 @@ class DoProcessingAction extends Action{
                         $ids[] = $model->id;
                     }
                     AddcreditOrderThirdParty::updateAll([
-                        "updated_at" => time()
+                        "updated_at" => time(),
+                        "next_query_time" => (time() + 300)
                     ], "id IN(".implode(",", $ids).")");
                     foreach($models as $model){
                         $this->process($model);

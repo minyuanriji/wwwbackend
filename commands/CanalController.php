@@ -24,15 +24,15 @@ class CanalController extends Controller
         try {
             $client = CanalConnectorFactory::createClient(CanalClient::TYPE_SOCKET_CLUE);
             # $client = CanalConnectorFactory::createClient(CanalClient::TYPE_SWOOLE);
-
-            $client->connect("111.230.197.124", 11111);
+            $canalConf = \Yii::$app->params['canal'];
+            $client->connect($canalConf['host'], $canalConf['port']);
             $client->checkValid();
 
-            $client->subscribe("1001", "example", "myrj.*");
+            $client->subscribe($canalConf['subscribe']['clientId'], "example", $canalConf['subscribe']['filter']);
 
             # $client->subscribe("1001", "example", "db_name.tb_name"); # 设置过滤
 
-            $allowSchemas = ["myrj"];
+            $allowSchemas = $canalConf['allows'];
 
             while (true) {
                 $message = $client->get(100);

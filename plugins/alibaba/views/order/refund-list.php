@@ -159,6 +159,10 @@ echo $this->render("com-refund-agree");
             //同意退款操作
             agree(row){
                 this.agreeEdit.dialogVisible = true;
+                return;
+                this.apply(row, "agree", function (rs){
+                    console.log(rs);
+                })
             },
             // 日期搜索
             changeTime() {
@@ -222,7 +226,7 @@ echo $this->render("com-refund-agree");
                 })
             },
 
-            apply(row, act) {
+            apply(row, act, fn) {
                 this.$prompt('请输入备注', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -245,6 +249,9 @@ echo $this->render("com-refund-agree");
                                 if (e.data.code === 0) {
                                     this.loadData(this.activeName);
                                     done();
+                                    if(typeof fn == "function"){
+                                        fn.call(this, e.data);
+                                    }
                                 } else {
                                     instance.confirmButtonText = '确定';
                                     this.$message.error(e.data.msg);

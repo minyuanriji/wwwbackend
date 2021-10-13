@@ -19,7 +19,7 @@ class AlibabaDistributionOrderDetail1688 extends BaseActiveRecord{
             [['mall_id', 'app_id', 'order_id', 'order_detail_id', 'goods_id', 'user_id',
               'ali_total_amount', 'ali_order_id', 'ali_post_fee', 'ali_postdata', 'created_at',
               'updated_at', 'app_key', 'status'], 'required'],
-            [['do_error', 'try_count'], 'safe']
+            [['do_error', 'try_count', 'ali_orderdata', 'ali_refund_id'], 'safe']
         ];
     }
 

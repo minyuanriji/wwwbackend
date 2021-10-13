@@ -42,7 +42,6 @@ class AlibabaDistributionAfterApplyForm extends BaseModel
                     throw new \Exception("不能重复确认操作！");
                 }
                 $OrderDetail && $OrderDetail->agreeRefund(false, $this->content);
-
             } elseif ($this->act == "refused") { //拒绝
                 if ($OrderDetail->refund_status == 'finished')
                     throw new \Exception("无法拒绝操作");

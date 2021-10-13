@@ -68,47 +68,19 @@ class RechargeRecordForm extends BaseModel
         if (!$plateforms) {
             throw new \Exception('平台信息不存在！',ApiCode::CODE_FAIL);
         }
-        return [
-            'FastCharging' => [
-                [
-                    'redbag_num'   => 50 + 50 * $plateforms->ratio / 100,
-                    'price'        => 50,
-                    'product_id'   => 1,
-                    'plateform_id' => $plateforms->id
-                ],
-                [
-                    'redbag_num'   => 100 + 100 * $plateforms->ratio / 100,
-                    'price'        => 100,
-                    'product_id'   => 2,
-                    'plateform_id' => $plateforms->id
-                ],
-                [
-                    'redbag_num'   => 200 + 200 * $plateforms->ratio / 100,
-                    'price'        => 200,
-                    'product_id'   => 3,
-                    'plateform_id' => $plateforms->id
-                ],
-            ],
-            'SlowCharge' => [
-                [
-                    'redbag_num'   => 50 + 50 * $plateforms->ratio / 100,
-                    'price'        => 50,
-                    'product_id'   => 4,
-                    'plateform_id' => $plateforms->id
-                ],
-                [
-                    'redbag_num'   => 100 + 100 * $plateforms->ratio / 100,
-                    'price'        => 100,
-                    'product_id'   => 5,
-                    'plateform_id' => $plateforms->id
-                ],
-                [
-                    'redbag_num'   => 200 + 200 * $plateforms->ratio / 100,
-                    'price'        => 200,
-                    'product_id'   => 6,
-                    'plateform_id' => $plateforms->id
-                ],
-            ],
-        ];
+
+        $products = @json_encode($plateforms->product_json_data, true);
+        $groupDatas = ['FastCharging' => [], 'SlowCharge' => []];
+        if($products){
+            foreach($products as $item){
+                if($item['type'] == "fast"){
+                    $groupDatas['FastCharging'][] = array_merge($item, [
+                        'redbag_num'   => $item['price'] + $item['price'] * $plateforms->ratio / 100,
+                        'plateform_id' => $plateforms->id
+                    ]);
+                }
+            }
+        }
+
     }
 }

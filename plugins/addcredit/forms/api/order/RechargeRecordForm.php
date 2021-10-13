@@ -66,7 +66,7 @@ class RechargeRecordForm extends BaseModel
     {
         $plateforms = AddcreditPlateforms::find()->where(["is_enabled" => 1])->orderBy("id DESC")->one();
         if (!$plateforms) {
-            throw new \Exception('平台不存在！',ApiCode::CODE_FAIL);
+            throw new \Exception('平台信息不存在！',ApiCode::CODE_FAIL);
         }
         return [
             'FastCharging' => [

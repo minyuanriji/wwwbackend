@@ -69,7 +69,7 @@ class RechargeRecordForm extends BaseModel
             throw new \Exception('平台信息不存在！',ApiCode::CODE_FAIL);
         }
 
-        $products = @json_encode($plateforms->product_json_data, true);
+        $products = @json_decode($plateforms->product_json_data, true);
         $groupDatas = ['FastCharging' => [], 'SlowCharge' => []];
         if($products){
             foreach($products as $item){
@@ -78,9 +78,13 @@ class RechargeRecordForm extends BaseModel
                         'redbag_num'   => $item['price'] + $item['price'] * $plateforms->ratio / 100,
                         'plateform_id' => $plateforms->id
                     ]);
+                }else{
+                    $groupDatas['SlowCharge'][] = array_merge($item, [
+                        'redbag_num'   => $item['price'] + $item['price'] * $plateforms->ratio / 100,
+                        'plateform_id' => $plateforms->id
+                    ]);
                 }
             }
         }
-
     }
 }

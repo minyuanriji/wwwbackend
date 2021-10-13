@@ -67,6 +67,9 @@ class DoProcessingAction extends Action{
             //保存请求数据、返回数据
             $model->plateform_request_data  = $res->request_data;
             $model->plateform_response_data = $res->response_content;
+            if(!$model->save()){
+                throw new \Exception(json_encode($model->getErrors()));
+            }
 
             //查询失败处理
             if ($res->code != QueryResult::CODE_SUCC) {
@@ -75,9 +78,7 @@ class DoProcessingAction extends Action{
 
             if($res->status == "success"){ //充值成功
                 $model->process_status = "success";
-                if(!$model->save()){
-                    throw new \Exception(json_encode($model->getErrors()));
-                }
+                $model->save();
             }elseif($res->status == "fail"){ //充值失败
                 throw new \Exception($res->message);
             }

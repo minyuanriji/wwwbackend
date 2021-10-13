@@ -21,6 +21,14 @@ interface IOrder
     /**
      * 查询订单
      * @param AddcreditOrder $orderModel
+     * @param AddcreditPlateforms $plateform
+     * @return QueryResult
+     */
+    public function query2(AddcreditOrder $orderModel, AddcreditPlateforms $plateform);
+
+    /**
+     * 查询订单
+     * @param AddcreditOrder $orderModel
      * @return QueryResult
      */
     public function query(AddcreditOrder $orderModel);

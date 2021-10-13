@@ -4,7 +4,7 @@ namespace app\plugins\addcredit\plateform\sdk\jing36;
 
 use app\plugins\addcredit\plateform\result\SubmitResult;
 
-class SubmitFastAction extends BaseAction {
+class SubmitSlowAction extends BaseAction {
 
     public function run(){
         $configs = @json_decode($this->plateModel->json_param, true);
@@ -12,12 +12,12 @@ class SubmitFastAction extends BaseAction {
         $appSecret = isset($configs['app_secret']) ? $configs['app_secret'] : "";
 
         $req = new Req($configs['host'], $appKey, $appSecret);
-        $params['orderId']   = $this->orderModel->order_no;
+        $params['orderId']   = $this->orderModel->id;
         $params['mobile']    = $this->orderModel->mobile;
         $params['amount']    = $this->orderModel->order_price;
         $params['notifyUrl'] = "https://www.mingyuanriji.cn";
 
-        $res = $req->doPost("/v1/mobile/order", $params);
+        $res = $req->doPost("/v1/mobile/sloworder", $params);
 
         $submitResult = new SubmitResult();
         $submitResult->request_data     = $res['request_data'];

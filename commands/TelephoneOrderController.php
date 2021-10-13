@@ -16,10 +16,10 @@ class TelephoneOrderController extends BaseCommandController{
 
     public function actions(){
         return [
-            //设置待处理任务
-            "set" => "app\\commands\\telephone_order_task\\SetProcessingAction",
-            //处理任务
-            "do" => "app\\commands\\telephone_order_task\\DoProcessingAction",
+            //提交充值任务
+            "submit" => "app\\commands\\telephone_order_task\\SetProcessingAction",
+            //查询充值任务
+            "query" => "app\\commands\\telephone_order_task\\DoProcessingAction",
         ];
     }
 

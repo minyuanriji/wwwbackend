@@ -2,16 +2,14 @@
 
 namespace app\commands\telephone_order_task;
 
-use app\core\ApiCode;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditOrderThirdParty;
 use app\plugins\addcredit\models\AddcreditPlateforms;
-use app\plugins\addcredit\plateform\sdk\kcb_sdk\PlateForm as kcb_PlateForm;
 use yii\base\Action;
 
 class SetProcessingAction extends Action{
 
-    const VER_START_TIME = "2021-10-09 13:42:00";
+    const VER_START_TIME = "2021-10-07 13:42:00";
 
     public function run(){
         $this->controller->commandOut(date("Y/m/d H:i:s") . " SetProcessingAction start");
@@ -23,7 +21,6 @@ class SetProcessingAction extends Action{
                 ]);
                 $query->leftJoin(["otp" => AddcreditOrderThirdParty::tableName()], "otp.order_id=o.id AND (otp.process_status='processing' OR otp.process_status='success')");
                 $query->andWhere("otp.id IS NULL");
-                $query->andWhere("o.request_num <= 3");
                 $query->andWhere("o.created_at > '".strtotime(self::VER_START_TIME)."'");
 
                 $query->select(["o.id"]);
@@ -56,8 +53,13 @@ class SetProcessingAction extends Action{
                             throw new \Exception(json_encode($model->getErrors()));
                         }
 
-                        $platForm = new kcb_PlateForm();
-                        $res = $platForm->submit($addcreditOrder, $plateform, false);
+                        $className = $plateform->class_dir;
+                        if(!class_exists($className)){
+                            throw new \Exception("充值类{$className}文件不存在");
+                        }
+
+                        $platClass = new $className();
+                        $res = $platClass->submit($addcreditOrder, $plateform, false);
 
                         $this->controller->commandOut("话费订单[ID:".$row['id']."]待处理任务添加成功");
                     }

@@ -17,7 +17,7 @@ class AddcreditPlateforms extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mall_id', 'name', 'sdk_dir', 'created_at', 'updated_at'], 'required'],
+            [['mall_id', 'name', 'sdk_dir', 'created_at', 'updated_at', 'class_dir'], 'required'],
         ];
     }
 }

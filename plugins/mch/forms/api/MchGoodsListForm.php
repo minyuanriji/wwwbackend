@@ -1,35 +1,34 @@
 <?php
-namespace app\mch\forms\api;
+namespace app\plugins\mch\forms\api;
 
 use app\core\ApiCode;
 use app\core\BasePagination;
+use app\forms\api\APICacheDataForm;
 use app\forms\api\goods\ApiGoods;
+use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\models\Goods;
 use app\models\GoodsCatRelation;
 use app\models\GoodsCats;
 use app\models\GoodsWarehouse;
+use app\models\Store;
+use app\plugins\mch\models\Mch;
 
-class GoodsListForm extends BaseModel{
+class MchGoodsListForm extends BaseModel implements ICacheForm {
 
     public $page;
-    public $limit;
-    public $cat_id;
-    public $mch_id;
-    public $keyword;
-    public $label;
+    public $store_id;
+    public $mall_id;
 
     public function rules(){
         return [
-            [['mch_id'], 'required'],
-            [['page', 'limit', 'cat_id', 'mch_id'], 'integer'],
-            [['keyword', 'label'], 'string'],
+            [['store_id'], 'required'],
             [['page'], 'default', 'value' => 1],
-            [['limit'], 'default', 'value' => 10],
+            [['mall_id'], 'safe']
         ];
     }
 
-    public function getList(){
+    public function tmp(){
         if (!$this->validate()) {
             return $this->returnApiResultData();
         }
@@ -127,5 +126,46 @@ class GoodsListForm extends BaseModel{
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $exception->getMessage());
 
         }
+    }
+
+    /**
+     * @return APICacheDataForm
+     */
+    public function getSourceDataForm(){
+        if(!$this->validate()){
+            return $this->responseErrorInfo();
+        }
+
+        try {
+
+            $store = Store::findOne($this->store_id);
+            if(!$store || $store->is_delete){
+                throw new \Exception("门店不存在");
+            }
+
+            $mch = Mch::findOne($store->mch_id);
+            if(!$mch || $mch->is_delete || $mch->review_status){
+
+            }
+
+            $query = Goods::find()->alias('g');
+            $query->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");
+            $query->andWhere([
+                'g.is_delete' => 0,
+                'g.is_recycle' => 0,
+                'g.status'     => 1,
+                'g.mall_id'    => $this->mall_id,
+                'g.mch_id'     => $this->store_id
+            ]);
+        }catch (\Exception $e){
+            return ['code' => ApiCode::CODE_FAIL, 'msg' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getCacheKey(){
+        return ["store_id" => $this->store_id, "page" => $this->page];
     }
 }

@@ -3,7 +3,7 @@ namespace app\mch\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\helpers\APICacheHelper;
-use app\mch\forms\api\GoodsListForm;
+use app\mch\forms\api\MchGoodsListForm;
 
 class GetMchGoodsController extends ApiController{
 
@@ -13,7 +13,7 @@ class GetMchGoodsController extends ApiController{
      */
     public function actionIndex()
     {
-        $form = new GoodsListForm();
+        $form = new MchGoodsListForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->getList());
     }

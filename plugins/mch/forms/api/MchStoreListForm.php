@@ -27,7 +27,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
         return [
             [['cat_id', 'page'], 'integer'],
             [['keyword'], 'string'],
-            [['effect', 'city_id', 'region_id', 'sort_by', 'distance'], 'safe'],
+            [['effect', 'city_id', 'region_id', 'sort_by', 'distance', 'longitude', 'latitude', 'sort_by'], 'safe'],
         ];
     }
 
@@ -41,6 +41,11 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
      * @return APICacheDataForm
      */
     public function getSourceDataForm(){
+
+        if($this->validate()){
+            return $this->responseErrorInfo();
+        }
+
         $query = $this->getQuery();
         $query->page($pagination, 15, max(1, (int)$this->page));
         $list = $query->asArray()->all();
@@ -106,17 +111,15 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
             ) <= '{$distanceMi}'");
         }elseif($this->region_id){ //按照市所在区搜索
             $cityData = CityHelper::reverseData($this->region_id);
-            $orWhere = ["OR"];
             if(isset($cityData['province']['id'])){
-                $orWhere[] = ["s.province_id" => $cityData['province']['id']];
+                $query->andWhere(["s.province_id" => $cityData['province']['id']]);
             }
             if(isset($cityData['city']['id'])){
-                $orWhere[] = ["s.city_id" => $cityData['city']['id']];
+                $query->andWhere(["s.city_id" => $cityData['city']['id']]);
             }
             if(isset($cityData['district']['id'])){
-                $orWhere[] = ["s.district_id" => $cityData['district']['id']];
+                $query->andWhere(["s.district_id" => $cityData['district']['id']]);
             }
-            $query->andWhere($orWhere);
         }elseif($this->city_id){
             $query->andWhere(["s.city_id" => $this->city_id]);
         }
@@ -142,6 +145,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
             $sortSql = "distance_mi ASC,s.id DESC";
         }
         $query->orderBy($sortSql);
+        echo $query->createCommand()->getRawSql();exit;
         return $query;
     }
 

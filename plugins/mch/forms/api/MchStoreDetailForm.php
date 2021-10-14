@@ -1,7 +1,5 @@
 <?php
-
-
-namespace app\mch\forms\api;
+namespace app\plugins\mch\forms\api;
 
 
 use app\core\ApiCode;
@@ -9,21 +7,21 @@ use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\models\DistrictArr;
+use app\models\Store;
 use app\plugins\mch\models\Mch;
-use app\plugins\mch\models\MchVisitLog;
 
-class GetMchStoreForm extends BaseModel implements ICacheForm {
+class MchStoreDetailForm extends BaseModel implements ICacheForm {
 
-    public $mch_id;
+    public $store_id;
 
     public function rules(){
         return [
-            [['mch_id'], 'required']
+            [['store_id'], 'required']
         ];
     }
 
     public function getCacheKey(){
-        return [(int)$this->mch_id];
+        return [(int)$this->store_id];
     }
 
     public function getSourceDataForm(){
@@ -32,26 +30,26 @@ class GetMchStoreForm extends BaseModel implements ICacheForm {
             return $this->responseErrorInfo();
         }
 
-        $mchId = (int)$this->mch_id;
-
         try {
-            $mchModel = Mch::find()->where([
-                'id'        => $mchId,
-                'mall_id'   => \Yii::$app->mall->id,
-                'is_delete' => 0,
-            ])->one();
-            $mchStoreModel = $mchModel ? $mchModel->store : null;
 
-            if (!$mchModel || !$mchStoreModel) {
-                throw new \Exception('商家店铺不存在');
+            $store = Store::findOne($this->store_id);
+            if(!$store || $store->is_delete){
+                throw new \Exception("门店不存在");
             }
 
-            $categoryModel = $mchModel->category;
-            $category = [
-                'id'      => $categoryModel ? $categoryModel->id : 0,
-                'name'    => $categoryModel ? $categoryModel->name : '',
-                'pic_url' => 'http://'
-            ];
+            $mch = Mch::findOne($store->mch_id);
+            if(!$mch || $mch->is_delete || $mch->review_status == Mch::REVIEW_STATUS_CHECKED){
+                throw new \Exception("商户不存在");
+            }
+
+            $category = $mch->category;
+
+            $detail = [];
+            $detail['id']  = $store->id;
+            $detail['mall_id'] = $store->mall_id;
+            $detail['name'] = $store->name;
+            $detail['category'] = !$category ? [] : ['id' => $category->id, 'name' => $category->name, 'pic_url' => $category->pic_url];
+
 
             $store = [];
             $store['mch_id']         = $mchStoreModel->mch_id;
@@ -85,7 +83,6 @@ class GetMchStoreForm extends BaseModel implements ICacheForm {
             return new APICacheDataForm([
                 "sourceData" => [
                     'code' => ApiCode::CODE_SUCCESS,
-                    'msg' => '请求成功',
                     'data' => [
                         'store'      => $store,
                         'category'   => $category

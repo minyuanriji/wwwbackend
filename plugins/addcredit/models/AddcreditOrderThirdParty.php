@@ -19,7 +19,7 @@ class AddcreditOrderThirdParty extends BaseActiveRecord{
     public function rules(){
         return [
             [['mall_id', 'order_id', 'process_status', 'unique_order_no', 'created_at'], 'required'],
-            [['plateform_request_data', 'plateform_response_data', 'updated_at', 'remark'], 'safe']
+            [['plateform_request_data', 'plateform_response_data', 'updated_at', 'remark', 'next_query_time'], 'safe']
         ];
     }
 

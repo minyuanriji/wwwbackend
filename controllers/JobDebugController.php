@@ -11,11 +11,13 @@ class JobDebugController extends BaseController {
 
     public function actionIndex(){
 
-        $plateModel = AddcreditPlateforms::findOne(2);
+        /*$plateModel = AddcreditPlateforms::findOne(2);
         $orderModel = AddcreditOrder::findOne(2);
 
         $plat = new PlateForm();
-        $plat->submit($orderModel, $plateModel);
+        $result = $plat->query2($orderModel, $plateModel);
+        PRINT_R($result);
+        EXIT;*/
 
 /*        $distribution = new Distribution("1265913", "twWQgEYSoiKU");
         $distribution->requestWithToken(new GetGoodsListForUserChoosed([

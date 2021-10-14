@@ -18,12 +18,12 @@ class PlateForm implements IOrder
      * @param $requestNum
      * @return SubmitResult
      */
-    public function submit(AddcreditOrder $addcreditOrder, AddcreditPlateforms $plateform, $requestNum = 1)
+    public function submit(AddcreditOrder $addcreditOrder, AddcreditPlateforms $plateform, $requestNum)
     {
         if($addcreditOrder->recharge_type == "fast"){ //快充
             $action = new SubmitFastAction($addcreditOrder, $plateform);
         }else{ //慢充
-
+            $action = new SubmitSlowAction($addcreditOrder, $plateform);
         }
         return $action->run();
     }
@@ -33,10 +33,21 @@ class PlateForm implements IOrder
      * @param AddcreditOrder $orderModel
      * @return QueryResult
      */
+    public function query2(AddcreditOrder $orderModel, AddcreditPlateforms $plateform)
+    {
+        return (new QueryAction($orderModel, $plateform))->run();
+    }
+
+    /**
+     * 查询订单
+     * @param AddcreditOrder $orderModel
+     * @return QueryResult
+     */
     public function query(AddcreditOrder $orderModel)
     {
-        // TODO: Implement query() method.
+        return (new QueryAction())->run();
     }
+
 
     /**
      * 账户余额查询

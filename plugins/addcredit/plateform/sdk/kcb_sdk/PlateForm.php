@@ -5,6 +5,7 @@ namespace app\plugins\addcredit\plateform\sdk\kcb_sdk;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\addcredit\plateform\IOrder;
+use app\plugins\addcredit\plateform\result\QueryResult;
 
 class PlateForm implements IOrder
 {
@@ -32,4 +33,14 @@ class PlateForm implements IOrder
         ]))->run();
     }
 
+    /**
+     * 查询订单
+     * @param AddcreditOrder $orderModel
+     * @param AddcreditPlateforms $plateform
+     * @return QueryResult
+     */
+    public function query2(AddcreditOrder $orderModel, AddcreditPlateforms $plateform)
+    {
+        return $this->query($orderModel);
+    }
 }

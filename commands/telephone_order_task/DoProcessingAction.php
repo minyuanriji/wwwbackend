@@ -4,9 +4,8 @@ namespace app\commands\telephone_order_task;
 
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditOrderThirdParty;
+use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\addcredit\plateform\result\QueryResult;
-use app\plugins\addcredit\plateform\sdk\kcb_sdk\Code;
-use app\plugins\addcredit\plateform\sdk\kcb_sdk\PlateForm as kcb_PlateForm;
 use yii\base\Action;
 
 class DoProcessingAction extends Action{
@@ -16,7 +15,11 @@ class DoProcessingAction extends Action{
         while (true){
             try {
                 $models = AddcreditOrderThirdParty::find()->where(["process_status" => 'processing'])
-                            ->andWhere("created_at < '".time()."'")
+                            ->andWhere([
+                                "AND",
+                                "created_at < '".time()."'",
+                                "next_query_time < '".time()."'"
+                            ])
                             ->orderBy("updated_at ASC")->limit(10)->all();
                 if($models){
                     $ids = [];
@@ -24,7 +27,8 @@ class DoProcessingAction extends Action{
                         $ids[] = $model->id;
                     }
                     AddcreditOrderThirdParty::updateAll([
-                        "updated_at" => time()
+                        "updated_at" => time(),
+                        "next_query_time" => (time() + 300)
                     ], "id IN(".implode(",", $ids).")");
                     foreach($models as $model){
                         $this->process($model);
@@ -51,51 +55,37 @@ class DoProcessingAction extends Action{
                 throw new \Exception("话费充值订单不存在");
             }
 
-            //先假设充值是成功的
-            $model->process_status = "success";
-            if(!$model->save()){
-                throw new \Exception(json_encode($model->getErrors()));
+            $platModel = AddcreditPlateforms::findOne($order->plateform_id);
+            if (!$platModel) {
+                throw new \Exception("无法获取平台信息");
             }
 
             //查询平台状态
             $order->order_no = $model->unique_order_no;
-            $plateForm = new kcb_PlateForm();
-            $res = $plateForm->query($order);
-            if(!$res) {
-                throw new \Exception('未知错误！');
+            $className = $platModel->class_dir;
+            if(!class_exists($className)){
+                throw new \Exception("充值类{$className}文件不存在");
             }
+            $platClass = new $className();
+            $res = $platClass->query2($order, $platModel);
 
             //保存请求数据、返回数据
             $model->plateform_request_data  = $res->request_data;
             $model->plateform_response_data = $res->response_content;
+            if(!$model->save()){
+                throw new \Exception(json_encode($model->getErrors()));
+            }
 
             //查询失败处理
             if ($res->code != QueryResult::CODE_SUCC) {
                 throw new \Exception($res->message);
             }
 
-            //判断是否充值成功
-            $content = json_decode($res->response_content,true);
-            $isRecharging = $isSuccess = false;
-            if(isset($content['errmsg']) && $content['errmsg'] == "ok"){
-                if(isset($content['data']) && !empty($content['data'])){
-                    $isRecharging = $content['data'][0]['state'] == Code::QUERY_RECHARGING;
-                    $isSuccess = $content['data'][0]['state'] == Code::QUERY_SUCCESS;
-                }
-            }
-
-            if($isRecharging){ //还在充值中
-                $t->rollBack();
-                return;
-            }
-
-            if(!$isSuccess){ //充值失败
-                throw new \Exception(isset($content['errmsg']) ? $content['errmsg'] : json_encode($content));
-            }
-
-            //保存结果
-            if(!$model->save()){
-                throw new \Exception(json_encode($model->getErrors()));
+            if($res->status == "success"){ //充值成功
+                $model->process_status = "success";
+                $model->save();
+            }elseif($res->status == "fail"){ //充值失败
+                throw new \Exception($res->message);
             }
 
             $this->controller->commandOut("话费充值任务[ID:{$model->id}]处理完成");

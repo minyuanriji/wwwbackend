@@ -30,7 +30,7 @@ class RechargeRecordForm extends BaseModel
         try {
             $query = AddcreditOrder::find();
             $query->andWhere([
-                'plateform_id' => $this->plateforms_id,
+                //'plateform_id' => $this->plateforms_id,
                 'user_id'    => \Yii::$app->user->id,
                 'mall_id'    => \Yii::$app->mall->id
             ])
@@ -64,65 +64,28 @@ class RechargeRecordForm extends BaseModel
 
     public function rechargeMoneyList ($plateforms_id)
     {
-        $plateforms = AddcreditPlateforms::findOne($plateforms_id);
+        $plateforms = AddcreditPlateforms::find()->where(["is_enabled" => 1])->orderBy("id DESC")->one();
         if (!$plateforms) {
-            throw new \Exception('平台不存在！',ApiCode::CODE_FAIL);
+            throw new \Exception('平台信息不存在！',ApiCode::CODE_FAIL);
         }
-        return [
-            'FastCharging' => [
-                /*[
-                    'redbag_num' => 10 + 10 * $plateforms->ratio / 100,
-                    'price' => 10,
-                    'product_id' => 10,
-                ],
-                [
-                    'redbag_num' => 20 + 20 * $plateforms->ratio / 100,
-                    'price' => 20,
-                    'product_id' => 28,
-                ],*/
-                [
-                    'redbag_num' => 30 + 30 * $plateforms->ratio / 100,
-                    'price' => 30,
-                    'product_id' => 123,
-                ],
-                [
-                    'redbag_num' => 50 + 50 * $plateforms->ratio / 100,
-                    'price' => 50,
-                    'product_id' => 124,
-                ],
-                [
-                    'redbag_num' => 100 + 100 * $plateforms->ratio / 100,
-                    'price' => 100,
-                    'product_id' => 125,
-                ],
-                [
-                    'redbag_num' => 200 + 200 * $plateforms->ratio / 100,
-                    'price' => 200,
-                    'product_id' => 126,
-                ],
-            ],
-            'SlowCharge' => [
-                [
-                    'redbag_num' => 30 + 30 * $plateforms->ratio / 100,
-                    'price' => 30,
-                    'product_id' => 86,
-                ],
-                [
-                    'redbag_num' => 50 + 50 * $plateforms->ratio / 100,
-                    'price' => 50,
-                    'product_id' => 83,
-                ],
-                [
-                    'redbag_num' => 100 + 100 * $plateforms->ratio / 100,
-                    'price' => 100,
-                    'product_id' => 84,
-                ],
-                [
-                    'redbag_num' => 200 + 200 * $plateforms->ratio / 100,
-                    'price' => 200,
-                    'product_id' => 85,
-                ],
-            ],
-        ];
+
+        $products = @json_decode($plateforms->product_json_data, true);
+        $groupDatas = ['FastCharging' => [], 'SlowCharge' => []];
+        if($products){
+            foreach($products as $item){
+                if($item['type'] == "fast"){
+                    $groupDatas['FastCharging'][] = array_merge($item, [
+                        'redbag_num'   => $item['price'] + $item['price'] * $plateforms->ratio / 100,
+                        'plateform_id' => $plateforms->id
+                    ]);
+                }else{
+                    $groupDatas['SlowCharge'][] = array_merge($item, [
+                        'redbag_num'   => $item['price'] + $item['price'] * $plateforms->ratio / 100,
+                        'plateform_id' => $plateforms->id
+                    ]);
+                }
+            }
+        }
+        return $groupDatas;
     }
 }

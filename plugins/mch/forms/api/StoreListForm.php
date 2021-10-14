@@ -15,6 +15,7 @@ class StoreListForm extends BaseModel implements ICacheForm {
     public $page;
     public $cat_id;
     public $keyword;
+    public $city_id;
     public $region_id;
     public $longitude;
     public $latitude;
@@ -25,7 +26,7 @@ class StoreListForm extends BaseModel implements ICacheForm {
         return [
             [['cat_id', 'page'], 'integer'],
             [['keyword'], 'string'],
-            [['effect', 'region_id', 'sort_by', 'distance'], 'safe'],
+            [['effect', 'city_id', 'region_id', 'sort_by', 'distance'], 'safe'],
         ];
     }
 
@@ -67,7 +68,10 @@ class StoreListForm extends BaseModel implements ICacheForm {
         ]);
     }
 
-
+    /**
+     * 生成查询对象
+     * @return \app\models\BaseActiveQuery
+     */
     public function getQuery(){
 
         $query = Store::find()->alias("s");
@@ -85,12 +89,16 @@ class StoreListForm extends BaseModel implements ICacheForm {
             $query->andWhere(["m.mch_common_cat_id" => $this->cat_id]);
         }
 
+        if($this->keyword){
+            $query->andWhere(["LIKE", "s.name", $this->keyword]);
+        }
+
         if($this->distance && $this->longitude && $this->latitude){ //距离范围
             $distanceMi = intval($this->distance) * 1000;
             $query->andWhere("ST_Distance_sphere (
-                                        point (longitude, latitude),
-                                        point ({$this->longitude}, {$this->latitude})
-                                    ) <= '{$distanceMi}'");
+                point (longitude, latitude),
+                point ({$this->longitude}, {$this->latitude})
+            ) <= '{$distanceMi}'");
         }elseif($this->region_id){ //按照市所在区搜索
             $cityData = CityHelper::reverseData($this->region_id);
             $orWhere = ["OR"];
@@ -104,6 +112,8 @@ class StoreListForm extends BaseModel implements ICacheForm {
                 $orWhere[] = ["s.district_id" => $cityData['district']['id']];
             }
             $query->andWhere($orWhere);
+        }elseif($this->city_id){
+            $query->andWhere(["s.city_id" => $this->city_id]);
         }
 
         $selects = ["s.id", "s.mall_id", "s.cover_url", "s.name", "s.mobile", "s.address", "s.province_id", "s.city_id", "s.district_id",
@@ -112,7 +122,6 @@ class StoreListForm extends BaseModel implements ICacheForm {
 
         if($this->longitude && $this->latitude){
             $selects[] = "ST_Distance_sphere(point(longitude, latitude), point(".$this->longitude.", ".$this->latitude.")) as distance_mi";
-
         }else{
             $selects[] = "-1 as distance_mi";
         }
@@ -128,7 +137,6 @@ class StoreListForm extends BaseModel implements ICacheForm {
             $sortSql = "distance_mi ASC,s.id DESC";
         }
         $query->orderBy($sortSql);
-
         return $query;
     }
 

@@ -48,28 +48,30 @@
                 </el-form-item>
 
                 <el-form-item label="轮播图">
-                    <div class="banner-edit-item" v-for="(banner,index) in data.banners">
-                        <div class="banner-edit-options">
-                            <el-button @click="bannerItemDelete(index)" type="primary" icon="el-icon-delete"
-                                       style="top: -6px;right: -31px;"></el-button>
-                        </div>
-                        <div flex="box:first">
-                            <div>
-                                <com-image-upload width="750" :height="data.height" v-model="banner.picUrl"
-                                                  style="margin-right: 5px;"></com-image-upload>
+                    <draggable v-model="data.banners">
+                        <div class="banner-edit-item" v-for="(banner,index) in data.banners">
+                            <div class="banner-edit-options">
+                                <el-button @click="bannerItemDelete(index)" type="primary" icon="el-icon-delete"
+                                           style="top: -6px;right: -31px;"></el-button>
                             </div>
-                            <div class="chooseLink">
-                                <div @click="pickLinkClick(index)">
-                                    <el-input v-model="banner.url" placeholder="点击选择链接" readonly
-                                              size="small">
-                                        <com-pick-link slot="append" @selected="linkSelected">
-                                            <el-button size="small">选择链接</el-button>
-                                        </com-pick-link>
-                                    </el-input>
+                            <div flex="box:first">
+                                <div>
+                                    <com-image-upload width="750" :height="data.height" v-model="banner.picUrl"
+                                                      style="margin-right: 5px;"></com-image-upload>
+                                </div>
+                                <div class="chooseLink">
+                                    <div @click="pickLinkClick(index)">
+                                        <el-input v-model="banner.url" placeholder="点击选择链接" readonly
+                                                  size="small">
+                                            <com-pick-link slot="append" @selected="linkSelected">
+                                                <el-button size="small">选择链接</el-button>
+                                            </com-pick-link>
+                                        </el-input>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </draggable>
                     <el-button size="small" @click="addBanner">添加轮播图</el-button>
                 </el-form-item>
             </el-form>
@@ -93,6 +95,7 @@
         </el-dialog>
     </div>
 </template>
+<script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.3/Sortable.min.js"></script>
 <script>
     Vue.component('diy-banner', {
         template: '#diy-banner',

@@ -10,6 +10,7 @@ use app\plugins\mch\forms\api\MchManageForm;
 use app\plugins\mch\forms\api\MchPassportForm;
 use app\plugins\mch\forms\api\MchQrCodeLoginForm;
 use app\plugins\mch\forms\api\PosterForm;
+use app\plugins\mch\forms\api\MchGetCityLowerForm;
 use app\plugins\mch\forms\api\UpdatePasswordForm;
 use app\plugins\mch\forms\api\VisitLogEditForm;
 
@@ -163,5 +164,13 @@ class MchController extends ApiController
         $form = new MchForm();
         $form->attributes = \Yii::$app->request->get();
         return $this->asJson($form->getMchSetting());
+    }
+
+    //获取市下级地区列表
+    public function actionGetCityLower()
+    {
+        $form = new MchGetCityLowerForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->getRegion());
     }
 }

@@ -203,4 +203,24 @@ class CityHelper{
         return ['city_id' => $newCityId, 'district' => array_values($data), 'level' => $level];
     }
 
+    /**
+     * 通过ID获取下级
+     * @param $id
+     */
+    public static function getLower($id)
+    {
+        if (empty($id))
+            return false;
+
+        $result = [];
+        $arrs = DistrictData::getArr();
+        foreach($arrs as $arr){
+            if($arr['parent_id'] == $id){
+                $result[] = $arr;
+            }
+        }
+
+        return ['list' => array_values($result)];
+    }
+
 }

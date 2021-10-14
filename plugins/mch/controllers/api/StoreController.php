@@ -1,22 +1,21 @@
 <?php
-namespace app\mch\controllers\api;
+namespace app\plugins\mch\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\core\ApiCode;
 use app\helpers\APICacheHelper;
-use app\mch\forms\api\GetMchsForm;
+use app\plugins\mch\forms\api\StoreListForm;
 
-class GetMchsController extends ApiController {
+class StoreController extends ApiController {
 
     /**
      * 获取商户
      * @return \yii\web\Response
      */
-    public function actionIndex(){
+    public function actionList(){
 
-        $form = new GetMchsForm();
+        $form = new StoreListForm();
         $form->attributes = $this->requestData;
-        $form->city_id    = \Yii::$app->request->headers->get("x-city-id");
         $form->longitude  = ApiController::$commonData['city_data']['longitude'];
         $form->latitude   = ApiController::$commonData['city_data']['latitude'];
         $form->is_login   = !\Yii::$app->user->isGuest;

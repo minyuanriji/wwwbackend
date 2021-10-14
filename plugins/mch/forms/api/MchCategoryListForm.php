@@ -1,5 +1,5 @@
 <?php
-namespace app\mch\forms\api;
+namespace app\plugins\mch\forms\api;
 
 
 use app\core\ApiCode;
@@ -8,7 +8,7 @@ use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\plugins\mch\models\MchCommonCat;
 
-class CommonCatForm extends BaseModel implements ICacheForm {
+class MchCategoryListForm extends BaseModel implements ICacheForm {
 
     public function getCacheKey() {
         return [];

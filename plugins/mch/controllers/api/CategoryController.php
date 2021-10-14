@@ -1,16 +1,17 @@
 <?php
-namespace app\mch\controllers\api;
+namespace app\plugins\mch\controllers\api;
 
 
 use app\controllers\api\ApiController;
 use app\core\ApiCode;
 use app\helpers\APICacheHelper;
-use app\mch\forms\api\CommonCatForm;
+use app\plugins\mch\forms\api\MchCategoryListForm;
 
-class GetMchsCatsController extends ApiController {
+class CategoryController extends ApiController {
 
-    public function actionIndex(){
-        $form = new CommonCatForm();
+    public function actionList(){
+        $form = new MchCategoryListForm();
+
         $form->attributes = \Yii::$app->request->get();
         $form->is_login   = !\Yii::$app->user->isGuest;
         $form->login_uid  = $form->is_login ? \Yii::$app->user->id : 0;

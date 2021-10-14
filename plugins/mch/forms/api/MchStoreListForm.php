@@ -145,7 +145,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
             $sortSql = "distance_mi ASC,s.id DESC";
         }
         $query->orderBy($sortSql);
-        echo $query->createCommand()->getRawSql();exit;
+       
         return $query;
     }
 

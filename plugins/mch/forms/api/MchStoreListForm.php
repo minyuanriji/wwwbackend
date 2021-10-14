@@ -2,6 +2,7 @@
 namespace app\plugins\mch\forms\api;
 
 
+use app\core\ApiCode;
 use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
 use app\helpers\CityHelper;
@@ -10,7 +11,7 @@ use app\models\Store;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCommonCat;
 
-class StoreListForm extends BaseModel implements ICacheForm {
+class MchStoreListForm extends BaseModel implements ICacheForm {
 
     public $page;
     public $cat_id;
@@ -62,8 +63,11 @@ class StoreListForm extends BaseModel implements ICacheForm {
 
         return new APICacheDataForm([
             "sourceData" => [
-                'list'       => $list,
-                'pagination' => $pagination
+                'code' => ApiCode::CODE_SUCCESS,
+                'data' => [
+                    'list'       => $list,
+                    'pagination' => $pagination
+                ]
             ]
         ]);
     }

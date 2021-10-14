@@ -26,8 +26,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
     public function rules(){
         return [
             [['cat_id', 'page'], 'integer'],
-            [['keyword'], 'string'],
-            [['effect', 'city_id', 'region_id', 'sort_by', 'distance', 'longitude', 'latitude', 'sort_by'], 'safe'],
+            [['keyword', 'city_id', 'region_id', 'sort_by', 'distance', 'longitude', 'latitude', 'sort_by'], 'safe'],
         ];
     }
 
@@ -42,40 +41,44 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
      */
     public function getSourceDataForm(){
 
-        if($this->validate()){
+        if(!$this->validate()){
             return $this->responseErrorInfo();
         }
 
-        $query = $this->getQuery();
-        $query->page($pagination, 15, max(1, (int)$this->page));
-        $list = $query->asArray()->all();
-        if($list){
-            foreach($list as &$item){
-                if($item['distance_mi'] < 0){
-                    $item['distance_mi'] = "距离未知";
-                }elseif($item['distance_mi'] < 1000){
-                    $item['distance_format'] = intval($item['distance_mi']) . "m";
-                }else if($item['distance_mi'] >= 1000){
-                    $item['distance_format'] = round(($item['distance_mi']/1000), 1) . "km";
+        try {
+            $query = $this->getQuery();
+            $query->page($pagination, 15, max(1, (int)$this->page));
+            $list = $query->asArray()->all();
+            if($list){
+                foreach($list as &$item){
+                    if($item['distance_mi'] < 0){
+                        $item['distance_mi'] = "距离未知";
+                    }elseif($item['distance_mi'] < 1000){
+                        $item['distance_format'] = intval($item['distance_mi']) . "m";
+                    }else if($item['distance_mi'] >= 1000){
+                        $item['distance_format'] = round(($item['distance_mi']/1000), 1) . "km";
+                    }
+                    $cityData = CityHelper::reverseData($item['district_id'], $item['city_id'], $item['province_id']);
+                    $item['province']    = isset($cityData['province']['name']) ? $cityData['province']['name'] : "";
+                    $item['city']        = isset($cityData['city']['name']) ? $cityData['city']['name'] : "";
+                    $item['district']    = isset($cityData['district']['name']) ? $cityData['district']['name'] : "";
+                    $item['region_name'] = $item['district'] ? $item['district'] : ($item['city'] ? $item['city'] : $item['province']);
+                    $item['remark']      = "付100送100购物券";
                 }
-                $cityData = CityHelper::reverseData($item['district_id'], $item['city_id'], $item['province_id']);
-                $item['province']    = isset($cityData['province']['name']) ? $cityData['province']['name'] : "";
-                $item['city']        = isset($cityData['city']['name']) ? $cityData['city']['name'] : "";
-                $item['district']    = isset($cityData['district']['name']) ? $cityData['district']['name'] : "";
-                $item['region_name'] = $item['district'] ? $item['district'] : ($item['city'] ? $item['city'] : $item['province']);
-                $item['remark']      = "付100送100购物券";
             }
-        }
 
-        return new APICacheDataForm([
-            "sourceData" => [
-                'code' => ApiCode::CODE_SUCCESS,
-                'data' => [
-                    'list'       => $list,
-                    'pagination' => $pagination
+            return new APICacheDataForm([
+                "sourceData" => [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'data' => [
+                        'list'       => $list,
+                        'pagination' => $pagination
+                    ]
                 ]
-            ]
-        ]);
+            ]);
+        }catch (\Exception $e){
+            return ['code' => ApiCode::CODE_FAIL, 'msg' => $e->getMessage()];
+        }
     }
 
     /**
@@ -145,7 +148,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
             $sortSql = "distance_mi ASC,s.id DESC";
         }
         $query->orderBy($sortSql);
-       
+
         return $query;
     }
 

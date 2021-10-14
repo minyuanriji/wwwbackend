@@ -121,7 +121,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
         }
 
         $selects = ["s.id", "s.mall_id", "s.cover_url", "s.name", "s.mobile", "s.address", "s.province_id", "s.city_id", "s.district_id",
-            "s.longitude", "s.latitude", "s.score", "m.mch_common_cat_id", "c.name"
+            "s.longitude", "s.latitude", "s.score", "m.mch_common_cat_id", "c.name as cat_name"
         ];
 
         if($this->longitude && $this->latitude){

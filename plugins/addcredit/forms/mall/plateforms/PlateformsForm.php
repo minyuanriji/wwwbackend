@@ -8,23 +8,28 @@ use app\models\BaseModel;
 use app\models\GoodsService;
 use app\models\User;
 use app\plugins\addcredit\models\AddcreditPlateforms;
+use function Webmozart\Assert\Tests\StaticAnalysis\float;
 
 class PlateformsForm extends BaseModel
 {
 
     public $id;
+    public $product_id;
     public $page;
     public $is_default;
     public $keyword;
     public $mch_id;
+    public $product_price;
+    public $product_type;
 
 
     public function rules()
     {
         return [
-            [['id', 'is_default', 'mch_id'], 'integer'],
+            [['id', 'is_default', 'mch_id', 'product_id', 'product_type'], 'integer'],
             [['page'], 'default', 'value' => 1],
             [['keyword'], 'string'],
+            [['product_price'], 'number'],
         ];
     }
 
@@ -82,6 +87,7 @@ class PlateformsForm extends BaseModel
             $detail['secret_key'] = isset($json_param['secret_key']) ? $json_param['secret_key'] : "";
             $user = User::findOne($detail['parent_id']);
             $detail['parent_name'] = $user ? $user->nickname : "";
+            $detail['product_json_data'] = json_decode($detail['product_json_data'], true);
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
@@ -94,6 +100,7 @@ class PlateformsForm extends BaseModel
         ];
     }
 
+    //弃用
     public function delete()
     {
         $services = GoodsService::find()->where([
@@ -133,6 +140,98 @@ class PlateformsForm extends BaseModel
                     'line' => $e->getLine()
                 ]
             ];
+        }
+    }
+
+    public function isEnable()
+    {
+        if (!$this->validate()) {
+            return $this->responseErrorInfo();
+        }
+
+        $transaction = \Yii::$app->db->beginTransaction();
+        try {
+            $plateforms = AddcreditPlateforms::findOne($this->id);
+
+            if (!$plateforms)
+                throw new \Exception('数据异常,该条数据不存在');
+
+            $plateforms::updateAll(['is_enabled' => 0], ['is_enabled' => 1]);
+
+            $plateforms->is_enabled = 1;
+            $plateforms->save();
+
+            $transaction->commit();
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '启用成功');
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage(),['error' => ['line' => $e->getLine()]]);
+        }
+    }
+
+    public function delProduct()
+    {
+        if (!$this->validate()) {
+            return $this->responseErrorInfo();
+        }
+
+        try {
+            $plateforms = AddcreditPlateforms::findOne($this->id);
+
+            if (!$plateforms)
+                throw new \Exception('数据异常,该条数据不存在');
+
+            $product = json_decode($plateforms->product_json_data, true);
+            foreach ($product as $key => $item) {
+                if ($item['product_id'] == $this->product_id) {
+                    unset($product[$key]);
+                }
+            }
+
+            $plateforms->product_json_data = json_encode(array_values($product));
+            if (!$plateforms->save())
+               throw new \Exception($plateforms->getErrorMessage());
+
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '删除成功');
+        } catch (\Exception $e) {
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage(),['error' => ['line' => $e->getLine()]]);
+        }
+    }
+
+    public function addProduct()
+    {
+        if (!$this->validate()) {
+            return $this->responseErrorInfo();
+        }
+
+        try {
+            $plateforms = AddcreditPlateforms::findOne($this->id);
+
+            if (!$plateforms)
+                throw new \Exception('数据异常,该条数据不存在');
+
+            $product = $plateforms->product_json_data;
+            if ($product) {
+                $product = json_decode($product, true);
+            }
+            $addProduct = [
+                "product_id" => $this->product_id,
+                "price" => $this->product_price,
+                "type" => ($this->product_type == 1) ? 'fast' : 'slow',
+            ];
+            if ($product) {
+                array_push($product,  $addProduct);
+            } else {
+                $product = [$addProduct];
+            }
+
+            $plateforms->product_json_data = json_encode($product);
+            if (!$plateforms->save())
+                throw new \Exception($plateforms->getErrorMessage());
+
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '添加成功');
+        } catch (\Exception $e) {
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage(),['error' => ['line' => $e->getLine()]]);
         }
     }
 }

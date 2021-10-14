@@ -17,11 +17,12 @@ class PlateformsEditForm extends BaseModel
     public $secret_key;
     public $parent_id;
     public $transfer_rate;
+    public $class_dir;
 
     public function rules()
     {
         return [
-            [['name', 'sdk_dir', 'ratio', 'cyd_id', 'secret_key','parent_id', 'transfer_rate'], 'required'],
+            [['name', 'sdk_dir', 'ratio', 'cyd_id', 'secret_key','parent_id', 'class_dir', 'transfer_rate'], 'required'],
             [['ratio', 'id', 'parent_id','transfer_rate'], 'integer'],
             [['name', 'sdk_dir', 'secret_key'], 'string'],
         ];
@@ -48,6 +49,7 @@ class PlateformsEditForm extends BaseModel
             $plateforms->ratio = $this->ratio;
             $plateforms->parent_id = $this->parent_id;
             $plateforms->transfer_rate = $this->transfer_rate;
+            $plateforms->class_dir = $this->class_dir;
             $plateforms->json_param = json_encode(['id' => $this->cyd_id, 'secret_key' => $this->secret_key]);
             if (!$plateforms->save()) {
                 throw new \Exception('保存失败');

@@ -53,7 +53,7 @@ class PlateformsController extends Controller
     }
 
     /**
-     * @Note:删除平台
+     * @Note:删除平台---弃用
      * @return \yii\web\Response
      */
     public function actionDelete()
@@ -63,6 +63,39 @@ class PlateformsController extends Controller
         $res = $form->delete();
 
         return $this->asJson($res);
+    }
+
+    /**
+     * @Note:启用或关闭平台
+     * @return \yii\web\Response
+     */
+    public function actionIsEnable()
+    {
+        $form = new PlateformsForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->isEnable());
+    }
+
+    /**
+     * @Note:删除平台产品
+     * @return \yii\web\Response
+     */
+    public function actionDelProduct()
+    {
+        $form = new PlateformsForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->delProduct());
+    }
+
+    /**
+     * @Note:添加平台产品
+     * @return \yii\web\Response
+     */
+    public function actionAddProduct()
+    {
+        $form = new PlateformsForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->addProduct());
     }
 
 }

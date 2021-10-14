@@ -3,9 +3,9 @@
 namespace app\plugins\mch\controllers\api;
 
 use app\plugins\mch\forms\api\MchGetCityLowerForm;
-use app\plugins\Controller;
+use app\controllers\api\ApiController;
 
-class MchRegionController extends Controller
+class MchRegionController extends ApiController
 {
     //获取市下级地区列表
     public function actionGetCityLower()

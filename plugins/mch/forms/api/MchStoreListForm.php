@@ -58,6 +58,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
                 $item['city']        = isset($cityData['city']['name']) ? $cityData['city']['name'] : "";
                 $item['district']    = isset($cityData['district']['name']) ? $cityData['district']['name'] : "";
                 $item['region_name'] = $item['district'] ? $item['district'] : ($item['city'] ? $item['city'] : $item['province']);
+                $item['remark']      = "付100送100购物券";
             }
         }
 

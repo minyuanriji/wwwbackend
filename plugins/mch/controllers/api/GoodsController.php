@@ -20,7 +20,6 @@ class GoodsController extends ApiController {
         $form->attributes = $this->requestData;
         $form->is_login   = !\Yii::$app->user->isGuest;
         $form->login_uid  = $form->is_login ? \Yii::$app->user->id : 0;
-        $form->mall_id    = \Yii::$app->mall->id;
 
         $res = APICacheHelper::get($form);
 

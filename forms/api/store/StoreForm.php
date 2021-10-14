@@ -355,10 +355,10 @@ class StoreForm extends BaseModel
                         "remark" => isset($data['remark']) ? $data['remark'] : '审核不通过',
                     ]);
                 } elseif($data['status'] == MchApply::STATUS_PASSED) { //审核通过
-                    if ($special_rate > 8.5)
+                    if ($special_rate > 9)
                         return [
                             'code'  => ApiCode::CODE_FAIL,
-                            'msg'   => '折扣不能大于8.5折'
+                            'msg'   => '折扣不能大于9折'
                         ];
 
                     $apply_data['settle_discount'] = $special_rate;

@@ -157,7 +157,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column
-                        label="用户" width="200">
+                        label="用户" width="300">
                     <template slot-scope="scope">
                         <div flex="dir:left cross:center" v-if="scope.row.user">
                             <com-image width="25" height="25" :src="scope.row.user.avatar"></com-image>
@@ -168,7 +168,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column
-                        label="联系人" width="200">
+                        label="联系人" width="300">
                     <template slot-scope="scope">
                         <div>
                             <com-ellipsis style="margin-left: 10px;" :line="1">{{scope.row.realname}}
@@ -181,7 +181,7 @@
                 <el-table-column
                         label="排序"
                         prop="sort"
-                        width="300">
+                        width="100">
                     <template slot-scope="scope">
                         <div v-if="id != scope.row.id">
                             <el-tooltip class="item" effect="dark" content="排序" placement="top">
@@ -203,6 +203,11 @@
                             </el-button>
                         </div>
                     </template>
+                </el-table-column>
+                <el-table-column
+                        label="服务费"
+                        prop="transfer_rate"
+                        width="100">
                 </el-table-column>
                 <el-table-column
                         label="入驻时间"

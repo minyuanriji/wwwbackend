@@ -80,42 +80,44 @@
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
-            <el-table
-                    v-loading="listLoading"
-                    :data="list"
-                    border
-                    style="width: 100%">
-                <el-table-column
-                        prop="id"
-                        label="ID"
-                        width="100">
-                </el-table-column>
+            <el-table ref="multipleTable" v-loading="listLoading" :data="list" border style="width: 100%" @selection-change="handleSelectionChange">
+
+                <el-table-column align='center' type="selection" width="60"></el-table-column>
+
+                <el-table-column prop="id" label="ID" width="100"></el-table-column>
+
                 <el-table-column label="平台名称" width="350px">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">{{scope.row.name}}</com-ellipsis>
                     </template>
                 </el-table-column>
+
                 <el-table-column label="SDK目录">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">{{scope.row.sdk_dir}}</com-ellipsis>
                     </template>
                 </el-table-column>
+
                 <el-table-column label="收费比例">
                     <template slot-scope="scope">
                         <com-ellipsis :line="1">{{scope.row.ratio}}%</com-ellipsis>
                     </template>
                 </el-table-column>
-                <el-table-column
-                        prop="created_at"
-                        width="220"
-                        label="添加日期">
+
+                <el-table-column label="状态">
+                    <template slot-scope="scope">
+                        <com-ellipsis v-if="scope.row.is_enabled == 1" style="color: #13ce66">使用中</com-ellipsis>
+                        <com-ellipsis v-else style="color: red">关闭中</com-ellipsis>
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="created_at" width="220" label="添加日期">
                     <template slot-scope="scope">
                         <div>{{scope.row.created_at}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column
-                        label="操作"
-                        width="220">
+
+                <el-table-column label="操作" width="220">
                     <template slot-scope="scope">
                         <el-button @click="edit(scope.row.id)" type="text" circle size="mini">
                             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -131,17 +133,17 @@
                 </el-table-column>
             </el-table>
 
-            <div flex="box:last cross:center" style="margin-top: 20px;">
-                <div></div>
-                <div>
-                    <el-pagination
-                            v-if="pageCount > 0"
-                            @current-change="pagination"
-                            background
-                            layout="prev, pager, next"
-                            :page-count="pageCount">
-                    </el-pagination>
+            <div style="display: flex;justify-content: space-between;margin-top:20px;">
+                <div style="margin: 7.5px 0;" v-if="selections.length > 0">
+                    <el-button @click="isEnable" type="primary">启用</el-button>
                 </div>
+                <el-pagination
+                        v-if="pageCount > 0"
+                        @current-change="pagination"
+                        background
+                        layout="prev, pager, next"
+                        :page-count="pageCount">
+                </el-pagination>
             </div>
         </div>
     </el-card>
@@ -158,6 +160,7 @@
                 pageCount: 0,
                 sort: 0,
                 id: null,
+                selections:[],
             };
         },
         methods: {
@@ -168,6 +171,39 @@
 
             quit() {
                 this.id = null;
+            },
+
+            handleSelectionChange(selection) {
+                this.selections = selection;
+                if (this.selections.length >= 2) {
+                    alert('只能选择一个');
+                    this.$refs.multipleTable.clearSelection();
+                }
+            },
+
+            isEnable() {
+                let self = this;
+                request({
+                    params: {
+                        r: 'plugin/addcredit/mall/plateforms/plateforms/is-enable'
+                    },
+                    method: 'post',
+                    data: {
+                        id: this.selections[0].id,
+                    },
+                }).then(e => {
+                    self.btnLoading = false;
+                    if (e.data.code == 0) {
+                        self.$message.success(e.data.msg);
+                        self.page = 1;
+                        self.getList();
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.$message.error(e.data.msg);
+                    self.btnLoading = false;
+                });
             },
 
             change(row) {

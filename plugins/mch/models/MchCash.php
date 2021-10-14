@@ -58,9 +58,9 @@ class MchCash extends BaseActiveRecord
             [['mall_id', 'mch_id', 'status', 'virtual_type', 'is_delete', 'transfer_status', 'retry_count'], 'integer'],
             [['money', 'fact_price'], 'number'],
             [['type', 'content'], 'string'],
-            [['created_at', 'updated_at', 'deleted_at', 'service_fee_rate', 'fact_price'], 'safe'],
+            [['created_at', 'updated_at', 'deleted_at', 'service_fee_rate', 'fact_price', 'type_data'], 'safe'],
             [['service_fee_rate'], 'number', 'min' => 0, 'max' => 100],
-            [['order_no', 'type_data'], 'string', 'max' => 255],
+            [['order_no'], 'string', 'max' => 255],
         ];
     }
 

@@ -5,6 +5,8 @@ namespace app\plugins\alibaba\controllers\mall;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionOrderListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionOrderRefundListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionAfterApplyForm;
+use app\plugins\alibaba\forms\mall\AlibabaDistributionSalePaymentForm;
+use app\plugins\alibaba\forms\mall\AlibabaDistributionPaymentInfoForm;
 use app\plugins\Controller;
 
 class OrderController extends Controller
@@ -48,5 +50,27 @@ class OrderController extends Controller
         $form = new AlibabaDistributionAfterApplyForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->save());
+    }
+
+    /**
+     * 售后订单打款
+     * @return string|\yii\web\Response
+     */
+    public function actionSalePayment()
+    {
+        $form = new AlibabaDistributionSalePaymentForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
+    }
+
+    /**
+     * 打款操作展示详情
+     * @return string|\yii\web\Response
+     */
+    public function actionPaymentInfo()
+    {
+        $form = new AlibabaDistributionPaymentInfoForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->getInfo());
     }
 }

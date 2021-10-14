@@ -66,7 +66,7 @@ class IdentityController extends ApiController
     }
 
     /**
-     * 授权登录2
+     * 微信公众号授权（使用中--------------------------------------------------------------------）
      * @Author: zal
      * @Date: 2020-04-27
      * @Time: 10:33
@@ -160,7 +160,7 @@ class IdentityController extends ApiController
     }
 
     /**
-     * 绑定
+     * 微信公众号授权完成绑定手机号（-------------------------------------------------------）
      * @return array
      * @throws \Exception
      */

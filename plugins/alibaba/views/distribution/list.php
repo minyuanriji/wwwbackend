@@ -80,6 +80,18 @@ Yii::$app->loadComponentView('com-rich-text');
                         {{scope.row.ali_data_json.channelPrice}}
                     </template>
                 </el-table-column>
+                <el-table-column width="90" label="是否每日推荐">
+                    <template slot-scope="scope">
+                        <el-switch
+                                :active-value="'1'"
+                                :inactive-value="'0'"
+                                @change="switchRecommendStatus(scope.row.id)"
+                                v-model="scope.row.is_recommend"
+                                active-color="#13ce66"
+                                inactive-color="#ff4949">
+                        </el-switch>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="scope" width="150" label="添加时间">
                     <template slot-scope="scope">
                         {{scope.row.created_at|dateTimeFormat('Y-m-d')}}
@@ -382,7 +394,6 @@ Yii::$app->loadComponentView('com-rich-text');
 
         </el-dialog>
 
-
         <el-dialog title="编辑商品" :visible.sync="editGoods.dialogVisible" :close-on-click-modal="false">
             <el-form :rules="editGoods.rules" ref="editGoodsFormData" label-width="20%" :model="editGoods.formData" size="small">
                 <el-form-item label="标题" prop="name">
@@ -483,6 +494,28 @@ Yii::$app->loadComponentView('com-rich-text');
             };
         },
         methods: {
+            switchRecommendStatus(id) {
+                let self = this;
+                self.listLoading = true;
+                request({
+                    params: {
+                        r: 'plugin/alibaba/mall/distribution/switch-recommend-status',
+                    },
+                    method: 'post',
+                    data: {
+                        id: id,
+                    }
+                }).then(e => {
+                    self.listLoading = false;
+                    if (e.data.code === 0) {
+                        self.$message.success(e.data.msg);
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    console.log(e);
+                });
+            },
             updatePicUrl(e, params) {
                 this.editGoods.formData.ali_product_info.info.image.images[params.currentIndex] = e[0].url;
             },
@@ -777,25 +810,26 @@ Yii::$app->loadComponentView('com-rich-text');
                 this.getList();
             },
             getList() {
-                let params = Object.assign(this.searchData, {
+                let that = this;
+                let params = Object.assign(that.searchData, {
                     r: 'plugin/alibaba/mall/distribution/goods-list',
-                    page: this.page,
+                    page: that.page,
                     app_id:getQuery("app_id")
                 });
                 request({
                     params
                 }).then(e => {
                     if (e.data.code === 0) {
-                        this.list = e.data.data.list;
-                        this.pagination = e.data.data.pagination;
+                        that.list = e.data.data.list;
+                        that.pagination = e.data.data.pagination;
                     } else {
-                        this.$message.error(e.data.msg);
+                        that.$message.error(e.data.msg);
                     }
-                    this.loading = false;
+                    that.loading = false;
                 }).catch(e => {
-                    this.loading = false;
+                    that.loading = false;
                 });
-                this.loading = true;
+                that.loading = true;
             }
         },
         directives:{

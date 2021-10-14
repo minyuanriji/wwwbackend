@@ -97,7 +97,9 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
                 throw new \Exception($res->error);
             }
             $status = $res->result['baseInfo']['status'];
-            if($status != "waitsellersend"){
+            $orderData1688 = $res->result;
+
+            /*if($status != "waitsellersend"){
                 throw new \Exception("只允许已付款未发货的订单退款 [{$status}]");
             }
 
@@ -117,11 +119,11 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
             }
             if($res->error){
                 throw new \Exception($res->error);
-            }
+            }*/
 
             //更新1688订单信息
             $detail1688->ali_refund_id = $res->refundId;
-            $detail1688->ali_orderdata = json_encode($res->result);
+            $detail1688->ali_orderdata = json_encode($orderData1688);
             $detail1688->updated_at    = time();
             if(!$detail1688->save()){
                 throw new \Exception(json_encode($detail1688->getErrors()));
@@ -181,6 +183,7 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
                 if(!$refund->save()){
                     throw new \Exception(json_encode($refund->getErrors()));
                 }
+                $moneyRefund = $refund;
             }
 
             //退购物券
@@ -193,9 +196,18 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
                 if(!$refund->save()){
                     throw new \Exception(json_encode($refund->getErrors()));
                 }
+                $shoppingVoucherRefund = $refund;
             }
 
             $trans && $t->commit();
+
+            $refundStatus = $res->result['baseInfo']['refundStatus'] ?? '';
+            return [
+                'orderStatus' => $status,
+                'refundStatus' => $refundStatus,
+                'moneyRefund' => $moneyRefund ?? '',
+                'shoppingVoucherRefund' => $shoppingVoucherRefund ?? '',
+            ];
         }catch (\Exception $e){
             $trans && $t->rollBack();
             throw $e;

@@ -15,11 +15,12 @@ class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm
     public $user_id;
     public $page;
     public $ali_cat_id;
+    public $recommend;
 
     public function rules(){
         return [
             [['page'], 'required'],
-            [['mall_id', 'user_id', 'page', 'ali_cat_id'], 'integer']
+            [['mall_id', 'user_id', 'page', 'ali_cat_id', 'recommend'], 'integer']
         ];
     }
 
@@ -40,9 +41,12 @@ class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm
                 $query->andWhere("FIND_IN_SET('{$this->ali_cat_id}', g.ali_category_id)");
             }
 
+            if ($this->recommend) {
+                $query->andWhere(['g.is_recommend' => $this->recommend]);
+            }
+
             $orderBy = "g.id DESC";
             $query->orderBy($orderBy);
-
 
             $selects = ["g.id", "g.name", "g.cover_url", "g.price", "g.origin_price", "g.freight_price", "s.voucher_price"];
             $list = $query->asArray()->select($selects)->page($pagination, 20, $this->page)->all();

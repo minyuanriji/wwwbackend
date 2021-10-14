@@ -56,7 +56,7 @@ echo $this->render("com-refund-agree");
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="支付状态" width="130">
+                    <el-table-column label="状态" width="130">
                         <template slot-scope="scope">
                             <div v-if="scope.row.refund_status=='finished' && scope.row.is_refund == 1" style="color: red">已退款</div>
                             <div v-if="scope.row.refund_status=='apply'" style="color: red">申请中</div>
@@ -102,7 +102,7 @@ echo $this->render("com-refund-agree");
                                 </el-tooltip>
                             </el-button>
 
-                            <el-button @click="apply(scope.row, 'paid')" type="text"  v-if="activeName == 'agree'" size="mini" circle>
+                            <el-button @click="doPayment(scope.row)" type="text"  v-if="activeName == 'agree'" size="mini" circle>
                                 <el-tooltip class="item" effect="dark" content="打款" placement="top">
                                     <img src="statics/img/mall/pay.png" alt="">
                                 </el-tooltip>
@@ -127,7 +127,7 @@ echo $this->render("com-refund-agree");
         </el-tabs>
     </el-card>
 
-    <com-refund-agree :visible="agreeEdit.dialogVisible" @close="agreeEdit.dialogVisible=false"></com-refund-agree>
+    <com-refund-agree :visible="agreeEdit.dialogVisible" :refund-data="agreeEdit.refundData" :agree-back-data="agreeEdit.agreeBackData" @close="agreeEdit.dialogVisible=false"></com-refund-agree>
 </div>
 <script>
     const app = new Vue({
@@ -148,7 +148,9 @@ echo $this->render("com-refund-agree");
                 pagination: null,
                 exportList: [],
                 agreeEdit: {
-                    dialogVisible: false
+                    dialogVisible: false,
+                    refundData: '',
+                    agreeBackData:''
                 }
             };
         },
@@ -159,10 +161,32 @@ echo $this->render("com-refund-agree");
             //同意退款操作
             agree(row){
                 this.agreeEdit.dialogVisible = true;
-                return;
+                this.agreeEdit.refundData = row;
                 this.apply(row, "agree", function (rs){
                     console.log(rs);
-                })
+                });
+            },
+            //打款操作展示详情
+            doPayment(row){
+                this.agreeEdit.dialogVisible = true;
+                this.agreeEdit.refundData = row;
+                request({
+                    params: {
+                        r: 'plugin/alibaba/mall/order/payment-info',
+                        order_id: row.order_id,
+                        order_detail_id: row.id,
+                    },
+                    method: 'get'
+                }).then(e => {
+                    this.loading = false;
+                    if (e.data.code == 0) {
+                        this.agreeEdit.agreeBackData = e.data.data;
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    this.loading = false;
+                });
             },
             // 日期搜索
             changeTime() {
@@ -247,6 +271,7 @@ echo $this->render("com-refund-agree");
                             }).then(e => {
                                 instance.confirmButtonLoading = false;
                                 if (e.data.code === 0) {
+                                    this.agreeEdit.agreeBackData = e.data.data;
                                     this.loadData(this.activeName);
                                     done();
                                     if(typeof fn == "function"){

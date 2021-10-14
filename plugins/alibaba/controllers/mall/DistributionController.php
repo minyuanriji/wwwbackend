@@ -18,6 +18,7 @@ use app\plugins\alibaba\forms\mall\AlibabaDistributionGoodsListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionGoodsSaveForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionGoodsSkuListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionSyncCategoryForm;
+use app\plugins\alibaba\forms\mall\AlibabaDistributionSwitchRecommendStatusForm;
 use app\plugins\Controller;
 
 class DistributionController extends Controller{
@@ -183,5 +184,16 @@ class DistributionController extends Controller{
         $form = new AlibabaDistributionCopySkuForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->copy());
+    }
+
+    /**
+     * @Note:等级状态变更
+     * @return \yii\web\Response
+     */
+    public function actionSwitchRecommendStatus()
+    {
+        $form = new AlibabaDistributionSwitchRecommendStatusForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->switch());
     }
 }

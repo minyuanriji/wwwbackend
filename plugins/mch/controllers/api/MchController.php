@@ -166,11 +166,4 @@ class MchController extends ApiController
         return $this->asJson($form->getMchSetting());
     }
 
-    //获取市下级地区列表
-    public function actionGetCityLower()
-    {
-        $form = new MchGetCityLowerForm();
-        $form->attributes = \Yii::$app->request->get();
-        return $this->asJson($form->getRegion());
-    }
 }

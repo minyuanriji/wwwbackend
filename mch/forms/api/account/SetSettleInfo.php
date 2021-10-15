@@ -33,6 +33,8 @@ class SetSettleInfo extends BaseModel{
         }
 
         try {
+            if (!$this->checkBank($this->paper_settleAccountNo))
+                throw new \Exception("银行卡填写不正确");
 
             $mch = Mch::findOne([
                 "id"            => $this->mch_id,
@@ -81,6 +83,36 @@ class SetSettleInfo extends BaseModel{
                 'code' => ApiCode::CODE_FAIL,
                 'msg'  => $e->getMessage(),
             ];
+        }
+    }
+
+    public function checkBank($no)
+    {
+        $arr_no = str_split($no);
+        $last_n = $arr_no[count($arr_no) - 1];
+        krsort($arr_no);
+        $i = 1;
+        $total = 0;
+        foreach ($arr_no as $n) {
+            if ($i % 2 == 0) {
+                $ix = $n * 2;
+                if ($ix >= 10) {
+                    $nx = 1 + ($ix % 10);
+                    $total += $nx;
+                } else {
+                    $total += $ix;
+                }
+            } else {
+                $total += $n;
+            }
+            $i++;
+        }
+        $total -= $last_n;
+        $total *= 9;
+        if ($last_n == ($total % 10)) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

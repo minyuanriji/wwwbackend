@@ -591,6 +591,9 @@ class AppConfigLogic
                 if (in_array($k1, ['width', 'height', 'size', 'top', 'left'])) {
                     $default[$k][$k1] = (float)$default[$k][$k1] / 2;
                 }
+                if ($k1 == 'center') {
+                    $default[$k][$k1] = (float)$default[$k][$k1];
+                }
             }
         }
         return $default;

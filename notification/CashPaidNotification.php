@@ -34,7 +34,7 @@ class CashPaidNotification
             $extra = json_decode($cash->extra,true);
             $data = [
                 'first'     => '您好，您的提现已到账！',
-                'keyword1'  => $cash->price,
+                'keyword1'  => $cash->fact_price,
                 'keyword2'  => $extra['bank_name'] . "尾号：" . substr($extra['bank_account'], -4),
                 'keyword3'  => date('Y-m-d H:i:s', $cash->updated_at),
                 'keyword4'  => '具体到账时间以银行时间为准！',
@@ -44,7 +44,7 @@ class CashPaidNotification
             $template_id = TemConfig::WithdrawalFailure;
             $data = [
                 'first'     => '您的提现申请失败，资金已原路退回！',
-                'keyword1'  => $cash->price,
+                'keyword1'  => $cash->fact_price,
                 'keyword2'  => date('Y-m-d H:i:s', $cash->updated_at),
                 'keyword3'  => '已退回',
                 'keyword4'  => $res['msg'],

@@ -126,7 +126,7 @@
                                            src="statics/img/mall/poster/default_qr_code.png">
                                 </com-image>
 
-                                <span v-if="ruleForm.share.name.is_show == 1 && ruleForm.share.name.center == 1"
+                                <span v-if="ruleForm.share.name.is_show == 1"
                                       :style="{
                                                     position: 'absolute',
                                                     top: ruleForm.share.name.top + 'px',
@@ -135,21 +135,6 @@
                                                     color: ruleForm.share.name.color}">
                                           用户昵称
                                 </span>
-
-                                <span v-else="ruleForm.share.name.is_show == 1 && ruleForm.share.name.center == 2"
-                                      :style="{
-                                                    position: 'absolute',
-                                                    top: ruleForm.share.name.top + 'px',
-                                                    fontSize: ruleForm.share.name.font * 2 + 'px',
-                                                    color: ruleForm.share.name.color,
-                                                    textAlign: 'center',
-                                                    display: 'block',
-                                                    width: '100%',
-                                               }"
-                                >
-                                    用户昵称
-                                </span>
-
                             </div>
                         </div>
                         <div class="form-body" v-if="ruleForm.share.bg_pic.url" flex="dir:top">
@@ -228,19 +213,13 @@
                                                     show-input>
                                             </el-slider>
                                         </el-form-item>
-                                        <el-form-item label="左间距" v-if="showLeftSpacing">
+                                        <el-form-item label="左间距">
                                             <el-slider
                                                     :min=0
                                                     :max=750-(ruleForm.share.name.font)
                                                     v-model="ruleForm.share.name.left"
                                                     show-input>
                                             </el-slider>
-                                        </el-form-item>
-                                        <el-form-item label="左右间距">
-                                            <el-radio-group v-model="ruleForm.share.name.center" @change="spacing">
-                                                <el-radio :label="1">调整</el-radio>
-                                                <el-radio :label="2">居中</el-radio>
-                                            </el-radio-group>
                                         </el-form-item>
                                         <el-form-item label="颜色">
                                             <el-color-picker
@@ -1246,7 +1225,6 @@
                 btnLoading: false,
                 cardLoading: false,
                 activeName: 'first',
-                showLeftSpacing:true,
             };
         },
         computed: {
@@ -1272,14 +1250,6 @@
             },
         },
         methods: {
-            spacing(val) {
-                console.log(val);
-                if (val == 1) {
-                    this.showLeftSpacing = true;
-                } else {
-                    this.showLeftSpacing = false;
-                }
-            },
             store(formName) {
                 this.$refs[formName].validate((valid) => {
                     let self = this;
@@ -1322,11 +1292,6 @@
                     self.cardLoading = false;
                     if (e.data.code == 0) {
                         self.ruleForm = e.data.data.detail;
-                        if (self.ruleForm.share.name.center == 1) {
-                            this.showLeftSpacing = true;
-                        } else {
-                            this.showLeftSpacing = false;
-                        }
                     } else {
                         self.$message.error(e.data.msg);
                     }

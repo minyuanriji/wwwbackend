@@ -61,13 +61,30 @@ class CheckoutAction extends Action{
                     $transferRate = (int)$checkoutOrder['transfer_rate'];
                     $integralFeeRate = (int)$checkoutOrder['integral_fee_rate'];
 
+                    /*
+                     * 分佣旧公式
                     $ruleData['profit_price'] = $this->controller->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate, $integralFeeRate);
-
                     if($ruleData['commission_type'] == 1){ //按百分比
                         $price = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
                     }else{ //按固定值
                         $price = (float)$ruleData['commisson_value'];
                     }
+                    */
+
+                    //TODO 最新公式，后期要做成后台配置
+                    if($parentData['role_type'] == "branch_office"){
+                        $ruleData['commisson_value'] = 0.15;
+                    }elseif($parentData['role_type'] == "partner"){
+                        $ruleData['commisson_value'] = 0.1;
+                    }elseif($parentData['role_type'] == "store"){
+                        $ruleData['commisson_value'] = 0.02;
+                    }else{
+                        $ruleData['commisson_value'] = 0;
+                    }
+                    $ruleData['role_type'] = $parentData['role_type'];
+                    $ruleData['ver'] = "2021/10/15";
+                    $ruleData['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];
+                    $price = $ruleData['profit_price'] * $ruleData['commisson_value'];
 
                     //生成分佣记录
                     if($price > 0){

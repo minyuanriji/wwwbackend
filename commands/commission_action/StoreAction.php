@@ -89,12 +89,23 @@ class StoreAction extends Action{
                 //计算分佣金额
                 $transferRate = (int)$checkoutOrder['transfer_rate'];//商户手续费
                 $integralFeeRate = (int)$checkoutOrder['integral_fee_rate'];
+
+                /*
+                 * 旧分佣规则
                 $commission_res['profit_price'] = $this->controller->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate, $integralFeeRate);
                 if($commission_res['commission_type'] == 1){ //按百分比
                     $price = (floatval($commission_res['commisson_value'])/100) * floatval($commission_res['profit_price']);
                 }else{ //按固定值
                     $price = (float)$commission_res['commisson_value'];
-                }
+                }*/
+
+                //TODO 新分佣规则
+                $commission_res['role_type'] = $parent_user->role_type;
+                $commission_res['ver'] = "2021/10/15";
+                $commission_res['commisson_value'] = 0.02;
+                $commission_res['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];
+                $price = $commission_res['commisson_value'] * $commission_res['profit_price'];
+
                 //生成分佣记录
                 if($price > 0){
                     $priceLog = CommissionStorePriceLog::findOne([

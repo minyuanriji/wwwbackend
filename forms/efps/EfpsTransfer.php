@@ -44,7 +44,7 @@ class EfpsTransfer extends BaseModel{
                     "customerCode"    => \Yii::$app->efps->getCustomerCode(),
                     "outTradeNo"      => $transferOrder->outTradeNo,
                     "notifyUrl"       => $transferOrder->notifyUrl,
-                    "amount"          => $transferOrder->amount * 100,
+                    "amount"          => ceil(floatval($transferOrder->amount) * 100),
                     "bankUserName"    => $transferOrder->bankUserName,
                     "bankCardNo"      => $transferOrder->bankCardNo,
                     "bankName"        => $transferOrder->bankName,

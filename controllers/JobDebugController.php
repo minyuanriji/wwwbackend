@@ -3,6 +3,7 @@ namespace app\controllers;
 
 
 
+use app\models\EfpsTransferOrder;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\addcredit\plateform\sdk\jing36\PlateForm;
@@ -10,6 +11,10 @@ use app\plugins\addcredit\plateform\sdk\jing36\PlateForm;
 class JobDebugController extends BaseController {
 
     public function actionIndex(){
+
+        /*$transferOrder = EfpsTransferOrder::findOne(2065);
+        echo ceil(floatval($transferOrder->amount) * 100);
+        exit;*/
 
         /*$plateModel = AddcreditPlateforms::findOne(2);
         $orderModel = AddcreditOrder::findOne(2);

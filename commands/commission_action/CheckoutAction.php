@@ -60,7 +60,9 @@ class CheckoutAction extends Action{
                     //计算分佣金额
                     $transferRate = (int)$checkoutOrder['transfer_rate'];
                     $integralFeeRate = (int)$checkoutOrder['integral_fee_rate'];
+
                     $ruleData['profit_price'] = $this->controller->calculateCheckoutOrderProfitPrice($checkoutOrder['order_price'], $transferRate, $integralFeeRate);
+
                     if($ruleData['commission_type'] == 1){ //按百分比
                         $price = (floatval($ruleData['commisson_value'])/100) * floatval($ruleData['profit_price']);
                     }else{ //按固定值

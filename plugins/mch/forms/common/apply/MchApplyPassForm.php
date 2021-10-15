@@ -108,7 +108,7 @@ class MchApplyPassForm extends BaseModel{
      */
     public static function setCheckoutOrderPaidAction(Mch $mch, Store $store){
 
-        //设置购物券赠送比例
+        //计算赠送比例
         $value = (100 - $mch->transfer_rate)/10;
         if($value <= 8){ //8折以下都是100%
             $giveValue = 100;
@@ -124,6 +124,8 @@ class MchApplyPassForm extends BaseModel{
         }else{
             $giveValue = 0;
         }
+
+        //设置购物券赠送
         if($giveValue > 0){
             $model = ShoppingVoucherFromStore::findOne([
                 "mall_id"  => $mch->mall_id,
@@ -150,33 +152,36 @@ class MchApplyPassForm extends BaseModel{
         }
 
         //设置积分赠送
-        $fromStore = ScoreFromStore::findOne([
-            "store_id" => $store->id
-        ]);
-        if(!$fromStore){
-            $fromStore = new ScoreFromStore([
-                "mall_id"    => $mch->mall_id,
-                "created_at" => time()
+        if($giveValue > 0){
+            $fromStore = ScoreFromStore::findOne([
+                "store_id" => $store->id
             ]);
+            if(!$fromStore){
+                $fromStore = new ScoreFromStore([
+                    "mall_id"    => $mch->mall_id,
+                    "created_at" => time()
+                ]);
+            }
+
+            $scoreSetting['integral_num'] = 0;
+            $scoreSetting['expire']       = -1;
+            $scoreSetting['period']       = 1;
+
+            $fromStore->mch_id        = $mch->id;
+            $fromStore->store_id      = $store->id;
+            $fromStore->updated_at    = time();
+            $fromStore->name          = $store->name;
+            $fromStore->cover_url     = $store->cover_url;
+            $fromStore->start_at      = time();
+            $fromStore->enable_score  = 1;
+            $fromStore->score_setting = json_encode($scoreSetting) ;
+            $fromStore->rate          = max(0, min(100, $giveValue));
+
+            if(!$fromStore->save()){
+                throw new \Exception(json_encode($fromStore->getErrors()));
+            }
         }
 
-        $scoreSetting['integral_num'] = 0;
-        $scoreSetting['expire']       = -1;
-        $scoreSetting['period']       = 1;
-
-        $fromStore->mch_id        = $mch->id;
-        $fromStore->store_id      = $store->id;
-        $fromStore->updated_at    = time();
-        $fromStore->name          = $store->name;
-        $fromStore->cover_url     = $store->cover_url;
-        $fromStore->start_at      = time();
-        $fromStore->enable_score  = 1;
-        $fromStore->score_setting = json_encode($scoreSetting) ;
-        $fromStore->rate          = 100;
-
-        if(!$fromStore->save()){
-            throw new \Exception(json_encode($fromStore->getErrors()));
-        }
     }
 
     /**

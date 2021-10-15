@@ -10,6 +10,7 @@ use app\models\BaseModel;
 use app\models\Store;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCommonCat;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 
 class MchStoreListForm extends BaseModel implements ICacheForm {
 
@@ -63,7 +64,12 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
                     $item['city']        = isset($cityData['city']['name']) ? $cityData['city']['name'] : "";
                     $item['district']    = isset($cityData['district']['name']) ? $cityData['district']['name'] : "";
                     $item['region_name'] = $item['district'] ? $item['district'] : ($item['city'] ? $item['city'] : $item['province']);
-                    $item['remark']      = "付100送100购物券";
+
+                    $item['remark'] = "";
+                    if($item['shopping_voucher_give_value']){
+                        $item['remark'] = "付100送".$item['shopping_voucher_give_value']."购物券";
+                    }
+
                 }
             }
 
@@ -90,6 +96,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
         $query = Store::find()->alias("s");
         $query->innerJoin(["m" => Mch::tableName()], "m.id=s.mch_id");
         $query->leftJoin(["c" => MchCommonCat::tableName()], "c.id=m.mch_common_cat_id");
+        $query->leftJoin(["svfs" => ShoppingVoucherFromStore::tableName()], "svfs.store_id=s.id AND svfs.is_delete=0");
         $query->andWhere([
             "AND",
             ["m.review_status" => Mch::REVIEW_STATUS_CHECKED],
@@ -128,7 +135,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
         }
 
         $selects = ["s.id", "s.mall_id", "s.cover_url", "s.name", "s.mobile", "s.address", "s.province_id", "s.city_id", "s.district_id",
-            "s.longitude", "s.latitude", "s.score", "m.mch_common_cat_id", "c.name as cat_name"
+            "s.longitude", "s.latitude", "s.score", "m.mch_common_cat_id", "c.name as cat_name", "svfs.give_value as shopping_voucher_give_value"
         ];
 
         if($this->longitude && $this->latitude){

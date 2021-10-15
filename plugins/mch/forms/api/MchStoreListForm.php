@@ -52,6 +52,11 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
             $list = $query->asArray()->all();
             if($list){
                 foreach($list as &$item){
+
+                    if(empty($item['cover_url'])){
+                        $item['cover_url'] = \Yii::$app->request->getHostInfo() . "/web/static/header-logo.png";
+                    }
+
                     if($item['distance_mi'] < 0){
                         $item['distance_mi'] = "距离未知";
                     }elseif($item['distance_mi'] < 1000){

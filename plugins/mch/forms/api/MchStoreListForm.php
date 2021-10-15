@@ -54,7 +54,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
                 foreach($list as &$item){
 
                     if(empty($item['cover_url'])){
-                        $item['cover_url'] = \Yii::$app->request->getHostInfo() . "/web/static/header-logo.png";
+                        $item['cover_url'] =  $this->host_info . "/web/static/header-logo.png";
                     }
 
                     $item['score'] = sprintf("%01.1f",floatval($item['score']));

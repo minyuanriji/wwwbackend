@@ -33,7 +33,7 @@ class CashAgreeNotification
         if (!$extra['bank_account'] || !is_string($extra['bank_account'])) return;
         $data = [
             'first'     => '恭喜，您的提现已转银行处理，具体到账时间以银行为准，请注意查收~~',
-            'keyword1'  => $cash->price,
+            'keyword1'  => $cash->fact_price,
             'keyword2'  => date('Y-m-d H:i:s', $cash->updated_at),
             'keyword3'  => $extra['bank_name'] . '(尾号' . substr($extra['bank_account'],-4) . ')',
             'remark'    => '感谢您的使用！如有疑问请联系客服020-31923526',

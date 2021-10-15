@@ -836,6 +836,10 @@ class Menus
                         'route' => 'mall/finance/integral-log',
                     ],
                     [
+                        'name' => '购物券记录',
+                        'route' => 'plugin/shopping_voucher/mall/shopping-voucher-log/list',
+                    ],
+                    [
                         'name' => '用户提现',
                         'route' => 'mall/finance/cash',
                     ],

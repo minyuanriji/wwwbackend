@@ -1,11 +1,3 @@
-<?php
-/**
-  * @link:http://www.gdqijianshi.com/
- * copyright: Copyright (c) 2020 广东七件事集团
- * author: zal
- */
-?>
-
 <style>
     .mobile-box {
         width: 400px;
@@ -133,6 +125,7 @@
                                            :height='ruleForm.share.qr_code.size + ""'
                                            src="statics/img/mall/poster/default_qr_code.png">
                                 </com-image>
+
                                 <span v-if="ruleForm.share.name.is_show == 1"
                                       :style="{
                                                     position: 'absolute',
@@ -141,7 +134,7 @@
                                                     fontSize: ruleForm.share.name.font * 2 + 'px',
                                                     color: ruleForm.share.name.color}">
                                           用户昵称
-                                    </span>
+                                </span>
                             </div>
                         </div>
                         <div class="form-body" v-if="ruleForm.share.bg_pic.url" flex="dir:top">

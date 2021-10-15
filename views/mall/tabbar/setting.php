@@ -1,14 +1,3 @@
-<?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * 设置
- * Author: zal
- * Date: 2020-04-13
- * Time: 10:16
- */
-?>
-
 <style>
     .nav-box {
         width: 220px;
@@ -267,7 +256,7 @@
                         </el-form-item>
                         <el-form-item label="导航链接" prop="url">
                             <div flex="box:last">
-                                <el-input disabled v-model="dialogRuleForm.url"></el-input>
+                                <el-input v-model="dialogRuleForm.url"></el-input>
                                 <div>
                                     <com-pick-link @selected="selectNavUrl" ignore="navigate">
                                         <el-button>选择链接</el-button>

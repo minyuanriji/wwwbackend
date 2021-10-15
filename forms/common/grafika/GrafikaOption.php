@@ -28,7 +28,9 @@ class GrafikaOption extends ApiGrafika
                     $default[$k][$k1] = RGBToHex($default[$k][$k1]);
                 } else if ($k == 'bg_pic' && $k1 == 'url' && $this->isUrl($default[$k][$k1])) {
                     $default[$k][$k1] = self::saveTempImage($this->destroyList($default[$k][$k1]));
-                };
+                } else if ($k1 == 'center') {
+                    $default[$k][$k1] = (float)$default[$k][$k1];
+                }
             }
 
             //destroy

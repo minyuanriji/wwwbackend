@@ -29,7 +29,7 @@ class CashRejectNotification
         $content = SerializeHelper::decode($cash->content);
         $data = [
             'first'     => '您的提现申请失败，资金已原路退回！',
-            'keyword1'  => $cash->price,
+            'keyword1'  => $cash->fact_price,
             'keyword2'  => date('Y-m-d H:i:s', $cash->updated_at),
             'keyword3'  => '已退回',
             'keyword4'  => $content['reject_content'] ? $content['reject_content'] : '',

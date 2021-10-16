@@ -9,7 +9,6 @@ use app\forms\mall\commission\HotelRecommendLogListForm;
 use app\forms\mall\commission\HotelScanCodeLogListForm;
 use app\forms\mall\commission\StoreScanCodeLogListForm;
 use app\forms\mall\commission\StoreRecommendLogListForm;
-use yii\base\BaseObject;
 
 class CommissionController extends MallController
 {

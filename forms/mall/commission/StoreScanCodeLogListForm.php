@@ -22,12 +22,13 @@ class StoreScanCodeLogListForm extends BaseModel
     public $start_date;
     public $end_date;
     public $keyword;
+    public $keyword_1;
     public $status;
 
     public function rules()
     {
         return [
-            [['page', 'limit', 'status'], 'integer'],
+            [['page', 'limit', 'status', 'keyword_1'], 'integer'],
             [['keyword', 'start_date', 'end_date'], 'trim'],
         ];
     }
@@ -38,23 +39,16 @@ class StoreScanCodeLogListForm extends BaseModel
 
         $query = CommissionCheckoutPriceLog::find()->alias('cc')->where([
             'cc.mall_id' => \Yii::$app->mall->id,
-        ])->joinwith(['user' => function ($query) {
-            if ($this->keyword) {
-                //$query->where(['like', 'nickname', $this->keyword]);
-            }
-        }])->orderBy('id desc');
-        $query->innerJoin(["u" => User::tableName()], "u.id=cc.user_id");
+        ]);
         $query->innerJoin(["co" => MchCheckoutOrder::tableName()], "co.id=cc.checkout_order_id");
         $query->innerJoin(["s" => Store::tableName()], "s.mch_id=co.mch_id");
+        $query->innerJoin(["u" => User::tableName()], "u.id=cc.user_id")
+            ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
-        if($this->keyword){
-            $query->andWhere([
-                "OR",
-                ["LIKE", "u.nickname", $this->keyword],
-                ["LIKE", "s.name", $this->keyword],
-                ["s.mch_id" => (int)$this->keyword]
-            ]);
-        }
+        $query->keyword($this->keyword_1 == 1 && $this->keyword, ["LIKE", "s.name", $this->keyword]);
+        $query->keyword($this->keyword_1 == 2 && $this->keyword, ["u.mobile" => $this->keyword]);
+        $query->keyword($this->keyword_1 == 3 && $this->keyword, ["co.order_no" => $this->keyword]);
+        $query->keyword($this->keyword_1 == 4 && $this->keyword, ["s.mch_id" => (int)$this->keyword]);
 
         if ($this->start_date && $this->end_date) {
             $query->andWhere(['<', 'cc.created_at', strtotime($this->end_date)])
@@ -65,7 +59,9 @@ class StoreScanCodeLogListForm extends BaseModel
         } else {
             $query->andWhere(['cc.status' => $this->status]);
         }
-        $list = $query->select(["cc.*"])->page($pagination, $this->limit)->asArray()->all();
+
+        $select = ['cc.*', 'u.nickname', 'u.avatar_url', 'u.role_type', 'u.mobile'];
+        $list = $query->select($select)->orderBy('cc.id desc')->page($pagination, $this->limit)->asArray()->all();
         if ($list) {
             foreach ($list as &$item) {
                 $item['order_no']       = '';
@@ -90,19 +86,7 @@ class StoreScanCodeLogListForm extends BaseModel
                     $store = Store::findOne(["mch_id" => $mch_checkout_order->mch_id]);
                     if ($store) {
                         $item['store_name'] = $store->name;
-                        $item['store_url'] = $store->cover_url;
-                    }
-                }
-                $item['identity'] = '';
-                if (isset($item['user']['role_type'])) {
-                    if ($item['user']['role_type'] == 'store') {
-                        $item['identity'] = 'VIP会员';
-                    } elseif ($item['user']['role_type'] == 'partner') {
-                        $item['identity'] = '合伙人';
-                    } elseif ($item['user']['role_type'] == 'branch_office') {
-                        $item['identity'] = '分公司';
-                    } elseif ($item['user']['role_type'] == 'user') {
-                        $item['identity'] = '普通用户';
+                        $item['store_url'] = $store->cover_url ?: 'https://www.mingyuanriji.cn/web/static/header-logo.png';
                     }
                 }
             }

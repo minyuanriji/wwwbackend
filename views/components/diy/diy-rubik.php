@@ -85,13 +85,13 @@ $diyIconPath="{$baseUrl}/statics/img/mall/diy";
                                                  :url="data.list[rubik].pic_url"></com-gallery>
                                 </el-form-item>
                                 <el-form-item label="选择链接">
-                                    <com-pick-link title="选择链接" @selected="selectLink">
-                                        <el-input size="small" v-model="rubikLink()" :disabled="true">
-                                            <template slot="append">
+                                    <el-input size="small" v-model="data.list[rubik].link.new_link_url">
+                                        <template slot="append">
+                                            <com-pick-link title="选择链接" @selected="selectLink">
                                                 <el-button>选择链接</el-button>
-                                            </template>
-                                        </el-input>
-                                    </com-pick-link>
+                                            </com-pick-link>
+                                        </template>
+                                    </el-input>
                                 </el-form-item>
                             </el-card>
                         </template>
@@ -716,7 +716,8 @@ $diyIconPath="{$baseUrl}/statics/img/mall/diy";
                 if (!this.data.list[this.rubik].link) {
                     Vue.set(this.data.list[this.rubik], 'link', {});
                 }
-                return this.data.list[this.rubik].link.name
+                console.log(this.data.list[this.rubik].link);
+                // return this.data.list[this.rubik].link.new_link_url
             }
         }
     });

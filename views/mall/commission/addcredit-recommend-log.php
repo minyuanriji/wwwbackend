@@ -8,26 +8,36 @@
         <div class="table-body">
             <div style="float: left">
                 <span>状态</span>
-                <el-select size="small" v-model="status" class="select" @change="change">
+                <el-select size="small" v-model="searchData.status" class="select" @change="change">
                     <el-option key="-2" label="全部" value="-2"></el-option>
                     <el-option key="-1" label="无效" value="-1"></el-option>
                     <el-option key="0" label="待结算" value="0"></el-option>
                     <el-option key="1" label="已结算" value="1"></el-option>
                 </el-select>
             </div>
-            <el-date-picker size="small" v-model="date" type="datetimerange"
+            <el-date-picker size="small" v-model="searchData.date" type="datetimerange"
                             style="float: left;margin-left: 10px"
                             value-format="yyyy-MM-dd HH:mm:ss"
                             range-separator="至" start-placeholder="开始日期"
                             @change="selectDateTime"
                             end-placeholder="结束日期">
             </el-date-picker>
-            <div class="input-item">
-                <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="keyword" clearable
-                          @clear="search">
-                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+
+            <div style="margin-bottom: 20px;">请选择搜索方式
+                <el-input style="width: 350px" size="small" v-model="searchData.keyword" placeholder="请输入搜索内容" clearable
+                          @clear="clearSearch"
+                          @change="search"
+                          @input="triggeredChange"
+                >
+                    <el-select style="width: 100px" slot="prepend" v-model="searchData.keyword_1">
+                        <el-option v-for="item in selectList" :key="item.value"
+                                   :label="item.name"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
                 </el-input>
             </div>
+
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
 
                 <el-table-column prop="id" label="ID" width="80"></el-table-column>
@@ -38,20 +48,28 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column label="订单信息" width="230">
+                <el-table-column label="订单信息" width="350">
                     <template slot-scope="scope">
                         <div>支付用户昵称：<b>{{scope.row.pay_user_name}}</b></div>
-                        <div>订单编号：<b style="font-size: 12px">{{scope.row.order_no}}</b></div>
+                        <div>订单编号：<b style="font-size: 14px">{{scope.row.order_no}}</b></div>
                         <div>订单金额：<b style="color:#cc3311">{{scope.row.order_price}}元</b></div>
                         <div>扣除红包：<b style="color:#cc3311">{{scope.row.integral_deduction_price}}</b></div>
                         <div>实际支付费用：<b style="color:#cc3311">{{scope.row.pay_price}}元</b></div>
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="user.nickname" label="收益人信息" width="200">
+                <el-table-column prop="user.nickname" label="收益人信息" width="400">
                     <template slot-scope="scope">
-                        <div>收益人昵称：{{scope.row.user.nickname}}</div>
-                        <div>收益人身份：{{scope.row.identity}}</div>
+                        <com-image mode="aspectFill"
+                                   style="float: left;margin-right: 8px"
+                                   :src="scope.row.avatar_url">
+                        </com-image>
+                        <div>昵称：{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
+                        <div v-if="scope.row.role_type=='store'">身份：VIP会员</div>
+                        <div v-if="scope.row.role_type=='partner'">身份：合伙人</div>
+                        <div v-if="scope.row.role_type=='branch_office'">身份：分公司</div>
+                        <div v-if="scope.row.role_type=='user'">身份：普通用户</div>
+                        <div>手机号：{{scope.row.mobile}}</div>
                     </template>
                 </el-table-column>
 
@@ -88,23 +106,34 @@
             return {
                 searchData: {
                     keyword: '',
+                    keyword_1: '',
                     date: '',
                     start_date: '',
                     end_date: '',
                     status: '',
                 },
-                date: '',
-                status: '',
-                keyword: '',
                 form: [],
                 pageCount: 0,
                 listLoading: false,
+                selectList: [
+                    {value: '1', name: '充值手机号'},
+                    {value: '2', name: '受益人手机号'},
+                    {value: '3', name: '受益人昵称'},
+                    {value: '4', name: '订单编号'},
+                ],
             };
         },
         methods: {
-            exportConfirm() {
-                this.searchData.keyword = this.keyword;
-                this.searchData.date = this.date;
+            clearSearch() {
+                this.page = 1;
+                this.searchData.keyword = '';
+                this.getList();
+            },
+            triggeredChange (){
+                if (this.searchData.keyword.length>0 && this.searchData.keyword_1.length<=0) {
+                    alert('请选择搜索方式');
+                    this.searchData.keyword='';
+                }
             },
             pagination(currentPage) {
                 this.page = currentPage;
@@ -112,7 +141,7 @@
             },
             search() {
                 this.page = 1;
-                if (this.date == null) {
+                if (this.searchData.date == null) {
                     this.searchData.start_date = '';
                     this.searchData.end_date = ''
                 }
@@ -128,11 +157,11 @@
                     params: {
                         r: 'mall/commission/addcredit-recommend-log',
                         page: this.page,
-                        date: this.date,
-                        keyword: this.keyword,
+                        keyword: this.searchData.keyword,
+                        keyword_1: this.searchData.keyword_1,
                         start_date: this.searchData.start_date,
                         end_date: this.searchData.end_date,
-                        status: this.status,
+                        status: this.searchData.status,
                     },
                 }).then(e => {
                     if (e.data.code === 0) {

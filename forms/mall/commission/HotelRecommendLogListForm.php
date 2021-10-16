@@ -24,12 +24,13 @@ class HotelRecommendLogListForm extends BaseModel
     public $start_date;
     public $end_date;
     public $keyword;
+    public $keyword_1;
     public $status;
 
     public function rules()
     {
         return [
-            [['page', 'limit', 'status'], 'integer'],
+            [['page', 'limit', 'status', 'keyword_1'], 'integer'],
             [['keyword', 'start_date', 'end_date'], 'trim'],
         ];
     }
@@ -40,11 +41,17 @@ class HotelRecommendLogListForm extends BaseModel
 
         $query = CommissionHotelPriceLog::find()->alias('cs')->where([
             'cs.mall_id' => \Yii::$app->mall->id,
-        ])->joinwith(['user' => function ($query) {
-            if ($this->keyword) {
-                $query->where(['like', 'nickname', $this->keyword]);
-            }
-        }])->orderBy('id desc');
+        ]);
+
+        $query->innerJoin(['ho' => HotelOrder::tableName()], 'cs.hotel_order_id = ho.id')
+            ->innerJoin(['h' => Hotels::tableName()], 'ho.hotel_id = h.id')
+            ->innerJoin(["u" => User::tableName()], "u.id=cs.user_id")
+            ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
+
+        $query->keyword($this->keyword_1 == 1 && $this->keyword, ["LIKE", "h.name", $this->keyword])
+                ->keyword($this->keyword_1 == 2 && $this->keyword, ["u.mobile" => $this->keyword])
+                ->keyword($this->keyword_1 == 3 && $this->keyword, ["LIKE", "u.nickname", $this->keyword])
+                ->keyword($this->keyword_1 == 4 && $this->keyword, ["ho.order_no" => $this->keyword]);
 
         if ($this->start_date && $this->end_date) {
             $query->andWhere(['<', 'cs.created_at', strtotime($this->end_date)])
@@ -55,7 +62,10 @@ class HotelRecommendLogListForm extends BaseModel
         } else {
             $query->andWhere(['cs.status' => $this->status]);
         }
-        $list = $query->page($pagination, $this->limit)->asArray()->all();
+
+        $select = ['cs.*', 'u.nickname', 'u.avatar_url', 'u.role_type', 'u.mobile'];
+        $list = $query->select($select)->page($pagination, $this->limit)->orderBy('cs.id desc')->asArray()->all();
+
         if ($list) {
             foreach ($list as &$item) {
                 $item['order_no']       = '';
@@ -67,10 +77,10 @@ class HotelRecommendLogListForm extends BaseModel
                 $item['integral_deduction_price']      = '';
                 $hotel_order = HotelOrder::findOne($item['hotel_order_id']);
                 if ($hotel_order) {
-                    $item['order_no'] = $hotel_order->order_no;
-                    $item['order_price'] = $hotel_order->order_price;
-                    $item['pay_price'] = $hotel_order->pay_price;
-                    $item['integral_deduction_price']      = $hotel_order->integral_deduction_price;
+                    $item['order_no']                   = $hotel_order->order_no;
+                    $item['order_price']                = $hotel_order->order_price;
+                    $item['pay_price']                  = $hotel_order->pay_price;
+                    $item['integral_deduction_price']   = $hotel_order->integral_deduction_price;
 
                     $user = User::findOne($hotel_order->user_id);
                     $item['pay_user_name'] = $user ? $user->nickname : '';
@@ -78,19 +88,7 @@ class HotelRecommendLogListForm extends BaseModel
                     $hotels = Hotels::findOne($hotel_order->hotel_id);
                     if ($hotels) {
                         $item['hotel_name'] = $hotels->name;
-                        $item['thumb_url'] = $hotels->thumb_url;
-                    }
-                }
-                $item['identity'] = '';
-                if (isset($item['user']['role_type'])) {
-                    if ($item['user']['role_type'] == 'store') {
-                        $item['identity'] = 'VIP会员';
-                    } elseif ($item['user']['role_type'] == 'partner') {
-                        $item['identity'] = '合伙人';
-                    } elseif ($item['user']['role_type'] == 'branch_office') {
-                        $item['identity'] = '分公司';
-                    } elseif ($item['user']['role_type'] == 'user') {
-                        $item['identity'] = '普通用户';
+                        $item['thumb_url'] = $hotels->thumb_url ?: 'https://www.mingyuanriji.cn/web/static/header-logo.png';
                     }
                 }
             }

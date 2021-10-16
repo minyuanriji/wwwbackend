@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="chooseLink">
                                     <div @click="pickLinkClick(index)">
-                                        <el-input v-model="banner.url" placeholder="点击选择链接" readonly
+                                        <el-input v-model="banner.url" placeholder="点击选择链接"
                                                   size="small">
                                             <com-pick-link slot="append" @selected="linkSelected">
                                                 <el-button size="small">选择链接</el-button>

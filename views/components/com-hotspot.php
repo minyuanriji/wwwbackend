@@ -158,14 +158,14 @@ $static = Yii::$app->request->hostInfo . Yii::$app->request->baseUrl;
                                 </el-col>
                             </el-row>
                         </el-form-item>
-                        <el-form-item label="热区链接" v-if="isLink">
-                            <com-pick-link style="margin-left: 10px" title="选择链接" @selected="selectLink">
-                                <el-input size="small" style="width: 100%;" :disabled="true" v-model="hotspotList[index].link.name">
-                                    <template slot="append">
-                                        <el-button>选择链接</el-button>
-                                    </template>
-                                </el-input>
-                            </com-pick-link>
+                        <el-form-item label="选择链接" v-if="isLink">
+                            <el-input size="small" style="width: 100%;" v-model="hotspotList[index].link.new_link_url">
+                                <template slot="append">
+                                    <com-pick-link style="margin-left: 10px" >
+                                        <el-button  @selected="selectLink">选择链接</el-button>
+                                    </com-pick-link>
+                                </template>
+                            </el-input>
                         </el-form-item>
                         <el-form-item label="热区属性" v-if="mode == 'auth'">
                             <el-radio-group v-model="hotspotList[index].open_type">

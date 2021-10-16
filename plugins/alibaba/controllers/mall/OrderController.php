@@ -6,8 +6,8 @@ use app\plugins\alibaba\forms\mall\AlibabaDistributionOrderDetailForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionOrderListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionOrderRefundListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionAfterApplyForm;
-use app\plugins\alibaba\forms\mall\AlibabaDistributionSalePaymentForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionPaymentInfoForm;
+use app\plugins\alibaba\forms\mall\AlibabaDistributionRefundPaidForm;
 use app\plugins\Controller;
 
 class OrderController extends Controller
@@ -56,8 +56,7 @@ class OrderController extends Controller
      * 售后订单打款
      * @return string|\yii\web\Response
      */
-    public function actionRefundPaid()
-    {
+    public function actionRefundPaid(){
         $form = new AlibabaDistributionRefundPaidForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->save());

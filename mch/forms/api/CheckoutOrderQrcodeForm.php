@@ -43,7 +43,7 @@ class CheckoutOrderQrcodeForm extends BaseModel {
             $pid = $mchModel->user_id;
             if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
                 $qrCode = new QrCodeCommon();
-                $res = $qrCode->getQrCode(['id' => $mchModel->id, 'pid' => $pid], 100, $this->route);
+                $res = $qrCode->getQrCode(['id' => $mchModel->id, 'pid' => $pid], 300, $this->route);
                 $codeUrl = $res['file_path'];
             }else{
                 //$this->route = "/h5/#/mch/personalCentre/ercode/payPages/payPages";

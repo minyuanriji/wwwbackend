@@ -132,7 +132,7 @@ class CommonLogic
         if (!file_exists($file)) {
             FileHelper::createDirectory(dirname($file));
             $qrCode = (new QrCode($url, ErrorCorrectionLevelInterface::HIGH))
-                ->useEncoding('UTF-8')->setLogoWidth(60)->setSize(300)->setMargin(5);
+                ->useEncoding('UTF-8')->setLogoWidth(60)->setSize(600)->setMargin(5);
             $qrCode->writeFile($file);
         }
 //        if ($option['qr_code']['type'] == 1) {

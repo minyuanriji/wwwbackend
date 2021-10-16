@@ -77,7 +77,7 @@
                         <el-table-column prop="refund_amount" label="金额/数量" width="200"></el-table-column>
                         <el-table-column label="操作">
                             <template slot-scope="scope">
-                                <el-button @click="paid(scope.row)" type="text" size="mini" circle v-if="scope.row.status == 'waitting'">
+                                <el-button @click="doPaid(scope.row, 'paid')" type="text" size="mini" circle v-if="scope.row.status == 'waitting'">
                                     <el-tooltip class="item" effect="dark" content="打款" placement="top">
                                         <img src="statics/img/mall/pay.png" alt="">
                                     </el-tooltip>
@@ -161,7 +161,7 @@
             close(){
                 this.$emit('close');
             },
-            paid(row) {
+            doPaid(row, act) {
                 this.$prompt('请输入备注', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -171,28 +171,20 @@
                             instance.confirmButtonText = '执行中...';
                             request({
                                 params: {
-                                    r: 'plugin/alibaba/mall/order/sale-payment',
+                                    r: 'plugin/alibaba/mall/order/refund-paid',
                                 },
                                 method: 'post',
                                 data: {
-                                    id: row.id,
+                                    refund_id: row.id,
                                     act: act,
-                                    content: instance.inputValue,
-                                    aliRefundStatus:this.agreeBackNewData.refundStatus,
+                                    remark: instance.inputValue
                                 }
                             }).then(e => {
                                 instance.confirmButtonLoading = false;
+                                instance.confirmButtonText = '确定';
                                 if (e.data.code === 0) {
-                                    this.dialogVisible = false;
-                                    this.$navigate({
-                                        r: 'plugin/alibaba/mall/order/refund-list',
-                                    });
                                     done();
-                                    if(typeof fn == "function"){
-                                        fn.call(this, e.data);
-                                    }
                                 } else {
-                                    instance.confirmButtonText = '确定';
                                     this.$message.error(e.data.msg);
                                 }
                             }).catch(e => {

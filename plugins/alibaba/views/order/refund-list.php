@@ -102,7 +102,7 @@ echo $this->render("com-refund-agree");
                                 </el-tooltip>
                             </el-button>
 
-                            <el-button @click="doPayment(scope.row)" type="text"  v-if="activeName == 'agree'" size="mini" circle>
+                            <el-button @click="doPayment(scope.row)" type="text" v-if="activeName == 'agree'" size="mini" circle>
                                 <el-tooltip class="item" effect="dark" content="打款" placement="top">
                                     <img src="statics/img/mall/pay.png" alt="">
                                 </el-tooltip>
@@ -127,7 +127,7 @@ echo $this->render("com-refund-agree");
         </el-tabs>
     </el-card>
 
-    <com-refund-agree :visible="agreeEdit.dialogVisible" :refund-data="agreeEdit.refundData" :agree-back-data="agreeEdit.agreeBackData" @close="agreeEdit.dialogVisible=false"></com-refund-agree>
+    <com-refund-agree :order-detail-id="agreeEdit.orderDetailId" @close="close"></com-refund-agree>
 </div>
 <script>
     const app = new Vue({
@@ -148,9 +148,7 @@ echo $this->render("com-refund-agree");
                 pagination: null,
                 exportList: [],
                 agreeEdit: {
-                    dialogVisible: false,
-                    refundData: '',
-                    agreeBackData:''
+                    orderDetailId: 0
                 }
             };
         },
@@ -160,33 +158,14 @@ echo $this->render("com-refund-agree");
         methods: {
             //同意退款操作
             agree(row){
-                this.agreeEdit.dialogVisible = true;
-                this.agreeEdit.refundData = row;
+                let that = this;
                 this.apply(row, "agree", function (rs){
-                    console.log(rs);
+                    that.agreeEdit.orderDetailId = row.id;
                 });
             },
             //打款操作展示详情
             doPayment(row){
-                this.agreeEdit.dialogVisible = true;
-                this.agreeEdit.refundData = row;
-                request({
-                    params: {
-                        r: 'plugin/alibaba/mall/order/payment-info',
-                        order_id: row.order_id,
-                        order_detail_id: row.id,
-                    },
-                    method: 'get'
-                }).then(e => {
-                    this.loading = false;
-                    if (e.data.code == 0) {
-                        this.agreeEdit.agreeBackData = e.data.data;
-                    } else {
-                        this.$message.error(e.data.msg);
-                    }
-                }).catch(e => {
-                    this.loading = false;
-                });
+                this.agreeEdit.orderDetailId = parseInt(row.id);
             },
             // 日期搜索
             changeTime() {
@@ -199,7 +178,6 @@ echo $this->render("com-refund-agree");
                 }
                 this.loadData();
             },
-
             loadData(status = 'apply', page = 1) {
                 this.loading = true;
                 request({
@@ -291,6 +269,10 @@ echo $this->render("com-refund-agree");
                     }
                 });
             },
+
+            close(){
+                this.agreeEdit.orderDetailId = 0;
+            }
         }
     })
 </script>

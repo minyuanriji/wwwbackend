@@ -122,7 +122,7 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
             }*/
 
             //更新1688订单信息
-            $detail1688->ali_refund_id = $res->refundId;
+            $detail1688->ali_refund_id = isset($res->refundId) ? $res->refundId : "";
             $detail1688->ali_orderdata = json_encode($orderData1688);
             $detail1688->updated_at    = time();
             if(!$detail1688->save()){

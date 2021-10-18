@@ -2,11 +2,12 @@
 
 namespace app\plugins\alibaba\controllers\mall;
 
+use app\plugins\alibaba\forms\mall\AlibabaDistributionOrderDetailForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionOrderListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionOrderRefundListForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionAfterApplyForm;
-use app\plugins\alibaba\forms\mall\AlibabaDistributionSalePaymentForm;
 use app\plugins\alibaba\forms\mall\AlibabaDistributionPaymentInfoForm;
+use app\plugins\alibaba\forms\mall\AlibabaDistributionRefundPaidForm;
 use app\plugins\Controller;
 
 class OrderController extends Controller
@@ -27,6 +28,16 @@ class OrderController extends Controller
     }
 
     /**
+     * 订单详情
+     * @return string|\yii\web\Response
+     */
+    public function actionOrderDetail(){
+        $form = new AlibabaDistributionOrderDetailForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->getDetail());
+    }
+
+    /**
      * 售后订单列表
      * @return string|\yii\web\Response
      */
@@ -42,23 +53,22 @@ class OrderController extends Controller
     }
 
     /**
+     * 售后订单打款
+     * @return string|\yii\web\Response
+     */
+    public function actionRefundPaid(){
+        $form = new AlibabaDistributionRefundPaidForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
+    }
+
+    /**
      * 售后申请
      * @return string|\yii\web\Response
      */
     public function actionApply()
     {
         $form = new AlibabaDistributionAfterApplyForm();
-        $form->attributes = \Yii::$app->request->post();
-        return $this->asJson($form->save());
-    }
-
-    /**
-     * 售后订单打款
-     * @return string|\yii\web\Response
-     */
-    public function actionSalePayment()
-    {
-        $form = new AlibabaDistributionSalePaymentForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->save());
     }

@@ -9,25 +9,21 @@ use app\plugins\alibaba\models\AlibabaDistributionOrderDetail;
 use app\plugins\alibaba\models\AlibabaDistributionOrderRefund;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
 
-class AlibabaDistributionSalePaymentForm extends BaseModel
-{
+class AlibabaDistributionRefundPaidForm extends BaseModel{
 
-    public $id;
+    public $refund_id;
     public $act;
-    public $content;
-    public $aliRefundStatus;
+    public $remark;
 
     public function rules()
     {
         return [
-            [['id', 'act'], 'required'],
-            [['id'], 'integer'],
-            [['content', 'aliRefundStatus'], 'safe']
+            [['refund_id'], 'required'],
+            [['act', 'remark'], 'safe']
         ];
     }
 
-    public function save()
-    {
+    public function save(){
 
         if (!$this->validate()) {
             return $this->responseErrorInfo();
@@ -35,30 +31,28 @@ class AlibabaDistributionSalePaymentForm extends BaseModel
 
         $t = \Yii::$app->getDb()->beginTransaction();
         try {
-            $orderRefund = AlibabaDistributionOrderRefund::findOne($this->id);
-            if (!$orderRefund) throw new \Exception("退款记录不存在");
 
-            $OrderDetail = AlibabaDistributionOrderDetail::findOne($orderRefund->order_detail_id);
-            if (!$OrderDetail || $OrderDetail->is_delete) {
-                throw new \Exception("售后订单详情不存在");
+            $orderRefund = AlibabaDistributionOrderRefund::findOne($this->refund_id);
+            if (!$orderRefund){
+                throw new \Exception("[AlibabaDistributionOrderRefund] 退款记录不存在");
+            }
+
+            if ($orderRefund->status != 'waitting'){
+                throw new \Exception("无法操作 {$orderRefund->status}");
+            }
+
+            $orderDetail = AlibabaDistributionOrderDetail::findOne($orderRefund->order_detail_id);
+            if (!$orderDetail || $orderDetail->is_delete) {
+                throw new \Exception("[AlibabaDistributionOrderDetail] 订单详情不存在");
             }
 
             if ($this->act == "cancel") { //拒绝
-                if ($orderRefund->status != 'waitting')
-                    throw new \Exception("无法拒绝操作");
-
-                $orderRefund->status = 'cancel';
-                $orderRefund->remark = $this->content;
-                if (!$orderRefund->save())
+                $orderRefund->updated_at = time();
+                $orderRefund->status     = 'cancel';
+                $orderRefund->remark     = $this->remark;
+                if (!$orderRefund->save()){
                     throw new \Exception($orderRefund->getErrors());
-
-                if ($OrderDetail->refund_status == 'finished')
-                    throw new \Exception("无法拒绝操作");
-
-                $OrderDetail->refund_status = 'refused';
-                if (!$OrderDetail->save())
-                    throw new \Exception(json_encode($OrderDetail->getErrors()));
-
+                }
                 $msg = '拒绝打款';
             } elseif ($this->act == "paid") {
                 if ($this->aliRefundStatus != 'refundsuccess')

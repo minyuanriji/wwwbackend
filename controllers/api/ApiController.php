@@ -196,7 +196,7 @@ class ApiController extends BaseController
 
         $districtList = DistrictData::getArr();
 
-        if(empty($cacheData)){
+        if(empty($cacheData) || empty($cacheData['city'])){
             $url = "https://apis.map.qq.com/ws/geocoder/v1/?location=".$cityData['latitude'].",".$cityData['longitude']."&key={$key}&get_poi=1";
 
             $hostInfo = \Yii::$app->getRequest()->getHostInfo();

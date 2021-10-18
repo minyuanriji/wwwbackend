@@ -6,6 +6,7 @@ use app\helpers\ArrayHelper;
 use app\plugins\hotel\jobs\HotelFetchBookingListJob;
 use app\plugins\hotel\libs\IPlateform;
 use app\plugins\hotel\libs\plateform\BookingListResult;
+use app\plugins\hotel\models\HotelPics;
 use app\plugins\hotel\models\Hotels;
 
 class ApiHotelHelper{
@@ -96,5 +97,15 @@ class ApiHotelHelper{
         }
 
         return $bookingList ?: [];
+    }
+
+    /**
+     * 获取酒店客预定列表
+     * @param Hotels $hotel
+     * @return
+     */
+    public static function diagram (Hotels $hotel)
+    {
+        return HotelPics::find()->where(['hotel_id' => $hotel->id])->count();
     }
 }

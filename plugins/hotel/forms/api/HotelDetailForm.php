@@ -43,7 +43,8 @@ class HotelDetailForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'hotel_info'   => ApiHotelHelper::format($hotel),
-                    'booking_list' => ApiHotelHelper::bookingList($hotel, $this->start_date, $this->days)
+                    'booking_list' => ApiHotelHelper::bookingList($hotel, $this->start_date, $this->days),
+                    'diagram_num' => ApiHotelHelper::diagram($hotel)
                 ]
             ];
         }catch (\Exception $e){

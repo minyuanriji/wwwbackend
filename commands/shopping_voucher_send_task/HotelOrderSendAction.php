@@ -54,7 +54,7 @@ class HotelOrderSendAction extends Action{
             "ho.pay_status='paid'",
             "ho.order_status IN('success', 'unconfirmed', 'finished')"
         ]);
-        $sendLogs = $query->select(["l.id", "l.user_id", "l.source_id", "l.source_type", "l.money"])
+        $sendLogs = $cloneQuery->select(["l.id", "l.user_id", "l.source_id", "l.source_type", "l.money"])
             ->orderBy("l.updated_at ASC")
             ->all();
         $sendLogIds = [];

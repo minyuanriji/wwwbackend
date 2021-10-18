@@ -21,6 +21,7 @@
                     {key:"store", label: "商户列表", r:"plugin/shopping_voucher/mall/from-store/list"},
                     {key: "hotel", label: "酒店列表", r:"plugin/shopping_voucher/mall/from-hotel/list"},
                     {key: "addcredit", label: "话费充值", r:"plugin/shopping_voucher/mall/from-addcredit/edit"},
+                    {key: "giftpacks", label: "大礼包列表", r:"plugin/shopping_voucher/mall/from-giftpacks/list"},
                 ]
             };
         },

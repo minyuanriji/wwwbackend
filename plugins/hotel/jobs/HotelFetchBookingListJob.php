@@ -5,6 +5,7 @@ use app\helpers\ArrayHelper;
 use app\models\Mall;
 use app\plugins\hotel\libs\IPlateform;
 use app\plugins\hotel\libs\plateform\BookingListResult;
+use app\plugins\hotel\models\HotelPics;
 use app\plugins\hotel\models\Hotels;
 use yii\base\BaseObject;
 use yii\queue\JobInterface;
@@ -49,6 +50,7 @@ class HotelFetchBookingListJob extends BaseObject implements JobInterface{
             $arr = ArrayHelper::toArray($bookingListItem);
             $arr['product_thumb'] = !empty($arr['product_thumb']) ? $arr['product_thumb'] : $this->hotel->thumb_url;
             $arr['product_num'] = max($arr['product_num'], 0);
+            $arr['diagram_url'] = HotelPics::find()->where(['hotel_id' => $this->hotel->id, 'room_product_code' => $arr['product_code']])->select('pic_url')->asArray()->all();
             $bookingList[] = $arr;
         }
 

@@ -95,6 +95,6 @@ class ApiHotelHelper{
             \Yii::$app->queue->delay(0)->push($job);
         }
 
-        return $bookingList ? $bookingList : [];
+        return $bookingList ?: [];
     }
 }

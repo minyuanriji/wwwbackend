@@ -6,6 +6,7 @@ use app\helpers\APICacheHelper;
 use app\plugins\ApiController;
 use app\plugins\hotel\forms\api\CityListForm;
 use app\plugins\hotel\forms\api\HotelDetailForm;
+use app\plugins\hotel\forms\api\HotelDiagramForm;
 use app\plugins\hotel\forms\api\HotelInfoForm;
 use app\plugins\hotel\forms\api\HotelSearchPrepareForm;
 use app\plugins\hotel\forms\api\HotelSimpleListForm;
@@ -62,5 +63,15 @@ class HotelController extends ApiController{
     {
         $form = new CityListForm();
         return $this->asJson($form->getList());
+    }
+
+    /*
+     * 获取酒店首页轮播图、城市等数据
+     * */
+    public function actionHotelDiagram ()
+    {
+        $form = new HotelDiagramForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->getDiagram());
     }
 }

@@ -2,10 +2,7 @@
 namespace app\plugins\hotel\helpers;
 
 use app\controllers\api\ApiController;
-use app\helpers\ArrayHelper;
 use app\plugins\hotel\jobs\HotelFetchBookingListJob;
-use app\plugins\hotel\libs\IPlateform;
-use app\plugins\hotel\libs\plateform\BookingListResult;
 use app\plugins\hotel\models\HotelPics;
 use app\plugins\hotel\models\Hotels;
 
@@ -100,12 +97,12 @@ class ApiHotelHelper{
     }
 
     /**
-     * 获取酒店客预定列表
-     * @param Hotels $hotel
+     * 获取酒店套图总数
+     * @param
      * @return
      */
-    public static function diagram (Hotels $hotel)
+    public static function diagram ($hotel_id)
     {
-        return HotelPics::find()->where(['hotel_id' => $hotel->id])->count();
+        return HotelPics::find()->where(['hotel_id' => $hotel_id])->count();
     }
 }

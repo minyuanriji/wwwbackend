@@ -33,6 +33,7 @@ class FromGoodsSearchGoodsForm extends BaseModel {
             $query->leftJoin(["svfg" => ShoppingVoucherFromGoods::tableName()], "g.id=svfg.goods_id");
             $query->orderBy("g.id DESC");
             $query->where([
+                "g.mch_id" => 0,
                 "g.is_delete" => 0
             ]);
 

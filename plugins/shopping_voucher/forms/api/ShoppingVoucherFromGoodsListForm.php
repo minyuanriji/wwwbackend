@@ -39,7 +39,7 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
 
             $list = $query->orderBy(['g.sort' => SORT_ASC, 'g.id' => SORT_DESC])
                 ->groupBy('g.goods_warehouse_id')
-                ->page($pagination, 10, $this->page)
+                ->page($pagination, 2, $this->page)
                 -> all();
 
             $newList = [];
@@ -76,7 +76,7 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
             foreach($newList as &$detail){
                 if(isset($fromGoodsRates[$detail['id']])){
                     $rate = $fromGoodsRates[$detail['id']];
-                    $detail['got_shopping_voucher_num'] = round((floatval($rate)/100) * floatval($detail['price']), 2);
+                    $detail['got_shopping_voucher_num'] = round((floatval($rate)/100) * floatval($detail['total_original_price']), 2);
                 }
             }
 

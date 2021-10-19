@@ -149,11 +149,11 @@
                 this.formData.list = selection;
             },
             //搜索商品
-            toSearch(){
+            toSearch(page){
                 let params = Object.assign({
                     r: 'plugin/shopping_voucher/mall/from-mall-goods/search-goods'
                 }, this.searchForm);
-                params['page'] = 1;
+                params['page'] = typeof page != "undefined" ? page : 1;
                 this.searchStatus=1;
                 this.searchLoading=true;
                 request({
@@ -170,9 +170,8 @@
                     this.searchLoading=false;
                 });
             },
-            pageChange(currentPage) {
-                this.searchForm.page = currentPage;
-                this.toSearch();
+            pageChange(page) {
+                this.toSearch(page);
             },
             //打开设置对话框
             openFormDialog(is_all){

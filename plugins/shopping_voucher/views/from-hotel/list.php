@@ -143,6 +143,10 @@ echo $this->render("../com/com-tab-from");
             };
         },
         methods: {
+            pageChange(page){
+                this.page = page;
+                this.getList();
+            },
             switchChanged(){
                 if(!this.commonSet.is_open){
                     this.saveCommon();

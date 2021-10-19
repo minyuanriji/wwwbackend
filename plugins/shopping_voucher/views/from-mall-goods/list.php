@@ -45,7 +45,7 @@ echo $this->render("../com/com-tab-from");
                             <template slot-scope="scope">
                                 <div flex="box:first">
                                     <div style="padding-right: 10px;">
-                                        <com-image mode="aspectFill" :src="scope.row.cover_url"></com-image>
+                                        <com-image mode="aspectFill" :src="scope.row.cover_pic"></com-image>
                                     </div>
                                     <div >
                                         <div>
@@ -56,23 +56,9 @@ echo $this->render("../com/com-tab-from");
                                                 <com-ellipsis :line="2">{{scope.row.name}}</com-ellipsis>
                                             </el-tooltip>
                                         </div>
-                                        <div>ID：{{scope.row.mch_id}}</div>
+                                        <div>ID：{{scope.row.goods_id}}</div>
                                     </div>
                                 </div>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="give_value" label="赠送比例/折扣" width="130">
-                            <template slot-scope="scope">
-                                <div>{{scope.row.give_value}}%</div>
-                                <div style="color:darkred">折扣：{{scope.row.transfer_rate}}折</div>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="total_income" label="总收入" width="110"></el-table-column>
-                        <el-table-column prop="total_send" label="总送出" width="110"></el-table-column>
-                        <el-table-column prop="parent_nickname" label="推荐人" width="150"></el-table-column>
-                        <el-table-column prop="scope" width="110" label="启动时间">
-                            <template slot-scope="scope">
-                                {{scope.row.start_at}}
                             </template>
                         </el-table-column>
                         <el-table-column prop="scope" width="110" label="添加时间">
@@ -87,11 +73,6 @@ echo $this->render("../com/com-tab-from");
                         </el-table-column>
                         <el-table-column label="操作">
                             <template slot-scope="scope">
-                                <el-button @click="editStore(scope.row)" type="text" circle size="mini">
-                                    <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-                                        <img src="statics/img/mall/edit.png" alt="">
-                                    </el-tooltip>
-                                </el-button>
                                 <el-button @click="deleteOn(scope.row)" type="text" circle size="mini">
                                     <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                         <img src="statics/img/mall/del.png" alt="">
@@ -156,6 +137,10 @@ echo $this->render("../com/com-tab-from");
             };
         },
         methods: {
+            pageChange(page){
+                this.page = page;
+                this.getList();
+            },
             newGoods(){
                 this.editData = {};
                 this.editDialogVisible = true;
@@ -192,6 +177,37 @@ echo $this->render("../com/com-tab-from");
                             that.loading = true;
                         });
                     }
+                });
+            },
+            deleteOn(row){
+                let self = this;
+                self.$confirm('删除该条数据, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.loading = true;
+                    request({
+                        params: {
+                            r: "plugin/shopping_voucher/mall/from-mall-goods/delete"
+                        },
+                        method: 'post',
+                        data: {
+                            id: row.id,
+                        }
+                    }).then(e => {
+                        self.loading = false;
+                        if (e.data.code === 0) {
+                            self.$message.success(e.data.msg);
+                            self.getList();
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        self.loading = false;
+                    });
+                }).catch(() => {
+
                 });
             },
             getList() {

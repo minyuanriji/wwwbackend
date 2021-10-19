@@ -61,7 +61,7 @@
                 </el-form-item>
                 <el-form-item >
                     <el-button @click="searchStatus=0" v-if="searchStatus==1" size="big" icon="el-icon-refresh-left" type="danger">重新搜索</el-button>
-                    <el-button @click="toSearch" v-if="searchStatus==0" size="big" icon="el-icon-search" type="primary">点击搜索</el-button>
+                    <el-button @click="toSearch(1)" v-if="searchStatus==0" size="big" icon="el-icon-search" type="primary">点击搜索</el-button>
                 </el-form-item>
             </el-form>
 
@@ -235,9 +235,9 @@
                 let params = Object.assign({
                     r: 'plugin/shopping_voucher/mall/from-store/search-store'
                 }, this.searchForm);
-                params['page'] = typeof page != "undefined" ? page : 1;
-                this.searchStatus=1;
-                this.searchLoading=true;
+                params['page'] = typeof page != "number" ? page : 1;
+                this.searchStatus = 1;
+                this.searchLoading = true;
                 request({
                     params
                 }).then(e => {

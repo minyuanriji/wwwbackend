@@ -14,7 +14,7 @@
                 </el-form-item>
                 <el-form-item >
                     <el-button @click="searchStatus=0" v-if="searchStatus==1" size="big" icon="el-icon-refresh-left" type="danger">重新搜索</el-button>
-                    <el-button @click="toSearch" v-if="searchStatus==0" size="big" icon="el-icon-search" type="primary">点击搜索</el-button>
+                    <el-button @click="toSearch(1)" v-if="searchStatus==0" size="big" icon="el-icon-search" type="primary">点击搜索</el-button>
                 </el-form-item>
             </el-form>
 

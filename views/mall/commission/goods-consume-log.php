@@ -205,47 +205,4 @@
         padding: 20px;
         background-color: #fff;
     }
-
-    .input-item {
-        display: inline-block;
-        width: 250px;
-        margin: 0 0 20px 20px;
-    }
-
-    .input-item .el-input__inner {
-        border-right: 0;
-    }
-
-    .input-item .el-input__inner:hover {
-        border: 1px solid #dcdfe6;
-        border-right: 0;
-        outline: 0;
-    }
-
-    .input-item .el-input__inner:focus {
-        border: 1px solid #dcdfe6;
-        border-right: 0;
-        outline: 0;
-    }
-
-    .input-item .el-input-group__append {
-        background-color: #fff;
-        border-left: 0;
-        width: 10%;
-        padding: 0;
-    }
-
-    .input-item .el-input-group__append .el-button {
-        padding: 0;
-    }
-
-    .input-item .el-input-group__append .el-button {
-        margin: 0;
-    }
-
-    .table-body .el-button {
-        padding: 0 !important;
-        border: 0;
-        margin: 0 5px;
-    }
 </style>

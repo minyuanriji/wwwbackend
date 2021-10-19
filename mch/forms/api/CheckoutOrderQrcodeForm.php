@@ -58,10 +58,8 @@ class CheckoutOrderQrcodeForm extends BaseModel {
                 'qrcode' => $codeUrl
             ]);
         }catch (\Exception $e){
-            \Yii::$app->redis->set('var1',$e -> getMessage());
+//            \Yii::$app->redis->set('var1',$e -> getMessage());
             return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());
         }
-
     }
-
 }

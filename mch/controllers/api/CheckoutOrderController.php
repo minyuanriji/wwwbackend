@@ -2,6 +2,7 @@
 namespace app\mch\controllers\api;
 
 
+use app\forms\api\poster\MchPosterForm;
 use app\mch\forms\api\CheckoutOrderInfoForm;
 use app\mch\forms\api\CheckoutOrderPayForm;
 use app\mch\forms\api\CheckoutOrderQrcodeForm;
@@ -68,5 +69,20 @@ class CheckoutOrderController extends MchMApiController {
         $form = new CheckoutOrderInfoForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->info());
+    }
+
+    /**
+     * 生成结账单---二维码(下载二维码)
+     * @return
+     * @throws \app\core\exceptions\ClassNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
+     */
+    public function actionSyntheticQrCode()
+    {
+        $form = new MchPosterForm();
+        $form->attributes = $this->requestData;
+        $form->mch_id = $this->mch_id;
+        return $this->asJson($form->get());
     }
 }

@@ -3,115 +3,33 @@
         padding: 20px;
         background-color: #fff;
     }
-
-    .input-item {
-        width: 250px;
-        margin: 0 0 20px;
-    }
-
-    .input-item .el-input__inner {
-        border-right: 0;
-    }
-
-    .input-item .el-input__inner:hover {
-        border: 1px solid #dcdfe6;
-        border-right: 0;
-        outline: 0;
-    }
-
-    .input-item .el-input__inner:focus {
-        border: 1px solid #dcdfe6;
-        border-right: 0;
-        outline: 0;
-    }
-
-    .input-item .el-input-group__append {
-        background-color: #fff;
-        border-left: 0;
-        width: 10%;
-        padding: 0;
-    }
-
-    .input-item .el-input-group__append .el-button {
-        padding: 0;
-    }
-
-    .input-item .el-input-group__append .el-button {
-        margin: 0;
-    }
-
-    .table-body .el-table .el-button {
-        padding: 0 !important;
-        border: 0;
-        margin: 0 5px;
-    }
-
-    .table-body .el-form-item {
-        margin-bottom: 0;
-    }
-
-    .sort-input {
-        width: 100%;
-        background-color: #F3F5F6;
-        height: 32px;
-    }
-
-    .sort-input span {
-        height: 32px;
-        width: 100%;
-        line-height: 32px;
-        display: inline-block;
-        padding: 0 10px;
-        font-size: 13px;
-    }
-
-    .sort-input .el-input__inner {
-        height: 32px;
-        line-height: 32px;
-        background-color: #F3F5F6;
-        float: left;
-        padding: 0 10px;
-        border: 0;
-    }
-
-    .el-alert {
-        padding: 0;
-        padding-left: 5px;
-        padding-bottom: 5px;
-    }
-
-    .el-alert--info .el-alert__description {
-        color: #606266;
-    }
-
-    .el-alert .el-button {
-        margin-left: 20px;
-    }
-
-    .el-alert__content {
-        display: flex;
-        align-items: center;
-    }
-
-    .table-body .el-alert__title {
-        margin-top: 5px;
-        font-weight: 400;
-    }
-    .el-tooltip__popper{max-width: 400px}
 </style>
 <div id="app" v-cloak>
     <el-card class="box-card" shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <div>
                 <span>账单记录</span>
-                <div style="float: right;margin-top: -5px"> </div>
+                <div>
+                    <div style="display: flex;justify-content: space-evenly">
+                        <div>
+                            <div style="text-align: center;">总收入</div>
+                            <div id="assets"><span style="color: #1ed0ff;font-size: 20px">{{Statistics.income}}</span>元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页收入</div>
+                            <div id="assets"><span style="color: #1ed0ff;font-size: 20px">{{Statistics.currentIncome}}</span>元</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="table-body">
-            <el-form @submit.native.prevent="searchList" size="small" :inline="true" :model="search">
-                <el-form-item>
-                    <el-select v-model="search.pay_status" placeholder="请选择"  @change="searchList" style="width:110px;">
+
+            <div style="display: flex;margin-bottom: 20px">
+                <div>
+                    支付状态
+                    <el-select v-model="searchData.pay_status" placeholder="请选择" size="small" @change="search" style="width:110px;">
                         <el-option
                                 v-for="item in pay_options"
                                 :key="item.value"
@@ -119,34 +37,86 @@
                                 :value="item.value">
                         </el-option>
                     </el-select>
-                </el-form-item>
-                <el-form-item>
-                    <div class="input-item">
-                        <el-input  @keyup.enter.native="searchList" size="small" placeholder="请输入店铺名/单号搜索" v-model="search.keyword" clearable
-                                   @clear='searchList'>
-                            <el-button slot="append" icon="el-icon-search" @click="searchList"></el-button>
-                        </el-input>
-                    </div>
-                </el-form-item>
-            </el-form>
+                </div>
+
+                <div style="margin-left: 20px">
+                    支付方式
+                    <el-select v-model="searchData.pay_mode" placeholder="请选择" size="small" @change="search" style="width:110px;">
+                        <el-option
+                                v-for="item in pay_mode"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </div>
+
+                <div style="margin-left: 20px">
+                    <el-date-picker size="small" v-model="searchData.date" type="datetimerange"
+                                    style="float: left"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    range-separator="至" start-placeholder="支付开始日期"
+                                    @change="selectDateTime"
+                                    end-placeholder="支付结束日期">
+                    </el-date-picker>
+                </div>
+
+                <div style="margin-left: 20px">
+                    <el-input style="width: 250px" size="small" v-model="searchData.keyword" placeholder="请输入搜索内容" clearable
+                              @clear="clearSearch"
+                              @change="search"
+                              @input="triggeredChange">
+                        <el-select style="width: 100px" slot="prepend" v-model="searchData.keyword_1">
+                            <el-option v-for="item in selectList" :key="item.value"
+                                       :label="item.name"
+                                       :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-input>
+                </div>
+
+                <div style="margin-left: 20px">
+                    <el-select size="small" v-model="level" placeholder="请选择区域" @change="levelChange" style="width: 120px">
+                        <el-option
+                                v-for="item in level_list"
+                                :label="item.name"
+                                :value="item.level">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div style="margin-left: 20px" v-if="level>0">
+                    省市区
+                    <el-cascader
+                            size="small"
+                            @change="addressChange"
+                            :options="district"
+                            :props="props"
+                            v-model="address">
+                    </el-cascader>
+                </div>
+
+                <el-button @click="clearWhere" style="color: #1ed0ff;margin-left: 20px" size="small">清空筛选条件</el-button>
+
+            </div>
+
             <el-table v-loading="listLoading" :data="list" border style="width: 100%">
-                <el-table-column prop="id" label="ID" width="60"></el-table-column>
-                <el-table-column prop="order_no" label="订单号" width="250"></el-table-column>
-                <el-table-column :show-overflow-tooltip="true" label="店铺信息" width="200">
+                <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                <el-table-column prop="order_no" label="订单号" width="270"></el-table-column>
+                <el-table-column :show-overflow-tooltip="true" label="店铺信息" width="350">
                     <template slot-scope="scope">
                         <div flex="cross:center">
-                            <com-image width="25" height="25" :src="scope.row.mchStore.cover_url"></com-image>
-                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.mchStore.name}}</div>
+                            <com-image width="25" height="25" :src="scope.row.cover_url"></com-image>
+                            <div style="margin-left: 10px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.name}}</div>
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="支付状态" width="250">
+                <el-table-column label="支付状态" width="260">
                     <template slot-scope="scope">
                         <div v-if="scope.row.is_pay==1">
-                            <div>支付用户：{{scope.row.payUser.nickname}}</div>
+                            <div>支付用户：{{scope.row.nickname}}</div>
                             <div>支付时间：{{scope.row.format_pay_time}}</div>
                         </div>
-                        <div v-else>-</div>
+                        <div v-else style="color: red">未支付</div>
                     </template>
                 </el-table-column>
 
@@ -175,7 +145,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column :show-overflow-tooltip="true" label="操作">
+                <!--<el-table-column :show-overflow-tooltip="true" label="操作">
                     <template slot-scope="scope">
                         <el-button @click="view(scope.row.id)" type="text" circle size="mini">
                             <el-tooltip class="item" effect="dark" content="详情" placement="top">
@@ -183,7 +153,7 @@
                             </el-tooltip>
                         </el-button>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
 
             </el-table>
 
@@ -205,32 +175,103 @@
         el: '#app',
         data() {
             return {
+                searchData: {
+                    keyword: '',
+                    keyword_1: '',
+                    date: '',
+                    start_date: '',
+                    end_date: '',
+                    pay_status: '',
+                    pay_mode: '',
+                },
+                selectList: [
+                    {value: '1', name: '支付用户昵称'},
+                    {value: '2', name: '店铺名'},
+                    {value: '3', name: '订单号'},
+                ],
+                Statistics:'',
+                level_list: [
+                    {
+                        name: '省',
+                        level: 1
+                    },
+                    {
+                        name: '市',
+                        level: 2
+                    },
+                    {
+                        name: '区',
+                        level: 3
+                    },
+                ],
+                level: '',
+                address: null,
+                district: [],
+                town_list: [],
+                province_id: 0,
+                city_id: 0,
+                district_id: 0,
+                props: {
+                    value: 'id',
+                    label: 'name',
+                    children: 'list'
+                },
+                levelShow:false,
                 list: [],
                 listLoading: false,
                 page: 1,
                 pageCount: 0,
-                loginRoute: '',
-
-                search: {
-                    keyword: '',
-                    pay_status: '0'
-                },
-                btnLoading: false,
-                mch_id: 0,
                 id: null,
-                sort: 0,
                 pay_options: [
-                    {label: "全部",   value: "0"},
+                    {label: "全部",   value: ""},
                     {label: "已支付", value: "paid"},
                     {label: "未支付", value: "unpaid"}
+                ],
+                pay_mode: [
+                    {label: "全部",   value: ""},
+                    {label: "红包", value: "red_packet"},
+                    {label: "余额", value: "balance"}
                 ]
             };
         },
         methods: {
+            triggeredChange (){
+                if (this.searchData.keyword.length>0 && this.searchData.keyword_1.length<=0) {
+                    alert('请选择搜索方式');
+                    this.searchData.keyword='';
+                }
+            },
+            clearSearch() {
+                this.page = 1;
+                this.searchData.keyword = '';
+                this.getList();
+            },
+            selectDateTime(e) {
+                if (e != null) {
+                    this.searchData.start_date = e[0];
+                    this.searchData.end_date = e[1];
+                } else {
+                    this.searchData.start_date = '';
+                    this.searchData.end_date = '';
+                }
+                this.search();
+            },
             pagination(currentPage) {
                 let self = this;
                 self.page = currentPage;
                 self.getList();
+            },
+            clearWhere() {
+                this.searchData.keyword = '';
+                this.searchData.keyword_1 = '';
+                this.searchData.pay_status = '';
+                this.searchData.start_date = '';
+                this.searchData.date = '';
+                this.searchData.end_date = '';
+                this.searchData.pay_mode = '';
+                this.address = '';
+                this.level = '';
+                this.getList();
             },
             getList() {
                 let self = this;
@@ -239,13 +280,20 @@
                     params: {
                         r: 'plugin/mch/mall/checkout-order/index',
                         page: self.page,
-                        keyword: self.search.keyword,
-                        pay_status: self.search.pay_status
+                        keyword: self.searchData.keyword,
+                        keyword_1: self.searchData.keyword_1,
+                        pay_status: self.searchData.pay_status,
+                        start_date: self.searchData.start_date,
+                        end_date: self.searchData.end_date,
+                        pay_mode: self.searchData.pay_mode,
+                        address: self.address,
+                        level: self.level,
                     },
                     method: 'get',
                 }).then(e => {
                     self.listLoading = false;
                     self.list = e.data.data.list;
+                    self.Statistics = e.data.data.Statistics;
                     self.pageCount = e.data.data.pagination.page_count;
                 }).catch(e => {
                     console.log(e);
@@ -257,10 +305,41 @@
                     id: id,
                 });
             },
-            searchList() {
+            search() {
                 this.page = 1;
                 this.getList();
-            }
+            },
+            levelChange(e) {
+                this.getDistrict(e);
+            },
+            // 获取省市区列表
+            getDistrict(level) {
+                if (level == 1) {
+                    level1 = 1;
+                } else if (level == 2) {
+                    level1 = 2;
+                } else if (level == 3) {
+                    level1 = 3;
+                } else {
+                    level1 = 4;
+                }
+                request({
+                    params: {
+                        r: 'district/index',
+                        level: level1
+                    },
+                }).then(e => {
+                    if (e.data.code == 0) {
+                        this.district = e.data.data.district;
+                    }
+                }).catch(e => {
+                });
+            },
+            addressChange(e) {
+                this.town_list = []
+                this.page = 1;
+                this.getList();
+            },
         },
         mounted: function () {
             this.getList();

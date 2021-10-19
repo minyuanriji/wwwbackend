@@ -1,4 +1,5 @@
 <?php
+echo $this->render("com-edit");
 echo $this->render("../com/com-tab-from");
 ?>
 <div id="app" v-cloak>
@@ -8,6 +9,7 @@ echo $this->render("../com/com-tab-from");
 
         <div class="table-body">
             <el-alert title="说明：用户通过现金支付商城商品订单，成功后可获得赠送购物券" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
+
 
             <el-tabs v-model="activeName2" type="border-card">
                 <el-tab-pane label="通用配置" name="first">
@@ -32,7 +34,12 @@ echo $this->render("../com/com-tab-from");
 
                 </el-tab-pane>
                 <el-tab-pane label="指定商品" name="second">
-                    <el-table :data="list" border style="width: 100%" v-loading="loading">
+
+                    <div style="">
+                        <el-button size="big" type="primary" @click="newGoods">添加商品</el-button>
+                    </div>
+
+                    <el-table :data="list" border style="width: 100%;margin-top:20px;" v-loading="loading">
                         <el-table-column prop="id" label="ID" width="100"></el-table-column>
                         <el-table-column sortable="custom" label="商品名称" width="300">
                             <template slot-scope="scope">
@@ -112,6 +119,12 @@ echo $this->render("../com/com-tab-from");
         </div>
     </el-card>
 
+    <com-edit :visible="editDialogVisible"
+              :edit-data="editData"
+              @close="close"
+              @update="update">
+    </com-edit>
+
 </div>
 <script>
     const app = new Vue({
@@ -143,6 +156,10 @@ echo $this->render("../com/com-tab-from");
             };
         },
         methods: {
+            newGoods(){
+                this.editData = {};
+                this.editDialogVisible = true;
+            },
             switchChanged(){
                 if(!this.commonSet.is_open){
                     this.saveCommon();
@@ -200,6 +217,12 @@ echo $this->render("../com/com-tab-from");
                     this.loading = false;
                 });
                 this.loading = true;
+            },
+            update(){
+                this.getList();
+            },
+            close(){
+                this.editDialogVisible = false;
             }
         },
         mounted: function() {

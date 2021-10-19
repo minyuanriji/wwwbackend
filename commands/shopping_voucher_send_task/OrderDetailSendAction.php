@@ -122,7 +122,8 @@ class OrderDetailSendAction extends Action{
     private function newAction(){
         $query = OrderDetail::find()->alias("od");
         $query->innerJoin(["o" => Order::tableName()], "o.id=od.order_id");
-        $query->innerJoin(["svfg" => ShoppingVoucherFromGoods::tableName()], "(svfg.goods_id=od.goods_id OR svfg.goods_id=0) AND svfg.is_delete=0");
+        //$query->innerJoin(["svfg" => ShoppingVoucherFromGoods::tableName()], "(svfg.goods_id=od.goods_id OR svfg.goods_id=0) AND svfg.is_delete=0");
+        $query->innerJoin(["svfg" => ShoppingVoucherFromGoods::tableName()], "(svfg.goods_id=od.goods_id) AND svfg.is_delete=0");
         $query->leftJoin(["svsl" => ShoppingVoucherSendLog::tableName()], "svsl.source_id=od.id AND svsl.source_type='from_order_detail'");
         $query->where([
             "o.is_pay"        => 1,
@@ -136,7 +137,7 @@ class OrderDetailSendAction extends Action{
         $query->andWhere([
             "AND",
             ["IN", "o.status", [1,2,3,6,7,8]],
-            ["IN", "od.refund_status", [0, 21]],
+            ["IN", "od.refund_status", [0, 10, 21]],
             "od.total_price > 0",
             "od.created_at>svfg.start_at",
             "svsl.id IS NULL"

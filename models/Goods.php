@@ -4,6 +4,7 @@ namespace app\models;
 
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchGoods;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromGoods;
 use Yii;
 
 /**
@@ -310,6 +311,10 @@ class Goods extends BaseActiveRecord
     {
 
         return $this->hasOne(GoodsWarehouse::className(), ['id' => 'goods_warehouse_id']);
+    }
+
+    public function getShoppingVoucherFromGoods(){
+        return $this->hasOne(ShoppingVoucherFromGoods::className(), ['goods_id' => 'id']);
     }
 
     public function getMallGoods()

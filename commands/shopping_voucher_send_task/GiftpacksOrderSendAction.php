@@ -4,10 +4,8 @@ namespace app\commands\shopping_voucher_send_task;
 
 use app\models\User;
 use app\plugins\giftpacks\models\GiftpacksOrder;
-use app\plugins\hotel\models\HotelOrder;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromGiftpacks;
-use app\plugins\shopping_voucher\models\ShoppingVoucherFromHotel;
 use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 use yii\base\Action;
 
@@ -38,39 +36,41 @@ class GiftpacksOrderSendAction extends Action{
 
         $query->andWhere([
             "AND",
-            "go.is_delete" => 0,
-            "go.pay_status='paid'"
+            ["go.is_delete" => 0],
+            ["go.pay_status" => "paid"]
         ]);
         $sendLogs = $query->select(["l.id", "l.user_id", "l.source_id", "l.source_type", "l.money"])
             ->orderBy("l.updated_at ASC")
             ->all();
         $sendLogIds = [];
-        foreach($sendLogs as $sendLog){
-            try {
-                $user = User::findOne($sendLog['user_id']);
-                if(!$user || $user->is_delete){
-                    throw new \Exception("用户不存在");
+        if($sendLogs){
+            foreach($sendLogs as $sendLog){
+                try {
+                    $user = User::findOne($sendLog['user_id']);
+                    if(!$user || $user->is_delete){
+                        throw new \Exception("用户不存在");
+                    }
+                    $modifyForm = new ShoppingVoucherLogModifiyForm([
+                        "money"       => $sendLog['money'],
+                        "desc"        => "大礼包订单消费获得赠送购物券",
+                        "source_id"   => $sendLog['source_id'],
+                        "source_type" => $sendLog['source_type']
+                    ]);
+                    $modifyForm->add($user, true);
+                    $sendLogIds[] = $sendLog['id'];
+                    $this->controller->commandOut("购物券发放记录ID:" . $sendLog['id'] . "处理完成");
+                }catch (\Exception $e){
+                    $remark = implode("\n", [$e->getMessage(), "line:" . $e->getLine(), "file:".$e->getFile()]);
+                    ShoppingVoucherSendLog::updateAll([
+                        "status" => "invalid",
+                        "remark" => $remark
+                    ], ["id" => $sendLog['id']]);
+                    $this->controller->commandOut($remark);
                 }
-                $modifyForm = new ShoppingVoucherLogModifiyForm([
-                    "money"       => $sendLog['money'],
-                    "desc"        => "大礼包订单消费获得赠送购物券",
-                    "source_id"   => $sendLog['source_id'],
-                    "source_type" => $sendLog['source_type']
-                ]);
-                $modifyForm->add($user, true);
-                $sendLogIds[] = $sendLog['id'];
-                $this->controller->commandOut("购物券发放记录ID:" . $sendLog['id'] . "处理完成");
-            }catch (\Exception $e){
-                $remark = implode("\n", [$e->getMessage(), "line:" . $e->getLine(), "file:".$e->getFile()]);
-                ShoppingVoucherSendLog::updateAll([
-                    "status" => "invalid",
-                    "remark" => $remark
-                ], ["id" => $sendLog['id']]);
-                $this->controller->commandOut($remark);
             }
-        }
-        if($sendLogIds){
-            ShoppingVoucherSendLog::updateAll(["status" => "success"], "id IN (".implode(",", $sendLogIds).")");
+            if($sendLogIds){
+                ShoppingVoucherSendLog::updateAll(["status" => "success"], "id IN (".implode(",", $sendLogIds).")");
+            }
         }
     }
 
@@ -109,37 +109,42 @@ class GiftpacksOrderSendAction extends Action{
         foreach($giftpacksOrders as $giftpacksOrder){
 
             $money = $giftpacksOrder['pay_price'] * (floatval($giftpacksOrder['give_value'])/100);
-            $userDatas = ['user_id' => $giftpacksOrder['user_id'], 'money' => $money];
+            $userDatas = [];
+            $userDatas[] = ['user_id' => $giftpacksOrder['user_id'], 'money' => $money];
 
             //推荐人也有奖励
             $recommender = @json_decode($giftpacksOrder['recommender'], true);
             if($recommender && !empty($giftpacksOrder['parent_role_type'])){
                 foreach($recommender as $recommenderItem){
-                    print_r($recommenderItem);exit;
+                    if($giftpacksOrder['parent_role_type'] == $recommenderItem['type']){
+                        $money = $giftpacksOrder['pay_price'] * (floatval($recommenderItem['give_value'])/100);
+                        $userDatas[] = [
+                            'user_id' => $giftpacksOrder['parent_id'],
+                            'money'   => $money
+                        ];
+                        break;
+                    }
                 }
             }
 
-            print_r($giftpacksOrder);exit;
+            foreach($userDatas as $userData){
+                $sendLog = new ShoppingVoucherSendLog([
+                    "mall_id"     => $giftpacksOrder['mall_id'],
+                    "user_id"     => $userData['user_id'],
+                    "money"       => $userData['money'],
+                    "source_id"   => $giftpacksOrder['id'],
+                    "source_type" => "from_giftpacks_order",
+                    "status"      => "waiting",
+                    "created_at"  => time(),
+                    "updated_at"  => time(),
+                    "data_json"   => json_encode($giftpacksOrder)
+                ]);
 
-            echo $money;
-            exit;
-
-            $sendLog = new ShoppingVoucherSendLog([
-                "mall_id"     => $giftpacksOrder['mall_id'],
-                "user_id"     => $giftpacksOrder['user_id'],
-                "source_id"   => $giftpacksOrder['id'],
-                "source_type" => "from_giftpacks_order",
-                "status"      => "waiting",
-                "money"       => $money,
-                "created_at"  => time(),
-                "updated_at"  => time(),
-                "data_json"   => json_encode($giftpacksOrder)
-            ]);
-
-            if($sendLog->save()){
-                $this->controller->commandOut("购物券发放记录创建成功，ID:" . $sendLog->id);
-            }else{
-                $this->controller->commandOut(json_encode($sendLog->getErrors()));
+                if($sendLog->save()){
+                    $this->controller->commandOut("购物券发放记录创建成功，ID:" . $sendLog->id);
+                }else{
+                    $this->controller->commandOut(json_encode($sendLog->getErrors()));
+                }
             }
         }
 

@@ -66,6 +66,7 @@ class PosterForm extends BaseModel
                     'left' => 80,
                     'color' => '#000',
                     'file_type' => 'text',
+                    'center' => 1,
                 ],
             ],
             'goods' => [

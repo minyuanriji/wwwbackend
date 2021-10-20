@@ -50,6 +50,12 @@ class SharePosterForm extends GrafikaOption implements BasePoster
             isset($option['head']) && $option['head']['file_path'] = self::head($this, "share/");
         }
 
+        if (isset($option['name']['center']) && $option['name']['center'] == 2) {
+            $pos = imagettfbbox(14,0, $this->font_path, trim($option['name']['text']));
+            $str_width = $pos[2] - $pos[0];
+            $option['name']['left'] = (750 - $str_width) / 2;
+        }
+
         $editor = $this->getPoster($option);
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',['pic_url' => $editor->qrcode_url . '?v=' . time()]);
     }

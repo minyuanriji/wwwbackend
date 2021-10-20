@@ -13,12 +13,14 @@ use app\plugins\mch\models\Mch;
 class MchStoreDetailForm extends BaseModel implements ICacheForm {
 
     public $store_id;
+    public $mch_id;
     public $longitude;
     public $latitude;
 
     public function rules(){
         return [
             [['store_id'], 'required'],
+            [['mch_id'], 'integer'],
             [['longitude', 'latitude'], 'safe']
         ];
     }
@@ -35,10 +37,19 @@ class MchStoreDetailForm extends BaseModel implements ICacheForm {
 
         try {
 
-            $store = Store::findOne($this->store_id);
-            if(!$store || $store->is_delete){
-                throw new \Exception("门店不存在");
+            if(!empty($this->mch_id)){
+                $store = Store::findOne(["mch_id" => $this->mch_id]);
+                if(!$store || $store->is_delete){
+                    throw new \Exception("门店不存在");
+                }
+            }else{
+                $store = Store::findOne($this->store_id);
+                if(!$store || $store->is_delete){
+                    throw new \Exception("门店不存在");
+                }
             }
+
+
 
             $mch = Mch::findOne($store->mch_id);
             if(!$mch || $mch->is_delete || $mch->review_status != Mch::REVIEW_STATUS_CHECKED){

@@ -24,6 +24,26 @@ Yii::$app->loadComponentView('com-dialog-select');
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
+            <div style="float: left; margin-left: 15px">
+                类型
+                <el-tooltip class="item" effect="dark" content="只有选择订单或者商家扫码类型，才能筛选省市区" placement="bottom">
+                    <i class="el-icon-question"></i>
+                </el-tooltip>
+                <el-select style="width: 120px;" size="small" v-model="searchData.source_type" @change='typeChange'>
+                    <el-option key="" label="全部" value=""></el-option>
+                    <el-option key="target_order" label="商城订单-消费" value="target_order"></el-option>
+                    <el-option key="from_order_cancel" label="订单取消" value="from_order_cancel"></el-option>
+                    <el-option key="admin" label="管理员操作" value="admin"></el-option>
+                    <el-option key="from_order_refund" label="订单退款" value="from_order_refund"></el-option>
+                    <el-option key="from_mch_checkout_order" label="商家扫码订单" value="from_mch_checkout_order"></el-option>
+                    <el-option key="target_alibaba_distribution_order" label="1688订单" value="target_alibaba_distribution_order"></el-option>
+                    <el-option key="1688_distribution_order_detail_refund" label="1688订单退款" value="1688_distribution_order_detail_refund"></el-option>
+                    <el-option key="from_hotel_order" label="酒店订单" value="from_hotel_order"></el-option>
+                    <el-option key="from_addcredit_order" label="话费订单" value="from_addcredit_order"></el-option>
+                    <el-option key="from_giftpacks_order" label="大礼包订单" value="from_giftpacks_order"></el-option>
+                    <el-option key="from_order" label="商城订单-获取" value="from_order"></el-option>
+                </el-select>
+            </div>
             <el-table :data="list" border style="width: 100%" v-loading="loading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
                 <el-table-column label="用户信息" width="280">
@@ -124,7 +144,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     title: "选择用户",
                     params: {},
                     columns: [
-                        {label:"收益", key:"total_income"},
+                        {label:"购物券", key:"shop_voucher_money"},
                         {label:"手机号", key:"mobile"},
                         {label:"等级", key:"role_type_text"}
                     ],
@@ -147,6 +167,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     keyword: '',
                     start_date: '',
                     end_at: '',
+                    source_type: '',
                 },
                 date: '',
                 list: [],
@@ -156,6 +177,12 @@ Yii::$app->loadComponentView('com-dialog-select');
             };
         },
         methods: {
+            typeChange(e) {
+                console.log(e);
+                this.page = 1;
+                this.searchData.source_type = e;
+                this.getList();
+            },
             getUsers(){
                 this.forDlgSelect.visible = true;
             },
@@ -225,6 +252,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     start_date: this.searchData.start_date,
                     end_date: this.searchData.end_date,
                     keyword: this.searchData.keyword,
+                    source_type: this.searchData.source_type,
                 };
                 request({
                     params,

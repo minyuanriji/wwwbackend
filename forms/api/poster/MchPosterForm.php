@@ -48,7 +48,7 @@ class MchPosterForm extends GrafikaOption implements BasePoster
             $str_width = $pos[2] - $pos[0];
             $option = [
                 'bg_pic' => [
-                    'url' => \Yii::$app->basePath . '\runtime\image\bj.jpg',
+                    'url' => \Yii::$app->basePath . '/runtime/image/bj.jpg',
                     'is_show' => 1,
                 ],
                 'qr_code' => [

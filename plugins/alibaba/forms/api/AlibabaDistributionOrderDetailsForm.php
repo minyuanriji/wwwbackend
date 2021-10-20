@@ -38,36 +38,55 @@ class AlibabaDistributionOrderDetailsForm extends BaseModel{
                 return $this->returnApiResultData();
             }
 
-            $detail1688 = AlibabaDistributionOrderDetail1688::findOne($this->order_id);
-            if(!$detail1688){
-                throw new \Exception('订单不存在');
+            $order = AlibabaDistributionOrder::findOne($this->order_id);
+            if(!$order || $order->is_delete){
+                throw new \Exception('[AlibabaDistributionOrder] 订单不存在');
             }
 
-            $order = AlibabaDistributionOrder::findOne($detail1688->order_id);
+            $orderDetails = AlibabaDistributionOrderDetail::find()->where([
+                "order_id"  => $order->id,
+                "is_delete" => 0
+            ])->all();
+            if(!$orderDetails){
+                throw new \Exception('[AlibabaDistributionOrderDetail] 订单详情不存在');
+            }
 
-            $data = $order->getAttributes();
-            $data['id'] = $this->order_id;
-            $data['detail'] = AlibabaDistributionOrderDetail::find()->where(['id' => $detail1688->order_detail_id, 'is_delete' => 0])->asArray()->all();
-            $data['shopping_voucher_num'] = $data['shopping_voucher_express_use_num'];
-            if ($data['detail']) {
-                foreach ($data['detail'] as &$item) {
-                    $goods = AlibabaDistributionGoodsList::findOne(['id' => $item['goods_id']]);
-                    $item['name']       = $goods['name'];
-                    $item['cover_url']  = $goods['cover_url'];
-                    $item['sku_labels'] = json_decode($item['sku_labels'], true);
-                    $data['shopping_voucher_num'] += $item['shopping_voucher_num'];
+            $query = AlibabaDistributionOrderDetail::find()->alias("od");
+            $query->innerJoin(["od1688" => AlibabaDistributionOrderDetail1688::tableName()], "od1688.order_detail_id=od.id");
+            $query->innerJoin(["g" => AlibabaDistributionGoodsList::tableName()], "g.id=od.goods_id");
+            $query->andWhere(["od.order_id" => $order->id]);
+            $selects = ["od.id", "od.order_id", "od.num", "od.unit_price", "od.total_original_price", "od.total_price", "od.is_refund", "od.refund_status", "od.shopping_voucher_decode_price",
+                "od.shopping_voucher_num", "od.sku_labels", "od1688.app_id", "od1688.ali_order_id",  "g.cover_url", "g.name"
+            ];
+            $orderDetails = $query->select($selects)->asArray()->all();
+            if(!$orderDetails){
+                throw new \Exception('[AlibabaDistributionOrderDetail] 详情记录不存在');
+            }
+
+            $apps = [];
+            foreach ($orderDetails as &$orderDetail) {
+                if(!isset($apps[$orderDetail['app_id']])){
+                    $apps[$orderDetail['app_id']] = AlibabaApp::findOne($orderDetail['app_id']);
                 }
+
+                $app = $apps[$orderDetail['app_id']];
+
+                //获取1688状态信息
+                $distribution = new Distribution($app->app_key, $app->secret);
+                $extraInfo = $this->get1688ExtraInfo($distribution, $app->access_token, $orderDetail['ali_order_id']);
+
+                $orderDetail['ali_info']   = $extraInfo;
+                $orderDetail['sku_labels'] = $orderDetail['sku_labels'] ? @json_decode($orderDetail['sku_labels'], true) : [];
+                $orderDetail['sku_labels'] = $orderDetail['sku_labels'] ? implode(",", $orderDetail['sku_labels']) : "";
             }
-            $data['created_at'] = date('Y-m-d H:i:s', $order['created_at']);
-            $data['pay_at']     = date('Y-m-d H:i:s', $order['pay_at']);
+            
+            $orderData = $order->getAttributes();
+            $orderData['details']    = $orderDetails;
+            $orderData['created_at'] = date('Y-m-d H:i:s', $order['created_at']);
+            $orderData['pay_at']     = $order->is_pay ? date('Y-m-d H:i:s', $order->pay_at) : "";
+            $orderData['shopping_voucher_total_use_num'] = floatval($orderData['shopping_voucher_express_use_num']) + floatval($orderData['shopping_voucher_use_num']);
 
-            $app = AlibabaApp::findOne($detail1688->app_id);
-            $distribution = new Distribution($app->app_key, $app->secret);
-
-            //获取1688信息
-            $data = array_merge($data, $this->get1688ExtraInfo($distribution, $app->access_token, $detail1688));
-
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'', $data);
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'', $orderData);
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($e));
         }
@@ -77,14 +96,14 @@ class AlibabaDistributionOrderDetailsForm extends BaseModel{
      * 获取1688信息
      * @param Distribution $distribution
      * @param $token
-     * @param AlibabaDistributionOrderDetail1688 $detail1688
+     * @param $ali_order_id
      * @return array
      * @throws \Exception
      */
-    private function get1688ExtraInfo(Distribution $distribution, $token, AlibabaDistributionOrderDetail1688 $detail1688){
+    private function get1688ExtraInfo(Distribution $distribution, $token, $ali_order_id){
         $res = $distribution->requestWithToken(new GetOrderInfo([
             "webSite" => "1688",
-            "orderId" => $detail1688->ali_order_id
+            "orderId" => $ali_order_id
         ]), $token);
         if(!empty($res->error)){
             throw new \Exception($res->error);

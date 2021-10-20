@@ -60,7 +60,7 @@ class MchStoreDetailForm extends BaseModel implements ICacheForm {
 
             $detail = [];
             $detail['id']             = $store->id;
-            $store['mch_id']          = $store->mch_id;
+            $detail['mch_id']          = $store->mch_id;
             $detail['mall_id']        = $store->mall_id;
             $detail['name']           = $store->name;
             $detail['category']       = !$category ? [] : ['id' => $category->id, 'name' => $category->name, 'pic_url' => $category->pic_url];

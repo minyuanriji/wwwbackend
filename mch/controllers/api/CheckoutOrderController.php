@@ -1,6 +1,6 @@
 <?php
-namespace app\mch\controllers\api;
 
+namespace app\mch\controllers\api;
 
 use app\forms\api\poster\MchPosterForm;
 use app\mch\forms\api\CheckoutOrderInfoForm;
@@ -9,8 +9,13 @@ use app\mch\forms\api\CheckoutOrderQrcodeForm;
 
 class CheckoutOrderController extends MchMApiController {
 
+    const action = ['qrcode', 'synthetic-qr-code'];
+
     public function beforeAction($action){
-        if($action->id != "qrcode"){
+        /*if($action->id != "qrcode"){
+            $this->check_auth = false;
+        }*/
+        if (!in_array($action->id, self::action)) {
             $this->check_auth = false;
         }
         return parent::beforeAction($action);

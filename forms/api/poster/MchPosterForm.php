@@ -17,8 +17,20 @@ class MchPosterForm extends GrafikaOption implements BasePoster
     public $route;
 
     use CustomizeFunction;
+
+    public function rules(){
+        return [
+            [['mch_id', 'route'], 'required'],
+            [['route'], 'string']
+        ];
+    }
+
     public function get()
     {
+        if (!$this->validate()) {
+            return $this->returnApiResultData();
+        }
+
         try {
             //获取商户
             $mchModel = Mch::findOne([

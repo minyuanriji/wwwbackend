@@ -31,6 +31,7 @@ use app\models\UserRelationshipLink;
 use app\plugins\boss\models\Boss;
 use app\plugins\boss\models\BossAwardMember;
 use app\plugins\boss\models\BossLevel;
+use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
 use yii\helpers\ArrayHelper;
 
 class UserForm extends BaseModel
@@ -219,6 +220,7 @@ class UserForm extends BaseModel
         ]);
         $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
         $query->leftJoin(["url" => UserRelationshipLink::tableName()], "url.user_id=u.id");
+        $query->leftJoin(["svu" => ShoppingVoucherUser::tableName()], "svu.user_id=u.id");
         $query->keyword($this->member_level, ['u.level' => $this->member_level]);
         if($this->platform){
             $query->leftJoin(['i' => UserInfo::tableName()], 'i.user_id = u.id');
@@ -273,7 +275,7 @@ class UserForm extends BaseModel
 
         $list = $query
             ->select(['u.id', 'u.role_type', 'u.static_integral', 'u.id as user_id', 'u.role_type', 'u.avatar_url', 'u.nickname', 'u.mobile', 'u.balance', 'u.level', 'u.score', 'u.static_score',
-                'u.created_at', 'u.parent_id', 'p.nickname as parent_nickname', 'p.role_type as parent_role_type', 'p.mobile as parent_mobile',
+                'u.created_at', 'u.parent_id', 'p.nickname as parent_nickname', 'p.role_type as parent_role_type', 'p.mobile as parent_mobile', "COALESCE(svu.money,0) AS `shop_voucher_money`",
                 '(u.income + u.income_frozen) as total_income',
                 'coupon_count' => $couponQuery,
                 'order_count' => $orderQuery,

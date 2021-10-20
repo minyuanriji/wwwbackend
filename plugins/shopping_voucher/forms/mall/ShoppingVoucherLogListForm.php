@@ -14,11 +14,12 @@ class ShoppingVoucherLogListForm extends BaseModel{
     public $start_date;
     public $end_date;
     public $keyword;
+    public $source_type;
 
     public function rules(){
         return [
             [['page', 'limit'], 'integer'],
-            [['keyword', 'start_date', 'end_date'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'source_type'], 'trim'],
         ];
     }
 
@@ -40,6 +41,10 @@ class ShoppingVoucherLogListForm extends BaseModel{
                     ["<", "l.created_at", strtotime($this->end_date)],
                     [">", "l.created_at", strtotime($this->start_date)]
                 ]);
+            }
+
+            if ($this->source_type) {
+                $query->andWhere(['source_type' => $this->source_type]);
             }
 
             if($this->keyword){

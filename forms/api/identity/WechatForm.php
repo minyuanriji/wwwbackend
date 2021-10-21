@@ -224,16 +224,16 @@ class WechatForm extends BaseModel
             $openid = md5($data["openid"].$randStr);
             \Yii::$app->cache->set($openid,$data);
             $returnData["key"] = $openid;
-            if(!empty($parent_user_id)){
+            /*if(!empty($parent_user_id)){
                 $user_data = (new UserMode()) -> getOneUserParent($returnData['access_token']);
                 if(!$user_data['parent_id'] || ($user_data['parent_id'] == 9)){
                     try{
-                        //(new UserMode()) -> updateUsers(['parent_id' => $parent_user_id],$user_data['id']);
+                        (new UserMode()) -> updateUsers(['parent_id' => $parent_user_id],$user_data['id']);
                     }catch (\Exception $e){
 
                     }
                 }
-            }
+            }*/
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',$returnData);
         }catch (\Exception $ex){
 

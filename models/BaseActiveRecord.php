@@ -380,7 +380,7 @@ class BaseActiveRecord extends \yii\db\ActiveRecord
             $return['page_count'] = (!empty($return['count'] ) && $return['count']  > 0) ? ceil($return['count']  / $return['page_size']) : 1;
             //边界处理
             if($return['page'] > $return['page_count']) $return['page'] = $return['page_count'];
-            $query->limit($return['page_size']);
+            $query->orderBy('id DESC')->limit($return['page_size']);
             $query->offset(($return['page'] - 1) * $return['page_size']);
             // $return['pagination'] = $pages;
             $return['list'] = $is_array ?  $query->AsArray()->all() : $query->all();

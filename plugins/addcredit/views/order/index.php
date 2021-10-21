@@ -25,7 +25,7 @@
                     </el-input>
                 </div>
 
-                <el-table :data="list" size="small" border v-loading="loading" style="margin-bottom: 15px">
+                <el-table :data="list" size="medium" border v-loading="loading" style="margin-bottom: 15px">
 
                     <el-table-column prop="id" label="ID" width="100"></el-table-column>
 
@@ -35,7 +35,7 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="充值手机号" width="100">
+                    <el-table-column label="充值手机号" width="200">
                         <template slot-scope="scope">
                             <div>{{scope.row.mobile}}</div>
                         </template>
@@ -47,7 +47,7 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="下单用户" width="180">
+                    <el-table-column label="下单用户" width="260">
                         <template slot-scope="scope">
                             <div>{{scope.row.nickname}}[ID:{{scope.row.user_id}}]</div>
                         </template>
@@ -65,10 +65,10 @@
                             <div>{{scope.row.status}}</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="时间" width="200">
+                    <el-table-column label="时间" width="260">
                         <template slot-scope="scope">
-                            <div>下单时间:{{scope.row.created_at}}</div>
-                            <div>更新时间:{{scope.row.updated_at}}</div>
+                            <div style="margin-bottom: 5px">下单时间:{{scope.row.created_at}}</div>
+                            <div style="margin-bottom: 5px">更新时间:{{scope.row.updated_at}}</div>
                             <div v-if="scope.row.pay_status != 'unpaid'">支付时间:{{scope.row.pay_at}}</div>
                         </template>
                     </el-table-column>
@@ -174,28 +174,11 @@
     })
 </script>
 <style>
-    .el-tabs__header {
-        padding: 0 20px;
-        height: 56px;
-        line-height: 56px;
-        background-color: #fff;
-    }
-
-    .export-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 2;
-    }
-
     .table-body {
         padding: 20px;
         background-color: #fff;
     }
-
-    .table-body .el-button {
-        padding: 0!important;
-        border: 0;
-        margin: 0 5px;
+    #app {
+        font-size: 18px;
     }
 </style>

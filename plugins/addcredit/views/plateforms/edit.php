@@ -1,162 +1,10 @@
 <style>
-    .el-tabs__header {
-        padding: 0 20px;
-        height: 56px;
-        line-height: 56px;
-        background-color: #fff;
-        margin-bottom: 0;
-    }
-
-    .title {
-        margin-top: 10px;
-        padding: 18px 20px;
-        border-top: 1px solid #F3F3F3;
-        border-bottom: 1px solid #F3F3F3;
-        background-color: #fff;
-    }
-
-    .form-body {
-        background-color: #fff;
-        padding: 20px 50% 20px 0;
-    }
-
     .button-item {
         padding: 9px 25px;
     }
 
-    .form-body .item {
-        width: 300px;
-        margin-bottom: 50px;
-        margin-right: 25px;
-    }
-
-    .item-img {
-        height: 550px;
-        padding: 25px 10px;
-        border-radius: 30px;
-        border: 1px solid #CCCCCC;
-        background-color: #fff;
-    }
-
-    .item .el-form-item {
-        width: 300px;
-        margin: 20px auto;
-    }
-
-    .left-setting-menu {
-        width: 260px;
-    }
-
-    .left-setting-menu .el-form-item {
-        height: 60px;
-        padding-left: 20px;
-        display: flex;
-        align-items: center;
-        margin-bottom: 0;
-        cursor: pointer;
-    }
-
-    .left-setting-menu .el-form-item .el-form-item__label {
-        cursor: pointer;
-    }
-
-    .left-setting-menu .el-form-item.active {
-        background-color: #F3F5F6;
-        border-top-left-radius: 10px;
-        width: 105%;
-        border-bottom-left-radius: 10px;
-    }
-
-    .left-setting-menu .el-form-item .el-form-item__content {
-        margin-left: 0 !important
-    }
-
-    .no-radius {
-        border-top-left-radius: 0 !important;
-    }
-
-    .del-btn {
-        position: absolute;
-        right: -8px;
-        top: -8px;
-        padding: 4px 4px;
-    }
-
-    .reset {
-        position: absolute;
-        top: 3px;
-        left: 90px;
-    }
-
-    .app-tip {
-        position: absolute;
-        right: 24px;
-        top: 16px;
-        height: 72px;
-        line-height: 72px;
-        max-width: calc(100% - 78px);
-    }
-
-    .app-tip:before {
-        content: ' ';
-        width: 0;
-        height: 0;
-        border-color: inherit;
-        position: absolute;
-        top: -32px;
-        right: 100px;
-        border-width: 16px;
-        border-style: solid;
-    }
-
-    .tip-content {
-        display: block;
-        white-space: nowrap;
-        width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin: 0 28px;
-        font-size: 28px;
-    }
-    .btn-abs{
-        position: absolute;
-        top: 12px;
-        right: 18px;
-    }
-
-    .form-body .app-share {
-        padding-top: 12px;
-        border-top: 1px solid #e2e2e2;
-        margin-top: -20px;
-    }
-
-    .form-body .app-share .app-share-bg {
-        position: relative;
-        width: 310px;
-        height: 360px;
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position: center
-    }
-
-    .form-body .app-share .app-share-bg .title {
-        width: 160px;
-        height: 29px;
-        line-height: 1;
-        word-break: break-all;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        overflow: hidden;
-    }
-
-    .form-body .app-share .app-share-bg .pic-image {
-        background-repeat: no-repeat;
-        background-position: 0 0;
-        background-size: cover;
-        width: 160px;
-        height: 130px;
+    .box-card input {
+        width: 500px;
     }
 
 </style>
@@ -165,37 +13,36 @@
 
         <el-tabs v-model="activeName">
             <el-tab-pane label="基础信息" name="Basics" style="background: white">
-                <el-form :model="ruleForm" :rules="rules" size="small" ref="ruleForm" label-width="200px" style="padding:20px 0;">
+                <el-form :model="ruleForm" :rules="rules" size="medium" ref="ruleForm" label-width="200px" style="padding:20px 0;">
                     <el-form-item prop="name" label="平台名称">
                         <el-input v-model="ruleForm.name"></el-input>
                     </el-form-item>
-                    <el-form-item label="cyd_id" prop="cyd_id">
+                    <el-form-item label="AppId" prop="cyd_id">
                         <el-input v-model="ruleForm.cyd_id"></el-input>
                     </el-form-item>
-                    <el-form-item label="秘钥" prop="secret_key">
+                    <el-form-item label="SecretKey" prop="secret_key">
                         <el-input  v-model="ruleForm.secret_key"></el-input>
                     </el-form-item>
-                    <el-form-item label="sdk_dir目录" prop="sdk_dir">
+                    <el-form-item label="SdkDir目录" prop="sdk_dir">
                         <el-input  v-model="ruleForm.sdk_dir"></el-input>
                     </el-form-item>
-                    <el-form-item label="class_dir目录" prop="class_dir">
+                    <el-form-item label="ClassDir目录" prop="class_dir">
                         <el-input  v-model="ruleForm.class_dir"></el-input>
                     </el-form-item>
                     <el-form-item label="服务费比例" prop="transfer_rate">
-                        <el-input type="number" v-model="ruleForm.transfer_rate" style="width: 100px;">
+                        <el-input type="number" v-model="ruleForm.transfer_rate" style="width: 500px;">
                             <template slot="append">%</template>
                         </el-input>
-                        <span style="color: red;font-size: 12px">请输入服务费0-100</span>
+                        <div style="color: red;font-size: 12px">请输入服务费0-100</div>
                     </el-form-item>
                     <el-form-item label="红包收费比例" prop="ratio">
-                        <el-input type="number" v-model="ruleForm.ratio" style="width: 100px;">
+                        <el-input type="number" v-model="ruleForm.ratio" style="width: 500px;">
                             <template slot="append">%</template>
                         </el-input>
-                        <span style="color: red;font-size: 12px">例如：10   充值100元 红包扣取110</span>
+                        <div style="color: red;font-size: 12px">例如：10   充值100元 红包扣取110</div>
                     </el-form-item>
                     <el-form-item label="推荐人" prop="parent_id">
-                        <el-autocomplete size="small"
-                                         v-model="ruleForm.parent_name"
+                        <el-autocomplete v-model="ruleForm.parent_name"
                                          value-key="nickname"
                                          :fetch-suggestions="querySearchAsync"
                                          placeholder="请输入搜索内容"
@@ -295,6 +142,12 @@
                     ],
                     transfer_rate: [
                         {required: true, message: '请输入服务费0-100', trigger: 'change'},
+                    ],
+                    ratio: [
+                        {required: true, message: '红包收费比例', trigger: 'change'},
+                    ],
+                    parent_id: [
+                        {required: true, message: '请选择推荐人', trigger: 'change'},
                     ]
                 },
                 btnLoading: false,

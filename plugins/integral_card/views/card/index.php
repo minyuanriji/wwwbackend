@@ -63,12 +63,9 @@
 			    </el-input>
 			</div>
 
-
-
             <div style="display: inline;margin-left: 20px;">
                 导出数据
             </div>
-
 
             <div style="display: inline;width: 100px;">
                 <el-input size="small" v-model="start_export_data" style="width: 100px;" placeholder="开始序号" @clear="search"></el-input>
@@ -79,13 +76,13 @@
             </div>
             <el-button type="primary" @click="exportData" size="small">一键导出</el-button>
 
-            <el-table
-                    v-loading="listLoading"
+            <el-table v-loading="listLoading"
                     :data="list"
                     border
                     style="width: 100%">
-                <el-table-column prop="name" label="卡券名称" width="200"></el-table-column>
-                <el-table-column prop="user.nickname" label="绑定用户"></el-table-column>
+                <el-table-column prop="id" label="ID" width="120"></el-table-column>
+                <el-table-column prop="name" label="卡券名称" width="150"></el-table-column>
+                <el-table-column prop="user.nickname" label="绑定用户" width="200"></el-table-column>
                 <el-table-column label="积分类型" prop="integral_setting">
                     <template slot-scope="scope">
 						<div size="small">{{scope.row.integral_setting.expire==-1?'永久有效':'限时有效'}}</div>
@@ -96,7 +93,7 @@
 				        <div size="small">{{scope.row.integral_setting.integral_num}}</div>
 					</template>
 				</el-table-column>
-				<el-table-column label="发放周期" prop="integral_setting" width="160">
+				<el-table-column label="发放周期" prop="integral_setting" width="100">
 				    <template slot-scope="scope">
 				        <div size="small">{{scope.row.integral_setting.period}}{{scope.row.integral_setting.period_unit=="month"?'月':'周'}}</div>
 					</template>
@@ -108,7 +105,7 @@
 				</el-table-column>
 				
 				
-                <el-table-column prop="expire_time" label="有效期" width="220">
+                <el-table-column prop="expire_time" label="有效期" width="180">
 					<template slot-scope="scope">
 					    <div size="small">{{scope.row.expire_time|formatDate}}</div>
 					</template>
@@ -120,7 +117,7 @@
 					    <div size="small">{{scope.row.fee}}元</div>
 					</template>
 				</el-table-column>
-                <el-table-column prop="updated_at" label="生成时间" width="220">
+                <el-table-column prop="updated_at" label="生成时间" width="180">
 					<template slot-scope="scope">
 					    <div size="small">{{scope.row.updated_at|formatDate}}</div>
 					</template>

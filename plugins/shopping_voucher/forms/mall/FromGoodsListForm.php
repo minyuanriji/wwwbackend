@@ -4,13 +4,18 @@ namespace app\plugins\shopping_voucher\forms\mall;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\models\Goods;
+use app\models\GoodsWarehouse;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromGoods;
 
 class FromGoodsListForm extends BaseModel {
 
+    public $page;
+    public $limit;
+
     public function rules(){
         return [
-            [[], 'integer']
+            [['page', 'limit'], 'integer']
         ];
     }
 
@@ -30,11 +35,23 @@ class FromGoodsListForm extends BaseModel {
                 $commonData["start_at"]   = date("Y-m-d", $fromGoods->start_at);
             }
 
-            $list = [];
             $pagination = null;
 
+            $query = ShoppingVoucherFromGoods::find()->alias("svfg")->where(["svfg.is_delete" => 0]);
+            $query->innerJoin(["g" => Goods::tableName()], "g.id=svfg.goods_id");
+            $query->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");
+
+            $selects = ["svfg.*", "gw.name", "g.id as goods_id", "gw.cover_pic"];
+            $query->orderBy("svfg.id DESC");
+
+            $list = $query->select($selects)->page($pagination, 10, $this->page)->asArray()->all();
+            if($list) {
+                foreach ($list as &$item) {
+                    $item['start_at'] = date("Y-m-d", $item['start_at'] ? $item['start_at'] : time());
+                }
+            }
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
-                'list'       => $list ?: [],
+                'list'       => $list ? $list : [],
                 'commonData' => $commonData,
                 'pagination' => $pagination
             ]);

@@ -5,8 +5,6 @@ namespace app\plugins\shopping_voucher\controllers\mall;
 use app\plugins\Controller;
 use app\plugins\shopping_voucher\forms\mall\FromGiftpacksCommonSaveForm;
 use app\plugins\shopping_voucher\forms\mall\FromGiftpacksListForm;
-use app\plugins\shopping_voucher\forms\mall\FromHotelCommonSaveForm;
-use app\plugins\shopping_voucher\forms\mall\FromHotelListForm;
 
 class FromGiftpacksController extends Controller{
 
@@ -15,7 +13,6 @@ class FromGiftpacksController extends Controller{
      * @return bool|string|\yii\web\Response
      */
     public function actionList(){
-
         if (\Yii::$app->request->isAjax) {
             $form = new FromGiftpacksListForm();
             $form->attributes = \Yii::$app->request->get();

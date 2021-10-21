@@ -25,15 +25,12 @@ class AlibabaDistributionOrder extends BaseActiveRecord{
         ];
     }
 
-
-
-
-
-
-
-
-
-
-
+    /**
+     * 获取订单详情记录
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrderDetails(){
+       return $this->hasMany(AlibabaDistributionOrderDetail::class, ["order_id" => "id"]);
+    }
 
 }

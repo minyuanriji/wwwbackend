@@ -221,4 +221,12 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
     public function getOrder(){
         return $this->hasOne(AlibabaDistributionOrder::class, ["id" => "order_id"]);
     }
+
+    /**
+     * 获取商品
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGoods(){
+        return $this->hasOne(AlibabaDistributionGoodsList::class, ["id" => "goods_id"]);
+    }
 }

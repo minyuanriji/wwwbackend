@@ -50,6 +50,7 @@ use app\models\UserAddress;
 use app\models\UserCoupon;
 use app\plugins\mch\models\Mch;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromGoods;
 use app\plugins\shopping_voucher\models\ShoppingVoucherTargetGoods;
 use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
 use app\plugins\shopping_voucher\target_services\ShoppingVoucherGoodsService;
@@ -906,26 +907,51 @@ class OrderSubmitForm extends BaseModel
             }
         }
 
-        //购物券开关
+        //购物券使用开关
         $shoppingVoucherUseData['enable'] = true;
 
+        //确认收货可获得购物券数量
+        $gotShoppingVoucherNum = 0;
+        $goodsIdPrices = [];
+        foreach ($listData as &$item) {
+            foreach($item['goods_list'] as $goods){
+                $goodsIdPrices[$goods['id']] = $goods['total_price'];
+            }
+        }
+        if($goodsIdPrices){
+            $fromGoodsDatas = ShoppingVoucherFromGoods::find()->andWhere([
+                "AND",
+                ["is_delete" => 0],
+                ["IN", "goods_id", array_keys($goodsIdPrices)],
+                "start_at<'".time()."'"
+            ])->select(["goods_id", "give_value"])->asArray()->all();
+            if($fromGoodsDatas){
+                foreach($fromGoodsDatas as $fromGoodsData){
+                    $totalPrice = isset($goodsIdPrices[$fromGoodsData['goods_id']]) ? $goodsIdPrices[$fromGoodsData['goods_id']] : 0;
+                    $gotShoppingVoucherNum += (floatval($fromGoodsData['give_value'])/100) * $totalPrice;
+                }
+            }
+        }
+
+
         return [
-            'is_need_address'     => $is_need_address ? 1 : 0,
-            'list'                => $listData,
-            'total_price'         => price_format($total_price),
-            'user_coupon'         => $userCouponList,
-            'is_auth_phone'       => $is_auth_phone,
-            'price_enable'        => $priceEnable,
-            'user_address'        => $hasCity ? (($userAddress && $userAddress->longitude && $userAddress->latitude) ? $userAddress : []) : $userAddress,
-            'user_address_enable' => $addressEnable,
-            'is_self_mention'     => $isSelfMention,
-            'custom_currency_all' => $this->getcustomCurrencyAll($listData),
-            'all_self_mention'    => $allSelfMention,
-            'hasCity'             => $hasCity,
-            'score_enable'        => $score_enable,
-            'integral_enable'     => $integral_enable, //红包券
-            'shopping_voucher'    => $shoppingVoucherUseData,
-            'form_data'           => [
+            'got_shopping_voucher_num' => round($gotShoppingVoucherNum, 2),
+            'is_need_address'          => $is_need_address ? 1 : 0,
+            'list'                     => $listData,
+            'total_price'              => price_format($total_price),
+            'user_coupon'              => $userCouponList,
+            'is_auth_phone'            => $is_auth_phone,
+            'price_enable'             => $priceEnable,
+            'user_address'             => $hasCity ? (($userAddress && $userAddress->longitude && $userAddress->latitude) ? $userAddress : []) : $userAddress,
+            'user_address_enable'      => $addressEnable,
+            'is_self_mention'          => $isSelfMention,
+            'custom_currency_all'      => $this->getcustomCurrencyAll($listData),
+            'all_self_mention'         => $allSelfMention,
+            'hasCity'                  => $hasCity,
+            'score_enable'             => $score_enable,
+            'integral_enable'          => $integral_enable, //红包券
+            'shopping_voucher'         => $shoppingVoucherUseData,
+            'form_data'                => [
                 'sign'             => isset($this->form_data['sign'])            ? $this->form_data['sign'] : null,
                 'related_id'       => isset($this->form_data['related_id'])      ? $this->form_data['related_id'] : null,
                 'related_user_id'  => isset($this->form_data['related_user_id']) ? $this->form_data['related_user_id'] : null,

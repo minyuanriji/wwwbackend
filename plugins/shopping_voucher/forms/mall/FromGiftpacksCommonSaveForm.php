@@ -9,13 +9,14 @@ use app\plugins\shopping_voucher\models\ShoppingVoucherFromGiftpacks;
 class FromGiftpacksCommonSaveForm extends BaseModel{
 
     public $is_open;
+    public $give_type;
     public $give_value;
     public $start_at;
     public $recommender;
 
     public function rules(){
         return [
-            [['is_open', 'give_value', 'start_at'], 'required'],
+            [['is_open', 'give_type', 'give_value', 'start_at'], 'required'],
             [['recommender'], 'safe']
         ];
     }
@@ -37,8 +38,8 @@ class FromGiftpacksCommonSaveForm extends BaseModel{
                 ]);
             }
 
-            $fromGiftpacks->give_type   = 1;
-            $fromGiftpacks->give_value  = max(0, min(100, $this->give_value));
+            $fromGiftpacks->give_type   = (int)$this->give_type;
+            $fromGiftpacks->give_value  = $this->give_type == 2 ? max(0, $this->give_value) : max(0, min(100, $this->give_value));
             $fromGiftpacks->updated_at  = time();
             $fromGiftpacks->is_delete   = $this->is_open ? 0 : 1;
             $fromGiftpacks->start_at    = max(time(), strtotime($this->start_at));

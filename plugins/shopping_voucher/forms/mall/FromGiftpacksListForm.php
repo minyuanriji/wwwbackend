@@ -22,16 +22,16 @@ class FromGiftpacksListForm extends BaseModel {
 
         try {
 
-
             $commonData = ["is_open" => 0, "give_value"  => "", "start_at" => ""];
             $commonData['recommender'] = [
-                ['type' => 'branch_office', 'give_value' => 0],
-                ['type' => 'partner', 'give_value' => 0],
-                ['type' => 'store', 'give_value' => 0],
+                ['type' => 'branch_office', 'give_type' => "1", 'give_value' => 0],
+                ['type' => 'partner', 'give_type' => "1", 'give_value' => 0],
+                ['type' => 'store', 'give_type' => "1", 'give_value' => 0],
             ];
             $fromGiftpacks = ShoppingVoucherFromGiftpacks::findOne(["pack_id" => 0]);
             if($fromGiftpacks){
                 $commonData["is_open"]    = !$fromGiftpacks->is_delete ? 1 : 0;
+                $commonData["give_type"]  = (string)$fromGiftpacks->give_type;
                 $commonData["give_value"] = $fromGiftpacks->give_value;
                 $commonData["start_at"]   = date("Y-m-d", $fromGiftpacks->start_at);
 
@@ -40,6 +40,7 @@ class FromGiftpacksListForm extends BaseModel {
                     foreach($recommander as $item1){
                         foreach($commonData['recommender'] as &$item2){
                             if($item1['type'] == $item2['type']){
+                                $item2['give_type'] = isset($item1['give_type']) ? (string)$item1['give_type'] : $item2['give_type'];
                                 $item2['give_value'] = floatval($item1['give_value']);
                                 break;
                             }

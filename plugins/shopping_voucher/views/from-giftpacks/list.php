@@ -18,8 +18,12 @@ echo $this->render("../com/com-tab-from");
                         <template v-if="commonSet.is_open">
                             <el-form-item label="赠送比例" prop="give_value">
                                 <div>
-                                    <el-input  type="number" min="0" max="100" placeholder="请输入内容" v-model="commonSet.give_value" style="width:260px;">
-                                        <template slot="append">%</template>
+                                    <el-input type="number" min="0" placeholder="请输入内容" v-model="commonSet.give_value" style="width:260px;">
+                                        <el-select v-model="commonSet.give_type" slot="prepend" placeholder="请选择" style="width:110px;">
+                                            <el-option label="按比例" value="1"></el-option>
+                                            <el-option label="按固定值" value="2"></el-option>
+                                        </el-select>
+                                        <template slot="append">{{commonSet.give_type == 1 ? "%" : "券"}}</template>
                                     </el-input>
                                 </div>
                                 <el-table :data="commonSet.recommender" border style="margin-top:10px;width: 40%">
@@ -33,7 +37,11 @@ echo $this->render("../com/com-tab-from");
                                     <el-table-column label="比例">
                                         <template slot-scope="scope">
                                             <el-input type="number" min="0" max="100" placeholder="请输入内容" v-model="scope.row.give_value" style="width:260px;">
-                                                <template slot="append">%</template>
+                                                <el-select v-model="scope.row.give_type" slot="prepend" placeholder="请选择" style="width:110px;">
+                                                    <el-option label="按比例" value="1"></el-option>
+                                                    <el-option label="按固定值" value="2"></el-option>
+                                                </el-select>
+                                                <template slot="append">{{scope.row.give_type == 1 ? "%" : "券"}}</template>
                                             </el-input>
                                         </template>
                                     </el-table-column>
@@ -146,6 +154,7 @@ echo $this->render("../com/com-tab-from");
                 searchData: {},
                 commonSet:{
                     is_open:false,
+                    give_type: "1",
                     give_value: '',
                     start_at: '',
                     recommender: []
@@ -178,6 +187,7 @@ echo $this->render("../com/com-tab-from");
                             method: "post",
                             data: {
                                 is_open:that.commonSet.is_open ? 1 : 0,
+                                give_type:that.commonSet.give_type,
                                 give_value:that.commonSet.give_value,
                                 start_at:that.commonSet.start_at,
                                 recommender: that.commonSet.recommender
@@ -208,10 +218,13 @@ echo $this->render("../com/com-tab-from");
                         this.list = e.data.data.list;
                         this.pagination = e.data.data.pagination;
                         let commonData = e.data.data.commonData;
+
+                        this.commonSet.give_type   = commonData.give_type;
                         this.commonSet.is_open     = commonData.is_open == 1 ? true : false;
                         this.commonSet.give_value  = commonData.give_value;
                         this.commonSet.start_at    = commonData.start_at;
                         this.commonSet.recommender = commonData.recommender;
+
                     } else {
                         this.$message.error(e.data.msg);
                     }

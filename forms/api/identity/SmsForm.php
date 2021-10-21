@@ -88,18 +88,22 @@ class SmsForm extends BaseModel
             return $this->returnApiResultData();
         }
 
-        $phoneConfig = AppConfigLogic::getPhoneConfig();
-
-        $user = User::findOne([
-                'mall_id' => \Yii::$app->mall->id,
-                'id' => \Yii::$app->user->id,
-                'is_delete' => 0
-            ]);
         $result = $this->checkCode();
         if (!$result) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
         }
 
+        $existMobile = User::find()->where(["mobile" => $this->mobile])->exists();
+        if($existMobile){
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,'手机号”'.$this->mobile.'“已被其它账号绑定');
+        }
+
+        $phoneConfig = AppConfigLogic::getPhoneConfig();
+        $user = User::findOne([
+            'mall_id' => \Yii::$app->mall->id,
+            'id' => \Yii::$app->user->id,
+            'is_delete' => 0
+        ]);
         if($phoneConfig["all_network_enable"] == 1 && !empty($user->mobile)){
             return $this->returnApiResultData(ApiCode::CODE_FAIL,'已经绑定过手机号了,无需绑定');
         }

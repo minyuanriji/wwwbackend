@@ -52,6 +52,10 @@ class CheckoutAction extends Action{
                 //通过相关规则键获取分佣规则进行分佣
                 foreach($parentDatas as $parentData) {
 
+                    //平级跳过
+                    if(isset($parentData['pingji']) && $parentData['pingji'] == 1)
+                        continue;
+
                     $ruleData = $parentData['rule_data'];
 
                     //无分佣规则 跳过

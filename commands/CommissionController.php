@@ -151,6 +151,7 @@ class CommissionController extends BaseCommandController{
         //平级合伙人插入
         $newParentDatas = array_reverse($newParentDatas);
         if(!empty($partner2Data)){
+            $partner2Data['pingji'] = 1;
             $tmpDatas = [];
             foreach($newParentDatas as $parentData){
                 if($parentData['role_type'] == "partner"){

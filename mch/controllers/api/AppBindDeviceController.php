@@ -8,6 +8,11 @@ use app\controllers\api\ApiController;
 use app\forms\api\identity\SmsForm;
 use app\mch\forms\api\BindDeviceForm;
 
+/**
+ * 商户登录
+ * @author mr.lin
+ * @deprecated 即将弃用
+ */
 class AppBindDeviceController extends ApiController {
 
     /**

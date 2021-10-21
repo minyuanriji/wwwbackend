@@ -10,6 +10,7 @@
 
 namespace app\controllers\api;
 
+use app\controllers\api\filters\BindMobileFilter;
 use app\controllers\api\filters\LoginFilter;
 use app\controllers\api\filters\CheckParentFilter;
 use app\forms\api\cart\CartAddForm;
@@ -23,6 +24,9 @@ class CartController extends ApiController
         return array_merge(parent::behaviors(), [
             'login' => [
                 'class' => LoginFilter::class,
+            ],
+            'bindMobile' => [
+                'class' => BindMobileFilter::class,
             ],
             'checkParent' => [
                 'class' => CheckParentFilter::class,

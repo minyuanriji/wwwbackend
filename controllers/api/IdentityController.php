@@ -84,6 +84,21 @@ class IdentityController extends ApiController
     }
 
     /**
+     * 小程序授权登录
+     */
+    public function actionMiniLogin ()
+    {
+        $wechatForm = new WechatForm();
+        $wechatForm->attributes = $this->requestData;
+        $parent_user_id = !empty($this->requestData['parent_user_id']) ? $this->requestData['parent_user_id'] : 0;
+        $parent_source = !empty($this->requestData['parent_source']) ? $this->requestData['parent_source'] : null;
+        $headers = \Yii::$app->request->headers;
+        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 5;
+        $result = $wechatForm->miniAuthorized($parent_user_id,$parent_source,$stands_mall_id);
+        return $result;
+    }
+
+    /**
      * 注册
      * @Author: zal
      * @Date: 2020-04-27
@@ -185,20 +200,6 @@ class IdentityController extends ApiController
         return $smsForm->bind($recommend_id,$stands_mall_id);
     }
 
-    /**
-     * 小程序授权登录
-     */
-    public function actionMiniLogin ()
-    {
-        $wechatForm = new WechatForm();
-        $wechatForm->attributes = $this->requestData;
-        $parent_user_id = !empty($this->requestData['parent_user_id']) ? $this->requestData['parent_user_id'] : 0;
-        $parent_source = !empty($this->requestData['parent_source']) ? $this->requestData['parent_source'] : null;
-        $headers = \Yii::$app->request->headers;
-        $stands_mall_id = isset($headers["x-stands-mall-id"]) ? $headers["x-stands-mall-id"] : 5;
-        $result = $wechatForm->miniAuthorized($parent_user_id,$parent_source,$stands_mall_id);
-        return $result;
-    }
 
     /**
      * 小程序授权手机号

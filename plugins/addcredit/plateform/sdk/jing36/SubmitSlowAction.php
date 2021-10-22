@@ -15,7 +15,7 @@ class SubmitSlowAction extends BaseAction {
         $params['orderId']   = $this->orderModel->id;
         $params['mobile']    = $this->orderModel->mobile;
         $params['amount']    = $this->orderModel->order_price;
-        $params['notifyUrl'] = "https://www.mingyuanriji.cn";
+        $params['notifyUrl'] = "https://www.mingyuanriji.cn/web/addcredit-notify/index.php";
 
         $res = $req->doPost("/v1/mobile/sloworder", $params);
 

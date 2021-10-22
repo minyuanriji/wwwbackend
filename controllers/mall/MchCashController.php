@@ -32,4 +32,10 @@ class MchCashController extends MallController{
         return $this->asJson($form->save());
     }
 
+    public function actionStatistics(){
+        $form = new MchCashListForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->statistics());
+    }
+
 }

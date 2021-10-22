@@ -17,10 +17,10 @@
                     <el-form-item prop="name" label="平台名称">
                         <el-input v-model="ruleForm.name"></el-input>
                     </el-form-item>
-                    <el-form-item label="AppId" prop="cyd_id">
+                    <el-form-item label="APP ID" prop="cyd_id">
                         <el-input v-model="ruleForm.cyd_id"></el-input>
                     </el-form-item>
-                    <el-form-item label="SecretKey" prop="secret_key">
+                    <el-form-item label="KEY" prop="secret_key">
                         <el-input  v-model="ruleForm.secret_key"></el-input>
                     </el-form-item>
                     <el-form-item label="SdkDir目录" prop="sdk_dir">

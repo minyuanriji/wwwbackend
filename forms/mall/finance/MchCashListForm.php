@@ -99,6 +99,74 @@ class MchCashListForm extends BaseModel{
             $exp->export($new_query, 'mc.');
             return false;
         }
+        $list = $query->orderBy(['mc.created_at' => SORT_DESC])->page($pagination, $this->limit, $this->page)->asArray()->all();
+        if($list){
+            foreach($list as &$item){
+                $typeData = @json_decode($item['type_data'], true);
+                $item = array_merge($item, is_array($typeData) ? $typeData : []);
+            }
+        }
+
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
+            'list'       => $list ?: [],
+            'export_list' => (new MchCashListExport())->fieldsList(),
+            'pagination' => $pagination,
+        ]);
+    }
+
+    public function statistics(){
+
+        if (!$this->validate()) {
+            return $this->responseErrorInfo();
+        }
+        $currentApply = 0;
+        $currentActual = 0;
+        $query = MchCash::find()->alias("mc");
+        $query->leftJoin(["eto" => EfpsTransferOrder::tableName()], "mc.order_no=eto.outTradeNo");
+        $query->leftJoin(["s" => Store::tableName()], "s.mch_id=mc.mch_id");
+        $query->leftJoin(["m" => Mch::tableName()], "m.id=s.mch_id");
+        $query->select(["mc.money", "mc.fact_price", "mc.transfer_status"]);
+
+        if ($this->keyword) {
+            $query->andWhere(["like", "s.name", $this->keyword]);
+        }
+
+        if ($this->start_date && $this->end_date) {
+            $query->andWhere(['<', 'mc.updated_at', strtotime($this->end_date)])
+                ->andWhere(['>', 'mc.updated_at', strtotime($this->start_date)]);
+        }
+
+        if($this->status == "no_confirm"){
+            $query->andWhere(["mc.status" => 0]);
+        }elseif($this->status == "no_paid"){
+            $query->andWhere(["mc.status" => 1]);
+            $query->andWhere(["mc.transfer_status" => 0]);
+        }elseif($this->status == "paid"){
+            $query->andWhere(["mc.status" => 1]);
+            $query->andWhere(["mc.transfer_status" => 1]);
+        }elseif($this->status == "refuse"){
+            $query->andWhere(["mc.status" => 2]);
+            $query->andWhere(["mc.transfer_status" => 0]);
+        }elseif($this->status == "return"){
+            $query->andWhere(["mc.status" => 2]);
+            $query->andWhere(["mc.transfer_status" => 2]);
+        }
+
+        if ($this->level && $this->address) {
+            if (is_string($this->address)) {
+                $this->address = explode(',', $this->address);
+            }
+            $where = [];
+            if ($this->level == 1) {
+                $where = ['s.province_id' => $this->address[0]];
+            } elseif ($this->level == 2) {
+                $where = ['s.province_id' => $this->address[0], 's.city_id' => $this->address[1]];
+            } elseif ($this->level == 3) {
+                $where = ['s.province_id' => $this->address[0], 's.city_id' => $this->address[1], 's.district_id' => $this->address[2]];
+            }
+            $query->andWhere($where);
+        }
+
         $applyQuery = clone $query;
         $applyMoney = $applyQuery->sum('mc.money');
         $actualQuery = clone $query;
@@ -116,15 +184,12 @@ class MchCashListForm extends BaseModel{
         }
 
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
-            'list'       => $list ?: [],
-            'export_list' => (new MchCashListExport())->fieldsList(),
             'Statistics' => [
                 'applyMoney' => $applyMoney ?: 0,
                 'actualMoney' => $actualMoney ?: 0,
                 'currentApply' => round($currentApply, 2),
                 'currentActual' => round($currentActual, 2),
             ],
-            'pagination' => $pagination,
         ]);
     }
 }

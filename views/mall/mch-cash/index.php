@@ -52,7 +52,7 @@
                     </div>
                 </div>
 
-                <div style="margin: 30px 0">
+                <div style="margin: 30px 0" v-loading="statisticsLoading">
                     <div style="display: flex;justify-content: space-evenly">
                         <div>
                             <div style="text-align: center">总申请提现金额</div>
@@ -181,6 +181,7 @@
                     end_at: ''
                 },
                 loading: false,
+                statisticsLoading: false,
                 activeName: '-1',
                 list: [],
                 pagination: null,
@@ -303,14 +304,39 @@
                     this.loading = false;
                     if (e.data.code == 0) {
                         this.list = e.data.data.list;
-                        this.Statistics = e.data.data.Statistics;
                         this.pagination = e.data.data.pagination;
                         this.export_list = e.data.data.export_list;
+                        this.statisticsLoadData(status, page);
                     } else {
                         this.$message.error(e.data.msg);
                     }
                 }).catch(e => {
                     this.loading = false;
+                });
+            },
+            statisticsLoadData(status = -1, page = 1) {
+                this.statisticsLoading = true;
+                request({
+                    params: {
+                        r: 'mall/mch-cash/statistics',
+                        status: status,
+                        page: page,
+                        start_date: this.search.start_date,
+                        end_date: this.search.end_date,
+                        keyword: this.search.keyword,
+                        level: this.level,
+                        address: this.address,
+                    },
+                    method: 'get'
+                }).then(e => {
+                    this.statisticsLoading = false;
+                    if (e.data.code == 0) {
+                        this.Statistics = e.data.data.Statistics;
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    this.statisticsLoading = false;
                 });
             },
             pageChange(page) {

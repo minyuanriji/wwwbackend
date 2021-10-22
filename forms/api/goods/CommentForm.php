@@ -57,10 +57,12 @@ class CommentForm extends BaseModel
                 'is_show' => 1
             ]);
 
-        if ($this->status >= 3) {
-            $query->andWhere(['>=', 'score', 3]);
-        } else {
-            $query->andWhere(['score' => $this->status]);
+        if ($this->status) {
+            if ($this->status >= 3) {
+                $query->andWhere(['>=', 'score', 3]);
+            } else {
+                $query->andWhere(['score' => $this->status]);
+            }
         }
 
         $list = $query->select(['*', 'time' => 'case when `is_virtual` = 1 then `virtual_at` else `created_at` end'])

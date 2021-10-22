@@ -84,7 +84,7 @@ class AddcreditOrderSendAction extends Action{
         ]);
         $query->orderBy("ao.updated_at ASC");
 
-        $selects = ["ao.id", "ao.mall_id", "ao.mobile", "ao.user_id", "ao.pay_price", "svfa.param_data_json", 'ao.product_id'];
+        $selects = ["ao.id", "ao.mall_id", "ao.mobile", "ao.user_id", "ao.pay_price", "svfa.param_data_json", 'ao.product_id', 'apf.product_json_data'];
 
         $AddcreditOrder = $query->select($selects)->asArray()->limit(10)->all();
         if(!$AddcreditOrder)
@@ -101,12 +101,30 @@ class AddcreditOrderSendAction extends Action{
             if (!$ruleData) {
                 continue;
             }
+
+            $productData = json_decode($value['product_json_data'], true);
+            if (!$productData)
+                continue;
+
             $mobile_count = AddcreditOrder::find()->where(['mobile' => $value['mobile'], 'pay_status' => 'paid'])->count();
-            if (in_array($value['product_id'], Config::FAST_CHARGING)) {
+
+            $productData = array_combine(array_column($productData, 'product_id'), $productData);
+
+            if (!isset($productData[$value['product_id']]))
+                continue;
+
+            if ($productData[$value['product_id']]['type'] == 'fast') {
                 $charge = 1;
             } else {
                 $charge = 0;
             }
+
+            /*if (in_array($value['product_id'], Config::FAST_CHARGING)) {
+                $charge = 1;
+            } else {
+                $charge = 0;
+            }*/
+
             if ($mobile_count > 1) {
                 if ($charge) {
                     $ratio = $ruleData['fast_follow_give'];

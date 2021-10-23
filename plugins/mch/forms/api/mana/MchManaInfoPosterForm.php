@@ -27,6 +27,11 @@ class MchManaInfoPosterForm extends SharePosterForm {
     }
 
     public function getSharePoster(){
+
+        //设置商户绑定的小程序账号
+        $user = User::findOne(MchAdminController::$adminUser['mch']['user_id']);
+        \Yii::$app->user->setIdentity($user);
+
         return parent::get($this->route);
     }
 

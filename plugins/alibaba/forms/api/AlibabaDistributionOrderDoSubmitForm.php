@@ -113,10 +113,10 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
             ];
         }catch (AliDistributionException $e){
             $t->rollBack();
-            
+
             //设置异常告警
             $aliGoods = AlibabaDistributionGoodsList::findOne($goodsItem['id']);
-            AliGoodsHelper::setWarn($aliGoods, $e->getMessage());
+            AliGoodsHelper::setWarn($aliGoods, $goodsItem['sku_id'], $e->getMessage());
 
             return [
                 'code' => ApiCode::CODE_FAIL,

@@ -17,7 +17,7 @@ class AlibabaDistributionGoodsWarn extends BaseActiveRecord{
     public function rules(){
         return [
             [['mall_id', 'goods_id', 'created_at', 'updated_at', 'flag'], 'required'],
-            [['remark'], 'safe']
+            [['remark', 'sku_id'], 'safe']
         ];
     }
 

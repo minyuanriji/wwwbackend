@@ -61,6 +61,15 @@ class SetProcessingAction extends Action{
                         $platClass = new $className();
                         $res = $platClass->submit($addcreditOrder, $plateform, false);
 
+                        if($res && isset($res->response_content)){
+                            //保存请求数据、返回数据
+                            $addcreditOrder->plateform_request_data  = $res->request_data;
+                            $addcreditOrder->plateform_response_data = $res->response_content;
+                            if(!$addcreditOrder->save()){
+                                throw new \Exception(json_encode($addcreditOrder->getErrors()));
+                            }
+                        }
+
                         $this->controller->commandOut("话费订单[ID:".$row['id']."]待处理任务添加成功");
                     }
                 }

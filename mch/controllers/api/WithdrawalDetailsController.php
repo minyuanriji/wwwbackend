@@ -4,6 +4,9 @@ namespace app\mch\controllers\api;
 
 use app\mch\forms\mch\MchCashForm;
 
+/**
+ * @deprecated
+ */
 class WithdrawalDetailsController extends MchMApiController{
     //提现明细
     public function actionMchAllList (){

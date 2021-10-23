@@ -5,6 +5,9 @@ use app\controllers\api\ApiController;
 use app\helpers\APICacheHelper;
 use app\mch\forms\api\MchGoodsListForm;
 
+/**
+ * @deprecated
+ */
 class GetMchGoodsController extends ApiController{
 
     /**

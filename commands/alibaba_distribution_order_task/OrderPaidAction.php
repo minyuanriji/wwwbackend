@@ -5,7 +5,9 @@ namespace app\commands\alibaba_distribution_order_task;
 use app\forms\common\UserBalanceModifyForm;
 use app\models\BalanceLog;
 use app\models\User;
+use app\plugins\alibaba\helpers\AliGoodsHelper;
 use app\plugins\alibaba\models\AlibabaApp;
+use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionOrderDetail;
 use app\plugins\alibaba\models\AlibabaDistributionOrderDetail1688;
 use app\plugins\alibaba\models\AlibabaDistributionOrderRefund;
@@ -42,10 +44,16 @@ class OrderPaidAction extends Action{
             if(!empty($error)){
                 $orderDetail1688->do_error = $e->getMessage();
                 $orderDetail1688->try_count += 1;
-                if($orderDetail1688->try_count > 3){ //错误次数超过3次，执行订单退款
+                if($orderDetail1688->try_count > 3){ //错误次数超过3次
                     //$this->doRefund($orderDetail1688);
                     $orderDetail1688->status = "invalid";
                     $orderDetail1688->save();
+
+                    //设置异常告警
+                    $aliGoods = AlibabaDistributionGoodsList::findOne($orderDetail1688->goods_id);
+                    $orderDetail = AlibabaDistributionOrderDetail::findOne($orderDetail1688->order_detail_id);
+                    AliGoodsHelper::setWarn($aliGoods, $orderDetail ? $orderDetail->sku_id : 0, $e->getMessage());
+
                 }else{
                     $orderDetail1688->save();
                 }

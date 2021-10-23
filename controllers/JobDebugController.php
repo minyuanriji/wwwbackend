@@ -7,10 +7,28 @@ use app\models\EfpsTransferOrder;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\addcredit\plateform\sdk\jing36\PlateForm;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromAddcredit;
+use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 
 class JobDebugController extends BaseController {
 
     public function actionIndex(){
+        /*$query = AddcreditOrder::find()->alias("ao");
+        $query->leftJoin(["apf" => AddcreditPlateforms::tableName()], "ao.plateform_id=apf.id");
+        $query->innerJoin(["svfa" => ShoppingVoucherFromAddcredit::tableName()], "(svfa.sdk_key=apf.sdk_dir) AND svfa.is_delete=0");
+        $query->leftJoin(["svs" => ShoppingVoucherSendLog::tableName()], "svs.source_id=ao.id AND svs.source_type='from_addcredit_order'");
+        $query->andWhere([
+            "AND",
+            "ao.pay_price > 0",
+            "svs.id IS NULL",
+            ["ao.pay_status" => 'paid']
+        ]);
+        $query->orderBy("ao.updated_at ASC");
+
+        $selects = ["ao.id", "ao.mall_id", "ao.mobile", "ao.user_id", "ao.pay_price", "svfa.param_data_json", 'ao.product_id'];
+
+        echo $query->select($selects)->asArray()->limit(10)->createCommand()->getRawSql();
+        exit;*/
 
         /*$transferOrder = EfpsTransferOrder::findOne(2065);
         echo ceil(floatval($transferOrder->amount) * 100);

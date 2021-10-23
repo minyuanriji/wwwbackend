@@ -12,11 +12,11 @@ use app\plugins\mch\models\MchAdminUser;
 class MchAdminAuthMobileForm extends BaseModel{
 
     public $mobile;
-    public $verify_code;
+    public $captcha;
 
     public function rules(){
         return [
-            [['mobile', 'verify_code'], 'required']
+            [['mobile', 'captcha'], 'required']
         ];
     }
 
@@ -30,7 +30,7 @@ class MchAdminAuthMobileForm extends BaseModel{
             //手机验证码验证
             $smsForm = new SmsForm();
             $smsForm->mobile  = $this->mobile;
-            $smsForm->captcha = $this->verify_code;
+            $smsForm->captcha = $this->captcha;
             if (!$smsForm->checkCode()) {
                 throw new \Exception("验证码不正确");
             }
@@ -55,15 +55,16 @@ class MchAdminAuthMobileForm extends BaseModel{
                     "created_at" => time()
                 ]);
             }
-            $adminUser->last_login_at = time();
-            $adminUser->login_ip      = \Yii::$app->getRequest()->getUserIP();
-            $adminUser->auth_key      = \Yii::$app->security->generateRandomString();
-            $adminUser->access_token  = \Yii::$app->security->generateRandomString();
+            $adminUser->last_login_at    = time();
+            $adminUser->token_expired_at = time() + 7 * 24 * 3600;
+            $adminUser->login_ip         = \Yii::$app->getRequest()->getUserIP();
+            $adminUser->auth_key         = \Yii::$app->security->generateRandomString();
+            $adminUser->access_token     = \Yii::$app->security->generateRandomString();
             if(!$adminUser->save()){
                 throw new \Exception(json_encode($adminUser->getErrors()));
             }
 
-            Sms::updateCodeStatus($this->mobile, $this->verify_code);
+            Sms::updateCodeStatus($this->mobile, $this->captcha);
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

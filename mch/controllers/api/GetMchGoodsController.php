@@ -2,8 +2,9 @@
 namespace app\mch\controllers\api;
 
 use app\controllers\api\ApiController;
+use app\core\ApiCode;
 use app\helpers\APICacheHelper;
-use app\mch\forms\api\MchGoodsListForm;
+use app\plugins\mch\forms\api\MchGoodsListForm;
 
 /**
  * @deprecated
@@ -18,6 +19,11 @@ class GetMchGoodsController extends ApiController{
     {
         $form = new MchGoodsListForm();
         $form->attributes = $this->requestData;
-        return $this->asJson($form->getList());
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
     }
 }

@@ -62,6 +62,8 @@ Yii::$app->loadComponentView('com-rich-text');
                         </div>
                     </template>
                 </el-table-column>
+                <el-table-column sortable="custom" prop="freight_price" width="110" label="运费（元）"></el-table-column>
+                <el-table-column sortable="custom" prop="ali_freight_price" width="110" label="1688运费（元）"></el-table-column>
                 <el-table-column prop="price_rate"  sortable="custom"  width="110" label="零售比（%）"></el-table-column>
                 <!--
                 <el-table-column prop="origin_price_rate" width="110" label="划线比（%）"></el-table-column>

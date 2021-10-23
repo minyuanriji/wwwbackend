@@ -34,6 +34,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
     public function getCacheKey(){
         $rawSql = $this->getQuery()->createCommand()->getRawSql();
         $keys[] = md5(strtolower($rawSql));
+        $keys[] = $this->page;
         return $keys;
     }
 

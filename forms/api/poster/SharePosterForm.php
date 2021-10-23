@@ -8,12 +8,17 @@ use app\forms\common\grafika\GrafikaOption;
 use app\logic\AppConfigLogic;
 use app\logic\CommonLogic;
 use app\models\User;
+use app\plugins\mch\controllers\api\mana\MchAdminController;
 
 class SharePosterForm extends GrafikaOption implements BasePoster
 {
     use CustomizeFunction;
     public function get($path = "pages/index/index", $stands_mall_id = 0)
     {
+        //设置商户绑定的小程序账号
+        $user = User::findOne(MchAdminController::$adminUser['mch']['user_id']);
+        \Yii::$app->user->setIdentity($user);
+
         $default = (new \app\forms\mall\poster\PosterForm())->getDefault()['share'];
         $options = AppConfigLogic::getPosterConfig($stands_mall_id);
         $option = $options["share"];

@@ -1,7 +1,6 @@
 <?php
 
-namespace app\plugins\mch\forms\api;
-
+namespace app\plugins\mch\forms\api\mana;
 
 use app\core\ApiCode;
 use app\helpers\CityHelper;
@@ -9,48 +8,20 @@ use app\models\BaseModel;
 use app\models\EfpsMchReviewInfo;
 use app\models\Goods;
 use app\models\Order;
+use app\plugins\mch\controllers\api\mana\MchAdminController;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
+use app\plugins\mch\models\MchCommonCat;
 use app\plugins\mch\models\MchPriceLog;
 
-/**
- * @author mr.lin
- * @deprecated 即将弃用
- */
-class MchBaseInfoForm extends BaseModel{
+class MchManaInfoBaseForm extends BaseModel{
 
-    public $mch_id;
-
-    public function rules(){
-        return [
-            [['mch_id'], 'required'],
-        ];
-    }
-
-    public function get()
-    {
-        if (!$this->validate()) {
-            return $this->responseErrorInfo();
-        }
+    public function get(){
 
         try {
-
-            $baseData = [
-                'store'      => null,
-                'category'   => null,
-                'stat'       => null,
-                'mch_mobile' => '',
-                'settle'     => []
-            ];
-
-            $mchInfo = Mch::find()->where([
-                'id' => $this->mch_id,
-                'is_delete' => 0
-            ])->with(["store", "category"])->asArray()->one();
-
-            if(!$mchInfo || $mchInfo['is_delete']){
-                throw new \Exception("商户不存在");
-            }
+            $mchInfo = MchAdminController::$adminUser['mch'];
+            $mchInfo['store']    = MchAdminController::$adminUser['store'];
+            $mchInfo['category'] = MchCommonCat::find()->where(["id" => $mchInfo['mch_common_cat_id']])->asArray()->one();
 
             if($mchInfo['review_status'] == Mch::REVIEW_STATUS_CHECKED){
                 $mchInfo['mch_status'] = "passed";
@@ -69,6 +40,7 @@ class MchBaseInfoForm extends BaseModel{
                 }
             }
 
+            $baseData['username'] = !empty(MchAdminController::$adminUser['username']) ? MchAdminController::$adminUser['username'] : "";
             $baseData['store'] = $mchInfo['store'];
             $city = CityHelper::reverseData($mchInfo['store']['district_id'],
                 $mchInfo['store']['city_id'], $mchInfo['store']['province_id']);
@@ -125,13 +97,17 @@ class MchBaseInfoForm extends BaseModel{
                     'base_info' => $baseData
                 ]
             ];
-        } catch (\Exception $e) {
+        }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
+                'msg'  => $e->getMessage(),
+                'error' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ];
         }
+
     }
+
 }

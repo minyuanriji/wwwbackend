@@ -7,6 +7,9 @@ use app\mch\forms\api\CheckoutOrderInfoForm;
 use app\mch\forms\api\CheckoutOrderPayForm;
 use app\mch\forms\api\CheckoutOrderQrcodeForm;
 
+/**
+ * @deprecated
+ */
 class CheckoutOrderController extends MchMApiController {
 
     const action = ['qrcode', 'synthetic-qr-code'];

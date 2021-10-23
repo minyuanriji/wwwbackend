@@ -3,6 +3,9 @@ namespace app\mch\controllers\api;
 
 use app\mch\forms\api\MchAccountLogListForm;
 
+/**
+ * @deprecated
+ */
 class AccountLogController extends MchMApiController {
 
 

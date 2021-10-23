@@ -5,6 +5,9 @@ namespace app\plugins\mch\controllers\api;
 use app\mch\controllers\api\MchMApiController;
 use app\plugins\mch\forms\api\MchBaseInfoForm;
 
+/**
+ * @deprecated
+ */
 class BaseController extends MchMApiController{
 
     /**

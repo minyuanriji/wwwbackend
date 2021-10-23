@@ -1,8 +1,11 @@
 <?php
 namespace app\mch\controllers\api;
 
-use app\mch\forms\api\MchSharePosterForm;
+use app\mch\forms\api\MchManaInfoPosterForm;
 
+/**
+ * @deprecated
+ */
 class ShareController extends MchMApiController {
 
     /**
@@ -13,7 +16,7 @@ class ShareController extends MchMApiController {
      * @throws \yii\db\Exception
      */
     public function actionPoster(){
-        $shareForm = new MchSharePosterForm([
+        $shareForm = new MchManaInfoPosterForm([
             'name'   => $this->mchData['store']['name']
         ]);
         $shareForm->attributes = $this->requestData;

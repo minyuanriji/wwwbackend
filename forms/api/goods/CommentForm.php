@@ -58,10 +58,17 @@ class CommentForm extends BaseModel
             ]);
 
         if ($this->status) {
-            if ($this->status >= 3) {
-                $query->andWhere(['>=', 'score', 3]);
-            } else {
-                $query->andWhere(['score' => $this->status]);
+            switch ($this->status) {
+                case 3:
+                    $query->andWhere(['>=', 'score', 4]);
+                    break;
+                case 2:
+                    $query->andWhere("FIND_IN_SET(score, '2,3')");
+                    break;
+                case 1:
+                    $query->andWhere("FIND_IN_SET(score, '0,1')");
+                    break;
+                default:
             }
         }
 
@@ -121,7 +128,8 @@ class CommentForm extends BaseModel
                 'is_show' => 1
             ])
             ->select([
-                'count(1) score_all', 'SUM(IF( score >=4 ,1,0)) score_3',
+                'count(1) score_all',
+                'SUM(IF( score >=4 ,1,0)) score_3',
                 'SUM(IF ( score < 4 and score >1,1,0)) score_2',
                 'SUM( IF ( score >= 0 and score <2,1,0) ) AS `score_1`',
             ])->asArray()->one();

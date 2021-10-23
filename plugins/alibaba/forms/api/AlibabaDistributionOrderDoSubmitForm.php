@@ -11,6 +11,7 @@ use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionOrder;
 use app\plugins\alibaba\models\AlibabaDistributionOrderDetail;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
+use lin010\alibaba\c2b2b\AliDistributionException;
 use lin010\alibaba\c2b2b\api\GetAddress;
 use lin010\alibaba\c2b2b\api\GetAddressResponse;
 use lin010\alibaba\c2b2b\api\GetGoodsDetail;
@@ -37,7 +38,7 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
 
             $data = $this->getData();
 
-            if(!$data['user_address']){
+            if (!$data['user_address']) {
                 throw new \Exception("未选择收货地址");
             }
 
@@ -45,57 +46,57 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
 
             foreach ($data['list'] as $orderItem) {
                 $order = new AlibabaDistributionOrder();
-                $order->mall_id                       = \Yii::$app->mall->id;
-                $order->user_id                       = $user->getId();
-                $order->order_no                      = static::getOrderNo('S');;
-                $order->total_price                   = $orderItem['total_price'];
-                $order->total_pay_price               = $orderItem['total_price'];
-                $order->total_goods_price             = $orderItem['total_price'] - $orderItem['express_price'];
-                $order->express_original_price        = $orderItem['express_price'];
-                $order->express_price                 = $orderItem['express_price'];
-                $order->total_goods_original_price    = $orderItem['total_goods_original_price'];
+                $order->mall_id = \Yii::$app->mall->id;
+                $order->user_id = $user->getId();
+                $order->order_no = static::getOrderNo('S');;
+                $order->total_price = $orderItem['total_price'];
+                $order->total_pay_price = $orderItem['total_price'];
+                $order->total_goods_price = $orderItem['total_price'] - $orderItem['express_price'];
+                $order->express_original_price = $orderItem['express_price'];
+                $order->express_price = $orderItem['express_price'];
+                $order->total_goods_original_price = $orderItem['total_goods_original_price'];
 
                 //购物券抵扣
-                $order->shopping_voucher_use_num              = $orderItem['shopping_voucher_use_num'];
-                $order->shopping_voucher_decode_price         = $orderItem['shopping_voucher_decode_price'];
-                $order->shopping_voucher_express_use_num      = $orderItem['shopping_voucher_express_use_num'];
+                $order->shopping_voucher_use_num = $orderItem['shopping_voucher_use_num'];
+                $order->shopping_voucher_decode_price = $orderItem['shopping_voucher_decode_price'];
+                $order->shopping_voucher_express_use_num = $orderItem['shopping_voucher_express_use_num'];
                 $order->shopping_voucher_express_decode_price = $orderItem['shopping_voucher_express_decode_price'];
 
-                $order->ali_address_info              = @json_encode($data['ali_address_info']);
-                $order->name                          = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
-                $order->mobile                        = !empty($data['user_address']['mobile']) ? $data['user_address']['mobile'] : "";
-                $order->address                       = $data['user_address']['province']
-                                                        . ' '
-                                                        . $data['user_address']['city']
-                                                        . ' '
-                                                        . $data['user_address']['district']
-                                                        . ' '
-                                                        . $data['user_address']['town']
-                                                        . ' '
-                                                        . $data['user_address']['detail'];
-                $order->address_id                    = $data['user_address']['id'];
-                $order->province_id                   = $data['user_address']['province_id'];
-                $order->remark                        = $this->remark;
-                $order->token                         = \Yii::$app->security->generateRandomString();
-                $order->is_pay                        = 0;
-                $order->pay_type                      = 0;
+                $order->ali_address_info = @json_encode($data['ali_address_info']);
+                $order->name = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
+                $order->mobile = !empty($data['user_address']['mobile']) ? $data['user_address']['mobile'] : "";
+                $order->address = $data['user_address']['province']
+                    . ' '
+                    . $data['user_address']['city']
+                    . ' '
+                    . $data['user_address']['district']
+                    . ' '
+                    . $data['user_address']['town']
+                    . ' '
+                    . $data['user_address']['detail'];
+                $order->address_id = $data['user_address']['id'];
+                $order->province_id = $data['user_address']['province_id'];
+                $order->remark = $this->remark;
+                $order->token = \Yii::$app->security->generateRandomString();
+                $order->is_pay = 0;
+                $order->pay_type = 0;
 
                 if (!$order->save()) {
                     throw new \Exception($this->responseErrorMsg($order));
                 }
 
                 //生成订单详情
-                foreach ($orderItem['goods_list'] as $goodsItem){
+                foreach ($orderItem['goods_list'] as $goodsItem) {
                     $this->extraOrderDetail($order, $goodsItem);
                 }
 
                 //扣除购物券
                 $shoppingVoucherUseNum = $order->shopping_voucher_express_use_num + $order->shopping_voucher_use_num;
-                if($shoppingVoucherUseNum > 0){
+                if ($shoppingVoucherUseNum > 0) {
                     $modifyForm = new ShoppingVoucherLogModifiyForm([
-                        "money"       => $shoppingVoucherUseNum,
-                        "desc"        => "订单(" . $order->id. ")创建扣除购物券：" . $shoppingVoucherUseNum,
-                        "source_id"   => $order->id,
+                        "money" => $shoppingVoucherUseNum,
+                        "desc" => "订单(" . $order->id . ")创建扣除购物券：" . $shoppingVoucherUseNum,
+                        "source_id" => $order->id,
                         "source_type" => "target_alibaba_distribution_order"
                     ]);
                     $modifyForm->sub($user);
@@ -109,6 +110,17 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
                 'data' => [
                     'token' => $order->token
                 ]
+            ];
+        }catch (AliDistributionException $e){
+            $t->rollBack();
+            
+            //设置异常告警
+            $aliGoods = AlibabaDistributionGoodsList::findOne($goodsItem['id']);
+            AliGoodsHelper::setWarn($aliGoods, $e->getMessage());
+
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
             ];
         }catch (\Exception $e){
             $t->rollBack();
@@ -176,10 +188,10 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
                 "addressInfo" => "{$userAddress->province} {$userAddress->city} {$userAddress->detail}"
             ]), $app->access_token);
             if(!empty($res->error)){
-                throw new \Exception($res->error);
+                throw new AliDistributionException($res->error);
             }
             if(!$res instanceof GetAddressResponse){
-                throw new \Exception("[GetAddressResponse]返回结果异常");
+                throw new AliDistributionException("[GetAddressResponse]返回结果异常");
             }
 
             $aliAddrInfo = (array)@json_decode($res->result, true);
@@ -203,18 +215,13 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
                 ])
             ]), $app->access_token);
             if(!$res instanceof OrderGetPreviewResponse){
-                throw new \Exception("[OrderGetPreviewResponse]返回结果异常");
+                throw new AliDistributionException("[OrderGetPreviewResponse]返回结果异常");
             }
 
             if(!empty($res->error)){
-                throw new \Exception($res->error);
+                throw new AliDistributionException($res->error);
             }
-        }catch (\Exception $e){
-
-            //设置异常告警
-            $aliGoods = AlibabaDistributionGoodsList::findOne($goodsItem['id']);
-            AliGoodsHelper::setWarn($aliGoods, $e->getMessage());
-
+        }catch (AliDistributionException $e){
             throw $e;
         }
     }

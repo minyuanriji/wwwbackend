@@ -41,7 +41,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     <el-option key="from_hotel_order" label="酒店订单" value="from_hotel_order"></el-option>
                     <el-option key="from_addcredit_order" label="话费订单" value="from_addcredit_order"></el-option>
                     <el-option key="from_giftpacks_order" label="大礼包订单" value="from_giftpacks_order"></el-option>
-                    <el-option key="from_order" label="商城订单-获取" value="from_order"></el-option>
+                    <el-option key="from_order_detail" label="商城订单-获取" value="from_order_detail"></el-option>
                 </el-select>
             </div>
             <el-table :data="list" border style="width: 100%" v-loading="loading">

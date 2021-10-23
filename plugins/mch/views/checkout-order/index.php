@@ -9,7 +9,7 @@
         <div slot="header">
             <div>
                 <span>账单记录</span>
-                <div>
+                <div  v-loading="statisticsLoading">
                     <div style="display: flex;justify-content: space-evenly">
                         <div>
                             <div style="text-align: center;">总收入</div>
@@ -219,6 +219,7 @@
                 levelShow:false,
                 list: [],
                 listLoading: false,
+                statisticsLoading: false,
                 page: 1,
                 pageCount: 0,
                 id: null,
@@ -241,11 +242,13 @@
                     this.searchData.keyword='';
                 }
             },
+
             clearSearch() {
                 this.page = 1;
                 this.searchData.keyword = '';
                 this.getList();
             },
+
             selectDateTime(e) {
                 if (e != null) {
                     this.searchData.start_date = e[0];
@@ -256,11 +259,13 @@
                 }
                 this.search();
             },
+
             pagination(currentPage) {
                 let self = this;
                 self.page = currentPage;
                 self.getList();
             },
+
             clearWhere() {
                 this.searchData.keyword = '';
                 this.searchData.keyword_1 = '';
@@ -273,6 +278,7 @@
                 this.level = '';
                 this.getList();
             },
+
             getList() {
                 let self = this;
                 self.listLoading = true;
@@ -292,13 +298,47 @@
                     method: 'get',
                 }).then(e => {
                     self.listLoading = false;
-                    self.list = e.data.data.list;
-                    self.Statistics = e.data.data.Statistics;
-                    self.pageCount = e.data.data.pagination.page_count;
+                    if (e.data.code === 0) {
+                        self.list = e.data.data.list;
+                        self.pageCount = e.data.data.pagination.page_count;
+                        self.billStatistics();
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
                 }).catch(e => {
                     console.log(e);
                 });
             },
+
+            billStatistics() {
+                let self = this;
+                self.statisticsLoading = true;
+                request({
+                    params: {
+                        r: 'plugin/mch/mall/checkout-order/bill-statistics',
+                        page: self.page,
+                        keyword: self.searchData.keyword,
+                        keyword_1: self.searchData.keyword_1,
+                        pay_status: self.searchData.pay_status,
+                        start_date: self.searchData.start_date,
+                        end_date: self.searchData.end_date,
+                        pay_mode: self.searchData.pay_mode,
+                        address: self.address,
+                        level: self.level,
+                    },
+                    method: 'get',
+                }).then(e => {
+                    self.statisticsLoading = false;
+                    if (e.data.code === 0) {
+                        self.Statistics = e.data.data.Statistics;
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    console.log(e);
+                });
+            },
+
             view(id) {
                 navigateTo({
                     r: 'plugin/mch/mall/checkout-order/detail',

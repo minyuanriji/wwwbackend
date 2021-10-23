@@ -13,15 +13,26 @@ Yii::$app->loadComponentView('com-rich-text');
                     </el-breadcrumb-item>
                     <el-breadcrumb-item >社交电商</el-breadcrumb-item>
                     <el-breadcrumb-item >商品管理</el-breadcrumb-item>
+                    <div style="float: right;margin: -5px 0">
+<!--                        @selected="exportConfirm"-->
+                        <com-export-dialog :field_list='export_list' :action_url="'<?= Yii::$app->request->baseUrl . '/index.php?r=plugin/alibaba/mall/distribution/goods-list' ?>'" :params="searchData"></com-export-dialog>
+                    </div>
                 </el-breadcrumb>
             </div>
         </div>
 
         <div class="table-body">
-
             <div class="input-item">
-                <el-input @keyup.enter.native="search" placeholder="请输入关键词搜索" v-model="searchData.keyword" clearable @clear="search">
-                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                <el-input style="width: 300px" v-model="searchData.keyword" placeholder="请输入搜索内容" clearable
+                          @clear="clearSearch"
+                          @change="search"
+                          @input="triggeredChange">
+                    <el-select style="width: 100px" slot="prepend" v-model="searchData.keyword_1">
+                        <el-option v-for="item in selectList" :key="item.value"
+                                   :label="item.name"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
                 </el-input>
             </div>
             <div style="float: right">
@@ -64,7 +75,7 @@ Yii::$app->loadComponentView('com-rich-text');
                 </el-table-column>
                 <el-table-column sortable="custom" prop="freight_price" width="110" label="运费（元）"></el-table-column>
                 <el-table-column sortable="custom" prop="ali_freight_price" width="110" label="1688运费（元）"></el-table-column>
-                <el-table-column prop="price_rate"  sortable="custom"  width="110" label="零售比（%）"></el-table-column>
+                <el-table-column prop="price_rate"  sortable="custom"  width="140" label="零售比（%）"></el-table-column>
                 <!--
                 <el-table-column prop="origin_price_rate" width="110" label="划线比（%）"></el-table-column>
                 -->
@@ -82,7 +93,7 @@ Yii::$app->loadComponentView('com-rich-text');
                         {{scope.row.ali_data_json.channelPrice}}
                     </template>
                 </el-table-column>
-                <el-table-column width="90" label="是否每日推荐">
+                <el-table-column width="120" label="是否每日推荐">
                     <template slot-scope="scope">
                         <el-switch
                                 :active-value="'1'"
@@ -458,6 +469,7 @@ Yii::$app->loadComponentView('com-rich-text');
                 activeName: 'first',
                 searchData: {
                     keyword: '',
+                    keyword_1: '',
                     sort_prop: '',
                     sort_type: '',
                 },
@@ -465,8 +477,6 @@ Yii::$app->loadComponentView('com-rich-text');
                 list: [],
                 pagination: null,
                 loading: false,
-
-
                 batchSetForm: {
                     category:[],
                     dialogVisible: false,
@@ -477,7 +487,6 @@ Yii::$app->loadComponentView('com-rich-text');
                     singleSetValue: 0,
                     singleEditGoods: null
                 },
-
                 editGoods:{
                     dialogVisible: false,
                     btnLoading: false,
@@ -492,10 +501,27 @@ Yii::$app->loadComponentView('com-rich-text');
                             }
                         }
                     }
-                }
+                },
+                export_list: [],
+                selectList: [
+                    {value: '1', name: '编号'},
+                    {value: '2', name: '商品名'},
+                ],
             };
         },
         methods: {
+            triggeredChange (){
+                if (this.searchData.keyword.length>0 && this.searchData.keyword_1.length<=0) {
+                    alert('请选择搜索方式');
+                    this.searchData.keyword='';
+                }
+            },
+            clearSearch() {
+                this.page = 1;
+                this.searchData.keyword = '';
+                this.searchData.keyword_1 = '';
+                this.getList();
+            },
             switchRecommendStatus(id) {
                 let self = this;
                 self.listLoading = true;
@@ -822,8 +848,10 @@ Yii::$app->loadComponentView('com-rich-text');
                     params
                 }).then(e => {
                     if (e.data.code === 0) {
-                        that.list = e.data.data.list;
-                        that.pagination = e.data.data.pagination;
+                        let {list, export_list, pagination} = e.data.data;
+                        that.list = list;
+                        that.export_list = export_list;
+                        that.pagination = pagination;
                     } else {
                         that.$message.error(e.data.msg);
                     }

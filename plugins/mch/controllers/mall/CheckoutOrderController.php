@@ -40,4 +40,11 @@ class CheckoutOrderController extends Controller{
         $form->attributes = \Yii::$app->request->get();
         return $this->asJson($form->execute());
     }
+
+    //账单记录统计
+    public function actionBillStatistics(){
+        $form = new CheckoutOrderSearchForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->statistics());
+    }
 }

@@ -9,7 +9,7 @@
                     </el-input>
                 </div>
 
-                <el-table :data="list" size="small" border v-loading="loading" style="margin-bottom: 15px">
+                <el-table :data="list" size="medium" border v-loading="loading" style="margin-bottom: 15px">
 
                     <el-table-column prop="id" label="ID" width="100"></el-table-column>
 

@@ -51,13 +51,21 @@ class CommentForm extends BaseModel
         }
         $goods = Goods::findOne($this->goods_id);
 
-        $list = OrderComments::find()
+        $query = OrderComments::find()
             ->where([
                 'goods_warehouse_id' => $goods->goods_warehouse_id, 'mall_id' => $this->mall->id, 'is_delete' => 0,
                 'is_show' => 1
-            ])
-            ->keyword($this->status, ['score' => $this->status])
-            ->select(['*', 'time' => 'case when `is_virtual` = 1 then `virtual_at` else `created_at` end'])
+            ]);
+
+        if ($this->status) {
+            if ($this->status >= 3) {
+                $query->andWhere(['>=', 'score', 3]);
+            } else {
+                $query->andWhere(['score' => $this->status]);
+            }
+        }
+
+        $list = $query->select(['*', 'time' => 'case when `is_virtual` = 1 then `virtual_at` else `created_at` end'])
             ->with('user')->apiPage($this->limit, $this->page)
             ->orderBy(['is_top' => SORT_DESC, 'created_at' => SORT_DESC])
             ->all();

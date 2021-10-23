@@ -3,6 +3,7 @@
 namespace app\plugins\alibaba\forms\mall;
 
 use app\core\ApiCode;
+use app\forms\mall\export\distributionGoodsListExport;
 use app\models\BaseModel;
 use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsCategory;
@@ -14,13 +15,18 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
     public $page;
     public $app_id;
     public $keyword;
+    public $keyword_1;
     public $sort_prop;
     public $sort_type;
+    public $flag;
+    public $fields;
 
     public function rules(){
         return [
-            [['page', 'app_id'], 'integer'],
+            [['page', 'app_id', 'keyword_1'], 'integer'],
             [['keyword', 'sort_type', 'sort_prop'], 'string'],
+            [['flag'], 'trim'],
+            [['fields'], 'safe'],
         ];
     }
 
@@ -44,9 +50,10 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
             if($this->app_id){
                 $query->andWhere(["g.app_id" => $this->app_id]);
             }
-            if ($this->keyword) {
-                $query->andWhere(['like','g.name',$this->keyword]);
-            }
+
+            //关键词搜索
+            $query->keyword($this->keyword_1 == 1, ['g.ali_offerId' => $this->keyword]);
+            $query->keyword($this->keyword_1 == 2, ['like', 'g.name', $this->keyword]);
 
             if ($this->sort_prop && $this->sort_type) {
                 $orderBy = 'g.' . $this->sort_prop . ($this->sort_type ? ' ' . $this->sort_type : ' DESC');
@@ -54,6 +61,14 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
                 $orderBy = "g.id DESC";
             }
             $query->orderBy($orderBy);
+
+            if ($this->flag == "EXPORT") {
+                $new_query = clone $query;
+                $exp = new distributionGoodsListExport();
+                $exp->fieldsKeyList = $this->fields;
+                $exp->export($new_query, 'g.');
+                return false;
+            }
 
             $list = $query->asArray()->page($pagination, 20, $this->page)->all();
             if($list){
@@ -96,8 +111,6 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
                     }
 
                     $item['ali_product_info'] = (array)@json_decode($item['ali_product_info'], true);
-
-                    //unset($item['ali_product_info']);
                 }
             }
 
@@ -105,6 +118,7 @@ class AlibabaDistributionGoodsListForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'list' => $list ?: [],
+                    'export_list' => (new distributionGoodsListExport())->fieldsList(),
                     'pagination' => $pagination
                 ]
             ];

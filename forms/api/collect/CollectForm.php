@@ -81,7 +81,7 @@ class CollectForm extends BaseModel
         if (!$collect->save()) {
             return $this->returnApiResultData();
         }
-        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '收藏成功');
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '收藏成功', ['id' => $collect->id]);
     }
 
 
@@ -138,7 +138,7 @@ class CollectForm extends BaseModel
     public function delete()
     {
 
-        if ($this->type == 'goods') {
+//        if ($this->type == 'goods') {
             $goods_collect = GoodsCollect::findOne(['id' => $this->id, 'is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'user_id' => \Yii::$app->user->id]);
             if (!$goods_collect) {
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, '该收藏不存在或已被删除');
@@ -148,8 +148,8 @@ class CollectForm extends BaseModel
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, '删除失败');
             }
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '删除成功');
-        }
-        return $this->returnApiResultData(ApiCode::CODE_FAIL, '删除失败');
+//        }
+//        return $this->returnApiResultData(ApiCode::CODE_FAIL, '删除失败');
 
     }
 

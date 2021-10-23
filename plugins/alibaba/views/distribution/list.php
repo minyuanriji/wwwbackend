@@ -517,6 +517,7 @@ Yii::$app->loadComponentView('com-rich-text');
             clearSearch() {
                 this.page = 1;
                 this.searchData.keyword = '';
+                this.searchData.keyword_1 = '';
                 this.getList();
             },
             switchRecommendStatus(id) {

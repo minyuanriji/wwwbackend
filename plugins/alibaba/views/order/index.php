@@ -63,18 +63,24 @@
                         </template>
                     </el-table-column>
 
+                    <el-table-column label="订单状态" width="130">
+                        <template slot-scope="scope">
+                            <div v-if="scope.row.status=='unpaid'">未支付</div>
+                            <div v-if="scope.row.status=='paid'">已支付</div>
+                            <div v-if="scope.row.status=='invalid'">无效</div>
+                        </template>
+                    </el-table-column>
+
                     <el-table-column label="实付金额" width="130">
                         <template slot-scope="scope">
                             <div v-if="scope.row.is_pay==1">
                                 <div v-if="scope.row.pay_type==1">现金：{{scope.row.total_price ?? 0}}</div>
                                 <div v-if="scope.row.pay_type==2">货到付款</div>
                                 <div v-if="scope.row.pay_type==3">购物券：
-                                    <span style="font-size: 16px;color: red">
                                     {{scope.row.shopping_voucher_decode_price ?? 0}}
-                                </span>
                                 </div>
-                                <div>运费：<span style="font-size: 16px;color: #13ce66">{{ scope.row.shopping_voucher_express_use_num }}</span></div>
-                                <div>总计：<span style="font-size: 22px">{{ scope.row.total_shopping_voucher_price }}</span></div>
+                                <div>运费：{{ scope.row.shopping_voucher_express_use_num }}</div>
+                                <div>总计：{{ scope.row.total_shopping_voucher_price }}</div>
                             </div>
                         </template>
                     </el-table-column>
@@ -92,6 +98,8 @@
                             <div>收件人地址：{{ scope.row.address }}</div>
                         </template>
                     </el-table-column>
+
+                    <el-table-column label="备注" width="200"  prop="do_error"></el-table-column>
 
                     <!--<el-table-column label="操作">
                         <template slot-scope="scope">

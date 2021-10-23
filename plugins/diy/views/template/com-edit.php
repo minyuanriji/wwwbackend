@@ -51,7 +51,7 @@ Yii::$app->loadComponentView('com-radio');
 
     .all-components .component-group {
         border: 1px solid #eeeeee;
-        width: 300px;
+        width: 301px;
         margin-bottom: 20px;
     }
 

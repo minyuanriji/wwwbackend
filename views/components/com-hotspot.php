@@ -161,8 +161,8 @@ $static = Yii::$app->request->hostInfo . Yii::$app->request->baseUrl;
                         <el-form-item label="选择链接" v-if="isLink">
                             <el-input size="small" style="width: 100%;" v-model="hotspotList[index].link.new_link_url">
                                 <template slot="append">
-                                    <com-pick-link style="margin-left: 10px" >
-                                        <el-button  @selected="selectLink">选择链接</el-button>
+                                    <com-pick-link style="margin-left: 10px" @selected="selectLink">
+                                        <el-button>选择链接</el-button>
                                     </com-pick-link>
                                 </template>
                             </el-input>

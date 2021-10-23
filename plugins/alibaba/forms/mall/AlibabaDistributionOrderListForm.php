@@ -10,6 +10,7 @@ use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
 use app\plugins\alibaba\models\AlibabaDistributionOrder;
 use app\plugins\alibaba\models\AlibabaDistributionOrderDetail;
+use app\plugins\alibaba\models\AlibabaDistributionOrderDetail1688;
 use app\plugins\commission\models\CommissionGiftpacksPriceLog;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksOrder;
@@ -42,7 +43,8 @@ class AlibabaDistributionOrderListForm extends BaseModel
             $query = AlibabaDistributionOrder::find()->alias('ao')->where(["ao.is_delete" => 0, "ao.is_recycle" => 0])
                 ->leftJoin(["ad" => AlibabaDistributionOrderDetail::tableName()], "ad.order_id = ao.id")
                 ->leftJoin(["ag" => AlibabaDistributionGoodsList::tableName()], "ag.id = ad.goods_id")
-                ->leftJoin(["u" => User::tableName()], "ao.user_id = u.id");
+                ->leftJoin(["u" => User::tableName()], "ao.user_id = u.id")
+                ->leftJoin(["aod" => AlibabaDistributionOrderDetail1688::tableName()], "aod.order_id = ao.id");
 
             if (!empty($this->keyword)) {
                 $query->andWhere([
@@ -69,7 +71,7 @@ class AlibabaDistributionOrderListForm extends BaseModel
                     ->keyword($this->status == 'closed', ['ao.is_closed' => 1]);
             }
 
-            $select = ['ao.*', "ag.name as goods_name", "ag.cover_url", 'ad.*', "u.nickname"];
+            $select = ['ao.*', "ag.name as goods_name", "ag.cover_url", 'ad.*', "u.nickname", "aod.status", "aod.do_error"];
 
             $list = $query->select($select)->orderBy("ao.id DESC")->page($pagination)->asArray()->all();
 

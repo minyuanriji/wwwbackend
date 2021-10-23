@@ -12,7 +12,7 @@ class SubmitSlowAction extends BaseAction {
         $appSecret = isset($configs['app_secret']) ? $configs['app_secret'] : "";
 
         $req = new Req($configs['host'], $appKey, $appSecret);
-        $params['orderId']   = $this->orderModel->id;
+        $params['orderId']   = $this->orderModel->order_no;
         $params['mobile']    = $this->orderModel->mobile;
         $params['amount']    = $this->orderModel->order_price;
         $params['notifyUrl'] = "https://www.mingyuanriji.cn/web/addcredit-notify/index.php";

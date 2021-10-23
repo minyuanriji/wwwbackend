@@ -5,7 +5,9 @@ namespace app\plugins\alibaba\forms\api;
 use app\core\ApiCode;
 use app\models\User;
 use app\models\UserAddress;
+use app\plugins\alibaba\helpers\AliGoodsHelper;
 use app\plugins\alibaba\models\AlibabaApp;
+use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionOrder;
 use app\plugins\alibaba\models\AlibabaDistributionOrderDetail;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
@@ -164,49 +166,56 @@ class AlibabaDistributionOrderDoSubmitForm extends AlibabaDistributionOrderForm 
      */
     private function validateAliGoods(AlibabaDistributionOrder $order, $goodsItem){
 
-        $app = AlibabaApp::findOne($goodsItem['app_id']);
-        $distribution = new Distribution($app->app_key, $app->secret);
-        $userAddress = UserAddress::findOne($order->address_id);
+        try {
+            $app = AlibabaApp::findOne($goodsItem['app_id']);
+            $distribution = new Distribution($app->app_key, $app->secret);
+            $userAddress = UserAddress::findOne($order->address_id);
 
-        //解析1688的地址
-        $res = $distribution->requestWithToken(new GetAddress([
-            "addressInfo" => "{$userAddress->province} {$userAddress->city} {$userAddress->detail}"
-        ]), $app->access_token);
-        if(!empty($res->error)){
-            throw new \Exception($res->error);
+            //解析1688的地址
+            $res = $distribution->requestWithToken(new GetAddress([
+                "addressInfo" => "{$userAddress->province} {$userAddress->city} {$userAddress->detail}"
+            ]), $app->access_token);
+            if(!empty($res->error)){
+                throw new \Exception($res->error);
+            }
+            if(!$res instanceof GetAddressResponse){
+                throw new \Exception("[GetAddressResponse]返回结果异常");
+            }
+
+            $aliAddrInfo = (array)@json_decode($res->result, true);
+
+            $res = $distribution->requestWithToken(new OrderGetPreview([
+                "addressParam" => json_encode([
+                    "fullName"     => $order->name,
+                    "mobile"       => $order->mobile,
+                    "phone"        => $order->mobile,
+                    "postCode"     => isset($aliAddrInfo['postCode']) ? $aliAddrInfo['postCode'] : "",
+                    "cityText"     => $userAddress->city,
+                    "provinceText" => $userAddress->province,
+                    "areaText"     => $userAddress->district,
+                    "address"      => $userAddress->detail,
+                    "districtCode" => isset($aliAddrInfo['addressCode']) ? $aliAddrInfo['addressCode'] : ""
+                ]),
+                "cargoParamList" => json_encode([
+                    'offerId'   => $goodsItem['ali_offerId'],
+                    'specId'    => $goodsItem['ali_spec_id'],
+                    'quantity'  => $goodsItem['num']
+                ])
+            ]), $app->access_token);
+            if(!$res instanceof OrderGetPreviewResponse){
+                throw new \Exception("[OrderGetPreviewResponse]返回结果异常");
+            }
+
+            if(!empty($res->error)){
+                throw new \Exception($res->error);
+            }
+        }catch (\Exception $e){
+
+            //设置异常告警
+            $aliGoods = AlibabaDistributionGoodsList::findOne($goodsItem['id']);
+            AliGoodsHelper::setWarn($aliGoods, $e->getMessage());
+
+            throw $e;
         }
-        if(!$res instanceof GetAddressResponse){
-            throw new \Exception("[GetAddressResponse]返回结果异常");
-        }
-
-        $aliAddrInfo = (array)@json_decode($res->result, true);
-
-        $res = $distribution->requestWithToken(new OrderGetPreview([
-            "addressParam" => json_encode([
-                "fullName"     => $order->name,
-                "mobile"       => $order->mobile,
-                "phone"        => $order->mobile,
-                "postCode"     => isset($aliAddrInfo['postCode']) ? $aliAddrInfo['postCode'] : "",
-                "cityText"     => $userAddress->city,
-                "provinceText" => $userAddress->province,
-                "areaText"     => $userAddress->district,
-                "address"      => $userAddress->detail,
-                "districtCode" => isset($aliAddrInfo['addressCode']) ? $aliAddrInfo['addressCode'] : ""
-            ]),
-            "cargoParamList" => json_encode([
-                'offerId'   => $goodsItem['ali_offerId'],
-                'specId'    => $goodsItem['ali_spec_id'],
-                'quantity'  => $goodsItem['num']
-            ])
-        ]), $app->access_token);
-        if(!$res instanceof OrderGetPreviewResponse){
-            throw new \Exception("[OrderGetPreviewResponse]返回结果异常");
-        }
-
-        if(!empty($res->error)){
-            throw new \Exception($res->error);
-        }
-
-
     }
 }

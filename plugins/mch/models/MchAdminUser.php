@@ -21,8 +21,8 @@ class MchAdminUser extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mall_id', 'mch_id', 'auth_key', 'access_token', 'created_at', 'updated_at'], 'required'],
-            [['token_expired_at', 'login_ip', 'last_login_at'], 'safe']
+            [['mall_id', 'mch_id', 'created_at'], 'required'],
+            [['token_expired_at', 'login_ip', 'last_login_at', 'updated_at', 'auth_key', 'access_token'], 'safe']
         ];
     }
 

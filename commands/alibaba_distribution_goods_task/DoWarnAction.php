@@ -63,6 +63,7 @@ class DoWarnAction extends Action{
                         ]);
                     }
                     $goodsWarn->remark = "invalid_sku:" . implode(",", $invalidSkus) . ":" . $goodsWarn->remark;
+                    $this->controller->commandOut("invalid sku:" . implode(",", $invalidSkus));
                 }
 
             }catch (AliDistributionException $e){
@@ -70,6 +71,7 @@ class DoWarnAction extends Action{
                 $aliGoods->updated_at = time();
                 $aliGoods->save();
                 $goodsWarn->remark = $e->getMessage() . ":" . $goodsWarn->remark;
+                $this->controller->commandOut($e->getMessage());
             }catch (\Exception $e){
                 $this->controller->commandOut($e->getMessage());
             }

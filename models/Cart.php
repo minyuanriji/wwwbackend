@@ -16,6 +16,7 @@ use Yii;
  * @property int $mch_id 商户id
  * @property int $is_delete 删除
  * @property int $sign 删除
+ * @property int $buy_now
  * @property string $attr_info 规格信息
  * @property string $created_at
  * @property string $deleted_at
@@ -50,7 +51,7 @@ class Cart extends BaseActiveRecord
     {
         return [
             [['mall_id', 'user_id', 'goods_id', 'attr_id', 'created_at', 'deleted_at', 'updated_at'], 'required'],
-            [['mall_id', 'user_id', 'goods_id', 'num', 'mch_id', 'is_delete', 'attr_id'], 'integer'],
+            [['mall_id', 'user_id', 'goods_id', 'num', 'mch_id', 'is_delete', 'attr_id', 'buy_now'], 'integer'],
             [['created_at', 'deleted_at', 'updated_at', 'sign', 'attr_info', 'mch_baopin_id'], 'safe'],
         ];
     }
@@ -71,6 +72,7 @@ class Cart extends BaseActiveRecord
             'is_delete' => '删除',
             'sign' => '标记',
             'attr_info' => '规格信息',
+            'buy_now' => '是否是立即购买',
             'created_at' => 'Created At',
             'deleted_at' => 'Deleted At',
             'updated_at' => 'Updated At',
@@ -86,7 +88,7 @@ class Cart extends BaseActiveRecord
      * @return array|\yii\db\ActiveRecord[]
      */
     public static function getList($wheres = []){
-        $query = self::find()->alias('c');
+        $query = self::find()->alias('c')->where(['buy_now' => 0]);
 
         if(isset($wheres["mall_id"]) && !empty($wheres["mall_id"])){
             $query->andWhere(['c.mall_id' => $wheres["mall_id"]]);

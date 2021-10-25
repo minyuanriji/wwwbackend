@@ -25,12 +25,13 @@ class CartAddForm extends BaseModel
     public $attr;
     public $num;
     public $mch_baopin_id;
+    public $buy_now;
 
     public function rules()
     {
         return [
             [['goods_id', 'attr', 'num'], 'required'],
-            [['goods_id', 'num', 'attr', 'mch_baopin_id'], 'integer'],
+            [['goods_id', 'num', 'attr', 'mch_baopin_id', 'buy_now'], 'integer'],
         ];
     }
 
@@ -91,6 +92,7 @@ class CartAddForm extends BaseModel
                 $cart->attr_id   = $this->attr;
                 $cart->num       = 0;
                 $cart->mch_id    = $goods->mch_id;
+                $cart->buy_now   = (int)$this->buy_now ?? 0;
                 $cart->attr_info = \Yii::$app->serializer->encode(ArrayHelper::toArray($attr));
             }
             $cart->num           = $this->num;

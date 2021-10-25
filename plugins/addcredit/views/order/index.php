@@ -191,8 +191,7 @@ echo $this->render("com-detail");
                     if (e.data.code == 0) {
                         this.list = e.data.data.list;
                         this.pagination = e.data.data.pagination;
-                        let i=0;
-                        that.queryStatus(i, e.data.data.list);
+                        //that.queryStatus(0, e.data.data.list);
                     } else {
                         this.$message.error(e.data.msg);
                     }

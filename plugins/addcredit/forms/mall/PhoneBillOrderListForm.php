@@ -56,7 +56,7 @@ class PhoneBillOrderListForm extends BaseModel
             $list = $query->select($selects)->page($pagination, 10)->asArray()->all();
             if ($list) {
                foreach ($list as &$row) {
-                   $row['order_status'] = '';
+                   //$row['order_status'] = '';
                }
             }
             return [

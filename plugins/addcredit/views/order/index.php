@@ -192,7 +192,9 @@ echo $this->render("com-detail");
                         this.pagination = e.data.data.pagination;
                         let i=0;
                         for(i=0; i < e.data.data.list.length; i++){
-                            that.queryStatus(e.data.data.list[i]);
+                            setTimeout(function(){
+                                that.queryStatus(e.data.data.list[i]);
+                            }, 1000);
                         }
                     } else {
                         this.$message.error(e.data.msg);

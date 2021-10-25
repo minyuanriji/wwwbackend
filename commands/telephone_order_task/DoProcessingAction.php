@@ -37,7 +37,7 @@ class DoProcessingAction extends Action{
             }catch (\Exception $e){
                 $this->controller->commandOut(implode("\n", [$e->getMessage(), $e->getFile(), $e->getLine()]));
             }
-            $this->controller->sleep(3);
+            $this->controller->sleep(15);
         }
     }
 

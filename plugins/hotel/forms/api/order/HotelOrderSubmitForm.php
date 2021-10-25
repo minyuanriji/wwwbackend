@@ -65,6 +65,14 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
                 $orderNeedPay = max(0, $orderPrice - $integralDeductionPrice);
             }
 
+            $arrive_date = strtotime($this->arrive_date);
+            $time = time();
+            if ($arrive_date < $time) {
+                $arriveDate = $time + 1800;
+            } else {
+                $arriveDate = $this->arrive_date;
+            }
+            
             //生成订单
             $order = new HotelOrder([
                 "mall_id"                  => \Yii::$app->mall->id,
@@ -80,7 +88,7 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
                 "booking_days"             => $this->days,
                 "real_booking_days"        => $this->days,
                 "booking_passengers"       => $this->passengers,
-                "booking_arrive_date"      => date("Y-m-d H:i:s", strtotime($this->arrive_date)),
+                "booking_arrive_date"      => date("Y-m-d H:i:s", strtotime($arriveDate)),
                 "created_at"               => time(),
                 "updated_at"               => time(),
                 "pay_status"               => "unpaid",

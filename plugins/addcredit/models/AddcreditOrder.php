@@ -45,7 +45,7 @@ class AddcreditOrder extends BaseActiveRecord
             [['mall_id', 'plateform_id', 'user_id', 'mobile', 'order_no', 'order_price',
               'order_status', 'created_at', 'updated_at', 'pay_status', 'recharge_type'], 'required'],
             [['pay_at', 'pay_price', 'pay_type', 'integral_deduction_price',
-              'integral_fee_rate', 'plateform_request_data', 'plateform_response_data'], 'safe']
+              'integral_fee_rate', 'plateform_request_data', 'plateform_response_data', 'is_manual'], 'safe']
         ];
     }
 }

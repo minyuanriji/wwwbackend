@@ -16,23 +16,24 @@ class EfpsPayQueryJob extends Component implements JobInterface{
     public $outTradeNo;
 
     public function execute($queue){
+
+        if(empty($this->outTradeNo)){
+            $efpsOrder = EfpsPaymentOrder::find()->where([
+                "is_pay" => 0
+            ])->andWhere(["<", "do_query_count", 3])->orderBy("update_at ASC")->one();
+        }else{
+            $efpsOrder = EfpsPaymentOrder::find()->where([
+                "is_pay"     => 0,
+                "outTradeNo" => $this->outTradeNo
+            ])->one();
+        }
+
+        if(!$efpsOrder) {
+            return;
+        }
+
         $t = \Yii::$app->getDb()->beginTransaction();
         try {
-            if(empty($this->outTradeNo)){
-                $efpsOrder = EfpsPaymentOrder::find()->where([
-                    "is_pay" => 0
-                ])->andWhere(["<", "do_query_count", 3])->orderBy("update_at ASC")->one();
-            }else{
-                $efpsOrder = EfpsPaymentOrder::find()->where([
-                    "is_pay"     => 0,
-                    "outTradeNo" => $this->outTradeNo
-                ])->one();
-            }
-
-            if(!$efpsOrder) {
-                throw new \Exception("支付记录不存在");
-            }
-
             $res = \Yii::$app->efps->payQuery([
                 "customerCode" => \Yii::$app->efps->getCustomerCode(),
                 "outTradeNo"   => $efpsOrder->outTradeNo
@@ -95,7 +96,9 @@ class EfpsPayQueryJob extends Component implements JobInterface{
                                 'amount'      => (float)$paymentOrder->amount,
                                 'title'       => $paymentOrder->title,
                                 'notifyClass' => $paymentOrder->notify_class,
-                                'payType'     => \app\core\payment\PaymentOrder::PAY_TYPE_ALIPAY
+                                'payType'     => $paymentOrder->pay_type == 1 ?
+                                                    \app\core\payment\PaymentOrder::PAY_TYPE_WECHAT :
+                                                    \app\core\payment\PaymentOrder::PAY_TYPE_ALIPAY
                             ]);
                             $notify->notify($po);
                         } catch (\Exception $e) {

@@ -3,6 +3,7 @@ namespace app\plugins\mch\controllers\api\mana;
 
 use app\plugins\mch\forms\api\mana\MchManaInfoBaseForm;
 use app\plugins\mch\forms\api\mana\MchManaInfoPosterForm;
+use app\plugins\mch\forms\api\mana\MchManaInfoUpdateForm;
 
 class InfoController extends MchAdminController {
 
@@ -14,6 +15,16 @@ class InfoController extends MchAdminController {
         $form = new MchManaInfoBaseForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->get());
+    }
+
+    /**
+     * 更新信息
+     * @return \yii\web\Response
+     */
+    public function actionUpdate(){
+        $form = new MchManaInfoUpdateForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->save());
     }
 
     /**

@@ -1,3 +1,6 @@
+<?php
+echo $this->render("com-detail");
+?>
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
         <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -35,11 +38,40 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="充值手机号" width="200">
+                    <el-table-column label="充值手机号" width="130">
                         <template slot-scope="scope">
                             <div>{{scope.row.mobile}}</div>
                         </template>
                     </el-table-column>
+
+                    <el-table-column label="类型" width="80">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.recharge_type == 'fast'">快充</span>
+                            <span v-if="scope.row.recharge_type == 'slow'">慢充</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column label="支付状态" width="100" align="center">
+                        <template slot-scope="scope">
+                            <span style="color:darkred" v-if="scope.row.pay_status == 'refunding'">退款中</span>
+                            <span style="color:darkgreen" v-if="scope.row.pay_status == 'paid'">已支付</span>
+                            <span style="" v-if="scope.row.pay_status == 'unpaid'">未支付</span>
+                            <span style="color:gray" v-if="scope.row.pay_status == 'refund'">已退款</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column label="订单状态" width="100" align="center">
+                        <template slot-scope="scope">
+                            <span style="color:darkgreen" v-if="scope.row.is_manual == 1">已通过手动充值成功</span>
+                            <span v-else>
+                                <span v-if="scope.row.order_status == ''">查询中...<b>{{counter}}</b></span>
+                                <span style="color:darkgreen" v-if="scope.row.order_status == 'success'">充值成功</span>
+                                <span style="color:royalblue" v-if="scope.row.order_status == 'processing'">充值中</span>
+                                <span style="color:darkred" v-if="scope.row.order_status == 'fail'">失败</span>
+                            </span>
+                        </template>
+                    </el-table-column>
+
 
                     <el-table-column label="充值金额" width="100">
                         <template slot-scope="scope">
@@ -47,25 +79,21 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="下单用户" width="260">
+                    <el-table-column label="下单用户" width="180">
                         <template slot-scope="scope">
                             <div>{{scope.row.nickname}}[ID:{{scope.row.user_id}}]</div>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="抵扣" width="230">
+                    <el-table-column label="抵扣" width="180">
                         <template slot-scope="scope"  v-if="scope.row.pay_status != 'unpaid'">
                             <div>余额抵扣：<b style="color:#077a00">{{scope.row.pay_price}}元</b></div>
                             <div>红包抵扣：<b style="color:#cc3311">{{scope.row.integral_deduction_price}}元</b></div>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="订单状态" width="150">
-                        <template slot-scope="scope">
-                            <div>{{scope.row.status}}</div>
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="时间" width="260">
+
+                    <el-table-column label="时间" width="230">
                         <template slot-scope="scope">
                             <div style="margin-bottom: 5px">下单时间:{{scope.row.created_at}}</div>
                             <div style="margin-bottom: 5px">更新时间:{{scope.row.updated_at}}</div>
@@ -73,7 +101,15 @@
                         </template>
                     </el-table-column>
 
-<!--                    <el-table-column label="操作"></el-table-column>-->
+                    <el-table-column label="操作">
+                        <template slot-scope="scope">
+                            <el-button @click="editIt(scope.row)" v-if="scope.row.pay_status != 'unpaid'" type="text" circle size="mini">
+                                <el-tooltip class="item" effect="dark" content="查看" placement="top">
+                                    <img src="statics/img/mall/edit.png" alt="">
+                                </el-tooltip>
+                            </el-button>
+                        </template>
+                    </el-table-column>
                 </el-table>
                 <div flex="box:last cross:center">
                     <div></div>
@@ -90,6 +126,9 @@
                 </div>
             </div>
         </el-tabs>
+
+        <com-detail @close="edit.visible=false" :visible="edit.visible" :order="edit.data"></com-detail>
+
     </el-card>
 </div>
 <script>
@@ -110,12 +149,20 @@
                 list: [],
                 pagination: null,
                 exportList: [],
+                edit: {data:{}, visible:false},
+                counter: 6
             };
         },
         mounted() {
             this.loadData();
         },
         methods: {
+
+            editIt(row){
+                this.edit.data    = row;
+                this.edit.visible = true;
+            },
+
             // 日期搜索
             changeTime() {
                 if (this.search.time) {
@@ -131,6 +178,7 @@
 
             loadData(status = 'all', page = 1) {
                 this.loading = true;
+                let that = this;
                 request({
                     params: {
                         r: 'plugin/addcredit/mall/order/order',
@@ -144,17 +192,41 @@
                 }).then(e => {
                     this.loading = false;
                     if (e.data.code == 0) {
-
-                        console.log(e);
                         this.list = e.data.data.list;
                         this.pagination = e.data.data.pagination;
-
+                        //that.queryStatus(0, e.data.data.list);
                     } else {
                         this.$message.error(e.data.msg);
                     }
                 }).catch(e => {
                     this.loading = false;
                 });
+            },
+            queryStatus(i, list){
+                this.counter = 6;
+                let that = this, timer = setInterval(function(){
+                    if(that.counter <= 0){
+                        request({
+                            params: {
+                                r: 'plugin/addcredit/mall/order/order/detail',
+                                id: list[i].id
+                            },
+                            method: 'get'
+                        }).then(e => {
+                            if (e.data.code == 0) {
+                                list[i].order_status = e.data.data.orderStatus;
+                                if(i < (list.length - 1)){
+                                    that.queryStatus(i+1, list);
+                                }
+                            } else {
+                                this.$message.error(e.data.msg);
+                            }
+                        }).catch(e => {});
+                        clearInterval(timer);
+                        return;
+                    }
+                    that.counter = that.counter - 1;
+                }, 1000);
             },
             toSearch() {
                 this.page = 1;

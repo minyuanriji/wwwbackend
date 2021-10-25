@@ -2,7 +2,7 @@
 namespace app\mch\controllers\api;
 
 
-use app\mch\forms\api\account\MchManaAccountInfoForm;
+use app\mch\forms\api\account\InfoForm;
 use app\mch\forms\api\account\SetSettleInfo;
 use app\mch\forms\api\account\SetWithdrawPwd;
 use app\mch\forms\api\account\WithdrawForm;
@@ -48,7 +48,7 @@ class AccountController extends MchMApiController {
      * @throws \yii\db\Exception
      */
     public function actionInfo(){
-        $form = new MchManaAccountInfoForm();
+        $form = new InfoForm();
         $form->attributes = $this->requestData;
         $form->mch_id = $this->mch_id;
         return $form->get();

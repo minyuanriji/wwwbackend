@@ -83,6 +83,6 @@ class MchGoodsListForm extends BaseModel implements ICacheForm {
      * @return array
      */
     public function getCacheKey(){
-        return ["store_id" => $this->store_id, "page" => $this->page];
+        return [$this->store_id, $this->page];
     }
 }

@@ -20,7 +20,7 @@ class DoProcessingAction extends Action{
                                 "created_at < '".time()."'",
                                 "next_query_time < '".time()."'"
                             ])
-                            ->orderBy("updated_at ASC")->limit(10)->all();
+                            ->orderBy("updated_at ASC")->limit(1)->all();
                 if($models){
                     $ids = [];
                     foreach($models as $model){
@@ -37,7 +37,7 @@ class DoProcessingAction extends Action{
             }catch (\Exception $e){
                 $this->controller->commandOut(implode("\n", [$e->getMessage(), $e->getFile(), $e->getLine()]));
             }
-            $this->controller->sleep(1);
+            $this->controller->sleep(15);
         }
     }
 

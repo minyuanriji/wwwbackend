@@ -75,7 +75,7 @@ class CheckoutAction extends Action{
                     */
 
                     //新公式
-                    $ruleData['commisson_value'] = (float)($ruleData['commisson_value']/100);
+                    $ruleData['commisson_value'] = min(0.15, (float)($ruleData['commisson_value']/100));
                     $ruleData['role_type'] = $parentData['role_type'];
                     $ruleData['ver'] = "2021/10/25";
                     $ruleData['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];

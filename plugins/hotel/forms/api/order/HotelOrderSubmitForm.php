@@ -70,7 +70,7 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
             if ($arrive_date < $time) {
                 $arriveDate = $time + 1800;
             } else {
-                $arriveDate = $this->arrive_date;
+                $arriveDate = $arrive_date;
             }
 
             //生成订单

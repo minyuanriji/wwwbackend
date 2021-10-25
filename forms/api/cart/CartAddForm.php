@@ -92,10 +92,10 @@ class CartAddForm extends BaseModel
                 $cart->attr_id   = $this->attr;
                 $cart->num       = 0;
                 $cart->mch_id    = $goods->mch_id;
-                $cart->buy_now   = (int)$this->buy_now ?? 0;
                 $cart->attr_info = \Yii::$app->serializer->encode(ArrayHelper::toArray($attr));
             }
             $cart->num           = $this->num;
+            $cart->buy_now   = (int)$this->buy_now ?? 0;
             $cart->mch_baopin_id = $this->mch_baopin_id;
             if ($cart->save()) {
                 \Yii::$app->trigger(Cart::EVENT_CART_ADD, new CartEvent(['cartIds' => [$cart->id]]));

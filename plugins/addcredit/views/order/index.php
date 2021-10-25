@@ -200,25 +200,25 @@ echo $this->render("com-detail");
                 });
             },
             queryStatus(i, list){
-                let that = this;
-                request({
-                    params: {
-                        r: 'plugin/addcredit/mall/order/order/detail',
-                        id: list[i].id
-                    },
-                    method: 'get'
-                }).then(e => {
-                    if (e.data.code == 0) {
-                        list[i].order_status = e.data.data.orderStatus;
-                        if(i < (list.length - 1)){
-                            setTimeout(function(){
+                setTimeout(function(){
+                    let that = this;
+                    request({
+                        params: {
+                            r: 'plugin/addcredit/mall/order/order/detail',
+                            id: list[i].id
+                        },
+                        method: 'get'
+                    }).then(e => {
+                        if (e.data.code == 0) {
+                            list[i].order_status = e.data.data.orderStatus;
+                            if(i < (list.length - 1)){
                                 that.queryStatus(i+1, list);
-                            }, 3000);
+                            }
+                        } else {
+                            this.$message.error(e.data.msg);
                         }
-                    } else {
-                        this.$message.error(e.data.msg);
-                    }
-                }).catch(e => {});
+                    }).catch(e => {});
+                }, 10000);
             },
             toSearch() {
                 this.page = 1;

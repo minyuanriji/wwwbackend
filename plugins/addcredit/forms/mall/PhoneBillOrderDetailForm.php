@@ -75,7 +75,7 @@ class PhoneBillOrderDetailForm extends BaseModel{
                 }
             }
 
-            if($order->order_status != $orderStatus){
+            if($orderStatus && $order->order_status != $orderStatus){
                 $order->updated_at = time();
                 $order->order_status = $orderStatus;
                 if(!$order->save()){

@@ -100,7 +100,8 @@ class CartAddForm extends BaseModel
             if ($cart->save()) {
                 \Yii::$app->trigger(Cart::EVENT_CART_ADD, new CartEvent(['cartIds' => [$cart->id]]));
                 return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"加入购物车成功", [
-                    "cart_id" => $cart->id
+                    "cart_id" => $cart->id,
+                    'cart_num' => Cart::find()->where(['buy_now' => 0, 'user_id' => \Yii::$app->user->id, 'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0])->count()
                 ]);
             } else {
                 return $this->returnApiResultData(999,"",$cart);

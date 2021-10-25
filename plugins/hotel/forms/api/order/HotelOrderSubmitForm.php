@@ -72,7 +72,7 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
             } else {
                 $arriveDate = $this->arrive_date;
             }
-            
+
             //生成订单
             $order = new HotelOrder([
                 "mall_id"                  => \Yii::$app->mall->id,
@@ -88,7 +88,7 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
                 "booking_days"             => $this->days,
                 "real_booking_days"        => $this->days,
                 "booking_passengers"       => $this->passengers,
-                "booking_arrive_date"      => date("Y-m-d H:i:s", strtotime($arriveDate)),
+                "booking_arrive_date"      => date("Y-m-d H:i:s", $arriveDate),
                 "created_at"               => time(),
                 "updated_at"               => time(),
                 "pay_status"               => "unpaid",

@@ -47,7 +47,7 @@ class PhoneBillOrderListForm extends BaseModel
             $selects = [
                 "u.id as user_id", "u.nickname", "ao.id", "ao.mobile",
                 "ao.order_no", "ao.order_price", "ao.integral_deduction_price", "ao.pay_price",
-                "ao.pay_status", "ao.order_status", "ao.recharge_type",
+                "ao.pay_status", "ao.order_status", "ao.recharge_type", "ao.is_manual",
                 "from_unixtime( ao.pay_at, '%Y-%m-%d %H:%i:%s' ) AS pay_at ",
                 "from_unixtime( ao.created_at, '%Y-%m-%d %H:%i:%s' ) AS created_at ",
                 "from_unixtime( ao.updated_at, '%Y-%m-%d %H:%i:%s' ) AS updated_at ",

@@ -26,8 +26,6 @@ class PhoneBillOrderRechargeForm extends BaseModel{
 
         try {
 
-            throw new \Exception("功能未开通");
-
             $order = AddcreditOrder::findOne($this->id);
             if(!$order){
                 throw new \Exception("订单不存在");
@@ -35,6 +33,10 @@ class PhoneBillOrderRechargeForm extends BaseModel{
 
             if($order->pay_status != "paid"){
                 throw new \Exception("订单未支付或退款中");
+            }
+
+            if($order->is_manual){
+                throw new \Exception("订单已通过手动充值过一次了");
             }
 
             $platModel = AddcreditPlateforms::findOne($order->plateform_id);
@@ -73,8 +75,14 @@ class PhoneBillOrderRechargeForm extends BaseModel{
                 }
             }
 
+            $order->is_manual  = 1;
+            $order->updated_at = time();
+            if(!$order->save()){
+                throw new \Exception($this->responseErrorMsg($order));
+            }
+
             //生成一条新的充值记录
-            $orderNo = substr(md5(uniqid()), -4) . date("ymdhis") . rand(100000, 999999);
+            /*$orderNo = substr(md5(uniqid()), -4) . date("ymdhis") . rand(100000, 999999);
             $model = new AddcreditOrderThirdParty([
                 "mall_id"         => $order->mall_id,
                 "order_id"        => $order->id,
@@ -98,7 +106,7 @@ class PhoneBillOrderRechargeForm extends BaseModel{
                 if(!$order->save()){
                     throw new \Exception($this->responseErrorMsg($order));
                 }
-            }
+            }*/
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

@@ -62,10 +62,13 @@ echo $this->render("com-detail");
 
                     <el-table-column label="订单状态" width="100" align="center">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.order_status == ''">查询中...<b>{{counter}}</b></span>
-                            <span style="color:darkgreen" v-if="scope.row.order_status == 'success'">充值成功</span>
-                            <span style="color:royalblue" v-if="scope.row.order_status == 'processing'">充值中</span>
-                            <span style="color:darkred" v-if="scope.row.order_status == 'fail'">失败</span>
+                            <span style="color:darkgreen" v-if="scope.row.is_manual">已通过手动充值成功</span>
+                            <span v-else>
+                                <span v-if="scope.row.order_status == ''">查询中...<b>{{counter}}</b></span>
+                                <span style="color:darkgreen" v-if="scope.row.order_status == 'success'">充值成功</span>
+                                <span style="color:royalblue" v-if="scope.row.order_status == 'processing'">充值中</span>
+                                <span style="color:darkred" v-if="scope.row.order_status == 'fail'">失败</span>
+                            </span>
                         </template>
                     </el-table-column>
 

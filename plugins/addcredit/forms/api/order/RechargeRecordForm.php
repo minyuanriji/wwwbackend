@@ -12,12 +12,13 @@ class RechargeRecordForm extends BaseModel
     public $plateforms_id;
     public $page;
     public $recharge_time;
+    public $is_list;
 
     public function rules()
     {
         return [
             [['plateforms_id'], 'required'],
-            [['page'], 'integer'],
+            [['page', 'is_list'], 'integer'],
             [['recharge_time'], 'string'],
         ];
     }
@@ -29,28 +30,28 @@ class RechargeRecordForm extends BaseModel
         }
         try {
             $query = AddcreditOrder::find();
-            $query->andWhere([
-                //'plateform_id' => $this->plateforms_id,
-                'user_id'    => \Yii::$app->user->id,
-                'mall_id'    => \Yii::$app->mall->id
-            ])
-                ->select([
-                    "id",
-                    "mobile",
-                    "order_price",
-                    "pay_status",
-                    "order_status",
-                    "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at",
-                ]);
-            if ($this->recharge_time) {
-                $query->andWhere('FROM_UNIXTIME(created_at,"%Y-%m-%d")="' . $this->recharge_time . '"');
+
+            if ($this->is_list) {
+                $select = ["id", "mobile", "order_price", "pay_status", "order_status", "DATE_FORMAT(FROM_UNIXTIME(created_at),'%H:%i:%s') as created_at"];
+                $sameDay = date('Y-m-d', time());
+                $query->andWhere('FROM_UNIXTIME(created_at,"%Y-%m-%d")="' . $sameDay . '"');
+                $limit = 999;
+            } else {
+                $select = ["id", "mobile", "order_price", "pay_status", "order_status", "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at"];
+                if ($this->recharge_time) {
+                    $query->andWhere('FROM_UNIXTIME(created_at,"%Y-%m-%d")="' . $this->recharge_time . '"');
+                }
+                $limit = 10;
             }
 
-            $result = $query->orderBy('created_at DESC')->page($pagination, 10)->asArray()->all();
+            $query->andWhere(['user_id' => \Yii::$app->user->id, 'mall_id' => \Yii::$app->mall->id])->select($select);
+
+            $result = $query->orderBy('created_at DESC')->page($pagination, $limit)->asArray()->all();
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => $result,
-                'money_list' => $this->rechargeMoneyList($this->plateforms_id),
+                'money_list' => $this->rechargeMoneyList(),
                 'msg' => '',
                 'pagination' => $pagination,
             ];
@@ -62,7 +63,7 @@ class RechargeRecordForm extends BaseModel
         }
     }
 
-    public function rechargeMoneyList ($plateforms_id)
+    public function rechargeMoneyList ()
     {
         $plateforms = AddcreditPlateforms::find()->where(["is_enabled" => 1])->orderBy("id DESC")->one();
         if (!$plateforms) {

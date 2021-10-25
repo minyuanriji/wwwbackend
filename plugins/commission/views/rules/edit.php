@@ -112,6 +112,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                                           ruleForm.item_type == 'addcredit_3r' ||
                                           ruleForm.item_type == 'giftpacks'"
                                     @update="updateCommissionRule"
+                                    :item-type="ruleForm.item_type"
                                     :ctype="commissionType"
                                     :chains="commissionRuleChains">
                             </com-commission-rule-edit>

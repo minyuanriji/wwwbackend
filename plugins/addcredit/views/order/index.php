@@ -191,11 +191,7 @@ echo $this->render("com-detail");
                         this.list = e.data.data.list;
                         this.pagination = e.data.data.pagination;
                         let i=0;
-                        for(i=0; i < e.data.data.list.length; i++){
-                            setTimeout(function(){
-                                that.queryStatus(e.data.data.list[i]);
-                            }, 1000);
-                        }
+                        that.queryStatus(i, e.data.data.list);
                     } else {
                         this.$message.error(e.data.msg);
                     }
@@ -203,16 +199,19 @@ echo $this->render("com-detail");
                     this.loading = false;
                 });
             },
-            queryStatus(row){
+            queryStatus(i, list){
                 request({
                     params: {
                         r: 'plugin/addcredit/mall/order/order/detail',
-                        id: row.id
+                        id: list[i].id
                     },
                     method: 'get'
                 }).then(e => {
                     if (e.data.code == 0) {
-                        row.order_status = e.data.data.orderStatus;
+                        list[i].order_status = e.data.data.orderStatus;
+                        if(i < (list.length - 1)){
+                            that.queryStatus(i+1, list);
+                        }
                     } else {
                         this.$message.error(e.data.msg);
                     }

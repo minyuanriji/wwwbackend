@@ -47,47 +47,22 @@ class PhoneBillOrderListForm extends BaseModel
             $selects = [
                 "u.id as user_id", "u.nickname", "ao.id", "ao.mobile",
                 "ao.order_no", "ao.order_price", "ao.integral_deduction_price", "ao.pay_price",
-                "ao.pay_status", "ao.order_status",
+                "ao.pay_status", "ao.order_status", "ao.recharge_type",
                 "from_unixtime( ao.pay_at, '%Y-%m-%d %H:%i:%s' ) AS pay_at ",
                 "from_unixtime( ao.created_at, '%Y-%m-%d %H:%i:%s' ) AS created_at ",
                 "from_unixtime( ao.updated_at, '%Y-%m-%d %H:%i:%s' ) AS updated_at ",
             ];
 
-            $list = $query->select($selects)->page($pagination)->asArray()->all();
+            $list = $query->select($selects)->page($pagination, 10)->asArray()->all();
             if ($list) {
                foreach ($list as &$row) {
-                   if ($row['pay_status'] == AddcreditOrder::PAY_TYPE_PAID) {
-                       switch ($row['order_status'])
-                       {
-                           case AddcreditOrder::ORDER_STATUS_FAIL:
-                               $row['status'] = '失败';
-                               break;
-                           case AddcreditOrder::ORDER_STATUS_PRO:
-                               $row['status'] = '充值中';
-                               break;
-                           case AddcreditOrder::ORDER_STATUS_SUC:
-                               $row['status'] = '充值成功';
-                               break;
-                           case AddcreditOrder::ORDER_STATUS_UNP:
-                               $row['status'] = '未付款';
-                               break;
-                           default:
-                               $row['status'] = '未知';
-                               break;
-                       }
-                   } elseif ($row['pay_status'] == AddcreditOrder::PAY_TYPE_REFUND) {
-                       $row['status'] = '已退款';
-                   } elseif ($row['pay_status'] == AddcreditOrder::PAY_TYPE_UNP) {
-                       $row['status'] = '未支付';
-                   } elseif ($row['pay_status'] == AddcreditOrder::PAY_TYPE_REF) {
-                       $row['status'] = '退款中';
-                   }
+                   $row['order_status'] = '';
                }
             }
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'list' => $list,
+                    'list' => $list ? $list : [],
                     'pagination' => $pagination
                 ]
             ];

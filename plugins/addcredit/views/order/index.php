@@ -200,6 +200,7 @@ echo $this->render("com-detail");
                 });
             },
             queryStatus(i, list){
+                let that = this;
                 request({
                     params: {
                         r: 'plugin/addcredit/mall/order/order/detail',

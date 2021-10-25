@@ -18,7 +18,7 @@
                     <tr class="c2">
                         <td class="label">订单状态： </td>
                         <td colspan="3">
-                            <span style="color:darkgreen" v-if="scope.row.is_manual == 1">已通过手动充值成功</span>
+                            <span style="color:darkgreen" v-if="order.is_manual == 1">已通过手动充值成功</span>
                             <span v-else>
                                 <span style="color:darkgreen" v-if="order.order_status == 'success'">充值成功</span>
                                 <span style="color:royalblue" v-if="order.order_status == 'processing'">充值中</span>

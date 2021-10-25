@@ -211,7 +211,9 @@ echo $this->render("com-detail");
                     if (e.data.code == 0) {
                         list[i].order_status = e.data.data.orderStatus;
                         if(i < (list.length - 1)){
-                            that.queryStatus(i+1, list);
+                            setTimeout(function(){
+                                that.queryStatus(i+1, list);
+                            }, 3000);
                         }
                     } else {
                         this.$message.error(e.data.msg);

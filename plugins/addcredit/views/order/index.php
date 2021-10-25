@@ -62,7 +62,7 @@ echo $this->render("com-detail");
 
                     <el-table-column label="订单状态" width="100" align="center">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.order_status == ''">查询中</span>
+                            <span v-if="scope.row.order_status == ''">查询中...<b>{{counter}}</b></span>
                             <span style="color:darkgreen" v-if="scope.row.order_status == 'success'">充值成功</span>
                             <span style="color:royalblue" v-if="scope.row.order_status == 'processing'">充值中</span>
                             <span style="color:darkred" v-if="scope.row.order_status == 'fail'">失败</span>
@@ -146,7 +146,8 @@ echo $this->render("com-detail");
                 list: [],
                 pagination: null,
                 exportList: [],
-                edit: {data:{}, visible:false}
+                edit: {data:{}, visible:false},
+                counter: 6
             };
         },
         mounted() {
@@ -200,25 +201,30 @@ echo $this->render("com-detail");
                 });
             },
             queryStatus(i, list){
-                setTimeout(function(){
-                    let that = this;
-                    request({
-                        params: {
-                            r: 'plugin/addcredit/mall/order/order/detail',
-                            id: list[i].id
-                        },
-                        method: 'get'
-                    }).then(e => {
-                        if (e.data.code == 0) {
-                            list[i].order_status = e.data.data.orderStatus;
-                            if(i < (list.length - 1)){
-                                that.queryStatus(i+1, list);
+                this.counter = 6;
+                let that = this, timer = setInterval(function(){
+                    if(that.counter <= 0){
+                        request({
+                            params: {
+                                r: 'plugin/addcredit/mall/order/order/detail',
+                                id: list[i].id
+                            },
+                            method: 'get'
+                        }).then(e => {
+                            if (e.data.code == 0) {
+                                list[i].order_status = e.data.data.orderStatus;
+                                if(i < (list.length - 1)){
+                                    that.queryStatus(i+1, list);
+                                }
+                            } else {
+                                this.$message.error(e.data.msg);
                             }
-                        } else {
-                            this.$message.error(e.data.msg);
-                        }
-                    }).catch(e => {});
-                }, 10000);
+                        }).catch(e => {});
+                        clearInterval(timer);
+                        return;
+                    }
+                    that.counter = that.counter - 1;
+                }, 1000);
             },
             toSearch() {
                 this.page = 1;

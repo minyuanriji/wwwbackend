@@ -58,7 +58,6 @@ class MchAdminAuthMobileForm extends BaseModel{
             $adminUser->last_login_at    = time();
             $adminUser->token_expired_at = time() + 7 * 24 * 3600;
             $adminUser->login_ip         = \Yii::$app->getRequest()->getUserIP();
-            $adminUser->auth_key         = \Yii::$app->security->generateRandomString();
             $adminUser->access_token     = \Yii::$app->security->generateRandomString();
             if(!$adminUser->save()){
                 throw new \Exception(json_encode($adminUser->getErrors()));

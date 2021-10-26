@@ -6,6 +6,8 @@ use app\plugins\mch\forms\api\mana\MchManaAccountInfoForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountLogForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountSetPwdForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountSetSettleInfo;
+use app\plugins\mch\forms\api\mana\MchManaAccountUpdateMobileForm;
+use app\plugins\mch\forms\api\mana\MchManaAccountValidateMobileForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountWithdrawForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountWithdrawLogForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountSetWithdrawPwdForm;
@@ -23,6 +25,32 @@ class AccountController extends MchAdminController {
         $form = new MchManaAccountSetPwdForm();
         $form->attributes = $this->requestData;
         return $form->save();
+    }
+
+    /**
+     * 验证绑定手机
+     * @return \yii\web\Response
+     * @throws \app\core\exceptions\ClassNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
+     */
+    public function actionValidateMobile(){
+        $form = new MchManaAccountValidateMobileForm();
+        $form->attributes = $this->requestData;
+        $this->asJson($form->check());
+    }
+
+    /**
+     * 更新绑定手机
+     * @return \yii\web\Response
+     * @throws \app\core\exceptions\ClassNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
+     */
+    public function actionUpdateMobile(){
+        $form = new MchManaAccountUpdateMobileForm();
+        $form->attributes = $this->requestData;
+        $this->asJson($form->update());
     }
 
     /**

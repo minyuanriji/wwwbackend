@@ -40,7 +40,7 @@ class MchApplyBasicForm extends BaseModel{
 
     public function save(){
 
-        $this->setPos();
+//        $this->setPos();
 
         if(!$this->validate()){
             return $this->responseErrorInfo();

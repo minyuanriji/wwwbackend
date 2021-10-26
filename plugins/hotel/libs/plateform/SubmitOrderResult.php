@@ -15,4 +15,6 @@ class SubmitOrderResult
     public $plateform_order_no = null; //平台订单号
 
     public $originData = null;
+
+    public $requestData = null;
 }

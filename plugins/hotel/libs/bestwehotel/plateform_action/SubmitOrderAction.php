@@ -58,7 +58,7 @@ class SubmitOrderAction extends BaseObject {
                 $lastArrTime = date('Y-m-d H:i:s',$twelve_time + 1800);
             }
 
-            $requestModel = new PostOrderRequest([
+            $postParams = [
                 "innId" => $hotelPlateformInfo['plateform_code'],
                 "roomTypeId"   => $roomPlateformInfo['plateform_code'],
                 "roomCount"    => $this->hotelOrder->booking_num,
@@ -69,7 +69,9 @@ class SubmitOrderAction extends BaseObject {
                 "externalId"   => $this->hotelOrder->order_no,
                 "productCode"  => isset($bookingData['productCode']) ? $bookingData['productCode'] : '',
                 "lastArrTime"  => $lastArrTime,
-            ]);
+            ];
+
+            $requestModel = new PostOrderRequest($postParams);
 
             $passengers = @json_decode($this->hotelOrder->booking_passengers, true);
             foreach($passengers as $passenger){
@@ -110,6 +112,7 @@ class SubmitOrderAction extends BaseObject {
             $submitOrderResult->plateform_order_no = $orderNo;
             $submitOrderResult->originData         = $originData;
             $submitOrderResult->code               = SubmitOrderResult::CODE_SUCC;
+            $submitOrderResult->requestData        = json_encode($postParams);
 
         }catch (HotelException $e){
             $submitOrderResult->code = SubmitOrderResult::CODE_FAIL;

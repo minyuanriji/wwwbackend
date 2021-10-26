@@ -63,6 +63,8 @@ class HotelOrderPaidNotifyProcess extends PaymentNotify{
         $hotelOrder->pay_status   = "paid";
         $hotelOrder->pay_at       = date("Y-m-d H:i:s");
         $hotelOrder->pay_price    = $paymentOrder->amount;
+        $hotelOrder->request_data = $res['data']['requestData'];
+        $hotelOrder->origin_data  = json_encode($res['data']['originData']);
         if(!$hotelOrder->save()){
             throw new \Exception($this->responseErrorMsg($hotelOrder));
         }

@@ -176,7 +176,9 @@ class OrderHelper{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'plateform_order_no' => $result->plateform_order_no,
-                    'is_success'         => $result->is_success ? 1 : 0
+                    'is_success'         => $result->is_success ? 1 : 0,
+                    'originData'         => $result->originData,
+                    'requestData'        => $result->requestData,
                 ]
             ];
         }catch (\Exception $e){

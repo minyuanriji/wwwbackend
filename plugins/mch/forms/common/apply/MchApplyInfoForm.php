@@ -4,6 +4,7 @@ namespace app\plugins\mch\forms\common\apply;
 
 
 use app\core\ApiCode;
+use app\helpers\CityHelper;
 use app\models\BaseModel;
 use app\plugins\mch\models\MchApply;
 
@@ -80,6 +81,13 @@ class MchApplyInfoForm extends BaseModel{
         $info['is_special_discount'] = isset($info['is_special_discount']) ? $info['is_special_discount'] : 0;
         $info['settle_special_rate_remark'] = isset($info['settle_special_rate_remark']) ? $info['settle_special_rate_remark'] : "";
         $info['settle_discount'] = isset($info['settle_discount']) ? (float)$info['settle_discount'] : "";
+
+        if ($info['store_province_id'] && $info['store_city_id'] && $info['store_district_id']) {
+            $cityInfo = CityHelper::reverseData($info['store_district_id'], $info['store_city_id'], $info['store_province_id']);
+        }
+        $info['province_name'] = $cityInfo['province']['name'] ?? '';
+        $info['city_name'] = $cityInfo['city']['name'] ?? '';
+        $info['district_name'] = $cityInfo['district']['name'] ?? '';
 
         return $info;
     }

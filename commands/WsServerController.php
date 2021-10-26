@@ -103,6 +103,21 @@ class WsServerController extends BaseCommandController {
     }
 
     /**
+     * 客户端绑定Token
+     * @param $param
+     */
+    public function messageActionRelToken($param){
+        if(!empty($param['data']['content'])){
+            $cache = \Yii::$app->getCache();
+            $token = $param['data']['content'];
+            $cacheKey = self::CLIENT_REL_MOBILE_CACHE_KEY_PREFIX . $token;
+            $cache->set($cacheKey, $param['frame']->fd);
+            $this->commandOut("客户端：".$param['frame']->fd."token关联成功");
+            $param['ws']->push($param['frame']->fd, "token关联成功\n");
+        }
+    }
+
+    /**
      * 消息权限控制
      * @param $data
      * @return boolean

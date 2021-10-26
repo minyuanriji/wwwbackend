@@ -13,6 +13,7 @@ use app\forms\efps\distribute\EfpsDistributeForm;
 use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchAdminUser;
 
 class CheckoutOrderPaidHandler {
 
@@ -77,7 +78,11 @@ class CheckoutOrderPaidHandler {
 
                 $status = 1;
 
-                static::voiceNotify($mch->mobile, "补商汇到账" . $checkoutOrder->order_price . "元");
+                $adminUser = MchAdminUser::findOne(["mch_id" => $mch->id]);
+                if($adminUser && $adminUser->access_token){
+                    static::voiceNotify($adminUser->access_token, "补商汇到账" . $checkoutOrder->order_price . "元");
+                }
+
             }catch (\Exception $e){
                 $t->rollBack();
                 throw new \Exception($e->getMessage());
@@ -95,7 +100,12 @@ class CheckoutOrderPaidHandler {
         }
     }
 
-    public static function voiceNotify($mobile, $text){
+    /**
+     * 通知商户支付成功了
+     * @param $token
+     * @param $text
+     */
+    public static function voiceNotify($token, $text){
         $base64Data = TencentCloudAudioHelper::request($text);
 
         if(!empty($base64Data)){
@@ -107,9 +117,10 @@ class CheckoutOrderPaidHandler {
 
             WebSocketRequestForm::add(new WebSocketRequestForm([
                 'action'        => 'MchPaidNotify',
-                'notify_mobile' => $mobile,
+                'notify_mobile' => $token,
                 'notify_data'   => "PAID:" . json_encode($data)
             ]));
         }
     }
+
 }

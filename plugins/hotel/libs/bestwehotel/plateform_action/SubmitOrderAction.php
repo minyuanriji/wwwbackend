@@ -49,7 +49,7 @@ class SubmitOrderAction extends BaseObject {
             $start_time = strtotime($this->hotelOrder->booking_start_date);//入住时间
             $arriveTime = $this->hotelOrder->booking_arrive_date;
             $booking_arrive_time = strtotime($arriveTime);//到店时间
-            $twelve_time = $start_time + 43200;//入住时间12点
+            $twelve_time = $start_time + 48600;//入住时间13点
             $six_time = $start_time + 108000;//入住时间第二天凌晨6点
 
             if ($booking_arrive_time >= $twelve_time && $booking_arrive_time <= $six_time) {

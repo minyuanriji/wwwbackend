@@ -5,6 +5,7 @@ use app\forms\common\attachment\CommonAttachment;
 use app\plugins\mch\forms\api\mana\MchManaInfoBaseForm;
 use app\plugins\mch\forms\api\mana\MchManaInfoPosterForm;
 use app\plugins\mch\forms\api\mana\MchManaInfoSetPicForm;
+use app\plugins\mch\forms\api\mana\MchManaAccountSetWithdrawPwdForm;
 use app\plugins\mch\forms\api\mana\MchManaInfoUpdateForm;
 
 class InfoController extends MchAdminController {
@@ -68,4 +69,5 @@ class InfoController extends MchAdminController {
         $form->attributes = $this->requestData;
         $this->asJson($form->save());
     }
+
 }

@@ -486,10 +486,10 @@ class AttachmentUploadForm extends Model
             $result = $client->upload($bucket, $key, fopen($tempName, 'rb'));
             //腾讯云对象存储报错
             if ($result) {
-                if (file_exists($LocalImage['url_link'])) {
+                if (isset($LocalImage['url_link']) && file_exists($LocalImage['url_link'])) {
                     unlink($LocalImage['url_link']);
                 }
-                if (file_exists($LocalImage['thumb_link'])) {
+                if (isset($LocalImage['thumb_link']) && file_exists($LocalImage['thumb_link'])) {
                     unlink($LocalImage['thumb_link']);
                 }
                 $this->url = "http://" . $result['Location'];

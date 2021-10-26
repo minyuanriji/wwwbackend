@@ -70,7 +70,7 @@
 
                     <tr v-for="row in groupData.partner">
                         <td colspan="2">
-                            <table class="commission-rule"  cellspacing="0" cellpadding="0" width="100%">
+                            <table  class="commission-rule"  cellspacing="0" cellpadding="0" width="100%">
                                 <template v-if="row.level == 1">
                                     <tr v-for="chain in row.chain">
                                         <td>直推消费者</td>
@@ -114,7 +114,7 @@
 
                     <tr v-for="row in groupData.store">
                         <td colspan="2">
-                            <table class="commission-rule"  cellspacing="0" cellpadding="0" width="100%">
+                            <table  class="commission-rule"  cellspacing="0" cellpadding="0" width="100%">
                                 <template v-if="row.level == 1">
                                     <tr v-for="chain in row.chain">
                                         <td>直推消费者</td>
@@ -153,7 +153,7 @@
 <script>
     Vue.component('com-commission-rule-edit', {
         template: '#com-commission-rule-edit',
-        props: ['ctype', 'chains'],
+        props: ['itemType', 'ctype', 'chains'],
         computed: {},
         watch: {
             chains: {

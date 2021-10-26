@@ -99,10 +99,10 @@ class StoreAction extends Action{
                     $price = (float)$commission_res['commisson_value'];
                 }*/
 
-                //TODO 新分佣规则
+                //新公式
                 $commission_res['role_type'] = $parent_user->role_type;
-                $commission_res['ver'] = "2021/10/15";
-                $commission_res['commisson_value'] = 0.02;
+                $commission_res['ver'] = "2021/10/25";
+                $commission_res['commisson_value'] = min(0.02, (float)($commission_res['commisson_value']/100));
                 $commission_res['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];
                 $price = $commission_res['commisson_value'] * $commission_res['profit_price'];
 

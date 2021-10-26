@@ -45,7 +45,6 @@ class CheckoutAction extends Action{
         }
 
         foreach($checkoutOrders as $checkoutOrder){
-
             try {
                 $parentDatas = $this->controller->getCommissionParentRuleDatas($checkoutOrder['pay_user_id'], $checkoutOrder['store_id'], 'checkout');
 
@@ -75,18 +74,10 @@ class CheckoutAction extends Action{
                     }
                     */
 
-                    //TODO 最新公式，后期要做成后台配置
-                    if($parentData['role_type'] == "branch_office"){
-                        $ruleData['commisson_value'] = 0.15;
-                    }elseif($parentData['role_type'] == "partner"){
-                        $ruleData['commisson_value'] = 0.1;
-                    }elseif($parentData['role_type'] == "store"){
-                        $ruleData['commisson_value'] = 0.02;
-                    }else{
-                        $ruleData['commisson_value'] = 0;
-                    }
+                    //新公式
+                    $ruleData['commisson_value'] = min(0.15, (float)($ruleData['commisson_value']/100));
                     $ruleData['role_type'] = $parentData['role_type'];
-                    $ruleData['ver'] = "2021/10/15";
+                    $ruleData['ver'] = "2021/10/25";
                     $ruleData['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];
                     $price = $ruleData['profit_price'] * $ruleData['commisson_value'];
 

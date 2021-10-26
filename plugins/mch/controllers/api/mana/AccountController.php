@@ -5,8 +5,10 @@ use app\plugins\mch\forms\api\mana\MchManaAccountIncomeLogForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountInfoForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountLogForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountSetPwdForm;
+use app\plugins\mch\forms\api\mana\MchManaAccountSetSettleInfo;
 use app\plugins\mch\forms\api\mana\MchManaAccountWithdrawForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountWithdrawLogForm;
+use app\plugins\mch\forms\api\mana\MchManaAccountSetWithdrawPwdForm;
 
 class AccountController extends MchAdminController {
 
@@ -19,6 +21,32 @@ class AccountController extends MchAdminController {
      */
     public function actionSetPwd(){
         $form = new MchManaAccountSetPwdForm();
+        $form->attributes = $this->requestData;
+        return $form->save();
+    }
+
+    /**
+     * 设置提现密码
+     * @return \yii\web\Response
+     * @throws \app\core\exceptions\ClassNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
+     */
+    public function actionSetWithdrawPwd(){
+        $form = new MchManaAccountSetWithdrawPwdForm();
+        $form->attributes = $this->requestData;
+        $this->asJson($form->save());
+    }
+
+    /**
+     * 设置结算信息
+     * @return \yii\web\Response
+     * @throws \app\core\exceptions\ClassNotFoundException
+     * @throws \yii\base\Exception
+     * @throws \yii\db\Exception
+     */
+    public function actionSetSettleInfo(){
+        $form = new MchManaAccountSetSettleInfo();
         $form->attributes = $this->requestData;
         return $form->save();
     }

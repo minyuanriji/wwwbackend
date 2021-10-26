@@ -207,7 +207,7 @@ class CommissionController extends BaseCommandController{
                 ['crc.level'     => $currentLevel]
             ]);
             $query->orderBy("crc.level DESC");
-            $query->select(["cr.commission_type", "crc.level", "crc.commisson_value"]);
+            $query->select(["cr.id as rule_id", "cr.commission_type", "crc.level", "crc.commisson_value"]);
             $query->asArray();
 
             //查找规则

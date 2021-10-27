@@ -19,6 +19,13 @@ class GiftpacksController extends ApiController {
     public function actionList(){
         $form = new GiftpacksListForm();
         $form->attributes = $this->requestData;
+        if (!$form->city_id && !$form->district_id) {
+            if (ApiController::$commonData['city_data']['district_id']) {
+                $form->district_id = ApiController::$commonData['city_data']['district_id'];
+            } else {
+                $form->city_id = ApiController::$commonData['city_data']['city_id'];
+            }
+        }
         return $this->asJson($form->getList());
     }
 

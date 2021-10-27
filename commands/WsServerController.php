@@ -26,7 +26,7 @@ class WsServerController extends BaseCommandController {
                 return;
             }
 
-			$this->commandOut($frame->data);
+			$this->commandOut("收到消息：" . $frame->data);
 	
             $data = (array)@json_decode($frame->data, true);
 

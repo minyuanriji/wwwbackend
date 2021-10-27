@@ -127,6 +127,7 @@ class CartForm extends BaseModel
                         }
                     }
                 } else {
+                    $newItem['attrs']['stock'] = 0;
                     //$newItem['attr_str'] = 1;
                 }
                 $newItem['goods']['name'] = $item->goods->name;

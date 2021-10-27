@@ -113,8 +113,8 @@ class WsServerController extends BaseCommandController {
             $token = $param['data']['content'];
             $cacheKey = self::CLIENT_REL_MOBILE_CACHE_KEY_PREFIX . $token;
             $cache->set($cacheKey, $param['frame']->fd);
-            $this->commandOut("客户端：".$param['frame']->fd."token关联成功");
-            $param['ws']->push($param['frame']->fd, "token关联成功\n");
+            $this->commandOut("客户端".$param['frame']->fd."：".$token.":关联成功");
+            $param['ws']->push("客户端".$param['frame']->fd."：".$token.":关联成功\n");
         }
     }
 

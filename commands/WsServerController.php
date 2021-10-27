@@ -26,8 +26,11 @@ class WsServerController extends BaseCommandController {
                 return;
             }
 
-			$this->commandOut("收到消息：" . $frame->data);
-	
+            if(isset($frame->fd)){
+                $token = $this->getClientToken($frame->fd);
+                $this->commandOut("收到消息[ID:{$frame->fd}，token:{$token}]：" . $frame->data);
+            }
+
             $data = (array)@json_decode($frame->data, true);
 
             $action = !empty($data['action']) ? "messageAction" . $data['action'] : "invalidAction";

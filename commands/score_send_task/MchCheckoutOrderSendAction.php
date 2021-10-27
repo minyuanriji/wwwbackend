@@ -76,6 +76,8 @@ class MchCheckoutOrderSendAction extends Action{
                 \Yii::$app->mall = Mall::findOne($checkOrder['mall_id']);
                 $scoreSetting = @json_decode($checkOrder['score_setting'], true);
                 $scoreSetting['integral_num'] = floatval($checkOrder['pay_price'] * ($checkOrder['rate']/100));
+                $scoreSetting['source_type'] = 'checkout_order';
+                $scoreSetting['source_id'] = $checkOrder['id'];
                 $res = Integral::addIntegralPlan($checkOrder['pay_user_id'], $scoreSetting, '商家二维码支付赠送积分券', '0');
                 $this->controller->commandOut("积分发放记录创建成功，ID:" . $sendLog->id);
             }else{

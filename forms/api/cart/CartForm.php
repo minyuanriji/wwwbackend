@@ -51,10 +51,6 @@ class CartForm extends BaseModel
         try {
             $user_id = \Yii::$app->user->id;
 
-            if(!$user_id){
-                throw new \Exception("未登录");
-            }
-
             //查询条件
             $wheres = [
                 'mall_id' => \Yii::$app->mall->id,
@@ -62,14 +58,11 @@ class CartForm extends BaseModel
                 'sign' => '',
             ];
             $list = Cart::getList($wheres);
-            $user = User::findOne(['id' => $user_id]);
+//            $user = User::findOne(['id' => $user_id]);
             $newList = [];
-
 
             /** @var Cart[] $list */
             foreach ($list as $item) {
-
-
                 $newItem = ArrayHelper::toArray($item);
                 $goods = ArrayHelper::toArray($item->goods);
                 $newItem['not_can_buy_reason']='';

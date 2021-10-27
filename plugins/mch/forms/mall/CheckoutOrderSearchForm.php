@@ -4,11 +4,19 @@
 namespace app\plugins\mch\forms\mall;
 
 use app\core\ApiCode;
+use app\helpers\ArrayHelper;
 use app\helpers\CityHelper;
 use app\models\Order;
+use app\models\ScoreLog;
 use app\models\Store;
 use app\models\User;
+use app\plugins\commission\models\CommissionCheckoutPriceLog;
+use app\plugins\commission\models\CommissionStorePriceLog;
+use app\plugins\integral_card\models\ScoreFromStore;
+use app\plugins\integral_card\models\ScoreSendLog;
+use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
+use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 use app\plugins\sign_in\forms\BaseModel;
 
 class CheckoutOrderSearchForm extends BaseModel
@@ -46,9 +54,9 @@ class CheckoutOrderSearchForm extends BaseModel
         }
 
         try {
-
             $query = MchCheckoutOrder::find()->alias('mco')
-                    ->leftJoin(["s" => Store::tableName()], "s.mch_id=mco.mch_id")
+                    ->innerJoin(["m" => Mch::tableName()], "m.id=mco.mch_id")
+                    ->innerJoin(["s" => Store::tableName()], "s.mch_id=mco.mch_id")
                     ->innerJoin(['u' => User::tableName()], 'u.id=mco.pay_user_id')
                     ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
@@ -99,15 +107,81 @@ class CheckoutOrderSearchForm extends BaseModel
                 $query->andWhere($regionWhere);
             }
 
-            $query->select(["mco.*", 'u.nickname', 's.cover_url', 's.name']);
+            $query->select(["mco.*", 'u.nickname', 's.cover_url', 's.name', 'm.transfer_rate', 's.id as store_id']);
 
-            $rows = $query->page($pagination, self::limit)->orderBy("mco.id DESC")->asArray()->all();
+            $list = $query->page($pagination, self::limit)->orderBy("mco.id DESC")->asArray()->all();
 
-            $list = [];
-            if ($rows) {
-                foreach ($rows as $row) {
-                    $row['format_pay_time'] = date("Y-m-d H:i:s", $row['pay_at']);
-                    $list[] = $row;
+            if ($list) {
+                $commissionStorePrice = new CommissionStorePriceLog();
+                $commissionCheckoutPrice = new CommissionCheckoutPriceLog();
+                foreach ($list as $key => $row) {
+                    $list[$key]['format_pay_time'] = date("Y-m-d H:i:s", $row['pay_at']);
+
+                    //获取赠送购物券
+                    $shoppingVoucherSend = ShoppingVoucherSendLog::find()->where([
+                        'mall_id' => \Yii::$app->mall->id,
+                        'user_id' => $row['pay_user_id'],
+                        'source_id' => $row['id'],
+                        'source_type' => 'from_mch_checkout_order',
+                    ])->select('status, money')->one();
+                    if ($shoppingVoucherSend) {
+                        $list[$key]['send_status'] = $shoppingVoucherSend->status;
+                        $list[$key]['send_money'] = $shoppingVoucherSend->money;
+                    } else {
+                        $list[$key]['send_status'] = '';
+                        $list[$key]['send_money'] = 0;
+                    }
+
+                    //获取赠送积分
+                    $scoreSend = ScoreSendLog::find()->where([
+                        'user_id' => $row['pay_user_id'],
+                        'source_id' => $row['id'],
+                        'source_type' => 'from_mch_checkout_order',
+                    ])->select('status')->one();
+                    if ($scoreSend) {
+                        $scoreFormStore = ScoreFromStore::findOne(['store_id' => $row['store_id']]);
+                        if ($scoreFormStore) {
+                            $rate = $scoreFormStore->rate;
+                        } else {
+                            $rate = 0;
+                        }
+                        $list[$key]['score_status'] = $scoreSend->status;
+                        $list[$key]['score_money'] = sprintf("%.2f", $row['pay_price'] * ($rate / 100));
+                    } else {
+                        $list[$key]['score_status'] = '';
+                        $list[$key]['score_money'] = 0;
+                    }
+
+                    //获取门店服务费
+                    if ($row['transfer_rate'] > 0) {
+                        $list[$key]['discount'] = (100 - $row['transfer_rate']) / 10;
+                    } else {
+                        $list[$key]['discount'] = 0;
+                    }
+
+                    //获取直推分佣
+                    $directPushCommission = $commissionStorePrice->getDirectPushCommission([
+                        'item_id' => $row['id'],
+                        'item_type' => 'checkout',
+                    ], 'user_id,price,status');
+                    if ($directPushCommission) {
+                        $list[$key]['direct_push_price'] = $directPushCommission->price;
+                        $list[$key]['direct_push_status'] = $directPushCommission->status;
+                        $list[$key]['direct_push_user_id'] = $directPushCommission->user->id;
+                        $list[$key]['direct_push_user_nickname'] = $directPushCommission->user->nickname;
+                    } else {
+                        $list[$key]['direct_push_price'] = 0;
+                        $list[$key]['direct_push_status'] = -1;
+                        $list[$key]['direct_push_user_id'] = 0;
+                        $list[$key]['direct_push_user_nickname'] = '';
+                    }
+
+                    //获取消费分佣
+                    $consumptionCommission = $commissionCheckoutPrice->getConsumptionCommission([
+                        'checkout_order_id' => $row['id']
+                    ], 'user_id,price,status');
+
+                    $list[$key]['consumption'] = $consumptionCommission;
                 }
             }
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [

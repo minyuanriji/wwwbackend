@@ -83,6 +83,8 @@ class CheckoutOrderPaidHandler {
                     static::voiceNotify($adminUser->access_token, "补商汇到账" . $checkoutOrder->order_price . "元");
                 }
 
+                static::voiceNotify($mch->mobile, "补商汇到账" . $checkoutOrder->order_price . "元");
+
             }catch (\Exception $e){
                 $t->rollBack();
                 throw new \Exception($e->getMessage());

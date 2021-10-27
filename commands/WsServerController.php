@@ -16,7 +16,7 @@ class WsServerController extends BaseCommandController {
 
         //监听WebSocket连接打开事件
         $ws->on('Open', function ($ws, $request) {
-            $this->commandOut("客户端：" . $request->fd . "连接成功");
+            $this->commandOut("客户端[ID:{$request->fd}]已连接");
         });
 
         //监听WebSocket消息事件
@@ -78,7 +78,6 @@ class WsServerController extends BaseCommandController {
         $text = !empty($param['request']->post['notify_data']) ? $param['request']->post['notify_data'] : "";
         $token = $param['request']->post['notify_mobile'];
         $fd = $this->getClientId($token);
-        $this->commandOut("客户端：" . $token);
         if(empty($fd) || !$param['ws']->isEstablished($fd)){
             $this->commandOut("客户端：" . $token. "已断开");
             $param['response']->end("ERROR");
@@ -97,7 +96,6 @@ class WsServerController extends BaseCommandController {
         if(!empty($param['data']['content'])){
             $mobile = $param['data']['content'];
             $this->setClientId($mobile, $param['frame']->fd);
-            $this->commandOut("客户端" . $param['frame']->fd."<=>手机{$mobile}关联成功");
             $param['ws']->push($param['frame']->fd, "客户端".$param['frame']->fd . "<=>{$mobile}关联成功\n");
         }
     }
@@ -110,7 +108,6 @@ class WsServerController extends BaseCommandController {
         if(!empty($param['data']['content'])){
             $token = $param['data']['content'];
             $this->setClientId($token, $param['frame']->fd);
-            $this->commandOut("客户端" . $param['frame']->fd."<=>".$token."关联成功");
             $param['ws']->push($param['frame']->fd, "客户端".$param['frame']->fd."<=>{$token}关联成功\n");
         }
     }
@@ -147,6 +144,11 @@ class WsServerController extends BaseCommandController {
     public function setClientId($token, $fd){
         $content = \Yii::$app->getCache()->get(self::CLIENT_LIST_CACHE_KEY);
         $clientDatas = $content ? json_decode($content, true) : [];
+
+        if(!isset($clientDatas[$token])){
+            $this->commandOut("客户端[ID:{$fd}]{$token}连接正常");
+        }
+
         $clientDatas[$token] = $fd;
         \Yii::$app->getCache()->set(self::CLIENT_LIST_CACHE_KEY, json_encode($clientDatas));
     }

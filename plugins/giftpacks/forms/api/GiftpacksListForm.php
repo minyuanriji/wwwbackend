@@ -3,6 +3,7 @@
 namespace app\plugins\giftpacks\forms\api;
 
 use app\core\ApiCode;
+use app\helpers\CityHelper;
 use app\models\BaseModel;
 use app\models\Store;
 use app\plugins\giftpacks\models\Giftpacks;
@@ -43,8 +44,12 @@ class GiftpacksListForm extends BaseModel{
 
             if ($this->city_id) {
                 $query->andWhere(['s.city_id' => $this->city_id]);
+                $cityInfo = CityHelper::reverseData(0, $this->city_id);
+                $cityName = $cityInfo['city']['name'] ?? '';
             } else if ($this->district_id) {
                 $query->andWhere(['s.district_id' => $this->district_id]);
+                $cityInfo = CityHelper::reverseData($this->district_id);
+                $cityName = $cityInfo['district']['name'] ?? '';
             }
 
             $list = $query->select($selects)->page($pagination, 10, max(1, (int)$this->page))
@@ -56,13 +61,11 @@ class GiftpacksListForm extends BaseModel{
                 }
             }
 
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'data' => [
-                    'list'       => $list ?: [],
-                    'pagination' => $pagination
-                ]
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
+                'list'       => $list ?: [],
+                'pagination' => $pagination,
+                'city_name'  => $cityName,
+            ]);
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,

@@ -42,7 +42,9 @@ class WsServerController extends BaseCommandController {
 
         //监听WebSocket连接关闭事件
         $ws->on('Close', function ($ws, $fd) {
-            $this->commandOut("客户端：{$fd}已断开");
+            $token = $this->getClientToken($fd);
+            $this->cleanClient($token);
+            $this->commandOut("客户端{$token}已断开");
         });
 
         $ws->on('request', function (\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
@@ -126,6 +128,18 @@ class WsServerController extends BaseCommandController {
     }
 
     /**
+     * 获取客户端TOKEN
+     * @param $fd
+     * @return string
+     */
+    public function getClientToken($fd){
+        $cache = \Yii::$app->getCache();
+        $content = $cache->get(self::CLIENT_LIST_CACHE_KEY);
+        $tokenDatas = array_flip(($content ? json_decode($content, true) : []));
+        return isset($tokenDatas[$fd]) ? $tokenDatas[$fd] : null;
+    }
+
+    /**
      * 设置客户端ID
      * @param $token
      * @param $fd
@@ -134,6 +148,19 @@ class WsServerController extends BaseCommandController {
         $content = \Yii::$app->getCache()->get(self::CLIENT_LIST_CACHE_KEY);
         $clientDatas = $content ? json_decode($content, true) : [];
         $clientDatas[$token] = $fd;
+        \Yii::$app->getCache()->set(self::CLIENT_LIST_CACHE_KEY, json_encode($clientDatas));
+    }
+
+    /**
+     * 删除客户端
+     * @param $token
+     */
+    public function cleanClient($token){
+        $content = \Yii::$app->getCache()->get(self::CLIENT_LIST_CACHE_KEY);
+        $clientDatas = $content ? json_decode($content, true) : [];
+        if(isset($clientDatas[$token])){
+            unset($clientDatas[$token]);
+        }
         \Yii::$app->getCache()->set(self::CLIENT_LIST_CACHE_KEY, json_encode($clientDatas));
     }
 

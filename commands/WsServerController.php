@@ -146,7 +146,7 @@ class WsServerController extends BaseCommandController {
         $clientDatas = $content ? json_decode($content, true) : [];
 
         if(!isset($clientDatas[$token])){
-            $this->commandOut("客户端[ID:{$fd}]{$token}连接正常");
+            $this->commandOut("客户端[ID:{$fd}，Token:{$token}]连接正常");
         }
 
         $clientDatas[$token] = $fd;

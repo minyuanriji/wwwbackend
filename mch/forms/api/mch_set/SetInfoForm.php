@@ -7,6 +7,7 @@ use app\helpers\ArrayHelper;
 use app\models\BaseModel;
 use app\models\DistrictData;
 use app\models\Store;
+use app\plugins\mch\models\Mch;
 
 class SetInfoForm extends BaseModel{
 
@@ -19,11 +20,12 @@ class SetInfoForm extends BaseModel{
     public $longitude;
     public $latitude;
     public $address;
+    public $store_mch_common_cat_id;
 
     public function rules(){
         return array_merge(parent::rules(), [
-            [['mch_id', 'name', 'cover_url', 'province_id', 'city_id', 'longitude', 'latitude', 'address'], 'required'],
-            [['mch_id', 'province_id', 'city_id'], 'integer'],
+            [['mch_id', 'name', 'cover_url', 'province_id', 'city_id', 'longitude', 'latitude', 'address', 'store_mch_common_cat_id'], 'required'],
+            [['mch_id', 'province_id', 'city_id', 'store_mch_common_cat_id'], 'integer'],
             [['cover_url', 'name', 'longitude', 'latitude', 'address'], 'string'],
             [['district_id'], 'safe']
         ]);
@@ -35,8 +37,8 @@ class SetInfoForm extends BaseModel{
             return $this->responseErrorInfo();
         }
 
+        $t = \Yii::$app->db->beginTransaction();
         try {
-
             $mchStore = Store::findOne([
                 "mch_id" => $this->mch_id
             ]);
@@ -69,18 +71,19 @@ class SetInfoForm extends BaseModel{
                 unset($detail['pic_url'][0]);
             }
 
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg'  => '请求成功',
-                'data' => [
-                    'detail' => $detail
-                ]
-            ];
+            $mch = Mch::findOne($this->mch_id);
+            if (!$mch || $mch->is_delete == 1)
+                throw new \Exception('商户不存在或已删除！');
+
+            $mch->mch_common_cat_id = $this->store_mch_common_cat_id;
+            if(!$mch->save())
+                throw new \Exception($this->responseErrorMsg($mch));
+
+            $t->commit();
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['detail' => $detail]);
         }catch (\Exception $e){
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => $e->getMessage(),
-            ];
+            $t->rollBack();
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
     }
 

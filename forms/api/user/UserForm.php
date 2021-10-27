@@ -291,7 +291,7 @@ class UserForm extends BaseModel
             'user_id'   => \Yii::$app->user->id,
             'is_delete' => 0
         ])->one();
-        if($mch && !$mch->is_delete && $mch->review_status == Mch::REVIEW_STATUS_CHECKED){
+        if($mch && $mch->review_status == Mch::REVIEW_STATUS_CHECKED){
             $userCenter['menus'][] = [
                 "icon_url"  => "https://www.mingyuanriji.cn/web/static/stock_img.png",
                 "name"      => "进货专区",
@@ -305,7 +305,7 @@ class UserForm extends BaseModel
                 "open_type" => "navigate"
             ];
         }
-        if($mch && !$mch->is_delete && $mch->review_status == Mch::REVIEW_STATUS_CHECKED) {
+        if($mch && $mch->review_status == Mch::REVIEW_STATUS_CHECKED) {
             $userCenter['menus'][] = [
                 "icon_url" => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
                 "name" => "商户",
@@ -327,8 +327,7 @@ class UserForm extends BaseModel
             }
         }
 
-        //商家入驻
-        if (YII_WEIXIN_APPLETS == 'true') {
+        if (!$mch || $mch->review_status != Mch::REVIEW_STATUS_CHECKED) {
             $userCenter['menus'][] = [
                 "icon_url"  => "https://dev.mingyuanriji.cn/web/static/shopSettle.png",
                 "name"      => "商家入驻",
@@ -336,6 +335,7 @@ class UserForm extends BaseModel
                 "open_type" => "navigate"
             ];
         }
+
 
         //分红股东显示
         $isBoss = Boss::find()->where([

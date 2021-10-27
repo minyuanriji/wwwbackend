@@ -4,6 +4,7 @@ namespace app\plugins\commission\models;
 
 use app\models\BaseActiveRecord;
 use app\models\User;
+use yii\helpers\ArrayHelper;
 
 class CommissionCheckoutPriceLog extends BaseActiveRecord
 {
@@ -28,5 +29,20 @@ class CommissionCheckoutPriceLog extends BaseActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    public function getConsumptionCommission($where, $select)
+    {
+        $consumption = self::find()->where($where)->select($select)->all();
+        $list = [];
+        if ($consumption) {
+            foreach ($consumption as $key => $item) {
+                $nickname = $item->user->nickname;
+                $item = ArrayHelper::toArray($item);
+                $list[$key] = $item;
+                $list[$key]['nickname'] = $nickname;
+            }
+        }
+        return $list;
     }
 }

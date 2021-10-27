@@ -29,4 +29,9 @@ class CommissionStorePriceLog extends BaseActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    public function getDirectPushCommission($where, $select)
+    {
+        return self::find()->where($where)->select($select)->one();
+    }
 }

@@ -102,14 +102,18 @@
             <el-table v-loading="listLoading" :data="list" border style="width: 100%">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
                 <el-table-column prop="order_no" label="订单号" width="270"></el-table-column>
-                <el-table-column :show-overflow-tooltip="true" label="店铺信息" width="350">
+                <el-table-column :show-overflow-tooltip="true" label="店铺信息" width="300">
                     <template slot-scope="scope">
                         <div flex="cross:center">
                             <com-image width="25" height="25" :src="scope.row.cover_url"></com-image>
-                            <div style="margin-left: 10px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.name}}</div>
+                            <div style="margin-left: 10px;overflow:hidden;text-overflow: ellipsis;">
+                                {{scope.row.name}}
+                                （<span style="color: #1ed0ff">{{scope.row.discount}}折</span>）
+                            </div>
                         </div>
                     </template>
                 </el-table-column>
+
                 <el-table-column label="支付状态" width="260">
                     <template slot-scope="scope">
                         <div v-if="scope.row.is_pay==1">
@@ -120,28 +124,52 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column :show-overflow-tooltip="true" label="订单金额" >
+                <el-table-column label="资金明细" width="160">
                     <template slot-scope="scope">
-                        <div flex="cross:center">
-                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.order_price}}</div>
+                        <div>支付现金：{{scope.row.pay_price}}</div>
+                        <div>支付红包：{{scope.row.integral_deduction_price}}</div>
+                        <div>总支付：{{scope.row.order_price}}</div>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="赠送明细" width="260">
+                    <template slot-scope="scope">
+                        <div>
+                            赠送购物券：{{scope.row.send_money}}
+                            <span v-if="scope.row.send_status == 'invalid' || scope.row.send_status == ''" style="color: red">(无效)</span>
+                            <span v-if="scope.row.send_status == 'success'" style="color: green">(已发送)</span>
+                            <span v-if="scope.row.send_status == 'waiting'" style="color: red">(待发送)</span>
+                        </div>
+                        <div>
+                            赠送积分：{{scope.row.score_money}}
+                            <span v-if="scope.row.score_status == 'invalid' || scope.row.score_status == ''" style="color: red">(无效)</span>
+                            <span v-if="scope.row.score_status == 'success'" style="color: green">(已发送)</span>
+                            <span v-if="scope.row.score_status == 'waiting'" style="color: red">(待发送)</span>
                         </div>
                     </template>
                 </el-table-column>
 
-                <el-table-column :show-overflow-tooltip="true" label="实际支付金额" >
+                <el-table-column label="佣金明细">
                     <template slot-scope="scope">
-                        <div flex="cross:center">
-                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.pay_price}}</div>
+                        <div>
+                            直推：<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                昵称：{{scope.row.direct_push_user_nickname}}({{scope.row.direct_push_user_id}})&nbsp;&nbsp;
+                                {{scope.row.direct_push_price}}&nbsp;&nbsp;
+                                <span v-if="scope.row.direct_push_status == -1" style="color: red">无效</span>
+                                <span v-if="scope.row.direct_push_status == 0">待结算</span>
+                                <span v-if="scope.row.direct_push_status == 1" style="color: #13ce66">已结算</span>
                         </div>
-                    </template>
-                </el-table-column>
-
-
-                <el-table-column :show-overflow-tooltip="true" label="支付方式">
-                    <template slot-scope="scope">
-                        <div flex="cross:center">
-                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">余额{{scope.row.pay_price}}+红包{{scope.row.integral_deduction_price}}</div>
-                        </div>
+                        <span>
+                            消费：<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span v-for="(item,index) in scope.row.consumption">
+                                昵称：{{item.nickname}}({{item.user_id}})&nbsp;&nbsp;
+                                {{item.price}}&nbsp;&nbsp;
+                                <span v-if="item.status == -1" style="color: red">无效</span>
+                                <span v-if="item.status == 0">待结算</span>
+                                <span v-if="item.status == 1" style="color: #13ce66">已结算</span>
+                                <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </span>
+                        </span>
                     </template>
                 </el-table-column>
 
@@ -167,7 +195,6 @@
                 </el-pagination>
             </div>
         </div>
-
     </el-card>
 </div>
 <script>
@@ -246,6 +273,7 @@
             clearSearch() {
                 this.page = 1;
                 this.searchData.keyword = '';
+                this.searchData.keyword_1 = '';
                 this.getList();
             },
 

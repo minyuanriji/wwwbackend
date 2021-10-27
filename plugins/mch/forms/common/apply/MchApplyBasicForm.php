@@ -32,15 +32,15 @@ class MchApplyBasicForm extends BaseModel{
 
     public function rules(){
         return [
-            [['user_id', 'captcha', 'realname', 'mobile', 'store_name', 'store_mch_common_cat_id', 'store_province_id', 'store_city_id', 'store_longitude', 'store_latitude', 'store_address'], 'required'],
+            [['user_id', 'captcha', 'realname', 'mobile', 'store_name', 'store_mch_common_cat_id', 'store_province_id', 'store_city_id', 'store_longitude', 'store_latitude'], 'required'],
             [['user_id', 'store_mch_common_cat_id', 'store_province_id', 'store_city_id'], 'integer'],
-            [['store_district_id'], 'safe']
+            [['store_district_id', 'store_address'], 'safe']
         ];
     }
 
     public function save(){
 
-        $this->setPos();
+//        $this->setPos();
 
         if(!$this->validate()){
             return $this->responseErrorInfo();

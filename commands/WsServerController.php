@@ -5,6 +5,7 @@ namespace app\commands;
 class WsServerController extends BaseCommandController {
 
     const CLIENT_REL_MOBILE_CACHE_KEY_PREFIX = "WEBSOCKET_CLIENT_LIST:";
+    const CLIENT_LIST_CACHE_KEY              = "WEBSOCKET_CLIENT_LIST";
 
     public function actionListen(){
 
@@ -72,17 +73,15 @@ class WsServerController extends BaseCommandController {
      * @param $param
      */
     public function requestActionMchPaidNotify($param){
-
         $text = !empty($param['request']->post['notify_data']) ? $param['request']->post['notify_data'] : "";
-        $cacheKey = self::CLIENT_REL_MOBILE_CACHE_KEY_PREFIX . $param['request']->post['notify_mobile'];
-        $cache = \Yii::$app->getCache();
-        $fd = $cache->get($cacheKey);
-        $this->commandOut("客户端：" . $cacheKey);
+        $token = $param['request']->post['notify_mobile'];
+        $fd = $this->getClientId($token);
+        $this->commandOut("客户端：" . $token);
         if(empty($fd) || !$param['ws']->isEstablished($fd)){
-            $this->commandOut("客户端：" . $cacheKey. "已断开");
+            $this->commandOut("客户端：" . $token. "已断开");
             $param['response']->end("ERROR");
         }else{
-            $this->commandOut("客户端：" . $cacheKey. "付款成功");
+            $this->commandOut("客户端：" . $token. "付款成功");
             $param['ws']->push($fd, $text);
             $param['response']->end("SUCCESS");
         }
@@ -94,12 +93,10 @@ class WsServerController extends BaseCommandController {
      */
     public function messageActionRelMobile($param){
         if(!empty($param['data']['content'])){
-            $cache = \Yii::$app->getCache();
             $mobile = $param['data']['content'];
-            $cacheKey = self::CLIENT_REL_MOBILE_CACHE_KEY_PREFIX . $mobile;
-            $cache->set($cacheKey, $param['frame']->fd);
-            $this->commandOut("客户端：".$param['frame']->fd."手机关联成功");
-            $param['ws']->push($param['frame']->fd, "手机关联成功\n");
+            $this->setClientId($mobile, $param['frame']->fd);
+            $this->commandOut("客户端" . $param['frame']->fd."<=>手机{$mobile}关联成功");
+            $param['ws']->push($param['frame']->fd, "客户端".$param['frame']->fd . "<=>{$mobile}关联成功\n");
         }
     }
 
@@ -109,13 +106,35 @@ class WsServerController extends BaseCommandController {
      */
     public function messageActionRelToken($param){
         if(!empty($param['data']['content'])){
-            $cache = \Yii::$app->getCache();
             $token = $param['data']['content'];
-            $cacheKey = self::CLIENT_REL_MOBILE_CACHE_KEY_PREFIX . $token;
-            $cache->set($cacheKey, $param['frame']->fd);
-            $this->commandOut("客户端".$param['frame']->fd."：".$token.":关联成功");
-            $param['ws']->push($param['frame']->fd, "客户端".$param['frame']->fd."：".$token.":关联成功\n");
+            $this->setClientId($token, $param['frame']->fd);
+            $this->commandOut("客户端" . $param['frame']->fd."<=>".$token."关联成功");
+            $param['ws']->push($param['frame']->fd, "客户端".$param['frame']->fd."<=>{$token}关联成功\n");
         }
+    }
+
+    /**
+     * 获取客户端ID
+     * @param $token
+     * @return integer
+     */
+    public function getClientId($token){
+        $cache = \Yii::$app->getCache();
+        $content = $cache->get(self::CLIENT_LIST_CACHE_KEY);
+        $clientDatas = $content ? json_decode($content, true) : [];
+        return isset($clientDatas[$token]) ? $clientDatas[$token] : null;
+    }
+
+    /**
+     * 设置客户端ID
+     * @param $token
+     * @param $fd
+     */
+    public function setClientId($token, $fd){
+        $content = \Yii::$app->getCache()->get(self::CLIENT_LIST_CACHE_KEY);
+        $clientDatas = $content ? json_decode($content, true) : [];
+        $clientDatas[$token] = $fd;
+        \Yii::$app->getCache()->set(self::CLIENT_LIST_CACHE_KEY, json_encode($clientDatas));
     }
 
     /**

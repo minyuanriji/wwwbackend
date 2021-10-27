@@ -28,7 +28,9 @@ class WsServerController extends BaseCommandController {
 
             if(isset($frame->fd)){
                 $token = $this->getClientToken($frame->fd);
-                $this->commandOut("收到消息[ID:{$frame->fd}，token:{$token}]：" . $frame->data);
+                if($token){
+                    $this->commandOut("收到消息[ID:{$frame->fd}，token:{$token}]：" . $frame->data);
+                }
             }
 
             $data = (array)@json_decode($frame->data, true);

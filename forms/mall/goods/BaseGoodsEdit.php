@@ -848,4 +848,13 @@ abstract class BaseGoodsEdit extends BaseModel
 //        echo $query->createCommand()->getRawSql();die;
         return $query;
     }
+
+    /**
+     * 基本商品数据模板
+     * @return array
+     */
+    public static function baseGoodsDataTpl(){
+        $jsonData = '{"labels":[],"attr":[],"cats":["372"],"mchCats":[],"cards":[],"services":[],"pic_url":[],"use_attr":0,"goods_num":"9999","status":1,"unit":"件","virtual_sales":0,"cover_pic":"","sort":100,"accumulative":0,"confine_count":-1,"confine_order_count":-1,"forehead":0,"forehead_score":0,"forehead_score_type":1,"freight_id":0,"freight":null,"give_score":0,"give_score_type":1,"individual_share":0,"is_level":1,"is_level_alone":0,"goods_brand":"","goods_supplier":"","pieces":0,"share_type":0,"attr_setting_type":0,"video_url":"","is_sell_well":0,"is_negotiable":0,"name":"1111","price":"1","original_price":0,"cost_price":0,"detail":"<p>1</p>","extra":"","app_share_title":"","app_share_pic":"","is_default_services":1,"member_price":{},"goods_no":"","goods_weight":"","select_attr_groups":[],"goodsWarehouse_attrGroups":[],"is_on_site_consumption":1,"share_level_type":0,"distributionLevelList":[],"form":null,"is_show_sales":1,"use_virtual_sales":1,"form_id":0,"attr_default_name":"","is_area_limit":0,"use_score":0,"area_limit":[{"list":[]}],"full_relief_price":0,"fulfil_price":0,"cannotrefund":["1","2","3"],"profit_price":0,"enable_upgrade_user_role":0,"upgrade_user_role_type":"","product":"","purchase_permission":[],"first_buy_setting":{"buy_num":0,"return_red_envelopes":0,"return_commission":0},"lianc_user_id":0,"lianc_commission_type":1,"lianc_commisson_value":0,"enable_score":0,"enable_integral":0,"max_deduct_integral":0,"integral_fee_rate":0,"is_order_paid":0,"is_order_sales":"0","price_display":[{"key":"price","display_id":0}]}';
+        return json_decode($jsonData, true);
+    }
 }

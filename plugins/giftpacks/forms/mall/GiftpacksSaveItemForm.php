@@ -4,9 +4,14 @@ namespace app\plugins\giftpacks\forms\mall;
 
 
 use app\core\ApiCode;
+use app\forms\mall\goods\BaseGoodsEdit;
+use app\mch\forms\goods\GoodsEditForm;
 use app\models\BaseModel;
+use app\models\Goods;
+use app\models\Store;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksItem;
+use app\plugins\mch\models\Mch;
 
 class GiftpacksSaveItemForm extends BaseModel{
 
@@ -16,6 +21,7 @@ class GiftpacksSaveItemForm extends BaseModel{
     public $pack_id;
     public $store_id;
     public $goods_id;
+    public $goods_price;
     public $expired_at;
     public $max_stock;
     public $usable_times;
@@ -24,7 +30,7 @@ class GiftpacksSaveItemForm extends BaseModel{
     public function rules(){
         return [
             [['name', 'cover_pic', 'item_price', 'pack_id', 'store_id',
-              'goods_id', 'expired_at', 'max_stock', 'usable_times'], 'required'],
+              'goods_id', 'goods_price', 'expired_at', 'max_stock', 'usable_times'], 'required'],
             [['limit_time'], 'safe']
         ];
     }
@@ -34,7 +40,42 @@ class GiftpacksSaveItemForm extends BaseModel{
             return $this->responseErrorInfo();
         }
 
+        $t = \Yii::$app->getDb()->beginTransaction();
         try {
+
+            $store = Store::findOne($this->store_id);
+            if(!$store || $store->is_delete){
+                throw new \Exception("门店[ID:{$this->store_id}]不存在");
+            }
+
+            $mch = Mch::findOne($store->mch_id);
+            if(!$mch || $mch->is_delete || $mch->review_status != Mch::REVIEW_STATUS_CHECKED){
+                throw new \Exception("商户{$store->mch_id}不存在");
+            }
+
+            if(!$this->goods_id){ //添加商品
+                $newGoodsData = $this->newGoodsData();
+                $newGoodsForm = new GoodsEditForm();
+                $newGoodsForm->attributes  = $newGoodsData;
+                $newGoodsForm->attrGroups  = [];
+                $newGoodsForm->expressName = [];
+                $newGoodsForm->mch_id      = $mch->id;
+                $res = $newGoodsForm->save();
+                if($res['code'] != ApiCode::CODE_SUCCESS){
+                    throw new \Exception($res['msg']);
+                }
+                $goods = Goods::findOne($res['data']['goods_id']);
+            }else{
+                $goods = Goods::findOne($this->goods_id);
+            }
+
+            if(!$goods || $goods->is_delete || $goods->is_recycle){
+                throw new \Exception("商品不存在");
+            }
+
+            if($goods->mch_id != $mch->id){
+                throw new \Exception("商品[ID:{$goods->id}]非商户产品");
+            }
 
             $giftpacks = Giftpacks::findOne($this->pack_id);
             if(!$giftpacks || $giftpacks->is_delete){
@@ -49,7 +90,7 @@ class GiftpacksSaveItemForm extends BaseModel{
                 "mall_id"  => \Yii::$app->mall->id,
                 "pack_id"  => $this->pack_id,
                 "store_id" => $this->store_id,
-                "goods_id" => $this->goods_id,
+                "goods_id" => $goods->id,
             ];
             $item = GiftpacksItem::findOne($uniqueData);
             if(!$item){
@@ -79,15 +120,33 @@ class GiftpacksSaveItemForm extends BaseModel{
                 throw new \Exception($this->responseErrorMsg($item));
             }
 
+            $t->commit();
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg'  => '保存成功'
             ];
         }catch (\Exception $e){
+            $t->rollBack();
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg'  => $e->getMessage()
             ];
         }
+    }
+
+    /**
+     * 拼装商品数据
+     * @return array
+     */
+    private function newGoodsData(){
+        $goodsData = array_merge(BaseGoodsEdit::baseGoodsDataTpl(), [
+            "pic_url"   => [["id" => 0, "pic_url" => $this->cover_pic]],
+            "cover_pic" => $this->cover_pic,
+            "name"      => $this->name,
+            "price"     => $this->goods_price,
+            "goods_num" => $this->max_stock
+        ]);
+        return $goodsData;
     }
 }

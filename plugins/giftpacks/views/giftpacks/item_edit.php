@@ -2,10 +2,11 @@
 
     <el-dialog width="65%" :title="dailogTitle" :visible.sync="dialogFormVisible">
 
-        <template v-if="formData.goods_id == 0">
+        <template v-if="chooseOn">
             <el-card class="box-card">
                 <div slot="header" class="clearfix">
                     <span>选择商品</span>
+                    <el-button @click="chooseOn = false" style="float: right; padding: 3px 0" type="text">取消</el-button>
                 </div>
                 <el-input @keyup.enter.native="loadGoodsData" size="small" placeholder="店名/商品名称/ID" v-model="search.keyword"
                           clearable @clear="searchGoods" style="width:300px;">
@@ -60,16 +61,22 @@
 
             <el-card class="box-card">
                 <div slot="header" class="clearfix">
-                    <span>已选商品</span>
-                    <!--
-                    <el-button @click="chooseGoods(null)" style="float: right; padding: 3px 0" type="text">重新选择</el-button>
-                    -->
+                    <span>设置商品</span>
+                    <el-button @click="chooseOn = true" style="float: right; padding: 3px 0" type="text">从商品库选择</el-button>
                 </div>
-                <el-form-item label="门店">
-                    <el-input style="width:350px"  v-model="formData.store_name" :disabled="true"></el-input>
+                <el-form-item label="门店" prop="store_id">
+                    <el-autocomplete
+                            style="width:350px"
+                            class="inline-input"
+                            v-model="formData.store_name"
+                            :fetch-suggestions="querySearch"
+                            placeholder="请输入内容"
+                            :trigger-on-focus="false"
+                            @select="selectStore"
+                            :disabled="formData.goods_id > 0"></el-autocomplete>
                 </el-form-item>
-                <el-form-item label="价格">
-                    <el-input style="width:150px" v-model="formData.goods_price" :disabled="true"></el-input>
+                <el-form-item label="价格"  prop="goods_price">
+                    <el-input style="width:150px" v-model="formData.goods_price" :disabled="formData.goods_id > 0"></el-input>
                 </el-form-item>
                 <el-form-item label="标题" prop="name">
                     <el-input style="width:350px"  v-model="formData.name"></el-input>
@@ -120,7 +127,7 @@
         </el-form>
 
 
-        <div v-if="formData.goods_id != 0" slot="footer" class="dialog-footer">
+        <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
             <el-button :loading="btnLoading" type="primary" @click="save()">确 定</el-button>
         </div>
@@ -136,8 +143,15 @@
             btnLoading: false,
             no_limit: false,
             no_expire: false,
-            formData: {goods_id:0, limit_time:0},
+            chooseOn: false,
+            formData: {store_id: '', goods_id:0, limit_time:0, goods_price: ''},
             rules: {
+                store_id: [
+                    {required: true, message: '未选择门店', trigger: 'change'}
+                ],
+                goods_price: [
+                    {required: true, message: '商品价格不能为空', trigger: 'change'}
+                ],
                 name: [
                     {required: true, message: '商品名称不能为空', trigger: 'change'}
                 ],
@@ -169,6 +183,27 @@
 
         },
         methods: {
+            selectStore(item){
+                this.formData['store_id']   = item.store_id;
+                this.formData['store_name'] = item.store_name;
+                this.formData['goods_id']   = 0;
+            },
+            querySearch(queryString, cb) {
+                let params = {
+                    r: 'plugin/giftpacks/mall/giftpacks/search-store',
+                    keyword: queryString
+                };
+                request({
+                    params: params,
+                    method: 'get',
+                }).then(e => {
+                    if (e.data.code == 0) {
+                        cb(e.data.data.list);
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                }).catch(e => {});
+            },
             hover_in(row, column, cell, event){
                 this.hover_row = row;
             },
@@ -223,9 +258,9 @@
                         name         : '',
                         cover_pic    : '',
                         pack_id      : pack_id,
-                        store_id     : 0,
+                        store_id     : '',
                         store_name   : '',
-                        goods_price  : 0,
+                        goods_price  : '',
                         goods_id     : 0,
                         limit_time   : 0,
                         expired_at   : '',

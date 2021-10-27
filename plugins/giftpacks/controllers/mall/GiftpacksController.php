@@ -9,6 +9,7 @@ use app\plugins\giftpacks\forms\mall\GiftpacksGoodsListForm;
 use app\plugins\giftpacks\forms\mall\GiftpacksItemListForm;
 use app\plugins\giftpacks\forms\mall\GiftpacksListForm;
 use app\plugins\giftpacks\forms\mall\GiftpacksSaveItemForm;
+use app\plugins\giftpacks\forms\mall\GiftpacksSearchStoreForm;
 
 class GiftpacksController extends Controller{
 
@@ -24,6 +25,16 @@ class GiftpacksController extends Controller{
         } else {
             return $this->render('index');
         }
+    }
+
+    /**
+     * 搜索门店
+     * @return string|\yii\web\Response
+     */
+    public function actionSearchStore(){
+        $form = new GiftpacksSearchStoreForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->search());
     }
 
     /**

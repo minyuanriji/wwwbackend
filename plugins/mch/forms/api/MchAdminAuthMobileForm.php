@@ -46,12 +46,14 @@ class MchAdminAuthMobileForm extends BaseModel{
 
             $adminUser = MchAdminUser::findOne([
                 "mall_id" => $mch->mall_id,
-                "mch_id"  => $mch->id
+                "mch_id"  => $mch->id,
+                "mobile"  => $mch->mobile
             ]);
             if(!$adminUser){
                 $adminUser = new MchAdminUser([
                     "mall_id"    => $mch->mall_id,
                     "mch_id"     => $mch->id,
+                    "mobile"     => $mch->mobile,
                     "created_at" => time()
                 ]);
             }

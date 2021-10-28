@@ -88,6 +88,8 @@ class PlateformsForm extends BaseModel
             $user = User::findOne($detail['parent_id']);
             $detail['parent_name'] = $user ? $user->nickname : "";
             $detail['product_json_data'] = json_decode($detail['product_json_data'], true);
+            $detail['enable_fast'] = (int)$detail['enable_fast'];
+            $detail['enable_slow'] = (int)$detail['enable_slow'];
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',

@@ -52,8 +52,8 @@ class PlateformsEditForm extends BaseModel
             $plateforms->parent_id = $this->parent_id;
             $plateforms->transfer_rate = $this->transfer_rate;
             $plateforms->class_dir = $this->class_dir;
-            $plateforms->enable_fast = $this->enable_fast;
-            $plateforms->enable_slow = $this->enable_slow;
+            $plateforms->enable_fast = (int)$this->enable_fast;
+            $plateforms->enable_slow = (int)$this->enable_slow;
             $plateforms->json_param = json_encode(['id' => $this->cyd_id, 'secret_key' => $this->secret_key]);
             if (!$plateforms->save()) {
                 throw new \Exception('保存失败');

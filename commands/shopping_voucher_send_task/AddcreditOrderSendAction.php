@@ -81,7 +81,7 @@ class AddcreditOrderSendAction extends Action{
             "ao.pay_price > 0",
             "svs.id IS NULL",
             ["ao.pay_status" => 'paid'],
-            ["ao.order_status" => "success"],
+            //["ao.order_status" => "success"],
         ]);
         $query->orderBy("ao.updated_at ASC");
 

@@ -122,11 +122,6 @@ echo $this->render("../com/com-tab-from");
                         </el-table-column>
                         <el-table-column label="操作">
                             <template slot-scope="scope">
-                                <el-button @click="editStore(scope.row)" type="text" circle size="mini">
-                                    <el-tooltip class="item" effect="dark" content="编辑" placement="top">
-                                        <img src="statics/img/mall/edit.png" alt="">
-                                    </el-tooltip>
-                                </el-button>
                                 <el-button @click="deleteOn(scope.row)" type="text" circle size="mini">
                                     <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                         <img src="statics/img/mall/del.png" alt="">

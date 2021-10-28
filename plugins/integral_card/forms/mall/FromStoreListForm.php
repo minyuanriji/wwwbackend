@@ -58,7 +58,7 @@ class FromStoreListForm extends BaseModel {
             }
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
-                'list'       => $list ? $list : [],
+                'list'       => $list ?: [],
                 'pagination' => $pagination
             ]);
         }catch (\Exception $e){

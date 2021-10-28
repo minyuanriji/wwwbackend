@@ -20,9 +20,9 @@ class FromStoreEditForm extends BaseModel{
 
     public function rules(){
         return [
-            [['mch_id', 'store_id', 'name', 'cover_url'], 'required'],
+            [['mch_id', 'store_id', 'name'], 'required'],
             [['id', 'mch_id', 'store_id'], 'integer'],
-            [['start_at'], 'string'],
+            [['start_at', 'cover_url'], 'string'],
             [['score_give_settings', 'score_enable', 'rate'], 'safe']
         ];
     }
@@ -70,7 +70,7 @@ class FromStoreEditForm extends BaseModel{
             $fromStore->store_id      = $this->store_id;
             $fromStore->updated_at    = time();
             $fromStore->name          = $this->name;
-            $fromStore->cover_url     = $this->cover_url;
+            $fromStore->cover_url     = $this->cover_url ?: 'https://www.mingyuanriji.cn/web/static/header-logo.png';
             $fromStore->start_at      = strtotime($this->start_at);
             $fromStore->enable_score  = $this->score_enable == "true" ? 1 : 0;
             $fromStore->score_setting = is_array($this->score_give_settings) ? json_encode($this->score_give_settings) : '';

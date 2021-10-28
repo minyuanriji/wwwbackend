@@ -1,5 +1,6 @@
 <?php
 echo $this->render("com-edit");
+echo $this->render("com-update");
 ?>
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
@@ -108,6 +109,11 @@ echo $this->render("com-edit");
               @close="close"
               @update="update"></com-edit>
 
+    <com-update :visible="updateDialogVisible"
+              :edit-data="editData"
+              @up_close="up_close"
+              @up_update="up_update"></com-update>
+
 </div>
 <script>
     const app = new Vue({
@@ -116,6 +122,7 @@ echo $this->render("com-edit");
             return {
                 activeName: 'first',
                 editDialogVisible: false,
+                updateDialogVisible: false,
                 editData: {},
                 searchData: {
                     keyword: ''
@@ -134,7 +141,7 @@ echo $this->render("com-edit");
             },
             editStore(row){
                 this.editData = row;
-                this.editDialogVisible = true;
+                this.updateDialogVisible = true;
             },
             deleteOn(row){
                 let self = this;
@@ -202,6 +209,13 @@ echo $this->render("com-edit");
             },
             close(){
                 this.editDialogVisible = false;
+            },
+            up_update(){
+                this.getList();
+                this.up_close();
+            },
+            up_close(){
+                this.updateDialogVisible = false;
             }
         },
         mounted: function() {

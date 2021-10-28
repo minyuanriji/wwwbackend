@@ -1,4 +1,5 @@
 <?php
+echo $this->render("com-edit");
 echo $this->render("../com/com-tab-from");
 ?>
 <div id="app" v-cloak>
@@ -32,6 +33,7 @@ echo $this->render("../com/com-tab-from");
                                             <span v-if="scope.row.type == 'branch_office'">分公司</span>
                                             <span v-if="scope.row.type == 'partner'">合伙人</span>
                                             <span v-if="scope.row.type == 'store'">VIP会员</span>
+                                            <span v-if="scope.row.type == 'user'">普通用户</span>
                                         </template>
                                     </el-table-column>
                                     <el-table-column label="比例">
@@ -58,36 +60,51 @@ echo $this->render("../com/com-tab-from");
 
                 </el-tab-pane>
                 <el-tab-pane label="指定大礼包" name="second">
-                    <el-table :data="list" border style="width: 100%" v-loading="loading">
+
+                    <div style="">
+                        <el-button size="big" type="primary" @click="newGoods">添加商品</el-button>
+                    </div>
+
+                    <el-table :data="list" border style="width: 100%;margin-top:20px;" v-loading="loading">
                         <el-table-column prop="id" label="ID" width="100"></el-table-column>
                         <el-table-column sortable="custom" label="礼包名称" width="300">
                             <template slot-scope="scope">
                                 <div flex="box:first">
                                     <div style="padding-right: 10px;">
-                                        <com-image mode="aspectFill" :src="scope.row.cover_url"></com-image>
+                                        <com-image mode="aspectFill" :src="scope.row.cover_pic"></com-image>
                                     </div>
                                     <div >
                                         <div>
                                             <el-tooltip class="item" effect="dark" placement="top">
                                                 <template slot="content">
-                                                    <div style="width: 320px;">{{scope.row.name}}</div>
+                                                    <div style="width: 320px;">{{scope.row.title}}</div>
                                                 </template>
-                                                <com-ellipsis :line="2">{{scope.row.name}}</com-ellipsis>
+                                                <com-ellipsis :line="2">{{scope.row.title}}</com-ellipsis>
                                             </el-tooltip>
                                         </div>
-                                        <div>ID：{{scope.row.mch_id}}</div>
+                                        <div>ID：{{scope.row.pack_id}}</div>
                                     </div>
                                 </div>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="give_value" label="赠送比例/折扣" width="130">
+                        <el-table-column prop="give_value" label="赠送配置" width="230">
                             <template slot-scope="scope">
-                                <div>{{scope.row.give_value}}%</div>
-                                <div style="color:darkred">折扣：{{scope.row.transfer_rate}}折</div>
+                                <div><b>消费者：</b>
+                                    <div v-if="scope.row.give_type == 1">按比例{{scope.row.give_value}}%赠送</div>
+                                    <div v-if="scope.row.give_type == 2">按固定值{{scope.row.give_value}}赠送</div>
+                                </div>
+                                <div><b>推荐人：</b>
+                                    <div v-for="recommender in scope.row.recommender">
+                                        <span v-if="recommender.type == 'branch_office'">分公司</span>
+                                        <span v-if="recommender.type == 'partner'">合伙人</span>
+                                        <span v-if="recommender.type == 'store'">VIP会员</span>
+                                        <span v-if="recommender.type == 'user'">普通用户</span>
+                                        <span v-if="recommender.give_type == 1">按比例{{recommender.give_value}}%赠送</span>
+                                        <span v-if="recommender.give_type == 2">按固定值{{recommender.give_value}}赠送</span>
+                                    </div>
+                                </div>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="total_income" label="总收入" width="110"></el-table-column>
-                        <el-table-column prop="total_send" label="总送出" width="110"></el-table-column>
                         <el-table-column prop="scope" width="110" label="启动时间">
                             <template slot-scope="scope">
                                 {{scope.row.start_at}}
@@ -137,6 +154,12 @@ echo $this->render("../com/com-tab-from");
         </div>
     </el-card>
 
+    <com-edit :visible="editDialogVisible"
+              :edit-data="editData"
+              @close="close"
+              @update="update">
+    </com-edit>
+
 </div>
 <script>
     const app = new Vue({
@@ -170,6 +193,14 @@ echo $this->render("../com/com-tab-from");
             };
         },
         methods: {
+            pageChange(page){
+                this.page = page;
+                this.getList();
+            },
+            newGoods(){
+                this.editData = {};
+                this.editDialogVisible = true;
+            },
             switchChanged(){
                 if(!this.commonSet.is_open){
                     this.saveCommon();
@@ -206,6 +237,37 @@ echo $this->render("../com/com-tab-from");
                     }
                 });
             },
+            deleteOn(row){
+                let self = this;
+                self.$confirm('删除该条数据, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.loading = true;
+                    request({
+                        params: {
+                            r: "plugin/shopping_voucher/mall/from-giftpacks/delete"
+                        },
+                        method: 'post',
+                        data: {
+                            id: row.id,
+                        }
+                    }).then(e => {
+                        self.loading = false;
+                        if (e.data.code === 0) {
+                            self.$message.success(e.data.msg);
+                            self.getList();
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        self.loading = false;
+                    });
+                }).catch(() => {
+
+                });
+            },
             getList() {
                 let params = Object.assign({
                     r: 'plugin/shopping_voucher/mall/from-giftpacks/list'
@@ -233,6 +295,12 @@ echo $this->render("../com/com-tab-from");
                     this.loading = false;
                 });
                 this.loading = true;
+            },
+            update(){
+                this.getList();
+            },
+            close(){
+                this.editDialogVisible = false;
             }
         },
         mounted: function() {

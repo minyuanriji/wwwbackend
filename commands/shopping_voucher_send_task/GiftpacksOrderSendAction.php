@@ -80,7 +80,6 @@ class GiftpacksOrderSendAction extends Action{
      */
     private function newAction(){
         $query = GiftpacksOrder::find()->alias("go");
-        $query->innerJoin(["svfg" => ShoppingVoucherFromGiftpacks::tableName()], "(svfg.pack_id=go.pack_id OR svfg.pack_id=0) AND svfg.is_delete=0");
         $query->leftJoin(["svsl" => ShoppingVoucherSendLog::tableName()], "svsl.source_id=go.id AND svsl.source_type='from_giftpacks_order'");
         $query->innerJoin(["u" => User::tableName()], "u.id=go.user_id");
         $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
@@ -97,7 +96,20 @@ class GiftpacksOrderSendAction extends Action{
         $selects = ["go.id", "go.mall_id", "go.user_id", "go.pay_price", "go.pack_id", "svfg.give_type", "svfg.give_value", "svfg.recommender",
             "u.parent_id", "p.role_type as parent_role_type"
         ];
-        $giftpacksOrders = $query->select($selects)->asArray()->limit(10)->all();
+        $query->select($selects)->asArray()->limit(10);
+
+        //指定配置
+        $cloneQuery = clone $query;
+        $cloneQuery->innerJoin(["svfg" => ShoppingVoucherFromGiftpacks::tableName()], "svfg.pack_id=go.pack_id");
+        $giftpacksOrders = $cloneQuery->all();
+
+        //通用配置
+        if(!$giftpacksOrders){
+            $cloneQuery = clone $query;
+            $cloneQuery->innerJoin(["svfg" => ShoppingVoucherFromGiftpacks::tableName()], "svfg.pack_id=0 AND svfg.is_delete=0");
+            $giftpacksOrders = $cloneQuery->all();
+        }
+
         if(!$giftpacksOrders)
             return false;
 
@@ -107,8 +119,12 @@ class GiftpacksOrderSendAction extends Action{
         }
         GiftpacksOrder::updateAll(["updated_at" => time()], "id IN (".implode(",", $giftpacksOrderIds).")");
         foreach($giftpacksOrders as $giftpacksOrder){
+            if($giftpacksOrder['give_type'] == 2){ //固定值
+                $money = floatval($giftpacksOrder['give_value']);
+            }else{ //比例
+                $money = $giftpacksOrder['pay_price'] * (floatval($giftpacksOrder['give_value'])/100);
+            }
 
-            $money = $giftpacksOrder['pay_price'] * (floatval($giftpacksOrder['give_value'])/100);
             $userDatas = [];
             $userDatas[] = ['user_id' => $giftpacksOrder['user_id'], 'money' => $money];
 
@@ -117,7 +133,11 @@ class GiftpacksOrderSendAction extends Action{
             if($recommender && !empty($giftpacksOrder['parent_role_type'])){
                 foreach($recommender as $recommenderItem){
                     if($giftpacksOrder['parent_role_type'] == $recommenderItem['type']){
-                        $money = $giftpacksOrder['pay_price'] * (floatval($recommenderItem['give_value'])/100);
+                        if($recommenderItem['give_type'] == 2){ //固定值
+                            $money = floatval($recommenderItem['give_value']);
+                        }else{ //比例
+                            $money = $giftpacksOrder['pay_price'] * (floatval($recommenderItem['give_value'])/100);
+                        }
                         $userDatas[] = [
                             'user_id' => $giftpacksOrder['parent_id'],
                             'money'   => $money
@@ -131,7 +151,7 @@ class GiftpacksOrderSendAction extends Action{
                 $sendLog = new ShoppingVoucherSendLog([
                     "mall_id"     => $giftpacksOrder['mall_id'],
                     "user_id"     => $userData['user_id'],
-                    "money"       => $userData['money'],
+                    "money"       => min(floatval($giftpacksOrder['pay_price']), $userData['money']),
                     "source_id"   => $giftpacksOrder['id'],
                     "source_type" => "from_giftpacks_order",
                     "status"      => "waiting",

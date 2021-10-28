@@ -321,6 +321,7 @@
                                     do_request();
                                 }else{
                                     that.$emit('update');
+                                    that.formDialogVisible=false;
                                 }
                             }
                         } else {

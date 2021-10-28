@@ -72,6 +72,8 @@ class RechargeRecordForm extends BaseModel
 
         $products = @json_decode($plateforms->product_json_data, true);
         $groupDatas = ['FastCharging' => [], 'SlowCharge' => []];
+        $groupDatas['enable_fast'] = $plateforms->enable_fast;
+        $groupDatas['enable_slow'] = $plateforms->enable_slow;
         if($products){
             foreach($products as $item){
                 if($item['type'] == "fast"){

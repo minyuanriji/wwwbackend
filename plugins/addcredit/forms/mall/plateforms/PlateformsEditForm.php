@@ -18,12 +18,14 @@ class PlateformsEditForm extends BaseModel
     public $parent_id;
     public $transfer_rate;
     public $class_dir;
+    public $enable_fast;
+    public $enable_slow;
 
     public function rules()
     {
         return [
             [['name', 'sdk_dir', 'ratio', 'cyd_id', 'secret_key','parent_id', 'class_dir', 'transfer_rate'], 'required'],
-            [['ratio', 'id', 'parent_id','transfer_rate'], 'integer'],
+            [['ratio', 'id', 'parent_id','transfer_rate', 'enable_fast', 'enable_fast'], 'integer'],
             [['name', 'sdk_dir', 'secret_key'], 'string'],
         ];
     }
@@ -50,6 +52,8 @@ class PlateformsEditForm extends BaseModel
             $plateforms->parent_id = $this->parent_id;
             $plateforms->transfer_rate = $this->transfer_rate;
             $plateforms->class_dir = $this->class_dir;
+            $plateforms->enable_fast = $this->enable_fast;
+            $plateforms->enable_slow = $this->enable_slow;
             $plateforms->json_param = json_encode(['id' => $this->cyd_id, 'secret_key' => $this->secret_key]);
             if (!$plateforms->save()) {
                 throw new \Exception('保存失败');

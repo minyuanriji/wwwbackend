@@ -139,8 +139,8 @@
                     transfer_rate: '',
                     class_dir: '',
                     product_json_data: '',
-                    enable_fast: 1,
-                    enable_fast: 0
+                    enable_fast: "1",
+                    enable_slow: "0"
                 },
                 rules: {
                     name: [

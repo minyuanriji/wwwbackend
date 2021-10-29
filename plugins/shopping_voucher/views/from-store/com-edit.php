@@ -59,6 +59,14 @@
                     </el-select>
                     <el-input :disabled="searchStatus==1"  type="number" min="0" placeholder="最小值" v-model="searchForm.cash_min" style="width:200px;"></el-input>
                 </el-form-item>
+                <el-form-item label="只搜索未设置的">
+                    <el-switch v-model="searchForm.is_new"
+                            active-text="是"
+                            inactive-text="否"
+                            active-value="1"
+                            inactive-value="0">
+                    </el-switch>
+                </el-form-item>
                 <el-form-item >
                     <el-button @click="searchStatus=0" v-if="searchStatus==1" size="big" icon="el-icon-refresh-left" type="danger">重新搜索</el-button>
                     <el-button @click="toSearch(1)" v-if="searchStatus==0" size="big" icon="el-icon-search" type="primary">点击搜索</el-button>
@@ -177,7 +185,8 @@
                     cash_min: '',
                     page: 1,
                     transfer_rate_min:'',
-                    transfer_rate_max: ''
+                    transfer_rate_max: '',
+                    is_new: "1"
                 },
                 searchStatus: 0,
                 searchLoading: false,

@@ -48,6 +48,9 @@ class CheckoutAction extends Action{
             try {
                 $parentDatas = $this->controller->getCommissionParentRuleDatas($checkoutOrder['pay_user_id'], $checkoutOrder['store_id'], 'checkout');
 
+                //计算分公司、合伙人、VIP会员分佣值
+                $this->setCommissoinValues($parentDatas);
+
                 //通过相关规则键获取分佣规则进行分佣
                 foreach($parentDatas as $parentData) {
 
@@ -146,5 +149,31 @@ class CheckoutAction extends Action{
         }
 
         return true;
+    }
+
+    /**
+     * 设置分佣值
+     * @param $parentDatas
+     * @return void
+     */
+    private function setCommissoinValues(&$parentDatas){
+        $totalCommissonValue = 15;
+        $setCommissoinValues = function(&$totalCommissonValue, &$parentDatas, $roleType) {
+            foreach($parentDatas as &$parentData){
+                $totalCommissonValue = max(0, $totalCommissonValue);
+                if(!isset($parentData['rule_data'])) continue;
+                $parentData['rule_data']['commission_type'] = 1;//强制全部按比例
+                if($parentData['role_type'] == $roleType){
+                    $parentData['rule_data']['commisson_value'] = min($totalCommissonValue, $parentData['rule_data']['commisson_value']);
+                    $totalCommissonValue -= $parentData['rule_data']['commisson_value'];
+                }
+            }
+        };
+        //设置VIP会员（即店主）
+        $setCommissoinValues($totalCommissonValue, $parentDatas, "store");
+        //设置合伙人
+        $setCommissoinValues($totalCommissonValue, $parentDatas,"partner");
+        //设置分公司
+        $setCommissoinValues($totalCommissonValue, $parentDatas,"branch_office");
     }
 }

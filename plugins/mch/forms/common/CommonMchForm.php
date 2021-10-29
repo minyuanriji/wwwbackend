@@ -43,6 +43,8 @@ class CommonMchForm extends BaseModel
             $orderBy = 'id DESC';
         }
 
+        $query->andWhere(['!=', 'mobile', '']);
+
         $list = $query->orderBy($orderBy)
             ->with('user', 'store', 'category')
             ->page($pagination)->asArray()->all();

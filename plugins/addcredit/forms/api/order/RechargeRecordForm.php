@@ -47,6 +47,11 @@ class RechargeRecordForm extends BaseModel
             $query->andWhere(['user_id' => \Yii::$app->user->id, 'mall_id' => \Yii::$app->mall->id])->select($select);
 
             $result = $query->orderBy('created_at DESC')->page($pagination, $limit)->asArray()->all();
+            if($result){
+                foreach($result as &$item){
+                    $item['order_status'] = $item['pay_status'] == "paid" ? "success" : $item['order_status'];
+                }
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

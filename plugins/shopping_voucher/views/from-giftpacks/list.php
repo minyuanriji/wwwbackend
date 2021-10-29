@@ -122,6 +122,11 @@ echo $this->render("../com/com-tab-from");
                         </el-table-column>
                         <el-table-column label="操作">
                             <template slot-scope="scope">
+                                <el-button @click="editStore(scope.row)" type="text" circle size="mini">
+                                    <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                        <img src="statics/img/mall/edit.png" alt="">
+                                    </el-tooltip>
+                                </el-button>
                                 <el-button @click="deleteOn(scope.row)" type="text" circle size="mini">
                                     <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                         <img src="statics/img/mall/del.png" alt="">
@@ -144,8 +149,6 @@ echo $this->render("../com/com-tab-from");
                     </el-col>
                 </el-tab-pane>
             </el-tabs>
-
-
         </div>
     </el-card>
 
@@ -154,6 +157,58 @@ echo $this->render("../com/com-tab-from");
               @close="close"
               @update="update">
     </com-edit>
+
+    <el-dialog title="修改比例" :visible.sync="dialogContent">
+        <el-form ref="commonSetForm" :model="commonSet" :rules="commFormRule" label-width="120px">
+            <el-form-item label="是否开启">
+                <el-switch v-model="commonSet.is_open" active-text="是" inactive-text="否"></el-switch>
+            </el-form-item>
+            <template v-if="commonSet.is_open">
+                <el-form-item label="赠送比例" prop="give_value">
+                    <div>
+                        <el-input type="number" min="0" placeholder="请输入内容" v-model="commonSet.give_value" style="width:260px;">
+                            <el-select v-model="commonSet.give_type" slot="prepend" placeholder="请选择" style="width:110px;">
+                                <el-option label="按比例" value="1"></el-option>
+                                <el-option label="按固定值" value="2"></el-option>
+                            </el-select>
+                            <template slot="append">{{commonSet.give_type == 1 ? "%" : "券"}}</template>
+                        </el-input>
+                    </div>
+                    <el-table :data="commonSet.recommender" border style="margin-top:10px;width: 70%">
+                        <el-table-column label="级别" width="110" align="center">
+                            <template slot-scope="scope">
+                                <span v-if="scope.row.type == 'branch_office'">分公司</span>
+                                <span v-if="scope.row.type == 'partner'">合伙人</span>
+                                <span v-if="scope.row.type == 'store'">VIP会员</span>
+                                <span v-if="scope.row.type == 'user'">普通用户</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="比例">
+                            <template slot-scope="scope">
+                                <el-input type="number" min="0" max="100" placeholder="请输入内容" v-model="scope.row.give_value" style="width:260px;">
+                                    <el-select v-model="scope.row.give_type" slot="prepend" placeholder="请选择" style="width:110px;">
+                                        <el-option label="按比例" value="1"></el-option>
+                                        <el-option label="按固定值" value="2"></el-option>
+                                    </el-select>
+                                    <template slot="append">{{scope.row.give_type == 1 ? "%" : "券"}}</template>
+                                </el-input>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-form-item>
+                <el-form-item label="启动日期" prop="start_at">
+                    <el-date-picker v-model="commonSet.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                </el-form-item>
+            </template>
+            <el-form-item >
+                <el-button :loading="loading" type="primary" @click="saveCommon">确 定</el-button>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogContent = false">取 消</el-button>
+            <el-button type="primary" @click="ratioSubmit" :loading="ratioLoading">确 定</el-button>
+        </div>
+    </el-dialog>
 
 </div>
 <script>
@@ -168,6 +223,7 @@ echo $this->render("../com/com-tab-from");
                 list: [],
                 page:1,
                 pagination: null,
+                dialogContent: false,
                 loading: false,
                 searchData: {},
                 commonSet:{
@@ -188,6 +244,13 @@ echo $this->render("../com/com-tab-from");
             };
         },
         methods: {
+            editStore(row){
+                this.dialogContent = true;
+                this.ratioForm = {
+                    ratio: row.ratio,
+                    id: row.id
+                }
+            },
             pageChange(page){
                 this.page = page;
                 this.getList();

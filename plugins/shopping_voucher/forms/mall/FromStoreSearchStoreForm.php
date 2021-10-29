@@ -25,10 +25,11 @@ class FromStoreSearchStoreForm extends BaseModel {
     public $page;
     public $transfer_rate_max;
     public $transfer_rate_min;
+    public $is_new;
 
     public function rules(){
         return [
-            [['id', 'page'], 'integer'],
+            [['id', 'page', 'is_new'], 'integer'],
             [['parent'], 'trim'],
             [['income_unit', 'cash_unit'], 'string'],
             [['name','district', 'date', 'income_min', 'cash_min', 'transfer_rate_max', 'transfer_rate_min'], 'safe']
@@ -131,6 +132,11 @@ class FromStoreSearchStoreForm extends BaseModel {
                 }
                 $subSql = "IFNULL((select sum(money) FROM {{%plugin_mch_account_log}} WHERE mch_id=m.id AND type=2 AND created_at>='{$startTime}' AND created_at<'{$endTime}'), 0) >= '{$this->cash_min}'";
                 $query->andWhere($subSql);
+            }
+
+            if($this->is_new){
+                $subQuery = ShoppingVoucherFromStore::find()->where(["is_delete" => 0])->select(["mch_id"]);
+                $query->andWhere(["NOT IN", "m.id", $subQuery]);
             }
 
             $selects = ["m.id", "s.mall_id", "s.id as store_id",  "s.name", "s.cover_url", "s.mobile", "s.address", "s.province_id", "s.city_id", "s.district_id",

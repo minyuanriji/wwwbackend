@@ -3,8 +3,11 @@
 namespace app\plugins\shopping_voucher\controllers\mall;
 
 use app\plugins\Controller;
+use app\plugins\shopping_voucher\forms\mall\FromGiftpacksBatchSaveForm;
 use app\plugins\shopping_voucher\forms\mall\FromGiftpacksCommonSaveForm;
+use app\plugins\shopping_voucher\forms\mall\FromGiftpacksDeleteForm;
 use app\plugins\shopping_voucher\forms\mall\FromGiftpacksListForm;
+use app\plugins\shopping_voucher\forms\mall\FromGiftpacksSearchGiftpacksForm;
 
 class FromGiftpacksController extends Controller{
 
@@ -32,4 +35,33 @@ class FromGiftpacksController extends Controller{
         return $this->asJson($form->save());
     }
 
+    /**
+     * 搜索大礼包
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionSearchGiftpacks(){
+        $form = new FromGiftpacksSearchGiftpacksForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->getList());
+    }
+
+    /**
+     * 批量保存
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionBatchSave(){
+        $form = new FromGiftpacksBatchSaveForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
+    }
+
+    /**
+     * 删除商品
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionDelete(){
+        $form = new FromGiftpacksDeleteForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->delete());
+    }
 }

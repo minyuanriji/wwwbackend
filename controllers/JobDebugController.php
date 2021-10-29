@@ -3,6 +3,8 @@ namespace app\controllers;
 
 
 
+use app\forms\common\WebSocketRequestForm;
+use app\mch\handlers\CheckoutOrderPaidHandler;
 use app\models\EfpsTransferOrder;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
@@ -13,6 +15,8 @@ use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 class JobDebugController extends BaseController {
 
     public function actionIndex(){
+        CheckoutOrderPaidHandler::voiceNotify("bNQMOmAywCEffAiOds9tABECSXPasRLX", "补商汇到账100元");
+        exit;
         /*$query = AddcreditOrder::find()->alias("ao");
         $query->leftJoin(["apf" => AddcreditPlateforms::tableName()], "ao.plateform_id=apf.id");
         $query->innerJoin(["svfa" => ShoppingVoucherFromAddcredit::tableName()], "(svfa.sdk_key=apf.sdk_dir) AND svfa.is_delete=0");

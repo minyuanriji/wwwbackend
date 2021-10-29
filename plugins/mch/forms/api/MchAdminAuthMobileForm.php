@@ -46,19 +46,20 @@ class MchAdminAuthMobileForm extends BaseModel{
 
             $adminUser = MchAdminUser::findOne([
                 "mall_id" => $mch->mall_id,
-                "mch_id"  => $mch->id
+                "mch_id"  => $mch->id,
+                "mobile"  => $mch->mobile
             ]);
             if(!$adminUser){
                 $adminUser = new MchAdminUser([
                     "mall_id"    => $mch->mall_id,
                     "mch_id"     => $mch->id,
+                    "mobile"     => $mch->mobile,
                     "created_at" => time()
                 ]);
             }
             $adminUser->last_login_at    = time();
             $adminUser->token_expired_at = time() + 7 * 24 * 3600;
             $adminUser->login_ip         = \Yii::$app->getRequest()->getUserIP();
-            $adminUser->auth_key         = \Yii::$app->security->generateRandomString();
             $adminUser->access_token     = \Yii::$app->security->generateRandomString();
             if(!$adminUser->save()){
                 throw new \Exception(json_encode($adminUser->getErrors()));

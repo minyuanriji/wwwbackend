@@ -40,6 +40,21 @@ class PhoneOrderSubmitForm extends BaseModel
                 throw new \Exception('手机号码错误,请重新输入！');
             }
 
+            $products = @json_decode($plate->product_json_data, true);
+            $product = null;
+            if($products){
+                foreach($products as $item){
+                    if($item['product_id'] == $this->product_id){
+                        $product = $item;
+                        break;
+                    }
+                }
+            }
+            if(!$product){
+                throw new \Exception("产品[ID:{$this->product_id}]不存在");
+            }
+
+
             //生成订单
             $order = new AddcreditOrder([
                 "mall_id"       => \Yii::$app->mall->id,
@@ -47,13 +62,13 @@ class PhoneOrderSubmitForm extends BaseModel
                 "user_id"       => \Yii::$app->user->id,
                 "mobile"        => $this->mobile,
                 "order_no"      => "HF" . $this->plateform_id . date("ymdHis") . rand(100, 999),
-                "order_price"   => $this->order_price,
+                "order_price"   => $product['price'],
                 "created_at"    => time(),
                 "updated_at"    => time(),
                 "order_status"  => 'unpaid',
                 "pay_status"    => 'unpaid',
                 "product_id"    => $this->product_id,
-                "recharge_type" => $this->product_id <= 3 ? "fast" : "slow"
+                "recharge_type" => $product['type']
             ]);
 
             //红包
@@ -62,11 +77,10 @@ class PhoneOrderSubmitForm extends BaseModel
                 if (!$user) {
                     throw new \Exception('账户不存在！');
                 }
-
                 if ($this->order_price > $user->static_integral) {
                     throw new \Exception('账户红包不足！');
                 }
-                $order->integral_deduction_price = $this->integral_deduction_price;
+                $order->integral_deduction_price = floatval($product['price']) + floatval($product['price']) * ($plate->ratio / 100);
             } elseif ($this->pay_type == 1) {
                 $order->pay_type = 'cash';
                 $order->pay_price = $this->order_price;

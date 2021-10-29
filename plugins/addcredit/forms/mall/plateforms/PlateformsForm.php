@@ -9,6 +9,7 @@ use app\models\GoodsService;
 use app\models\User;
 use app\plugins\addcredit\models\AddcreditPlateforms;
 use function Webmozart\Assert\Tests\StaticAnalysis\float;
+use function Webmozart\Assert\Tests\StaticAnalysis\string;
 
 class PlateformsForm extends BaseModel
 {
@@ -88,6 +89,8 @@ class PlateformsForm extends BaseModel
             $user = User::findOne($detail['parent_id']);
             $detail['parent_name'] = $user ? $user->nickname : "";
             $detail['product_json_data'] = json_decode($detail['product_json_data'], true);
+            $detail['enable_fast'] = (string)$detail['enable_fast'];
+            $detail['enable_slow'] = (string)$detail['enable_slow'];
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',

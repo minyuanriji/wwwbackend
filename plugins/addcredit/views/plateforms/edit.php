@@ -49,6 +49,22 @@
                                          @select="inviterClick">
                         </el-autocomplete>
                     </el-form-item>
+                    <el-form-item label="快充" prop="enable_fast">
+                        <el-switch v-model="ruleForm.enable_fast"
+                                active-text="启用"
+                                inactive-text="关闭"
+                                active-value="1"
+                                inactive-value="0">
+                        </el-switch>
+                    </el-form-item>
+                    <el-form-item label="慢充" prop="enable_slow">
+                        <el-switch v-model="ruleForm.enable_slow"
+                                   active-text="启用"
+                                   inactive-text="关闭"
+                                   active-value="1"
+                                   inactive-value="0">
+                        </el-switch>
+                    </el-form-item>
                     <el-form-item >
                         <el-button class="button-item" :loading="btnLoading" type="primary" @click="store('ruleForm')" size="big">保存</el-button>
                     </el-form-item>
@@ -123,6 +139,8 @@
                     transfer_rate: '',
                     class_dir: '',
                     product_json_data: '',
+                    enable_fast: "1",
+                    enable_slow: "0"
                 },
                 rules: {
                     name: [

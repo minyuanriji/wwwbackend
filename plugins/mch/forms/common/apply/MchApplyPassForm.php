@@ -163,8 +163,10 @@ class MchApplyPassForm extends BaseModel{
                 ]);
             }
 
+            $scoreSetting['is_permanent'] = 1;
             $scoreSetting['integral_num'] = 0;
             $scoreSetting['expire']       = -1;
+            $scoreSetting['period_unit']  = "month";
             $scoreSetting['period']       = 1;
 
             $fromStore->mch_id        = $mch->id;

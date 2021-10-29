@@ -6,68 +6,13 @@
         <el-dialog width="70%" :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
 
             <el-form label-width="15%" size="small">
-                <el-form-item label="推荐人">
-                    <el-input :disabled="searchStatus==1" style="width:300px;" placeholder="ID/昵称/手机号" v-model="searchForm.parent" clearable >
-                        <!--
-                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-                        -->
-                    </el-input>
-                </el-form-item>
                 <el-form-item label="ID">
-                    <el-input :disabled="searchStatus==1" type="number" min="0" placeholder="按商户ID精确搜索" v-model="searchForm.id" style="width:300px;"></el-input>
+                    <el-input :disabled="searchStatus==1" type="number" min="0" placeholder="按大礼包ID精确搜索" v-model="searchForm.id" style="width:300px;"></el-input>
                 </el-form-item>
                 <el-form-item label="名称">
-                    <el-input :disabled="searchStatus==1"  placeholder="按商户名称模糊搜索" v-model="searchForm.name" style="width:300px;"></el-input>
+                    <el-input :disabled="searchStatus==1"  placeholder="按大礼包名称模糊搜索" v-model="searchForm.name" style="width:300px;"></el-input>
                 </el-form-item>
-                <el-form-item label="地区">
-                    <el-cascader
-                            :options="district"
-                            :props="props"
-                            v-model="searchForm.district"
-                            :disabled="searchStatus==1"
-                            clearable>
-                    </el-cascader>
-                </el-form-item>
-                <el-form-item label="日期">
-                    <el-date-picker
-                            v-model="searchForm.date"
-                            type="datetimerange"
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :disabled="searchStatus==1" >
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label="折扣">
-                    <el-input :disabled="searchStatus==1" type="number" min="0" placeholder="最小值" v-model="searchForm.transfer_rate_min" style="width:100px;"></el-input>
-                    <span style="margin-left:10px;margin-right:10px;">至</span>
-                    <el-input :disabled="searchStatus==1" type="number" min="0" placeholder="最大值" v-model="searchForm.transfer_rate_max" style="width:100px;"></el-input>
-                </el-form-item>
-                <el-form-item label="收入">
-                    <el-select :disabled="searchStatus==1"  v-model="searchForm.income_unit" placeholder="请选择" style="width:130px;">
-                        <el-option value="day" label="日收入大于"></el-option>
-                        <el-option value="month" label="月收入大于"></el-option>
-                        <el-option value="year" label="年收入大于"></el-option>
-                    </el-select>
-                    <el-input :disabled="searchStatus==1" type="number" min="0" placeholder="最小值" v-model="searchForm.income_min" style="width:200px;"></el-input>
-                </el-form-item>
-                <el-form-item label="支出">
-                    <el-select :disabled="searchStatus==1"  v-model="searchForm.cash_unit" placeholder="请选择" style="width:130px;">
-                        <el-option value="day" label="日支出大于"></el-option>
-                        <el-option value="month" label="月支出大于"></el-option>
-                        <el-option value="year" label="年支出大于"></el-option>
-                    </el-select>
-                    <el-input :disabled="searchStatus==1"  type="number" min="0" placeholder="最小值" v-model="searchForm.cash_min" style="width:200px;"></el-input>
-                </el-form-item>
-                <el-form-item label="只搜索未设置的">
-                    <el-switch v-model="searchForm.is_new"
-                            active-text="是"
-                            inactive-text="否"
-                            active-value="1"
-                            inactive-value="0">
-                    </el-switch>
-                </el-form-item>
-                <el-form-item >
+                <el-form-item>
                     <el-button @click="searchStatus=0" v-if="searchStatus==1" size="big" icon="el-icon-refresh-left" type="danger">重新搜索</el-button>
                     <el-button @click="toSearch(1)" v-if="searchStatus==0" size="big" icon="el-icon-search" type="primary">点击搜索</el-button>
                 </el-form-item>
@@ -75,44 +20,38 @@
 
             <el-card class="box-card" v-if="searchStatus==1">
                 <div slot="header" class="clearfix">
-                    <span>商户列表</span>
+                    <span>大礼包列表</span>
                     <el-button @click="openFormDialog(true)" style="float: right; padding: 3px 0" type="text">全部设置</el-button>
                 </div>
-                <el-table  @selection-change="handleSelectionChange" border v-loading="searchLoading" :data="searchResult.list" style="width: 100%">
+                <el-table @selection-change="handleSelectionChange" border v-loading="searchLoading" :data="searchResult.list" style="width: 100%">
                     <el-table-column align="center" type="selection" width="60"></el-table-column>
                     <el-table-column prop="id" label="ID" width="90"> </el-table-column>
-                    <el-table-column prop="name" label="商户名称">
+                    <el-table-column prop="title" label="大礼包名称" width="300">
                         <template slot-scope="scope">
                             <div flex="cross:center">
-                                <com-image width="25" height="25" :src="scope.row.cover_url"></com-image>
-                                <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.name}}</div>
+                                <com-image width="25" height="25" :src="scope.row.cover_pic"></com-image>
+                                <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.title}}</div>
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="当前赠送比例/折扣" width="150">
+                    <el-table-column label="当前赠送配置">
                         <template slot-scope="scope">
-                            <div>{{scope.row.give_value ? (scope.row.give_value+"%") : "-"}}</div>
-                            <div style="color:darkred">折扣：{{scope.row.transfer_rate}}折</div>
+                            <div v-if="scope.row.recommender != ''"><b>消费者：</b>
+                                <div v-if="scope.row.give_type == 1">按比例{{scope.row.give_value}}%赠送</div>
+                                <div v-if="scope.row.give_type == 2">按固定值{{scope.row.give_value}}赠送</div>
+                            </div>
+                            <div v-if="scope.row.recommender != ''"><b>推荐人：</b>
+                                <div v-for="recommender in scope.row.recommender">
+                                    <span v-if="recommender.type == 'branch_office'">分公司</span>
+                                    <span v-if="recommender.type == 'partner'">合伙人</span>
+                                    <span v-if="recommender.type == 'store'">VIP会员</span>
+                                    <span v-if="recommender.type == 'user'">普通用户</span>
+                                    <span v-if="recommender.give_type == 1">按比例{{recommender.give_value}}%赠送</span>
+                                    <span v-if="recommender.give_type == 2">按固定值{{recommender.give_value}}赠送</span>
+                                </div>
+                            </div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="手机/地址" width="260">
-                        <template slot-scope="scope">
-                            <div>{{scope.row.mobile}}</div>
-                            <el-tooltip class="item" effect="dark" placement="top">
-                                <template slot="content">
-                                    {{scope.row.province}} {{scope.row.city}} {{scope.row.district}}{{scope.row.address}}
-                                </template>
-                                <com-ellipsis :line="1">{{scope.row.province}} {{scope.row.city}} {{scope.row.district}}{{scope.row.address}}</com-ellipsis>
-                            </el-tooltip>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="account_money" label="账户余额" width="150"> </el-table-column>
-                    <el-table-column label="推荐人" width="150">
-                        <template slot-scope="scope">
-                            <com-ellipsis :line="1">{{scope.row.parent_nickname}}</com-ellipsis>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="created_at" label="入驻时间" width="150"> </el-table-column>
                 </el-table>
 
                 <div style="display: flex;justify-content: space-between;margin-top:20px;">
@@ -137,16 +76,43 @@
 
         <el-dialog width="30%" title="设置购物券赠送" :visible.sync="formDialogVisible" :close-on-click-modal="false">
             <el-form ref="formData" :rules="formRule" label-width="15%" :model="formData" size="small">
-                <el-form-item :label="!formData.is_all ? '商户数' : '总页数'">
+                <el-form-item :label="!formData.is_all ? '记录数' : '总页数'">
                     <span>{{formProgressData.total_num}}</span>
                 </el-form-item>
                 <el-form-item label="已完成">
                     <span>{{formProgressData.finished_num}}</span>
                 </el-form-item>
                 <el-form-item label="赠送比例" prop="give_value">
-                    <el-input :disabled="formProgressData.loading" type="number" min="0" max="100" placeholder="请输入内容" v-model="formData.give_value" style="width:260px;">
-                        <template slot="append">%</template>
-                    </el-input>
+                    <div>
+                        <el-input :disabled="formProgressData.loading" type="number" min="0" max="100" placeholder="请输入内容" v-model="formData.give_value" style="width:260px;">
+                            <el-select v-model="formData.give_type" slot="prepend" placeholder="请选择" style="width:110px;">
+                                <el-option label="按比例" value="1"></el-option>
+                                <el-option label="按固定值" value="2"></el-option>
+                            </el-select>
+                            <template slot="append">{{formData.give_type == 1 ? "%" : "券"}}</template>
+                        </el-input>
+                    </div>
+                    <el-table :data="formData.recommender" border style="margin-top:10px;width:100%">
+                        <el-table-column label="级别" width="110" align="center">
+                            <template slot-scope="scope">
+                                <span v-if="scope.row.type == 'branch_office'">分公司</span>
+                                <span v-if="scope.row.type == 'partner'">合伙人</span>
+                                <span v-if="scope.row.type == 'store'">VIP会员</span>
+                                <span v-if="scope.row.type == 'user'">普通用户</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="比例">
+                            <template slot-scope="scope">
+                                <el-input type="number" min="0" max="100" placeholder="请输入内容" v-model="scope.row.give_value" style="width:260px;">
+                                    <el-select v-model="scope.row.give_type" slot="prepend" placeholder="请选择" style="width:110px;">
+                                        <el-option label="按比例" value="1"></el-option>
+                                        <el-option label="按固定值" value="2"></el-option>
+                                    </el-select>
+                                    <template slot="append">{{scope.row.give_type == 1 ? "%" : "券"}}</template>
+                                </el-input>
+                            </template>
+                        </el-table-column>
+                    </el-table>
                 </el-form-item>
                 <el-form-item label="启动日期" prop="start_at">
                     <el-date-picker :disabled="formProgressData.loading" v-model="formData.start_at" type="date" placeholder="选择日期"></el-date-picker>
@@ -170,23 +136,13 @@
         },
         data() {
             return {
-                dialogTitle: "设置商户",
+                dialogTitle: "设置大礼包",
                 activeName: "first",
                 dialogVisible: false,
                 searchForm:{
-                    parent: '',
                     id: '',
                     name:'',
-                    district: '',
-                    date: '',
-                    income_unit: 'day',
-                    income_min: '',
-                    cash_unit: 'day',
-                    cash_min: '',
-                    page: 1,
-                    transfer_rate_min:'',
-                    transfer_rate_max: '',
-                    is_new: "1"
+                    page: 1
                 },
                 searchStatus: 0,
                 searchLoading: false,
@@ -200,9 +156,15 @@
                     is_all:0,
                     do_page: 1,
                     do_search: null,
-                    give_type: 1,
+                    give_type: "1",
                     give_value: 0,
-                    start_at: ''
+                    start_at: '',
+                    recommender: [
+                        {type: 'branch_office', give_type: "1", give_value: 0},
+                        {type: 'partner', give_type: "1", give_value: 0},
+                        {type: 'store', give_type: "1", give_value: 0},
+                        {type: 'user', give_type: "1", give_value: 0}
+                    ]
                 },
                 formRule:{
                     give_value: [
@@ -216,14 +178,7 @@
                     loading: false,
                     total_num:0,
                     finished_num:0
-                },
-                props: {
-                    value: 'id',
-                    label: 'name',
-                    children: 'list',
-                    checkStrictly: true
-                },
-                district: []
+                }
             };
         },
         watch: {
@@ -232,21 +187,21 @@
             }
         },
         mounted: function () {
-            this.getDistrict();
+
         },
         methods: {
-            //选择待设置商户
+            //选择待设置大礼包
             handleSelectionChange(selection) {
                 this.formData.list = selection;
             },
-            //搜索商户
+            //搜索大礼包
             toSearch(page){
                 let params = Object.assign({
-                    r: 'plugin/shopping_voucher/mall/from-store/search-store'
+                    r: 'plugin/shopping_voucher/mall/from-giftpacks/search-giftpacks'
                 }, this.searchForm);
-                params['page'] = typeof page != "number" ? page : 1;
-                this.searchStatus = 1;
-                this.searchLoading = true;
+                params['page'] = typeof page != "undefined" ? page : 1;
+                this.searchStatus=1;
+                this.searchLoading=true;
                 request({
                     params
                 }).then(e => {
@@ -284,7 +239,7 @@
                     that.formProgressData.loading = true;
                     request({
                         params: {
-                            r: "plugin/shopping_voucher/mall/from-store/batch-save"
+                            r: "plugin/shopping_voucher/mall/from-giftpacks/batch-save"
                         },
                         method: "post",
                         data: that.formData
@@ -319,21 +274,6 @@
             },
             close(){
                 this.$emit('close');
-            },
-            // 获取省市区列表
-            getDistrict() {
-                request({
-                    params: {
-                        r: 'district/index',
-                        level: 3
-                    },
-                }).then(e => {
-                    if (e.data.code == 0) {
-                        this.district = e.data.data.district;
-                    }
-                }).catch(e => {
-
-                });
             }
         }
     });

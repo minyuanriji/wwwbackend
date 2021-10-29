@@ -9,6 +9,7 @@ use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\models\Goods;
 use app\models\GoodsWarehouse;
+use app\models\OrderDetail;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromGoods;
 
 class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
@@ -32,30 +33,33 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
 
         try {
 
-            $query = Goods::find()->alias('g')->with(['goodsWarehouse', 'attr']);
+            $query = Goods::find()->alias('g');
             $query->innerJoin(["svfg" => ShoppingVoucherFromGoods::tableName()], "svfg.goods_id=g.id AND svfg.is_delete=0");
-            $query->leftJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
+            $query->innerJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
+            $query->leftJoin(["od" => OrderDetail::tableName()], "od.goods_id=g.id AND od.is_refund=0");
+
             $query->where(['g.is_delete' => 0,'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => $this->base_mall_id]);
 
+            $selects = ["g.id", "g.is_level", "g.is_show_sales", "gw.cover_pic", "g.goods_stock",
+                "g.max_deduct_integral", "g.mch_id", "gw.name", "gw.original_price", "g.price", "g.status",
+                "gw.unit", "g.use_attr", "gw.video_url", "g.virtual_sales", "g.use_virtual_sales"
+            ];
+            $selects[] = "IF(sum(od.num), sum(od.num), 0) as count_sales";
+
             $list = $query->orderBy(['g.sort' => SORT_ASC, 'g.id' => SORT_DESC])
+                ->select($selects)
+                ->asArray()
                 ->groupBy('g.goods_warehouse_id')
                 ->page($pagination, 20, $this->page)
-                -> all();
+                ->all();
 
             $newList = [];
-            /* @var Goods[] $list */
             $goodsIds = [];
-            foreach ($list as $item) {
-                $apiGoods = ApiGoods::getCommon();
-                $apiGoods->goods = $item;
-                $apiGoods->isSales = 1;
-                $detail = $apiGoods->getDetail();
-                $detail['app_share_title'] = $item->app_share_title;
-                $detail['app_share_pic'] = $item->app_share_pic;
-                $detail['use_attr'] = $item->use_attr;
-                $detail['unit'] = $item->unit;
-                if ($item->use_virtual_sales) {
-                    $detail['sales'] = sprintf("已售%s%s", $item->sales + $item->virtual_sales, $item->unit);
+            foreach ($list as $detail) {
+                if ($detail['use_virtual_sales']) {
+                    $detail['sales'] = sprintf("已售%s%s", $detail['count_sales'] + $detail['virtual_sales'], $detail['unit']);
+                }else{
+                    $detail['sales'] = sprintf("已售%s%s", $detail['count_sales'], $detail['unit']);
                 }
                 $detail['got_shopping_voucher_num'] = 0;
                 $newList[] = $detail;

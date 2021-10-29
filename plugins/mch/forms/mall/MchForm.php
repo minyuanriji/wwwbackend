@@ -10,6 +10,8 @@ use app\models\Store;
 use app\models\User;
 use app\plugins\mch\forms\common\CommonMchForm;
 use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchApply;
+use phpDocumentor\Reflection\Types\Null_;
 
 class MchForm extends BaseModel
 {
@@ -132,6 +134,7 @@ class MchForm extends BaseModel
 
             $model->is_delete = 1;
             $model->user_id   = 0;
+            $model->mobile   = Null;
             if (!$model->save()) {
                 throw new \Exception($this->responseErrorMsg($model));
             }
@@ -151,17 +154,21 @@ class MchForm extends BaseModel
                 throw new \Exception($this->responseErrorMsg($user));
             }
 
+            //修改资料审核状态
+            $mchApply = MchApply::find()->where(['user_id' => $user->id])->one();
+            if ($mchApply) {
+                $mchApply->status = 'applying';
+                if (!$mchApply->save())
+                    throw new \Exception($mchApply->getErrors());
+            }
+
+
             $transaction->commit();
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '删除成功',
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '删除成功');
+
         } catch (\Exception $e) {
             $transaction->rollBack();
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => $e->getMessage(),
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
     }
 

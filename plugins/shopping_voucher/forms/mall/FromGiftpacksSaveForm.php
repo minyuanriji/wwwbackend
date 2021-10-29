@@ -4,81 +4,55 @@ namespace app\plugins\shopping_voucher\forms\mall;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
-use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromGiftpacks;
 
 class FromGiftpacksSaveForm extends BaseModel{
 
-    public $id;
-    public $mch_id;
-    public $store_id;
+    public $is_open;
     public $give_type;
     public $give_value;
-    public $name;
-    public $cover_url;
     public $start_at;
+    public $recommender;
+    public $pack_id;
 
     public function rules(){
         return [
-            [['mch_id', 'store_id', 'give_type', 'give_value', 'name', 'cover_url'], 'required'],
-            [['id', 'mch_id', 'store_id'], 'integer'],
-            [['start_at'], 'string']
+            [['give_value','start_at'], 'required'],
+            [['is_open', 'pack_id', 'give_type'], 'integer'],
+            [['recommender'], 'safe'],
         ];
     }
 
     public function save(){
 
-        if(!$this->validate()){
+        if(!$this->validate())
             return $this->responseErrorInfo();
-        }
 
         try {
-
-            $fromStore = ShoppingVoucherFromStore::findOne($this->id);
-            if(!$fromStore){
-
-                $exists = ShoppingVoucherFromStore::findOne([
-                    "store_id" => $this->store_id
+            $fromGiftPacks = ShoppingVoucherFromGiftpacks::findOne(['pack_id' => $this->pack_id]);
+            if(!$fromGiftPacks){
+                $fromGiftPacks = new ShoppingVoucherFromGiftpacks([
+                    "mall_id"    => \Yii::$app->mall->id,
+                    "created_at" => time()
                 ]);
-                if($exists && !$exists->is_delete){
-                    throw new \Exception("已添加过该门店了");
-                }
-
-                if(!$exists){
-                    $fromStore = new ShoppingVoucherFromStore([
-                        "mall_id"    => \Yii::$app->mall->id,
-                        "created_at" => time()
-                    ]);
-                }else{
-                    $fromStore = $exists;
-                    $fromStore->is_delete = 0;
-                    $fromStore->deleted_at = 0;
-                }
-
+            }else{
+                $fromGiftPacks->is_delete = 0;
+                $fromGiftPacks->deleted_at = 0;
             }
 
-            $fromStore->mch_id     = $this->mch_id;
-            $fromStore->store_id   = $this->store_id;
-            $fromStore->give_type  = 1;
-            $fromStore->give_value = max(min($this->give_value, 100), 0);
-            $fromStore->updated_at = time();
-            $fromStore->name       = $this->name;
-            $fromStore->cover_url  = $this->cover_url;
-            $fromStore->start_at   = strtotime($this->start_at);
+            $fromGiftPacks->pack_id     = $this->pack_id;
+            $fromGiftPacks->give_type   = $this->give_type;
+            $fromGiftPacks->give_value  = max(min($this->give_value, 100), 0);
+            $fromGiftPacks->updated_at  = time();
+            $fromGiftPacks->start_at    = max(time(), strtotime($this->start_at));
+            $fromGiftPacks->recommender = @json_encode($this->recommender);
 
-            if(!$fromStore->save()){
-                throw new \Exception($this->responseErrorMsg($fromStore));
-            }
+            if(!$fromGiftPacks->save())
+                throw new \Exception($this->responseErrorMsg($fromGiftPacks));
 
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg'  => '保存成功'
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '保存成功');
         }catch (\Exception $e){
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg'  => $e->getMessage()
-            ];
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
-
     }
 }

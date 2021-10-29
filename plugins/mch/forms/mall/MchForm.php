@@ -21,11 +21,13 @@ class MchForm extends BaseModel
     public $sort;
     public $level;
     public $address;
+    public $sort_prop;
+    public $sort_type;
 
     public function rules()
     {
         return [
-            [['keyword', 'switch_type', 'password'], 'string'],
+            [['keyword', 'switch_type', 'password', 'sort_prop', 'sort_type'], 'string'],
             [['id', 'sort', 'level'], 'integer'],
             [['page'], 'default', 'value' => 1],
             [['address'], 'safe'],
@@ -43,6 +45,8 @@ class MchForm extends BaseModel
     {
         $form = new CommonMchForm();
         $form->keyword = $this->keyword;
+        $form->sort_type = $this->sort_type;
+        $form->sort_prop = $this->sort_prop;
         $res = $form->getList();
 
         return [

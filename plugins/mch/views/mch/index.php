@@ -139,11 +139,12 @@
                     v-loading="listLoading"
                     :data="list"
                     border
-                    style="width: 100%">
+                    style="width: 100%"
+                    @sort-change="sortOrder">
                 <el-table-column
                         prop="id"
                         label="ID"
-                        width="60">
+                        width="80">
                 </el-table-column>
                 <el-table-column
                         :show-overflow-tooltip="true"
@@ -157,7 +158,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column
-                        label="用户" width="300">
+                        label="用户" width="280">
                     <template slot-scope="scope">
                         <div flex="dir:left cross:center" v-if="scope.row.user">
                             <com-image width="25" height="25" :src="scope.row.user.avatar"></com-image>
@@ -168,7 +169,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column
-                        label="联系人" width="300">
+                        label="联系人" width="200">
                     <template slot-scope="scope">
                         <div>
                             <com-ellipsis style="margin-left: 10px;" :line="1">{{scope.row.realname}}
@@ -181,7 +182,8 @@
                 <el-table-column
                         label="排序"
                         prop="sort"
-                        width="100">
+                        width="100"
+                        sortable="custom">
                     <template slot-scope="scope">
                         <div v-if="id != scope.row.id">
                             <el-tooltip class="item" effect="dark" content="排序" placement="top">
@@ -212,7 +214,7 @@
                 <el-table-column
                         label="入驻时间"
                         prop="review_time"
-                        width="220">
+                        width="200">
                 </el-table-column>
                 <el-table-column
                         label="开业"
@@ -306,6 +308,8 @@
 
                 search: {
                     keyword: '',
+                    sort_prop: '',
+                    sort_type: '',
                 },
                 dialogFormVisible: false,
                 form: {
@@ -323,6 +327,11 @@
             };
         },
         methods: {
+            sortOrder (e) {
+                this.search.sort_prop = e.prop;
+                this.search.sort_type = e.order == "descending" ? 'DESC' : 'ASC';
+                this.getList();
+            },
             editSort(row) {
                 this.id = row.id;
                 this.sort = row.sort;
@@ -344,7 +353,9 @@
                     params: {
                         r: 'plugin/mch/mall/mch/index',
                         page: self.page,
-                        keyword: self.search.keyword
+                        keyword: self.search.keyword,
+                        sort_prop: self.search.sort_prop,
+                        sort_type: self.search.sort_type,
                     },
                     method: 'get',
                 }).then(e => {

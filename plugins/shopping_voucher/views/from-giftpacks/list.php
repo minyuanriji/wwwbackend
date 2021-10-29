@@ -155,7 +155,7 @@ echo $this->render("../com/com-tab-from");
                 commonSet:{
                     is_open:false,
                     give_type: "1",
-                    give_value: '',
+                    give_value: 0,
                     start_at: '',
                     recommender: []
                 },

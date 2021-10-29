@@ -190,6 +190,18 @@ class CheckoutAction extends Action{
                 "partner"       => 0.08,
                 "store"         => 0.02
             ],
+            "branch_office" => [
+                "branch_office" => 0.15,
+                "pingji"        => 0,
+                "partner"       => 0,
+                "store"         => 0
+            ],
+            "partner" => [
+                "branch_office" => 0,
+                "pingji"        => 0,
+                "partner"       => 0.1,
+                "store"         => 0
+            ],
             "store" => [
                 "branch_office" => 0,
                 "pingji"        => 0,

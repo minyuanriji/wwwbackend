@@ -249,13 +249,16 @@
                             if(!that.formData.is_all){
                                 that.formProgressData.finished_num = that.formProgressData.total_num;
                                 that.$emit('update');
+                                that.formDialogVisible=false;
                             }else{
                                 that.formProgressData.finished_num = that.formData.do_page;
                                 if(that.formData.do_page < that.formProgressData.total_num){
                                     that.formData.do_page++;
                                     do_request();
                                 }else{
+                                    that.$emit('close');
                                     that.$emit('update');
+                                    that.formDialogVisible=false;
                                 }
                             }
                         } else {

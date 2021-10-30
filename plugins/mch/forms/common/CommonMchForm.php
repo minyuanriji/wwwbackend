@@ -2,24 +2,25 @@
 
 namespace app\plugins\mch\forms\common;
 
-use app\forms\common\goods\CommonGoodsStatistic;
-use app\forms\common\order\CommonOrderStatistic;
 use app\models\BaseModel;
 use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\Plugin;
+use phpDocumentor\Reflection\Types\This;
 
 class CommonMchForm extends BaseModel
 {
     public $keyword;
     public $page;
-    //
     public $id;
     public $is_review_status;
+    public $sort_prop;
+    public $sort_type;
 
     public function getList()
     {
+
         $query = Mch::find()->where([
             'mall_id' => \Yii::$app->mall->id,
             'is_delete' => 0,
@@ -36,7 +37,15 @@ class CommonMchForm extends BaseModel
             ]);
         }
 
-        $list = $query->orderBy(['sort' => SORT_ASC])
+        if ($this->sort_prop && $this->sort_type) {
+            $orderBy = $this->sort_prop . ' ' . $this->sort_type;
+        } else {
+            $orderBy = 'id DESC';
+        }
+
+        $query->andWhere(['!=', 'mobile', '']);
+
+        $list = $query->orderBy($orderBy)
             ->with('user', 'store', 'category')
             ->page($pagination)->asArray()->all();
 

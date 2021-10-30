@@ -3,6 +3,7 @@
 namespace app\plugins\integral_card\controllers\admin;
 
 use app\plugins\Controller;
+use app\plugins\integral_card\forms\mall\FromStoreBatchSaveForm;
 use app\plugins\integral_card\forms\mall\FromStoreDeleteForm;
 use app\plugins\integral_card\forms\mall\FromStoreEditForm;
 use app\plugins\integral_card\forms\mall\FromStoreListForm;
@@ -43,4 +44,15 @@ class FromStoreController extends Controller{
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->delete());
     }
+
+    /**
+     * 批量保存
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionBatchSave(){
+        $form = new FromStoreBatchSaveForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->save());
+    }
+
 }

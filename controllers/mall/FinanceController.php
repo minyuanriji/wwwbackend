@@ -169,6 +169,18 @@ class FinanceController extends MallController
 
 
     /**
+     * @Note:积分记录统计
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionStatistics()
+    {
+        $form = new ScoreLogListForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->statistics());
+    }
+
+
+    /**
      * @Author: 广东七件事 ganxiaohao
      * @Date: 2020-05-14
      * @Time: 17:54

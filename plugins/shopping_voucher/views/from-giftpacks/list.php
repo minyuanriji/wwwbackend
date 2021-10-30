@@ -122,6 +122,11 @@ echo $this->render("../com/com-tab-from");
                         </el-table-column>
                         <el-table-column label="操作">
                             <template slot-scope="scope">
+                                <el-button @click="editStore(scope.row)" type="text" circle size="mini">
+                                    <el-tooltip class="item" effect="dark" content="编辑" placement="top">
+                                        <img src="statics/img/mall/edit.png" alt="">
+                                    </el-tooltip>
+                                </el-button>
                                 <el-button @click="deleteOn(scope.row)" type="text" circle size="mini">
                                     <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                         <img src="statics/img/mall/del.png" alt="">
@@ -144,8 +149,6 @@ echo $this->render("../com/com-tab-from");
                     </el-col>
                 </el-tab-pane>
             </el-tabs>
-
-
         </div>
     </el-card>
 
@@ -154,6 +157,54 @@ echo $this->render("../com/com-tab-from");
               @close="close"
               @update="update">
     </com-edit>
+
+    <el-dialog title="修改比例" :visible.sync="dialogContent">
+        <el-form ref="aloneSetForm" :model="aloneSet" :rules="aloneFormRule" label-width="120px">
+            <el-form-item label="是否开启">
+                <el-switch v-model="aloneSet.is_open" active-text="是" inactive-text="否"></el-switch>
+            </el-form-item>
+            <template v-if="aloneSet.is_open">
+                <el-form-item label="赠送比例" prop="give_value">
+                    <div>
+                        <el-input type="number" min="0" placeholder="请输入内容" v-model="aloneSet.give_value" style="width:260px;">
+                            <el-select v-model="aloneSet.give_type" slot="prepend" placeholder="请选择" style="width:110px;">
+                                <el-option label="按比例" value="1"></el-option>
+                                <el-option label="按固定值" value="2"></el-option>
+                            </el-select>
+                            <template slot="append">{{aloneSet.give_type == 1 ? "%" : "券"}}</template>
+                        </el-input>
+                    </div>
+                    <el-table :data="aloneSet.recommender" border style="margin-top:10px;width: 70%">
+                        <el-table-column label="级别" width="110" align="center">
+                            <template slot-scope="scope">
+                                <span v-if="scope.row.type == 'branch_office'">分公司</span>
+                                <span v-if="scope.row.type == 'partner'">合伙人</span>
+                                <span v-if="scope.row.type == 'store'">VIP会员</span>
+                                <span v-if="scope.row.type == 'user'">普通用户</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="比例">
+                            <template slot-scope="scope">
+                                <el-input type="number" min="0" max="100" placeholder="请输入内容" v-model="scope.row.give_value" style="width:260px;">
+                                    <el-select v-model="scope.row.give_type" slot="prepend" placeholder="请选择" style="width:110px;">
+                                        <el-option label="按比例" value="1"></el-option>
+                                        <el-option label="按固定值" value="2"></el-option>
+                                    </el-select>
+                                    <template slot="append">{{scope.row.give_type == 1 ? "%" : "券"}}</template>
+                                </el-input>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-form-item>
+                <el-form-item label="启动日期" prop="start_at">
+                    <el-date-picker v-model="aloneSet.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                </el-form-item>
+            </template>
+            <el-form-item >
+                <el-button :loading="aloneLoading" type="primary" @click="saveAlone">确 定</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
 
 </div>
 <script>
@@ -168,12 +219,14 @@ echo $this->render("../com/com-tab-from");
                 list: [],
                 page:1,
                 pagination: null,
+                dialogContent: false,
                 loading: false,
+                aloneLoading: false,
                 searchData: {},
                 commonSet:{
                     is_open:false,
                     give_type: "1",
-                    give_value: '',
+                    give_value: 0,
                     start_at: '',
                     recommender: []
                 },
@@ -184,10 +237,36 @@ echo $this->render("../com/com-tab-from");
                     start_at:[
                         {required: true, message: '启动日期不能为空', trigger: 'change'},
                     ]
-                }
+                },
+                aloneFormRule:{
+                    give_value: [
+                        {required: true, message: '赠送比例不能为空', trigger: 'change'},
+                    ],
+                    start_at:[
+                        {required: true, message: '启动日期不能为空', trigger: 'change'},
+                    ]
+                },
+                aloneSet:{
+                    is_open:false,
+                    give_type: "1",
+                    pack_id: 0,
+                    give_value: 0,
+                    start_at: '',
+                    recommender: []
+                },
             };
         },
         methods: {
+            editStore(row){
+                console.log(row);
+                this.dialogContent = true;
+                this.aloneSet.recommender = row.recommender;
+                this.aloneSet.is_open = true;
+                this.aloneSet.give_type = row.give_type;
+                this.aloneSet.give_value = row.give_value;
+                this.aloneSet.start_at = row.start_at;
+                this.aloneSet.pack_id = row.pack_id;
+            },
             pageChange(page){
                 this.page = page;
                 this.getList();
@@ -228,6 +307,40 @@ echo $this->render("../com/com-tab-from");
                         }).catch(e => {
                             that.$message.error('请求失败！');
                             that.loading = true;
+                        });
+                    }
+                });
+            },
+            saveAlone(){
+                let that = this;
+                this.$refs['aloneSetForm'].validate((valid) => {
+                    if (valid) {
+                        that.aloneLoading = true;
+                        request({
+                            params: {
+                                r: "plugin/shopping_voucher/mall/from-giftpacks/save"
+                            },
+                            method: "post",
+                            data: {
+                                is_open:that.aloneSet.is_open ? 1 : 0,
+                                give_type:that.aloneSet.give_type,
+                                give_value:that.aloneSet.give_value,
+                                start_at:that.aloneSet.start_at,
+                                recommender: that.aloneSet.recommender,
+                                pack_id: that.aloneSet.pack_id,
+                            }
+                        }).then(e => {
+                            that.aloneLoading = false;
+                            if (e.data.code == 0) {
+                                that.$message.success(e.data.msg);
+                                that.dialogContent=false;
+                                that.getList();
+                            } else {
+                                that.$message.error(e.data.msg);
+                            }
+                        }).catch(e => {
+                            that.$message.error('请求失败！');
+                            that.aloneLoading = true;
                         });
                     }
                 });

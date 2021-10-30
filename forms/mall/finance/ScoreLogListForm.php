@@ -39,14 +39,14 @@ class ScoreLogListForm extends BaseModel
         $query = ScoreLog::find()->alias('b')->where([
             'b.mall_id' => \Yii::$app->mall->id,
         ])->innerJoin(["u" => User::tableName()], "u.id=b.user_id")
-          ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]])
+          ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]])
           ->select(["b.*", "u.nickname", "u.mobile"]);
 
         if (!empty($this->keyword)) {
             $query->andWhere([
                 "OR",
-                "u.nickname LIKE '%" . $this->keyword . "%'",
-                "u.mobile LIKE '%" . $this->keyword . "%'",
+                ['u.mobile' => $this->keyword],
+                ['LIKE', 'u.nickname', $this->keyword]
             ]);
         }
 
@@ -106,11 +106,85 @@ class ScoreLogListForm extends BaseModel
             'export_list' => (new ScoreLogExport())->fieldsList(),
             'pagination' => $pagination
         ]);
-
     }
 
+    public function statistics()
+    {
+        if (!$this->validate()) {
+            return $this->responseErrorInfo();
+        }
 
+        $query = ScoreLog::find()->alias('b')->where([
+            'b.mall_id' => \Yii::$app->mall->id,
+        ])->innerJoin(["u" => User::tableName()], "u.id=b.user_id")
+            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]])
+            ->select(["b.*", "u.nickname", "u.mobile"]);
 
+        if (!empty($this->keyword)) {
+            $query->andWhere([
+                "OR",
+                ['u.mobile' => $this->keyword],
+                ['LIKE', 'u.nickname', $this->keyword]
+            ]);
+        }
 
+        if ($this->user_id) {
+            $query->andWhere(['b.user_id' => $this->user_id]);
+        }
 
+        if ($this->start_date && $this->end_date) {
+            $query->andWhere(['<', 'b.created_at', strtotime($this->end_date)])
+                ->andWhere(['>', 'b.created_at', strtotime($this->start_date)]);
+        }
+
+        if ($this->source_type) {
+            switch ($this->source_type)
+            {
+                case 'order':
+                    $query->andWhere(['and', ['b.source_type' => 'normal'], ['like', 'b.desc', '下单积分抵扣']]);
+                    break;
+                case 'order_cancellation':
+                    $query->andWhere(['and', ['b.source_type' => 'normal'], ['like', 'b.desc', '商品订单取消']]);
+                    break;
+                case 'sign_in':
+                    $query->andWhere(['and', ['b.source_type' => 'normal'], ['like', 'b.desc', '签到赠送积分']]);
+                    break;
+                case 'admin':
+                    $query->andWhere(['and', ['b.source_type' => 'normal'], ['like', 'b.desc', '管理员']]);
+                    break;
+                case 'give':
+                    $query->andWhere(['and', ['b.source_type' => 'normal'], ['like', 'b.desc', '订单购买赠送']]);
+                    break;
+                default:
+                    $query->andWhere(['b.source_type' => $this->source_type]);
+            }
+        }
+
+        $incomeQuery = clone $query;
+        $income = $incomeQuery->andWhere(['b.type' => 1])->sum('b.score');
+        $expendQuery = clone $query;
+        $expend = $expendQuery->andWhere(['b.type' => 2])->sum('b.score');
+
+        $list = $query->orderBy('b.id desc')->page($pagination, $this->limit)->asArray()->all();
+
+        $currentIncome = $currentExpend = 0;
+        if ($list) {
+            foreach ($list as $v) {
+                if ($v['type'] == 1) {
+                    $currentIncome += $v['score'];
+                } else {
+                    $currentExpend += $v['score'];
+                }
+            }
+        }
+
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
+            'Statistics' => [
+                'income' => $income ?: 0,
+                'expend' => $expend ?: 0,
+                'currentIncome' => sprintf("%.2f", $currentIncome),
+                'currentExpend' => sprintf("%.2f", $currentExpend),
+            ],
+        ]);
+    }
 }

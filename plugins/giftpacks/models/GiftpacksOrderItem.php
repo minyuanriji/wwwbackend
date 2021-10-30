@@ -22,6 +22,11 @@ class GiftpacksOrderItem extends BaseActiveRecord
             [['current_num', 'max_num', 'expired_at', 'other_json_data'], 'safe']
         ];
     }
+
+    public function getGiftpacksItem()
+    {
+        return $this->hasOne(GiftpacksItem::className(), ['id' => 'pack_item_id']);
+    }
 }
 
 

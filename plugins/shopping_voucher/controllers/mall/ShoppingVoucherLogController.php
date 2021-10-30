@@ -24,6 +24,16 @@ class ShoppingVoucherLogController extends Controller{
     }
 
     /**
+     * 购物券记录统计
+     * @return bool|string|\yii\web\Response
+     */
+    public function actionStatistics(){
+        $form = new ShoppingVoucherLogListForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->statistics());
+    }
+
+    /**
      * 购物券充值
      * @return bool|string|\yii\web\Response
      */

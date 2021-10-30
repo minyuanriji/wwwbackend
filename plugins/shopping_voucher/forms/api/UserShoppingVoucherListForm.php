@@ -48,10 +48,10 @@ class UserShoppingVoucherListForm extends BaseModel {
             $selects = ["id", "type", "current_money", "money", "desc", "source_type", "created_at"];
 
             $incomeQuery = clone $query;
-            $income = $incomeQuery->andWhere(['type' => 1])->sum('integral');
+            $income = $incomeQuery->andWhere(['type' => 1])->sum('money');
 
             $expenditureQuery = clone $query;
-            $expenditure = $expenditureQuery->andWhere(['type' => 2])->sum('integral');
+            $expenditure = $expenditureQuery->andWhere(['type' => 2])->sum('money');
 
             $list = $query->select($selects)->page($pagination, 10, max(1, (int)$this->page))
                 ->asArray()->all();

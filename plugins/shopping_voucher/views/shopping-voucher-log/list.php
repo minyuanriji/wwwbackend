@@ -9,6 +9,26 @@ Yii::$app->loadComponentView('com-dialog-select');
                 <div style="float: right;margin: -5px 0">
                     <el-button @click="handleRecharge" type="primary" size="small">充值购物券</el-button>
                 </div>
+                <div style="margin: 30px 0" v-loading="statisticsLoading">
+                    <div style="display: flex;justify-content: space-evenly">
+                        <div>
+                            <div style="text-align: center">总收入</div>
+                            <div id="assets">{{Statistics.income}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">总支出</div>
+                            <div id="assets">{{Statistics.expend}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页收入</div>
+                            <div id="assets">{{Statistics.currentIncome}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页支出</div>
+                            <div id="assets">{{Statistics.currentExpend}}元</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="table-body">
@@ -130,6 +150,7 @@ Yii::$app->loadComponentView('com-dialog-select');
         data() {
             return {
                 btnLoading: false,
+                statisticsLoading: false,
                 rechargeForm: {
                     type: "1",
                     user_id: '',
@@ -170,6 +191,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     source_type: '',
                 },
                 date: '',
+                Statistics: '',
                 list: [],
                 pagination: null,
                 loading: false,
@@ -224,7 +246,6 @@ Yii::$app->loadComponentView('com-dialog-select');
                     }
                 });
             },
-
             pageChange(currentPage) {
                 this.page = currentPage;
                 this.getList();
@@ -244,7 +265,6 @@ Yii::$app->loadComponentView('com-dialog-select');
                 this.page = 1;
                 this.search();
             },
-
             getList() {
                 let params = {
                     r: 'plugin/shopping_voucher/mall/shopping-voucher-log/list',
@@ -260,6 +280,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     if (e.data.code === 0) {
                         this.list = e.data.data.list;
                         this.pagination = e.data.data.pagination;
+                        this.getStatistics();
                     } else {
                         this.$message.error(e.data.msg);
                     }
@@ -268,6 +289,29 @@ Yii::$app->loadComponentView('com-dialog-select');
                     this.loading = false;
                 });
                 this.loading = true;
+            },
+            getStatistics() {
+                let params = {
+                    r: 'plugin/shopping_voucher/mall/shopping-voucher-log/statistics',
+                    page: this.page,
+                    start_date: this.searchData.start_date,
+                    end_date: this.searchData.end_date,
+                    keyword: this.searchData.keyword,
+                    source_type: this.searchData.source_type,
+                };
+                request({
+                    params,
+                }).then(e => {
+                    if (e.data.code === 0) {
+                        this.Statistics = e.data.data.Statistics;
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                    this.statisticsLoading = false;
+                }).catch(e => {
+                    this.statisticsLoading = false;
+                });
+                this.statisticsLoading = true;
             },
         },
     mounted: function() {

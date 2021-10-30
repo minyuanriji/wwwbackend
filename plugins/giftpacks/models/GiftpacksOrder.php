@@ -23,4 +23,11 @@ class GiftpacksOrder extends BaseActiveRecord
               'commission_status', 'commission_remark', 'process_class'], 'safe']
         ];
     }
+
+    public function getGiftpacks()
+    {
+        return $this->hasOne(Giftpacks::className(), ['id' => 'pack_id']);
+    }
+
+
 }

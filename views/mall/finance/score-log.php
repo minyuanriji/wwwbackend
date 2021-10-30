@@ -6,6 +6,26 @@
                 <div style="float: right;">
                     <com-export-dialog :field_list='export_list' :params="searchData" @selected="exportConfirm"></com-export-dialog>
                 </div>
+                <div style="margin: 30px 0" v-loading="statisticsLoading">
+                    <div style="display: flex;justify-content: space-evenly">
+                        <div>
+                            <div style="text-align: center">总收入</div>
+                            <div id="assets">{{Statistics.income}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">总支出</div>
+                            <div id="assets">{{Statistics.expend}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页收入</div>
+                            <div id="assets">{{Statistics.currentIncome}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页支出</div>
+                            <div id="assets">{{Statistics.currentExpend}}元</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="table-body">
@@ -98,8 +118,10 @@
                 form: [],
                 pagination: null,
                 listLoading: false,
+                statisticsLoading: false,
                 export_list: [],
                 source_type:'',
+                Statistics: '',
             };
         },
         methods: {
@@ -166,6 +188,7 @@
                         this.form = e.data.data.list;
                         this.export_list = e.data.data.export_list;
                         this.pagination = e.data.data.pagination;
+                        this.getStatistics();
                     } else {
                         this.$message.error(e.data.msg);
                     }
@@ -174,6 +197,36 @@
                     this.listLoading = false;
                 });
                 this.listLoading = true;
+            },
+
+            getStatistics() {
+                let params = {
+                    r: 'mall/finance/statistics',
+                    page: this.page,
+                    date: this.date,
+                    user_id: getQuery('user_id'),
+                    keyword: this.keyword,
+                    source_type: this.source_type,
+                };
+                if (this.date) {
+                    Object.assign(params, {
+                        start_date: this.date[0],
+                        end_date: this.date[1],
+                    });
+                }
+                request({
+                    params,
+                }).then(e => {
+                    if (e.data.code === 0) {
+                        this.Statistics = e.data.data.Statistics;
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                    this.statisticsLoading = false;
+                }).catch(e => {
+                    this.statisticsLoading = false;
+                });
+                this.statisticsLoading = true;
             },
         },
     mounted: function() {

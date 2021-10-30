@@ -181,7 +181,7 @@ class UserForm extends BaseModel
             'mobile' => $user->mobile,
             'avatar' => $user->avatar_url,
             'score' => intval($user->score),
-            'total_score' => $user->total_score,
+            'total_score' => sprintf("%.2f", $user->total_score),
             'static_score' => intval($user->static_score),
             'dynamic_score' => intval($user->dynamic_score),
             'birthday' => $user->birthday > 0 ? date("Y-m-d",$user->birthday) : 0,

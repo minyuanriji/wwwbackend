@@ -66,7 +66,8 @@ class GiftpacksOrderClerkQrCodeForm extends BaseModel{
                 "mall_id"      => $orderPackItem->mall_id,
                 "source_type"  => "giftpacks_order_item",
                 "source_id"    => $orderPackItem->id,
-                "app_platform" => \Yii::$app->appPlatform
+                "app_platform" => \Yii::$app->appPlatform,
+                "status"       => 0,
             ];
             $clerkData = ClerkData::findOne($uniqueData);
             if(!$clerkData){

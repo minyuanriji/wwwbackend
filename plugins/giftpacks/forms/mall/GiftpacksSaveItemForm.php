@@ -120,6 +120,11 @@ class GiftpacksSaveItemForm extends BaseModel{
                 throw new \Exception($this->responseErrorMsg($item));
             }
 
+            //上面添加商品完之后设置商户商品会把商品下架，此处在上架  后台设置商户上架商品审核
+            $goods->status = Goods::STATUS_ON;
+            if (!$goods->save())
+                throw new \Exception($this->responseErrorMsg($goods));
+
             $t->commit();
 
             return [

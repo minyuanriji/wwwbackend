@@ -48,7 +48,7 @@ class MchGoodsListForm extends BaseModel implements ICacheForm {
             $query->andWhere([
                 'g.is_delete'  => 0,
                 'g.is_recycle' => 0,
-                'g.status'     => 1,
+//                'g.status'     => 1,//上下架都显示
                 'g.mall_id'    => $store->mall_id,
                 'g.mch_id'     => $mch->id
             ]);

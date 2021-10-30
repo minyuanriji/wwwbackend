@@ -102,7 +102,7 @@
             <el-table v-loading="listLoading" :data="list" border style="width: 100%">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
                 <el-table-column prop="order_no" label="订单号" width="270"></el-table-column>
-                <el-table-column :show-overflow-tooltip="true" label="店铺信息" width="300">
+                <el-table-column :show-overflow-tooltip="true" label="店铺信息" width="280">
                     <template slot-scope="scope">
                         <div flex="cross:center">
                             <com-image width="25" height="25" :src="scope.row.cover_url"></com-image>
@@ -117,7 +117,7 @@
                 <el-table-column label="支付状态" width="260">
                     <template slot-scope="scope">
                         <div v-if="scope.row.is_pay==1">
-                            <div>支付用户：{{scope.row.nickname}}</div>
+                            <div>支付用户：{{scope.row.nickname}}(ID：{{scope.row.pay_user_id}})</div>
                             <div>支付时间：{{scope.row.format_pay_time}}</div>
                         </div>
                         <div v-else style="color: red">未支付</div>

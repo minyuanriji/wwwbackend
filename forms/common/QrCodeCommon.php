@@ -115,7 +115,7 @@ class QrCodeCommon extends BaseModel
     {
         /** @var Wechat $wechat */
         $wechat = \Yii::$app->wechat;
-        $accessTokenArray = $wechat->miniProgram->access_token->getToken(true);
+        $accessTokenArray = $wechat->miniProgram->access_token->getToken();
 //        $this->accessToken = \Yii::$app->wechat->getAccessToken();
         if (!isset($accessTokenArray["access_token"])) {
             throw new \Exception('微信配置有误');

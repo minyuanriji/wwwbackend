@@ -48,12 +48,11 @@ class CheckoutAction extends Action{
             try {
                 $parentDatas = $this->controller->getCommissionParentRuleDatas($checkoutOrder['pay_user_id'], $checkoutOrder['store_id'], 'checkout');
 
+                //计算分公司、合伙人、VIP会员分佣值
+                $this->setCommissoinValues($parentDatas);
+
                 //通过相关规则键获取分佣规则进行分佣
                 foreach($parentDatas as $parentData) {
-
-                    //平级跳过
-                    if(isset($parentData['pingji']) && $parentData['pingji'] == 1)
-                        continue;
 
                     $ruleData = $parentData['rule_data'];
 
@@ -75,9 +74,8 @@ class CheckoutAction extends Action{
                     */
 
                     //新公式
-                    $ruleData['commisson_value'] = min(0.15, (float)($ruleData['commisson_value']/100));
                     $ruleData['role_type'] = $parentData['role_type'];
-                    $ruleData['ver'] = "2021/10/25";
+                    $ruleData['ver'] = "2021/10/29";
                     $ruleData['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];
                     $price = $ruleData['profit_price'] * $ruleData['commisson_value'];
 
@@ -146,5 +144,91 @@ class CheckoutAction extends Action{
         }
 
         return true;
+    }
+
+    /**
+     * 设置分佣值
+     * @param $parentDatas
+     * @return void
+     */
+    private function setCommissoinValues(&$parentDatas){
+        //分佣规则
+        $fitRules = [
+            "branch_office#partner#partner#store" => [
+                "branch_office" => 0.034,
+                "pingji"        => 0.016,
+                "partner"       => 0.08,
+                "store"         => 0.02
+            ],
+            "branch_office#partner#store" => [
+                "branch_office" => 0.05,
+                "pingji"        => 0,
+                "partner"       => 0.08,
+                "store"         => 0.02
+            ],
+            "branch_office#partner" => [
+                "branch_office" => 0.5,
+                "pingji"        => 0,
+                "partner"       => 0.1,
+                "store"         => 0
+            ],
+            "branch_office#store" => [
+                "branch_office" => 0.13,
+                "pingji"        => 0,
+                "partner"       => 0,
+                "store"         => 0.02
+            ],
+            "partner#partner" => [
+                "branch_office" => 0,
+                "pingji"        => 0.03,
+                "partner"       => 0.07,
+                "store"         => 0
+            ],
+            "partner#store" => [
+                "branch_office" => 0,
+                "pingji"        => 0,
+                "partner"       => 0.08,
+                "store"         => 0.02
+            ],
+            "branch_office" => [
+                "branch_office" => 0.15,
+                "pingji"        => 0,
+                "partner"       => 0,
+                "store"         => 0
+            ],
+            "partner" => [
+                "branch_office" => 0,
+                "pingji"        => 0,
+                "partner"       => 0.1,
+                "store"         => 0
+            ],
+            "store" => [
+                "branch_office" => 0,
+                "pingji"        => 0,
+                "partner"       => 0,
+                "store"         => 0.02
+            ]
+        ];
+        $keys = [];
+        foreach($parentDatas as $parentData){
+            if(isset($parentData['pingji']) && $parentData['pingji'] == 1){
+                $keys[] = "partner";
+            }else{
+                $keys[] = $parentData['role_type'];
+            }
+        }
+        $keyVal = implode("#", $keys);
+        if(!empty($keyVal) && isset($fitRules[$keyVal])){
+            $rule = $fitRules[$keyVal];
+        }else{
+            $rule = ["branch_office" => 0, "pingji" => 0, "partner" => 0, "store" => 0];
+        }
+        foreach($parentDatas as &$parentData){
+            if(isset($parentData['pingji']) && $parentData['pingji'] == 1){
+                $parentData['rule_data']['commisson_value'] = $rule['pingji'];
+            }elseif(isset($rule[$parentData['role_type']])){
+                $parentData['rule_data']['commisson_value'] = $rule[$parentData['role_type']];
+            }
+        }
     }
 }

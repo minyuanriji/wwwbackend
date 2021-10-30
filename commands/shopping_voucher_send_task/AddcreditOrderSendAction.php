@@ -143,6 +143,11 @@ class AddcreditOrderSendAction extends Action{
 
             $money = $value['pay_price'] * (floatval($ratio)/100);
 
+            //慢充，新用户第一次购物券赠超过100部分按50%赠送
+            if ($mobile_count <=1 && $money > 100 && $productData[$value['product_id']]['type'] != 'fast') {
+                $money = 100 + ($money - 100) * 0.5;
+            }
+
             $sendLog = new ShoppingVoucherSendLog([
                 "mall_id"     => $value['mall_id'],
                 "user_id"     => $value['user_id'],

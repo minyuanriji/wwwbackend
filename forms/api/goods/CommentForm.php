@@ -73,7 +73,8 @@ class CommentForm extends BaseModel
         }
 
         $list = $query->select(['*', 'time' => 'case when `is_virtual` = 1 then `virtual_at` else `created_at` end'])
-            ->with('user')->apiPage($this->limit, $this->page)
+            ->with('user')
+            ->page($pagination)
             ->orderBy(['is_top' => SORT_DESC, 'created_at' => SORT_DESC])
             ->all();
 
@@ -115,9 +116,7 @@ class CommentForm extends BaseModel
             $good_rate = number_format($good_num / $total,2) * 100;
         }
 
-
-
-        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['comments' => $newList, 'comment_count' => $this->countData($goods),'good_rate'=>$good_rate]);
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', ['comments' => $newList, 'comment_count' => $this->countData($goods),'good_rate'=>$good_rate, 'pagination' => $pagination]);
     }
 
     private function countData($goods)

@@ -347,7 +347,7 @@ class OrderSubmitForm extends BaseModel
                 }
 
                 $order->province_id                 = $data['is_need_address'] ? $districtArr->getId($data['user_address']['province']) : 0;
-                $order->remark                      = empty($orderItem['remark']) ? "" : $orderItem['remark'];
+                $order->remark                      = empty($orderItem['remark']) ? ($this->form_data['remark'] ?? "") : $orderItem['remark'];
                 $order->order_form                  = $order->encodeOrderForm($orderItem['order_form_data']);
                 $order->distance                    = isset($orderItem['form_data']['distance']) ? $orderItem['form_data']['distance'] : 0;//同城距离
                 $order->words                       = '';

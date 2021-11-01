@@ -46,7 +46,6 @@ class GiftpacksOrderListForm extends BaseModel{
                         'and',
                         ['current_num' => 0],
                         ['>', 'max_num', 0],
-                        ['>', 'expired_at', 0],
                         ['<', 'expired_at', time()],
                     ])->select('order_id')],
                 ]);

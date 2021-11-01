@@ -218,6 +218,7 @@ class UserForm extends BaseModel
             'u.is_delete' => 0,
             'u.mall_id' => $mall_id
         ]);
+        $query->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL]]);
         $query->leftJoin(["p" => User::tableName()], "p.id=u.parent_id");
         $query->leftJoin(["url" => UserRelationshipLink::tableName()], "url.user_id=u.id");
         $query->leftJoin(["svu" => ShoppingVoucherUser::tableName()], "svu.user_id=u.id");

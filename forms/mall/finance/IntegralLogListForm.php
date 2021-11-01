@@ -41,7 +41,7 @@ class IntegralLogListForm extends BaseModel
             'il.mall_id' => \Yii::$app->mall->id,
         ])->orderBy('il.id desc');
         $query->innerJoin(["u" => User::tableName()], "u.id=il.user_id")
-            ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
+            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
         if ($this->user_id) {
             $query->andWhere(['il.user_id' => $this->user_id]);

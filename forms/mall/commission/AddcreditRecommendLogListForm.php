@@ -47,7 +47,7 @@ class AddcreditRecommendLogListForm extends BaseModel
 
         $query->innerJoin(['ao' => AddcreditOrder::tableName()], 'ao.id=ca.addcredit_order_id')
             ->innerJoin(["u" => User::tableName()], "u.id=cs.user_id")
-            ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
+            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
         $query->keyword($this->keyword_1 == 1 && $this->keyword, ["ao.mobile" => $this->keyword])
             ->keyword($this->keyword_1 == 2 && $this->keyword, ["u.mobile" => $this->keyword])

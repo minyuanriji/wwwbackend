@@ -46,7 +46,7 @@ class HotelRecommendLogListForm extends BaseModel
         $query->innerJoin(['ho' => HotelOrder::tableName()], 'cs.hotel_order_id = ho.id')
             ->innerJoin(['h' => Hotels::tableName()], 'ho.hotel_id = h.id')
             ->innerJoin(["u" => User::tableName()], "u.id=cs.user_id")
-            ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
+            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
         $query->keyword($this->keyword_1 == 1 && $this->keyword, ["LIKE", "h.name", $this->keyword])
                 ->keyword($this->keyword_1 == 2 && $this->keyword, ["u.mobile" => $this->keyword])

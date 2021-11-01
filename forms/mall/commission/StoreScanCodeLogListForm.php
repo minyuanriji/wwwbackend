@@ -43,7 +43,7 @@ class StoreScanCodeLogListForm extends BaseModel
         $query->innerJoin(["co" => MchCheckoutOrder::tableName()], "co.id=cc.checkout_order_id");
         $query->innerJoin(["s" => Store::tableName()], "s.mch_id=co.mch_id");
         $query->innerJoin(["u" => User::tableName()], "u.id=cc.user_id")
-            ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
+            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
         $query->keyword($this->keyword_1 == 1 && $this->keyword, ["LIKE", "s.name", $this->keyword]);
         $query->keyword($this->keyword_1 == 2 && $this->keyword, ["u.mobile" => $this->keyword]);

@@ -41,7 +41,7 @@ class GoodsConsumeLogListForm extends BaseModel
             $query->innerJoin(["g" => Goods::tableName()], "g.id=cg.goods_id");
             $query->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");
             $query->innerJoin(["u" => User::tableName()], "u.id=cg.user_id")
-                ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
+                ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
             $query->keyword($this->keyword_1 == 1 && $this->keyword, ["LIKE", "u.nickname", $this->keyword]);
             $query->keyword($this->keyword_1 == 2 && $this->keyword, ["u.mobile" => $this->keyword]);

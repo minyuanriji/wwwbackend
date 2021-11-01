@@ -18,6 +18,8 @@
             </div>
         </div>
         <div class="table-body">
+            <el-alert title="说明：点击用户头像可查看详细资产记录" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
+
             <el-select size="small" v-model="role_type" @change='search' class="select">
                 <el-option key="" label="全部用户" value=""></el-option>
                 <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
@@ -59,14 +61,14 @@
                              alt="">
                         <img class="platform-img" v-if="scope.row.platform == 'mp-tt'"
                              src="statics/img/mall/toutiao.png" alt="">
-                        <el-button @click="openId(scope.$index)" type="success"
+                        <!--<el-button @click="openId(scope.$index)" type="success"
                                    style="float:right;padding:5px !important;">显示OpenId
-                        </el-button>
+                        </el-button>-->
                         <div v-if="scope.row.is_open_id">{{scope.row.platform_user_id}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="mobile" label="手机号" width="120"></el-table-column>
-                <el-table-column label="推广" width="260">
+                <el-table-column label="推广" width="200">
                     <template slot-scope="scope">
                         <div style="font-size:12px;">
                             <div>上级名称：[ID:{{scope.row.parent_id}}]{{scope.row.parent_nickname}}</div>
@@ -126,21 +128,26 @@
                                    v-text="scope.row.balance"></el-button>
                     </template>
                 </el-table-column>
-                <el-table-column prop="score" label="动态积分"></el-table-column>
-                <el-table-column prop="static_score" label="静态积分">
+
+                <el-table-column prop="score" label="积分" width="130">
                     <template slot-scope="scope">
-                        <el-button type="text" @click="$navigate({r: 'mall/user/score-log', user_id:scope.row.user_id})"
-                                   v-text="scope.row.static_score"></el-button>
+                        <div>
+                            动态积分：{{scope.row.score}}
+                        </div>
+                        <div>
+                            静态积分：<el-button type="text" @click="$navigate({r: 'mall/user/score-log', user_id:scope.row.user_id})"
+                                            v-text="scope.row.static_score"></el-button>
+                        </div>
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="score" label="加入时间">
+                <el-table-column prop="score" label="加入时间" width="160">
                     <template slot-scope="scope">
                         {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
                     </template>
                 </el-table-column>
 
-                <el-table-column label="操作" width="280">
+                <el-table-column label="操作" width="160">
                     <template slot-scope="scope">
                         <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                             <el-button circle type="text" size="mini"

@@ -108,6 +108,7 @@
                 </el-form-item>
             </el-form>
         </div>
+        <el-button style="color: #409EFF;cursor: pointer" @click="$navigate({r:'mall/user/index'})">返回上一页</el-button>
         <el-button class="button-item" :loading="btnLoading" type="primary" @click="onSubmit">提交</el-button>
     </el-card>
 </section>

@@ -73,7 +73,7 @@ class CommentForm extends BaseModel
         }
 
         $list = $query->select(['*', 'time' => 'case when `is_virtual` = 1 then `virtual_at` else `created_at` end'])
-            ->with('user')
+            ->with('user')//->apiPage($this->limit, $this->page)
             ->page($pagination)
             ->orderBy(['is_top' => SORT_DESC, 'created_at' => SORT_DESC])
             ->all();

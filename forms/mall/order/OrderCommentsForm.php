@@ -30,7 +30,6 @@ class OrderCommentsForm extends BaseModel
     public $type;
     public $comment_type;
     public $is_reply;
-    public $platform;
     public $batch_ids;
     public $template_id;
     public $reply_type;
@@ -41,7 +40,7 @@ class OrderCommentsForm extends BaseModel
     {
         return [
             [['id', 'page_size', 'is_show', 'type', 'comment_type', 'template_id', 'reply_type', 'status'], 'integer'],
-            [['keyword', 'sign', 'platform', 'reply_text'], 'string'],
+            [['keyword', 'sign', 'reply_text'], 'string'],
             [['keyword', 'sign'], 'default', 'value' => ''],
             [['page_size'], 'default', 'value' => 10],
             [['batch_ids'], 'safe']
@@ -63,7 +62,6 @@ class OrderCommentsForm extends BaseModel
             ->leftJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id = g.goods_warehouse_id')
             ->leftJoin(['u' => User::tableName()], 'o.user_id = u.id');
 
-        $query->keyword($this->platform, ['i.platform' => $this->platform]);
         switch ($this->type) {
             case 1:
                 $query->keyword($this->keyword, ['or', [
@@ -87,9 +85,22 @@ class OrderCommentsForm extends BaseModel
             $query->andWhere(['o.reply_content' => '']);
         }
 
-        $query->keyword($this->comment_type, ['score' => $this->comment_type]);
+        if ($this->comment_type) {
+            switch ($this->comment_type) {
+                case 3:
+                    $query->andWhere(['>=', 'o.score', 4]);
+                    break;
+                case 2:
+                    $query->andWhere("FIND_IN_SET(o.score, '2,3')");
+                    break;
+                case 1:
+                    $query->andWhere("FIND_IN_SET(o.score, '0,1')");
+                    break;
+                default:
+            }
+        }
 
-        $list = $query->select('o.*, u.nickname, gw.name, gw.cover_pic, u.platform')
+        $list = $query->select('o.*, u.nickname, gw.name, gw.cover_pic')
             ->orderBy('id DESC')
             ->with('detail', 'goods.goodsWarehouse')
             ->page($pagination, $this->page_size)
@@ -98,7 +109,6 @@ class OrderCommentsForm extends BaseModel
         /** @var OrderComments $item */
         foreach ($list as $item) {
             $newItem = ArrayHelper::toArray($item);
-            $newItem['platform'] = isset($item->user->platform) ? $item->user->platform : '';
             if ($item->is_virtual == 1) {
                 $newItem['nickname'] = '(' . $item->virtual_user . ')';
             } else {

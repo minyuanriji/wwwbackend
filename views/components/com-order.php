@@ -569,6 +569,7 @@ Yii::$app->loadComponentView('order/com-city');
                                             </span>
                                         </div>
                                         <div class="com-order-goods-price">
+                                            商品ID：{{goods.goods_id}}&nbsp;&nbsp;&nbsp;
                                             <span v-if="goods.goods_info && goods.goods_info.goods_attr &&
                                              goods.goods_info.goods_attr.no">
                                                 货号：{{goods.goods_info.goods_attr.no}}

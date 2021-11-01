@@ -1,9 +1,4 @@
 <?php
-/**
-  * @link:http://www.gdqijianshi.com/
- * copyright: Copyright (c) 2020 广东七件事集团
- * author: xay
- */
 Yii::$app->loadComponentView('order/com-edit-template');
 ?>
 <style>
@@ -142,16 +137,6 @@ Yii::$app->loadComponentView('order/com-edit-template');
                         <el-option key="4" label="差评" value="1"></el-option>
                     </el-select>
                 </div>
-                <div flex="dir:left">
-                    <div class="label-text" flex="cross:center">所属平台</div>
-                    <el-select size="small" class="select" v-model="platform" @change="change" placeholder="所属平台">
-                        <el-option label="全平台" value=""></el-option>
-                        <el-option label="微信" value="wxapp"></el-option>
-                        <el-option label="支付宝" value="aliapp"></el-option>
-                        <el-option label="抖音/头条" value="ttapp"></el-option>
-                        <el-option label="百度" value="bdapp"></el-option>
-                    </el-select>
-                </div>
                 <div class="input-item">
                     <el-input @keyup.enter.native="change" size="small" placeholder="请输入搜索内容" v-model="keyword"
                               clearable
@@ -182,29 +167,6 @@ Yii::$app->loadComponentView('order/com-edit-template');
                 </el-table-column>
                 <el-table-column prop="id" label="ID" width="80"></el-table-column>
                 <el-table-column prop="nickname" label="用户" width="100"></el-table-column>
-                <el-table-column prop="platform" align="center" label="平台" width="80">
-                    <template slot-scope="scope">
-                        <el-tooltip class="item" effect="dark" v-if="scope.row.platform == 'wxapp'" content="微信"
-                                    placement="top">
-                            <img src="statics/img/mall/wx.png" alt="">
-                        </el-tooltip>
-                        <el-tooltip class="item" effect="dark" v-else-if="scope.row.platform == 'aliapp'" content="支付宝"
-                                    placement="top">
-                            <img src="statics/img/mall/ali.png" alt="">
-                        </el-tooltip>
-                        <el-tooltip class="item" effect="dark" v-else-if="scope.row.platform == 'ttapp'" content="抖音/头条"
-                                    placement="top">
-                            <img src="statics/img/mall/toutiao.png" alt="">
-                        </el-tooltip>
-                        <el-tooltip class="item" effect="dark" v-else-if="scope.row.platform == 'bdapp'" content="百度"
-                                    placement="top">
-                            <img src="statics/img/mall/baidu.png" alt="">
-                        </el-tooltip>
-                        <el-tooltip class="item" effect="dark" v-else content="后台" placement="top">
-                            <img src="statics/img/mall/site.png" alt="">
-                        </el-tooltip>
-                    </template>
-                </el-table-column>
                 <el-table-column prop="name" label="商品名称" width="200">
                     <template slot-scope="scope">
                         <div class="goods-info">
@@ -216,14 +178,14 @@ Yii::$app->loadComponentView('order/com-edit-template');
                 </el-table-column>
                 <el-table-column prop="score" align="center" label="评价" width="80">
                     <template slot-scope="scope">
-                        <el-tooltip class="item" effect="dark" v-if="scope.row.score==3" content="好评" placement="top">
+                        <el-tooltip class="item" effect="dark" v-if="scope.row.score>=4" content="好评" placement="top">
                             <img src="statics/img/mall/good.png" alt="">
                         </el-tooltip>
-                        <el-tooltip class="item" effect="dark" v-else-if="scope.row.score==2" content="中评"
+                        <el-tooltip class="item" effect="dark" v-else-if="scope.row.score==2 || scope.row.score==3" content="中评"
                                     placement="top">
                             <img src="statics/img/mall/normal.png" alt="">
                         </el-tooltip>
-                        <el-tooltip class="item" effect="dark" v-else-if="scope.row.score==1" content="差评"
+                        <el-tooltip class="item" effect="dark" v-else-if="scope.row.score<=1" content="差评"
                                     placement="top">
                             <img src="statics/img/mall/bad.png" alt="">
                         </el-tooltip>
@@ -256,6 +218,11 @@ Yii::$app->loadComponentView('order/com-edit-template');
                     <template slot-scope="scope">
                         <el-tag v-if="scope.row.is_show" size="small" type="success">显示</el-tag>
                         <el-tag v-else size="small" type="warning">隐藏</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="is_show" label="时间" width="160">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="220">
@@ -392,7 +359,6 @@ Yii::$app->loadComponentView('order/com-edit-template');
                 btnLoading: false,
                 dialogImg: false,
                 click_img: null,
-                platform: '',
                 multipleSelection: [],
                 dialogVisible: false,
                 activeName: '1',
@@ -423,8 +389,8 @@ Yii::$app->loadComponentView('order/com-edit-template');
                 this.getTemplateList();
             },
             change() {
-                // this.page = 1;
-                // this.search();
+                this.page = 1;
+                this.search();
             },
             search() {
                 this.listLoading = true;
@@ -435,7 +401,6 @@ Yii::$app->loadComponentView('order/com-edit-template');
                         type: this.type,
                         comment_type: this.comment_type,
                         keyword: this.keyword,
-                        platform: this.platform,
                     },
                 }).then(e => {
                     if (e.data.code === 0) {

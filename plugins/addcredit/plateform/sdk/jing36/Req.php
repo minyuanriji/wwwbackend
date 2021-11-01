@@ -9,7 +9,7 @@ class Req{
     public $appSecret;
 
     public function __construct($host, $appKey, $appSecret) {
-        $this->host      = $host;
+        $this->host      = "https://api.36duojing.com";
         $this->appKey    = $appKey;
         $this->appSecret = $appSecret;
     }

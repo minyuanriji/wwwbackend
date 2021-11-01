@@ -42,7 +42,13 @@ class GiftpacksOrderListForm extends BaseModel{
             } elseif ($this->status == 'completed') {
                 $query->andWhere([
                     'and',
-                    ['go.id' => GiftpacksOrderItem::find()->andWhere(['current_num' => 0])->select('order_id')],
+                    ['go.id' => GiftpacksOrderItem::find()->andWhere([
+                        'and',
+                        ['current_num' => 0],
+                        ['>', 'max_num', 0],
+                        ['>', 'expired_at', 0],
+                        ['<', 'expired_at', time()],
+                    ])->select('order_id')],
                 ]);
             } else {
                 $query->andWhere(["go.pay_status" => "unpaid"]);

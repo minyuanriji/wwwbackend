@@ -160,40 +160,52 @@ class UserForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-        //$child_ids = UserChildren::find()->where(['user_id' => $this->user_id, 'is_delete' => 0])->select('child_id')->column();
 
-        $userRelationshipLink = UserRelationshipLink::findOne(["user_id" => $this->user_id]);
-        $childSubQuery = UserRelationshipLink::find()->select(["user_id"])
-                            ->andWhere([
-                                "AND",
-                                [">", "left", $userRelationshipLink->left],
-                                ["<", "right", $userRelationshipLink->right]
-                            ]);
+        try {
+            //$child_ids = UserChildren::find()->where(['user_id' => $this->user_id, 'is_delete' => 0])->select('child_id')->column();
 
-        $query = User::find()->alias('u')->select('u.id,u.nickname')
-            ->where(['u.is_inviter' => 1, 'u.mall_id' => \Yii::$app->mall->id])
-            ->andWhere([
-                "OR",
-                ['LIKE', 'u.nickname', $this->keyword]
-            ]);
+            $userRelationshipLink = UserRelationshipLink::findOne(["user_id" => $this->user_id]);
+            if(!$userRelationshipLink){
+                throw new \Exception("关系链异常");
+            }
+            $childSubQuery = UserRelationshipLink::find()->select(["user_id"])
+                ->andWhere([
+                    "AND",
+                    [">", "left", $userRelationshipLink->left],
+                    ["<", "right", $userRelationshipLink->right]
+                ]);
 
-        if(is_numeric($this->keyword)){
-            $query->orWhere(
-                ['or', ['u.id' => $this->keyword], ['u.mobile' => $this->keyword]]
-            );
+
+            $query = User::find()->alias('u')->select('u.id,u.nickname')
+                ->where(['u.is_inviter' => 1, 'u.mall_id' => \Yii::$app->mall->id])
+                ->andWhere([
+                    "OR",
+                    ['LIKE', 'u.nickname', $this->keyword]
+                ]);
+
+            if(is_numeric($this->keyword)){
+                $query->orWhere(
+                    ['or', ['u.id' => $this->keyword], ['u.mobile' => $this->keyword]]
+                );
+            }
+
+            $query->andWhere(['not in', 'u.id', $childSubQuery]);
+            /*if (count($child_ids)) {
+                $query->andWhere(['not in', 'u.id', $child_ids]);
+            }*/
+            $list = $query->orderBy('id desc')->limit(30)->all();
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'data' => [
+                    'list' => $list
+                ]
+            ];
+        }catch (\Exception $e){
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
         }
-
-        $query->andWhere(['not in', 'u.id', $childSubQuery]);
-        /*if (count($child_ids)) {
-            $query->andWhere(['not in', 'u.id', $child_ids]);
-        }*/
-        $list = $query->orderBy('id desc')->limit(30)->all();
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'data' => [
-                'list' => $list
-            ]
-        ];
     }
 
 

@@ -20,13 +20,17 @@ class PlateformsEditForm extends BaseModel
     public $class_dir;
     public $enable_fast;
     public $enable_slow;
+    public $allow_plats;
+    public $pattern_deny;
+    public $region_deny;
 
     public function rules()
     {
         return [
             [['name', 'sdk_dir', 'ratio', 'cyd_id', 'secret_key','parent_id', 'class_dir', 'transfer_rate'], 'required'],
             [['ratio', 'id', 'parent_id','transfer_rate', 'enable_fast', 'enable_slow'], 'integer'],
-            [['name', 'sdk_dir', 'secret_key'], 'string'],
+            [['name', 'sdk_dir', 'secret_key', 'allow_plats', 'pattern_deny'], 'string'],
+            [['region_deny'], 'safe']
         ];
     }
 
@@ -55,6 +59,9 @@ class PlateformsEditForm extends BaseModel
             $plateforms->enable_fast = (int)$this->enable_fast;
             $plateforms->enable_slow = (int)$this->enable_slow;
             $plateforms->json_param = json_encode(['id' => $this->cyd_id, 'secret_key' => $this->secret_key]);
+            $plateforms->allow_plats = $this->allow_plats;
+            $plateforms->pattern_deny = $this->pattern_deny;
+            $plateforms->region_deny  = !empty($this->region_deny) ? json_encode($this->region_deny) : "";
             if (!$plateforms->save()) {
                 throw new \Exception('保存失败');
             }

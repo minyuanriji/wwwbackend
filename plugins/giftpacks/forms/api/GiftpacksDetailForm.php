@@ -72,12 +72,30 @@ class GiftpacksDetailForm extends BaseModel{
                 }
             }
 
+
+            //获取最新两条可参与的拼团
+            $joinGroups = GiftpacksGroup::find()->alias("gg")
+                        ->innerJoin(["u" => User::tableName()], "u.id=gg.user_id")
+                        ->andWhere([
+                            "AND",
+                            ["gg.pack_id" => $giftpacks->id],
+                            ["gg.status" => "sharing"],
+                            [">", "gg.expired_at", time()],
+                            "gg.need_num > gg.user_num"
+                        ])->select(["gg.id as group_id", "u.nickname", "u.avatar_url", "gg.need_num", "gg.user_num", "gg.expired_at"])
+                        ->asArray()->orderBy("gg.id DESC")->limit(2)->all();
+            if($joinGroups){
+                foreach($joinGroups as &$joinGroup){
+                    $joinGroup['need_num'] = $joinGroup['need_num'] - $joinGroup['user_num'];
+                }
+            }
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'detail'     => $detail,
-                    'my_group'   => $myGroup,
-                    'group_list' => $groupList ? $groupList : []
+                    'detail'      => $detail,
+                    'my_group'    => $myGroup,
+                    'group_list'  => $groupList ? $groupList : [],
+                    'join_groups' => $joinGroups ? $joinGroups : []
                 ]
             ];
         }catch (\Exception $e){

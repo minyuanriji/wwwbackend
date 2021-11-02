@@ -151,7 +151,7 @@ class GiftpacksOrderSendAction extends Action{
                 $sendLog = new ShoppingVoucherSendLog([
                     "mall_id"     => $giftpacksOrder['mall_id'],
                     "user_id"     => $userData['user_id'],
-                    "money"       => min(floatval($giftpacksOrder['pay_price']), $userData['money']),
+                    "money"       => $userData['money'],
                     "source_id"   => $giftpacksOrder['id'],
                     "source_type" => "from_giftpacks_order",
                     "status"      => "waiting",

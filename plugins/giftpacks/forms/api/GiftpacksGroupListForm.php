@@ -38,12 +38,12 @@ class GiftpacksGroupListForm extends BaseModel{
                 ->orderBy("gg.updated_at DESC");
             $query->andWhere([
                 "AND",
-                ["gg.status" => "success"],
+                ["IN", "gg.status", ["success", "sharing"]],
                 ["gg.pack_id" => $giftpacks->id],
                 //[">", "gg.expired_at", time()],
                 //[">", "gg.need_num", "gg.user_num"]
             ]);
-            $selects = ["gg.id", "gg.need_num", "gg.user_num", "gg.expired_at",
+            $selects = ["gg.id", "gg.status", "gg.need_num", "gg.user_num", "gg.expired_at",
                 "gg.created_at", "gg.user_id", "u.nickname", "u.avatar_url"
             ];
             $query->select($selects);
@@ -51,6 +51,13 @@ class GiftpacksGroupListForm extends BaseModel{
             $list = $query->page($pagination, 10, max(1, (int)$this->page))->asArray()->all();
             if($list){
                 foreach($list as &$log){
+                    if($log['status'] == "sharing"){
+                        if($log['need_num'] <= $log['user_num']){
+                            $log['status'] = "success";
+                        }elseif($log['expired_at'] < time()){
+                            $log['status'] = "closed";
+                        }
+                    }
                     $log['created_at']     = date("Y-m-d H:i:s");
                     $log['still_need_num'] = intval($log['need_num']) - intval($log['user_num']);
                     unset($log['need_num']);

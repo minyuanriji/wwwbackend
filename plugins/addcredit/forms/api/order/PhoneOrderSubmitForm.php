@@ -4,6 +4,7 @@ namespace app\plugins\addcredit\forms\api\order;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\plugins\addcredit\helpers\OrderHelper;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\sign_in\models\User;
@@ -39,6 +40,8 @@ class PhoneOrderSubmitForm extends BaseModel
             if (!$mobile) {
                 throw new \Exception('手机号码错误,请重新输入！');
             }
+
+            OrderHelper::allow($plate, $this->mobile);
 
             $products = @json_decode($plate->product_json_data, true);
             $product = null;
@@ -114,7 +117,7 @@ class PhoneOrderSubmitForm extends BaseModel
      * */
     private function validatePhone ($mobile)
     {
-        if (preg_match("/^1((34[0-8]\d{7})|((3[0-3|5-9])|(4[5-7|9])|(5[0-3|5-9])|(66)|(7[2-3|5-8])|(8[0-9])|(9[1|8|9]))\d{8})$/", $mobile)) {
+        if (preg_match("/^1[3456789]\d{9}$/", $mobile)) {
             return true;
         } else {
             return false;

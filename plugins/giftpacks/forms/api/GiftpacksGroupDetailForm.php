@@ -56,9 +56,15 @@ class GiftpacksGroupDetailForm extends BaseModel{
                         ->select([
                             "ggpo.user_id", "u.nickname", "u.avatar_url"
                         ])->asArray()->all();
+            $isJoiner = 0;
             if($joinList){
+                $joinUserIds = [];
                 foreach($joinList as &$row){
                     $row['is_owner'] = $row['user_id'] == $groupInfo['user_id'] ? 1 : 0;
+                    $joinUserIds[] = $row['user_id'];
+                }
+                if(!\Yii::$app->user->isGuest){
+                    $isJoiner = in_array(\Yii::$app->user->id, $joinUserIds) ? 1 : 0;
                 }
             }
 
@@ -66,6 +72,7 @@ class GiftpacksGroupDetailForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     "group_info"     => $groupInfo,
+                    "is_joiner"      => $isJoiner,
                     "join_list"      => $joinList,
                     "giftpacks_info" => GiftpacksDetailForm::detail($giftpacks)
                 ]

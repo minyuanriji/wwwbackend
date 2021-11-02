@@ -63,6 +63,7 @@ class PlateformsForm extends BaseModel
             ->asArray()->all();
         if ($list) {
             foreach ($list as &$item) {
+                $item['region_deny'] = !empty($item['region_deny']) ? @json_decode($item['region_deny'], true) : [];
                 $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
                 $item['json_param'] = json_decode($item['json_param'],true);
             }
@@ -91,6 +92,7 @@ class PlateformsForm extends BaseModel
             $detail['product_json_data'] = json_decode($detail['product_json_data'], true);
             $detail['enable_fast'] = (string)$detail['enable_fast'];
             $detail['enable_slow'] = (string)$detail['enable_slow'];
+            $detail['region_deny'] = !empty($detail['region_deny']) ? json_decode($detail['region_deny'], true) : [];
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',

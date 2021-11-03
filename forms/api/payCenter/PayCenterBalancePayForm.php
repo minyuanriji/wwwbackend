@@ -175,7 +175,7 @@ class PayCenterBalancePayForm extends BaseModel{
             $desc       = "支付话费订单";
             $sourceType = "addcredit_order";
             $sourceId   = $order->id;
-        }elseif(substr($paymentOrder->order_no, 0, 3) == "OI"){
+        }elseif(substr($paymentOrder->order_no, 0, 3) == "OIL"){
             $order = OilOrders::findOne(["order_no" => $paymentOrder->order_no]);
             if (!$order){
                 throw new \Exception("[OilOrders]订单“{$paymentOrder->order_no}”记录不存在");

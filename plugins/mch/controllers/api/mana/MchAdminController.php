@@ -35,7 +35,6 @@ class MchAdminController extends ApiController {
         ]);
     }
 
-
     /**
      * 通过手机号登录
      * @return yii\web\Response

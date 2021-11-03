@@ -4,6 +4,8 @@ namespace app\plugins\seckill\forms\api\index;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\models\Order;
+use app\models\OrderDetail;
 use app\plugins\seckill\models\Seckill;
 
 class SeckillListForm extends BaseModel
@@ -46,6 +48,18 @@ class SeckillListForm extends BaseModel
                     $item['score_deduction_price'] = $item['seckillGoodsPrice'][0]['score_deduction_price'] ?? 0;
                     $item['seckill_price'] = $item['seckillGoodsPrice'][0]['seckill_price'] ?? 0;
                     unset($item['goods'], $item['seckillGoodsPrice']);
+
+                    $query = Order::find()->alias('o');
+
+                    $item['buyNum'] = $query->leftJoin(['od' => OrderDetail::tableName()], 'od.order_id=o.id')
+                        ->andWhere([
+                            'and',
+                            ['o.cancel_status' => 0],
+                            ['od.goods_id' => $item['goods_id']],
+                            ['>', 'o.created_at', $seckill['start_time']],
+                            ['<', 'o.created_at', $seckill['end_time']],
+                        ])->sum('od.num') ?: 0;
+
                 }
                 $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);
                 $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);

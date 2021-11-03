@@ -3,6 +3,7 @@
 namespace app\plugins\seckill\controllers\mall\goods;
 
 use app\plugins\Controller;
+use app\plugins\seckill\forms\mall\seckill_goods\MallGoodsSearchForm;
 use app\plugins\seckill\forms\mall\seckill_goods\SeckillGoodsDelForm;
 use app\plugins\seckill\forms\mall\seckill_goods\SeckillGoodsDelSkuForm;
 use app\plugins\seckill\forms\mall\seckill_goods\SeckillGoodsListForm;
@@ -71,6 +72,19 @@ class SeckillGoodsController extends Controller
     public function actionSearchMallGoodsSku()
     {
         $form = new SeckillGoodsSkuSearchForm();
+        $form->attributes = \Yii::$app->request->post();
+        $res = $form->search();
+
+        return $this->asJson($res);
+    }
+
+    /**
+     * @Note:查询商城积分商品
+     * @return \yii\web\Response
+     */
+    public function actionMallGoods()
+    {
+        $form = new MallGoodsSearchForm();
         $form->attributes = \Yii::$app->request->post();
         $res = $form->search();
 

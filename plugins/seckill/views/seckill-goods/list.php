@@ -142,9 +142,9 @@ Yii::$app->loadComponentView('com-rich-text');
                                     <div flex="dir:left">
                                         <el-tooltip class="item" effect="dark" placement="top">
                                             <template slot="content">
-                                                <div style="width: 320px;">{{scope.row.name}}</div>
+                                                <div style="width: 320px;">{{scope.row.goodsWarehouse.name}}</div>
                                             </template>
-                                            <com-ellipsis :line="1">{{scope.row.name}}</com-ellipsis>
+                                            <com-ellipsis :line="1">{{scope.row.goodsWarehouse.name}}</com-ellipsis>
                                         </el-tooltip>
                                     </div>
                                 </div>
@@ -153,7 +153,7 @@ Yii::$app->loadComponentView('com-rich-text');
                         </template>
                     </el-table-column>
                     <el-table-column prop="goods_stock" width="90" label="库存"></el-table-column>
-                    <el-table-column prop="price" width="90" label="售价"></el-table-column>
+                    <el-table-column prop="goodsWarehouse.original_price" width="90" label="售价"></el-table-column>
                     <el-table-column prop="forehead_score" width="150" label="可抵扣积分"></el-table-column>
                     <el-table-column label="状态" width="100">
                         <template slot-scope="scope">
@@ -527,13 +527,13 @@ Yii::$app->loadComponentView('com-rich-text');
                 self.mallGoodsLoading=true;
                 request({
                     params: {
-                        r: 'mall/goods/index',
-                        page:self.mallGoodsPage,
-                        search: {
-                            keyword:self.mallGoodsSearch
-                        },
+                        r: 'plugin/seckill/mall/goods/seckill-goods/mall-goods',
                     },
-                    method: 'get',
+                    method: 'post',
+                    data:{
+                        page:self.mallGoodsPage,
+                        keyword:self.mallGoodsSearch
+                    }
                 }).then(e => {
                     if (e.data.code === 0) {
                         self.$message.success(e.data.msg);

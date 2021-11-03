@@ -47,7 +47,7 @@
                 }).then(e => {
                     this.loading = false;
                     if (e.data.code == 0) {
-
+                        this.ruleForm = Object.assign(this.ruleForm, e.data.data);
                     }
                 }).catch(e => {
                     this.loading = false;

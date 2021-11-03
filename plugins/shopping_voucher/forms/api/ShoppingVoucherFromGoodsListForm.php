@@ -36,7 +36,6 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
             $query = Goods::find()->alias('g');
             $query->innerJoin(["svfg" => ShoppingVoucherFromGoods::tableName()], "svfg.goods_id=g.id AND svfg.is_delete=0");
             $query->innerJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
-            $query->leftJoin(["od" => OrderDetail::tableName()], "od.goods_id=g.id AND od.is_refund=0");
 
             $query->where(['g.is_delete' => 0,'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => $this->base_mall_id]);
 
@@ -44,7 +43,6 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
                 "g.max_deduct_integral", "g.mch_id", "gw.name", "gw.original_price", "g.price", "g.status",
                 "gw.unit", "g.use_attr", "gw.video_url", "g.virtual_sales", "g.use_virtual_sales"
             ];
-            $selects[] = "IF(sum(od.num), sum(od.num), 0) as count_sales";
 
             $list = $query->orderBy(['g.sort' => SORT_ASC, 'g.id' => SORT_DESC])
                 ->select($selects)
@@ -56,15 +54,33 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
             $newList = [];
             $goodsIds = [];
             foreach ($list as $detail) {
-                if ($detail['use_virtual_sales']) {
-                    $detail['sales'] = sprintf("已售%s%s", $detail['count_sales'] + $detail['virtual_sales'], $detail['unit']);
-                }else{
-                    $detail['sales'] = sprintf("已售%s%s", $detail['count_sales'], $detail['unit']);
-                }
+                $detail['sales'] = sprintf("已售%s%s", 0, $detail['unit']);
                 $detail['got_shopping_voucher_num'] = 0;
                 $newList[] = $detail;
                 $goodsIds[] = $detail['id'];
             }
+
+            //统计销量
+            if($goodsIds){
+                $rows = OrderDetail::find()->asArray()->select(["goods_id", "count(*) as num"])->andWhere([
+                    "AND",
+                    ["is_refund" => 0],
+                    ["IN", "goods_id", implode(",", $goodsIds)]
+                ])->groupBy("goods_id")->all();
+                $salesArr = [];
+                if($rows){
+                    foreach($rows as $row){
+                        $salesArr[$row['goods_id']] = $row['num'];
+                    }
+                }
+                foreach($newList as &$detail){
+                    if(isset($salesArr[$detail['id']])){
+                        $sale = $salesArr[$detail['id']];
+                        $detail['sales'] = sprintf("已售%s%s", $sale + $detail['virtual_sales'], $detail['unit']);
+                    }
+                }
+            }
+
 
             $fromGoodsRates = [];
             if($goodsIds){

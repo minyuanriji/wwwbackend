@@ -3,6 +3,7 @@
 namespace app\plugins\oil\controllers\mall;
 
 use app\plugins\Controller;
+use app\plugins\oil\forms\mall\OilSettingLoadForm;
 use app\plugins\oil\forms\mall\OilSettingUpdateForm;
 
 class OilController extends Controller{

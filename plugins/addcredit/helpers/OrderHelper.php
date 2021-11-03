@@ -43,7 +43,6 @@ class OrderHelper{
                     $region['city_id'] == $cityInfo['city_id']){
                     throw new \Exception("暂不支持" . $region['province'] . $region['city'] . "地区号码充值");
                 }
-
             }elseif(!empty($region['province_id'])){
                 if($region['province_id'] == $cityInfo['province_id']){
                     throw new \Exception("暂不支持" . $region['province'] . "地区号码充值");

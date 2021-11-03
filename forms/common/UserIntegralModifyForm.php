@@ -33,6 +33,9 @@ class UserIntegralModifyForm extends BaseModel{
         if($this->type == 1){ //增加
             $user->static_integral = $currentIntegral + floatval($this->integral);
         }else{ //减少
+            if($currentIntegral < floatval($this->integral)){
+                throw new \Exception("红包不足");
+            }
             $user->static_integral = max(0, $currentIntegral - floatval($this->integral));
         }
         if(!$user->save()){

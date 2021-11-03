@@ -21,4 +21,9 @@ class Seckill extends BaseActiveRecord
             [['is_delete'], 'safe']
         ];
     }
+
+    public function getSeckillGoods ()
+    {
+        return $this->hasMany(SeckillGoods::className(),['seckill_id' => 'id'])->where(['is_delete' => 0]);
+    }
 }

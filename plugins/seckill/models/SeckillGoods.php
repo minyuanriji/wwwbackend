@@ -32,4 +32,9 @@ class SeckillGoods extends BaseActiveRecord
     {
         return $this->hasOne(Seckill::className(), ['id' => 'seckill_id']);
     }
+
+    public function getGoods ()
+    {
+        return $this->hasOne(Goods::className(), ['id' => 'goods_id']);
+    }
 }

@@ -36,7 +36,7 @@ class SeckillListForm extends BaseModel
                 'seckillGoods.seckillGoodsPrice',
                 'seckillGoods.goods',
                 'seckillGoods.goods.goodsWarehouse'
-            )->select('id,name,start_time,end_time')->asArray()->one();
+            )->select('id,name,start_time,end_time,pic_url')->asArray()->one();
             if ($seckill) {
                 foreach ($seckill['seckillGoods'] as &$item) {
                     $item['cover_pic'] = $item['goods']['goodsWarehouse']['cover_pic'] ?? '';
@@ -47,7 +47,7 @@ class SeckillListForm extends BaseModel
                     $item['seckill_price'] = $item['seckillGoodsPrice'][0]['seckill_price'] ?? 0;
                     unset($item['goods'], $item['seckillGoodsPrice']);
                 }
-                $seckill['start_time'] = date('Y-m-d H:i:s', $seckill['start_time']);
+                $seckill['start_time'] = date('Y-m-d ', $seckill['start_time']);
                 $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);
             }
 

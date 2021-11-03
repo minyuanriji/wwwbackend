@@ -38,9 +38,23 @@
 
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
 
-                <el-table-column label="专题名称" width="350px">
+                <el-table-column label="专题名称" >
                     <template slot-scope="scope">
-                        <com-ellipsis :line="1">{{scope.row.name}}</com-ellipsis>
+                        <div flex="box:first">
+                            <div style="padding-right: 10px;">
+                                <com-image mode="aspectFill" :src="scope.row.pic_url"></com-image>
+                            </div>
+                            <div flex="cross:top cross:center">
+                                <div flex="dir:left">
+                                    <el-tooltip class="item" effect="dark" placement="top">
+                                        <template slot="content">
+                                            <div style="width: 320px;">{{scope.row.name}}</div>
+                                        </template>
+                                        <com-ellipsis :line="2">{{scope.row.name}}</com-ellipsis>
+                                    </el-tooltip>
+                                </div>
+                            </div>
+                        </div>
                     </template>
                 </el-table-column>
 

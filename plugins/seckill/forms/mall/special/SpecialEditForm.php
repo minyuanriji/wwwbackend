@@ -13,25 +13,14 @@ class SpecialEditForm extends BaseModel
     public $name;
     public $start_time;
     public $end_time;
-
-
-    public $cyd_id;
-    public $secret_key;
-    public $parent_id;
-    public $transfer_rate;
-    public $class_dir;
-    public $enable_fast;
-    public $enable_slow;
-    public $allow_plats;
-    public $pattern_deny;
-    public $region_deny;
+    public $pic_url;
 
     public function rules()
     {
         return [
             [['name', 'start_time', 'end_time'], 'required'],
             [['id'], 'integer'],
-            [['name', 'start_time', 'end_time'], 'string'],
+            [['name', 'start_time', 'end_time', 'pic_url'], 'string'],
         ];
     }
 
@@ -51,7 +40,8 @@ class SpecialEditForm extends BaseModel
                 $seckill->mall_id = \Yii::$app->mall->id;
             }
             $seckill->name = $this->name;
-            $seckill->start_time = strtotime($this->start_time);
+            $seckill->name = $this->name;
+            $seckill->pic_url = $this->pic_url;
             $seckill->end_time = strtotime($this->end_time);
 
             if ($seckill->start_time > $seckill->end_time)

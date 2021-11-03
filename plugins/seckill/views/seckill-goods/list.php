@@ -31,8 +31,27 @@ Yii::$app->loadComponentView('com-rich-text');
 
             <el-table :data="list"  border style="width: 100%" v-loading="loading" >
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column prop="seckill.name" label="秒杀专题（归属）" width="150"></el-table-column>
-                <el-table-column label="商品">
+                <el-table-column label="秒杀专题（归属）" width="300">
+                    <template slot-scope="scope">
+                        <div flex="box:first">
+                            <div style="padding-right: 10px;">
+                                <com-image mode="aspectFill" :src="scope.row.seckill.pic_url"></com-image>
+                            </div>
+                            <div flex="cross:top cross:center">
+                                <div flex="dir:left">
+                                    <el-tooltip class="item" effect="dark" placement="top">
+                                        <template slot="content">
+                                            <div style="width: 320px;">{{scope.row.seckill.name}}</div>
+                                        </template>
+                                        <com-ellipsis :line="2">{{scope.row.seckill.name}}</com-ellipsis>
+                                    </el-tooltip>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="商品" width="500">
                     <template slot-scope="scope">
                         <div flex="box:first">
                             <el-popover placement="top-start"  trigger="hover">
@@ -46,9 +65,9 @@ Yii::$app->loadComponentView('com-rich-text');
                                 <div flex="dir:left">
                                     <el-tooltip class="item" effect="dark" placement="top">
                                         <template slot="content">
-                                            <div style="width: 320px;">{{scope.row.name}}</div>
+                                            <div style="width: 320px;">{{scope.row.name}}（ID：{{scope.row.goods_id}}）</div>
                                         </template>
-                                        <com-ellipsis :line="2">{{scope.row.name}}</com-ellipsis>
+                                        <com-ellipsis :line="2">{{scope.row.name}}（ID：{{scope.row.goods_id}}）</com-ellipsis>
                                     </el-tooltip>
                                 </div>
                             </div>
@@ -93,7 +112,7 @@ Yii::$app->loadComponentView('com-rich-text');
             </div>
         </div>
 
-        <el-dialog width="50%" title="添加商品" :visible.sync="goodsDialogVisible">
+        <el-dialog width="70%" title="添加商品" :visible.sync="goodsDialogVisible">
             <template >
                 <div>
                     <el-input @keyup.enter.native="toSearch" size="small" placeholder="请输入商品ID或名称搜索"
@@ -157,8 +176,8 @@ Yii::$app->loadComponentView('com-rich-text');
             </div>
         </el-dialog>
 
-        <el-dialog width="50%" title="商品设置" :visible.sync="editGoodsAttrParams.dialogVisible" v-loading="editGoodsAttrParams.btnLoading">
-            <el-alert title="说明：限单 0 代表不限制购买" type="info" :closable="false" style="margin-bottom: 20px;color: red"></el-alert>
+        <el-dialog width="70%" title="商品设置" :visible.sync="editGoodsAttrParams.dialogVisible" v-loading="editGoodsAttrParams.btnLoading">
+            <el-alert title="说明：每人限购： 0 代表不限制购买" type="info" :closable="false" style="margin-bottom: 20px;color: red"></el-alert>
             <div v-if="openTheme">
                 秒杀专题：<el-select v-model="specialKeyword"  filterable @change="specialChange"
                                 reserve-keyword
@@ -200,7 +219,12 @@ Yii::$app->loadComponentView('com-rich-text');
                             <el-input disabled v-model="scope.row.original_price"></el-input>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="buy_limit" width="150" label="限单">
+                    <el-table-column prop="goods_stock" width="150" label="商品原库存">
+                        <template slot-scope="scope">
+                            <el-input disabled v-model="scope.row.goods_stock"></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="buy_limit" width="150" label="每人限购">
                         <template slot-scope="scope">
                             <el-input type="number" v-model="scope.row.buy_limit"></el-input>
                         </template>
@@ -213,7 +237,7 @@ Yii::$app->loadComponentView('com-rich-text');
                     </el-table-column>
                     <el-table-column prop="real_stock" width="150" label="真实库存">
                         <template slot-scope="scope">
-                            <el-input v-model="scope.row.real_stock"></el-input>
+                            <el-input v-model="scope.row.real_stock" @change="compare(scope.row.real_stock,scope.row.goods_stock)"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column width="150" label="虚拟库存">
@@ -281,8 +305,6 @@ Yii::$app->loadComponentView('com-rich-text');
                 searchData: {
                     keyword: '',
                     keyword_type: '',
-                    sort_prop: '',
-                    sort_type: '',
                 },
                 date: '',
                 list: [],
@@ -342,6 +364,13 @@ Yii::$app->loadComponentView('com-rich-text');
             };
         },
         methods: {
+            compare(real, primary){
+                let surplus;
+                surplus = real-primary;
+                if (surplus >= 0) {
+                    alert('真实库存不能大于原库存');
+                }
+            },
             triggeredChange (){
                 if (this.searchData.keyword.length>0 && this.searchData.keyword_type.length<=0) {
                     alert('请选择搜索方式');
@@ -464,6 +493,7 @@ Yii::$app->loadComponentView('com-rich-text');
                 this.editGoodsAttrParams.dialogVisible = true;
                 this.editGoodsAttrParams.formData = [row];
                 this.openTheme = openTheme;
+                this.specialId = row.seckill_id;
             },
             search() {
                 this.page = 1;

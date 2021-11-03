@@ -16,7 +16,6 @@ class SeckillGoodsListForm extends BaseModel
     public $keyword;
     public $keyword_type;
 
-
     public function rules()
     {
         return [
@@ -47,7 +46,7 @@ class SeckillGoodsListForm extends BaseModel
 
             $query->keyword($this->keyword_type == 'goods_name', ['like', 'gw.name', $this->keyword]);
 
-            $list = $query->select('sg.*,gw.name,gw.cover_pic,gw.original_price,g.attr_groups')
+            $list = $query->select('sg.*,gw.name,gw.cover_pic,gw.original_price,g.attr_groups,g.goods_stock')
                 ->page($pagination)
                 ->orderBy(['id' => SORT_ASC])
                 ->asArray()->all();

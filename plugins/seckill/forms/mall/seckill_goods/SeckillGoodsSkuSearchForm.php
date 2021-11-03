@@ -45,6 +45,7 @@ class SeckillGoodsSkuSearchForm extends BaseModel
             $info['mall_id'] = $goodsInfo['mall_id'];
             $info['name'] = $goodsInfo['goodsWarehouse']['name'];
             $info['real_stock'] = 0;
+            $info['goods_stock'] = $goodsInfo['goods_stock'];
             $info['original_price'] = $goodsInfo['goodsWarehouse']['original_price'];
             $info['virtual_seckill_num'] = 0;
             $info['virtual_stock'] = 0;

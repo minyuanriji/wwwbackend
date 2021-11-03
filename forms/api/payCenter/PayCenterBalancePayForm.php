@@ -97,7 +97,7 @@ class PayCenterBalancePayForm extends BaseModel{
                     throw new \Exception($paymentOrder->getFirstErrors());
                 }
 
-                list($source_type, $source_id, $desc) = $this->getOrderSource($paymentOrder->order_no);
+                list($source_type, $source_id, $desc) = $this->getOrderSource($paymentOrder);
 
                 $NotifyClass = $paymentOrder->notify_class;
                 $notifyObject = new $NotifyClass();

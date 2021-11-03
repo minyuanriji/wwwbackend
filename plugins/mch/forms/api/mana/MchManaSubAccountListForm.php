@@ -4,9 +4,8 @@ namespace app\plugins\mch\forms\api\mana;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
-use app\models\User;
 use app\plugins\mch\controllers\api\mana\MchAdminController;
-use app\plugins\mch\models\MchSubAccount;
+use app\plugins\mch\models\MchAdminUser;
 
 class MchManaSubAccountListForm extends BaseModel{
 
@@ -26,23 +25,23 @@ class MchManaSubAccountListForm extends BaseModel{
 
         try {
 
-            $query = MchSubAccount::find()->alias("msa");
-            $query->innerJoin(["u" => User::tableName()], "u.id=msa.user_id");
-
-            $query->andWhere(["msa.mch_id" => MchAdminController::$adminUser['mch_id']]);
-
-            $query->select(["msa.created_at", "u.id as user_id", "u.mobile", "u.nickname", "u.avatar_url"]);
-            $query->orderBy("msa.id DESC");
+            $query = MchAdminUser::find()->alias("mau");
+            $query->andWhere(["mau.mch_id" => MchAdminController::$adminUser['mch_id']]);
+            $query->select(["mau.id", "mau.created_at", "mau.mobile"]);
+            $query->orderBy("mau.id DESC");
 
             $list = $query->asArray()->page($pagination, 10, $this->page)->all();
             foreach($list as &$item){
+                $item['user_id']    = $item['id'];
+                $item['nickname']   = "u" . $item['mobile'];
+                $item['avatar_url'] = "";
                 $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
             }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'list' => $list,
+                    'list'       => $list,
                     'pagination' => $pagination
                 ]
             ];

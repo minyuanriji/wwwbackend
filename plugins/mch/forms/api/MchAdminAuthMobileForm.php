@@ -35,27 +35,37 @@ class MchAdminAuthMobileForm extends BaseModel{
                 throw new \Exception("验证码不正确");
             }
 
-            $mch = Mch::findOne([
-                'mobile'        => $this->mobile,
-                'review_status' => Mch::REVIEW_STATUS_CHECKED,
-                'is_delete'     => 0
-            ]);
-            if(!$mch){
+            //子账号登录
+            $adminUser = MchAdminUser::find()->where([
+                "mobile" => $this->mobile,
+                "is_sub" => 1
+            ])->one();
+            if($adminUser){
+                $mch = Mch::findOne($adminUser->mch_id);
+            }else{
+                $mch = Mch::findOne([
+                    'mobile'        => $this->mobile,
+                    'review_status' => Mch::REVIEW_STATUS_CHECKED,
+                    'is_delete'     => 0
+                ]);
+            }
+            if(!$mch || $mch->is_delete || $mch->review_status != Mch::REVIEW_STATUS_CHECKED){
                 throw new \Exception("商户不存在");
             }
 
-            $adminUser = MchAdminUser::findOne([
-                "mall_id" => $mch->mall_id,
-                "mch_id"  => $mch->id,
-                "mobile"  => $mch->mobile
-            ]);
-            if(!$adminUser){
-                $adminUser = new MchAdminUser([
-                    "mall_id"    => $mch->mall_id,
-                    "mch_id"     => $mch->id,
-                    "mobile"     => $mch->mobile,
-                    "created_at" => time()
-                ]);
+            if(!$adminUser){ //这里是主账号登录
+                $adminUser = MchAdminUser::find()->where([
+                    "mobile" => $this->mobile,
+                    "is_sub" => 0
+                ])->one();
+                if(!$adminUser){
+                    $adminUser = new MchAdminUser([
+                        "mall_id"    => $mch->mall_id,
+                        "mch_id"     => $mch->id,
+                        "mobile"     => $mch->mobile,
+                        "created_at" => time()
+                    ]);
+                }
             }
             $adminUser->last_login_at    = time();
             $adminUser->token_expired_at = time() + 7 * 24 * 3600;

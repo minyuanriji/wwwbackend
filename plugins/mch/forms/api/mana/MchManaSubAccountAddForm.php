@@ -7,9 +7,8 @@ use app\core\ApiCode;
 use app\forms\api\identity\SmsForm;
 use app\helpers\sms\Sms;
 use app\models\BaseModel;
-use app\models\User;
 use app\plugins\mch\controllers\api\mana\MchAdminController;
-use app\plugins\mch\models\MchSubAccount;
+use app\plugins\mch\models\MchAdminUser;
 
 class MchManaSubAccountAddForm extends BaseModel{
 
@@ -36,29 +35,23 @@ class MchManaSubAccountAddForm extends BaseModel{
                 throw new \Exception("手机验证码不正确");
             }
 
-            $user = User::findOne(["mobile" => $this->mobile]);
-            if(!$user || $user->is_delete){
-                throw new \Exception("子账户用户信息不存在");
+            $subAdminUser = MchAdminUser::findOne([
+                "mobile" => $this->mobile,
+                "is_sub" => 1
+            ]);
+            if($subAdminUser){
+                throw new \Exception("该手机已是另一个商户的子账号，请先解绑后再进行绑定操作");
             }
 
-
-            if(MchAdminController::$adminUser['mch']['user_id'] == $user->id){
-                throw new \Exception("主账户不能作为子账户");
-            }
-
-            $subAccount = MchSubAccount::findOne(["user_id" => $user->id]);
-            if(!$subAccount){
-                $subAccount = new MchSubAccount([
-                    'mall_id' => $user->mall_id,
-                    'user_id' => $user->id,
-                    'mch_id'  => MchAdminController::$adminUser['mch_id'],
-                    'created_at' => time()
-                ]);
-            }
-
-            $subAccount->updated_at = time();
-            if(!$subAccount->save()){
-                throw new \Exception($this->responseErrorMsg($subAccount));
+            $subAdminUser = new MchAdminUser([
+                "mall_id"    => MchAdminController::$adminUser['mall_id'],
+                "mch_id"     => MchAdminController::$adminUser['mch_id'],
+                "mobile"     => $this->mobile,
+                "created_at" => time(),
+                "is_sub"     => 1
+            ]);
+            if(!$subAdminUser->save()){
+                throw new \Exception(json_encode($subAdminUser->getErrors()));
             }
 
             Sms::updateCodeStatus($this->mobile, $this->captcha);

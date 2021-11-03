@@ -22,7 +22,7 @@ class MchAdminUser extends BaseActiveRecord
     {
         return [
             [['mall_id', 'mch_id', 'mobile', 'created_at'], 'required'],
-            [['token_expired_at', 'login_ip', 'last_login_at', 'updated_at', 'auth_key', 'auth_expired_at', 'access_token'], 'safe']
+            [['token_expired_at', 'login_ip', 'last_login_at', 'updated_at', 'auth_key', 'auth_expired_at', 'access_token', 'is_sub'], 'safe']
         ];
     }
 

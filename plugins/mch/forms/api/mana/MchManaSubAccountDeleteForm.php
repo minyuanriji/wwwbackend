@@ -5,8 +5,6 @@ namespace app\plugins\mch\forms\api\mana;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
-use app\plugins\mch\controllers\api\mana\MchAdminController;
-use app\plugins\mch\models\MchSubAccount;
 
 class MchManaSubAccountDeleteForm extends BaseModel{
 
@@ -26,13 +24,7 @@ class MchManaSubAccountDeleteForm extends BaseModel{
 
         try {
 
-            $subAccount = MchSubAccount::findOne([
-                "mch_id"  => MchAdminController::$adminUser['mch_id'],
-                "user_id" => $this->user_id
-            ]);
-            if($subAccount){
-                $subAccount->delete();
-            }
+            throw new \Exception("子账号删除功能维护中");
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

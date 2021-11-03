@@ -47,7 +47,7 @@ class SeckillListForm extends BaseModel
                     $item['seckill_price'] = $item['seckillGoodsPrice'][0]['seckill_price'] ?? 0;
                     unset($item['goods'], $item['seckillGoodsPrice']);
                 }
-                $seckill['start_time'] = date('Y-m-d ', $seckill['start_time']);
+                $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);
                 $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);
             }
 

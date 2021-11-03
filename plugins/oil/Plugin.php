@@ -26,8 +26,8 @@ class Plugin extends \app\plugins\Plugin{
     public function getMenus(){
         return [
             [
-                'name' => '加油设置',
-                'route' => 'plugin/seckill/mall/oil/setting',
+                'name' => '基础设置',
+                'route' => 'plugin/oil/mall/oil/setting',
                 'icon' => 'el-icon-setting',
                 'action' => []
             ]
@@ -35,7 +35,7 @@ class Plugin extends \app\plugins\Plugin{
     }
 
     public function getIndexRoute(){
-        return 'plugin/seckill/mall/oil/setting';
+        return 'plugin/oil/mall/oil/setting';
     }
 
 

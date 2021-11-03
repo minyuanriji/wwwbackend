@@ -38,7 +38,8 @@ class OilOrders extends BaseActiveRecord
             "refund"      => "已退款",
             "refunding"   => "退款中",
             "expired"     => "已过期",
-            "invalid"     => "无效订单"
+            "invalid"     => "无效订单",
+            "unpaid"      => "未支付"
         ];
         $info = ["status" => "-1"];
         if($pay_status == "paid" && !in_array($order_status, ["cancel", "unpaid"])){ //已支付
@@ -48,7 +49,7 @@ class OilOrders extends BaseActiveRecord
         }elseif($order_status == "unpaid" && (time() - 12 * 3600) > $created_at){
             $info['status'] = "expired";
         }else{ //无效订单
-            $info['status'] = $order_status != "cancel" ? "invalid" : "cancel";
+            $info['status'] = in_array($order_status, ["cancel", "unpaid"]) ? $order_status : "invalid";
         }
         $info['text'] = isset($allStatus[$info['status']]) ? $allStatus[$info['status']] : "";
         return $info;

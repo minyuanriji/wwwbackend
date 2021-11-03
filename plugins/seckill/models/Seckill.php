@@ -1,6 +1,6 @@
 <?php
-namespace app\plugins\hotel\models;
 
+namespace app\plugins\seckill\models;
 
 use app\models\BaseActiveRecord;
 

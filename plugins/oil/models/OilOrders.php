@@ -21,4 +21,36 @@ class OilOrders extends BaseActiveRecord
             [['pay_at', 'pay_price', 'pay_type', 'integral_deduction_price', 'integral_fee_rate'], 'safe']
         ];
     }
+
+    /**
+     * 获取订单状态
+     * @param $order_status
+     * @param $pay_status
+     * @param $created_at
+     * @return array
+     */
+    public static function getStatusInfo($order_status, $pay_status, $created_at){
+        $allStatus = [
+            "unconfirmed" => "待确认",
+            "wait"        => "待使用",
+            "fail"        => "确认失败",
+            "finished"    => "已完成",
+            "refund"      => "已退款",
+            "refunding"   => "退款中",
+            "expired"     => "已过期",
+            "invalid"     => "无效订单"
+        ];
+        $info = ["status" => "-1"];
+        if($pay_status == "paid" && !in_array($order_status, ["cancel", "unpaid"])){ //已支付
+            $info['status'] = $order_status;
+        }elseif(in_array($pay_status, ["refund", "refunding"])) {  //退款中、已退款
+            $info['status'] = $pay_status;
+        }elseif($order_status == "unpaid" && (time() - 12 * 3600) > $created_at){
+            $info['status'] = "expired";
+        }else{ //无效订单
+            $info['status'] = $order_status != "cancel" ? "invalid" : "cancel";
+        }
+        $info['text'] = isset($allStatus[$info['status']]) ? $allStatus[$info['status']] : "";
+        return $info;
+    }
 }

@@ -14,6 +14,7 @@ use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\alibaba\models\AlibabaDistributionOrder;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\mch\models\MchCheckoutOrder;
+use app\plugins\oil\models\OilOrders;
 
 class PayCenterBalancePayForm extends BaseModel{
 
@@ -173,6 +174,14 @@ class PayCenterBalancePayForm extends BaseModel{
             }
             $desc       = "支付话费订单";
             $sourceType = "addcredit_order";
+            $sourceId   = $order->id;
+        }elseif(substr($paymentOrder->order_no, 0, 3) == "OI"){
+            $order = OilOrders::findOne(["order_no" => $paymentOrder->order_no]);
+            if (!$order){
+                throw new \Exception("[OilOrders]订单“{$paymentOrder->order_no}”记录不存在");
+            }
+            $desc       = "支付加油券订单";
+            $sourceType = "oil_order";
             $sourceId   = $order->id;
         }else {
             $order = Order::findOne(["order_no" => $paymentOrder->order_no]);

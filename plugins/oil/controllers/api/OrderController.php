@@ -5,6 +5,7 @@ namespace app\plugins\oil\controllers\api;
 use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
 use app\plugins\oil\forms\api\OilDoSubmitForm;
+use app\plugins\oil\forms\api\OilOrderListForm;
 use app\plugins\oil\forms\api\OilPayPrepareForm;
 use app\plugins\oil\forms\api\OilSubmitPreviewForm;
 
@@ -16,6 +17,16 @@ class OrderController extends ApiController {
                 'class' => LoginFilter::class,
             ]
         ]);
+    }
+
+    /**
+     * 订单记录
+     * @return \yii\web\Response
+     */
+    public function actionList(){
+        $form = new OilOrderListForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->getList());
     }
 
     /**

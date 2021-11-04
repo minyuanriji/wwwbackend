@@ -44,6 +44,7 @@ class GoodsController extends ApiController
             ])
         );
 
+
         $res = APICacheHelper::get($form, true);
         if($res['code'] == ApiCode::CODE_SUCCESS){
             $res = $res['data'];

@@ -222,6 +222,8 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                 }
             }
 
+            $info['is_seckill'] = 0;
+            $info['seckill_goods'] = [];
             //判断商品是否是秒杀商品
             $seckillGoodsResult = SeckillGoods::find()->andWhere(['goods_id' => $this->id, 'is_delete' => 0])->asArray()->all();
             if ($seckillGoodsResult) {
@@ -245,8 +247,10 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                             }
                         }
                     }
-
                 }
+                $info['is_seckill'] = 1;
+                $seckillResult['seckill_goods_price'] = array_values($seckillResult['seckill_goods_price']);
+                $info['seckill_goods'] = $seckillResult;
             }
 
             $sourceData = $this->returnApiResultData(

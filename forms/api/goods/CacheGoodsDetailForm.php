@@ -224,6 +224,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
 
             $info['is_seckill'] = 0;// 0、否  1、积分秒杀商品
             $info['seckill_goods'] = [];
+            $info['surplus_time'] = 0;
             //判断商品是否是秒杀商品
             $seckillGoodsResult = SeckillGoods::find()->andWhere(['goods_id' => $this->id, 'is_delete' => 0])->asArray()->all();
             if ($seckillGoodsResult) {

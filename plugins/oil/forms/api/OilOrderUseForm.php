@@ -39,16 +39,17 @@ class OilOrderUseForm extends BaseModel{
                 throw new \Exception("订单[ID:{$order->id}]状态异常 {$status}");
             }
 
-            if(in_array($status['status'], ["unconfirmed", "wait"])){
-                $product = OilProduct::findOne($order->product_id);
-                if(!$product){
-                    throw new \Exception("订单产品[ID:{$order->product_id}]信息不存在");
-                }
+            $product = OilProduct::findOne($order->product_id);
+            if(!$product){
+                throw new \Exception("订单产品[ID:{$order->product_id}]信息不存在");
+            }
 
-                $platModel = OilPlateforms::findOne($product->plat_id);
-                if(!$platModel || $platModel->is_delete || !$platModel->is_enabled){
-                    throw new \Exception("平台[ID:{$product->plat_id}信息不存在");
-                }
+            $platModel = OilPlateforms::findOne($product->plat_id);
+            if(!$platModel || $platModel->is_delete || !$platModel->is_enabled){
+                throw new \Exception("平台[ID:{$product->plat_id}信息不存在");
+            }
+
+            if(in_array($status['status'], ["unconfirmed", "wait"])){
 
                 if(empty($platModel->class_dir) || !class_exists($platModel->class_dir)){
                     throw new \Exception("类{$platModel->class_dir}丢失");
@@ -75,10 +76,11 @@ class OilOrderUseForm extends BaseModel{
 
             $t->commit();
 
+            $config = json_decode($platModel->json_param, true);
             $responseData = json_decode($order->plat_response_data, true);
-            $responseData['data']['mpwx_path']         = "/stand-page/redeem-coupon-code/redeem-coupon-code";
-            $responseData['data']['mpwx_app_id']       = "wx04e3f34ed1e88950";
-            $responseData['data']['mpwx_base64_image'] = base64_encode(file_get_contents(ROOT_PATH . "/plugins/debug_mpwx_qrcode.png"));
+            $responseData['data']['mpwx_path']         = isset($config['mpwx_path']) ? $config['mpwx_path'] : "";
+            $responseData['data']['mpwx_app_id']       = isset($config['appId']) ? $config['appId'] : "";
+            $responseData['data']['mpwx_base64_image'] = isset($config['mpwx_pic']) ? base64_encode(file_get_contents($config['mpwx_pic'])) : "";
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

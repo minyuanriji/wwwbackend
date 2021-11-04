@@ -260,7 +260,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                     $info['is_seckill'] = 1;
                     $seckillResult['seckill_goods_price'] = array_values($seckillResult['seckill_goods_price']);
                     $info['seckill_goods'] = $seckillResult;
-                    $info['surplus_time'] = $seckillResult['end_time'] - time();
+                    $info['surplus_time'] = $seckillResult['end_time'];
                 }
             }
 

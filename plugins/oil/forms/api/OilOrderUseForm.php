@@ -76,6 +76,10 @@ class OilOrderUseForm extends BaseModel{
             $t->commit();
 
             $responseData = json_decode($order->plat_response_data, true);
+            $responseData['data']['mpwx_path']         = "/stand-page/redeem-coupon-code/redeem-coupon-code";
+            $responseData['data']['mpwx_app_id']       = "wx04e3f34ed1e88950";
+            $responseData['data']['mpwx_base64_image'] = "base64的小程序码图片";
+            $responseData['data']['h5_base64_image']   = "base64de的H5图片";
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

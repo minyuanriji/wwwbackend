@@ -58,20 +58,23 @@ class SeckillListForm extends BaseModel
 
                     //获取真实购买数
                     $item['buyNum'] = SeckillGoods::SeckillGoodsBuyNum($item['goods_id'], $seckill);
+                    if ($item['buyNum']) {
+                        $keyArray = [];
+                        $keyArray['buyNum'] = $item['buyNum'];
+                        $keyArray['falseNum'] = $item['buyNum'] * $rand;
 
-                    $keyArray = [];
-                    $keyArray['buyNum'] = $item['buyNum'];
-                    $keyArray['falseNum'] = $item['buyNum'] * $rand;
+                        $progressKeyID = md5('JFMS' . $seckill['id'] . $item['goods_id']);
 
-                    $progressKeyID = md5('JFMS' . $seckill['id'] . $item['goods_id']);
-
-                    //过期时间
-                    if ($item['buyNum'] == $item['real_stock']) {
-                        $item['falseNum'] = $item['virtual_stock'];
+                        //过期时间
+                        if ($item['buyNum'] == $item['real_stock']) {
+                            $item['falseNum'] = $item['virtual_stock'];
+                        } else {
+                            $cacheTime = $seckill['end_time'] - time() + 1800;
+                            $progressNum = $this->getSeckillGoodsProgress($progressKeyID, json_encode($keyArray), $cacheTime);
+                            $item['falseNum'] = $progressNum;
+                        }
                     } else {
-                        $cacheTime = $seckill['end_time'] - time() + 1800;
-                        $progressNum = $this->getSeckillGoodsProgress($progressKeyID, json_encode($keyArray), $cacheTime);
-                        $item['falseNum'] = $progressNum;
+                        $item['falseNum'] = 0;
                     }
                 }
                 $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);

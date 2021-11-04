@@ -18,7 +18,7 @@ class Seckill extends BaseActiveRecord
     {
         return [
             [['mall_id', 'name', 'start_time', 'end_time', 'created_at', 'updated_at'], 'required'],
-            [['is_delete'], 'safe']
+            [['is_delete', 'pic_url'], 'safe']
         ];
     }
 

@@ -369,6 +369,7 @@ Yii::$app->loadComponentView('com-rich-text');
                 surplus = real-primary;
                 if (surplus >= 0) {
                     alert('真实库存不能大于原库存');
+                    this.editGoodsAttrParams.formData[0].real_stock=0;
                 }
             },
             triggeredChange (){

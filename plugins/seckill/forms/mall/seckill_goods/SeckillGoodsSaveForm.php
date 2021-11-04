@@ -25,7 +25,7 @@ class SeckillGoodsSaveForm extends BaseModel
     public function rules()
     {
         return [
-            [['buy_limit', 'virtual_seckill_num', 'real_stock', 'virtual_stock'], 'required'],
+            [['buy_limit', 'virtual_seckill_num', 'real_stock', 'virtual_stock', 'goods_id', 'seckill_id'], 'required'],
             [['id', 'seckill_id', 'goods_id'], 'integer'],
             [['seckillGoodsPrice'], 'safe']
         ];
@@ -40,6 +40,28 @@ class SeckillGoodsSaveForm extends BaseModel
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
+        }
+
+        //判断活动是否结束
+        $seckill = Seckill::findOne($this->seckill_id);
+        if (!$seckill || $seckill->is_delete)
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, '该秒杀活动不存在！');
+
+        if ($seckill->end_time < time())
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, '该秒杀活动已结束！');
+
+        //判断该商品是否在某个秒杀活动进行中
+        $seckillGoodsModel = SeckillGoods::find()->andWhere(['goods_id' => $this->goods_id, 'is_delete' => 0])->asArray()->all();
+        if ($seckillGoodsModel && !$this->id) {
+            $seckill_ids = array_column($seckillGoodsModel, 'seckill_id');
+
+            $seckillModel = Seckill::find()->andWhere([
+                'and',
+                ['in', 'id', $seckill_ids],
+                ['>', 'end_time', time()],
+            ])->count();
+            if ($seckillModel > 0)
+                throw new \Exception('该商品在其它秒杀活动进行中,请选择其他商品');
         }
 
         $t = \Yii::$app->db->beginTransaction();

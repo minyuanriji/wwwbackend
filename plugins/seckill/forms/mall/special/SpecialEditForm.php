@@ -30,6 +30,11 @@ class SpecialEditForm extends BaseModel
             return $this->responseErrorInfo();
         }
         try {
+            $start_time = strtotime($this->start_time);
+            $end_time = strtotime($this->end_time);
+            if ($start_time > $end_time)
+                throw new \Exception('开始时间不能大于结束时间！');
+
             if ($this->id) {
                 $seckill = Seckill::findOne($this->id);
                 if (!$seckill)
@@ -40,15 +45,11 @@ class SpecialEditForm extends BaseModel
                 $seckill->mall_id = \Yii::$app->mall->id;
             }
             $seckill->name = $this->name;
-            $seckill->name = $this->name;
             $seckill->pic_url = $this->pic_url;
-            $seckill->end_time = strtotime($this->end_time);
-
-            if ($seckill->start_time > $seckill->end_time)
-                throw new \Exception('开始时间不能大于结束时间！');
-
+            $seckill->start_time = $start_time;
+            $seckill->end_time = $end_time;
             if (!$seckill->save())
-                throw new \Exception('保存失败');
+                throw new \Exception($seckill->getErrorMessage());
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '保存成功');
         } catch (\Exception $e) {

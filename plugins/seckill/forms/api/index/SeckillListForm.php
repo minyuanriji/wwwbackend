@@ -25,12 +25,13 @@ class SeckillListForm extends BaseModel
             return $this->responseErrorInfo();
         }
         try{
-            $beforeDawn = strtotime(date('Y-m-d', time()));//凌晨0:0
-            $night = strtotime(date('Y-m-d',strtotime('+1 day'))) - 1;//23:59
+            /*$beforeDawn = strtotime(date('Y-m-d', time()));//凌晨0:0
+            $night = strtotime(date('Y-m-d',strtotime('+1 day'))) - 1;//23:59*/
+
             $seckill = Seckill::find()->andWhere([
                 'and',
-                ['>', 'start_time', $beforeDawn],
-                ['<', 'end_time', $night],
+                ['<', 'start_time', time()],
+                ['>', 'end_time', time()],
                 ['is_delete' => 0],
                 ['mall_id' => \Yii::$app->mall->id],
             ])->with(
@@ -39,6 +40,7 @@ class SeckillListForm extends BaseModel
                 'seckillGoods.goods',
                 'seckillGoods.goods.goodsWarehouse'
             )->select('id,name,start_time,end_time,pic_url')->asArray()->one();
+
             if ($seckill) {
                 foreach ($seckill['seckillGoods'] as &$item) {
                     $item['cover_pic'] = $item['goods']['goodsWarehouse']['cover_pic'] ?? '';

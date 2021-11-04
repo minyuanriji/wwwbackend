@@ -222,7 +222,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                 }
             }
 
-            $info['is_seckill'] = 0;
+            $info['is_seckill'] = 0;// 0、否  1、积分秒杀商品
             $info['seckill_goods'] = [];
             //判断商品是否是秒杀商品
             $seckillGoodsResult = SeckillGoods::find()->andWhere(['goods_id' => $this->id, 'is_delete' => 0])->asArray()->all();
@@ -238,8 +238,16 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                     $seckillResult['virtual_stock'] = $backSeckillGoodsResult[$seckillResult['id']]['virtual_stock'];
                     $seckillResult['seckill_goods_id'] = $backSeckillGoodsResult[$seckillResult['id']]['id'];
 
+                    //获取秒杀商品规格价格
                     $seckillResult['seckill_goods_price'] = SeckillGoodsPrice::find()->where(['seckill_goods_id' => $seckillResult['seckill_goods_id']])->asArray()->all();
                     if ($seckillResult['seckill_goods_price'] && isset($info['attr_list'])) {
+
+                        //获取最小价格
+                        $seckillMinPrice = array_column($seckillResult['seckill_goods_price'], 'seckill_price');
+                        $info['min_price'] = min($seckillMinPrice);
+                        $info['max_price'] = max($seckillMinPrice);
+
+                        //修改商品规格价格
                         $seckillResult['seckill_goods_price'] = array_combine(array_column($seckillResult['seckill_goods_price'], 'attr_id'), $seckillResult['seckill_goods_price']);
                         foreach ($info['attr_list'] as &$item) {
                             if (isset($seckillResult['seckill_goods_price'][$item['id']])) {
@@ -247,10 +255,12 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                             }
                         }
                     }
+
+                    $info['is_seckill'] = 1;
+                    $seckillResult['seckill_goods_price'] = array_values($seckillResult['seckill_goods_price']);
+                    $info['seckill_goods'] = $seckillResult;
+                    $info['surplus_time'] = $seckillResult['end_time'] - time();
                 }
-                $info['is_seckill'] = 1;
-                $seckillResult['seckill_goods_price'] = array_values($seckillResult['seckill_goods_price']);
-                $info['seckill_goods'] = $seckillResult;
             }
 
             $sourceData = $this->returnApiResultData(

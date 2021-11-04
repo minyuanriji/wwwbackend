@@ -17,6 +17,10 @@ use app\models\BaseModel;
 use app\models\Cart;
 use app\models\GoodsAttr;
 use app\models\Goods;
+use app\models\Order;
+use app\models\OrderDetail;
+use app\plugins\seckill\models\Seckill;
+use app\plugins\seckill\models\SeckillGoods;
 use yii\helpers\ArrayHelper;
 
 class CartAddForm extends BaseModel
@@ -67,6 +71,17 @@ class CartAddForm extends BaseModel
                 ]);
             }])->one();
 
+            //判断是否是秒杀商品并且在秒杀活动内
+            $check = $this->checkBuyPower($this->goods_id);
+            if (isset($check['code']) && $check['code'] == 1)
+                throw new \Exception($check['msg']);
+
+            if ($check && isset($check['seckillGoodsPrice'])) {
+                $backSeckillGoodsPrice = array_combine(array_column($check['seckillGoodsPrice'], 'attr_id'), $check['seckillGoodsPrice']);
+                if (isset($backSeckillGoodsPrice[$this->attr])) {
+                    $attr->price = $backSeckillGoodsPrice[$this->attr]['score_deduction_price'];
+                }
+            }
             if (!$attr) {
                 return $this->returnApiResultData(ApiCode::CODE_FAIL,"商品异常");
             }
@@ -92,8 +107,9 @@ class CartAddForm extends BaseModel
                 $cart->attr_id   = $this->attr;
                 $cart->num       = 0;
                 $cart->mch_id    = $goods->mch_id;
-                $cart->attr_info = \Yii::$app->serializer->encode(ArrayHelper::toArray($attr));
             }
+
+            $cart->attr_info = \Yii::$app->serializer->encode(ArrayHelper::toArray($attr));
             $cart->num           = $this->num;
             $cart->buy_now   = (int)$this->buy_now ?? 0;
             $cart->mch_baopin_id = $this->mch_baopin_id;
@@ -108,7 +124,37 @@ class CartAddForm extends BaseModel
             }
         } catch (\Exception $e) {
             //Cart::cacheStatusSet(false);
-            return $this->returnApiResultData(ApiCode::CODE_FAIL,CommonLogic::getExceptionMessage($e));
+            return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());
+        }
+    }
+
+    //购买前检测
+    private function checkBuyPower ($goods_id)
+    {
+        try {
+            //查询该商品是否是秒杀商品及活动时间, 秒杀商品是否还有库存
+           $seckillGoodsResult = SeckillGoods::judgeSeckillGoods($goods_id);
+           if ($seckillGoodsResult) {
+               if ($this->num > $seckillGoodsResult['buy_limit']) {
+                   throw new \Exception('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
+               }
+
+               $buyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult);
+               if ($buyNum >= $seckillGoodsResult['real_stock']) {
+                   throw new \Exception('秒杀商品库存不足');
+               }
+
+               if ($seckillGoodsResult['buy_limit'] > 0) {
+                   $userBuyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult, \Yii::$app->user->id);
+                   if ($userBuyNum >= $seckillGoodsResult['buy_limit']) {
+                       throw new \Exception('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
+                   }
+               }
+           }
+
+           return $seckillGoodsResult;
+        } catch (\Exception $e){
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
     }
 }

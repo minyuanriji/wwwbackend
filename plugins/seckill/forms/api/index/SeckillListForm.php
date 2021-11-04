@@ -7,6 +7,7 @@ use app\models\BaseModel;
 use app\models\Order;
 use app\models\OrderDetail;
 use app\plugins\seckill\models\Seckill;
+use app\plugins\seckill\models\SeckillGoods;
 
 class SeckillListForm extends BaseModel
 {
@@ -51,17 +52,27 @@ class SeckillListForm extends BaseModel
                     $item['seckill_price'] = $item['seckillGoodsPrice'][0]['seckill_price'] ?? 0;
                     unset($item['goods'], $item['seckillGoodsPrice']);
 
-                    $query = Order::find()->alias('o');
+                    //获取虚假比例
+                    $ratio = ceil($item['virtual_stock'] / $item['real_stock'] / 2) ;
+                    $rand = rand($ratio / 10, $ratio);
 
-                    $item['buyNum'] = $query->leftJoin(['od' => OrderDetail::tableName()], 'od.order_id=o.id')
-                        ->andWhere([
-                            'and',
-                            ['o.cancel_status' => 0],
-                            ['od.goods_id' => $item['goods_id']],
-                            ['>', 'o.created_at', $seckill['start_time']],
-                            ['<', 'o.created_at', $seckill['end_time']],
-                        ])->sum('od.num') ?: 0;
+                    //获取真实购买数
+                    $item['buyNum'] = SeckillGoods::SeckillGoodsBuyNum($item['goods_id'], $seckill);
 
+                    $keyArray = [];
+                    $keyArray['buyNum'] = $item['buyNum'];
+                    $keyArray['falseNum'] = $item['buyNum'] * $rand;
+
+                    $progressKeyID = md5('JFMS' . $seckill['id'] . $item['goods_id']);
+
+                    //过期时间
+                    if ($item['buyNum'] == $item['real_stock']) {
+                        $item['falseNum'] = $item['virtual_stock'];
+                    } else {
+                        $cacheTime = $seckill['end_time'] - time() + 1800;
+                        $progressNum = $this->getSeckillGoodsProgress($progressKeyID, json_encode($keyArray), $cacheTime);
+                        $item['falseNum'] = $progressNum;
+                    }
                 }
                 $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);
                 $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);
@@ -71,6 +82,36 @@ class SeckillListForm extends BaseModel
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
+    }
+
+    /**
+     * 获取秒杀商品进度条
+     * @param string $keyID
+     * @return array|null
+     */
+    protected static function getSeckillGoodsProgress($keyID, $keyArray, $cacheTime)
+    {
+        $cache = \Yii::$app->getCache();
+        $progressNum = $cache->get($keyID);
+        if(!$progressNum){
+            $cache->set($keyID, $keyArray, $cacheTime);
+            $valArray = json_decode($keyArray, true);
+            $progressNum = $valArray['falseNum'];
+        } else {
+            $valArray = json_decode($progressNum, true);
+
+            if ($keyArray['buyNum'] == $valArray['buyNum']) {
+                $progressNum = $valArray['falseNum'];
+            }
+
+            if ($keyArray['buyNum'] > $valArray['buyNum']) {
+                $valArray['falseNum'] = $valArray['falseNum'] + $keyArray['falseNum'];
+                $value = json_encode($valArray);
+                $cache->set($keyID, $value, $cacheTime);
+                $progressNum = $valArray['falseNum'];
+            }
+        }
+        return $progressNum;
     }
 
 }

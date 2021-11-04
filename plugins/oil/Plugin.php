@@ -30,6 +30,12 @@ class Plugin extends \app\plugins\Plugin{
                 'route' => 'plugin/oil/mall/oil/setting',
                 'icon' => 'el-icon-setting',
                 'action' => []
+            ],
+            [
+                'name' => '平台管理',
+                'route' => 'plugin/oil/mall/plateform/list',
+                'icon' => 'el-icon-setting',
+                'action' => []
             ]
         ];
     }

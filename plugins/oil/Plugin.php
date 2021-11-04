@@ -36,6 +36,12 @@ class Plugin extends \app\plugins\Plugin{
                 'route' => 'plugin/oil/mall/plateform/list',
                 'icon' => 'el-icon-setting',
                 'action' => []
+            ],
+            [
+                'name' => '订单管理',
+                'route' => 'plugin/oil/mall/order/list',
+                'icon' => 'el-icon-setting',
+                'action' => []
             ]
         ];
     }

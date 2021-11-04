@@ -58,6 +58,16 @@ class OilBaseSubmitForm extends BaseModel{
         $orderData = [];
         $orderData['mall_id']         = $user->mall_id;
         $orderData['user_id']         = $user->id;
+        $orderData['mobile']          = $this->mobile;
+        $orderData['province_id']     = $region['province_id'];
+        $orderData['province']        = $region['province_name'];
+        $orderData['city_id']         = $region['city_id'];
+        $orderData['city']            = $region['city_name'];
+        $orderData['district_id']     = $region['district_id'];
+        $orderData['district']        = $region['district_name'];
+        $orderData['location']        = $region['poi']['lng'] . "," . $region['poi']['lat'];
+        $orderData['poi_type']        = "tx"; //腾讯坐标
+        $orderData['address']         = $region['poi']['addr'];
         $orderData['product_id']      = $product->id;
         $orderData['user_integral']   = intval($user->static_integral);  //用户红包总数
         $orderData['remain_integral'] = intval($user->static_integral); //用户剩余红包总数
@@ -108,6 +118,7 @@ class OilBaseSubmitForm extends BaseModel{
             throw new \Exception("抱歉~无法获取到您的所在位置");
         }
 
+
         //区域限制
         $regionDenys = !empty($platModel->region_deny) ? @json_decode($platModel->region_deny, true) : [];
         foreach($regionDenys as $region){
@@ -144,7 +155,7 @@ class OilBaseSubmitForm extends BaseModel{
         $district = isset($poi['district']) ? $poi['district'] : "";
         $cityInfo = CityHelper::likeSearch($province, $city, $district);
 
-        $cityInfo['poi'] = ['lng' => $this->lng, 'lat' => $this->lat];
+        $cityInfo['poi'] = ['addr' => $poi['address'], 'lng' => $this->lng, 'lat' => $this->lat];
 
         return $cityInfo;
     }

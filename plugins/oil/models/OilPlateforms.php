@@ -17,7 +17,7 @@ class OilPlateforms extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mall_id', 'name', 'sdk_src', 'created_at', 'updated_at'], 'required'],
+            [['mall_id', 'name', 'sdk_src', 'class_dir', 'created_at', 'updated_at'], 'required'],
             [['is_delete', 'region_deny', 'is_enabled', 'product_json_data'], 'safe']
         ];
     }

@@ -6,6 +6,7 @@ use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
 use app\plugins\oil\forms\api\OilDoSubmitForm;
 use app\plugins\oil\forms\api\OilOrderListForm;
+use app\plugins\oil\forms\api\OilOrderUseForm;
 use app\plugins\oil\forms\api\OilPayPrepareForm;
 use app\plugins\oil\forms\api\OilSubmitPreviewForm;
 
@@ -57,5 +58,15 @@ class OrderController extends ApiController {
         $form = new OilPayPrepareForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->prepare());
+    }
+
+    /**
+     * 执行使用操作
+     * @return \yii\web\Response
+     */
+    public function actionUse(){
+        $form = new OilOrderUseForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->toUse());
     }
 }

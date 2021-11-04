@@ -78,9 +78,9 @@ class OilOrderUseForm extends BaseModel{
 
             $config = json_decode($platModel->json_param, true);
             $responseData = json_decode($order->plat_response_data, true);
-            $responseData['data']['mpwx_path']         = isset($config['mpwx_path']) ? $config['mpwx_path'] : "";
-            $responseData['data']['mpwx_app_id']       = isset($config['appId']) ? $config['appId'] : "";
-            $responseData['data']['mpwx_base64_image'] = isset($config['mpwx_pic']) ? base64_encode(file_get_contents($config['mpwx_pic'])) : "";
+            $responseData['data']['mpwx_path']   = isset($config['mpwx_path']) ? $config['mpwx_path'] : "";
+            $responseData['data']['mpwx_app_id'] = isset($config['appId']) ? $config['appId'] : "";
+            $responseData['data']['mpwx_pic']    = isset($config['mpwx_pic']) ? $config['mpwx_pic'] : "";
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

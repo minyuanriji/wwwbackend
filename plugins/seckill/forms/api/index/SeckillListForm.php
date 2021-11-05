@@ -3,6 +3,7 @@
 namespace app\plugins\seckill\forms\api\index;
 
 use app\core\ApiCode;
+use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\Order;
 use app\models\OrderDetail;
@@ -94,7 +95,7 @@ class SeckillListForm extends BaseModel
             ];
 
         } catch (\Exception $e) {
-            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, CommonLogic::getExceptionMessage($e));
         }
     }
 

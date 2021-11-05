@@ -42,6 +42,7 @@ class SeckillListForm extends BaseModel
                 'seckillGoods.goods.goodsWarehouse'
             )->select('id,name,start_time,end_time,pic_url')->asArray()->one();
 
+            $result = [];
             if ($seckill) {
                 foreach ($seckill['seckillGoods'] as &$item) {
                     $item['cover_pic'] = $item['goods']['goodsWarehouse']['cover_pic'] ?? '';
@@ -79,9 +80,15 @@ class SeckillListForm extends BaseModel
                 }
                 $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);
                 $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);
+                $result = $seckill;
             }
 
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', $seckill ?: []);
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '数据请求成功',
+                'data' => $result,
+            ];
+
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }

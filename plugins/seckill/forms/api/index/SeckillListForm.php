@@ -80,11 +80,11 @@ class SeckillListForm extends BaseModel
                         $item['falseNum'] = 0;
                     }
                     if ($item['falseNum'] == 0 || $item['virtual_stock'] == 0) {
-                        $item['surplus_percentage'] = 0.01;
+                        $item['surplus_percentage'] = 0;
                     } else {
                         $surplus = floatval(intval($item['falseNum']) / intval($item['virtual_stock']));
                         $item['surplus_percentage'] = round($surplus, 2);
-                        if ($item['surplus_percentage'] <= 0 && $item['buyNum']) {
+                        if ($item['surplus_percentage'] < 0 && $item['buyNum']) {
                             $item['surplus_percentage'] = 0.01;
                         }
                     }

@@ -70,7 +70,7 @@
 
                     <el-table-column label="用户信息" width="230">
                         <template slot-scope="scope">
-                            <div>昵称：{{scope.row.nickname}}</div>
+                            <div>昵称：<span style="color:steelblue">{{scope.row.nickname}}</span>[ID:{{scope.row.user_id}}]</div>
                             <div>手机：{{scope.row.mobile}}</div>
                         </template>
                     </el-table-column>

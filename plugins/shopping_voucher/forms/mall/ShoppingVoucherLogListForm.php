@@ -118,6 +118,7 @@ class ShoppingVoucherLogListForm extends BaseModel{
             $expend = $expendQuery->andWhere(['l.type' => 2])->sum('l.money');
 
             $list = $query->page($pagination, $this->limit)->asArray()->all();
+            $currentIncome = $currentExpend = 0;
             if ($list) {
                 foreach ($list as $v) {
                     if ($v['type'] == 1) {

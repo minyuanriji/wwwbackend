@@ -80,6 +80,10 @@ class SeckillListForm extends BaseModel
                 }
                 $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);
                 $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);
+                $seckill['surplus_percentage'] = sprintf("%.2f",$seckill['falseNum'] / $item['virtual_stock']);
+                if ($seckill['surplus_percentage'] <= 0) {
+                    $seckill['surplus_percentage'] = 0.01;
+                }
                 $result = $seckill;
             }
 

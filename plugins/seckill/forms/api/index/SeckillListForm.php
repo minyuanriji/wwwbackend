@@ -9,6 +9,7 @@ use app\models\Order;
 use app\models\OrderDetail;
 use app\plugins\seckill\models\Seckill;
 use app\plugins\seckill\models\SeckillGoods;
+use function Webmozart\Assert\Tests\StaticAnalysis\float;
 
 class SeckillListForm extends BaseModel
 {
@@ -78,7 +79,8 @@ class SeckillListForm extends BaseModel
                     } else {
                         $item['falseNum'] = 0;
                     }
-                    $item['surplus_percentage'] = sprintf("%.2f",$item['falseNum'] / $item['virtual_stock']);
+                    $surplus = floatval(intval($item['falseNum']) / intval($item['virtual_stock']));
+                    $item['surplus_percentage'] = round($surplus, 2);
                     if ($item['surplus_percentage'] <= 0) {
                         $item['surplus_percentage'] = 0.01;
                     }

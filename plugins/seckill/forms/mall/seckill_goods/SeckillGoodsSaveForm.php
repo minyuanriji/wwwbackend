@@ -68,11 +68,16 @@ class SeckillGoodsSaveForm extends BaseModel
         try {
             if ($this->id) {
                 $seckillGoodsModel = SeckillGoods::findOne($this->id);
-                if (!$seckillGoodsModel)
+                if (!$seckillGoodsModel || $seckillGoodsModel->is_delete)
                     throw new \Exception('秒杀商品不存在！');
             } else {
-                $seckillGoodsModel = new SeckillGoods();
-                $seckillGoodsModel->mall_id = \Yii::$app->mall->id;
+                $seckillGoodsModel = SeckillGoods::find()->andWhere(['seckill_id' => $this->seckill_id, 'goods_id' => $this->goods_id])->one();
+                if (!$seckillGoodsModel) {
+                    $seckillGoodsModel = new SeckillGoods();
+                    $seckillGoodsModel->mall_id = \Yii::$app->mall->id;
+                } else {
+                    $seckillGoodsModel->is_delete = 0;
+                }
             }
             $seckillGoodsModel->seckill_id = $this->seckill_id;
             $seckillGoodsModel->goods_id = $this->goods_id;
@@ -80,7 +85,6 @@ class SeckillGoodsSaveForm extends BaseModel
             $seckillGoodsModel->virtual_seckill_num = $this->virtual_seckill_num;
             $seckillGoodsModel->real_stock = $this->real_stock;
             $seckillGoodsModel->virtual_stock = $this->virtual_stock;
-            $seckillGoodsModel->is_delete = 0;
             if (!$seckillGoodsModel->save())
                 throw new \Exception($seckillGoodsModel->getErrorMessage());
 

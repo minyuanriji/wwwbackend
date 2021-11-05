@@ -473,6 +473,10 @@ Yii::$app->loadComponentView('com-rich-text');
                     alert('请选择秒杀专题');
                     return;
                 }
+                if (this.editGoodsAttrParams.formData[0].real_stock <= 0) {
+                    alert('请填写真实库存');
+                    return;
+                }
                 if (this.editGoodsAttrParams.formData[0].virtual_stock < this.editGoodsAttrParams.formData[0].real_stock) {
                     alert('虚拟库存不能小于真实库存');
                     return;
@@ -485,6 +489,7 @@ Yii::$app->loadComponentView('com-rich-text');
                         that.$message.success(e.data.msg);
                         that.editGoodsAttrParams.dialogVisible=false;
                         that.getList();
+                        that.specialKeyword ='';
                     } else {
                         that.$message.error(e.data.msg);
                     }

@@ -3565,8 +3565,8 @@ class OrderSubmitForm extends BaseModel
 
             //判断是否是秒杀商品并且在秒杀活动内
             $seckillGoodsResult = $this->checkBuyPower($goods['goods_id'], $goods['num']);
-            if (isset($check['code']) && $check['code'] == 1){
-                throw new \Exception($check['msg']);
+            if (isset($seckillGoodsResult['code']) && $seckillGoodsResult['code'] == 1){
+                throw new OrderException($seckillGoodsResult['msg']);
             } else {
                 $backSeckillGoodsResult = array_combine(array_column($seckillGoodsResult['seckillGoodsPrice'], 'attr_id'), $seckillGoodsResult['seckillGoodsPrice']);
                 foreach ($goods['goods_list'] as &$list) {
@@ -3594,6 +3594,7 @@ class OrderSubmitForm extends BaseModel
                 $goodsList['is_seckill'] = 1;
             }
         }
+
     }
     //支付前检测
     private function checkBuyPower ($goods_id, $num)

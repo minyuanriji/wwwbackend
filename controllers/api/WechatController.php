@@ -155,6 +155,7 @@ class WechatController extends ApiController
             'onMenuShareWeibo',
             'onMenuShareQZone',
             'updateAppMessageShareData',
+            'updateTimelineShareData',
             'stopRecord',
             'scanQRCode',
             'chooseWXPay',

@@ -41,12 +41,32 @@ class SeckillGoods extends BaseActiveRecord
         return $this->hasOne(Goods::className(), ['id' => 'goods_id']);
     }
 
-    //判断商品是否是秒杀商品，是否在活动时间内
     public static function judgeSeckillGoods ($goods_id)
     {
         $time = time();
+
+        $query = self::find()->alias('sg');
+
+        $query->leftJoin(['s' => Seckill::tableName()], 's.id=sg.seckill_id')
+            ->andWhere([
+                'and',
+                ['s.is_delete' => 0],
+                ['<', 's.start_time', $time],
+                ['>', 's.end_time', $time],
+            ]);
+
+        $exist = $query->select('sg.*, s.start_time, s.end_time')
+            ->andWhere(['sg.is_delete' => 0, 'sg.goods_id' => $goods_id])->with('seckillGoodsPrice')->asArray()->one();
+
+        return $exist;
+    }
+
+    //判断商品是否是秒杀商品，是否在活动时间内
+    public static function judgeSeckillGoods1 ($goods_id)
+    {
         $dbTransaction = \Yii::$app->db->beginTransaction();
         try {
+            $time = time();
             $query = self::find()->alias('sg');
 
             $query->leftJoin(['s' => Seckill::tableName()], 's.id=sg.seckill_id')
@@ -63,6 +83,7 @@ class SeckillGoods extends BaseActiveRecord
 
             $dbTransaction->commit();
             return $exist;
+
         } catch(\Exception $e) {
             $dbTransaction->rollBack();
             throw $e;

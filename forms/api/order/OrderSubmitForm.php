@@ -3586,7 +3586,7 @@ class OrderSubmitForm extends BaseModel
                     $goodsList['total_price'] = $goodsList['total_goods_price'];
                     $goods['total_price'] = $goodsList['total_goods_price'];
                 }
-                $goods['forehead_score'] = min($forehead_score);
+                $goods['forehead_score'] = $forehead_score ? min($forehead_score) : 0;
                 $goods['total_original_price'] = $total_goods_price + $goodsList['express_price'];
                 $goodsList['is_seckill'] = 1;
             }

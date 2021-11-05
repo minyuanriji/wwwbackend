@@ -84,7 +84,7 @@ class OilOrderUseForm extends BaseModel{
                 'data' => [
                     "couponCode"  => $responseData['data']['couponCode'],
                     "mpwx_path"   => isset($config['mpwx_path']) ? $config['mpwx_path'] : "",
-                    "mpwx_app_id" => isset($config['appId']) ? $config['appId'] : "",
+                    "mpwx_app_id" => isset($config['mpwx_app_id']) ? $config['mpwx_app_id'] : "",
                     "mpwx_pic"    => isset($config['mpwx_pic']) ? $config['mpwx_pic'] : ""
                 ]
             ];

@@ -31,6 +31,7 @@ class OilPlateformDetailForm extends BaseModel{
             $detail = $plateform->getAttributes();
             $detail['region_deny'] = !empty($plateform->region_deny) ? json_decode($plateform->region_deny, true) : [];
             $detail['products'] = !empty($detail['product_json_data']) ? json_decode($detail['product_json_data'], true) : [];
+            $detail['params'] = !empty($plateform->json_param) ? json_decode($plateform->json_param, true) : [];
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => $detail

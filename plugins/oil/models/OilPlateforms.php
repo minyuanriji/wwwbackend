@@ -22,4 +22,14 @@ class OilPlateforms extends BaseActiveRecord
         ];
     }
 
+    public function getParams(){
+        $paramArray = @json_decode($this->json_param, true);
+        $data = [];
+        if($paramArray){
+            foreach($paramArray as $item){
+                $data[$item['name']] = $item['value'];
+            }
+        }
+        return $data;
+    }
 }

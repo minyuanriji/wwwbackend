@@ -23,12 +23,63 @@
                 <el-tabs v-model="activeName">
                     <el-tab-pane label="基础信息" name="Basics" style="padding:20px 0;background: white">
                         <el-form-item prop="name" label="平台名称">
-                            <el-input v-model="ruleForm.name"></el-input>
+                            <el-input v-model="ruleForm.name" style="width:350px;"></el-input>
                         </el-form-item>
-                        <el-form-item label="SDK目录" prop="sdk_src">
-                            <el-input  v-model="ruleForm.sdk_src"></el-input>
+                        <el-form-item label="SDK目录" prop="sdk_src" >
+                            <el-input  v-model="ruleForm.sdk_src" style="width:350px;"></el-input>
                         </el-form-item>
-
+                        <el-form-item label="自定义参数" prop="sdk_src">
+                            <el-card class="box-card" style="width:60%;">
+                                <el-table :data="paramsList" highlight-current-row style="width: 100%">
+                                    <el-table-column property="type" label="类型" width="100" align="center">
+                                        <template slot-scope="scope">
+                                            <span v-if="scope.row.type=='image'">图片</span>
+                                            <span v-if="scope.row.type=='input'">输入</span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column property="name" label="名称" width="150" ></el-table-column>
+                                    <el-table-column label="内容">
+                                        <template slot-scope="scope">
+                                            <span v-if="scope.row.type=='input'">
+                                                <el-input v-model="scope.row.value"></el-input>
+                                            </span>
+                                            <span v-if="scope.row.type=='image'">
+                                                <com-attachment :multiple="false" :max="1" v-model="scope.row.value">
+                                                    <el-tooltip class="item"
+                                                                effect="dark"
+                                                                content="建议尺寸:240 * 240"
+                                                                placement="top">
+                                                        <el-button size="mini">选择文件</el-button>
+                                                    </el-tooltip>
+                                                </com-attachment>
+                                                <com-image mode="aspectFill" width='80px' height='80px' :src="scope.row.value" style="margin-top:3px;"></com-image>
+                                            </span>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="操作" width="110" align="center">
+                                        <template slot-scope="scope">
+                                            <el-button @click="delParam(scope.row)" type="text" circle size="mini">
+                                                <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                                    <img src="statics/img/mall/del.png" alt="">
+                                                </el-tooltip>
+                                            </el-button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                                <div style="margin-top: 20px">
+                                    <template v-if="new_param_edit">
+                                        <el-select v-model="new_param_type" placeholder="类型" size="big" style="width:150px;">
+                                            <el-option value="input" label="输入框"></el-option>
+                                            <el-option value="image" label="图片上传"></el-option>
+                                        </el-select>
+                                        <el-input  v-model="new_param_name" size="big" style="width:300px;"></el-input>
+                                        <el-button @click="newParam" icon="el-icon-edit-outline" size="big" type="danger">保存</el-button>
+                                        <el-button @click="new_param_edit=false" size="big">取消</el-button>
+                                    </template>
+                                    <el-button v-if="!new_param_edit" @click="new_param_edit=true" icon="el-icon-plus" size="big">添加</el-button>
+                                </div>
+                            </el-card>
+                        </el-form-item>
                     </el-tab-pane>
                     <el-tab-pane label="限制" name="limit" style="padding:20px 0px;background: white">
                         <el-form-item label="限制地区" prop="region_deny_list">
@@ -134,6 +185,10 @@
                     region_deny: [],
                     products: []
                 },
+                paramsList: [],
+                new_param_type: '',
+                new_param_name: '',
+                new_param_edit: false,
                 rules: {
                     name: [
                         {required: true, message: '请输入平台名称', trigger: 'change'},
@@ -168,6 +223,53 @@
             };
         },
         methods: {
+            delParam(row){
+                this.$confirm('删除该条数据, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    let i, newParamsList = [];
+                    for(i=0; i < this.paramsList.length; i++){
+                        if(this.paramsList[i].name != row.name){
+                            newParamsList.push(this.paramsList[i]);
+                        }
+                    }
+                    this.paramsList = newParamsList;
+                }).catch(() => {
+
+                });
+
+            },
+            newParam(){
+                if(this.new_param_type == ''){
+                    this.$message.error("请选择参数类型");
+                    return;
+                }
+                if(this.new_param_name == ''){
+                    this.$message.error("请输入参数名称");
+                    return;
+                }
+                if(!this.new_param_name.match(/^[a-z_]+[0-9]*$/i)){
+                    this.$message.error("参数名称只能为英文字符、下划线、数字组成，且首字符不能为数字");
+                    return;
+                }
+                let i;
+                for(i=0; i < this.paramsList.length; i++){
+                    if(this.paramsList[i].name == this.new_param_name){
+                        this.$message.error("此参数名称已在列表中");
+                        return;
+                    }
+                }
+                this.paramsList.push({
+                    type: this.new_param_type,
+                    name: this.new_param_name,
+                    value: ''
+                });
+                this.new_param_edit = false;
+                this.new_param_type = '';
+                this.new_param_name = '';
+            },
             deleteRegion(index){
                 let that = this;
                 this.$confirm('你确定要删除吗?', '提示', {
@@ -231,6 +333,7 @@
                     if (valid) {
                         self.btnLoading = true;
                         self.ruleForm.region_deny = self.region_deny_list;
+                        self.ruleForm['params'] = self.paramsList;
                         if (getQuery('id')) {
                             self.ruleForm['id'] = getQuery('id');
                         }
@@ -273,6 +376,7 @@
                     self.cardLoading = false;
                     if (e.data.code == 0) {
                         self.region_deny_list = e.data.data.region_deny;
+                        self.paramsList = e.data.data.params;
                         self.ruleForm = e.data.data;
                     } else {
                         self.$message.error(e.data.msg);

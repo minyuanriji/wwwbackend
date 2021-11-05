@@ -10,7 +10,8 @@ class Plateform extends BasePlateform
 {
     public function submit(OilOrders $order, OilProduct $product)
     {
-        $config = @json_decode($this->platModel->json_param, true);
+        $config = $this->platModel->getParams();
+
         $appId = isset($config['appId']) ? $config['appId'] : "";
         $appSecret = isset($config['appSecret']) ? $config['appSecret'] : "";
         try {

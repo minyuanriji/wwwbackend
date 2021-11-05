@@ -12,13 +12,14 @@ class OilPlateformEditForm extends BaseModel {
     public $name;
     public $sdk_src;
     public $region_deny;
+    public $params;
 
     public function rules()
     {
         return [
             [['name', 'sdk_src'], 'required'],
             [['id'], 'integer'],
-            [['region_deny'], 'safe']
+            [['region_deny', 'params'], 'safe']
         ];
     }
 
@@ -48,6 +49,7 @@ class OilPlateformEditForm extends BaseModel {
             $plateform->sdk_src     = $this->sdk_src;
             $plateform->updated_at  = time();
             $plateform->region_deny = !empty($this->region_deny) ? json_encode($this->region_deny) : "";
+            $plateform->json_param  = !empty($this->params) ? json_encode($this->params) : "";
             if (!$plateform->save()) {
                 throw new \Exception($this->responseErrorMsg($plateform));
             }

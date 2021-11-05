@@ -21,6 +21,7 @@ use app\models\Order;
 use app\models\OrderDetail;
 use app\plugins\seckill\models\Seckill;
 use app\plugins\seckill\models\SeckillGoods;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 
 class CartAddForm extends BaseModel
@@ -73,8 +74,6 @@ class CartAddForm extends BaseModel
 
             //判断是否是秒杀商品并且在秒杀活动内
             $check = $this->checkBuyPower($this->goods_id);
-            if (isset($check['code']) && $check['code'] == 1)
-                throw new \Exception($check['msg']);
 
             if ($check && isset($check['seckillGoodsPrice'])) {
                 $backSeckillGoodsPrice = array_combine(array_column($check['seckillGoodsPrice'], 'attr_id'), $check['seckillGoodsPrice']);
@@ -124,38 +123,36 @@ class CartAddForm extends BaseModel
             }
         } catch (\Exception $e) {
             //Cart::cacheStatusSet(false);
-            return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, CommonLogic::getExceptionMessage($e));
         }
     }
 
-    //购买前检测
+
+    /*购买前检测
+     * @throws Exception
+     * */
     private function checkBuyPower ($goods_id)
     {
-        try {
-            //查询该商品是否是秒杀商品及活动时间, 秒杀商品是否还有库存
-           $seckillGoodsResult = SeckillGoods::judgeSeckillGoods($goods_id);
-           if ($seckillGoodsResult) {
-               if ($seckillGoodsResult['buy_limit'] > 0) {
-                   if ($this->num > $seckillGoodsResult['buy_limit']) {
-                       throw new \Exception('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
-                   }
+        //查询该商品是否是秒杀商品及活动时间, 秒杀商品是否还有库存
+       $seckillGoodsResult = SeckillGoods::judgeSeckillGoods($goods_id);
+       if ($seckillGoodsResult) {
+           if ($seckillGoodsResult['buy_limit'] > 0) {
+               if ($this->num > $seckillGoodsResult['buy_limit']) {
+                   throw new Exception('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
+               }
 
-                   $buyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult);
-                   if ($buyNum + $this->num > $seckillGoodsResult['real_stock']) {
-                       $surplus = $seckillGoodsResult['real_stock'] - $buyNum;
-                       throw new \Exception('秒杀商品库存不足，还剩余'. ($surplus < 0) ? 0 : $surplus . '件');
-                   }
+               $buyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult);
+               if ($buyNum + $this->num > $seckillGoodsResult['real_stock']) {
+                   $surplus = $seckillGoodsResult['real_stock'] - $buyNum;
+                   throw new Exception('秒杀商品库存不足，还剩余'. ($surplus < 0) ? 0 : $surplus . '件');
+               }
 
-                   $userBuyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult, \Yii::$app->user->id);
-                   if ($userBuyNum + $this->num > $seckillGoodsResult['buy_limit']) {
-                       throw new \Exception('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
-                   }
+               $userBuyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult, \Yii::$app->user->id);
+               if ($userBuyNum + $this->num > $seckillGoodsResult['buy_limit']) {
+                   throw new Exception('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
                }
            }
-
-           return $seckillGoodsResult;
-        } catch (\Exception $e){
-            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
-        }
+       }
+       return $seckillGoodsResult;
     }
 }

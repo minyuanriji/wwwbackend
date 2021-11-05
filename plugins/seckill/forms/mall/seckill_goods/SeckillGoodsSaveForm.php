@@ -42,6 +42,10 @@ class SeckillGoodsSaveForm extends BaseModel
             return $this->responseErrorInfo();
         }
 
+        if ($this->virtual_stock < $this->real_stock) {
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, '虚拟库存不能小于真实库存！');
+        }
+
         //判断活动是否结束
         $seckill = Seckill::findOne($this->seckill_id);
         if (!$seckill || $seckill->is_delete)
@@ -61,7 +65,7 @@ class SeckillGoodsSaveForm extends BaseModel
                 ['>', 'end_time', time()],
             ])->count();
             if ($seckillModel > 0)
-                throw new \Exception('该商品在其它秒杀活动进行中,请选择其他商品');
+                return $this->returnApiResultData(ApiCode::CODE_FAIL, '该商品在其它秒杀活动进行中,请选择其他商品！');
         }
 
         $t = \Yii::$app->db->beginTransaction();
@@ -90,6 +94,10 @@ class SeckillGoodsSaveForm extends BaseModel
 
             if ($this->seckillGoodsPrice) {
                 foreach ($this->seckillGoodsPrice as $item) {
+                    if ($item['attr_price'] < $item['score_deduction_price']) {
+                        throw new \Exception('积分抵扣金额不能大于原价格，规格ID：' . $item['attr_id']);
+                    }
+
                     if ($item['id']) {
                         $seckillGoodsPriceModel = SeckillGoodsPrice::findOne($item['id']);
                         if (!$seckillGoodsPriceModel)

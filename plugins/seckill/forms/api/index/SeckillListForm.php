@@ -88,6 +88,9 @@ class SeckillListForm extends BaseModel
                             $item['surplus_percentage'] = 0.01;
                         }
                     }
+                    if ($item['surplus_percentage'] > 1) {
+                        $item['surplus_percentage'] = 1;
+                    }
                 }
                 $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);
                 $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);

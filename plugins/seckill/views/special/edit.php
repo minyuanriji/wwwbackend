@@ -129,6 +129,9 @@
                             self.btnLoading = false;
                             if (e.data.code == 0) {
                                 self.$message.success(e.data.msg);
+                                navigateTo({
+                                    r: 'plugin/seckill/mall/special/special',
+                                });
                             } else {
                                 self.$message.error(e.data.msg);
                             }

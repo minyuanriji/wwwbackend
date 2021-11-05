@@ -253,6 +253,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                         foreach ($info['attr_list'] as &$item) {
                             if (isset($seckillResult['seckill_goods_price'][$item['id']])) {
                                 $item['price'] = $seckillResult['seckill_goods_price'][$item['id']]['score_deduction_price'];
+                                $item['operating_expenses_price'] = $seckillResult['seckill_goods_price'][$item['id']]['seckill_price'];
                             }
                         }
                     }

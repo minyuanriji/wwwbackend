@@ -3,11 +3,13 @@
 namespace app\plugins\seckill\forms\api\index;
 
 use app\core\ApiCode;
+use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\Order;
 use app\models\OrderDetail;
 use app\plugins\seckill\models\Seckill;
 use app\plugins\seckill\models\SeckillGoods;
+use function Webmozart\Assert\Tests\StaticAnalysis\float;
 
 class SeckillListForm extends BaseModel
 {
@@ -42,6 +44,7 @@ class SeckillListForm extends BaseModel
                 'seckillGoods.goods.goodsWarehouse'
             )->select('id,name,start_time,end_time,pic_url')->asArray()->one();
 
+            $result = [];
             if ($seckill) {
                 foreach ($seckill['seckillGoods'] as &$item) {
                     $item['cover_pic'] = $item['goods']['goodsWarehouse']['cover_pic'] ?? '';
@@ -53,8 +56,8 @@ class SeckillListForm extends BaseModel
                     unset($item['goods'], $item['seckillGoodsPrice']);
 
                     //获取虚假比例
-                    $ratio = ceil($item['virtual_stock'] / $item['real_stock'] / 2) ;
-                    $rand = rand($ratio / 10, $ratio);
+                    $ratio = ceil($item['virtual_stock'] / $item['real_stock']) ;
+                    $rand = rand(ceil($ratio / 10), $ratio);
 
                     //获取真实购买数
                     $item['buyNum'] = SeckillGoods::SeckillGoodsBuyNum($item['goods_id'], $seckill);
@@ -76,14 +79,25 @@ class SeckillListForm extends BaseModel
                     } else {
                         $item['falseNum'] = 0;
                     }
+                    $surplus = floatval(intval($item['falseNum']) / intval($item['virtual_stock']));
+                    $item['surplus_percentage'] = round($surplus, 2);
+                    if ($item['surplus_percentage'] <= 0 && $item['buyNum']) {
+                        $item['surplus_percentage'] = 0.01;
+                    }
                 }
                 $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);
                 $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);
+                $result = $seckill;
             }
 
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', $seckill);
+            return [
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '数据请求成功',
+                'data' => $result,
+            ];
+
         } catch (\Exception $e) {
-            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, CommonLogic::getExceptionMessage($e));
         }
     }
 
@@ -101,14 +115,24 @@ class SeckillListForm extends BaseModel
             $valArray = json_decode($keyArray, true);
             $progressNum = $valArray['falseNum'];
         } else {
-            $valArray = json_decode($progressNum, true);
+            if (is_string($progressNum)) {
+                $valArray = json_decode($progressNum, true);
+            } else {
+                $valArray = $progressNum;
+            }
+
+            $keyArray = json_decode($keyArray, true);
 
             if ($keyArray['buyNum'] == $valArray['buyNum']) {
                 $progressNum = $valArray['falseNum'];
             }
 
             if ($keyArray['buyNum'] > $valArray['buyNum']) {
-                $valArray['falseNum'] = $valArray['falseNum'] + $keyArray['falseNum'];
+                if ($valArray['falseNum'] > $keyArray['buyNum']) {
+                    $valArray['falseNum'] += $keyArray['buyNum'];
+                } else {
+                    $valArray['falseNum'] = $keyArray['falseNum'];
+                }
                 $value = json_encode($valArray);
                 $cache->set($keyID, $value, $cacheTime);
                 $progressNum = $valArray['falseNum'];

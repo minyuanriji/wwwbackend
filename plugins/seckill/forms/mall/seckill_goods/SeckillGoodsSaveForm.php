@@ -71,8 +71,13 @@ class SeckillGoodsSaveForm extends BaseModel
                 if (!$seckillGoodsModel || $seckillGoodsModel->is_delete)
                     throw new \Exception('秒杀商品不存在！');
             } else {
-                $seckillGoodsModel = new SeckillGoods();
-                $seckillGoodsModel->mall_id = \Yii::$app->mall->id;
+                $seckillGoodsModel = SeckillGoods::find()->andWhere(['seckill_id' => $this->seckill_id, 'goods_id' => $this->goods_id])->one();
+                if (!$seckillGoodsModel) {
+                    $seckillGoodsModel = new SeckillGoods();
+                    $seckillGoodsModel->mall_id = \Yii::$app->mall->id;
+                } else {
+                    $seckillGoodsModel->is_delete = 0;
+                }
             }
             $seckillGoodsModel->seckill_id = $this->seckill_id;
             $seckillGoodsModel->goods_id = $this->goods_id;
@@ -90,8 +95,11 @@ class SeckillGoodsSaveForm extends BaseModel
                         if (!$seckillGoodsPriceModel)
                             throw new \Exception($seckillGoodsPriceModel->getErrorMessage());
                     } else {
-                        $seckillGoodsPriceModel = new SeckillGoodsPrice();
-                        $seckillGoodsPriceModel->mall_id = \Yii::$app->mall->id;
+                        $seckillGoodsPriceModel = SeckillGoodsPrice::find()->andWhere(['goods_id' => $item['goods_id'], 'attr_id' => $item['attr_id'], 'seckill_id' => $item['seckill_id'] ?? $this->seckill_id])->one();
+                        if (!$seckillGoodsPriceModel) {
+                            $seckillGoodsPriceModel = new SeckillGoodsPrice();
+                            $seckillGoodsPriceModel->mall_id = \Yii::$app->mall->id;
+                        }
                     }
                     $seckillGoodsPriceModel->goods_id = $item['goods_id'];
                     $seckillGoodsPriceModel->attr_id = $item['attr_id'];

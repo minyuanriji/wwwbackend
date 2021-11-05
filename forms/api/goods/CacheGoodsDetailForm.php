@@ -21,6 +21,9 @@ use app\models\GoodsFootmark;
 use app\models\GoodsService;
 use app\models\Option;
 use app\models\UserCoupon;
+use app\plugins\seckill\models\Seckill;
+use app\plugins\seckill\models\SeckillGoods;
+use app\plugins\seckill\models\SeckillGoodsPrice;
 use app\plugins\shopping_voucher\models\ShoppingVoucherTargetGoods;
 use app\services\Goods\PriceDisplayService;
 
@@ -57,7 +60,6 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, '该商品不存在或者已下架！');
             }
             //增加足迹
-
             if ($this->user_id) {
                 $footmark = GoodsFootmark::findOne(['user_id' => $this->user_id, 'goods_id' => $this->id]);
                 if (!$footmark) {
@@ -217,6 +219,48 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                 if($this->user_id){
                     $user = \app\models\User::findOne($this->user_id);
                     $info['shopping_voucher']['user_shopping_voucher'] = $user ? $user->shoppingVoucherUser->money : 0;
+                }
+            }
+
+            $info['is_seckill'] = 0;// 0、否  1、积分秒杀商品
+            $info['seckill_goods'] = [];
+            $info['surplus_time'] = 0;
+            //判断商品是否是秒杀商品
+            $seckillGoodsResult = SeckillGoods::find()->andWhere(['goods_id' => $this->id, 'is_delete' => 0])->asArray()->all();
+            if ($seckillGoodsResult) {
+                $backSeckillGoodsResult = array_combine(array_column($seckillGoodsResult, 'seckill_id'), $seckillGoodsResult);
+                $seckill_ids = array_column($seckillGoodsResult, 'seckill_id');
+                $seckillResult = Seckill::find()->andWhere(['and', ['in', 'id', $seckill_ids], ['>', 'end_time', time()]])->asArray()->one();
+                if ($seckillResult && isset($backSeckillGoodsResult[$seckillResult['id']])) {
+                    $seckillResult['goods_id'] = $backSeckillGoodsResult[$seckillResult['id']]['goods_id'];
+                    $seckillResult['buy_limit'] = $backSeckillGoodsResult[$seckillResult['id']]['buy_limit'];
+                    $seckillResult['virtual_seckill_num'] = $backSeckillGoodsResult[$seckillResult['id']]['virtual_seckill_num'];
+                    $seckillResult['real_stock'] = $backSeckillGoodsResult[$seckillResult['id']]['real_stock'];
+                    $seckillResult['virtual_stock'] = $backSeckillGoodsResult[$seckillResult['id']]['virtual_stock'];
+                    $seckillResult['seckill_goods_id'] = $backSeckillGoodsResult[$seckillResult['id']]['id'];
+
+                    //获取秒杀商品规格价格
+                    $seckillResult['seckill_goods_price'] = SeckillGoodsPrice::find()->where(['seckill_goods_id' => $seckillResult['seckill_goods_id']])->asArray()->all();
+                    if ($seckillResult['seckill_goods_price'] && isset($info['attr_list'])) {
+
+                        //获取最小价格
+                        $seckillMinPrice = array_column($seckillResult['seckill_goods_price'], 'seckill_price');
+                        $info['min_price'] = min($seckillMinPrice);
+                        $info['max_price'] = max($seckillMinPrice);
+
+                        //修改商品规格价格
+                        $seckillResult['seckill_goods_price'] = array_combine(array_column($seckillResult['seckill_goods_price'], 'attr_id'), $seckillResult['seckill_goods_price']);
+                        foreach ($info['attr_list'] as &$item) {
+                            if (isset($seckillResult['seckill_goods_price'][$item['id']])) {
+                                $item['price'] = $seckillResult['seckill_goods_price'][$item['id']]['score_deduction_price'];
+                            }
+                        }
+                    }
+
+                    $info['is_seckill'] = 1;
+                    $seckillResult['seckill_goods_price'] = array_values($seckillResult['seckill_goods_price']);
+                    $info['seckill_goods'] = $seckillResult;
+                    $info['surplus_time'] = $seckillResult['end_time'];
                 }
             }
 

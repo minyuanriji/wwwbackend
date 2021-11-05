@@ -49,6 +49,7 @@ use app\models\User;
 use app\models\UserAddress;
 use app\models\UserCoupon;
 use app\plugins\mch\models\Mch;
+use app\plugins\seckill\models\SeckillGoods;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromGoods;
 use app\plugins\shopping_voucher\models\ShoppingVoucherTargetGoods;
@@ -347,7 +348,7 @@ class OrderSubmitForm extends BaseModel
                 }
 
                 $order->province_id                 = $data['is_need_address'] ? $districtArr->getId($data['user_address']['province']) : 0;
-                $order->remark                      = empty($orderItem['remark']) ? "" : $orderItem['remark'];
+                $order->remark                      = empty($orderItem['remark']) ? ($this->form_data['remark'] ?? "") : $orderItem['remark'];
                 $order->order_form                  = $order->encodeOrderForm($orderItem['order_form_data']);
                 $order->distance                    = isset($orderItem['form_data']['distance']) ? $orderItem['form_data']['distance'] : 0;//同城距离
                 $order->words                       = '';
@@ -633,6 +634,7 @@ class OrderSubmitForm extends BaseModel
         $listData = $this->getListData($this->groupByFormDataList());
 
         foreach ($listData as &$item) {
+            $item['is_seckill'] = 0;//积分秒杀标示  0、否  1、积分秒杀
 
             $goods_list = $item['goods_list'];
             $this->checkGoodsStock($goods_list);
@@ -681,8 +683,12 @@ class OrderSubmitForm extends BaseModel
             $item = $CouponService->getUsableUserCouponId();
             //优惠卷计算
             $item = $this->setCouponDiscountData($item, $formDataItem, $type);
-
             //优惠卷结束
+
+
+            /*----------------------------------检测商品是否是秒杀商品,是的话改变价格 运费，小计--------------------------------------*/
+            $this->checkSeckillGoods($item, false);
+
 
             //是否使用积分减免
             if (isset($this->form_data['use_score']) && $this->form_data['use_score'] == 1) {
@@ -716,11 +722,21 @@ class OrderSubmitForm extends BaseModel
 
             $item = $this->setDeliveryData($item, $formDataItem);
 
-            $item                = $this->setExpressData($item);
-            $totalPrice          = price_format($item['total_goods_price'] + $item['express_price']);
-            $item['total_price'] = $this->setTotalPrice($totalPrice);
+            //不是积分秒杀商品走这里
+            if (isset($item['is_seckill']) && $item['is_seckill'] != 1) {
+                $item                = $this->setExpressData($item);
+
+                $totalPrice          = price_format($item['total_goods_price'] + $item['express_price']);
+                $item['total_price'] = $this->setTotalPrice($totalPrice);
+            }
+
 
             $item = $this->setGoodsForm($item);
+
+            /*----------------------------------检测商品是否是秒杀商品,是的话改变价格 运费，小计--------------------------------------*/
+            if (!$use_score) {
+                $this->checkSeckillGoods($item, true);
+            }
 
         }
 
@@ -3528,5 +3544,50 @@ class OrderSubmitForm extends BaseModel
         }
 
         return false;
+    }
+
+    /**
+     * 检测商品是否是秒杀商品
+     * @Author: zal
+     * @Date: 2020-04-30
+     * @Time: 14:33
+     * @param array $goodsList
+     * @throws OrderException
+     */
+    public function checkSeckillGoods(&$goodsList, $open)
+    {
+        $express_price = 0;
+        $total_price = 0;
+        $total_goods_price = 0;
+        $forehead_score = [];
+        foreach ($goodsList['same_goods_list'] as &$goods) {
+            $seckillGoodsResult = SeckillGoods::judgeSeckillGoods($goods['goods_id']);
+            if ($seckillGoodsResult) {
+                $backSeckillGoodsResult = array_combine(array_column($seckillGoodsResult['seckillGoodsPrice'], 'attr_id'), $seckillGoodsResult['seckillGoodsPrice']);
+                foreach ($goods['goods_list'] as &$list) {
+                    if (isset($backSeckillGoodsResult[$list['goods_attr']->id])) {
+                        $list['unit_price'] = $backSeckillGoodsResult[$list['goods_attr']->id]['score_deduction_price'];
+                        $express_price += $backSeckillGoodsResult[$list['goods_attr']->id]['seckill_price'] * $goods['num'];
+                        $total_goods_price += $list['unit_price'] * $goods['num'];
+                        if ($open) {
+                            $total_price += $list['unit_price'] * $goods['num'];
+                        }
+                        $forehead_score[] = $list['unit_price'];
+                        $list['total_original_price'] = $list['unit_price'] * $goods['num'];
+                        $list['total_price'] = $list['unit_price'] * $goods['num'];
+                    }
+                }
+                $goodsList['express_price'] = $express_price;
+                $goodsList['total_goods_price'] = $total_goods_price + $goodsList['express_price'];
+                $goodsList['total_goods_original_price'] = $goodsList['total_goods_price'];
+                if ($open) {
+                    $goodsList['total_price'] = $goodsList['total_goods_price'];
+                    $goods['total_price'] = $goodsList['total_goods_price'];
+                }
+                $goods['forehead_score'] = min($forehead_score);
+                $goods['total_original_price'] = $total_goods_price + $goodsList['express_price'];
+                $goodsList['is_seckill'] = 1;
+            }
+        }
     }
 }

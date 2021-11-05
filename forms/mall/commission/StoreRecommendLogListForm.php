@@ -42,7 +42,7 @@ class StoreRecommendLogListForm extends BaseModel
         $query->innerJoin(["co" => MchCheckoutOrder::tableName()], "co.id=cs.item_id")
             ->innerJoin(["s" => Store::tableName()], "s.mch_id=co.mch_id")
             ->innerJoin(["u" => User::tableName()], "u.id=cs.user_id")
-            ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
+            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
         $query->keyword($this->keyword_1 == 1 && $this->keyword, ["LIKE", "s.name", $this->keyword]);
         $query->keyword($this->keyword_1 == 2 && $this->keyword, ["u.mobile" => $this->keyword]);

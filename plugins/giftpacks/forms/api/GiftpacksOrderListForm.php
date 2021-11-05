@@ -7,6 +7,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksOrder;
+use app\plugins\giftpacks\models\GiftpacksOrderItem;
 
 class GiftpacksOrderListForm extends BaseModel{
 
@@ -38,7 +39,17 @@ class GiftpacksOrderListForm extends BaseModel{
                 $query->andWhere(["go.pay_status" => "paid"]);
             }elseif($this->status == "refund"){
                 $query->andWhere(["IN", "go.pay_status", ["refund", "refunding"]]);
-            }else{
+            } elseif ($this->status == 'completed') {
+                $query->andWhere([
+                    'and',
+                    ['go.id' => GiftpacksOrderItem::find()->andWhere([
+                        'and',
+                        ['current_num' => 0],
+                        ['>', 'max_num', 0],
+                        ['<', 'expired_at', time()],
+                    ])->select('order_id')],
+                ]);
+            } else {
                 $query->andWhere(["go.pay_status" => "unpaid"]);
             }
 

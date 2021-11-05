@@ -52,7 +52,7 @@ class CashListForm extends BaseModel
         $query = Cash::find()->alias('c')
             ->where(['c.mall_id' => $this->mall_id, 'c.is_delete' => 0])
             ->innerJoin(["u" => User::tableName()], "u.id=c.user_id")
-            ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]])
+            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]])
             ->keyword($this->status >= 0, ['c.status' => $this->status])
             ->keyword($this->user_id, ['c.user_id' => $this->user_id])
             ->select('c.*,u.nickname,u.mobile,u.avatar_url');

@@ -26,8 +26,14 @@ class Plugin extends \app\plugins\Plugin{
     public function getMenus(){
         return [
             [
-                'name' => '秒杀设置',
-                'route' => 'plugin/seckill/mall/seckill/setting',
+                'name' => '秒杀专题设置',
+                'route' => 'plugin/seckill/mall/special/special',
+                'icon' => 'el-icon-setting',
+                'action' => []
+            ],
+            [
+                'name' => '秒杀商品列表',
+                'route' => 'plugin/seckill/mall/goods/seckill-goods/list',
                 'icon' => 'el-icon-setting',
                 'action' => []
             ]
@@ -35,7 +41,7 @@ class Plugin extends \app\plugins\Plugin{
     }
 
     public function getIndexRoute(){
-        return 'plugin/seckill/mall/seckill/setting';
+        return 'plugin/seckill/mall/special/special';
     }
 
 

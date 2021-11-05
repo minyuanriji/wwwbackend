@@ -5,9 +5,9 @@
         <div slot="header">
             <div>
                 <span>入驻申请</span>
-                <div style="float: right;margin-top: -5px">
+                <!--<div style="float: right;margin-top: -5px">
                     <el-button @click="exportRecord" type="primary" size="small">数据导出</el-button>
-                </div>
+                </div>-->
             </div>
         </div>
         <div class="table-body" >

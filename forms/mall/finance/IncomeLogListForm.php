@@ -49,7 +49,7 @@ class IncomeLogListForm extends BaseModel
         $query = IncomeLog::find()->alias('b')->where([
             'b.mall_id' => \Yii::$app->mall->id,
         ])->innerJoin(['u' => User::tableName()], 'u.id=b.user_id')
-            ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
+            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
         if ($this->keyword) {
             $query->andWhere(['or', ['like', 'u.nickname', $this->keyword], ['like', 'u.mobile', $this->keyword]]);
         }

@@ -1,6 +1,6 @@
 <?php
-namespace app\plugins\hotel\models;
 
+namespace app\plugins\seckill\models;
 
 use app\models\BaseActiveRecord;
 
@@ -18,7 +18,12 @@ class Seckill extends BaseActiveRecord
     {
         return [
             [['mall_id', 'name', 'start_time', 'end_time', 'created_at', 'updated_at'], 'required'],
-            [['is_delete'], 'safe']
+            [['is_delete', 'pic_url'], 'safe']
         ];
+    }
+
+    public function getSeckillGoods ()
+    {
+        return $this->hasMany(SeckillGoods::className(),['seckill_id' => 'id'])->where(['is_delete' => 0]);
     }
 }

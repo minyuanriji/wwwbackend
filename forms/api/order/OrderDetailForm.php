@@ -71,8 +71,8 @@ class OrderDetailForm extends BaseModel
             $detail["total_pay_price"]               = $order["total_pay_price"];
             $detail["total_goods_original_price"]    = $order["total_goods_original_price"];
             $detail["express_price"]                 = $order["express_price"];
-            $detail["coupon_discount_price"]         = $order["coupon_discount_price"];
-            $detail["score_deduction_price"]         = $order["integral_deduction_price"];
+            $detail["coupon_discount_price"]         = $order["integral_deduction_price"];
+            $detail["score_deduction_price"]         = $order["score_deduction_price"];
             $detail["shopping_voucher_decode_price"] = $order["shopping_voucher_decode_price"];
             $detail["name"]                          = $order["name"];
             $detail["mobile"]                        = $order["mobile"];

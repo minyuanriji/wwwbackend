@@ -81,7 +81,7 @@ class SeckillListForm extends BaseModel
                     }
                     $surplus = floatval(intval($item['falseNum']) / intval($item['virtual_stock']));
                     $item['surplus_percentage'] = round($surplus, 2);
-                    if ($item['surplus_percentage'] <= 0) {
+                    if ($item['surplus_percentage'] <= 0 && $item['buyNum']) {
                         $item['surplus_percentage'] = 0.01;
                     }
                 }

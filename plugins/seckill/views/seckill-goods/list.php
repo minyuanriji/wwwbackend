@@ -473,6 +473,10 @@ Yii::$app->loadComponentView('com-rich-text');
                     alert('请选择秒杀专题');
                     return;
                 }
+                if (this.editGoodsAttrParams.formData[0].virtual_stock < this.editGoodsAttrParams.formData[0].real_stock) {
+                    alert('虚拟库存不能小于真实库存');
+                    return;
+                }
                 this.editGoodsAttrParams.btnLoading = true;
                 this.editGoodsAttrParams.formData[0].seckill_id = this.specialId;
                 this.editSave(this.editGoodsAttrParams.formData[0], function(e){

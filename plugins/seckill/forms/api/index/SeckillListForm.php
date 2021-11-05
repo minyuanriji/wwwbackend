@@ -54,8 +54,8 @@ class SeckillListForm extends BaseModel
                     unset($item['goods'], $item['seckillGoodsPrice']);
 
                     //获取虚假比例
-                    $ratio = ceil($item['virtual_stock'] / $item['real_stock'] / 2) ;
-                    $rand = rand($ratio / 10, $ratio);
+                    $ratio = ceil($item['virtual_stock'] / $item['real_stock']) ;
+                    $rand = rand(ceil($ratio / 10), $ratio);
 
                     //获取真实购买数
                     $item['buyNum'] = SeckillGoods::SeckillGoodsBuyNum($item['goods_id'], $seckill);
@@ -115,7 +115,11 @@ class SeckillListForm extends BaseModel
             }
 
             if ($keyArray['buyNum'] > $valArray['buyNum']) {
-                $valArray['falseNum'] = $valArray['falseNum'] + $keyArray['falseNum'];
+                if ($valArray['falseNum'] > $keyArray['buyNum']) {
+                    $valArray['falseNum'] += $keyArray['buyNum'];
+                } else {
+                    $valArray['falseNum'] = $keyArray['falseNum'];
+                }
                 $value = json_encode($valArray);
                 $cache->set($keyID, $value, $cacheTime);
                 $progressNum = $valArray['falseNum'];

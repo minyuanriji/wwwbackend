@@ -141,8 +141,9 @@ class CartAddForm extends BaseModel
                    }
 
                    $buyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult);
-                   if ($buyNum >= $seckillGoodsResult['real_stock']) {
-                       throw new \Exception('秒杀商品库存不足');
+                   if ($buyNum + $this->num >= $seckillGoodsResult['real_stock']) {
+                       $surplus = $seckillGoodsResult['real_stock'] - $buyNum;
+                       throw new \Exception('秒杀商品库存不足，还剩余'. $surplus . '件');
                    }
 
                    $userBuyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult, \Yii::$app->user->id);

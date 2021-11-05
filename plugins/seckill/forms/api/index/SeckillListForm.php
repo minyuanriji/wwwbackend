@@ -81,7 +81,7 @@ class SeckillListForm extends BaseModel
                 $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);
             }
 
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', $seckill);
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', $seckill ?: []);
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }

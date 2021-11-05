@@ -135,18 +135,18 @@ class CartAddForm extends BaseModel
             //查询该商品是否是秒杀商品及活动时间, 秒杀商品是否还有库存
            $seckillGoodsResult = SeckillGoods::judgeSeckillGoods($goods_id);
            if ($seckillGoodsResult) {
-               if ($this->num > $seckillGoodsResult['buy_limit']) {
-                   throw new \Exception('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
-               }
-
-               $buyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult);
-               if ($buyNum >= $seckillGoodsResult['real_stock']) {
-                   throw new \Exception('秒杀商品库存不足');
-               }
-
                if ($seckillGoodsResult['buy_limit'] > 0) {
+                   if ($this->num > $seckillGoodsResult['buy_limit']) {
+                       throw new \Exception('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
+                   }
+
+                   $buyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult);
+                   if ($buyNum >= $seckillGoodsResult['real_stock']) {
+                       throw new \Exception('秒杀商品库存不足');
+                   }
+
                    $userBuyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult, \Yii::$app->user->id);
-                   if ($userBuyNum + $this->num >= $seckillGoodsResult['buy_limit']) {
+                   if ($userBuyNum + $this->num > $seckillGoodsResult['buy_limit']) {
                        throw new \Exception('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
                    }
                }

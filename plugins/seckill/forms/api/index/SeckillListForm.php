@@ -77,9 +77,9 @@ class SeckillListForm extends BaseModel
                     } else {
                         $item['falseNum'] = 0;
                     }
-                    $seckill['surplus_percentage'] = sprintf("%.2f",$seckill['falseNum'] / $item['virtual_stock']);
-                    if ($seckill['surplus_percentage'] <= 0) {
-                        $seckill['surplus_percentage'] = 0.01;
+                    $item['surplus_percentage'] = sprintf("%.2f",$item['falseNum'] / $item['virtual_stock']);
+                    if ($item['surplus_percentage'] <= 0) {
+                        $item['surplus_percentage'] = 0.01;
                     }
                 }
                 $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);

@@ -116,11 +116,11 @@
 
                         <div style="">
                             <el-table v-loading="loading" :data="ruleForm.products" >
-                                <el-table-column prop="product_key" label="编号" width="100" align="center"></el-table-column>
-                                <el-table-column prop="product_price" label="价格" width="200" align="center"></el-table-column>
+                                <el-table-column prop="name" label="编号" width="100" align="center"></el-table-column>
+                                <el-table-column prop="price" label="价格" width="200" align="center"></el-table-column>
                                 <el-table-column label="操作" align="center">
                                     <template slot-scope="scope">
-                                        <el-button @click="delProduct(ruleForm.id, scope.row.product_key, scope.$index)" circle type="text" size="mini">
+                                        <el-button @click="delProduct(ruleForm.id, scope.row.name, scope.$index)" circle type="text" size="mini">
                                             <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                                 <img src="statics/img/mall/del.png" alt="">
                                             </el-tooltip>

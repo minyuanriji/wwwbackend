@@ -28,7 +28,7 @@ class OilProductListForm extends BaseModel{
                 "plat_id"   => $platModel->id,
                 "status"    => 1,
                 "is_delete" => 0
-            ])->asArray()->orderBy("price ASC")->all();
+            ])->asArray()->orderBy("sort DESC, price ASC")->all();
 
             $rows = OilSetting::find()->asArray()->all();
             $settings = [];

@@ -18,7 +18,7 @@ class OilProduct extends BaseActiveRecord
     {
         return [
             [['mall_id', 'plat_id', 'name', 'price', 'created_at', 'updated_at'], 'required'],
-            [['status', 'is_delete'], 'safe']
+            [['status', 'is_delete', 'sort'], 'safe']
         ];
     }
 }

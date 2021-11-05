@@ -5,6 +5,7 @@ namespace app\plugins\oil\forms\mall;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\oil\models\OilPlateforms;
+use app\plugins\oil\models\OilProduct;
 
 class OilPlateformAddProductForm extends BaseModel {
 
@@ -32,17 +33,26 @@ class OilPlateformAddProductForm extends BaseModel {
                 throw new \Exception("平台[ID:{$this->plateform_id}]不存在");
             }
 
-            $product = !empty($plateform->product_json_data) ? json_decode($plateform->product_json_data, true) : [];
-            $product[] = [
-                "product_key"   => $this->product_key,
-                "product_price" => $this->product_price,
-                "sort"          => $this->sort
-            ];
+            $product = OilProduct::findOne([
+                "plat_id" => $plateform->id,
+                "name"    => $this->product_key
+            ]);
+            if(!$product){
+                $product = new OilProduct([
+                    "mall_id"    => $plateform->mall_id,
+                    "plat_id"    => $plateform->id,
+                    "name"       => $this->product_key,
+                    "created_at" => time()
+                ]);
+            }
+            $product->price      = $this->product_price;
+            $product->sort       = $this->sort;
+            $product->updated_at = time();
+            $product->status     = 1;
+            $product->is_delete  = 0;
 
-            $plateform->product_json_data = json_encode($product);
-            $plateform->updated_at = time();
-            if (!$plateform->save()){
-                throw new \Exception($plateform->getErrorMessage());
+            if (!$product->save()){
+                throw new \Exception($product->getErrorMessage());
             }
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '添加成功');

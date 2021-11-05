@@ -5,6 +5,7 @@ namespace app\plugins\oil\forms\mall;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\oil\models\OilPlateforms;
+use app\plugins\oil\models\OilProduct;
 
 class OilPlateformDetailForm extends BaseModel{
 
@@ -28,9 +29,14 @@ class OilPlateformDetailForm extends BaseModel{
                 throw new \Exception("平台不存在");
             }
 
+            $products = OilProduct::find()->where([
+                "plat_id" => $plateform->id,
+                "is_delete" => 0
+            ])->asArray()->orderBy("sort DESC")->all();
+
             $detail = $plateform->getAttributes();
             $detail['region_deny'] = !empty($plateform->region_deny) ? json_decode($plateform->region_deny, true) : [];
-            $detail['products'] = !empty($detail['product_json_data']) ? json_decode($detail['product_json_data'], true) : [];
+            $detail['products'] = $products ? $products : [];
             $detail['params'] = !empty($plateform->json_param) ? json_decode($plateform->json_param, true) : [];
             return [
                 'code' => ApiCode::CODE_SUCCESS,

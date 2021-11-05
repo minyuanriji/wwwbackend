@@ -5,6 +5,7 @@ namespace app\plugins\oil\forms\mall;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\oil\models\OilPlateforms;
+use app\plugins\oil\models\OilProduct;
 
 class OilPlateformDelProductForm extends BaseModel {
 
@@ -30,18 +31,18 @@ class OilPlateformDelProductForm extends BaseModel {
                 throw new \Exception("平台[ID:{$this->plateform_id}]不存在");
             }
 
-            $products = !empty($plateform->product_json_data) ? json_decode($plateform->product_json_data, true) : [];
-            $newProduct = [];
-            foreach($products as $product){
-                if($product['product_key'] != $this->product_key){
-                    $newProduct[] = $product;
-                }
+            $product = OilProduct::findOne([
+                "plat_id" => $plateform->id,
+                "name"    => $this->product_key
+            ]);
+            if(!$product){
+                throw new \Exception("产品不存在[ID:{$this->product_key}]");
             }
 
-            $plateform->product_json_data = json_encode($newProduct);
-            $plateform->updated_at = time();
-            if (!$plateform->save()){
-                throw new \Exception($plateform->getErrorMessage());
+            $product->is_delete  = 1;
+            $product->updated_at = time();
+            if (!$product->save()){
+                throw new \Exception($product->getErrorMessage());
             }
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '操作成功');

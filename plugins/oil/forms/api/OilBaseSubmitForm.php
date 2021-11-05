@@ -120,8 +120,20 @@ class OilBaseSubmitForm extends BaseModel{
 
 
         //区域限制
-        $regionDenys = !empty($platModel->region_deny) ? @json_decode($platModel->region_deny, true) : [];
-        foreach($regionDenys as $region){
+        $regionDenysList = !empty($platModel->region_deny) ? @json_decode($platModel->region_deny, true) : [];
+        $allowRegions = [];
+        $denyRegions = [];
+        foreach($regionDenysList as $item){
+            if(empty($item['type'])) continue;
+            if($item['type'] == "allow"){
+                $allowRegions[] = $item;
+            }else{
+                $denyRegions[] = $item;
+            }
+        }
+
+        //禁止区域
+        foreach($denyRegions as $region){
             if(!empty($region['province_id']) && !empty($region['city_id']) && !empty($region['district_id'])){
                 if($region['province_id'] == $cityInfo['province_id'] &&
                     $region['city_id'] == $cityInfo['city_id'] &&
@@ -138,6 +150,33 @@ class OilBaseSubmitForm extends BaseModel{
                     throw new \Exception("暂不支持" . $region['province'] . "地区加油操作");
                 }
             }
+        }
+
+        //允许区域
+        $isAllow = false;
+        foreach($allowRegions as $region){
+            if(!empty($region['province_id']) && !empty($region['city_id']) && !empty($region['district_id'])){
+                if($region['province_id'] == $cityInfo['province_id'] &&
+                    $region['city_id'] == $cityInfo['city_id'] &&
+                    $region['district_id'] == $cityInfo['district_id']){
+                    $isAllow = true;
+                    break;
+                }
+            }elseif(!empty($region['province_id']) && !empty($region['city_id'])){
+                if($region['province_id'] == $cityInfo['province_id'] &&
+                    $region['city_id'] == $cityInfo['city_id']){
+                    $isAllow = true;
+                    break;
+                }
+            }elseif(!empty($region['province_id'])){
+                if($region['province_id'] == $cityInfo['province_id']){
+                    $isAllow = true;
+                    break;
+                }
+            }
+        }
+        if(!$isAllow){
+            throw new \Exception("暂不支持" . $cityInfo['province'] . $cityInfo['city'] . $cityInfo['district'] . "地区加油操作");
         }
     }
 

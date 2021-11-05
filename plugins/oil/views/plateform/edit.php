@@ -84,6 +84,12 @@
                     <el-tab-pane label="限制" name="limit" style="padding:20px 0px;background: white">
                         <el-form-item label="限制地区" prop="region_deny_list">
                             <el-table :data="region_deny_list" border style="width: 40%">
+                                <el-table-column label="类型" align="center">
+                                    <template slot-scope="scope">
+                                        <span v-if="scope.row.type == 'allow'">允许</span>
+                                        <span v-if="scope.row.type == 'deny'">禁止</span>
+                                    </template>
+                                </el-table-column>
                                 <el-table-column prop="province" label="省" align="center"></el-table-column>
                                 <el-table-column prop="city" label="市" align="center"></el-table-column>
                                 <el-table-column prop="district" label="区"  align="center"></el-table-column>
@@ -105,6 +111,10 @@
                                              v-model="new_region_arr"
                                              clearable>
                                 </el-cascader>
+                                <el-select v-model="new_region_type" size="big" placeholder="请选择" style="width:150px;">
+                                    <el-option label="允许" value="allow"></el-option>
+                                    <el-option label="禁止" value="deny"></el-option>
+                                </el-select>
                                 <el-button :loading="new_region_loading" @click="newRegion" type="danger" size="big" >确定</el-button>
                                 <el-button @click="is_new_region=false" size="big" >取消</el-button>
                             </div>
@@ -166,6 +176,7 @@
             return {
                 is_new_region: false,
                 new_region_arr: [],
+                new_region_type: 'allow',
                 new_region_loading: false,
                 region_deny_list: [],
                 platList: [],
@@ -182,6 +193,7 @@
                     id: 0,
                     name: '',
                     sdk_src: '',
+                    region_allow: [],
                     region_deny: [],
                     products: []
                 },
@@ -292,9 +304,14 @@
                     return;
                 }
 
+                if(this.new_region_type == ''){
+                    this.$message.error("请选择类型");
+                    return;
+                }
+
                 this.new_region_loading = true;
 
-                let i, newItem = {province_id:0}, id, region = null;
+                let i, newItem = {type:this.new_region_type, province_id:0}, id, region = null;
                 for(i=0; i < this.new_region_arr.length; i++){
                     id = this.new_region_arr[i];
                     if(typeof this.districtMap[id] == "undefined")

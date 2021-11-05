@@ -176,7 +176,7 @@ class OilBaseSubmitForm extends BaseModel{
             }
         }
         if(!$isAllow){
-            throw new \Exception("暂不支持" . $cityInfo['province'] . $cityInfo['city'] . $cityInfo['district'] . "地区加油操作");
+            throw new \Exception("非常抱歉~暂不支持" . $cityInfo['province_name'] . "/" . $cityInfo['city_name']  . "/" . $cityInfo['district_name'] . "所属地区操作");
         }
     }
 

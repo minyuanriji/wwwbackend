@@ -108,7 +108,12 @@ class SeckillListForm extends BaseModel
             $valArray = json_decode($keyArray, true);
             $progressNum = $valArray['falseNum'];
         } else {
-            $valArray = json_decode($progressNum, true);
+            if (is_string($progressNum)) {
+                $valArray = json_decode($progressNum, true);
+            } else {
+                $valArray = $progressNum;
+            }
+
             $keyArray = json_decode($keyArray, true);
 
             if ($keyArray['buyNum'] == $valArray['buyNum']) {

@@ -146,7 +146,7 @@ class CartAddForm extends BaseModel
 
                if ($seckillGoodsResult['buy_limit'] > 0) {
                    $userBuyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult, \Yii::$app->user->id);
-                   if ($userBuyNum >= $seckillGoodsResult['buy_limit']) {
+                   if ($userBuyNum + $this->num >= $seckillGoodsResult['buy_limit']) {
                        throw new \Exception('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
                    }
                }

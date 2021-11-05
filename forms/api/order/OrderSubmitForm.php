@@ -3561,7 +3561,6 @@ class OrderSubmitForm extends BaseModel
         $total_goods_price = 0;
         $forehead_score = [];
         foreach ($goodsList['same_goods_list'] as &$goods) {
-//            $seckillGoodsResult = SeckillGoods::judgeSeckillGoods($goods['goods_id']);
 
             //判断是否是秒杀商品并且在秒杀活动内
             $seckillGoodsResult = $this->checkBuyPower($goods['goods_id'], $goods['num']);

@@ -95,8 +95,11 @@ class SeckillGoodsSaveForm extends BaseModel
                         if (!$seckillGoodsPriceModel)
                             throw new \Exception($seckillGoodsPriceModel->getErrorMessage());
                     } else {
-                        $seckillGoodsPriceModel = new SeckillGoodsPrice();
-                        $seckillGoodsPriceModel->mall_id = \Yii::$app->mall->id;
+                        $seckillGoodsPriceModel = SeckillGoodsPrice::find()->andWhere(['goods_id' => $item['goods_id'], 'attr_id' => $item['attr_id'], 'seckill_id' => $item['seckill_id'] ?? $this->seckill_id])->one();
+                        if (!$seckillGoodsPriceModel) {
+                            $seckillGoodsPriceModel = new SeckillGoodsPrice();
+                            $seckillGoodsPriceModel->mall_id = \Yii::$app->mall->id;
+                        }
                     }
                     $seckillGoodsPriceModel->goods_id = $item['goods_id'];
                     $seckillGoodsPriceModel->attr_id = $item['attr_id'];

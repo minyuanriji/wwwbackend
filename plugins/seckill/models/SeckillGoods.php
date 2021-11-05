@@ -45,21 +45,28 @@ class SeckillGoods extends BaseActiveRecord
     public static function judgeSeckillGoods ($goods_id)
     {
         $time = time();
+        $dbTransaction = \Yii::$app->db->beginTransaction();
+        try {
+            $query = self::find()->alias('sg');
 
-        $query = self::find()->alias('sg');
+            $query->leftJoin(['s' => Seckill::tableName()], 's.id=sg.seckill_id')
+                ->andWhere([
+                    'and',
+                    ['s.is_delete' => 0],
+                    ['<', 's.start_time', $time],
+                    ['>', 's.end_time', $time],
+                ]);
 
-        $query->leftJoin(['s' => Seckill::tableName()], 's.id=sg.seckill_id')
-            ->andWhere([
-                'and',
-                ['s.is_delete' => 0],
-                ['<', 's.start_time', $time],
-                ['>', 's.end_time', $time],
-            ]);
+            $exist = $query->select('sg.*, s.start_time, s.end_time')
+                ->where("sg.goods_id = $goods_id for update")
+                ->andWhere(['sg.is_delete' => 0])->with('seckillGoodsPrice')->asArray()->one();
 
-        $exist = $query->select('sg.*, s.start_time, s.end_time')
-            ->andWhere(['sg.is_delete' => 0, 'sg.goods_id' => $goods_id])->with('seckillGoodsPrice')->asArray()->one();
-
-        return $exist;
+            $dbTransaction->commit();
+            return $exist;
+        } catch(\Exception $e) {
+            $dbTransaction->rollBack();
+            throw $e;
+        }
     }
 
     public static function SeckillGoodsBuyNum ($goods_id, $seckillResult, $user_id=0)

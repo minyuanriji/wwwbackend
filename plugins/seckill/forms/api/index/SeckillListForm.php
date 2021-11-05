@@ -103,14 +103,13 @@ class SeckillListForm extends BaseModel
     {
         $cache = \Yii::$app->getCache();
         $progressNum = $cache->get($keyID);
-        $keyArray = json_decode($keyArray, true);
-
         if(!$progressNum){
             $cache->set($keyID, $keyArray, $cacheTime);
             $valArray = json_decode($keyArray, true);
             $progressNum = $valArray['falseNum'];
         } else {
             $valArray = json_decode($progressNum, true);
+            $keyArray = json_decode($keyArray, true);
 
             if ($keyArray['buyNum'] == $valArray['buyNum']) {
                 $progressNum = $valArray['falseNum'];

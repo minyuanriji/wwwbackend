@@ -230,7 +230,11 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
             if ($seckillGoodsResult) {
                 $backSeckillGoodsResult = array_combine(array_column($seckillGoodsResult, 'seckill_id'), $seckillGoodsResult);
                 $seckill_ids = array_column($seckillGoodsResult, 'seckill_id');
-                $seckillResult = Seckill::find()->andWhere(['and', ['in', 'id', $seckill_ids], ['>', 'end_time', time()]])->asArray()->one();
+                $seckillResult = Seckill::find()->andWhere(['and',
+                    ['in', 'id', $seckill_ids],
+                    ['<', 'start_time', time()],
+                    ['>', 'end_time', time()]
+                ])->asArray()->one();
                 if ($seckillResult && isset($backSeckillGoodsResult[$seckillResult['id']])) {
                     $seckillResult['goods_id'] = $backSeckillGoodsResult[$seckillResult['id']]['goods_id'];
                     $seckillResult['buy_limit'] = $backSeckillGoodsResult[$seckillResult['id']]['buy_limit'];

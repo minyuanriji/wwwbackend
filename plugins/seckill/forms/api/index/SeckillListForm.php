@@ -99,8 +99,8 @@ class SeckillListForm extends BaseModel
                 } elseif ($seckill['start_time'] < time() && $seckill['end_time'] > time()) {
                     $seckill['status'] = 1;//进行中
                 }
-                $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);
-                $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);
+                $seckill['start_time'] = date('Y-m-d H:i', $seckill['start_time']);
+                $seckill['end_time'] = date('Y-m-d H:i', $seckill['end_time']);
                 $result = $seckill;
             }
 

@@ -126,10 +126,10 @@ class OilOrderSendAction extends Action{
             $isFirst = !$sendLog ? true : false;
 
             if($isFirst){ //首次赠送
-                $oilOrder['give_type'] = $oilOrder['first_give_type'];
+                $oilOrder['give_type']  = $oilOrder['first_give_type'];
                 $oilOrder['give_value'] = $oilOrder['first_give_value'];
             }else{ //第二次赠送
-                $oilOrder['give_type'] = $oilOrder['second_give_type'];
+                $oilOrder['give_type']  = $oilOrder['second_give_type'];
                 $oilOrder['give_value'] = $oilOrder['second_give_value'];
             }
 

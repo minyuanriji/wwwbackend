@@ -99,7 +99,6 @@ class MchApplyBasicForm extends BaseModel{
                 throw new \Exception($this->responseErrorMsg($applyModel));
             }
 
-
             Sms::updateCodeStatus($this->mobile, $this->captcha);
 
             return [

@@ -2,10 +2,13 @@
 
 namespace app\commands\shopping_voucher_send_task;
 
+use app\models\User;
 use app\plugins\oil\models\OilOrders;
 use app\plugins\oil\models\OilPlateforms;
 use app\plugins\oil\models\OilProduct;
+use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromOil;
+use app\plugins\shopping_voucher\models\ShoppingVoucherLog;
 use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 use yii\base\Action;
 
@@ -29,7 +32,40 @@ class OilOrderSendAction extends Action{
      * 处理发放记录
      * @return void
      */
-    private function sendAction(){}
+    private function sendAction(){
+        $sendLogs = ShoppingVoucherSendLog::find()->where(["status" => "waiting", "source_type" => "from_oil_order"])
+            ->select(["id", "user_id", "source_id", "source_type", "money"])
+            ->orderBy("updated_at ASC")
+            ->asArray()->limit(10)->all();
+        $sendLogIds = [];
+        foreach($sendLogs as $sendLog){
+            try {
+                $user = User::findOne($sendLog['user_id']);
+                if(!$user || $user->is_delete){
+                    throw new \Exception("用户不存在");
+                }
+                $modifyForm = new ShoppingVoucherLogModifiyForm([
+                    "money"       => $sendLog['money'],
+                    "desc"        => "话费充值获得赠送购物券",
+                    "source_id"   => $sendLog['source_id'],
+                    "source_type" => $sendLog['source_type']
+                ]);
+                $modifyForm->add($user, true);
+                $sendLogIds[] = $sendLog['id'];
+                $this->controller->commandOut("购物券发放记录ID:" . $sendLog['id'] . "处理完成");
+            }catch (\Exception $e){
+                $remark = implode("\n", [$e->getMessage(), "line:" . $e->getLine(), "file:".$e->getFile()]);
+                ShoppingVoucherSendLog::updateAll([
+                    "status" => "invalid",
+                    "remark" => $remark
+                ], ["id" => $sendLog['id']]);
+                $this->controller->commandOut($remark);
+            }
+        }
+        if($sendLogIds){
+            ShoppingVoucherSendLog::updateAll(["status" => "success"], "id IN (".implode(",", $sendLogIds).")");
+        }
+    }
 
     /**
      * 新增发送记录
@@ -81,6 +117,45 @@ class OilOrderSendAction extends Action{
 
         foreach($oilOrders as $oilOrder){
 
+            //通过查询历史赠送记录，判断用户是否首次赠送购物券
+            $sendLog = ShoppingVoucherLog::find()->where([
+                "user_id"     => $oilOrder['user_id'],
+                "type"        => 1,
+                "source_type" => "from_oil_order"
+            ])->one();
+            $isFirst = !$sendLog ? true : false;
+
+            if($isFirst){ //首次赠送
+                $oilOrder['give_type'] = $oilOrder['first_give_type'];
+                $oilOrder['give_value'] = $oilOrder['first_give_value'];
+            }else{ //第二次赠送
+                $oilOrder['give_type'] = $oilOrder['second_give_type'];
+                $oilOrder['give_value'] = $oilOrder['second_give_value'];
+            }
+
+            if($oilOrder['give_type'] == 2){ //固定值
+                $money = floatval($oilOrder['give_value']);
+            }else{ //比例
+                $money = $oilOrder['pay_price'] * (floatval($oilOrder['give_value'])/100);
+            }
+
+            $sendLog = new ShoppingVoucherSendLog([
+                "mall_id"     => $oilOrder['mall_id'],
+                "user_id"     => $oilOrder['user_id'],
+                "money"       => $money,
+                "source_id"   => $oilOrder['id'],
+                "source_type" => "from_oil_order",
+                "status"      => "waiting",
+                "created_at"  => time(),
+                "updated_at"  => time(),
+                "data_json"   => json_encode($oilOrder)
+            ]);
+
+            if($sendLog->save()){
+                $this->controller->commandOut("购物券发放记录创建成功，ID:" . $sendLog->id);
+            }else{
+                $this->controller->commandOut(json_encode($sendLog->getErrors()));
+            }
         }
 
         return true;

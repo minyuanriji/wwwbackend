@@ -32,9 +32,9 @@ class SeckillListForm extends BaseModel
             $night = strtotime(date('Y-m-d',strtotime('+1 day'))) - 1;//23:59*/
 
             $seckill = Seckill::find()->andWhere([
-                'and',
+                'and',/*
                 ['<', 'start_time', time()],
-                ['>', 'end_time', time()],
+                ['>', 'end_time', time()],*/
                 ['is_delete' => 0],
                 ['mall_id' => \Yii::$app->mall->id],
             ])->with(
@@ -42,7 +42,7 @@ class SeckillListForm extends BaseModel
                 'seckillGoods.seckillGoodsPrice',
                 'seckillGoods.goods',
                 'seckillGoods.goods.goodsWarehouse'
-            )->select('id,name,start_time,end_time,pic_url')->asArray()->one();
+            )->select('id,name,start_time,end_time,pic_url')->orderBy('end_time asc')->asArray()->one();
 
             $result = [];
             if ($seckill) {
@@ -91,6 +91,13 @@ class SeckillListForm extends BaseModel
                     if ($item['surplus_percentage'] > 1) {
                         $item['surplus_percentage'] = 1;
                     }
+                }
+                if ($seckill['start_time'] > time()) {
+                    $seckill['status'] = 0;//未开始
+                } elseif ($seckill['end_time'] < time()) {
+                    $seckill['status'] = 2;//已结束
+                } elseif ($seckill['start_time'] < time() && $seckill['end_time'] > time()) {
+                    $seckill['status'] = 1;//进行中
                 }
                 $seckill['start_time'] = date('Y-m-d', $seckill['start_time']);
                 $seckill['end_time'] = date('Y-m-d H:i:s', $seckill['end_time']);

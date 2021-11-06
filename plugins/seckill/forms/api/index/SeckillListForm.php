@@ -33,8 +33,8 @@ class SeckillListForm extends BaseModel
 
             $seckill = Seckill::find()->andWhere([
                 'and',/*
-                ['<', 'start_time', time()],
-                ['>', 'end_time', time()],*/
+                ['<', 'start_time', time()],*/
+                ['>', 'end_time', time()],
                 ['is_delete' => 0],
                 ['mall_id' => \Yii::$app->mall->id],
             ])->with(

@@ -20,7 +20,11 @@ class EfpsPayQueryJob extends Component implements JobInterface{
         if(empty($this->outTradeNo)){
             $efpsOrder = EfpsPaymentOrder::find()->where([
                 "is_pay" => 0
-            ])->andWhere(["<", "do_query_count", 3])->orderBy("update_at ASC")->one();
+            ])->andWhere([
+                "AND",
+                ["<", "do_query_count", 10],
+                [">", "transactionStartTime", date("YmdHis", time() - 600)]
+            ])->orderBy("update_at ASC")->one();
         }else{
             $efpsOrder = EfpsPaymentOrder::find()->where([
                 "is_pay"     => 0,

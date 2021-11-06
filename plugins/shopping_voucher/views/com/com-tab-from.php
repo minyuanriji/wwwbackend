@@ -23,6 +23,7 @@
                     {key: "addcredit", label: "话费充值", r:"plugin/shopping_voucher/mall/from-addcredit/edit"},
                     {key: "giftpacks", label: "大礼包列表", r:"plugin/shopping_voucher/mall/from-giftpacks/list"},
                     {key: "mallGoods", label: "商城商品", r:"plugin/shopping_voucher/mall/from-mall-goods/list"},
+                    {key: "oil", label: "加油", r:"plugin/shopping_voucher/mall/from-oil/list"},
                 ]
             };
         },

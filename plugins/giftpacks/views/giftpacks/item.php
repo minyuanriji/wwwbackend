@@ -82,6 +82,16 @@
                 </template>
             </el-table-column>
         </el-table>
+       <div style="padding:30px 0;text-align:left;">
+           <el-pagination
+                   v-if="list.length > 0"
+                   style="display: inline-block;float: right;"
+                   background :page-size="pagination.pageSize"
+                   @current-change="pageChange"
+                   layout="prev, pager, next" :current-page="pagination.current_page"
+                   :total="pagination.total_count">
+           </el-pagination>
+       </div>
     </el-dialog>
 </div>
 <script>
@@ -102,6 +112,10 @@
             pagination: null
         },
         methods: {
+            pageChange(page) {
+                this.search.page = page;
+                this.loadData();
+            },
             show(pack_data){
                 this.dailogTitle = pack_data.title;
                 this.dialogFormVisible = true;

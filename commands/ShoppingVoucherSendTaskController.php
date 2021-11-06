@@ -11,7 +11,8 @@ class ShoppingVoucherSendTaskController extends BaseCommandController {
             'ho' => 'app\commands\shopping_voucher_send_task\HotelOrderSendAction',
             'hf' => 'app\commands\shopping_voucher_send_task\AddcreditOrderSendAction',
             'gf' => 'app\commands\shopping_voucher_send_task\GiftpacksOrderSendAction',
-            'od' => 'app\commands\shopping_voucher_send_task\OrderDetailSendAction'
+            'od' => 'app\commands\shopping_voucher_send_task\OrderDetailSendAction',
+            'oo' => 'app\commands\shopping_voucher_send_task\OilOrderSendAction'
         ];
     }
 

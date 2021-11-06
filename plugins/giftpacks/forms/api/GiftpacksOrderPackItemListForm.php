@@ -62,7 +62,7 @@ class GiftpacksOrderPackItemListForm extends BaseModel{
 
             $query->orderBy("goi.id DESC");
 
-            $list = $query->select($selects)->page($pagination, 10, max(1, (int)$this->page))
+            $list = $query->select($selects)->page($pagination, 999, max(1, (int)$this->page))
                 ->asArray()->all();
             if($list){
                 foreach($list as &$item){

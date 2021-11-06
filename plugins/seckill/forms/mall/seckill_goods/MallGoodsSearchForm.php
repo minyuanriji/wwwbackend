@@ -37,7 +37,7 @@ class MallGoodsSearchForm extends BaseModel
                 ['mall_id' => \Yii::$app->mall->id],
                 ['status' => 1],
                 ['is_delete' => 0],
-                ['>', 'forehead_score', 0]
+//                ['>', 'forehead_score', 0]
             ])->with(['goodsWarehouse' => function ($query) {
                 $query->select('id,cover_pic,name,original_price');
             }]);

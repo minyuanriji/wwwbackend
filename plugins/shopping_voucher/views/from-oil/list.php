@@ -26,7 +26,7 @@ echo $this->render("../com/com-tab-from");
                                     <template slot="append">{{commonSet.first_give_type == 1 ? "%" : "券"}}</template>
                                 </el-input>
                             </el-form-item>
-                            <el-form-item label="首次赠送配置" prop="second_give_value">
+                            <el-form-item label="第二次赠送配置" prop="second_give_value">
                                 <el-input type="number" min="0" placeholder="请输入内容" v-model="commonSet.second_give_value" style="width:260px;">
                                     <el-select v-model="commonSet.second_give_type" slot="prepend" placeholder="请选择" style="width:110px;">
                                         <el-option label="按比例" value="1"></el-option>

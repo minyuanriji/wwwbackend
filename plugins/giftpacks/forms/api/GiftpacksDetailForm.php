@@ -89,6 +89,9 @@ class GiftpacksDetailForm extends BaseModel{
                     $joinGroup['need_num'] = $joinGroup['need_num'] - $joinGroup['user_num'];
                 }
             }
+
+            $detail['sold_num'] += 300;
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [

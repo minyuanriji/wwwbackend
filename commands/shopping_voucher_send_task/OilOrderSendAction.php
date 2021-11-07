@@ -139,6 +139,11 @@ class OilOrderSendAction extends Action{
                 $money = $oilOrder['pay_price'] * (floatval($oilOrder['give_value'])/100);
             }
 
+            //上限100，超过100部分按50%计算
+            if($money > 100){
+                $money = 100 + ($money - 100) * 0.5;
+            }
+
             $sendLog = new ShoppingVoucherSendLog([
                 "mall_id"     => $oilOrder['mall_id'],
                 "user_id"     => $oilOrder['user_id'],

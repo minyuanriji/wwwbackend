@@ -90,6 +90,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
     const SOURCE_SHARE_VIDEO = 5;
     const SOURCE_SHARE_NEWS = 6;
     const SOURCE_SHARE_CARD = 7;
+    const SOURCE_SHARE_GIFTPACKS = 3;
 
     const UPGRADE_STATUS_CONDITION = 1;
     const UPGRADE_STATUS_GOODS = 2;

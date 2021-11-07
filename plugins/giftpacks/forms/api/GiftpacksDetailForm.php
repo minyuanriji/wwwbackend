@@ -83,7 +83,7 @@ class GiftpacksDetailForm extends BaseModel{
                             [">", "gg.expired_at", time()],
                             "gg.need_num > gg.user_num"
                         ])->select(["gg.id as group_id", "u.nickname", "u.avatar_url", "gg.need_num", "gg.user_num", "gg.expired_at"])
-                        ->asArray()->orderBy("gg.id DESC")->limit(2)->all();
+                        ->asArray()->orderBy("gg.id DESC")->limit(50)->all();
             if($joinGroups){
                 foreach($joinGroups as &$joinGroup){
                     $joinGroup['need_num'] = $joinGroup['need_num'] - $joinGroup['user_num'];

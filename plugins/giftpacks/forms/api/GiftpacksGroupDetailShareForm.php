@@ -55,6 +55,19 @@ class GiftpacksGroupDetailShareForm extends GrafikaOption implements BasePoster{
             isset($option['nickname']) && $option['nickname']['text'] = \Yii::$app->user->identity->nickname;
 
             $option['price']['text'] = "￥" . $giftpacks->price;
+            if (isset($option['price']) && isset($option['name'])) {
+                //自适应
+                $nameSize = imagettfbbox($option['name']['font'], 0, $this->font_path, $option['name']['text']);
+                $nameHeight = $option['name']['top'] + $nameSize[1] - $nameSize[7];
+
+                $priceSize = imagettfbbox($option['price']['font'], 0, $this->font_path, $option['price']['text']);
+                $priceHeight = $option['price']['top'] + $priceSize[1] - $priceSize[7];
+
+                //compare
+                if ($nameHeight > $option['price']['top'] && $priceHeight > $option['name']['top']) {
+                    $option['price']['top'] = $nameHeight + 25;
+                }
+            }
 
             $cache = $this->getCache($option);
             if ($cache) {

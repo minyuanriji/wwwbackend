@@ -39,4 +39,13 @@ class MobileHelper
 
         return $info;
     }
+
+    /**
+     * 判断是否手机号码
+     * @param $mobile
+     * @return boolean
+     */
+    public static function isMobile($mobile){
+        return preg_match("/^1[3456789]\d{9}$/", $mobile);
+    }
 }

@@ -4,7 +4,9 @@ namespace app\plugins\giftpacks\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\plugins\giftpacks\forms\api\GiftpacksDetailForm;
+use app\plugins\giftpacks\forms\api\GiftpacksDetailShareForm;
 use app\plugins\giftpacks\forms\api\GiftpacksGroupDetailForm;
+use app\plugins\giftpacks\forms\api\GiftpacksGroupDetailShareForm;
 use app\plugins\giftpacks\forms\api\GiftpacksGroupListForm;
 use app\plugins\giftpacks\forms\api\GiftpacksItemDetailForm;
 use app\plugins\giftpacks\forms\api\GiftpacksItemListForm;
@@ -37,6 +39,26 @@ class GiftpacksController extends ApiController {
         $form = new GiftpacksDetailForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->getDetail());
+    }
+
+    /**
+     * 分享大礼包
+     * @return \yii\web\Response
+     */
+    public function actionDetailShare(){
+        $form = new GiftpacksDetailShareForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->get());
+    }
+
+    /**
+     * 分享拼团
+     * @return \yii\web\Response
+     */
+    public function actionGroupDetailShare(){
+        $form = new GiftpacksGroupDetailShareForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->get());
     }
 
     /**

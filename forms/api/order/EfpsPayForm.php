@@ -18,6 +18,9 @@ use app\plugins\alibaba\models\AlibabaDistributionOrder;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\mch\models\MchCheckoutOrder;
 
+/**
+ * @deprecated
+ */
 class EfpsPayForm extends BaseModel{
 
     public $union_id;

@@ -3,6 +3,7 @@ namespace app\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
 use app\forms\api\order\EfpsPayForm;
+use app\forms\api\payCenter\PayCenterBalancePayForm;
 
 class EfpsPayController extends ApiController{
 
@@ -19,9 +20,9 @@ class EfpsPayController extends ApiController{
      * @return array
      */
     public function actionBalance(){
-        $form = new EfpsPayForm();
+        $form = new PayCenterBalancePayForm();
         $form->attributes = $this->requestData;
-        return $this->asJson($form->balancePay());
+        return $this->asJson($form->doPay());
     }
 
     /**

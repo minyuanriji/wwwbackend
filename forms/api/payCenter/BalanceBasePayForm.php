@@ -10,6 +10,9 @@ use app\models\BalanceLog;
 use app\models\BaseModel;
 use app\models\User;
 
+/**
+ * @deprecated
+ */
 abstract class BalanceBasePayForm extends BaseModel {
 
     public $trade_pwd;

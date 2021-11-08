@@ -60,6 +60,7 @@ class GiftpacksListForm extends BaseModel{
                 foreach($list as &$item){
                     $item['max_stock'] = (int)$item['max_stock'];
                     $item['item_num']  = (int)GiftpacksDetailForm::availableItemsQueryByPackId($item['id'])->count();
+                    $item['sold_num']  += 300;
                 }
             }
 

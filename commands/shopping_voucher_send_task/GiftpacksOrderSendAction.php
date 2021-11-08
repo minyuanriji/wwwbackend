@@ -100,7 +100,7 @@ class GiftpacksOrderSendAction extends Action{
 
         //指定配置
         $cloneQuery = clone $query;
-        $cloneQuery->innerJoin(["svfg" => ShoppingVoucherFromGiftpacks::tableName()], "svfg.pack_id=go.pack_id");
+        $cloneQuery->innerJoin(["svfg" => ShoppingVoucherFromGiftpacks::tableName()], "svfg.pack_id=go.pack_id AND svfg.is_delete=0");
         $giftpacksOrders = $cloneQuery->all();
 
         //通用配置

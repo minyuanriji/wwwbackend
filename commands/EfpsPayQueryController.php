@@ -13,7 +13,7 @@ class EfpsPayQueryController extends BaseCommandController{
         echo date("Y-m-d H:i:s") . " 支付结果状态守护程序启动...完成\n";
         while (true) {
 
-            $this->sleep(1);
+            sleep(3);
 
             try {
                 $job = new EfpsPayQueryJob();

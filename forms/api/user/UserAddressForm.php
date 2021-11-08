@@ -37,17 +37,15 @@ class UserAddressForm extends BaseModel
     public $town_id;
     public $town;
 
-
-
     public function rules()
     {
         return [
-            [['name', 'province_id', 'city_id', 'district_id', 'mobile', 'detail'], 'required'],
+            [['name', 'province_id', 'city_id', 'district_id', 'mobile', 'detail'], 'required', 'message'=>'{attribute}不能为空'],
             [['detail', 'hasCity','town'], 'string'],
             [['id', 'province_id', 'city_id', 'district_id', 'is_default', 'limit','town_id'], 'integer'],
             [['is_default',], 'default', 'value' => 0],
             [['name', 'mobile', 'latitude', 'longitude', 'location'], 'string', 'max' => 255],
-            [['detail'], 'string', 'max' => 1000],
+            ['detail', 'checkDetail'],
             [['latitude', 'longitude', 'location'], 'default', 'value' => ''],
             [['mobile'], PhoneNumberValidator::className(), 'when' => function ($model) {
                 $mall = Mall::findOne(['id' => \Yii::$app->mall->id]);
@@ -62,11 +60,11 @@ class UserAddressForm extends BaseModel
         return [
             'id' => 'ID',
             'name' => '收货人',
-            'province_id' => 'Province ID',
+            'province_id' => '省份ID',
             'province' => '省份名称',
-            'city_id' => 'City ID',
+            'city_id' => '城市ID',
             'city' => '城市名称',
-            'district_id' => 'District ID',
+            'district_id' => '县ID',
             'district' => '县区名称',
             'mobile' => '联系电话',
             'detail' => '详细地址',
@@ -76,6 +74,15 @@ class UserAddressForm extends BaseModel
             'town_id'=>'镇ID',
             'town'=>'镇名称'
         ];
+    }
+
+    //效验地址详情
+    public function checkDetail($attribute, $params)
+    {
+        $detail = $this->detail;
+        if (strlen($detail) > 1000) {
+            $this->addError($attribute, "详细地址最大字节不能大于1000！");
+        }
     }
 
     /**

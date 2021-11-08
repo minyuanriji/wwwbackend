@@ -4,6 +4,7 @@ namespace app\plugins\hotel\helpers;
 use app\controllers\api\ApiController;
 use app\plugins\hotel\jobs\HotelFetchBookingListJob;
 use app\plugins\hotel\models\HotelPics;
+use app\plugins\hotel\models\HotelRoom;
 use app\plugins\hotel\models\Hotels;
 
 class ApiHotelHelper{
@@ -91,6 +92,21 @@ class ApiHotelHelper{
             $bookingList = $job->execute(null);
         }else{
             \Yii::$app->queue->delay(0)->push($job);
+        }
+        if ($bookingList) {
+            foreach ($bookingList as &$room) {
+                $hotelRoomResult = HotelRoom::findOne(['product_code' => $room['product_code'], 'is_delete' => 0]);
+                if ($hotelRoomResult) {
+                    $room['floor'] = $hotelRoomResult->floor;
+                    $room['bed_width'] = $hotelRoomResult->bed_width;
+                    $room['people_num'] = $hotelRoomResult->people_num;
+                } else {
+                    $room['floor'] = 0;
+                    $room['bed_width'] = 0;
+                    $room['people_num'] = 0;
+                }
+            }
+
         }
 
         return $bookingList ?: [];

@@ -53,12 +53,18 @@ class RechargeRecordForm extends BaseModel
                 }
             }
 
+            //获取上次充值手机号码
+            $mobile = AddcreditOrder::find()->andWhere(['user_id' => \Yii::$app->user->id, 'mall_id' => \Yii::$app->mall->id])
+                ->select('mobile')->orderBy('created_at DESC')->one();
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => $result,
                 'money_list' => $this->rechargeMoneyList(),
+                'mobile' => $mobile,
                 'msg' => '',
                 'pagination' => $pagination,
+
             ];
         } catch (\Exception $e) {
             return [

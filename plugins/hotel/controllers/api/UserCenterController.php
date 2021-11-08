@@ -9,6 +9,7 @@ use app\plugins\hotel\forms\api\user_center\UserCenterOrderDetailForm;
 use app\plugins\hotel\forms\api\user_center\UserCenterOrderListForm;
 use app\plugins\hotel\forms\api\user_center\UserCenterOrderRefundableForm;
 use app\plugins\hotel\forms\api\user_center\UserCenterOrderRefundApplyForm;
+use app\plugins\hotel\forms\api\user_center\UserCenterSaveOrderResidentForm;
 
 class UserCenterController extends ApiController{
 
@@ -68,6 +69,16 @@ class UserCenterController extends ApiController{
         $form = new UserCenterOrderRefundApplyForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->apply());
+    }
+
+    /**
+     * 未支付订单修改入住人信息
+     * @return \yii\web\Response
+     */
+    public function actionSaveOrderResident(){
+        $form = new UserCenterSaveOrderResidentForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->save());
     }
 
 }

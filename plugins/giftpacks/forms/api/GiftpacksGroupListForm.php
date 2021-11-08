@@ -34,8 +34,7 @@ class GiftpacksGroupListForm extends BaseModel{
             }
 
             $query = GiftpacksGroup::find()->alias("gg")
-                ->innerJoin(["u" => User::tableName()], "u.id=gg.user_id")
-                ->orderBy("gg.updated_at DESC");
+                ->innerJoin(["u" => User::tableName()], "u.id=gg.user_id");
             $query->andWhere([
                 "AND",
                 ["IN", "gg.status", ["success", "sharing"]],
@@ -46,8 +45,10 @@ class GiftpacksGroupListForm extends BaseModel{
             $selects = ["gg.id", "gg.status", "gg.need_num", "gg.user_num", "gg.expired_at",
                 "gg.created_at", "gg.user_id", "u.nickname", "u.avatar_url"
             ];
+            $selects[] = "IF(gg.expired_at > '".time()."' AND gg.status='sharing' , 1, 0) as displaysort";
             $query->select($selects);
 
+            $query->orderBy("displaysort DESC, gg.updated_at DESC");
             $list = $query->page($pagination, 10, max(1, (int)$this->page))->asArray()->all();
             if($list){
                 foreach($list as &$log){

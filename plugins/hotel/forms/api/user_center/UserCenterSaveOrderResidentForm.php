@@ -27,7 +27,7 @@ class UserCenterSaveOrderResidentForm extends BaseModel
         try {
 
             //获取订单详情
-            $orderDetail = HotelOrder::find()->asArray()->where(["id" => $this->hotel_order_id])->one();
+            $orderDetail = HotelOrder::find()->where(["id" => $this->hotel_order_id])->one();
             if (!$orderDetail) {
                 throw new \Exception("订单不存在");
             }

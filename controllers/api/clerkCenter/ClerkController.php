@@ -7,6 +7,7 @@ use app\controllers\api\filters\LoginFilter;
 use app\forms\api\clerkCenter\ClerkDetailForm;
 use app\forms\api\clerkCenter\ClerkDoForm;
 use app\forms\api\clerkCenter\ClerkGetLogForm;
+use app\forms\api\clerkCenter\ClerkSweepInfoForm;
 
 class ClerkController extends ApiController{
 
@@ -46,6 +47,16 @@ class ClerkController extends ApiController{
         $form = new ClerkGetLogForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->getList());
+    }
+
+    /**
+     * 扫核销码跳转详情
+     * @return \yii\web\Response
+     */
+    public function actionSweepJump(){
+        $form = new ClerkSweepInfoForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->getInfo());
     }
 
 }

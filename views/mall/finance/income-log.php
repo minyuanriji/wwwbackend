@@ -4,78 +4,81 @@ Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
 
 <div id="app" v-cloak>
-    <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
-        <div slot="header">
-            <div>
-                <span>收益记录</span>
-                <div style="float: right;margin-right: 10px">
-                    <com-export-dialog :field_list='export_list' :params="searchData" @selected="exportConfirm"></com-export-dialog>
-                </div>
-                <div style="float: right;margin-right: 10px">
-                    <el-button @click="handleIncome" type="primary" size="small">收益充值</el-button>
-                </div>
+    <el-card style="border-radius: 15px">
+        <div>
+            <span>收益记录</span>
+            <div style="float: right;margin-right: 10px;margin-bottom: 10px">
+                <com-export-dialog :field_list='export_list' :params="searchData" @selected="exportConfirm"></com-export-dialog>
+            </div>
+            <div style="float: right;margin-right: 10px;margin-bottom: 10px">
+                <el-button @click="handleIncome" type="primary" size="small">收益充值</el-button>
             </div>
         </div>
-        <div class="table-body">
-            <div style="display: flex;justify-content: space-evenly;">
-                <div style="width: 25%">
-                    <el-date-picker size="small" v-model="date" type="datetimerange"
-                                    style="float: left"
-                                    value-format="yyyy-MM-dd HH:mm:ss"
-                                    range-separator="至" start-placeholder="开始日期"
-                                    @change="selectDateTime"
-                                    end-placeholder="结束日期">
-                    </el-date-picker>
-                </div>
-                <div style="width: 15%">
-                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称、手机号搜索" v-model="keyword" clearable @clear="search">
-                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-                    </el-input>
-                </div>
-                <div style="width: 18%">
-                    类型
-                    <el-tooltip class="item" effect="dark" content="只有选择订单或者商家扫码类型，才能筛选省市区" placement="bottom">
-                        <i class="el-icon-question"></i>
-                    </el-tooltip>
-                    <el-select size="small" v-model="type" @change='searchType' class="select" placeholder="请选择类型">
-                        <el-option key="" label="全部" value=""></el-option>
-                        <el-option key="goods" label="商品分佣" value="goods"></el-option>
-                        <el-option key="checkout" label="结账单收入" value="checkout"></el-option>
-                        <el-option key="cash" label="提现" value="cash"></el-option>
-                        <el-option key="admin" label="管理员操作" value="admin"></el-option>
-                        <el-option key="store" label="推荐门店分佣" value="store"></el-option>
-                        <el-option key="migrate" label="旧商城迁移" value="migrate"></el-option>
-                        <el-option key="boss" label="股东分红" value="boss"></el-option>
-                        <el-option key="hotel_commission" label="推荐酒店分佣" value="hotel_commission"></el-option>
-                        <el-option key="hotel_3r_commission" label="酒店消费分佣" value="hotel_3r_commission"></el-option>
-                        <el-option key="giftpacks_commission" label="大礼包分佣" value="giftpacks_commission"></el-option>
-                        <el-option key="region_goods" label="区域商品分红分佣" value="region_goods"></el-option>
-                        <el-option key="region_checkout" label="区域门店扫码分红" value="region_checkout"></el-option>
-                    </el-select>
-                </div>
-                <div style="width: 16%"  v-if="levelShow">
-                    等级
-                    <el-select size="small" v-model="level" placeholder="请选择区域等级" @change="levelChange">
-                        <el-option
-                                v-for="item in level_list"
-                                :label="item.name"
-                                :value="item.level">
-                        </el-option>
-                    </el-select>
-                </div>
-                <div style="width: 20%" v-if="level>0">
-                    省市区
-                    <el-cascader
-                            size="small"
-                            @change="addressChange"
-                            :options="district"
-                            :props="props"
-                            v-model="address">
-                    </el-cascader>
-                </div>
+    </el-card>
+
+    <el-card style="border-radius: 15px;margin-top: 15px;">
+        <div style="display: flex;">
+            <div style="margin-right: 10px">
+                <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称、手机号搜索" v-model="keyword" clearable @clear="search">
+                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                </el-input>
+            </div>
+            <div style="margin-right: 10px">
+                <el-date-picker size="small" v-model="date" type="datetimerange"
+                                style="float: left"
+                                value-format="yyyy-MM-dd HH:mm:ss"
+                                range-separator="至" start-placeholder="开始日期"
+                                @change="selectDateTime"
+                                end-placeholder="结束日期">
+                </el-date-picker>
             </div>
 
-            <div style="margin: 30px 0">
+            <div style="width: 18%">
+                类型
+                <el-tooltip class="item" effect="dark" content="只有选择订单或者商家扫码类型，才能筛选省市区" placement="bottom">
+                    <i class="el-icon-question"></i>
+                </el-tooltip>
+                <el-select size="small" v-model="type" @change='searchType' class="select" placeholder="请选择类型">
+                    <el-option key="" label="全部" value=""></el-option>
+                    <el-option key="goods" label="商品分佣" value="goods"></el-option>
+                    <el-option key="checkout" label="结账单收入" value="checkout"></el-option>
+                    <el-option key="cash" label="提现" value="cash"></el-option>
+                    <el-option key="admin" label="管理员操作" value="admin"></el-option>
+                    <el-option key="store" label="推荐门店分佣" value="store"></el-option>
+                    <el-option key="migrate" label="旧商城迁移" value="migrate"></el-option>
+                    <el-option key="boss" label="股东分红" value="boss"></el-option>
+                    <el-option key="hotel_commission" label="推荐酒店分佣" value="hotel_commission"></el-option>
+                    <el-option key="hotel_3r_commission" label="酒店消费分佣" value="hotel_3r_commission"></el-option>
+                    <el-option key="giftpacks_commission" label="大礼包分佣" value="giftpacks_commission"></el-option>
+                    <el-option key="region_goods" label="区域商品分红分佣" value="region_goods"></el-option>
+                    <el-option key="region_checkout" label="区域门店扫码分红" value="region_checkout"></el-option>
+                </el-select>
+            </div>
+            <div style="margin-right: 10px"  v-if="levelShow">
+                等级
+                <el-select size="small" v-model="level" placeholder="请选择区域等级" @change="levelChange">
+                    <el-option
+                            v-for="item in level_list"
+                            :label="item.name"
+                            :value="item.level">
+                    </el-option>
+                </el-select>
+            </div>
+            <div style="margin-right: 10px" v-if="level>0">
+                省市区
+                <el-cascader
+                        size="small"
+                        @change="addressChange"
+                        :options="district"
+                        :props="props"
+                        v-model="address">
+                </el-cascader>
+            </div>
+        </div>
+    </el-card>
+    <el-card shadow="never" style="border:0;" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
+        <div class="table-body" style="border-radius: 15px;">
+            <div style="margin-bottom:20px;">
                 <div style="display: flex;justify-content: space-evenly">
                     <div>
                         <div style="text-align: center">总收入</div>
@@ -105,7 +108,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                         </com-user-finance-stat>
                     </template>
                 </el-table-column>
-                <el-table-column label="收支情况(收益)" width="130">
+                <el-table-column label="收支情况(收益)" width="150">
                     <template slot-scope="scope">
                         <div style="font-size: 18px;color: #68CF3D" v-if="scope.row.type == 1">+{{scope.row.income}}</div>
                         <div style="font-size: 18px;color: #F6AA5A" v-if="scope.row.type == 2">-{{scope.row.income}}</div>
@@ -122,17 +125,17 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             </el-table>
 
             <!--工具条 批量操作和分页-->
-            <el-col :span="24" class="toolbar">
+            <div style="text-align: center">
                 <el-pagination
                         background
                         layout="prev, pager, next"
                         @current-change="pageChange"
                         :page-size="pagination.pageSize"
                         :total="pagination.total_count"
-                        style="float:right;margin:15px"
+                        style="margin-top:20px;"
                         v-if="pagination">
                 </el-pagination>
-            </el-col>
+            </div>
         </div>
 
         <!-- 充值收益 -->

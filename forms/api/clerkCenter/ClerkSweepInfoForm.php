@@ -5,6 +5,7 @@ namespace app\forms\api\clerkCenter;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\clerk\ClerkData;
+use app\models\Goods;
 use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
 
@@ -31,9 +32,9 @@ class ClerkSweepInfoForm extends BaseModel
         $result['cover_pic'] = '';
         $result['name'] = '';
         $result['type'] = 0;
-        $result['current_num'] = 0;
-        $result['expired_at'] = 0;
+        $result['infos'] = [];
         $result['id'] = 0;
+        $result['goods_price'] = 0;
         try {
             $clerkData = ClerkData::findOne($this->id);
             if (!$clerkData) {
@@ -46,13 +47,17 @@ class ClerkSweepInfoForm extends BaseModel
                     $result['status'] = 'invalid';
 //                    throw new \Exception('大礼包核销订单不存在');
                 } else {
-                    $giftPacksResult = GiftpacksItem::find()->andWhere(['id' => $giftOrderItemResult->pack_item_id, 'is_delete' => 0])->one();
+                    $giftPacksResult = GiftpacksItem::find()->alias('gpi')
+                        ->innerJoin(["g" => Goods::tableName()], "g.id=gpi.goods_id")
+                        ->select('gpi.*, g.price as goods_price')
+                        ->andWhere(['gpi.id' => $giftOrderItemResult->pack_item_id, 'gpi.is_delete' => 0])->one();
                     if (!$giftPacksResult) {
                         throw new \Exception('产品不存在');
                     }
 
                     $result['cover_pic'] = $giftPacksResult->cover_pic;
                     $result['name'] = $giftPacksResult->name;
+                    $result['goods_price'] = $giftPacksResult->goods_price;
 
                     switch ($clerkData->source_type)
                     {
@@ -74,9 +79,18 @@ class ClerkSweepInfoForm extends BaseModel
                         default:
                             $result['type'] = 0;
                     }
-
-                    $result['current_num'] = $giftOrderItemResult->current_num;
-                    $result['expired_at'] = $giftOrderItemResult->expired_at;
+                    $infos = [];
+                    if($giftOrderItemResult->max_num > 0){
+                        $infos[] = "还剩".$giftOrderItemResult->current_num."次";
+                    }else{
+                        $infos[] = "不限次数";
+                    }
+                    if($giftOrderItemResult->expired_at > 0){
+                        $infos[] = date("Y-m-d", $giftOrderItemResult->expired_at) . "到期";
+                    }else{
+                        $infos[] = "永久有效";
+                    }
+                    $result['infos'] = implode("，", $infos);
                     $result['id'] = $clerkData->id;
                     $result['status'] = 'normal';
                 }

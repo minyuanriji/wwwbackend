@@ -60,18 +60,18 @@ class UserAddressForm extends BaseModel
         return [
             'id' => 'ID',
             'name' => '收货人',
-            'province_id' => '省份ID',
+            'province_id' => '省份',
             'province' => '省份名称',
-            'city_id' => '城市ID',
+            'city_id' => '城市',
             'city' => '城市名称',
-            'district_id' => '县ID',
+            'district_id' => '县',
             'district' => '县区名称',
             'mobile' => '联系电话',
             'detail' => '详细地址',
             'latitude' => '定位地址',
             'longitude' => '定位地址',
             'location' => '定位地址',
-            'town_id'=>'镇ID',
+            'town_id'=>'镇',
             'town'=>'镇名称'
         ];
     }

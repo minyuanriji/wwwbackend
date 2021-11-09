@@ -35,7 +35,7 @@
                         <template slot-scope="scope">
                             <div><b>编号：</b>{{scope.row.order_no}}</div>
                             <div><b>日期：</b>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
-                            <div><b>金额：</b><span style="color:darkgreen">100元</span></div>
+                            <div><b>金额：</b><span style="color:darkgreen">{{scope.row.product_price}}元</span></div>
                         </template>
                     </el-table-column>
 

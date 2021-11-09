@@ -1,82 +1,93 @@
 <div id="app" v-cloak>
-    <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
-        <el-form size="small" class="export-btn" :inline="true" :model="search">
+    <el-tabs v-model="activeName" @tab-click="handleClick" style="border-radius: 15px">
 
-        </el-form>
-        <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tab-pane label="全部" name="all"></el-tab-pane>
+        <el-tab-pane label="未审核" name="no_confirm"></el-tab-pane>
+        <el-tab-pane label="待打款" name="no_paid"></el-tab-pane>
+        <el-tab-pane label="已打款" name="paid"></el-tab-pane>
+        <el-tab-pane label="拒绝" name="refuse"></el-tab-pane>
+        <el-tab-pane label="已驳回" name="return"></el-tab-pane>
 
-            <el-tab-pane label="全部" name="all"></el-tab-pane>
-            <el-tab-pane label="未审核" name="no_confirm"></el-tab-pane>
-            <el-tab-pane label="待打款" name="no_paid"></el-tab-pane>
-            <el-tab-pane label="已打款" name="paid"></el-tab-pane>
-            <el-tab-pane label="拒绝" name="refuse"></el-tab-pane>
-            <el-tab-pane label="已驳回" name="return"></el-tab-pane>
+        <el-card style="border-radius: 15px">
+            <div style="float: right;margin-right: 10px;margin-bottom: 10px">
+                <com-export-dialog :field_list='export_list' :params="searchData"
+                                   @selected="exportConfirm"></com-export-dialog>
+            </div>
+            <div style="margin-top:10px" v-loading="statisticsLoading">
+                <div style="display: flex;justify-content: space-evenly">
+                    <div>
+                        <div style="text-align: center">总申请提现金额</div>
+                        <div id="assets">{{Statistics.applyMoney}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">总实际打款（已转账）</div>
+                        <div id="assets">{{Statistics.actualMoney}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">当页申请提现金额</div>
+                        <div id="assets">{{Statistics.currentApply}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">当页实际打款（已转账）</div>
+                        <div id="assets">{{Statistics.currentActual}}元</div>
+                    </div>
+                </div>
+            </div>
 
-            <com-export-dialog :field_list='export_list' :params="searchData" @selected="exportConfirm"></com-export-dialog>
+        </el-card>
+
+        <el-card style="border-radius: 15px;margin-top: 15px;">
+            <div style="display: flex;justify-content: space-evenly;">
+                <div style="width: 30%">
+                    <div style="float: left;margin-top: 5px">打款时间：</div>
+                    <el-date-picker size="small" v-model="date" type="datetimerange"
+                                    style="float: left"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    range-separator="至" start-placeholder="开始日期"
+                                    @change="selectDateTime"
+                                    end-placeholder="结束日期">
+                    </el-date-picker>
+                </div>
+                <div style="width: 16%">
+                    <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入商户名称搜索"
+                              v-model="search.keyword" clearable @clear="goSearch">
+                        <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
+                    </el-input>
+                </div>
+                <div style="width: 16%">
+                    等级
+                    <el-select size="small" v-model="level" placeholder="请选择区域等级" @change="levelChange">
+                        <el-option
+                                v-for="item in level_list"
+                                :label="item.name"
+                                :value="item.level">
+                        </el-option>
+                    </el-select>
+                </div>
+                <div style="width: 20%" v-if="level>0">
+                    省市区
+                    <el-cascader
+                            size="small"
+                            @change="addressChange"
+                            :options="district"
+                            :props="props"
+                            v-model="address">
+                    </el-cascader>
+                </div>
+            </div>
+        </el-card>
+
+        <el-card shadow="never" style="border:0;border-radius: 15px;margin-top: 15px"
+                 body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
+
+
             <div class="table-body">
-                <div style="display: flex;justify-content: space-evenly;">
-                    <div style="width: 30%">
-                        <div style="float: left;margin-top: 5px">打款时间：</div>
-                        <el-date-picker size="small" v-model="date" type="datetimerange"
-                                        style="float: left"
-                                        value-format="yyyy-MM-dd HH:mm:ss"
-                                        range-separator="至" start-placeholder="开始日期"
-                                        @change="selectDateTime"
-                                        end-placeholder="结束日期">
-                        </el-date-picker>
-                    </div>
-                    <div style="width: 16%">
-                        <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入商户名称搜索" v-model="search.keyword" clearable @clear="goSearch">
-                            <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
-                        </el-input>
-                    </div>
-                    <div style="width: 16%">
-                        等级
-                        <el-select size="small" v-model="level" placeholder="请选择区域等级" @change="levelChange">
-                            <el-option
-                                    v-for="item in level_list"
-                                    :label="item.name"
-                                    :value="item.level">
-                            </el-option>
-                        </el-select>
-                    </div>
-                    <div style="width: 20%" v-if="level>0">
-                        省市区
-                        <el-cascader
-                                size="small"
-                                @change="addressChange"
-                                :options="district"
-                                :props="props"
-                                v-model="address">
-                        </el-cascader>
-                    </div>
-                </div>
 
-                <div style="margin: 30px 0" v-loading="statisticsLoading">
-                    <div style="display: flex;justify-content: space-evenly">
-                        <div>
-                            <div style="text-align: center">总申请提现金额</div>
-                            <div id="assets">{{Statistics.applyMoney}}元</div>
-                        </div>
-                        <div>
-                            <div style="text-align: center">总实际打款（已转账）</div>
-                            <div id="assets">{{Statistics.actualMoney}}元</div>
-                        </div>
-                        <div>
-                            <div style="text-align: center">当页申请提现金额</div>
-                            <div id="assets">{{Statistics.currentApply}}元</div>
-                        </div>
-                        <div>
-                            <div style="text-align: center">当页实际打款（已转账）</div>
-                            <div id="assets">{{Statistics.currentActual}}元</div>
-                        </div>
-                    </div>
-                </div>
-
-                <el-table :data="list" size="small" border v-loading="loading" style="margin-top:20px;margin-bottom: 15px">
+                <el-table :data="list" size="small" border v-loading="loading" style="margin-bottom: 15px">
                     <el-table-column label="基本信息">
                         <template slot-scope="scope">
-                            <com-image mode="aspectFill" :src="scope.row.cover_url" style="float: left;margin-right: 10px"></com-image>
+                            <com-image mode="aspectFill" :src="scope.row.cover_url"
+                                       style="float: left;margin-right: 10px"></com-image>
                             <div>{{scope.row.name}}</div>
                         </template>
                     </el-table-column>
@@ -123,25 +134,32 @@
                     <el-table-column label="操作">
                         <template slot-scope="scope">
 
-                            <el-button @click="apply(scope.row, 'confirm')" v-if="scope.row.status == 0" size="mini" circle style="margin-top: 10px">
+                            <el-button @click="apply(scope.row, 'confirm')" v-if="scope.row.status == 0" size="mini"
+                                       circle style="margin-top: 10px">
                                 <el-tooltip class="item" effect="dark" content="同意" placement="top">
                                     <img src="statics/img/mall/pass.png" alt="">
                                 </el-tooltip>
                             </el-button>
 
-                            <el-button @click="apply(scope.row, 'refuse')" v-if="scope.row.status != 2 && (scope.row.status != 1 || scope.row.transfer_status != 1)" size="mini" circle style="margin-left: 10px;margin-top: 10px">
+                            <el-button @click="apply(scope.row, 'refuse')"
+                                       v-if="scope.row.status != 2 && (scope.row.status != 1 || scope.row.transfer_status != 1)"
+                                       size="mini" circle style="margin-left: 10px;margin-top: 10px">
                                 <el-tooltip class="item" effect="dark" content="拒绝" placement="top">
                                     <img src="statics/img/mall/nopass.png" alt="">
                                 </el-tooltip>
                             </el-button>
 
-                            <el-button @click="apply(scope.row, 'return')" v-if="(scope.row.status == 2 && scope.row.transfer_status == 0)" size="mini" circle style="margin-left: 10px;margin-top: 10px">
+                            <el-button @click="apply(scope.row, 'return')"
+                                       v-if="(scope.row.status == 2 && scope.row.transfer_status == 0)" size="mini"
+                                       circle style="margin-left: 10px;margin-top: 10px">
                                 <el-tooltip class="item" effect="dark" content="退还账户余额" placement="top">
                                     <img src="statics/img/mall/balance.png" alt="">
                                 </el-tooltip>
                             </el-button>
 
-                            <el-button @click="apply(scope.row, 'paid')" v-if="scope.row.status == 1 && scope.row.transfer_status == 0" size="mini" circle style="margin-top: 10px">
+                            <el-button @click="apply(scope.row, 'paid')"
+                                       v-if="scope.row.status == 1 && scope.row.transfer_status == 0" size="mini" circle
+                                       style="margin-top: 10px">
                                 <el-tooltip class="item" effect="dark" content="打款" placement="top">
                                     <img src="statics/img/mall/pay.png" alt="">
                                 </el-tooltip>
@@ -151,22 +169,20 @@
                     </el-table-column>
                 </el-table>
 
-                <div flex="box:last cross:center">
-                    <div></div>
-                    <div>
-                        <el-pagination
+                <div  style="text-align: center">
+                    <el-pagination
                             v-if="list.length > 0"
-                            style="display: inline-block;float: right;"
+                            style="margin-top:20px;"
                             background :page-size="pagination.pageSize"
                             @current-change="pageChange"
                             layout="prev, pager, next" :current-page="pagination.current_page"
                             :total="pagination.total_count">
-                        </el-pagination>
-                    </div>
+                    </el-pagination>
                 </div>
             </div>
-        </el-tabs>
-    </el-card>
+        </el-card>
+    </el-tabs>
+
 </div>
 <script>
     const app = new Vue({
@@ -277,7 +293,7 @@
                                 done();
                                 instance.confirmButtonLoading = false;
                             });
-                        }else{
+                        } else {
                             done();
                         }
                     }
@@ -401,6 +417,7 @@
         right: 10px;
         z-index: 2;
     }
+
     #assets {
         font-size: 18px;
         color: #1ed0ff;
@@ -408,12 +425,11 @@
     }
 
     .table-body {
-        padding: 20px;
         background-color: #fff;
     }
 
     .table-body .el-button {
-        padding: 0!important;
+        padding: 0 !important;
         border: 0;
         margin: 0 5px;
     }

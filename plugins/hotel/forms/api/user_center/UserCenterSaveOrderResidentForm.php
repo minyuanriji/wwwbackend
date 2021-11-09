@@ -10,6 +10,7 @@ class UserCenterSaveOrderResidentForm extends BaseModel
 {
 
     public $hotel_order_id;
+    public $booking_passengers;
 
     public function rules()
     {

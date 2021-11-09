@@ -62,7 +62,7 @@ class GiftpacksItemDetailForm extends BaseModel{
         $selects[] = "s.name as store_name"; //店铺名称
         $selects = array_merge($selects, [
             "s.mch_id", "s.score", "s.longitude", "s.latitude",
-            "s.mobile", "s.address", "s.province_id", "s.city_id", "s.district_id"
+            "s.mobile", "s.address", "s.province_id", "s.city_id", "s.district_id", "s.cover_url"
         ]);
         $selects[] = "ST_Distance_sphere(point(s.longitude, s.latitude), point(".$lng.", ".$lat.")) as distance_mi";
 

@@ -217,7 +217,8 @@ class GiftpacksGroupPaidProcessForm extends BaseModel{
 
         $this->finished  = $finished;
         $this->pay_order = $payOrder;
-        $this->order_id  = isset($userOrderIds[$payOrder->user_id]) ? $userOrderIds[$payOrder->user_id] : 0;
+//        $this->order_id  = isset($userOrderIds[$payOrder->user_id]) ? $userOrderIds[$payOrder->user_id] : 0;
+        $this->order_id  = isset($userOrderIds[\Yii::$app->user->id]) ? $userOrderIds[\Yii::$app->user->id] : 0;
     }
 
     public function getFinished(){

@@ -28,6 +28,12 @@ class ClerkSweepInfoForm extends BaseModel
         }
 
         $result = [];
+        $result['cover_pic'] = '';
+        $result['name'] = '';
+        $result['type'] = 0;
+        $result['current_num'] = 0;
+        $result['expired_at'] = 0;
+        $result['id'] = 0;
         try {
             $clerkData = ClerkData::findOne($this->id);
             if (!$clerkData) {

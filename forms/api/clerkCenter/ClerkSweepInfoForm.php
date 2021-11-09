@@ -49,15 +49,15 @@ class ClerkSweepInfoForm extends BaseModel
                 } else {
                     $giftPacksResult = GiftpacksItem::find()->alias('gpi')
                         ->innerJoin(["g" => Goods::tableName()], "g.id=gpi.goods_id")
-                        ->select('gpi.*, g.price as goods_price')
-                        ->andWhere(['gpi.id' => $giftOrderItemResult->pack_item_id, 'gpi.is_delete' => 0])->one();
+                        ->select(['gpi.*', 'g.price as goods_price'])
+                        ->andWhere(['gpi.id' => $giftOrderItemResult->pack_item_id, 'gpi.is_delete' => 0])->asArray()->one();
                     if (!$giftPacksResult) {
                         throw new \Exception('产品不存在');
                     }
 
-                    $result['cover_pic'] = $giftPacksResult->cover_pic;
-                    $result['name'] = $giftPacksResult->name;
-                    $result['goods_price'] = $giftPacksResult->goods_price;
+                    $result['cover_pic'] = $giftPacksResult['cover_pic'];
+                    $result['name'] = $giftPacksResult['name'];
+                    $result['goods_price'] = $giftPacksResult['goods_price'];
 
                     switch ($clerkData->source_type)
                     {

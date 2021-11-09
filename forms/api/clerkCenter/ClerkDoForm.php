@@ -25,6 +25,7 @@ class ClerkDoForm extends BaseModel{
             return $this->responseErrorInfo();
         }
 
+        $status = 'fail';
         $t = \Yii::$app->db->beginTransaction();
         try {
 
@@ -67,10 +68,12 @@ class ClerkDoForm extends BaseModel{
             }
 
             $t->commit();
+            $status = 'success';
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '核销成功'
+                'msg' => '核销成功',
+                'data' => $status,
             ];
         }catch (\Exception $e){
             $t->rollBack();
@@ -78,6 +81,7 @@ class ClerkDoForm extends BaseModel{
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => $e->getMessage(),
                 'error' => [
+                    'status' => $status,
                     'line' => $e->getLine()
                 ]
             ];

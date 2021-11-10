@@ -46,11 +46,14 @@ class CheckParentFilter extends ActionFilter
         }
 
         if(!$user->parent_id && !$user->is_boss){
-            \Yii::$app->response->data = [
-                'code' => ApiCode::CODE_BIND_PARENT,
-                'msg' => '请先绑定推荐人',
-            ];
-            return false;
+            $user->parent_id = 9;
+            if(!$user->save()){
+                \Yii::$app->response->data = [
+                    'code' => ApiCode::CODE_BIND_PARENT,
+                    'msg' => '请先绑定推荐人',
+                ];
+                return false;
+            }
         }
         
         return true;

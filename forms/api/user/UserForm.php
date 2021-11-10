@@ -129,7 +129,7 @@ class UserForm extends BaseModel
 
 
         $parentName = '系统';
-        if ($user->parent_id != 0) {
+        if ($user->parent_id) {
             $parent = User::findOne([
                 'id' => $user->parent_id,
                 'mall_id' => \Yii::$app->mall->id,
@@ -139,6 +139,8 @@ class UserForm extends BaseModel
             if ($parent) {
                 $parentName = $parent->nickname;
             }
+        }else{
+            $user->parent_id = GLOBAL_PARENT_ID;
         }
 
         /*$levelName = '普通用户';

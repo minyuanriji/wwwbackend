@@ -45,8 +45,8 @@ class RelationLogic extends BaseLogic
             throw new Exception('未启用关系链'.$parent_id);
         }
 
-        if($user->parent_id){
-            throw new Exception('用户已存在上级');
+        if($user->parent_id && $user->parent_id != GLOBAL_PARENT_ID){
+            throw new Exception("用户已存在上级[PID:{$user->parent_id}]");
         }
 
         if ($parent_id == $user->id) {

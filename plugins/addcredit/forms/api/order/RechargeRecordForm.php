@@ -4,6 +4,7 @@ namespace app\plugins\addcredit\forms\api\order;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\models\User;
 use app\plugins\addcredit\models\AddcreditOrder;
 use app\plugins\addcredit\models\AddcreditPlateforms;
 
@@ -53,15 +54,19 @@ class RechargeRecordForm extends BaseModel
                 }
             }
 
-            //获取上次充值手机号码
-            $mobile = AddcreditOrder::find()->andWhere(['user_id' => \Yii::$app->user->id, 'mall_id' => \Yii::$app->mall->id])
+            $user = User::findOne(\Yii::$app->user->id);
+
+                //获取上次充值手机号码
+            $mobile = AddcreditOrder::find()->andWhere(['user_id' => $user->id, 'mall_id' => \Yii::$app->mall->id])
                 ->select('mobile')->asArray()->orderBy('created_at DESC')->one();
+
+
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => $result,
                 'money_list' => $this->rechargeMoneyList(),
-                'mobile' => $mobile ? $mobile : '',
+                'mobile' => $mobile ? $mobile : $user->mobile,
                 'msg' => '',
                 'pagination' => $pagination,
 

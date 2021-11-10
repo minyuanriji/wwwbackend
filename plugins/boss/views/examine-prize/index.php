@@ -6,6 +6,11 @@
             </div>
         </div>
         <div class="table-body">
+            <el-alert
+                    title="说明：一键打款只有选择未打款的选项才会出现"
+                    type="info"
+                    style="margin-bottom: 20px;color: red">
+            </el-alert>
             <div class="input-item">
                 <el-input @keyup.enter.native="search" size="small"
                           placeholder="请输入名称进行搜索"
@@ -19,7 +24,9 @@
                     v-loading="listLoading"
                     :data="list"
                     border
-                    style="width: 100%">
+                    style="width: 100%"
+                    @selection-change="oneClickPayment">
+                <el-table-column align='center' type="selection" width="60"></el-table-column>
 
                 <el-table-column
                         prop="id"
@@ -87,7 +94,10 @@
 
             </el-table>
 
-            <div style="text-align: right;margin: 20px 0;">
+            <div style="text-align: center;margin-top: 20px;">
+                <div v-if="clickPayId.length > 0" style="float: left;">
+                    <el-button @click="OnekeyExamine" type="primary">一键打款</el-button>
+                </div>
                 <el-pagination
                         @current-change="pagination"
                         background
@@ -129,12 +139,21 @@
                         return [];
                     }
                 },
+                clickPayId:[],
             };
         },
         mounted: function () {
             this.getList();
         },
         methods: {
+            oneClickPayment (selection) {
+                let self = this;
+                selection.forEach(function (item) {
+                    if (item.status == 0) {
+                        self.clickPayId.push(item.id);
+                    }
+                })
+            },
             remarks(id) {
                 this.dialogContent = true;
                 this.remarksForm = {
@@ -198,6 +217,30 @@
                     self.pageCount = e.data.data.pagination.page_count;
                 }).catch(e => {
                     console.log(e);
+                });
+            },
+            OnekeyExamine () {
+                this.$confirm('确认批量打款？', '提示', {
+                    type: 'warning',
+                }).then(e => {
+                    request({
+                        params: {
+                            r: 'plugin/boss/mall/examine-prize/batch-examine',
+                        },
+                        data:{
+                            ids: this.clickPayId
+                        },
+                        method: 'post'
+                    }).then(e => {
+                        if (e.data.code === 0) {
+                            this.$message.success(e.data.msg);
+                            this.getList();
+                        } else {
+                            this.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                    });
+                }).catch(e => {
                 });
             },
             examine(id) {
@@ -328,9 +371,4 @@
         margin: 0;
     }
 
-    .table-body .el-button {
-        padding: 0 !important;
-        border: 0;
-        margin: 0 5px;
-    }
 </style>

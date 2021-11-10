@@ -1,14 +1,3 @@
-<?php
-/**
- * @link:http://www.gdqijianshi.com/
- * @copyright: Copyright (c) 2020 广东七件事集团
- * Created by PhpStorm
- * Author: ganxiaohao
- * Date: 2020-05-08
- * Time: 16:11
- */
-?>
-
 <div id="app" v-cloak>
     <el-card shadow="never" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">

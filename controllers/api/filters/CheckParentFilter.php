@@ -46,7 +46,7 @@ class CheckParentFilter extends ActionFilter
         }
 
         if(!$user->parent_id && !$user->is_boss){
-            $user->parent_id = 9;
+            $user->parent_id = GLOBAL_PARENT_ID;
             if(!$user->save()){
                 \Yii::$app->response->data = [
                     'code' => ApiCode::CODE_BIND_PARENT,

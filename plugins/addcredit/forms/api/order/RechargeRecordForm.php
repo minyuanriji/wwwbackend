@@ -66,7 +66,7 @@ class RechargeRecordForm extends BaseModel
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => $result,
                 'money_list' => $this->rechargeMoneyList(),
-                'mobile' => $mobile ? $mobile : $user->mobile,
+                'mobile' => $mobile ? $mobile : (string)$user->mobile,
                 'msg' => '',
                 'pagination' => $pagination,
 

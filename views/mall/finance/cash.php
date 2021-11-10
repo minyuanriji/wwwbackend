@@ -3,49 +3,57 @@ Yii::$app->loadComponentView('com-user-finance-stat');
 ?>
 
 <div id="app" v-cloak>
-    <el-card shadow="never" style="border:0;" body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
-        <el-tabs v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane label="全部" name="-1"></el-tab-pane>
-            <el-tab-pane label="未审核" name="0"></el-tab-pane>
-            <el-tab-pane label="待打款" name="1"></el-tab-pane>
-            <el-tab-pane label="已打款" name="2"></el-tab-pane>
-            <el-tab-pane label="驳回" name="3"></el-tab-pane>
-            <com-export-dialog :field_list='exportList' :params="searchData" @selected="exportConfirm"></com-export-dialog>
+    <el-tabs v-model="activeName" @tab-click="handleClick">
+        <el-tab-pane label="全部" name="-1"></el-tab-pane>
+        <el-tab-pane label="未审核" name="0"></el-tab-pane>
+        <el-tab-pane label="待打款" name="1"></el-tab-pane>
+        <el-tab-pane label="已打款" name="2"></el-tab-pane>
+        <el-tab-pane label="驳回" name="3"></el-tab-pane>
 
-            <div class="table-body">
-                <div style="float: left;margin-top: 5px">打款时间：</div>
-                <el-date-picker size="small" v-model="date" type="datetimerange"
-                                     style="float: left"
-                                     value-format="yyyy-MM-dd HH:mm:ss"
-                                     range-separator="至" start-placeholder="开始日期"
-                                     @change="selectDateTime"
-                                     end-placeholder="结束日期">
-                </el-date-picker>
-                <div class="input-item" style="margin-left:15px;display:inline-block;width:300px;">
-                    <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入昵称搜索" v-model="search.keyword" clearable @clear="goSearch">
-                        <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
-                    </el-input>
-                </div>
-                <div style="margin: 30px 0">
-                    <div style="display: flex;justify-content: space-evenly">
-                        <div>
-                            <div style="text-align: center">总申请提现金额</div>
-                            <div id="assets">{{Statistics.applyMoney}}元</div>
-                        </div>
-                        <div>
-                            <div style="text-align: center">总实际打款（已打款）</div>
-                            <div id="assets">{{Statistics.actualMoney}}元</div>
-                        </div>
-                        <div>
-                            <div style="text-align: center">当页申请提现金额</div>
-                            <div id="assets">{{Statistics.currentApply}}元</div>
-                        </div>
-                        <div>
-                            <div style="text-align: center">当页实际打款（已打款）</div>
-                            <div id="assets">{{Statistics.currentActual}}元</div>
-                        </div>
+        <el-card style="border-radius: 15px;margin-bottom: 10px">
+            <div style="float: right">
+                <com-export-dialog :field_list='exportList' :params="searchData" @selected="exportConfirm"></com-export-dialog>
+            </div>
+            <div >
+                <div style="display: flex;justify-content: space-evenly">
+                    <div>
+                        <div style="text-align: center">总申请提现金额</div>
+                        <div id="assets">{{Statistics.applyMoney}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">总实际打款（已打款）</div>
+                        <div id="assets">{{Statistics.actualMoney}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">当页申请提现金额</div>
+                        <div id="assets">{{Statistics.currentApply}}元</div>
+                    </div>
+                    <div>
+                        <div style="text-align: center">当页实际打款（已打款）</div>
+                        <div id="assets">{{Statistics.currentActual}}元</div>
                     </div>
                 </div>
+            </div>
+        </el-card>
+
+        <el-card style="border-radius: 15px;margin-top: 15px;margin-bottom: 10px">
+            <div style="float: left;margin-top: 5px">打款时间：</div>
+            <el-date-picker size="small" v-model="date" type="datetimerange"
+                            style="float: left"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            range-separator="至" start-placeholder="开始日期"
+                            @change="selectDateTime"
+                            end-placeholder="结束日期">
+            </el-date-picker>
+            <div class="input-item" style="margin-left:15px;display:inline-block;width:300px;">
+                <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入昵称搜索" v-model="search.keyword" clearable @clear="goSearch">
+                    <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
+                </el-input>
+            </div>
+        </el-card>
+
+        <el-card shadow="never" style="border:0;" body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
+            <div class="table-body">
                 <el-table :data="list" size="small" border v-loading="loading" style="margin-top:20px;margin-bottom: 15px">
                     <el-table-column label="基本信息">
                         <template slot-scope="scope">
@@ -132,22 +140,19 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                         </template>
                     </el-table-column>
                 </el-table>
-                <div flex="box:last cross:center">
-                    <div></div>
-                    <div>
-                        <el-pagination
-                            v-if="list.length > 0"
-                            style="display: inline-block;float: right;"
-                            background :page-size="pagination.pageSize"
-                            @current-change="pageChange"
-                            layout="prev, pager, next" :current-page="pagination.current_page"
-                            :total="pagination.total_count">
-                        </el-pagination>
-                    </div>
+                <div style="text-align: center">
+                    <el-pagination
+                        v-if="list.length > 0"
+                        style="margin-top:20px;"
+                        background :page-size="pagination.pageSize"
+                        @current-change="pageChange"
+                        layout="prev, pager, next" :current-page="pagination.current_page"
+                        :total="pagination.total_count">
+                    </el-pagination>
                 </div>
             </div>
-        </el-tabs>
-    </el-card>
+        </el-card>
+    </el-tabs>
 </div>
 <script>
     const app = new Vue({

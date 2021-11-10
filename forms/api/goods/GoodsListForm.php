@@ -33,12 +33,14 @@ class GoodsListForm extends BaseModel implements ICacheForm
     public $cat_id;
     public $keyword;
     public $label;
+    public $order;
+    public $orderBy;
 
     public function rules()
     {
         return [
             [['page', 'limit', 'cat_id'], 'integer'],
-            [['keyword', 'label'], 'string'],
+            [['keyword', 'label', 'order', 'orderBy'], 'string'],
             [['page'], 'default', 'value' => 1],
             [['limit'], 'default', 'value' => 10],
         ];
@@ -47,7 +49,7 @@ class GoodsListForm extends BaseModel implements ICacheForm
     public function getCacheKey(){
         return [
             (int)$this->page, (int)$this->limit, (int)$this->cat_id,
-            (int)$this->limit, $this->keyword, $this->label
+            (int)$this->limit, $this->keyword, $this->label, $this->order, $this->orderBy
         ];
     }
 
@@ -99,7 +101,18 @@ class GoodsListForm extends BaseModel implements ICacheForm
             /**
              * @var BasePagination $pagination
              */
-            $list = $query->orderBy(['g.sort' => SORT_ASC, 'g.id' => SORT_DESC])
+
+            $orderBy = ['g.sort' => SORT_ASC, 'g.id' => SORT_DESC];
+
+            if ($this->order && $this->orderBy) {
+                if ($this->order == 'price') {
+                    $orderBy = 'g.price ' . $this->orderBy;
+                } elseif ($this->order == 'sale') {
+                    $orderBy = 'g.virtual_sales ' . $this->orderBy;
+                }
+            }
+
+            $list = $query->orderBy($orderBy)
                 ->groupBy('g.goods_warehouse_id')
                 ->page($pagination, $this->limit, $this->page)
                 -> all();

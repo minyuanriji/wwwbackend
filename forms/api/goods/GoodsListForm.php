@@ -10,8 +10,6 @@
 
 namespace app\forms\api\goods;
 
-namespace app\forms\api\goods;
-
 use app\core\ApiCode;
 use app\core\BasePagination;
 use app\forms\api\APICacheDataForm;

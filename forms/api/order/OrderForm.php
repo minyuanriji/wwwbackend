@@ -40,6 +40,7 @@ class OrderForm extends BaseModel
     public $offline;
     public $offline_used;
     public $order_refund_id;
+    public $keywords;
 
     public function rules()
     {
@@ -48,6 +49,7 @@ class OrderForm extends BaseModel
             ['page', 'default', 'value' => 1],
             ['limit', 'default', 'value' => 20],
             ['order_refund_id', 'safe'],
+            ['keywords', 'string'],
         ];
     }
 
@@ -81,6 +83,10 @@ class OrderForm extends BaseModel
             $form->only_offline_used = $this->offline_used ? 1 : 0;
         }else{ //寄送
             $form->only_express_order = 1;
+        }
+
+        if ($this->keywords) {
+            $form->keywords = $this->keywords;
         }
 
         $list = $form->search();

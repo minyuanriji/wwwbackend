@@ -16,12 +16,14 @@ class AlibabaDistributionOrderListForm extends BaseModel{
     public $page;
     public $limit;
     public $status;
+    public $keywords;
 
     public function rules()
     {
         return [
             [['page', 'limit'], 'integer'],
-            [['status'], 'safe']
+            [['status'], 'safe'],
+            [['keywords'], 'string'],
         ];
     }
 
@@ -47,6 +49,13 @@ class AlibabaDistributionOrderListForm extends BaseModel{
                 "total_goods_original_price", "is_pay", "shopping_voucher_use_num", "shopping_voucher_decode_price",
                 "shopping_voucher_express_use_num", "shopping_voucher_express_decode_price"
             ];
+
+            if ($this->keywords) {
+                $goodsIds = AlibabaDistributionGoodsList::find()->andWhere(['like', 'name', $this->keywords])->select('id');
+                $orderIds = AlibabaDistributionOrderDetail::find()->andWhere(['goods_id' => $goodsIds])->select('order_id');
+                $query->andWhere(['id' => $orderIds]);
+            }
+
             $orderDatas = $query->select($selects)->asArray()->orderBy("id DESC")->page($pagination, 20, $this->page)->all();
             if($orderDatas){
                 $orderIds = $tmpOrderDatas = [];

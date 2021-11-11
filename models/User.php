@@ -79,7 +79,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
     const PLATFORM_H5 = 'h5';
 
     //app
-    const PLATFORM_APP = 'APP';
+    const PLATFORM_APP = 'app';
 
     /** @var int 是否有邀请资格 */
     const IS_INVITER_YES = 1;

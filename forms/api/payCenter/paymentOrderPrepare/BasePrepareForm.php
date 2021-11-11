@@ -68,6 +68,7 @@ abstract class BasePrepareForm extends BaseModel {
             }
             $supportPayTypes = array_diff($supportPayTypes, $notSupportPayTypes);
 
+
             $unionOrderNo = 'JX' . mb_substr(md5(uniqid()), 2);
             $paymentOrderUnion = new PaymentOrderUnion();
             $paymentOrderUnion->is_pay            = 0;

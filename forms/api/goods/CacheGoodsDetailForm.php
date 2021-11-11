@@ -264,6 +264,8 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                                 }
                                 $item['operating_expenses_price'] = $seckillResult['seckill_goods_price'][$item['id']]['seckill_price'];
                                 $compare[] = $item['price'];
+                            } else {
+                                $item['operating_expenses_price'] = $item['price'];
                             }
                         }
                     }

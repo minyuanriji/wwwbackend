@@ -26,7 +26,7 @@ class MchManaSubAccountListForm extends BaseModel{
         try {
 
             $query = MchAdminUser::find()->alias("mau");
-            $query->andWhere(["mau.mch_id" => MchAdminController::$adminUser['mch_id']]);
+            $query->andWhere(["mau.is_sub" => 1, "mau.mch_id" => MchAdminController::$adminUser['mch_id']]);
             $query->select(["mau.id", "mau.created_at", "mau.mobile"]);
             $query->orderBy("mau.id DESC");
 

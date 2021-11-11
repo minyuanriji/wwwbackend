@@ -34,6 +34,7 @@ class OrderLogic
         if(empty($payTypeData)){
             $payTypeData[] = "wechat";
         }
+        $payTypeData[] = "alipay";
         return $payTypeData;
     }
 

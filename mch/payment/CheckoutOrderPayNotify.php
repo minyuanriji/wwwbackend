@@ -23,6 +23,20 @@ class CheckoutOrderPayNotify extends PaymentNotify{
         if(!$checkoutOrder)
             return false;
 
+        switch ($paymentOrder->payType) {
+            case PaymentOrder::PAY_TYPE_BALANCE:
+                $checkoutOrder->pay_type = 3;
+                break;
+            case PaymentOrder::PAY_TYPE_WECHAT:
+                $checkoutOrder->pay_type = 1;
+                break;
+            case PaymentOrder::PAY_TYPE_ALIPAY:
+                $checkoutOrder->pay_type = 4;
+                break;
+            default:
+                break;
+        }
+
         $event = new CheckoutOrderPaidEvent();
         $event->checkoutOrder = $checkoutOrder;
         $event->amount        = $paymentOrder->amount;

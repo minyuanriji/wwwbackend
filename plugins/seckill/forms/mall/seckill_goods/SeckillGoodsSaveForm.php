@@ -9,6 +9,8 @@ use app\models\GoodsWarehouse;
 use app\plugins\seckill\models\Seckill;
 use app\plugins\seckill\models\SeckillGoods;
 use app\plugins\seckill\models\SeckillGoodsPrice;
+use app\plugins\shopping_voucher\forms\mall\ShoppingVoucherGoodsEditForm;
+use yii\base\BaseObject;
 
 class SeckillGoodsSaveForm extends BaseModel
 {
@@ -114,9 +116,23 @@ class SeckillGoodsSaveForm extends BaseModel
                     $seckillGoodsPriceModel->seckill_id = $item['seckill_id'] ?? $this->seckill_id;
                     $seckillGoodsPriceModel->seckill_price = $item['seckill_price'];
                     $seckillGoodsPriceModel->score_deduction_price = $item['score_deduction_price'];
+                    $seckillGoodsPriceModel->shopping_voucher_deduction_price = $item['shopping_voucher_deduction_price'];
                     $seckillGoodsPriceModel->seckill_goods_id = $item['seckill_goods_id'] ?? $seckillGoodsModel->id;
                     if (!$seckillGoodsPriceModel->save())
                         throw new \Exception($seckillGoodsPriceModel->getErrorMessage());
+
+                    if ($item['shopping_voucher_deduction_price'] > 0) {
+                        $goodsResult = Goods::find()->andWhere('id = ' . $item['goods_id'])->with('goodsWarehouse')->one();
+
+                        $shoppingVoucherGoodsEdit = new ShoppingVoucherGoodsEditForm([
+                            'id' => 0,
+                            'goods_id' => $item['goods_id'],
+                            'name' => $goodsResult->goodsWarehouse->name,
+                            'cover_pic' => $goodsResult->goodsWarehouse->cover_pic,
+                            'voucher_price' => $goodsResult->goodsWarehouse->original_price,
+                        ]);
+                        $shoppingVoucherGoodsEdit->save();
+                    }
                 }
             }
 

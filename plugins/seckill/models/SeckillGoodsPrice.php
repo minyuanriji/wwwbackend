@@ -18,7 +18,7 @@ class SeckillGoodsPrice extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mall_id', 'goods_id', 'attr_id', 'seckill_id', 'seckill_price', 'seckill_goods_id'], 'required'],
+            [['mall_id', 'goods_id', 'attr_id', 'seckill_id', 'seckill_price', 'seckill_goods_id', 'shopping_voucher_deduction_price'], 'required'],
         ];
     }
 

@@ -235,6 +235,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                     ['<', 'start_time', time()],
                     ['>', 'end_time', time()]
                 ])->asArray()->one();
+                $compare = [];
                 if ($seckillResult && isset($backSeckillGoodsResult[$seckillResult['id']])) {
                     $seckillResult['goods_id'] = $backSeckillGoodsResult[$seckillResult['id']]['goods_id'];
                     $seckillResult['buy_limit'] = $backSeckillGoodsResult[$seckillResult['id']]['buy_limit'];
@@ -256,8 +257,13 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                         $seckillResult['seckill_goods_price'] = array_combine(array_column($seckillResult['seckill_goods_price'], 'attr_id'), $seckillResult['seckill_goods_price']);
                         foreach ($info['attr_list'] as &$item) {
                             if (isset($seckillResult['seckill_goods_price'][$item['id']])) {
-                                $item['price'] = $seckillResult['seckill_goods_price'][$item['id']]['score_deduction_price'];
+                                if ($seckillResult['seckill_goods_price'][$item['id']]['shopping_voucher_deduction_price'] > 0) {
+                                    $item['price'] = $seckillResult['seckill_goods_price'][$item['id']]['shopping_voucher_deduction_price'];
+                                } else {
+                                    $item['price'] = $seckillResult['seckill_goods_price'][$item['id']]['score_deduction_price'];
+                                }
                                 $item['operating_expenses_price'] = $seckillResult['seckill_goods_price'][$item['id']]['seckill_price'];
+                                $compare[] = $item['price'];
                             }
                         }
                     }
@@ -266,6 +272,9 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                     $seckillResult['seckill_goods_price'] = array_values($seckillResult['seckill_goods_price']);
                     $info['seckill_goods'] = $seckillResult;
                     $info['surplus_time'] = $seckillResult['end_time'];
+                    if($voucherGoods) {
+                        $info['shopping_voucher']['voucher_price'] = $compare ? min($compare) : 0;
+                    }
                 }
             }
 

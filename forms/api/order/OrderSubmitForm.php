@@ -101,7 +101,7 @@ class OrderSubmitForm extends BaseModel
      * 是否开启红包券
      * @var bool
      */
-    protected $enableIntegral= true;
+    protected $enableIntegral = true;
 
     /**
      * 是否开启自定义表单功能
@@ -242,7 +242,7 @@ class OrderSubmitForm extends BaseModel
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS, "", $data);
     }
 
-   /**
+    /**
      * 提交订单
      * @return array
      * @throws \app\core\exceptions\ClassNotFoundException
@@ -259,13 +259,13 @@ class OrderSubmitForm extends BaseModel
             try {
                 $data = $this->handleData($type = 2);
             } catch (OrderException $orderException) {
-                \Yii::$app->redis->set('var2',$orderException);
+                \Yii::$app->redis->set('var2', $orderException);
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, CommonLogic::getExceptionMessage($orderException));
             }
 
             //需要设置收货地址的情况
             //全部是到店消费商品，就不需要设置收货地址
-            if($data['is_need_address']){
+            if ($data['is_need_address']) {
                 if (!$this->getUserAddress() && !$data['all_self_mention']) {
                     return $this->returnApiResultData(ApiCode::CODE_FAIL, "请先选择收货地址");
                 }
@@ -277,10 +277,10 @@ class OrderSubmitForm extends BaseModel
                         return $this->returnApiResultData(ApiCode::CODE_FAIL, "请填写手机号");
                     }
                     /** @var Mall $mall */
-                    $mall   = Mall::findOne(['id' => \Yii::$app->mall->id]);
+                    $mall = Mall::findOne(['id' => \Yii::$app->mall->id]);
                     $status = $mall->getMallSettingOne('mobile_verify');
                     if ($status) {
-                        $value   = $data['user_address']['mobile'];
+                        $value = $data['user_address']['mobile'];
                         $pattern = (new PhoneNumberValidator())->pattern;
                         if ($value && !preg_match($pattern, $value)) {
                             return $this->returnApiResultData(ApiCode::CODE_FAIL, "手机格式不正确");
@@ -294,45 +294,45 @@ class OrderSubmitForm extends BaseModel
                     }
                 }
 
-                if (!$data['user_address_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'当前收货地址不允许购买。');
-                if (!$data['price_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL,'订单总价未达到起送要求。');
+                if (!$data['user_address_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL, '当前收货地址不允许购买。');
+                if (!$data['price_enable']) return $this->returnApiResultData(ApiCode::CODE_FAIL, '订单总价未达到起送要求。');
 
             }
 
-            $token  = $this->getToken();
+            $token = $this->getToken();
 
             $oldOrder = Order::findOne(['token' => $token, 'sign' => $this->sign, 'is_delete' => 0]);
-            if ($oldOrder)  return $this->returnApiResultData(ApiCode::CODE_FAIL,'重复下单。');
+            if ($oldOrder) return $this->returnApiResultData(ApiCode::CODE_FAIL, '重复下单。');
             $user = \Yii::$app->user->identity;
 
             $districtArr = new DistrictArr();
             $event_data = array();//事件参数
             foreach ($data['list'] as $orderItem) {
                 $order = new Order();
-                $order->mall_id                       = \Yii::$app->mall->id;
-                $order->user_id                       = $user->getId();
-                $order->order_no                      = Order::getOrderNo('S');;
-                $order->total_price                   = $orderItem['total_price'];
-                $order->total_pay_price               = $orderItem['total_price'];
-                $order->express_original_price        = $orderItem['express_price'];
-                $order->express_price                 = $orderItem['express_price'];
-                $order->total_goods_price             = $orderItem['total_goods_price'];
-                $order->total_goods_original_price    = $orderItem['total_goods_original_price'];
-                $order->member_discount_price         = $orderItem['member_discount'];
-                $order->use_user_coupon_id            = 0;
-                $order->coupon_discount_price         = 0;
-                $order->use_score                     = $orderItem['score']['use'] ? $orderItem['score']['use_num'] : 0;
+                $order->mall_id = \Yii::$app->mall->id;
+                $order->user_id = $user->getId();
+                $order->order_no = Order::getOrderNo('S');;
+                $order->total_price = $orderItem['total_price'];
+                $order->total_pay_price = $orderItem['total_price'];
+                $order->express_original_price = $orderItem['express_price'];
+                $order->express_price = $orderItem['express_price'];
+                $order->total_goods_price = $orderItem['total_goods_price'];
+                $order->total_goods_original_price = $orderItem['total_goods_original_price'];
+                $order->member_discount_price = $orderItem['member_discount'];
+                $order->use_user_coupon_id = 0;
+                $order->coupon_discount_price = 0;
+                $order->use_score = $orderItem['score']['use'] ? $orderItem['score']['use_num'] : 0;
                 //积分抵扣
-                $order->score_deduction_price         = $orderItem['score']['use'] ? $orderItem['score']['deduction_price'] : 0;
+                $order->score_deduction_price = $orderItem['score']['use'] ? $orderItem['score']['deduction_price'] : 0;
                 //红包券抵扣
-                $order->integral_deduction_price      = $orderItem['integral']['use'] ? $orderItem['integral']['integral_deduction_price'] : 0;
+                $order->integral_deduction_price = $orderItem['integral']['use'] ? $orderItem['integral']['integral_deduction_price'] : 0;
 
                 //购物券抵扣
-                $order->shopping_voucher_use_num      = $orderItem['shopping_voucher_use_num'];
+                $order->shopping_voucher_use_num = $orderItem['shopping_voucher_use_num'];
                 $order->shopping_voucher_decode_price = $orderItem['shopping_voucher_decode_price'];
 
-                $order->name                        = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
-                $order->mobile                      = !empty($data['user_address']['mobile']) ? $data['user_address']['mobile'] : "";
+                $order->name = !empty($data['user_address']['name']) ? $data['user_address']['name'] : "";
+                $order->mobile = !empty($data['user_address']['mobile']) ? $data['user_address']['mobile'] : "";
                 if ($data['is_need_address'] && $orderItem['delivery']['send_type'] !== 'offline') {
                     $order->address = $data['user_address']['province']
                         . ' '
@@ -344,26 +344,26 @@ class OrderSubmitForm extends BaseModel
                         . ' '
                         . $data['user_address']['detail'];
 
-                    $order->address_id=$data['user_address']['id'];
+                    $order->address_id = $data['user_address']['id'];
                 }
 
-                $order->province_id                 = $data['is_need_address'] ? $districtArr->getId($data['user_address']['province']) : 0;
-                $order->remark                      = empty($orderItem['remark']) ? ($this->form_data['remark'] ?? "") : $orderItem['remark'];
-                $order->order_form                  = $order->encodeOrderForm($orderItem['order_form_data']);
-                $order->distance                    = isset($orderItem['form_data']['distance']) ? $orderItem['form_data']['distance'] : 0;//同城距离
-                $order->words                       = '';
+                $order->province_id = $data['is_need_address'] ? $districtArr->getId($data['user_address']['province']) : 0;
+                $order->remark = empty($orderItem['remark']) ? ($this->form_data['remark'] ?? "") : $orderItem['remark'];
+                $order->order_form = $order->encodeOrderForm($orderItem['order_form_data']);
+                $order->distance = isset($orderItem['form_data']['distance']) ? $orderItem['form_data']['distance'] : 0;//同城距离
+                $order->words = '';
 
-                $order->is_pay                      = Order::IS_PAY_NO;
-                $order->pay_type                    = Order::IS_PAY_NO;
-                $order->is_send                     = 0;
-                $order->is_confirm                  = Order::IS_COMMENT_NO;
-                $order->is_sale                     = 0;
-                $order->support_pay_types           = $order->encodeSupportPayTypes($this->supportPayTypes);
+                $order->is_pay = Order::IS_PAY_NO;
+                $order->pay_type = Order::IS_PAY_NO;
+                $order->is_send = 0;
+                $order->is_confirm = Order::IS_COMMENT_NO;
+                $order->is_sale = 0;
+                $order->support_pay_types = $order->encodeSupportPayTypes($this->supportPayTypes);
 
-                if($data['is_need_address']){
+                if ($data['is_need_address']) {
                     if ($orderItem['delivery']['send_type'] === 'offline') {
                         if (empty($orderItem['store']))
-                            return $this->returnApiResultData(ApiCode::CODE_FAIL,'请选择自提门店。');
+                            return $this->returnApiResultData(ApiCode::CODE_FAIL, '请选择自提门店。');
                         $order->store_id = $orderItem['store']['id'];
                         $order->send_type = Order::SEND_TYPE_SELF;
                     } elseif ($orderItem['delivery']['send_type'] === 'city') {
@@ -377,36 +377,36 @@ class OrderSubmitForm extends BaseModel
                     }
                 }
 
-                $order->sign                        = $this->sign !== null ? $this->sign : '';
-                $order->token                       = $token;
-                $order->status                      = $this->status;
+                $order->sign = $this->sign !== null ? $this->sign : '';
+                $order->token = $token;
+                $order->status = $this->status;
 
                 //满减金额
-                $order->full_relief_price           = $orderItem['total_full_relief_price'];
+                $order->full_relief_price = $orderItem['total_full_relief_price'];
 
                 //核销码、门店
-                $order->mch_id                      = $orderItem['form_data']['mch_id'];
-                if($orderItem['is_offline']){
-                    $order->offline_qrcode          = (string)rand(10000000, 99999999);
-                    $order->store_id                = (int)$orderItem['form_data']['store_id'];
-                    $order->send_type               = Order::SEND_TYPE_SELF;
+                $order->mch_id = $orderItem['form_data']['mch_id'];
+                if ($orderItem['is_offline']) {
+                    $order->offline_qrcode = (string)rand(10000000, 99999999);
+                    $order->store_id = (int)$orderItem['form_data']['store_id'];
+                    $order->send_type = Order::SEND_TYPE_SELF;
                 }
 
                 //订单类型
                 $isOffline = $orderItem['is_offline'];
-                $isBaopin  = $orderItem['is_baopin'];
-                if($isOffline && $isBaopin){ //核销、爆品
+                $isBaopin = $orderItem['is_baopin'];
+                if ($isOffline && $isBaopin) { //核销、爆品
                     $order->order_type = "offline_baopin";
-                }elseif($isOffline && !$isBaopin){ //核销、商品
+                } elseif ($isOffline && !$isBaopin) { //核销、商品
                     $order->order_type = "offline_normal";
-                }elseif(!$isOffline && $isBaopin){ //寄送、爆品
+                } elseif (!$isOffline && $isBaopin) { //寄送、爆品
                     $order->order_type = "express_baopin";
-                }else{ //寄送、商品
+                } else { //寄送、商品
                     $order->order_type = "express_normal";
                 }
 
                 if (!$order->save()) {
-                    return $this->returnApiResultData(ApiCode::CODE_FAIL,(new BaseModel())->responseErrorMsg($order));
+                    return $this->returnApiResultData(ApiCode::CODE_FAIL, (new BaseModel())->responseErrorMsg($order));
                 }
 
                 if ($orderItem['mch']['id'] > 0) {
@@ -418,7 +418,7 @@ class OrderSubmitForm extends BaseModel
                     // }
                 }
 
-                foreach ($orderItem['goods_list'] as $goodsItem){
+                foreach ($orderItem['goods_list'] as $goodsItem) {
                     $this->subGoodsNum($goodsItem['goods_attr'], $goodsItem['num'], $goodsItem);
                     $this->extraOrderDetail($order, $goodsItem);
                 }
@@ -429,17 +429,17 @@ class OrderSubmitForm extends BaseModel
                     $userCoupon->is_use = 1;
                     $userCoupon->is_failure = 1;
                     if ($userCoupon->update(true, ['is_use']) === false) {
-                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'优惠券状态更新失败。');
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, '优惠券状态更新失败。');
                     }
                 }
 
 
                 //扣除购物券
-                if($order->shopping_voucher_use_num > 0){
+                if ($order->shopping_voucher_use_num > 0) {
                     $modifyForm = new ShoppingVoucherLogModifiyForm([
-                        "money"       => $order->shopping_voucher_use_num,
-                        "desc"        => "订单(" . $order->id. ")创建扣除购物券：" . $order->shopping_voucher_use_num,
-                        "source_id"   => $order->id,
+                        "money" => $order->shopping_voucher_use_num,
+                        "desc" => "订单(" . $order->id . ")创建扣除购物券：" . $order->shopping_voucher_use_num,
+                        "source_id" => $order->id,
                         "source_type" => "target_order"
                     ]);
                     $modifyForm->sub($user);
@@ -448,17 +448,17 @@ class OrderSubmitForm extends BaseModel
                 // 扣除积分
                 if ($order->score_deduction_price) {
                     $res = IntegralDeduct::buyGooodsScoreDeduct($order);
-                    if($res === false){
-                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'积分券扣除失败。');
+                    if ($res === false) {
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, '积分券扣除失败。');
                     }
                 }
-                
+
 
                 // 扣除红包券
                 if ($order->integral_deduction_price) {
-                    $res = IntegralDeduct::buyGooodsDeduct($order,1);
-                    if($res === false){
-                        return $this->returnApiResultData(ApiCode::CODE_FAIL,'红包券扣除失败。');
+                    $res = IntegralDeduct::buyGooodsDeduct($order, 1);
+                    if ($res === false) {
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, '红包券扣除失败。');
                     }
                 }
                 //开放额外的订单处理接口
@@ -479,7 +479,7 @@ class OrderSubmitForm extends BaseModel
                 $event->orderItem = $orderItem;
 
 
-                array_push($event_data,$event); //保存事件参数,待入库后触发
+                array_push($event_data, $event); //保存事件参数,待入库后触发
 
                 //添加公共订单任务
                 $commonOrderForm = new CommonOrderForm();
@@ -495,13 +495,13 @@ class OrderSubmitForm extends BaseModel
             }
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, "", [
-                'token'    => $token,
+                'token' => $token,
                 'queue_id' => $queueId ?? 0,
             ]);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             $t->rollBack();
-            \Yii::$app->redis->set('var1',$e -> getMessage());
-            return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());
+            \Yii::$app->redis->set('var1', $e->getMessage());
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
     }
 
@@ -509,7 +509,8 @@ class OrderSubmitForm extends BaseModel
      * 购物车分组
      * @return array
      */
-    public function groupByFormDataList(){
+    public function groupByFormDataList()
+    {
         //获取购物车数据，按照商户、爆品、到店、线上、核销分组
         $cartIds = is_string($this->form_data["list"]) ? explode(",", trim($this->form_data["list"])) : [];
         $query = Cart::find()->alias("c")->andWhere([
@@ -528,89 +529,89 @@ class OrderSubmitForm extends BaseModel
         $cartDatas = $query->select($selects)->asArray()->all();
 
         $dataGroupList = [];
-        foreach($cartDatas as $row){
-            if(!empty($row['is_on_site_consumption'])){ //到店核销商品
+        foreach ($cartDatas as $row) {
+            if (!empty($row['is_on_site_consumption'])) { //到店核销商品
                 $row['offline_data'] = 1;
-                if(!empty($row['baopin_id'])){
+                if (!empty($row['baopin_id'])) {
                     $row['baopin_data'] = 1;
                 }
                 $dataGroupList['single'][] = $row;
-            }elseif(!empty($row['baopin_id'])){ //爆品
+            } elseif (!empty($row['baopin_id'])) { //爆品
                 $row['baopin_data'] = 1;
-                if(!empty($row['is_on_site_consumption'])){
+                if (!empty($row['is_on_site_consumption'])) {
                     $row['offline_data'] = 1;
                 }
                 $dataGroupList['single'][] = $row;
-            }elseif(!empty($row['mch_id'])){ //商家产品
+            } elseif (!empty($row['mch_id'])) { //商家产品
                 $dataGroupList['mch'][$row['mch_id'] . "_" . $row['store_id']][] = $row;
-            }else{
+            } else {
                 $dataGroupList['muti'][] = $row;
             }
         }
         $formDataList = [];
-        foreach($dataGroupList as $type => $dataGroup){
-            if($type == "single"){ //一个订单只允许一个商品
-                foreach($dataGroup as $row){
+        foreach ($dataGroupList as $type => $dataGroup) {
+            if ($type == "single") { //一个订单只允许一个商品
+                foreach ($dataGroup as $row) {
                     $goodsList = [
                         [
-                            'id'            => $row['id'],
+                            'id' => $row['id'],
                             'goods_attr_id' => $row['goods_attr_id'],
-                            'num'           => $row['num'],
-                            'cart_id'       => $row['cart_id'],
-                            'mch_id'        => (int)$row['mch_id'],
-                            'baopin_id'     => (int)$row['baopin_id']
+                            'num' => $row['num'],
+                            'cart_id' => $row['cart_id'],
+                            'mch_id' => (int)$row['mch_id'],
+                            'baopin_id' => (int)$row['baopin_id']
                         ]
                     ];
                     $formDataList[] = [
-                        'is_offline'      => isset($row['offline_data']) ? 1 : 0,
-                        'is_baopin'       => isset($row['baopin_data']) ? 1 : 0,
-                        'mch_id'          => (int)$row['mch_id'],
-                        'store_id'        => (int)$row['store_id'],
-                        'goods_list'      => $goodsList,
+                        'is_offline' => isset($row['offline_data']) ? 1 : 0,
+                        'is_baopin' => isset($row['baopin_data']) ? 1 : 0,
+                        'mch_id' => (int)$row['mch_id'],
+                        'store_id' => (int)$row['store_id'],
+                        'goods_list' => $goodsList,
                         'use_coupon_list' => []
                     ];
                 }
-            }elseif($type == "mch"){ //商户分组
-                foreach($dataGroup as $key => $list){
+            } elseif ($type == "mch") { //商户分组
+                foreach ($dataGroup as $key => $list) {
                     $goodsList = [];
-                    foreach($list as $row){
+                    foreach ($list as $row) {
                         $goodsList[] = [
-                            'id'            => $row['id'],
+                            'id' => $row['id'],
                             'goods_attr_id' => $row['goods_attr_id'],
-                            'num'           => $row['num'],
-                            'cart_id'       => $row['cart_id'],
-                            'mch_id'        => (int)$row['mch_id'],
-                            'baopin_id'     => (int)$row['baopin_id']
+                            'num' => $row['num'],
+                            'cart_id' => $row['cart_id'],
+                            'mch_id' => (int)$row['mch_id'],
+                            'baopin_id' => (int)$row['baopin_id']
                         ];
                     }
                     $parts = explode("_", $key);
                     $formDataList[] = [
-                        'is_offline'      => 0,
-                        'is_baopin'       => 0,
-                        'mch_id'          => $parts[0],
-                        'store_id'        => $parts[1],
-                        'goods_list'      => $goodsList,
+                        'is_offline' => 0,
+                        'is_baopin' => 0,
+                        'mch_id' => $parts[0],
+                        'store_id' => $parts[1],
+                        'goods_list' => $goodsList,
                         'use_coupon_list' => []
                     ];
                 }
-            }else{ //其它平台商品
+            } else { //其它平台商品
                 $goodsList = [];
-                foreach($dataGroup as $row){
+                foreach ($dataGroup as $row) {
                     $goodsList[] = [
-                        'id'            => $row['id'],
+                        'id' => $row['id'],
                         'goods_attr_id' => $row['goods_attr_id'],
-                        'num'           => $row['num'],
-                        'cart_id'       => $row['cart_id'],
-                        'mch_id'        => 0,
-                        'baopin_id'     => 0
+                        'num' => $row['num'],
+                        'cart_id' => $row['cart_id'],
+                        'mch_id' => 0,
+                        'baopin_id' => 0
                     ];
                 }
                 $formDataList[] = [
-                    'is_offline'      => 0,
-                    'is_baopin'       => 0,
-                    'mch_id'          => 0,
-                    'store_id'        => 0,
-                    'goods_list'      => $goodsList,
+                    'is_offline' => 0,
+                    'is_baopin' => 0,
+                    'mch_id' => 0,
+                    'store_id' => 0,
+                    'goods_list' => $goodsList,
                     'use_coupon_list' => []
                 ];
             }
@@ -643,36 +644,36 @@ class OrderSubmitForm extends BaseModel
 
             $this->checkGoodsBuyLimit($goods_list);
 
-            $formDataItem            = $item['form_data'];
-            $item['express_price']   = price_format(0);
+            $formDataItem = $item['form_data'];
+            $item['express_price'] = price_format(0);
 
-            $item['remark']          = isset($formDataItem['remark'])
+            $item['remark'] = isset($formDataItem['remark'])
                 ? $formDataItem['remark'] : null;
             $item['order_form_data'] = isset($formDataItem['order_form'])
                 ? $formDataItem['order_form'] : null;
-            $totalGoodsPrice         = 0;
+            $totalGoodsPrice = 0;
             $totalGoodsOriginalPrice = 0;
 
             foreach ($goods_list as $i => $goodsItem) {
-                $totalGoodsPrice          += $goodsItem['total_price'];
-                $totalGoodsOriginalPrice  += $goodsItem['total_original_price'];
+                $totalGoodsPrice += $goodsItem['total_price'];
+                $totalGoodsOriginalPrice += $goodsItem['total_original_price'];
             }
 
             unset($goodsItem);
-            $item['goods_list']                 = $goods_list;
-            $item['total_goods_price']          = price_format($totalGoodsPrice);
+            $item['goods_list'] = $goods_list;
+            $item['total_goods_price'] = price_format($totalGoodsPrice);
             $item['total_goods_original_price'] = price_format($totalGoodsOriginalPrice);
 
             //找出多规格同一商品，区分规格商品列表合并成同一商品列表
             $SameGoodsService = new SameGoodsService($item);
-            $item             = $SameGoodsService->getSameGoods();
+            $item = $SameGoodsService->getSameGoods();
 
             //会员价减免
             $item = $this->setMemberDiscountData($item);
 
             //满额减免
             $FullReliefPriceService = new FullReliefPriceService($item);
-            $item                   = $FullReliefPriceService->countFullRelief();
+            $item = $FullReliefPriceService->countFullRelief();
 
             //优惠券开始
             $CouponService = new CouponService($item, $type, $this->enableCoupon);
@@ -705,17 +706,17 @@ class OrderSubmitForm extends BaseModel
 
             //计算积分
             $ScoreService = new ScoreService($item, $type, $use_score, $this->enableScore);
-            $item         = $ScoreService->countScore();
+            $item = $ScoreService->countScore();
 
 
             //计算红包券总额
-            $user_integral   = isset($IntegralService) ? $IntegralService->getRemainingIntegral() : User::getCanUseIntegral(\Yii::$app->user->id);
+            $user_integral = isset($IntegralService) ? $IntegralService->getRemainingIntegral() : User::getCanUseIntegral(\Yii::$app->user->id);
             $IntegralService = new IntegralService($item, $user_integral, $type, $use_integral, $this->enableIntegral);
-            $item            = $IntegralService->countIntegral();
+            $item = $IntegralService->countIntegral();
 
             //same_goods_list转换到goods_list入库
-            $AttrGoodsService        = new AttrGoodsService($item);
-            $item                    = $AttrGoodsService->getGoodsList();
+            $AttrGoodsService = new AttrGoodsService($item);
+            $item = $AttrGoodsService->getGoodsList();
             $item['same_goods_list'] = $SameGoodsService->toArray($item['same_goods_list']);
 
             $item['total_price'] = $item['total_goods_price'];
@@ -724,9 +725,9 @@ class OrderSubmitForm extends BaseModel
 
             //不是积分秒杀商品走这里
             if (isset($item['is_seckill']) && $item['is_seckill'] != 1) {
-                $item                = $this->setExpressData($item);
+                $item = $this->setExpressData($item);
 
-                $totalPrice          = price_format($item['total_goods_price'] + $item['express_price']);
+                $totalPrice = price_format($item['total_goods_price'] + $item['express_price']);
                 $item['total_price'] = $this->setTotalPrice($totalPrice);
             }
 
@@ -749,31 +750,31 @@ class OrderSubmitForm extends BaseModel
         foreach ($listData as &$item) {
             $item['shopping_voucher_use_num'] = 0;
             $item['shopping_voucher_decode_price'] = 0;
-            foreach($item['goods_list'] as &$goodsItem){
+            foreach ($item['goods_list'] as &$goodsItem) {
                 $goodsItem['use_shopping_voucher'] = 0;
                 $goodsItem['use_shopping_voucher_decode_price'] = 0;
                 $goodsItem['use_shopping_voucher_num'] = 0;
                 //如果用户选择使用购物券按支付
-                if($goodsItem['total_price'] > 0 && $shoppingVoucherUseData['use']){
+                if ($goodsItem['total_price'] > 0 && $shoppingVoucherUseData['use']) {
                     $voucherGoods = ShoppingVoucherTargetGoods::findOne([
-                        "goods_id"  => $goodsItem['id'],
+                        "goods_id" => $goodsItem['id'],
                         "is_delete" => 0
                     ]);
-                    if(!$voucherGoods)
+                    if (!$voucherGoods)
                         continue;
 
                     $goodsItem['use_shopping_voucher'] = 1;
 
                     //计算购物券价与商品价格比例
-                    $ratio = $voucherGoods->voucher_price/$goodsItem['goods_attr']['price'];
-                    if(($userRemainingShoppingVoucher/$ratio) > $goodsItem['total_price']){
+                    $ratio = $voucherGoods->voucher_price / $goodsItem['goods_attr']['price'];
+                    if (($userRemainingShoppingVoucher / $ratio) > $goodsItem['total_price']) {
                         $needNum = floatval($goodsItem['total_price']) * $ratio;
                         $goodsItem['use_shopping_voucher_decode_price'] = $goodsItem['total_price'];
                         $userRemainingShoppingVoucher -= $needNum;
                         $goodsItem['use_shopping_voucher_num'] = $needNum;
                         $goodsItem['total_price'] = 0;
-                    }else{
-                        $decodePrice = ($userRemainingShoppingVoucher/$ratio);
+                    } else {
+                        $decodePrice = ($userRemainingShoppingVoucher / $ratio);
                         $goodsItem['total_price'] -= $decodePrice;
                         $goodsItem['use_shopping_voucher_decode_price'] = $decodePrice;
                         $goodsItem['use_shopping_voucher_num'] = $userRemainingShoppingVoucher;
@@ -794,10 +795,10 @@ class OrderSubmitForm extends BaseModel
         }
         $shoppingVoucherUseData['remaining'] = $userRemainingShoppingVoucher;
 
-        $total_price        = 0;
+        $total_price = 0;
         $totalOriginalPrice = 0;
         foreach ($listData as &$priceItem) {
-            $total_price        += $priceItem['total_price'];
+            $total_price += $priceItem['total_price'];
             $totalOriginalPrice += $priceItem['total_goods_original_price'];
         }
         //是否自提
@@ -852,13 +853,13 @@ class OrderSubmitForm extends BaseModel
             if (!$userAddress) {
                 /** @var Order $order */
                 $order = Order::find()->where([
-                    'user_id'   => \Yii::$app->user->id,
+                    'user_id' => \Yii::$app->user->id,
                     'send_type' => Order::SEND_TYPE_SELF,
                     'is_delete' => 0
                 ])->orderBy(['created_at' => SORT_DESC])->one();
                 if ($order) {
                     $userAddress = [
-                        'name'   => $order->name,
+                        'name' => $order->name,
                         'mobile' => $order->mobile
                     ];
                 }
@@ -904,7 +905,7 @@ class OrderSubmitForm extends BaseModel
         }
         //红包券开关
         if ($this->enableIntegral) {
-            $integral_enable = isset($optionCache->integral_status)?$optionCache->integral_status:false;
+            $integral_enable = isset($optionCache->integral_status) ? $optionCache->integral_status : false;
         } else {
             $integral_enable = false;
         }
@@ -917,7 +918,7 @@ class OrderSubmitForm extends BaseModel
         //判断如果有一个不是线下自取商品 就需要地址
         $is_need_address = false;
         foreach ($listData as &$item) {
-            if(!$item['form_data']['is_offline']){
+            if (!$item['form_data']['is_offline']) {
                 $is_need_address = true;
                 break;
             }
@@ -930,21 +931,21 @@ class OrderSubmitForm extends BaseModel
         $gotShoppingVoucherNum = 0;
         $goodsIdPrices = [];
         foreach ($listData as &$item) {
-            foreach($item['goods_list'] as $goods){
+            foreach ($item['goods_list'] as $goods) {
                 $goodsIdPrices[$goods['id']] = $goods['total_price'];
             }
         }
-        if($goodsIdPrices){
+        if ($goodsIdPrices) {
             $fromGoodsDatas = ShoppingVoucherFromGoods::find()->andWhere([
                 "AND",
                 ["is_delete" => 0],
                 ["IN", "goods_id", array_keys($goodsIdPrices)],
-                "start_at<'".time()."'"
+                "start_at<'" . time() . "'"
             ])->select(["goods_id", "give_value"])->asArray()->all();
-            if($fromGoodsDatas){
-                foreach($fromGoodsDatas as $fromGoodsData){
+            if ($fromGoodsDatas) {
+                foreach ($fromGoodsDatas as $fromGoodsData) {
                     $totalPrice = isset($goodsIdPrices[$fromGoodsData['goods_id']]) ? $goodsIdPrices[$fromGoodsData['goods_id']] : 0;
-                    $gotShoppingVoucherNum += (floatval($fromGoodsData['give_value'])/100) * $totalPrice;
+                    $gotShoppingVoucherNum += (floatval($fromGoodsData['give_value']) / 100) * $totalPrice;
                 }
             }
         }
@@ -952,25 +953,25 @@ class OrderSubmitForm extends BaseModel
 
         return [
             'got_shopping_voucher_num' => round($gotShoppingVoucherNum, 2),
-            'is_need_address'          => $is_need_address ? 1 : 0,
-            'list'                     => $listData,
-            'total_price'              => price_format($total_price),
-            'user_coupon'              => $userCouponList,
-            'is_auth_phone'            => $is_auth_phone,
-            'price_enable'             => $priceEnable,
-            'user_address'             => $hasCity ? (($userAddress && $userAddress->longitude && $userAddress->latitude) ? $userAddress : []) : $userAddress,
-            'user_address_enable'      => $addressEnable,
-            'is_self_mention'          => $isSelfMention,
-            'custom_currency_all'      => $this->getcustomCurrencyAll($listData),
-            'all_self_mention'         => $allSelfMention,
-            'hasCity'                  => $hasCity,
-            'score_enable'             => $score_enable,
-            'integral_enable'          => $integral_enable, //红包券
-            'shopping_voucher'         => $shoppingVoucherUseData,
-            'form_data'                => [
-                'sign'             => isset($this->form_data['sign'])            ? $this->form_data['sign'] : null,
-                'related_id'       => isset($this->form_data['related_id'])      ? $this->form_data['related_id'] : null,
-                'related_user_id'  => isset($this->form_data['related_user_id']) ? $this->form_data['related_user_id'] : null,
+            'is_need_address' => $is_need_address ? 1 : 0,
+            'list' => $listData,
+            'total_price' => price_format($total_price),
+            'user_coupon' => $userCouponList,
+            'is_auth_phone' => $is_auth_phone,
+            'price_enable' => $priceEnable,
+            'user_address' => $hasCity ? (($userAddress && $userAddress->longitude && $userAddress->latitude) ? $userAddress : []) : $userAddress,
+            'user_address_enable' => $addressEnable,
+            'is_self_mention' => $isSelfMention,
+            'custom_currency_all' => $this->getcustomCurrencyAll($listData),
+            'all_self_mention' => $allSelfMention,
+            'hasCity' => $hasCity,
+            'score_enable' => $score_enable,
+            'integral_enable' => $integral_enable, //红包券
+            'shopping_voucher' => $shoppingVoucherUseData,
+            'form_data' => [
+                'sign' => isset($this->form_data['sign']) ? $this->form_data['sign'] : null,
+                'related_id' => isset($this->form_data['related_id']) ? $this->form_data['related_id'] : null,
+                'related_user_id' => isset($this->form_data['related_user_id']) ? $this->form_data['related_user_id'] : null,
             ],
         ];
     }
@@ -997,12 +998,12 @@ class OrderSubmitForm extends BaseModel
             $goodsList = $this->getGoodsListData($formDataItem['goods_list']);
             $mchItem = [
                 'is_offline' => $formDataItem['is_offline'],
-                'is_baopin'  => $formDataItem['is_baopin'],
-                'mch_id'     => $formDataItem['mch_id'],
-                'store_id'   => $formDataItem['store_id'],
-                'mch'        => $this->getMchInfo(isset($formDataItem['mch_id']) ? $formDataItem['mch_id'] : 0),
+                'is_baopin' => $formDataItem['is_baopin'],
+                'mch_id' => $formDataItem['mch_id'],
+                'store_id' => $formDataItem['store_id'],
+                'mch' => $this->getMchInfo(isset($formDataItem['mch_id']) ? $formDataItem['mch_id'] : 0),
                 'goods_list' => $goodsList,
-                'form_data'  => $formDataItem,
+                'form_data' => $formDataItem,
             ];
             $listData[] = $mchItem;
         }
@@ -1018,14 +1019,14 @@ class OrderSubmitForm extends BaseModel
     {
         if ($id == 0) {
             return [
-                'id'   => 0,
+                'id' => 0,
                 'name' => \Yii::$app->mall->name,
                 'integral_fee_rate' => 0
             ];
         } else {
             $mch = Mch::findOne($id);
             return [
-                'id'   => $id,
+                'id' => $id,
                 'name' => $mch ? $mch->store->name : '未知商户',
                 'integral_fee_rate' => $mch ? $mch->integral_fee_rate : 0
             ];
@@ -1042,10 +1043,10 @@ class OrderSubmitForm extends BaseModel
     {
         $list = [];
         foreach ($goodsList as $i => $goodsItem) {
-            $result                  = $this->getOneGoodsItemData($goodsItem);
-            $result['form_data']     = isset($goodsItem['form_data']) ? $goodsItem['form_data'] : null;
-            $result['baopin_id']     = $goodsItem['baopin_id'];
-            $list[]                  = $result;
+            $result = $this->getOneGoodsItemData($goodsItem);
+            $result['form_data'] = isset($goodsItem['form_data']) ? $goodsItem['form_data'] : null;
+            $result['baopin_id'] = $goodsItem['baopin_id'];
+            $list[] = $result;
         }
         return $list;
     }
@@ -1063,9 +1064,9 @@ class OrderSubmitForm extends BaseModel
     {
         /** @var Goods $goods */
         $goods = Goods::find()->with('goodsWarehouse')->where([
-            'id'        => $goodsItem['id'],
-            'mall_id'   => \Yii::$app->mall->id,
-            'status'    => 1,
+            'id' => $goodsItem['id'],
+            'mall_id' => \Yii::$app->mall->id,
+            'status' => 1,
             'is_delete' => 0,
         ])->one();
 
@@ -1077,8 +1078,8 @@ class OrderSubmitForm extends BaseModel
         $this->checkGoods($goods, $goodsItem);
         try {
             /** @var OrderGoodsAttr $goodsAttr */
-            $goods_attr_id     = $goodsItem['goods_attr_id'];
-            $goodsAttr         = $this->getGoodsAttr($goods_attr_id, $goods);
+            $goods_attr_id = $goodsItem['goods_attr_id'];
+            $goodsAttr = $this->getGoodsAttr($goods_attr_id, $goods);
             $goodsAttr->number = $goodsItem['num'];
         } catch (\Exception $exception) {
             throw new OrderException($exception->getFile() . ";line:" . $exception->getLine() . ";message:" . $exception->getMessage() . '无法查询商品`' . $goods->name . '`的规格信息。');
@@ -1086,42 +1087,42 @@ class OrderSubmitForm extends BaseModel
         $attrList = $goods->signToAttr($goodsAttr->sign_id);
 
         //如果是多商户商品，可全额抵扣
-        if($goods->mch_id){
+        if ($goods->mch_id) {
             $goods->max_deduct_integral = $goodsAttr->price;
         }
 
         $itemData = [
-            'id'                     => $goods->id,
-            'name'                   => $goods->goodsWarehouse->name,
-            'num'                    => $goodsItem['num'],
-            'forehead_score'         => $goods->forehead_score,
-            'forehead_score_type'    => $goods->forehead_score_type,
-            'accumulative'           => $goods->accumulative,
-            'pieces'                 => $goods->pieces,
-            'forehead'               => $goods->forehead,
-            'freight_id'             => $goods->freight_id,
-            'unit_price'             => price_format($goodsAttr->original_price),
-            'total_original_price'   => price_format($goodsAttr->original_price * $goodsItem['num']),
-            'total_price'            => price_format($goodsAttr->price * $goodsItem['num']),
-            'member_discount'        => price_format(0),
-            'cover_pic'              => $goods->goodsWarehouse->cover_pic,
-            'is_level_alone'         => $goods->is_level_alone,
-            'is_level'               => $goods->is_level,
-            'goods_warehouse_id'     => $goods->goods_warehouse_id,
-            'sign'                   => $goods->sign,
-            'confine_order_count'    => $goods->confine_order_count,
-            'form_id'                => $goods->form_id,
-            'goods_attr'             => $goodsAttr,
-            'attr_list'              => $attrList,
-            'discounts'              => $goodsAttr->discount,
-            'user_coupon_id'         => isset($goodsItem["user_coupon_id"]) ? $goodsItem["user_coupon_id"] : 0,
-            'fulfil_price'           => $goods->fulfil_price,
-            'full_relief_price'      => $goods->full_relief_price,
-            'max_deduct_integral'    => $goods->max_deduct_integral,
+            'id' => $goods->id,
+            'name' => $goods->goodsWarehouse->name,
+            'num' => $goodsItem['num'],
+            'forehead_score' => $goods->forehead_score,
+            'forehead_score_type' => $goods->forehead_score_type,
+            'accumulative' => $goods->accumulative,
+            'pieces' => $goods->pieces,
+            'forehead' => $goods->forehead,
+            'freight_id' => $goods->freight_id,
+            'unit_price' => price_format($goodsAttr->original_price),
+            'total_original_price' => price_format($goodsAttr->original_price * $goodsItem['num']),
+            'total_price' => price_format($goodsAttr->price * $goodsItem['num']),
+            'member_discount' => price_format(0),
+            'cover_pic' => $goods->goodsWarehouse->cover_pic,
+            'is_level_alone' => $goods->is_level_alone,
+            'is_level' => $goods->is_level,
+            'goods_warehouse_id' => $goods->goods_warehouse_id,
+            'sign' => $goods->sign,
+            'confine_order_count' => $goods->confine_order_count,
+            'form_id' => $goods->form_id,
+            'goods_attr' => $goodsAttr,
+            'attr_list' => $attrList,
+            'discounts' => $goodsAttr->discount,
+            'user_coupon_id' => isset($goodsItem["user_coupon_id"]) ? $goodsItem["user_coupon_id"] : 0,
+            'fulfil_price' => $goods->fulfil_price,
+            'full_relief_price' => $goods->full_relief_price,
+            'max_deduct_integral' => $goods->max_deduct_integral,
             // 规格自定义货币 例如：步数宝的步数币
             //'custom_currency' => $this->getCustomCurrency($goods, $goodsAttr),
             'is_on_site_consumption' => $goods->is_on_site_consumption, //到店消费类型
-            'integral_fee_rate'      => $goods->integral_fee_rate
+            'integral_fee_rate' => $goods->integral_fee_rate
         ];
         return $itemData;
     }
@@ -1148,8 +1149,8 @@ class OrderSubmitForm extends BaseModel
         $user = \Yii::$app->user->identity;
 
         $member = MemberLevel::getOneData([
-            'level'     => $user->level,
-            'mall_id'   => \Yii::$app->mall->id,
+            'level' => $user->level,
+            'mall_id' => \Yii::$app->mall->id,
             'is_delete' => 0,
         ]);
         if (!$member) {
@@ -1167,7 +1168,7 @@ class OrderSubmitForm extends BaseModel
                     continue;
                 }
                 $memberUnitPrice = null;
-                $discountName    = null;
+                $discountName = null;
 
                 $goodsItem['member_discount'] = price_format(0);
 
@@ -1193,7 +1194,7 @@ class OrderSubmitForm extends BaseModel
                         throw new OrderException('商品金额不合法，商品金额必须是数字且大于等于0元。');
                     }
                     $memberUnitPrice = $goodsPrice * $member->discount / 10;
-                    $discountName    = '会员折扣优惠';
+                    $discountName = '会员折扣优惠';
                 }
 
                 if ($memberUnitPrice && is_numeric($memberUnitPrice) && $memberUnitPrice >= 0) {
@@ -1203,17 +1204,17 @@ class OrderSubmitForm extends BaseModel
                     // 商品单件价格（会员优惠后）
                     $goodsAttr->price = $memberUnitPrice - ($goodsAttr->original_price - $goodsAttr->price);
                     $memberTotalPrice = price_format($memberUnitPrice * $goodsItem['num']);
-                    $memberSubPrice   = $goodsItem['total_original_price'] - $memberTotalPrice;
+                    $memberSubPrice = $goodsItem['total_original_price'] - $memberTotalPrice;
                     if ($memberSubPrice != 0) {
                         // 减去会员优惠金额
-                        $memberSubPrice                    = min($goodsItem['total_price'], $memberSubPrice);
-                        $goodsItem['total_price']          = price_format($goodsItem['total_price'] - $memberSubPrice);
+                        $memberSubPrice = min($goodsItem['total_price'], $memberSubPrice);
+                        $goodsItem['total_price'] = price_format($goodsItem['total_price'] - $memberSubPrice);
 
                         //1计算
-                        $totalSubPrice                     += $memberSubPrice;
+                        $totalSubPrice += $memberSubPrice;
                         $same_goods_total_sub_price += $memberSubPrice;
-                        $goodsItem['discounts'][]          = [
-                            'name'  => $discountName,
+                        $goodsItem['discounts'][] = [
+                            'name' => $discountName,
                             'value' => $memberSubPrice > 0 ?
                                 ('-' . price_format($memberSubPrice))
                                 : ('+' . price_format(0 - $memberSubPrice))
@@ -1222,15 +1223,15 @@ class OrderSubmitForm extends BaseModel
                         //2计算
                         $discountItem['total_goods_price'] = price_format($discountItem['total_goods_price'] - $memberSubPrice);
                         $same_goods['total_price'] = $same_goods['total_price'] - $memberSubPrice;
-                        $goodsItem['member_discount']      = price_format($memberSubPrice);
+                        $goodsItem['member_discount'] = price_format($memberSubPrice);
                     }
                 }
             }
 
             if ($same_goods_total_sub_price) {
                 $same_goods['member_discount'] = price_format($same_goods_total_sub_price);
-            }else{
-                $same_goods['member_discount']=0;
+            } else {
+                $same_goods['member_discount'] = 0;
             }
         }
 
@@ -1268,22 +1269,22 @@ class OrderSubmitForm extends BaseModel
      * @return mixed
      * @throws OrderException
      */
-    protected function setCouponDiscountData($couponItem, $formItem,$type)
+    protected function setCouponDiscountData($couponItem, $formItem, $type)
     {
-        $returnData         = [];
+        $returnData = [];
         //$returnItem         = $couponItem["goods_list"];
-        $returnItem         = $couponItem["same_goods_list"];
-        $discountMoney      = $subPrice = 0;
+        $returnItem = $couponItem["same_goods_list"];
+        $discountMoney = $subPrice = 0;
         $allTotalGoodsPrice = 0;
 
         foreach ($returnItem as &$val) {
-            $userCouponId  = $val["usable_user_coupon_id"];
+            $userCouponId = $val["usable_user_coupon_id"];
             $val['coupon'] = [
-                'enabled'         => true,
-                'use'             => false,
+                'enabled' => true,
+                'use' => false,
                 'coupon_discount' => price_format(0),
-                'user_coupon_id'  => 0,
-                'coupon_error'    => "",
+                'user_coupon_id' => 0,
+                'coupon_error' => "",
             ];
             if (!$this->enableCoupon || $couponItem['mch']['id'] != 0) { // 入住商不可使用优惠券
                 $val['coupon']['enabled'] = false;
@@ -1334,7 +1335,7 @@ class OrderSubmitForm extends BaseModel
                         'coupon_id' => $coupon->id,
                         'is_delete' => 0,
                     ]);
-                    $catIdList          = [];
+                    $catIdList = [];
                     foreach ($couponCatRelations as $couponCatRelation) {
                         $catIdList[] = $couponCatRelation->cat_id;
                     }
@@ -1344,8 +1345,8 @@ class OrderSubmitForm extends BaseModel
                         ->alias('gcr')
                         ->leftJoin(['gc' => GoodsCats::tableName()], 'gcr.cat_id=gc.id')
                         ->where([
-                            'gc.is_delete'  => 0,
-                            'gcr.cat_id'    => $catIdList,
+                            'gc.is_delete' => 0,
+                            'gcr.cat_id' => $catIdList,
                             'gcr.is_delete' => 0
                         ])
                         ->all();
@@ -1358,7 +1359,7 @@ class OrderSubmitForm extends BaseModel
                         'coupon_id' => $coupon->id,
                         'is_delete' => 0,
                     ]);
-                    $couponGoodsIdList    = [];
+                    $couponGoodsIdList = [];
                     foreach ($couponGoodsRelations as $couponGoodsRelation) {
                         $couponGoodsIdList[] = $couponGoodsRelation->goods_warehouse_id;
                     }
@@ -1368,12 +1369,12 @@ class OrderSubmitForm extends BaseModel
                     $val['coupon']['coupon_error'] = '所选优惠券未满足使用条件.';
                     continue;
                 }
-                $sub      = UserCouponLogic::getDiscountAmount($userCoupon, $val['total_original_price']);
+                $sub = UserCouponLogic::getDiscountAmount($userCoupon, $val['total_original_price']);
                 $subPrice = min($val['total_price'], $sub, $val['total_original_price']);
                 if ($subPrice > 0) {
                     //$val['total_price'] = price_format($val['total_price'] - $subPrice);
-                    $val['coupon']['use']             = true;
-                    $val['coupon']['user_coupon_id']  = $userCoupon->id;
+                    $val['coupon']['use'] = true;
+                    $val['coupon']['user_coupon_id'] = $userCoupon->id;
                     $val['coupon']['coupon_discount'] = price_format($subPrice);
                 }
                 $val = $this->setDiscountPrice($val, $val["total_price"], $subPrice, $couponGoodsIdList);
@@ -1394,11 +1395,11 @@ class OrderSubmitForm extends BaseModel
 
                 $subPrice = min($val['total_price'], $subPrice);
 
-                $val['coupon']['use']             = true;
-                $val['coupon']['user_coupon_id']  = $userCoupon->id;
+                $val['coupon']['use'] = true;
+                $val['coupon']['user_coupon_id'] = $userCoupon->id;
                 $val['coupon']['coupon_discount'] = price_format($subPrice);
 
-               // $val                              = $this->setDiscountPrice($val, $val["total_price"], $subPrice);
+                // $val                              = $this->setDiscountPrice($val, $val["total_price"], $subPrice);
             }
 
             $discountMoney += $subPrice;
@@ -1411,9 +1412,9 @@ class OrderSubmitForm extends BaseModel
             }
         }
         //优惠券总共抵扣多少钱
-        $couponItem["same_goods_list"]            = $returnItem;
+        $couponItem["same_goods_list"] = $returnItem;
 
-        $couponItem["total_goods_price"]     = price_format($couponItem['total_goods_price'] - $discountMoney);
+        $couponItem["total_goods_price"] = price_format($couponItem['total_goods_price'] - $discountMoney);
         $couponItem['total_coupon_discount'] = $subPrice;
 
         \Yii::warning('order_submit setCouponDiscountData couponItem=' . var_export($couponItem, true));
@@ -1433,9 +1434,9 @@ class OrderSubmitForm extends BaseModel
     {
         \Yii::warning("setScoreDiscountData formMchItem=" . var_export($formMchItem, true));
         $scoreItem['score'] = [
-            'can_use'         => false,
-            'use'             => false,
-            'use_num'         => 0,
+            'can_use' => false,
+            'use' => false,
+            'use_num' => 0,
             'deduction_price' => price_format(0),
         ];
         if (!$this->enableScore || $scoreItem['mch']['id'] != 0) {
@@ -1456,7 +1457,7 @@ class OrderSubmitForm extends BaseModel
         if (empty($memberScoreArray)) {
             return $scoreItem;
         }
-        $memberscore  = 0;
+        $memberscore = 0;
         $score_status = $memberScoreArray["score_status"];
 
         if ($score_status == 1) {
@@ -1509,26 +1510,26 @@ class OrderSubmitForm extends BaseModel
             $orderGoodsAttr = $goodsItem['goods_attr'];
 
             if (($totalDeductionscore + $goodsMaxDeductionscore) > $maxDeductionscore) { // 抵扣的金额超过最多可抵扣的
-                $orderGoodsAttr->use_score   = price_format($maxDeductionscore - $totalDeductionscore);
+                $orderGoodsAttr->use_score = price_format($maxDeductionscore - $totalDeductionscore);
                 $orderGoodsAttr->score_price = price_format($orderGoodsAttr->use_score / $memberscore);
-                $totalDeductionPrice         = price_format($maxDeductionscore / $memberscore);
-                $totalDeductionscore         = $maxDeductionscore;
+                $totalDeductionPrice = price_format($maxDeductionscore / $memberscore);
+                $totalDeductionscore = $maxDeductionscore;
                 break;
             } else {
 
                 $goodsMaxDeductionPrice = price_format($goodsMaxDeductionscore / $memberscore);
 
-                $totalDeductionPrice         += price_format($goodsMaxDeductionPrice);
+                $totalDeductionPrice += price_format($goodsMaxDeductionPrice);
 
-                $totalDeductionscore         += price_format($goodsMaxDeductionscore);
-                $orderGoodsAttr->use_score   = price_format($goodsMaxDeductionscore);
+                $totalDeductionscore += price_format($goodsMaxDeductionscore);
+                $orderGoodsAttr->use_score = price_format($goodsMaxDeductionscore);
                 $orderGoodsAttr->score_price = price_format($goodsMaxDeductionPrice);
             }
         }
 
-        $scoreItem['score']['use_num']         = $totalDeductionscore;
+        $scoreItem['score']['use_num'] = $totalDeductionscore;
         $scoreItem['score']['deduction_price'] = price_format($totalDeductionPrice);
-        $scoreItem['score']['can_use']         = $scoreItem['score']['use_num'] > 0 ? true : false;
+        $scoreItem['score']['can_use'] = $scoreItem['score']['use_num'] > 0 ? true : false;
 
         if (isset($this->form_data['use_score']) && $this->form_data['use_score'] == 1) {
             $scoreItem['score']['use'] = true;
@@ -1538,7 +1539,7 @@ class OrderSubmitForm extends BaseModel
 
         if ($type == 2) {
             //if ($scoreItem['score']['use']) {
-             //   $scoreItem['total_goods_price'] = price_format($scoreItem['total_goods_price'] - $totalDeductionPrice);
+            //   $scoreItem['total_goods_price'] = price_format($scoreItem['total_goods_price'] - $totalDeductionPrice);
             //}
             $scoreItem = $this->setGoodsListScoreSub($scoreItem);
         }
@@ -1612,9 +1613,9 @@ class OrderSubmitForm extends BaseModel
     protected function getSendType($sendItem)
     {
         if (isset($sendItem['mch']['id']) && $sendItem['mch']['id'] > 0) {
-            $form         = new SettingForm();
+            $form = new SettingForm();
             $form->mch_id = $sendItem['mch']['id'];
-            $setting      = $form->search();
+            $setting = $form->search();
 
             return $setting['send_type'];
         }
@@ -1654,11 +1655,11 @@ class OrderSubmitForm extends BaseModel
             throw new OrderException('配送方式`' . $formMchItem['send_type'] . '`不正确。');
         }
         foreach ($sendType as $item) {
-            $deliveryItem['delivery']['send_type']        = $formMchItem['send_type'];
-            $deliveryItem['delivery']['disabled']         = false;
+            $deliveryItem['delivery']['send_type'] = $formMchItem['send_type'];
+            $deliveryItem['delivery']['disabled'] = false;
             $deliveryItem['delivery']['send_type_list'][] =
                 [
-                    'name'  => ($item == 'express') ? '快递配送' : ($item == 'offline' ? '上门自提' : '同城配送'),
+                    'name' => ($item == 'express') ? '快递配送' : ($item == 'offline' ? '上门自提' : '同城配送'),
                     'value' => $item,
                 ];
         }
@@ -1674,14 +1675,14 @@ class OrderSubmitForm extends BaseModel
      */
     protected function setStoreData($mchItem, $formMchItem, $formData)
     {
-        $mchItem['store']               = null;
+        $mchItem['store'] = null;
         $mchItem['store_select_enable'] = true;
         if ($mchItem['delivery']['send_type'] != 'offline') {
             return $mchItem;
         }
         $storeExists = Store::find()->where([
-            'mall_id'   => \Yii::$app->mall->id,
-            'mch_id'    => $mchItem['mch']['id'],
+            'mall_id' => \Yii::$app->mall->id,
+            'mch_id' => $mchItem['mch']['id'],
             'is_delete' => 0,
         ])->exists();
         if (!$storeExists) {
@@ -1693,16 +1694,16 @@ class OrderSubmitForm extends BaseModel
         if (!empty($formMchItem['store_id'])) {
             $store = Store::find()
                 ->where([
-                    'id'        => $formMchItem['store_id'],
-                    'mall_id'   => \Yii::$app->mall->id,
-                    'mch_id'    => $mchItem['mch']['id'],
+                    'id' => $formMchItem['store_id'],
+                    'mall_id' => \Yii::$app->mall->id,
+                    'mch_id' => $mchItem['mch']['id'],
                     'is_delete' => 0,
                 ])->asArray()->one();
         } else {
             $query = Store::find()
                 ->where([
-                    'mall_id'   => \Yii::$app->mall->id,
-                    'mch_id'    => $mchItem['mch']['id'],
+                    'mall_id' => \Yii::$app->mall->id,
+                    'mch_id' => $mchItem['mch']['id'],
                     'is_delete' => 0,
                 ]);
             if ($formMchItem['mch_id'] == 0) {
@@ -1748,9 +1749,9 @@ class OrderSubmitForm extends BaseModel
      */
     protected function setExpressData($expressItem)
     {
-        $noZeroGoodsList              = []; // 没有被包邮的商品列表（未单独设置包邮规则）
-        $noZeroIndRuleGoodsList       = []; // 没有被包邮的单独设置包邮规则的商品列表
-        $zeroIndRuleGoodsList         = []; // 被包邮的单独设置包邮规则的商品列表
+        $noZeroGoodsList = []; // 没有被包邮的商品列表（未单独设置包邮规则）
+        $noZeroIndRuleGoodsList = []; // 没有被包邮的单独设置包邮规则的商品列表
+        $zeroIndRuleGoodsList = []; // 被包邮的单独设置包邮规则的商品列表
         $expressItem['express_price'] = price_format(0);
 
         if ($expressItem['delivery']['send_type'] == 'offline') { // 上门自提无需运费
@@ -1776,20 +1777,20 @@ class OrderSubmitForm extends BaseModel
                 'lng' => $address->longitude,
                 'lat' => $address->latitude
             ];
-            $num   = 0;
+            $num = 0;
             foreach ($expressItem['goods_list'] as $goodsItem) { // 按商品ID小计件数和金额，看是否达到包邮条件
                 $num += $goodsItem['num'];
             }
 
             try {
                 $commonDelivery = DeliveryCommon::getInstance();
-                $cityConfig     = $commonDelivery->getConfig();
+                $cityConfig = $commonDelivery->getConfig();
                 if (isset($cityConfig['price_enable']) && $cityConfig['price_enable'] && $expressItem['total_goods_original_price'] < $cityConfig['price_enable']) {
                     $expressItem['city']['error'] = '未达到起送价' . $cityConfig['price_enable'] . '元';
                     return $expressItem;
                 }
-                $distance            = $commonDelivery->getDistance($point);
-                $totalSecondPrice    = $commonDelivery->getPrice($distance, $num);
+                $distance = $commonDelivery->getDistance($point);
+                $totalSecondPrice = $commonDelivery->getPrice($distance, $num);
                 $expressItem['city'] = [
                     'address' => $cityConfig['address']['address'],
                     'explain' => $cityConfig['explain']
@@ -1798,9 +1799,9 @@ class OrderSubmitForm extends BaseModel
                 $expressItem['city']['error'] = '用户定位地址不在配送范围内';
                 return $expressItem;
             }
-            $expressItem['distance']      = $distance;
+            $expressItem['distance'] = $distance;
             $expressItem['express_price'] = price_format($totalSecondPrice);
-            $expressItem['total_price']   = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
+            $expressItem['total_price'] = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
             return $expressItem;
         }
 
@@ -1809,10 +1810,10 @@ class OrderSubmitForm extends BaseModel
         foreach ($expressItem['goods_list'] as $goodsItem) { // 按商品ID小计件数和金额，看是否达到包邮条件
             if (isset($groupGoodsTotalList[$goodsItem['id']])) {
                 $groupGoodsTotalList[$goodsItem['id']]['total_price'] += $goodsItem['total_price'];
-                $groupGoodsTotalList[$goodsItem['id']]['num']         += $goodsItem['num'];
+                $groupGoodsTotalList[$goodsItem['id']]['num'] += $goodsItem['num'];
             } else {
                 $groupGoodsTotalList[$goodsItem['id']]['total_price'] = $goodsItem['total_price'];
-                $groupGoodsTotalList[$goodsItem['id']]['num']         = $goodsItem['num'];
+                $groupGoodsTotalList[$goodsItem['id']]['num'] = $goodsItem['num'];
             }
             $groupGoodsTotalList[$goodsItem['id']]['total_price'] =
                 price_format($groupGoodsTotalList[$goodsItem['id']]['total_price']);
@@ -1842,11 +1843,11 @@ class OrderSubmitForm extends BaseModel
         /** @var FreeDeliveryRules[] $freeDeliveries */
         $freeDeliveries = FreeDeliveryRules::find()->where([
             'is_delete' => 0,
-            'mall_id'   => \Yii::$app->mall->id,
-            'mch_id'    => $expressItem['mch']['id']
+            'mall_id' => \Yii::$app->mall->id,
+            'mch_id' => $expressItem['mch']['id']
         ])->orderBy('price')->all();
         foreach ($freeDeliveries as $freeDelivery) {
-            $districts  = $freeDelivery->decodeDetail();
+            $districts = $freeDelivery->decodeDetail();
             $inDistrict = false;
             foreach ($districts as $district) {
                 if ($district['id'] == $address->province_id) {
@@ -1873,44 +1874,44 @@ class OrderSubmitForm extends BaseModel
         }
 
         $postageRuleGroups = []; // 商品按匹配到的运费规则进行分组
-        $noPostageRuleHit  = true; // 没有比配到运费规则
+        $noPostageRuleHit = true; // 没有比配到运费规则
         $str_id = '';
         $str_num = '';
         foreach ($noZeroGoodsList as $goodsItem) {
-            $str_id .=  $goodsItem['id'] . ',';
+            $str_id .= $goodsItem['id'] . ',';
             $str_num .= $goodsItem['num'] . ',';
             //判断是否使用到快递模板
             if ($goodsItem['freight_id'] != -1) {
                 //获取快递规则
                 $postageRule = PostageRules::findOne([
-                    'mall_id'   => \Yii::$app->mall->id,
-                    'id'        => $goodsItem['freight_id'],
+                    'mall_id' => \Yii::$app->mall->id,
+                    'id' => $goodsItem['freight_id'],
                     'is_delete' => 0,
-                    'mch_id'    => $expressItem['mch']['id'],
+                    'mch_id' => $expressItem['mch']['id'],
                 ]);
 
                 if (!$postageRule) {
                     //获取默认规则
                     $postageRule = PostageRules::findOne([
-                        'mall_id'   => \Yii::$app->mall->id,
-                        'status'    => 1,
+                        'mall_id' => \Yii::$app->mall->id,
+                        'status' => 1,
                         'is_delete' => 0,
-                        'mch_id'    => $expressItem['mch']['id'],
+                        'mch_id' => $expressItem['mch']['id'],
                     ]);
                 }
             } else {
                 $postageRule = PostageRules::findOne([
-                    'mall_id'   => \Yii::$app->mall->id,
-                    'status'    => 1,
+                    'mall_id' => \Yii::$app->mall->id,
+                    'status' => 1,
                     'is_delete' => 0,
-                    'mch_id'    => $expressItem['mch']['id'],
+                    'mch_id' => $expressItem['mch']['id'],
                 ]);
             }
             if (!$postageRule) {
                 continue;
             }
 
-            $rule        = null; // 用户的收货地址是否在规则中
+            $rule = null; // 用户的收货地址是否在规则中
             $ruleDetails = $postageRule->decodeDetail();
             foreach ($ruleDetails as $ruleDetail) {
                 foreach ($ruleDetail['list'] as $district) {
@@ -1937,8 +1938,8 @@ class OrderSubmitForm extends BaseModel
             if (!isset($postageRuleGroups['rule:' . $postageRule->id])) {
                 $postageRuleGroups['rule:' . $postageRule->id] = [
                     'postage_rule' => $postageRule,
-                    'rule'         => $rule,
-                    'goods_list'   => [],
+                    'rule' => $rule,
+                    'goods_list' => [],
                 ];
             }
             $postageRuleGroups['rule:' . $postageRule->id]['goods_list'][] = $goodsItem;
@@ -1946,16 +1947,16 @@ class OrderSubmitForm extends BaseModel
         if ($noPostageRuleHit) {
             return $expressItem;
         }
-        $firstPriceList   = [];
+        $firstPriceList = [];
         $totalSecondPrice = 0;
 
         foreach ($postageRuleGroups as $group) {
             /** @var PostageRules $postageRule */
             $postageRule = $group['postage_rule'];
-            $rule        = $group['rule'];
-            $goodsList   = $group['goods_list'];
+            $rule = $group['rule'];
+            $goodsList = $group['goods_list'];
 
-            $firstPrice  = $rule['firstPrice'];
+            $firstPrice = $rule['firstPrice'];
             $secondPrice = 0;
             if ($postageRule->type == 1) { // 按重量计费
                 $totalWeight = 0;
@@ -1989,10 +1990,10 @@ class OrderSubmitForm extends BaseModel
             $firstPriceList[] = $firstPrice;
             $totalSecondPrice += $secondPrice;
         }
-        $str_id_arr = array_filter(explode(',',$str_id));
-        $str_num_arr = array_filter(explode(',',$str_num));
+        $str_id_arr = array_filter(explode(',', $str_id));
+        $str_num_arr = array_filter(explode(',', $str_num));
         $order_data = [];
-        foreach ($str_id_arr as $key => $val){
+        foreach ($str_id_arr as $key => $val) {
             $order_data[] = [
                 'id' => $val,
                 'num' => $str_num_arr[$key]
@@ -2000,25 +2001,25 @@ class OrderSubmitForm extends BaseModel
         }
         $goods_data = [
             'order_id' => $order_data,
-            'data' => $address -> province
+            'data' => $address->province
         ];
         //$express_price = (new PostageRulesBus()) -> getExpressPrice($goods_data,1);
         //$express_price = array_sum($express_price);
 
         //累积运费
         $totalFirstPrices = 0;
-        if(is_array($firstPriceList)){
-            foreach($firstPriceList as $firstPrice){
+        if (is_array($firstPriceList)) {
+            foreach ($firstPriceList as $firstPrice) {
                 $totalFirstPrices += $firstPrice;
             }
-        }else{
+        } else {
             $totalFirstPrices = floatval($firstPriceList);
         }
 
 
         $expressItem['express_price'] = price_format($totalFirstPrices + $totalSecondPrice);
         //$expressItem['express_price'] = $express_price;
-        $expressItem['total_price']   = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
+        $expressItem['total_price'] = price_format($expressItem['total_goods_price'] + $expressItem['express_price']);
         return $expressItem;
     }
 
@@ -2049,11 +2050,11 @@ class OrderSubmitForm extends BaseModel
 
     protected function setGoodsForm($mchItem)
     {
-        $defaultForm   = null;
+        $defaultForm = null;
         $noDefaultForm = false;
         $existsFormIds = [];
-        $dataOfFormId  = [];
-        $hasGoodsForm  = false;
+        $dataOfFormId = [];
+        $hasGoodsForm = false;
         foreach ($mchItem['goods_list'] as &$goodsItem) {
             $goodsItem['form'] = null;
             if (!isset($goodsItem['form_id']) || $goodsItem['form_id'] == -1) {
@@ -2065,11 +2066,11 @@ class OrderSubmitForm extends BaseModel
                 }
                 if (!$defaultForm) {
                     $defaultForm = Form::findOne([
-                        'mall_id'    => \Yii::$app->mall->id,
-                        'mch_id'     => $mchItem['mch']['id'],
+                        'mall_id' => \Yii::$app->mall->id,
+                        'mch_id' => $mchItem['mch']['id'],
                         'is_default' => 1,
-                        'status'     => 1,
-                        'is_delete'  => 0,
+                        'status' => 1,
+                        'is_delete' => 0,
                     ]);
                     if (!$defaultForm) {
                         $noDefaultForm = true;
@@ -2079,10 +2080,10 @@ class OrderSubmitForm extends BaseModel
                 $form = $defaultForm;
             } else {
                 $form = Form::findOne([
-                    'id'        => $goodsItem['form_id'],
-                    'mall_id'   => \Yii::$app->mall->id,
-                    'mch_id'    => $mchItem['mch']['id'],
-                    'status'    => 1,
+                    'id' => $goodsItem['form_id'],
+                    'mall_id' => \Yii::$app->mall->id,
+                    'mch_id' => $mchItem['mch']['id'],
+                    'status' => 1,
                     'is_delete' => 0,
                 ]);
             }
@@ -2101,7 +2102,7 @@ class OrderSubmitForm extends BaseModel
             if (in_array($form->id, $existsFormIds)) {
                 $sameForm = true;
             } else {
-                $sameForm        = false;
+                $sameForm = false;
                 $existsFormIds[] = $form->id;
             }
             if (!$sameForm && !empty($goodsItem['form_data'])) {
@@ -2110,14 +2111,14 @@ class OrderSubmitForm extends BaseModel
                 $goodsItem['form_data'] = $dataOfFormId[$form->id];
             }
             $goodsItem['form'] = [
-                'id'        => $form->id,
-                'name'      => $form->name,
-                'value'     => $form->value,
+                'id' => $form->id,
+                'name' => $form->name,
+                'value' => $form->value,
                 'same_form' => $sameForm,
             ];
         }
         $mchItem['diff_goods_form_count'] = intval(count($existsFormIds));
-        $mchItem['has_goods_form']        = $hasGoodsForm;
+        $mchItem['has_goods_form'] = $hasGoodsForm;
         return $mchItem;
     }
 
@@ -2137,13 +2138,13 @@ class OrderSubmitForm extends BaseModel
         $user = \Yii::$app->user->identity;
         if (!isset($this->form_data['user_address_id']) || empty($this->form_data["user_address_id"])) {
             $userAddress = UserAddress::getOneData([
-                'user_id'    => $user->id,
-                'is_delete'  => 0,
+                'user_id' => $user->id,
+                'is_delete' => 0,
                 'is_default' => 1,
             ]);
             if (empty($userAddress)) {
                 $userAddress = UserAddress::getUserAddressDefault([
-                    'user_id'   => $user->id,
+                    'user_id' => $user->id,
                     'is_delete' => 0,
                 ]);
             }
@@ -2151,9 +2152,9 @@ class OrderSubmitForm extends BaseModel
             $this->userAddress = $userAddress;
         } else {
             $this->userAddress = UserAddress::getOneData([
-                'user_id'   => $user->id,
+                'user_id' => $user->id,
                 'is_delete' => 0,
-                'id'        => $this->form_data['user_address_id'],
+                'id' => $this->form_data['user_address_id'],
             ]);
         }
         if (empty($this->userAddress)) {
@@ -2177,14 +2178,14 @@ class OrderSubmitForm extends BaseModel
         if (!is_array($list) || !count($list)) {
             return [];
         }
-        $data                    = $list[0];
+        $data = $list[0];
         $goodsTotalOriginalPrice = 0;
         foreach ($data['goods_list'] as $goodsItem) {
             $goodsTotalOriginalPrice += $goodsItem['total_original_price'];
         }
 
         /** @var User $user */
-        $user        = \Yii::$app->user->identity;
+        $user = \Yii::$app->user->identity;
         $nowDateTime = time();
 
         /** @var UserCoupon[] $allList */
@@ -2219,16 +2220,16 @@ class OrderSubmitForm extends BaseModel
         }
 
         $goodsWarehouseIdList = [];
-        $catIdList            = [];
+        $catIdList = [];
         foreach ($data['goods_list'] as &$goodsItem) {
-            $goods                          = Goods::findOne($goodsItem['id']);
-            $goodsWarehouseIdList[]         = $goods->goods_warehouse_id;
-            $goodsCatRelations              = GoodsCatRelation::findAll([
+            $goods = Goods::findOne($goodsItem['id']);
+            $goodsWarehouseIdList[] = $goods->goods_warehouse_id;
+            $goodsCatRelations = GoodsCatRelation::findAll([
                 'goods_warehouse_id' => $goods->goods_warehouse_id,
-                'is_delete'          => 0,
+                'is_delete' => 0,
             ]);
             $goodsItem['goodsCatRelations'] = $goodsCatRelations;
-            $goodsItem['goods']             = $goods;
+            $goodsItem['goods'] = $goods;
             foreach ($goodsCatRelations as $goodsCatRelation) {
                 $catIdList[] = $goodsCatRelation->cat_id;
             }
@@ -2239,9 +2240,9 @@ class OrderSubmitForm extends BaseModel
             if (!$userCoupon->coupon) {
                 continue;
             }
-            $userCoupon->coupon_data               = \Yii::$app->serializer->decode($userCoupon->coupon_data);
+            $userCoupon->coupon_data = \Yii::$app->serializer->decode($userCoupon->coupon_data);
             $userCoupon->coupon_data->appoint_type = $userCoupon->coupon->appoint_type;
-            $userCoupon->coupon_data->name         = $userCoupon->coupon->name;
+            $userCoupon->coupon_data->name = $userCoupon->coupon->name;
 
             if ($userCoupon->coupon->appoint_type == 2) {
                 /** @var GoodsWarehouse[] $goodsList */
@@ -2309,11 +2310,11 @@ class OrderSubmitForm extends BaseModel
     public function getUserUsableCoupon($coupon)
     {
         $couponItem['coupon'] = [
-            'enabled'         => true,
-            'use'             => false,
+            'enabled' => true,
+            'use' => false,
             'coupon_discount' => price_format(0),
-            'user_coupon_id'  => 0,
-            'coupon_error'    => "",
+            'user_coupon_id' => 0,
+            'coupon_error' => "",
         ];
         if (!$this->enableCoupon || $couponItem['mch']['id'] != 0) { // 入住商不可使用优惠券
             $couponItem['coupon']['enabled'] = false;
@@ -2359,7 +2360,7 @@ class OrderSubmitForm extends BaseModel
                     'coupon_id' => $coupon->id,
                     'is_delete' => 0,
                 ]);
-                $catIdList          = [];
+                $catIdList = [];
                 foreach ($couponCatRelations as $couponCatRelation) {
                     $catIdList[] = $couponCatRelation->cat_id;
                 }
@@ -2369,8 +2370,8 @@ class OrderSubmitForm extends BaseModel
                     ->alias('gcr')
                     ->leftJoin(['gc' => GoodsCats::tableName()], 'gcr.cat_id=gc.id')
                     ->where([
-                        'gc.is_delete'  => 0,
-                        'gcr.cat_id'    => $catIdList,
+                        'gc.is_delete' => 0,
+                        'gcr.cat_id' => $catIdList,
                         'gcr.is_delete' => 0
                     ])
                     ->all();
@@ -2383,30 +2384,30 @@ class OrderSubmitForm extends BaseModel
                     'coupon_id' => $coupon->id,
                     'is_delete' => 0,
                 ]);
-                $couponGoodsIdList    = [];
+                $couponGoodsIdList = [];
                 foreach ($couponGoodsRelations as $couponGoodsRelation) {
                     $couponGoodsIdList[] = $couponGoodsRelation->goods_warehouse_id;
                 }
             }
-            $totalGoodsPrice         = 0;
+            $totalGoodsPrice = 0;
             $totalGoodsOriginalPrice = 0;
             foreach ($couponItem['goods_list'] as $goodsItem) {
                 if (!in_array($goodsItem['goods_warehouse_id'], $couponGoodsIdList)) {
                     continue;
                 }
-                $totalGoodsPrice         += $goodsItem['total_price'];
+                $totalGoodsPrice += $goodsItem['total_price'];
                 $totalGoodsOriginalPrice += $goodsItem['total_original_price'];
             }
             if ($userCoupon->coupon_min_price > $totalGoodsOriginalPrice) { // 可用的商品原总价未达到优惠券使用条件
                 $couponItem['coupon']['coupon_error'] = '所选优惠券未满足使用条件';
                 return $couponItem;
             }
-            $sub      = UserCouponLogic::getDiscountAmount($userCoupon, $totalGoodsOriginalPrice);
+            $sub = UserCouponLogic::getDiscountAmount($userCoupon, $totalGoodsOriginalPrice);
             $subPrice = min($totalGoodsPrice, $sub, $couponItem['total_goods_price']);
             if ($subPrice > 0) {
-                $couponItem['total_goods_price']         = price_format($couponItem['total_goods_price'] - $subPrice);
-                $couponItem['coupon']['use']             = true;
-                $couponItem['coupon']['user_coupon_id']  = $userCoupon->id;
+                $couponItem['total_goods_price'] = price_format($couponItem['total_goods_price'] - $subPrice);
+                $couponItem['coupon']['use'] = true;
+                $couponItem['coupon']['user_coupon_id'] = $userCoupon->id;
                 $couponItem['coupon']['coupon_discount'] = price_format($subPrice);
             }
             $couponItem = $this->setDiscountPrice($couponItem, $totalGoodsPrice, $subPrice, $couponGoodsIdList);
@@ -2423,12 +2424,12 @@ class OrderSubmitForm extends BaseModel
             if ($subPrice > $couponItem['total_goods_price']) {
                 $subPrice = $couponItem['total_goods_price'];
             }
-            $totalGoodsPrice                         = $couponItem['total_goods_price'];
-            $couponItem['total_goods_price']         = price_format($couponItem['total_goods_price'] - $subPrice);
-            $couponItem['coupon']['use']             = true;
-            $couponItem['coupon']['user_coupon_id']  = $userCoupon->id;
+            $totalGoodsPrice = $couponItem['total_goods_price'];
+            $couponItem['total_goods_price'] = price_format($couponItem['total_goods_price'] - $subPrice);
+            $couponItem['coupon']['use'] = true;
+            $couponItem['coupon']['user_coupon_id'] = $userCoupon->id;
             $couponItem['coupon']['coupon_discount'] = price_format($subPrice);
-            $couponItem                              = $this->setDiscountPrice($couponItem, $totalGoodsPrice, $subPrice);
+            $couponItem = $this->setDiscountPrice($couponItem, $totalGoodsPrice, $subPrice);
         }
         return $couponItem;
 
@@ -2436,14 +2437,14 @@ class OrderSubmitForm extends BaseModel
         if (!is_array($list) || !count($list)) {
             return [];
         }
-        $data                    = $list[0];
+        $data = $list[0];
         $goodsTotalOriginalPrice = 0;
         foreach ($data['goods_list'] as $goodsItem) {
             $goodsTotalOriginalPrice += $goodsItem['total_original_price'];
         }
 
         /** @var User $user */
-        $user        = \Yii::$app->user->identity;
+        $user = \Yii::$app->user->identity;
         $nowDateTime = time();
 
         /** @var UserCoupon[] $allList */
@@ -2478,16 +2479,16 @@ class OrderSubmitForm extends BaseModel
         }
 
         $goodsWarehouseIdList = [];
-        $catIdList            = [];
+        $catIdList = [];
         foreach ($data['goods_list'] as &$goodsItem) {
-            $goods                          = Goods::findOne($goodsItem['id']);
-            $goodsWarehouseIdList[]         = $goods->goods_warehouse_id;
-            $goodsCatRelations              = GoodsCatRelation::findAll([
+            $goods = Goods::findOne($goodsItem['id']);
+            $goodsWarehouseIdList[] = $goods->goods_warehouse_id;
+            $goodsCatRelations = GoodsCatRelation::findAll([
                 'goods_warehouse_id' => $goods->goods_warehouse_id,
-                'is_delete'          => 0,
+                'is_delete' => 0,
             ]);
             $goodsItem['goodsCatRelations'] = $goodsCatRelations;
-            $goodsItem['goods']             = $goods;
+            $goodsItem['goods'] = $goods;
             foreach ($goodsCatRelations as $goodsCatRelation) {
                 $catIdList[] = $goodsCatRelation->cat_id;
             }
@@ -2498,9 +2499,9 @@ class OrderSubmitForm extends BaseModel
             if (!$userCoupon->coupon) {
                 continue;
             }
-            $userCoupon->coupon_data               = \Yii::$app->serializer->decode($userCoupon->coupon_data);
+            $userCoupon->coupon_data = \Yii::$app->serializer->decode($userCoupon->coupon_data);
             $userCoupon->coupon_data->appoint_type = $userCoupon->coupon->appoint_type;
-            $userCoupon->coupon_data->name         = $userCoupon->coupon->name;
+            $userCoupon->coupon_data->name = $userCoupon->coupon->name;
 
             if ($userCoupon->coupon->appoint_type == 2) {
                 /** @var GoodsWarehouse[] $goodsList */
@@ -2615,34 +2616,34 @@ class OrderSubmitForm extends BaseModel
     public function extraOrderDetail($order, $goodsItem, $commonOrderId = 0)
     {
         \Yii::warning('order_submit extraOrderDetail goodsItem=' . var_export($goodsItem, true));
-        $orderDetail                        = new OrderDetail();
-        $orderDetail->order_id              = $order->id;
-        $orderDetail->goods_id              = $goodsItem['id'];
-        $orderDetail->num                   = $goodsItem['num'];
-        $orderDetail->unit_price            = $goodsItem['unit_price'];
-        $orderDetail->total_original_price  = $goodsItem['total_original_price'];
-        $orderDetail->total_price           = $goodsItem['total_price'];
+        $orderDetail = new OrderDetail();
+        $orderDetail->order_id = $order->id;
+        $orderDetail->goods_id = $goodsItem['id'];
+        $orderDetail->num = $goodsItem['num'];
+        $orderDetail->unit_price = $goodsItem['unit_price'];
+        $orderDetail->total_original_price = $goodsItem['total_original_price'];
+        $orderDetail->total_price = $goodsItem['total_price'];
         $orderDetail->member_discount_price = $goodsItem['member_discount'];
-        $orderDetail->sign                  = $goodsItem['sign'];
-        $orderDetail->goods_no              = $goodsItem['goods_attr']['no'] ?: '';
-        $goodsInfo                          = [
-            'attr_list'  => $goodsItem['attr_list'],
+        $orderDetail->sign = $goodsItem['sign'];
+        $orderDetail->goods_no = $goodsItem['goods_attr']['no'] ?: '';
+        $goodsInfo = [
+            'attr_list' => $goodsItem['attr_list'],
             'goods_attr' => $goodsItem['goods_attr'],
         ];
-        $orderDetail->goods_info            = $orderDetail->encodeGoodsInfo($goodsInfo);
-        $orderDetail->form_data             = \Yii::$app->serializer->encode(isset($goodsItem['form_data']) ? $goodsItem['form_data'] : null);
-        $orderDetail->form_id               = (isset($goodsItem['form']) && isset($goodsItem['form']['id'])) ? $goodsItem['form']['id'] : 0;
-        $orderDetail->use_user_coupon_id    = $goodsItem['coupon']['use'] ? $goodsItem['coupon']['user_coupon_id'] : 0;
+        $orderDetail->goods_info = $orderDetail->encodeGoodsInfo($goodsInfo);
+        $orderDetail->form_data = \Yii::$app->serializer->encode(isset($goodsItem['form_data']) ? $goodsItem['form_data'] : null);
+        $orderDetail->form_id = (isset($goodsItem['form']) && isset($goodsItem['form']['id'])) ? $goodsItem['form']['id'] : 0;
+        $orderDetail->use_user_coupon_id = $goodsItem['coupon']['use'] ? $goodsItem['coupon']['user_coupon_id'] : 0;
         $orderDetail->coupon_discount_price = $goodsItem['coupon']['coupon_discount'];
 
         //规格商品积分使用
         $orderDetail->use_score_price = $goodsItem['use_score_price'];
-        $orderDetail->use_score       = $goodsItem['use_score'];
-        $orderDetail->score_price       = $goodsItem['score_price'];
-        
+        $orderDetail->use_score = $goodsItem['use_score'];
+        $orderDetail->score_price = $goodsItem['score_price'];
+
         //红包券抵扣
-        $orderDetail->integral_price       = $goodsItem['integral_price'];
-        $orderDetail->integral_fee_rate    = $goodsItem['integral_fee_rate'];
+        $orderDetail->integral_price = $goodsItem['integral_price'];
+        $orderDetail->integral_fee_rate = $goodsItem['integral_fee_rate'];
 
         //购物券抵扣
         $orderDetail->shopping_voucher_decode_price = $goodsItem['use_shopping_voucher_decode_price'];
@@ -2651,7 +2652,7 @@ class OrderSubmitForm extends BaseModel
         //满减金额
         $orderDetail->full_relief_price = $goodsItem['actual_full_relief_price'];
 
-        $orderDetailId                      = $orderDetail->save();
+        $orderDetailId = $orderDetail->save();
         if (!$orderDetailId) {
             throw new \Exception((new BaseModel())->responseErrorMsg($orderDetail));
         }
@@ -2669,8 +2670,8 @@ class OrderSubmitForm extends BaseModel
 
         // 优惠券标记已使用
         if ($orderDetail->use_user_coupon_id) {
-            $userCoupon             = UserCoupon::findOne($orderDetail->use_user_coupon_id);
-            $userCoupon->is_use     = 1;
+            $userCoupon = UserCoupon::findOne($orderDetail->use_user_coupon_id);
+            $userCoupon->is_use = 1;
             $userCoupon->is_failure = 1;
             if ($userCoupon->update(true, [
                     'is_use',
@@ -2679,7 +2680,6 @@ class OrderSubmitForm extends BaseModel
                 throw new \Exception('优惠券状态更新失败。');
             }
         }
-
 
 
     }
@@ -2791,7 +2791,7 @@ class OrderSubmitForm extends BaseModel
             \Yii::$app->mall->id,
             Option::GROUP_APP,
             [
-                'is_enable'   => 0,
+                'is_enable' => 0,
                 'total_price' => 0
             ],
             $mchId
@@ -2842,10 +2842,10 @@ class OrderSubmitForm extends BaseModel
     {
         if ($goods->mch_id > 0) {
             $mch = Mch::findOne([
-                'mall_id'       => \Yii::$app->mall->id,
-                'is_delete'     => 0,
+                'mall_id' => \Yii::$app->mall->id,
+                'is_delete' => 0,
                 'review_status' => 1,
-                'id'            => $goods->mch_id
+                'id' => $goods->mch_id
             ]);
 
             if (!$mch) {
@@ -2990,7 +2990,7 @@ class OrderSubmitForm extends BaseModel
             if ($resetPrice < $goodsPrice || ($index == count($item['goods_list']) - 1 && $resetPrice > 0)) {
                 $goodsPrice = $resetPrice;
             }
-            $resetPrice           -= $goodsPrice;
+            $resetPrice -= $goodsPrice;
             $goods['total_price'] -= min($goodsPrice, $goods['total_price']);
         }
         unset($goods);
@@ -3022,11 +3022,11 @@ class OrderSubmitForm extends BaseModel
                 ->leftJoin(['o' => Order::tableName()], 'od.order_id=o.id')
                 ->where([
                     'o.cancel_status' => 0,
-                    'o.is_delete'     => 0,
-                    'o.is_recycle'    => 0,
-                    'o.user_id'       => \Yii::$app->user->id,
-                    'od.is_delete'    => 0,
-                    'od.goods_id'     => $goods['id'],
+                    'o.is_delete' => 0,
+                    'o.is_recycle' => 0,
+                    'o.user_id' => \Yii::$app->user->id,
+                    'od.is_delete' => 0,
+                    'od.goods_id' => $goods['id'],
                 ])
                 ->groupBy('od.order_id')
                 ->count();
@@ -3054,7 +3054,7 @@ class OrderSubmitForm extends BaseModel
             if (isset($goodsIdMap[$goods['id']])) {
                 $goodsIdMap[$goods['id']]['num'] += $goods['num'];
             } else {
-                $goodsIdMap[$goods['id']]['num']   = $goods['num'];
+                $goodsIdMap[$goods['id']]['num'] = $goods['num'];
                 $goodsIdMap[$goods['id']]['goods'] = $goods['goods_attr']['goods'];
             }
         }
@@ -3067,10 +3067,10 @@ class OrderSubmitForm extends BaseModel
             $oldOrderGoodsNum = OrderDetail::find()->alias('od')
                 ->leftJoin(['o' => Order::tableName()], 'od.order_id=o.id')
                 ->where([
-                    'od.goods_id'  => $goodsId,
+                    'od.goods_id' => $goodsId,
                     'od.is_delete' => 0,
-                    'o.user_id'    => \Yii::$app->user->id,
-                    'o.is_delete'  => 0,
+                    'o.user_id' => \Yii::$app->user->id,
+                    'o.is_delete' => 0,
                 ])
                 ->andWhere([
                     '!=',
@@ -3079,7 +3079,7 @@ class OrderSubmitForm extends BaseModel
                 ])
                 ->sum('od.num');
             $oldOrderGoodsNum = $oldOrderGoodsNum ? intval($oldOrderGoodsNum) : 0;
-            $totalNum         = $oldOrderGoodsNum + $item['num'];
+            $totalNum = $oldOrderGoodsNum + $item['num'];
             if ($totalNum > $goods->confine_count) {
                 throw new OrderException('商品（' . $goods->goodsWarehouse->name . '）限购' . $goods->confine_count . '件');
             }
@@ -3193,7 +3193,7 @@ class OrderSubmitForm extends BaseModel
         }
         try {
             $plugin = \Yii::$app->plugin->getPlugin('vip_card');
-            $data   = $plugin->vipDiscount($data);
+            $data = $plugin->vipDiscount($data);
             return $data;
         } catch (\Exception $e) {
             return $data;
@@ -3210,7 +3210,7 @@ class OrderSubmitForm extends BaseModel
      */
     protected function getTemplateMessage()
     {
-        $arr  = [
+        $arr = [
             'order_pay_tpl',
             'order_cancel_tpl',
             'order_send_tpl'
@@ -3230,15 +3230,15 @@ class OrderSubmitForm extends BaseModel
         $goodsTotalOriginalPrice = $item["total_goods_original_price"];
 
         /** @var User $user */
-        $user        = \Yii::$app->user->identity;
+        $user = \Yii::$app->user->identity;
         $nowDateTime = time();
         /** @var UserCoupon[] $allList */
         $allList = UserCoupon::getList([
-            'mall_id'          => \Yii::$app->mall->id,
-            'user_id'          => $user->id,
-            'is_use'           => 0,
-            'end_at'           => $nowDateTime,
-            'is_failure'       => 0,
+            'mall_id' => \Yii::$app->mall->id,
+            'user_id' => $user->id,
+            'is_use' => 0,
+            'end_at' => $nowDateTime,
+            'is_failure' => 0,
             'coupon_min_price' => $goodsTotalOriginalPrice,
         ]);
         if (!count($allList)) {
@@ -3246,16 +3246,16 @@ class OrderSubmitForm extends BaseModel
         }
 
         $goodsWarehouseIdList = [];
-        $catIdList            = [];
+        $catIdList = [];
         foreach ($item['goods_list'] as &$goodsItem) {
-            $goods                          = Goods::findOne($goodsItem['id']);
-            $goodsWarehouseIdList[]         = $goods->goods_warehouse_id;
-            $goodsCatRelations              = GoodsCatRelation::findAll([
+            $goods = Goods::findOne($goodsItem['id']);
+            $goodsWarehouseIdList[] = $goods->goods_warehouse_id;
+            $goodsCatRelations = GoodsCatRelation::findAll([
                 'goods_warehouse_id' => $goods->goods_warehouse_id,
-                'is_delete'          => 0,
+                'is_delete' => 0,
             ]);
             $goodsItem['goodsCatRelations'] = $goodsCatRelations;
-            $goodsItem['goods']             = $goods;
+            $goodsItem['goods'] = $goods;
             foreach ($goodsCatRelations as $goodsCatRelation) {
                 $catIdList[] = $goodsCatRelation->cat_id;
             }
@@ -3269,11 +3269,11 @@ class OrderSubmitForm extends BaseModel
             $coupon_data = \Yii::$app->serializer->decode($userCoupon->coupon_data);
             unset($coupon_data->created_at, $coupon_data->updated_at, $coupon_data->deleted_at, $coupon_data->is_delete, $coupon_data->cat->created_at,
                 $coupon_data->cat->updated_at, $coupon_data->cat->deleted_at, $coupon_data->cat->is_delete);
-            $coupon_data->begin_at                 = !empty($coupon_data->begin_at) ? date("Y-m-d", $coupon_data->begin_at) : 0;
-            $coupon_data->end_at                   = !empty($coupon_data->end_at) ? date("Y-m-d", $coupon_data->end_at) : 0;
-            $userCoupon->coupon_data               = $coupon_data;
+            $coupon_data->begin_at = !empty($coupon_data->begin_at) ? date("Y-m-d", $coupon_data->begin_at) : 0;
+            $coupon_data->end_at = !empty($coupon_data->end_at) ? date("Y-m-d", $coupon_data->end_at) : 0;
+            $userCoupon->coupon_data = $coupon_data;
             $userCoupon->coupon_data->appoint_type = $userCoupon->coupon->appoint_type;
-            $userCoupon->coupon_data->name         = $userCoupon->coupon->name;
+            $userCoupon->coupon_data->name = $userCoupon->coupon->name;
 
             if ($userCoupon->coupon->appoint_type == Coupon::APPOINT_TYPE_CAT || $userCoupon->coupon->appoint_type == Coupon::APPOINT_TYPE_GOODS) {
                 if ($userCoupon->coupon->appoint_type == Coupon::APPOINT_TYPE_GOODS) {
@@ -3346,11 +3346,11 @@ class OrderSubmitForm extends BaseModel
     private function getUserUsableCouponData($couponItem, $userCoupon)
     {
         $couponItem['coupon'] = [
-            'enabled'         => true,
-            'use'             => false,
+            'enabled' => true,
+            'use' => false,
             'coupon_discount' => price_format(0),
-            'user_coupon_id'  => 0,
-            'coupon_error'    => "",
+            'user_coupon_id' => 0,
+            'coupon_error' => "",
         ];
         if (!$this->enableCoupon || $couponItem['mch']['id'] != 0) { // 入住商不可使用优惠券
             return false;
@@ -3368,7 +3368,7 @@ class OrderSubmitForm extends BaseModel
                     'coupon_id' => $coupon->id,
                     'is_delete' => 0,
                 ]);
-                $catIdList          = [];
+                $catIdList = [];
                 foreach ($couponCatRelations as $couponCatRelation) {
                     $catIdList[] = $couponCatRelation->cat_id;
                 }
@@ -3378,8 +3378,8 @@ class OrderSubmitForm extends BaseModel
                     ->alias('gcr')
                     ->leftJoin(['gc' => GoodsCats::tableName()], 'gcr.cat_id=gc.id')
                     ->where([
-                        'gc.is_delete'  => 0,
-                        'gcr.cat_id'    => $catIdList,
+                        'gc.is_delete' => 0,
+                        'gcr.cat_id' => $catIdList,
                         'gcr.is_delete' => 0
                     ])
                     ->all();
@@ -3392,27 +3392,27 @@ class OrderSubmitForm extends BaseModel
                     'coupon_id' => $coupon->id,
                     'is_delete' => 0,
                 ]);
-                $couponGoodsIdList    = [];
+                $couponGoodsIdList = [];
                 foreach ($couponGoodsRelations as $couponGoodsRelation) {
                     $couponGoodsIdList[] = $couponGoodsRelation->goods_warehouse_id;
                 }
             }
-            $totalGoodsPrice         = 0;
+            $totalGoodsPrice = 0;
             $totalGoodsOriginalPrice = 0;
             foreach ($couponItem['goods_list'] as $goodsItem) {
                 if (!in_array($goodsItem['goods_warehouse_id'], $couponGoodsIdList)) {
                     continue;
                 }
-                $totalGoodsPrice         += $goodsItem['total_price'];
+                $totalGoodsPrice += $goodsItem['total_price'];
                 $totalGoodsOriginalPrice += $goodsItem['total_original_price'];
             }
             //可抵扣金额
-            $sub      = UserCouponLogic::getDiscountAmount($userCoupon, $totalGoodsOriginalPrice);
+            $sub = UserCouponLogic::getDiscountAmount($userCoupon, $totalGoodsOriginalPrice);
             $subPrice = min($totalGoodsPrice, $sub, $couponItem['total_goods_price']);
             if ($subPrice > 0) {
-                $couponItem['total_goods_price']         = price_format($couponItem['total_goods_price'] - $subPrice);
-                $couponItem['coupon']['use']             = true;
-                $couponItem['coupon']['user_coupon_id']  = $userCoupon->id;
+                $couponItem['total_goods_price'] = price_format($couponItem['total_goods_price'] - $subPrice);
+                $couponItem['coupon']['use'] = true;
+                $couponItem['coupon']['user_coupon_id'] = $userCoupon->id;
                 $couponItem['coupon']['coupon_discount'] = price_format($subPrice);
             }
             $couponItem = $this->setDiscountPrice($couponItem, $totalGoodsPrice, $subPrice, $couponGoodsIdList);
@@ -3425,12 +3425,12 @@ class OrderSubmitForm extends BaseModel
             if ($subPrice > $couponItem['total_goods_price']) {
                 $subPrice = $couponItem['total_goods_price'];
             }
-            $totalGoodsPrice                         = $couponItem['total_goods_price'];
-            $couponItem['total_goods_price']         = price_format($couponItem['total_goods_price'] - $subPrice);
-            $couponItem['coupon']['use']             = true;
-            $couponItem['coupon']['user_coupon_id']  = $userCoupon->id;
+            $totalGoodsPrice = $couponItem['total_goods_price'];
+            $couponItem['total_goods_price'] = price_format($couponItem['total_goods_price'] - $subPrice);
+            $couponItem['coupon']['use'] = true;
+            $couponItem['coupon']['user_coupon_id'] = $userCoupon->id;
             $couponItem['coupon']['coupon_discount'] = price_format($subPrice);
-            $couponItem                              = $this->setDiscountPrice($couponItem, $totalGoodsPrice, $subPrice);
+            $couponItem = $this->setDiscountPrice($couponItem, $totalGoodsPrice, $subPrice);
         }
         return $couponItem;
     }
@@ -3459,13 +3459,13 @@ class OrderSubmitForm extends BaseModel
      */
     public function extraCommonOrder($order, $orderItem)
     {
-        $commonOrderFrom            = new CommonOrderForm();
-        $formData                   = [];
-        $formData["order_id"]       = $order->id;
-        $formData["goods_list"]     = $orderItem['goods_list'];
-        $formData["pay_price"]      = $order->total_pay_price;
+        $commonOrderFrom = new CommonOrderForm();
+        $formData = [];
+        $formData["order_id"] = $order->id;
+        $formData["goods_list"] = $orderItem['goods_list'];
+        $formData["pay_price"] = $order->total_pay_price;
         $commonOrderFrom->form_data = $formData;
-        $result                     = $commonOrderFrom->addCommonOrder();
+        $result = $commonOrderFrom->addCommonOrder();
         return $result;
     }
 
@@ -3482,7 +3482,7 @@ class OrderSubmitForm extends BaseModel
 
         foreach ($item['goods_list'] as $key => $goodsItem) {
             $full_relief_price = isset($goodsItem['full_relief_price']) ? $goodsItem['full_relief_price'] : 0;
-            $fulfil_price      = isset($goodsItem['fulfil_price']) ? $goodsItem['fulfil_price'] : 0;
+            $fulfil_price = isset($goodsItem['fulfil_price']) ? $goodsItem['fulfil_price'] : 0;
 
             $result = $this->goodsFullReliefOne($goodsItem['id'], $goodsItem['unit_price'], $goodsItem['total_original_price'], $goodsItem['total_price'], $goodsItem['num'], $fulfil_price, $full_relief_price);
 
@@ -3535,11 +3535,11 @@ class OrderSubmitForm extends BaseModel
             $change_unit_price = price_format($change_unit_price - $per_full_relief_price);
 
             return [
-                'goods_id'              => $goods_id,
-                'total_price'           => $total_price,
-                'full_relief_price'     => $full_relief_price,
+                'goods_id' => $goods_id,
+                'total_price' => $total_price,
+                'full_relief_price' => $full_relief_price,
                 'per_full_relief_price' => $per_full_relief_price,
-                'change_unit_price'     => $change_unit_price
+                'change_unit_price' => $change_unit_price
             ];
         }
 
@@ -3564,20 +3564,26 @@ class OrderSubmitForm extends BaseModel
 
             //判断是否是秒杀商品并且在秒杀活动内
             $seckillGoodsResult = $this->checkBuyPower($goods['goods_id'], $goods['num']);
-            if ($seckillGoodsResult && isset($seckillGoodsResult['seckillGoodsPrice'])){
+            if ($seckillGoodsResult && isset($seckillGoodsResult['seckillGoodsPrice'])) {
                 $backSeckillGoodsResult = array_combine(array_column($seckillGoodsResult['seckillGoodsPrice'], 'attr_id'), $seckillGoodsResult['seckillGoodsPrice']);
                 foreach ($goods['goods_list'] as &$list) {
-                    if (isset($backSeckillGoodsResult[$list['goods_attr']->id])) {
+                    if (
+                        isset($backSeckillGoodsResult[$list['goods_attr']->id])
+                        &&
+                        ($backSeckillGoodsResult[$list['goods_attr']->id]['score_deduction_price'] > 0)
+                    ) {
                         $list['unit_price'] = $backSeckillGoodsResult[$list['goods_attr']->id]['score_deduction_price'];
-                        $express_price += $backSeckillGoodsResult[$list['goods_attr']->id]['seckill_price'] * $goods['num'];
-                        $total_goods_price += $list['unit_price'] * $goods['num'];
-                        if ($open) {
-                            $total_price += $list['unit_price'] * $goods['num'];
-                        }
-                        $forehead_score[] = $list['unit_price'];
-                        $list['total_original_price'] = $list['unit_price'] * $goods['num'];
-                        $list['total_price'] = $list['unit_price'] * $goods['num'];
+                    } else {
+                        $list['unit_price'] = $backSeckillGoodsResult[$list['goods_attr']->id]['shopping_voucher_deduction_price'];
                     }
+                    $express_price += $backSeckillGoodsResult[$list['goods_attr']->id]['seckill_price'] * $goods['num'];
+                    $total_goods_price += $list['unit_price'] * $goods['num'];
+                    if ($open) {
+                        $total_price += $list['unit_price'] * $goods['num'];
+                    }
+                    $forehead_score[] = $list['unit_price'];
+                    $list['total_original_price'] = $list['unit_price'] * $goods['num'];
+                    $list['total_price'] = $list['unit_price'] * $goods['num'];
                 }
                 $goodsList['express_price'] = $express_price;
                 $goodsList['total_goods_price'] = $total_goods_price + $goodsList['express_price'];
@@ -3586,33 +3592,34 @@ class OrderSubmitForm extends BaseModel
                     $goodsList['total_price'] = $goodsList['total_goods_price'];
                     $goods['total_price'] = $goodsList['total_goods_price'];
                 }
-                $goods['forehead_score'] = min($forehead_score);
+                $goods['forehead_score'] = $forehead_score ? min($forehead_score) : 0;
                 $goods['total_original_price'] = $total_goods_price + $goodsList['express_price'];
                 $goodsList['is_seckill'] = 1;
             }
         }
 
     }
+
     //支付前检测
-    private function checkBuyPower ($goods_id, $num)
+    private function checkBuyPower($goods_id, $num)
     {
         //查询该商品是否是秒杀商品及活动时间, 秒杀商品是否还有库存
         $seckillGoodsResult = SeckillGoods::judgeSeckillGoods($goods_id);
         if ($seckillGoodsResult) {
             if ($seckillGoodsResult['buy_limit'] > 0) {
                 if ($num > $seckillGoodsResult['buy_limit']) {
-                    throw new OrderException('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
+                    throw new OrderException('每人最多限购' . $seckillGoodsResult['buy_limit'] . '单');
                 }
 
                 $buyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult);
                 if ($buyNum + $num > $seckillGoodsResult['real_stock']) {
                     $surplus = $seckillGoodsResult['real_stock'] - $buyNum;
-                    throw new OrderException('秒杀商品库存不足，还剩余'. $surplus . '件');
+                    throw new OrderException('秒杀商品库存不足，还剩余' . $surplus . '件');
                 }
 
                 $userBuyNum = SeckillGoods::SeckillGoodsBuyNum($goods_id, $seckillGoodsResult, \Yii::$app->user->id);
                 if ($userBuyNum + $num > $seckillGoodsResult['buy_limit']) {
-                    throw new OrderException('每人最多限购'. $seckillGoodsResult['buy_limit'] .'单');
+                    throw new OrderException('每人最多限购' . $seckillGoodsResult['buy_limit'] . '单');
                 }
             }
         }

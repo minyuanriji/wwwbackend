@@ -271,6 +271,11 @@ Yii::$app->loadComponentView('com-rich-text');
                                 <el-input v-model="scope.row.score_deduction_price"></el-input>
                             </template>
                         </el-table-column>
+                        <el-table-column prop="shopping_voucher_deduction_price" width="180" label="购物券抵扣金额">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.shopping_voucher_deduction_price"></el-input>
+                            </template>
+                        </el-table-column>
 
                         <el-table-column label="操作" >
                             <template slot-scope="scope">
@@ -343,14 +348,6 @@ Yii::$app->loadComponentView('com-rich-text');
                     dialogVisible: false,
                     btnLoading: false,
                     formData:'',
-                    /*{
-                        name:'',
-                        buy_limit:0,
-                        virtual_seckill_num:0,
-                        virtual_stock:0,
-                        real_stock:0,
-                        seckillGoodsPrice:''
-                    }*/
                 },
                 mallGoods:'',
                 mallGoodsLoading:false,

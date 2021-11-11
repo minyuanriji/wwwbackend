@@ -86,7 +86,7 @@ class SeckillListForm extends BaseModel
                     } else {
                         $remainder = $item['falseNum'] / $item['virtual_stock'];
                         if ($remainder > 0) {
-                            $item['surplus_percentage'] = sprintf("%.2f", $remainder);
+                            $item['surplus_percentage'] = number_format($remainder, "2");
                         } else {
                             $item['surplus_percentage'] = 0;
                         }

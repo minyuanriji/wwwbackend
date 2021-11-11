@@ -34,7 +34,7 @@ class PluginShoppingVoucherLog
                                 AddcreditRechargeNotification::send($row);
                             default;
                         }
-                    } else {
+                    }/* else {
                         switch ($row['source_type'])
                         {
                             case 1:
@@ -43,7 +43,7 @@ class PluginShoppingVoucherLog
                                 break;
                             default;
                         }
-                    }
+                    }*/
                     \Yii::error('IncomeLogNotice:' . json_encode($row) . '---time:' . date("Y-m-d H:i:s", time()));
                 }
             }

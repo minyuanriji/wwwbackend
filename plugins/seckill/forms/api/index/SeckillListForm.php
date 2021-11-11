@@ -58,7 +58,11 @@ class SeckillListForm extends BaseModel
                     //获取虚假比例
                     $ratio = ceil($item['virtual_stock'] / $item['real_stock']);
 
-                    $rand = rand($ratio - 3, $ratio);
+                    $remainRatio = $ratio - 3;
+                    if ($remainRatio <= 0) {
+                        $remainRatio = 0.1;
+                    }
+                    $rand = rand($remainRatio, $ratio);
 
                     //获取真实购买数
                     $item['buyNum'] = SeckillGoods::SeckillGoodsBuyNum($item['goods_id'], $seckill);

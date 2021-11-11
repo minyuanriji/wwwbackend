@@ -48,6 +48,10 @@ class SeckillGoodsSaveForm extends BaseModel
             return $this->returnApiResultData(ApiCode::CODE_FAIL, '虚拟库存不能小于真实库存！');
         }
 
+        if ($this->virtual_stock <= 0 || $this->real_stock <= 0) {
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, '请填写虚拟库存或真实库存！');
+        }
+
         //判断活动是否结束
         $seckill = Seckill::findOne($this->seckill_id);
         if (!$seckill || $seckill->is_delete)

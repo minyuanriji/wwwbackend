@@ -56,12 +56,13 @@ class SeckillListForm extends BaseModel
                     unset($item['goods'], $item['seckillGoodsPrice']);
 
                     //获取虚假比例
-                    $ratio = ceil($item['virtual_stock'] / $item['real_stock']) ;
-                    $rand = rand(ceil($ratio / 10), $ratio);
+                    $ratio = ceil($item['virtual_stock'] / $item['real_stock']);
+
+                    $rand = rand($ratio - 3, $ratio);
 
                     //获取真实购买数
                     $item['buyNum'] = SeckillGoods::SeckillGoodsBuyNum($item['goods_id'], $seckill);
-                    if ($item['buyNum']) {
+                    if ($item['buyNum'] > 0) {
                         $keyArray = [];
                         $keyArray['buyNum'] = $item['buyNum'];
                         $keyArray['falseNum'] = $item['buyNum'] * $rand;
@@ -79,15 +80,18 @@ class SeckillListForm extends BaseModel
                     } else {
                         $item['falseNum'] = 0;
                     }
-                    if ($item['falseNum'] == 0 || $item['virtual_stock'] == 0) {
+
+                    if ($item['falseNum'] == 0) {
                         $item['surplus_percentage'] = 0;
                     } else {
-                        $surplus = floatval(intval($item['falseNum']) / intval($item['virtual_stock']));
-                        $item['surplus_percentage'] = round($surplus, 2);
-                        if ($item['surplus_percentage'] < 0 && $item['buyNum']) {
-                            $item['surplus_percentage'] = 0.01;
+                        $remainder = $item['falseNum'] / $item['virtual_stock'];
+                        if ($remainder > 0) {
+                            $item['surplus_percentage'] = sprintf("%.2f", $remainder);
+                        } else {
+                            $item['surplus_percentage'] = 0;
                         }
                     }
+
                     if ($item['surplus_percentage'] > 1) {
                         $item['surplus_percentage'] = 1;
                     }
@@ -127,32 +131,25 @@ class SeckillListForm extends BaseModel
         if(!$progressNum){
             $cache->set($keyID, $keyArray, $cacheTime);
             $valArray = json_decode($keyArray, true);
-            $progressNum = $valArray['falseNum'];
+            $newPprogressNum = $valArray['falseNum'];
         } else {
-            if (is_string($progressNum)) {
-                $valArray = json_decode($progressNum, true);
-            } else {
-                $valArray = $progressNum;
-            }
+            //上次缓存的销量
+            $valArray = json_decode($progressNum, true);
 
-            $keyArray = json_decode($keyArray, true);
+            //本次读取的销量
+            $newKeyArray = json_decode($keyArray, true);
 
-            if ($keyArray['buyNum'] == $valArray['buyNum']) {
-                $progressNum = $valArray['falseNum'];
-            }
-
-            if ($keyArray['buyNum'] > $valArray['buyNum']) {
-                if ($valArray['falseNum'] > $keyArray['buyNum']) {
-                    $valArray['falseNum'] += $keyArray['buyNum'];
-                } else {
-                    $valArray['falseNum'] = $keyArray['falseNum'];
-                }
-                $value = json_encode($valArray);
-                $cache->set($keyID, $value, $cacheTime);
-                $progressNum = $valArray['falseNum'];
+            //如果读取的和上次购买数量一致，返回缓存虚假销量
+            if ($newKeyArray['buyNum'] == $valArray['buyNum']) {
+                $newPprogressNum = $valArray['falseNum'];
+            } elseif ($newKeyArray['buyNum'] > $valArray['buyNum']) {
+                $valArray['falseNum'] = $newKeyArray['falseNum'];
+                $valArray['buyNum'] = $newKeyArray['buyNum'];
+                $cache->set($keyID, json_encode($valArray), $cacheTime);
+                $newPprogressNum = $valArray['falseNum'];
             }
         }
-        return $progressNum;
+        return $newPprogressNum;
     }
 
 }

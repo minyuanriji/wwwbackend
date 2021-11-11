@@ -22,14 +22,21 @@ class BossController extends Controller
     public function actionIndex()
     {
         if (\Yii::$app->request->isAjax) {
-            if (\Yii::$app->request->isPost) {
-            } else {
+            $form = new BossListForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->getList());
+        } else {
+            if (\Yii::$app->request->post('flag') === 'EXPORT') {
+                $fields = explode(',', \Yii::$app->request->post('fields'));
                 $form = new BossListForm();
-                $form->attributes = \Yii::$app->request->get();
-                return $this->asJson($form->getList());
+                $form->attributes = \Yii::$app->request->post();
+                $form->fields = $fields;
+                $form->getList();
+                return false;
+            } else {
+                return $this->render('index');
             }
         }
-        return $this->render('index');
     }
 
     /**

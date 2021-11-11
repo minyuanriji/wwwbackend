@@ -100,12 +100,23 @@ class SeckillGoodsSaveForm extends BaseModel
                         throw new \Exception('积分抵扣金额不能大于原价格，规格ID：' . $item['attr_id']);
                     }
 
+                    if ($item['shopping_voucher_deduction_price'] > 0) {
+                        if ($item['seckill_price'] > 0 || $item['score_deduction_price'] > 0) {
+                            throw new \Exception('选择购物券抵扣时不能选择秒杀价和积分抵扣');
+                        }
+                    }
+
                     if ($item['id']) {
                         $seckillGoodsPriceModel = SeckillGoodsPrice::findOne($item['id']);
                         if (!$seckillGoodsPriceModel)
                             throw new \Exception($seckillGoodsPriceModel->getErrorMessage());
                     } else {
-                        $seckillGoodsPriceModel = SeckillGoodsPrice::find()->andWhere(['goods_id' => $item['goods_id'], 'attr_id' => $item['attr_id'], 'seckill_id' => $item['seckill_id'] ?? $this->seckill_id])->one();
+                        $seckillGoodsPriceModel = SeckillGoodsPrice::find()
+                            ->andWhere([
+                                'goods_id' => $item['goods_id'],
+                                'attr_id' => $item['attr_id'],
+                                'seckill_id' => $item['seckill_id'] ?? $this->seckill_id
+                            ])->one();
                         if (!$seckillGoodsPriceModel) {
                             $seckillGoodsPriceModel = new SeckillGoodsPrice();
                             $seckillGoodsPriceModel->mall_id = \Yii::$app->mall->id;

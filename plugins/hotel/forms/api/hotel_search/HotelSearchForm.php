@@ -79,7 +79,7 @@ class HotelSearchForm extends BaseModel{
      * @param $prepareId
      * @return string|null
      */
-    private static function getBindSearchIdByPrepareId($prepareId){
+    protected static function getBindSearchIdByPrepareId($prepareId){
         $cacheKey = "HotelSearchPrepare:" . $prepareId;
         return \Yii::$app->getCache()->get($cacheKey);
     }

@@ -20,11 +20,19 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
     public $city_id;
     public $order_by_name;
     public $sort_type;
+    public $keyword;    //关键词
+    public $s_price;    //起步价
+    public $e_price;    //截止价
+    public $level;      //星级1-10
+    public $start_date; //起始日期日期
+    public $type;       //酒店类型：in国内、hour钟点房、bb民宿
+    public $days;       //预订天数
 
     public function rules(){
         return [
-            [['page', 'city_id'], 'integer'],
-            [['lng', 'lat', 'search_id', 'order_by_name', 'sort_type'], 'string']
+            [['page', 'city_id', 'days'], 'integer'],
+            [['lng', 'lat', 'search_id', 'order_by_name', 'sort_type'], 'string'],
+            [['type', 'start_date', 'keyword', 's_price', 'e_price', 'level'], 'safe']
         ];
     }
 
@@ -124,6 +132,23 @@ class HotelSimpleListForm extends BaseModel implements ICacheForm {
                     "city_id" => $this->city_id
                 ]);
             }
+        }
+
+        if(!empty($this->keyword)){
+            $query->andWhere([
+                "OR",
+                ["LIKE", "ho.name", $this->keyword],
+                ["LIKE", "ho.address", $this->keyword],
+                "FIND_IN_SET('".$this->keyword."', ho.tag)"
+            ]);
+        }
+
+        if(!empty($this->s_price)){
+            $query->andWhere([">=", "ho.price", floatval($this->s_price)]);
+        }
+
+        if(!empty($this->e_price)){
+            $query->andWhere(["<=", "ho.price", floatval($this->e_price)]);
         }
 
         $selects = ["ho.id", "ho.thumb_url", "ho.name", "ho.type", "ho.cmt_grade", "ho.cmt_num", "ho.price"];

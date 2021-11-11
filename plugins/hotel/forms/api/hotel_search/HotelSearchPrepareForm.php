@@ -72,7 +72,7 @@ class HotelSearchPrepareForm extends HotelSearchForm {
         }
 
         try {
-            if($this->city_id <= 0 && !empty($this->lng) && !empty($this->lat)){
+            /*if($this->city_id <= 0 && !empty($this->lng) && !empty($this->lat)){
                 $poi = TencentMapHelper::toPoi($this->host_info, $this->lng, $this->lat);
                 $citySearch = CityHelper::likeSearch($poi['province'], $poi['city'], $poi['district']);
                 $cityId = isset($citySearch['city_id']) ? $citySearch['city_id'] : 0;
@@ -130,7 +130,11 @@ class HotelSearchPrepareForm extends HotelSearchForm {
                 $hotelIds[] = $row['id'];
             }
 
-            list($prepareId, $searchId) = static::start($hotelIds, $this->attributes);
+            list($prepareId, $searchId) = static::start($hotelIds, $this->attributes);*/
+
+            $prepareId = uniqid();
+            $searchId = static::generateSearchId($this->attributes);
+            \Yii::$app->getCache()->set("hotel:{$prepareId}", $this->attributes);
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

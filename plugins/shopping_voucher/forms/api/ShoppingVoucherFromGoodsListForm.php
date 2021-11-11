@@ -54,7 +54,7 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
             $newList = [];
             $goodsIds = [];
             foreach ($list as $detail) {
-                $detail['sales'] = sprintf("已售%s%s", 0, $detail['unit']);
+                $detail['sales'] = sprintf("已售%s%s", $detail['virtual_sales'], $detail['unit']);
                 $detail['got_shopping_voucher_num'] = 0;
                 $newList[] = $detail;
                 $goodsIds[] = $detail['id'];

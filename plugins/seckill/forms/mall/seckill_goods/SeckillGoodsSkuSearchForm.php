@@ -63,6 +63,7 @@ class SeckillGoodsSkuSearchForm extends BaseModel
                 $attrInfo['spec_name'] = $spec_name;
                 $attrInfo['goods_id'] = $goodsInfo['id'];
                 $attrInfo['score_deduction_price'] = 0;
+                $attrInfo['shopping_voucher_deduction_price'] = 0;
                 $attrInfo['seckill_price'] = 0;
                 $attrInfo['attr_price'] = $attr['price'];
                 $info['seckillGoodsPrice'][] = $attrInfo;

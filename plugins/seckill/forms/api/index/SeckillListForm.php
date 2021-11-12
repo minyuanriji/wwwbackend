@@ -105,7 +105,6 @@ class SeckillListForm extends BaseModel
                         $item['surplus_percentage'] = (string)$item['surplus_percentage'];
                     }
                     $item['surplus_percentage'] = (float)substr($item['surplus_percentage'], 0, strpos($item['surplus_percentage'], '.') + 3);
-                    var_dump($item['surplus_percentage']);die;
                 }
                 if ($seckill['start_time'] > time()) {
                     $seckill['status'] = 0;//未开始

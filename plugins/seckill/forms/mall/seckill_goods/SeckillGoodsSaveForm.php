@@ -14,7 +14,6 @@ use yii\base\BaseObject;
 
 class SeckillGoodsSaveForm extends BaseModel
 {
-
     public $id;
     public $seckill_id;
     public $goods_id;
@@ -44,14 +43,6 @@ class SeckillGoodsSaveForm extends BaseModel
             return $this->responseErrorInfo();
         }
 
-        if ($this->virtual_stock < $this->real_stock) {
-            return $this->returnApiResultData(ApiCode::CODE_FAIL, '虚拟库存不能小于真实库存！');
-        }
-
-        if ($this->virtual_stock <= 0 || $this->real_stock <= 0) {
-            return $this->returnApiResultData(ApiCode::CODE_FAIL, '请填写虚拟库存或真实库存！');
-        }
-
         //判断活动是否结束
         $seckill = Seckill::findOne($this->seckill_id);
         if (!$seckill || $seckill->is_delete)
@@ -59,6 +50,12 @@ class SeckillGoodsSaveForm extends BaseModel
 
         if ($seckill->end_time < time())
             return $this->returnApiResultData(ApiCode::CODE_FAIL, '该秒杀活动已结束！');
+
+        if ($this->virtual_stock < $this->real_stock)
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, '虚拟库存不能小于真实库存！');
+
+        if ($this->virtual_stock <= 0 || $this->real_stock <= 0)
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, '请填写虚拟库存或真实库存！');
 
         //判断该商品是否在某个秒杀活动进行中
         $seckillGoodsModel = SeckillGoods::find()->andWhere(['goods_id' => $this->goods_id, 'is_delete' => 0])->asArray()->all();
@@ -100,14 +97,16 @@ class SeckillGoodsSaveForm extends BaseModel
 
             if ($this->seckillGoodsPrice) {
                 foreach ($this->seckillGoodsPrice as $item) {
-                    if ($item['attr_price'] < $item['score_deduction_price']) {
+                    if (($item['seckill_price'] <= 0)  && ($item['score_deduction_price'] <= 0) && ($item['shopping_voucher_deduction_price'] <= 0))
+                        throw new \Exception('请添加价格，规格ID：' . $item['attr_id']);
+
+                    if ($item['attr_price'] < $item['score_deduction_price'])
                         throw new \Exception('积分抵扣金额不能大于原价格，规格ID：' . $item['attr_id']);
-                    }
 
                     if ($item['shopping_voucher_deduction_price'] > 0) {
-                        if ($item['seckill_price'] > 0 || $item['score_deduction_price'] > 0) {
+                        if ($item['seckill_price'] > 0 || $item['score_deduction_price'] > 0)
                             throw new \Exception('选择购物券抵扣时不能选择秒杀价和积分抵扣');
-                        }
+
                     }
 
                     if ($item['id']) {

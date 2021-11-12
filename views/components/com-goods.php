@@ -1364,7 +1364,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 distributionLevelList: [],
                 form: null,
                 is_show_sales: 0,
-                use_virtual_sales: 0,
+                use_virtual_sales: 1,
                 form_id: 0,
                 attr_default_name: '',
                 is_area_limit: 0,

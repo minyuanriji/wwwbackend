@@ -19,21 +19,14 @@ Yii::$app->loadPluginComponentView('boss-level');
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <span>股东列表</span>
-            <!--<el-form size="small" :inline="true" :model="search" style="float: right;margin-top: -5px;">
-                <el-form-item>
-                    <com-export-dialog :field_list='exportList' :params="search" @selected="confirmSubmit">
-                    </com-export-dialog>
-                </el-form-item>
-            </el-form>-->
+
+            <div style="float: right">
+                <el-button type="primary" size="small" style="padding: 9px 15px !important;" @click="editClick">添加股东
+                </el-button>
+                <com-export-dialog :field_list='exportList' :action_url="'<?= Yii::$app->request->baseUrl . '/index.php?r=plugin/boss/mall/boss/index' ?>'" :params="search" ></com-export-dialog>
+            </div>
         </div>
         <div class="table-body">
-            <!--<el-select size="small" v-model="search.platform" @change='toSearch' class="select">
-                <el-option key="all" label="全部平台" value=""></el-option>
-                <el-option key="wxapp" label="微信" value="wxapp"></el-option>
-                <el-option key="aliapp" label="支付宝" value="aliapp"></el-option>
-                <el-option key="ttapp" label="抖音/头条" value="ttapp"></el-option>
-                <el-option key="bdapp" label="百度" value="bdapp"></el-option>
-            </el-select>-->
             <el-select size="small" v-model="search.level_id" @change='toSearch' class="select">
                 <el-option key="all" label="全部等级" value="0"></el-option>
                 <el-option :key="index" :label="item.name" :value="item.id"
@@ -45,14 +38,7 @@ Yii::$app->loadPluginComponentView('boss-level');
                     <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
                 </el-input>
             </div>
-            <!--<div class="batch">
-                <boss-batch :choose-list="choose_list" :boss-level-list="bossLevelList"
-                           @to-search="loadData"></boss-batch>
-            </div>-->
-            <div style="float: right">
-                <el-button type="primary" size="small" style="padding: 9px 15px !important;" @click="editClick">添加股东
-                </el-button>
-            </div>
+
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-table :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           @selection-change="handleSelectionChange">
@@ -63,15 +49,6 @@ Yii::$app->loadPluginComponentView('boss-level');
                             <com-image style="float: left;margin-right: 5px;" mode="aspectFill"
                                        :src="scope.row.avatar_url"></com-image>
                             <div>{{scope.row.nickname}}</div>
-                            <div>
-                                <img v-if="scope.row.userInfo.platform == 'wxapp'" src="statics/img/mall/wx.png" alt="">
-                                <img v-if="scope.row.userInfo.platform == 'aliapp'" src="statics/img/mall/ali.png"
-                                     alt="">
-                                <img v-if="scope.row.userInfo.platform == 'ttapp'" src="statics/img/mall/toutiao.png"
-                                     alt="">
-                                <img v-if="scope.row.userInfo.platform == 'bdapp'" src="statics/img/mall/baidu.png"
-                                     alt="">
-                            </div>
                         </template>
                     </el-table-column>
 
@@ -93,11 +70,6 @@ Yii::$app->loadPluginComponentView('boss-level');
                             <div>{{scope.row.total_price}}</div>
                         </template>
                     </el-table-column>
-                    <!--<el-table-column label="佣金比列" prop="rate" width="100">
-                        <template slot-scope="scope">
-                            <div>{{scope.row.rate}}%</div>
-                        </template>
-                    </el-table-column>-->
                     <!--<el-table-column label="推荐人" prop="parent_name"></el-table-column>
                     <el-table-column width='200' label="下级用户">
                         <template slot-scope="scope">
@@ -114,28 +86,14 @@ Yii::$app->loadPluginComponentView('boss-level');
                             <el-tag size="small">{{scope.row.level_name}}</el-tag>
                         </template>
                     </el-table-column>
-                    </el-table-column>
                     <el-table-column label="时间" width="200">
                         <template slot-scope="scope">
                             <div>成为股东时间：<br>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
                         </template>
                     </el-table-column>
-                    </el-table-column>
                     <el-table-column label="备注信息" prop="remarks"></el-table-column>
                     <el-table-column label="操作" width="300px">
                         <template slot-scope="scope">
-                            <!--<el-button type="text" size="mini" circle style="margin-top: 10px"
-                                       @click.native="order(scope.row.user_id)">
-                                <el-tooltip class="item" effect="dark" content="查看订单" placement="top">
-                                    <img src="statics/img/mall/boss/order.png" alt="">
-                                </el-tooltip>
-                            </el-button>
-                            <el-button type="text" size="mini" circle style="margin-left: 10px;margin-top: 10px"
-                                       @click.native="cash(scope.row.user_id)">
-                                <el-tooltip class="item" effect="dark" content="提现详情" placement="top">
-                                    <img src="statics/img/mall/boss/detail.png" alt="">
-                                </el-tooltip>
-                            </el-button>-->
                             <el-button type="text" size="mini" circle style="margin-left: 10px;margin-top: 10px"
                                        @click.native="remarks(scope.row)">
                                 <el-tooltip class="item" effect="dark" content="添加备注" placement="top">
@@ -157,18 +115,15 @@ Yii::$app->loadPluginComponentView('boss-level');
                     </el-table-column>
                 </el-table>
             </el-tabs>
-            <div flex="box:last cross:center">
-                <div></div>
-                <div>
-                    <el-pagination
-                            v-if="list.length > 0"
-                            style="display: inline-block;float: right;"
-                            background :page-size="pagination.pageSize"
-                            @current-change="pageChange"
-                            layout="prev, pager, next" :current-page="pagination.current_page"
-                            :total="pagination.total_count">
-                    </el-pagination>
-                </div>
+            <div style="text-align: center">
+                <el-pagination
+                        v-if="list.length > 0"
+                        style="margin-top: 20px"
+                        background :page-size="pagination.pageSize"
+                        @current-change="pageChange"
+                        layout="prev, pager, next" :current-page="pagination.current_page"
+                        :total="pagination.total_count">
+                </el-pagination>
             </div>
         </div>
     </el-card>

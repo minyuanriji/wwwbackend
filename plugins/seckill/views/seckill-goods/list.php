@@ -248,7 +248,7 @@ Yii::$app->loadComponentView('com-rich-text');
                 </el-table>
 
                 <el-card class="box-card" style="margin-top:20px;">
-
+                    <el-alert title="说明：积分抵扣+秒杀价格和购物券抵扣只能二选一" type="info" :closable="false" style="margin-bottom: 20px;color: red"></el-alert>
                     <el-table :data="editGoodsAttrParams.formData[0].seckillGoodsPrice" height="400" border style="margin-top:20px;width: 100%">
                         <el-table-column prop="attr_id" label="规格ID" width="100"></el-table-column>
                         <el-table-column property="spec_name" label="商品SKU" width="250">
@@ -269,6 +269,11 @@ Yii::$app->loadComponentView('com-rich-text');
                         <el-table-column prop="score_deduction_price" width="180" label="积分抵扣金额">
                             <template slot-scope="scope">
                                 <el-input v-model="scope.row.score_deduction_price"></el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="shopping_voucher_deduction_price" width="180" label="购物券抵扣金额">
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.shopping_voucher_deduction_price"></el-input>
                             </template>
                         </el-table-column>
 
@@ -343,14 +348,6 @@ Yii::$app->loadComponentView('com-rich-text');
                     dialogVisible: false,
                     btnLoading: false,
                     formData:'',
-                    /*{
-                        name:'',
-                        buy_limit:0,
-                        virtual_seckill_num:0,
-                        virtual_stock:0,
-                        real_stock:0,
-                        seckillGoodsPrice:''
-                    }*/
                 },
                 mallGoods:'',
                 mallGoodsLoading:false,

@@ -13,7 +13,10 @@ namespace app\forms\common\order;
 use app\core\BasePagination;
 use app\models\BaseModel;
 use app\models\BaseActiveQuery;
+use app\models\Goods;
+use app\models\GoodsWarehouse;
 use app\models\Order;
+use app\models\OrderDetail;
 
 /**
  * @property Order $order
@@ -60,10 +63,12 @@ class OrderListCommon extends BaseModel
     public $only_offline_order = 0; //只显示核销订单
     public $only_offline_used  = 0; //只显示已使用的核销订单
 
+    public $keywords;
+
     public function rules()
     {
         return [
-            [['sign_id', 'keyword'], 'string'],
+            [['sign_id', 'keyword', 'keywords'], 'string'],
             [['mall_id', 'limit', 'mch_id', 'is_detail', 'is_refund', 'is_array', 'limit', 'sort',
                 'is_pagination', 'is_mch_order', 'is_user', 'is_goods', 'all_mch', 'status','sale_status',
                 'is_comment', 'user_id', 'is_recycle'], 'integer'],
@@ -101,6 +106,7 @@ class OrderListCommon extends BaseModel
             'is_recycle' => 'setIsRecycle',
             'dateArr' => 'setDate',
             'relations' => 'setRelations',
+            'keywords' => 'setKeywords',
         ];
         return isset($array[$key]) ? $array[$key] : null;
     }
@@ -316,5 +322,18 @@ class OrderListCommon extends BaseModel
     protected function setRelations()
     {
         $this->query->with($this->relations);
+    }
+
+    protected function setKeywords ()
+    {
+        $goodsWarehouseIds = GoodsWarehouse::find()->andWhere(['mall_id' => \Yii::$app->mall->id])
+            ->andWhere(['like', 'name', $this->keywords])->select('id');
+        $goodsIds = Goods::find()->andWhere(['goods_warehouse_id' => $goodsWarehouseIds])->select('id');
+        $orderIds = OrderDetail::find()->andWhere(['goods_id' => $goodsIds])->select('order_id');
+        $this->query->andWhere([
+            'or',
+            ['LIKE', 'o.order_no', $this->keywords],
+            ['o.id' => $orderIds]
+        ]);
     }
 }

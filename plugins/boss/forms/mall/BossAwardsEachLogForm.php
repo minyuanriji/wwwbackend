@@ -11,6 +11,7 @@ class BossAwardsEachLogForm extends BaseModel
     //添加记录
     public function save($data)
     {
+        $t = \Yii::$app->db->beginTransaction();
         try {
             if (isset($data['id'])) {
                 $each_res = BossAwardEachLog::find()->andWhere(['id' => $data['id']])->one();
@@ -32,6 +33,7 @@ class BossAwardsEachLogForm extends BaseModel
             if (!$each_res->save()) {
                 throw new \Exception($this->responseErrorMsg($each_res));
             } else {
+                $t->commit();
                 return [
                     'code' => ApiCode::CODE_SUCCESS,
                     'msg' => '保存成功',
@@ -39,13 +41,11 @@ class BossAwardsEachLogForm extends BaseModel
                 ];
             }
         } catch (\Exception $exception) {
+            $t->rollBack();
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => $exception->getMessage()
             ];
         }
     }
-
-
-
 }

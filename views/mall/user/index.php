@@ -1,12 +1,3 @@
-<?php
-/**
-  * @link:http://www.gdqijianshi.com/
- * copyright: Copyright (c) 2020 广东七件事集团
- * author: zal
- */
-
-?>
-
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
@@ -21,19 +12,15 @@
             <el-alert title="说明：点击用户头像可查看详细资产记录" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
 
             <el-select size="small" v-model="role_type" @change='search' class="select">
-                <el-option key="" label="全部用户" value=""></el-option>
-                <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
-                <el-option key="partner" label="合伙人" value="partner"></el-option>
-                <el-option key="store" label="VIP会员" value="store"></el-option>
-                <el-option key="user" label="普通用户" value="user"></el-option>
+                <el-option
+                    v-for="item in allUser"
+                    :label="item.name"
+                    :value="item.value"
+                >
+                </el-option>
             </el-select>
             <el-select size="small" v-model="platform" @change='search' class="select">
-                <el-option key="0" label="全部平台" value="0"></el-option>
-                <el-option key="mp-wx" label="微信小程序" value="mp-wx"></el-option>
-                <el-option key="wechat" label="微信" value="wechat"></el-option>
-                <el-option key="mp-ali" label="支付宝" value="aliapp"></el-option>
-                <el-option key="mp-tt" label="抖音/头条" value="ttapp"></el-option>
-                <el-option key="mp-bd" label="百度" value="bdapp"></el-option>
+                <el-option v-for="item in allPlatform" :label="item.name" :value="item.value"></el-option>
             </el-select>
             <div class="input-item" style="width:300px;">
                 <el-input @keyup.enter.native="search" size="small" placeholder="请输入ID/昵称/手机号" v-model="keyword"
@@ -168,9 +155,10 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <div style="text-align: right;margin: 20px 0;">
+            <div style="text-align: center;margin-top: 20px;">
                 <el-pagination @current-change="pagination" background layout="prev, pager, next"
-                               :page-count="pageCount" :current-page="currentPage"></el-pagination>
+                               :page-count="pageCount" :current-page="currentPage">
+                </el-pagination>
             </div>
         </div>
         <!-- 充值积分 -->
@@ -224,7 +212,6 @@
                 <el-button :loading="btnLoading" type="primary" @click="balanceSubmit">充值</el-button>
             </div>
         </el-dialog>
-
         <!-- 用户推荐列表 -->
         <el-dialog :title="'用户'+recommandData.nickname+'[ID:'+recommandData.id+']的推荐列表'" :visible.sync="dialogChildren" width="50%">
             <el-select size="small" v-model="recommandData.role_type" @change='childSearch' class="select">
@@ -309,7 +296,7 @@
                 searchData: {
                     keyword: '',
                 },
-                platform: '0',
+                platform: '',
                 member_level: '0',
                 role_type: '',
                 mall_members: [],
@@ -375,7 +362,55 @@
                     currentPage: 0,
                     team_type: '',
                 },
-                childData: []
+                childData: [],
+                allUser: [
+                    {
+                        name:'全部用户',
+                        value:'0',
+                    },
+                    {
+                        name:'分公司',
+                        value:'branch_office',
+                    },
+                    {
+                        name:'合伙人',
+                        value:'partner',
+                    },
+                    {
+                        name:'VIP会员',
+                        value:'store',
+                    },
+                    {
+                        name:'普通用户',
+                        value:'user',
+                    }
+                ],
+                allPlatform: [
+                    {
+                        name:'全部平台',
+                        value:'0',
+                    },
+                    {
+                        name:'微信小程序',
+                        value:'mp-wx',
+                    },
+                    {
+                        name:'微信',
+                        value:'wechat',
+                    },
+                    {
+                        name:'支付宝',
+                        value:'aliapp',
+                    },
+                    {
+                        name:'抖音/头条',
+                        value:'ttapp',
+                    },
+                    {
+                        name:'百度',
+                        value:'bdapp',
+                    },
+                ],
             }
         },
         methods: {

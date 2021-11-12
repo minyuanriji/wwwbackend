@@ -670,4 +670,25 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
         }
         return $voucherUser;
     }
+
+    public static function getRoleType($type)
+    {
+        switch ($type) {
+            case 'branch_office':
+                $text = '分公司';
+                break;
+            case 'partner':
+                $text = '合伙人';
+                break;
+            case 'store':
+                $text = 'VIP会员';
+                break;
+            case 'user':
+                $text = '普通用户';
+                break;
+            default:
+        }
+
+        return $text;
+    }
 }

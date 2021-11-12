@@ -2,6 +2,7 @@
 
 namespace app\plugins\boss\controllers\mall;
 
+use app\plugins\boss\forms\mall\BossAwardsBatchExamineListForm;
 use app\plugins\boss\forms\mall\BossAwardsExamineDeleteForm;
 use app\plugins\boss\forms\mall\BossAwardsExamineListForm;
 use app\plugins\Controller;
@@ -36,6 +37,19 @@ class ExaminePrizeController extends Controller
             }
         }
         return $this->render('edit');
+    }
+
+    /**
+     * @Note:批量审核
+     * @return string|\yii\web\Response
+     */
+    public function actionBatchExamine()
+    {
+        if (\Yii::$app->request->isPost) {
+            $form = new BossAwardsBatchExamineListForm();
+            $form->ids = \Yii::$app->request->post('ids');
+            return $this->asJson($form->examine());
+        }
     }
 
     /**

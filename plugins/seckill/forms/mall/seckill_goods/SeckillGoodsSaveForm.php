@@ -9,6 +9,8 @@ use app\models\GoodsWarehouse;
 use app\plugins\seckill\models\Seckill;
 use app\plugins\seckill\models\SeckillGoods;
 use app\plugins\seckill\models\SeckillGoodsPrice;
+use app\plugins\shopping_voucher\forms\mall\ShoppingVoucherGoodsEditForm;
+use yii\base\BaseObject;
 
 class SeckillGoodsSaveForm extends BaseModel
 {
@@ -44,6 +46,10 @@ class SeckillGoodsSaveForm extends BaseModel
 
         if ($this->virtual_stock < $this->real_stock) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL, '虚拟库存不能小于真实库存！');
+        }
+
+        if ($this->virtual_stock <= 0 || $this->real_stock <= 0) {
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, '请填写虚拟库存或真实库存！');
         }
 
         //判断活动是否结束
@@ -98,12 +104,23 @@ class SeckillGoodsSaveForm extends BaseModel
                         throw new \Exception('积分抵扣金额不能大于原价格，规格ID：' . $item['attr_id']);
                     }
 
+                    if ($item['shopping_voucher_deduction_price'] > 0) {
+                        if ($item['seckill_price'] > 0 || $item['score_deduction_price'] > 0) {
+                            throw new \Exception('选择购物券抵扣时不能选择秒杀价和积分抵扣');
+                        }
+                    }
+
                     if ($item['id']) {
                         $seckillGoodsPriceModel = SeckillGoodsPrice::findOne($item['id']);
                         if (!$seckillGoodsPriceModel)
                             throw new \Exception($seckillGoodsPriceModel->getErrorMessage());
                     } else {
-                        $seckillGoodsPriceModel = SeckillGoodsPrice::find()->andWhere(['goods_id' => $item['goods_id'], 'attr_id' => $item['attr_id'], 'seckill_id' => $item['seckill_id'] ?? $this->seckill_id])->one();
+                        $seckillGoodsPriceModel = SeckillGoodsPrice::find()
+                            ->andWhere([
+                                'goods_id' => $item['goods_id'],
+                                'attr_id' => $item['attr_id'],
+                                'seckill_id' => $item['seckill_id'] ?? $this->seckill_id
+                            ])->one();
                         if (!$seckillGoodsPriceModel) {
                             $seckillGoodsPriceModel = new SeckillGoodsPrice();
                             $seckillGoodsPriceModel->mall_id = \Yii::$app->mall->id;
@@ -114,9 +131,23 @@ class SeckillGoodsSaveForm extends BaseModel
                     $seckillGoodsPriceModel->seckill_id = $item['seckill_id'] ?? $this->seckill_id;
                     $seckillGoodsPriceModel->seckill_price = $item['seckill_price'];
                     $seckillGoodsPriceModel->score_deduction_price = $item['score_deduction_price'];
+                    $seckillGoodsPriceModel->shopping_voucher_deduction_price = $item['shopping_voucher_deduction_price'];
                     $seckillGoodsPriceModel->seckill_goods_id = $item['seckill_goods_id'] ?? $seckillGoodsModel->id;
                     if (!$seckillGoodsPriceModel->save())
                         throw new \Exception($seckillGoodsPriceModel->getErrorMessage());
+
+                    if ($item['shopping_voucher_deduction_price'] > 0) {
+                        $goodsResult = Goods::find()->andWhere('id = ' . $item['goods_id'])->with('goodsWarehouse')->one();
+
+                        $shoppingVoucherGoodsEdit = new ShoppingVoucherGoodsEditForm([
+                            'id' => 0,
+                            'goods_id' => $item['goods_id'],
+                            'name' => $goodsResult->goodsWarehouse->name,
+                            'cover_pic' => $goodsResult->goodsWarehouse->cover_pic,
+                            'voucher_price' => $goodsResult->goodsWarehouse->original_price,
+                        ]);
+                        $shoppingVoucherGoodsEdit->save();
+                    }
                 }
             }
 

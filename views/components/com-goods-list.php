@@ -257,8 +257,8 @@ Yii::$app->loadComponentView('goods/com-batch');
                         </template>
                     </el-table-column>
                     <el-table-column prop="virtual_sales" width="110" label="虚拟销量" sortable="false"></el-table-column>
-                    <el-table-column prop="real_sales" width="110" label="真实销量" ></el-table-column>
-                    <el-table-column label="状态" width="100">
+                    <el-table-column prop="real_sales" width="90" label="真实销量" ></el-table-column>
+                    <el-table-column label="状态" width="80">
                         <template slot-scope="scope">
                             <template v-if="!is_mch || mchMallSetting.is_goods_audit == 0">
                                 <el-tag size="small" type="success" v-if="scope.row.status">销售中</el-tag>
@@ -277,13 +277,11 @@ Yii::$app->loadComponentView('goods/com-batch');
                             </template>
                         </template>
                     </el-table-column>
-
                     <el-table-column prop="scope" width="180" label="添加时间">
                         <template slot-scope="scope">
                             {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
                         </template>
                     </el-table-column>
-
                     <el-table-column width="100" v-if="is_mch && mchMallSetting.is_goods_audit == 1" label="申请状态">
                         <template slot-scope="scope">
                             <template>
@@ -307,9 +305,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                         </template>
                     </el-table-column>
                     <slot name="column-col"></slot>
-                    <el-table-column
-                            label="操作"
-                            :width="actionWitch">
+                    <el-table-column label="操作">
                         <template slot-scope="scope">
                             <slot name="action" :item="scope.row"></slot>
                             <template v-if="is_action">
@@ -356,7 +352,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                     </el-table-column>
                 </el-table>
 				<!-- 这里就是el-table的分页数 -->
-                <div flex="main:right cross:center" style="margin-top: 20px;">
+                <div style="margin-top: 20px;text-align: center;">
                     <div v-if="pageCount > 0">
                         <el-pagination
                                 @current-change="pagination"
@@ -410,10 +406,6 @@ Yii::$app->loadComponentView('goods/com-batch');
             is_action: {
                 type: Boolean,
                 default: true
-            },
-            actionWitch: {
-                type: Number,
-                default: 200
             },
             is_add_goods: {
                 type: Boolean,

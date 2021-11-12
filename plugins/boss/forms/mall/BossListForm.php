@@ -3,6 +3,7 @@
 namespace app\plugins\boss\forms\mall;
 
 
+use app\forms\mall\export\BossExport;
 use app\helpers\ArrayHelper;
 use app\models\User;
 use app\plugins\boss\forms\common\BossLevelCommon;
@@ -53,6 +54,13 @@ class BossListForm extends BaseModel
         if ($this->level_id) {
             $query->andWhere(['d.level_id' => $this->level_id]);
         }
+        if ($this->flag == "EXPORT") {
+            $new_query = clone $query;
+            $exp = new BossExport();
+            $exp->fieldsKeyList = $this->fields;
+            $exp->export($new_query, 'd.');
+            return false;
+        }
         $list = $query->page($pagination, $this->limit, $this->page)
             ->orderBy($this->sort)->all();
         $newList = [];
@@ -83,62 +91,7 @@ class BossListForm extends BaseModel
             'code' => 0,
             'msg' => '',
             'data' => [
-                'list' => $newList,
-                'pagination' => $pagination,
-                'bossLevelList' => BossLevelCommon::getInstance()->getList(),
-            ]
-        ];
-    }
-
-    public function getListOld()
-    {
-        if (!$this->validate()) {
-            return $this->responseErrorInfo();
-        }
-        $mall = \Yii::$app->mall;
-        $pagination = null;
-        $query = Boss::find()->alias('d')->with(['user'])
-            ->where(['d.is_delete' => 0, 'd.mall_id' => $mall->id])
-            ->leftJoin(['u' => User::tableName()], 'u.id = d.user_id');
-        if ($this->keyword) {
-            $query->andWhere([
-                'or',
-                ['like', 'u.username', $this->keyword],
-                ['like', 'u.nickname', $this->keyword]
-            ]);
-        }
-        if ($this->level) {
-            $query->andWhere(['d.level' => $this->level]);
-        }
-        $list = $query->page($pagination, $this->limit, $this->page)
-            ->orderBy($this->sort)->all();
-        $newList = [];
-        /* @var Boss[] $list */
-        foreach ($list as $item) {
-            $newItem = ArrayHelper::toArray($item);
-            /* @var User $user */
-            $user = $item->user;
-            $newItem = array_merge($newItem, [
-                'nickname' => $user['nickname'],
-                'avatar_url' => $user['avatar_url'],
-                'parent_name' => $user['parent'] ? $user['parent']['nickname'] : '平台',
-            ]);
-            $newItem['userInfo'] = ArrayHelper::toArray($item->user);
-            $boss_level=null;
-            if ($item->level > 0) {
-                $common = BossLevelCommon::getInstance();
-                $boss_level = $common->getBossLevelByLevel($item->level);
-                if (!$boss_level) {
-                    throw new \Exception('无效的分销商等级');
-                }
-            }
-            $newItem['level_name'] = $boss_level ? $boss_level->name : '默认等级';
-            $newList[] = $newItem;
-        }
-        return [
-            'code' => 0,
-            'msg' => '',
-            'data' => [
+                'export_list' => (new BossExport())->fieldsList(),
                 'list' => $newList,
                 'pagination' => $pagination,
                 'bossLevelList' => BossLevelCommon::getInstance()->getList(),

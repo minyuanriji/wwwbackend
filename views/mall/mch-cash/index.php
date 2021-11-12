@@ -33,7 +33,6 @@
                     </div>
                 </div>
             </div>
-
         </el-card>
 
         <el-card style="border-radius: 15px;margin-top: 15px;">
@@ -79,10 +78,7 @@
 
         <el-card shadow="never" style="border:0;border-radius: 15px;margin-top: 15px"
                  body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
-
-
             <div class="table-body">
-
                 <el-table :data="list" size="small" border v-loading="loading" style="margin-bottom: 15px">
                     <el-table-column label="基本信息">
                         <template slot-scope="scope">
@@ -169,7 +165,7 @@
                     </el-table-column>
                 </el-table>
 
-                <div  style="text-align: center">
+                <div style="text-align: center">
                     <el-pagination
                             v-if="list.length > 0"
                             style="margin-top:20px;"

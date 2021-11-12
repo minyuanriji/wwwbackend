@@ -34,6 +34,7 @@ use app\plugins\boss\models\BossLevel;
 use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
 use yii\helpers\ArrayHelper;
 
+ini_set('memory_limit', '1024M');
 class UserForm extends BaseModel
 {
     public $id;

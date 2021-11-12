@@ -116,6 +116,7 @@
                 this.getOrders();
             },
             switchTab(){
+                this.page = 1;
                 this.getOrders();
             },
             handleSelectionChange(val) {

@@ -96,6 +96,8 @@
 
 <?php echo $this->render("item_edit"); ?>
 
+<?php echo $this->render("item_send"); ?>
+
 <?php echo $this->render("item"); ?>
 
 

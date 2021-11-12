@@ -64,7 +64,6 @@ class GiftpacksItemListForm extends BaseModel{
                     unset($item['distance_mi']);
 
                     $item['score'] = number_format($item['score'], 1);
-
                     $item['max_stock'] = (int)$item['max_stock'];
                     $infos = [];
                     if($item['usable_times'] > 0){

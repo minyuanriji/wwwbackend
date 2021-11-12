@@ -74,6 +74,11 @@
                             <img src="statics/img/mall/edit.png" alt="">
                         </el-tooltip>
                     </el-button>
+                    <el-button @click="sendItem(scope.row)" type="text" circle size="mini">
+                        <el-tooltip class="item" effect="dark" content="发放" placement="top">
+                            <img src="statics/img/mall/send.png" alt="">
+                        </el-tooltip>
+                    </el-button>
                     <el-button @click="deleteItem(scope.row, scope.$index)" type="text" circle size="mini">
                         <el-tooltip class="item" effect="dark" content="删除" placement="top">
                             <img src="statics/img/mall/del.png" alt="">
@@ -121,6 +126,9 @@
                 this.dialogFormVisible = true;
                 this.pack_id = pack_data.id;
                 this.loadData();
+            },
+            sendItem(item_data){
+                itemSendApp.show(item_data);
             },
             editItem(item_data){
                 var self = this;

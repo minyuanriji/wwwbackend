@@ -636,4 +636,7 @@ Yii::$app->loadComponentView('com-rich-text');
         margin: 0 0 20px 0;
     }
 
+    .el-dialog {
+        border-radius: 15px;
+    }
 </style>

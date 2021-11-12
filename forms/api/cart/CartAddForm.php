@@ -109,7 +109,7 @@ class CartAddForm extends BaseModel
             }
 
             $cart->attr_info = \Yii::$app->serializer->encode(ArrayHelper::toArray($attr));
-            $cart->num           = $this->num;
+            $cart->num       = $this->num;
             $cart->buy_now   = (int)$this->buy_now ?? 0;
             $cart->mch_baopin_id = $this->mch_baopin_id;
             if ($cart->save()) {

@@ -366,7 +366,7 @@ abstract class BaseGoodsEdit extends BaseModel
         $this->goodsWarehouse = $goodsWarehouse;
         // 商品
         $goods->goods_warehouse_id = $this->goods_warehouse_id;
-        $goods->virtual_sales = $this->virtual_sales;
+        $goods->virtual_sales = ($this->virtual_sales > 0) ?: rand(300, 900);
         $goods->price = $this->price;
         $goods->use_attr = $this->use_attr;
         $goods->attr_groups = \Yii::$app->serializer->encode($this->attrGroups);

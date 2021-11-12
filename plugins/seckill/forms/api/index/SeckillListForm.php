@@ -56,13 +56,15 @@ class SeckillListForm extends BaseModel
                     unset($item['goods'], $item['seckillGoodsPrice']);
 
                     //获取虚假比例
-                    $ratio = ceil($item['virtual_stock'] / $item['real_stock']);
+                    $ratio = floor($item['virtual_stock'] / $item['real_stock']);
 
-                    $remainRatio = $ratio - 3;
+                    $remainRatio = $ratio - 4;
+
                     if ($remainRatio <= 0) {
-                        $remainRatio = 0.1;
+                        $remainRatio = 2;
                     }
-                    $rand = rand($remainRatio, $ratio);
+
+                    $rand = mt_rand($remainRatio, $ratio);
 
                     //获取真实购买数
                     $item['buyNum'] = SeckillGoods::SeckillGoodsBuyNum($item['goods_id'], $seckill);
@@ -99,6 +101,11 @@ class SeckillListForm extends BaseModel
                     if ($item['surplus_percentage'] > 1) {
                         $item['surplus_percentage'] = 1;
                     }
+//                    $item['surplus_percentage'] = $item['surplus_percentage'] * 100;
+                    if (!is_array($item['surplus_percentage'])) {
+                        $item['surplus_percentage'] = (string)$item['surplus_percentage'];
+                    }
+                    $item['surplus_percentage'] = (float)substr($item['surplus_percentage'], 0, strpos($item['surplus_percentage'], '.') + 3);
                 }
                 if ($seckill['start_time'] > time()) {
                     $seckill['status'] = 0;//未开始

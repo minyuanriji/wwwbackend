@@ -12,6 +12,7 @@ namespace app\logic;
 
 use app\forms\common\attachment\CommonUpload;
 use app\models\AttachmentStorage;
+use app\models\User;
 use Da\QrCode\Contracts\ErrorCorrectionLevelInterface;
 use Da\QrCode\QrCode;
 use jianyan\easywechat\Wechat;
@@ -118,12 +119,16 @@ class CommonLogic
      * @return string
      * @throws \Exception
      */
-    public static function createQrcode($option, $model, $path, $dir)
+    public static function createQrcode($option, $model, $path, $dir, $appPlatform = '')
     {
         $mallSettings = AppConfigLogic::getMallSettingConfig(["web_url"]);
 //        $host = isset($mallSettings["web_url"]) ? urldecode($mallSettings["web_url"]) : "";
         $host = \Yii::$app->request->hostInfo;//isset($mallSettings["web_url"]) ? urldecode($mallSettings["web_url"]) : "";
         \Yii::error("二维码域名----".$host);
+
+        if ($appPlatform == User::PLATFORM_APP) {
+            $host .= '/h5/#/';
+        }
 
         $url = $host . $path;
         $file = \Yii::getAlias('@runtime/image/') . $dir;//生成的二维码保存地址

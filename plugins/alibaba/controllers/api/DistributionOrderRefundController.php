@@ -6,6 +6,7 @@ use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
 use app\plugins\alibaba\forms\api\AlibabaDistributionOrderRefundApplyForm;
 use app\plugins\alibaba\forms\api\AlibabaDistributionOrderRefundReasonsForm;
+use app\plugins\alibaba\forms\api\DistributionOrderRefundToRefundSubmitForm;
 
 class DistributionOrderRefundController extends ApiController {
 
@@ -15,6 +16,12 @@ class DistributionOrderRefundController extends ApiController {
                 'class' => LoginFilter::class,
             ],
         ]);
+    }
+
+    public function actionToRefundSubmit(){
+        $form = new DistributionOrderRefundToRefundSubmitForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->getDetail());
     }
 
     /**

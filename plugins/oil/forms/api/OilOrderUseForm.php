@@ -4,6 +4,7 @@ namespace app\plugins\oil\forms\api;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\plugins\oil\models\OilJiayoulaTransferOrder;
 use app\plugins\oil\models\OilOrders;
 use app\plugins\oil\models\OilPlateforms;
 use app\plugins\oil\models\OilProduct;
@@ -71,6 +72,24 @@ class OilOrderUseForm extends BaseModel{
                 $order->plat_response_data = json_encode($responseData);
                 if(!$order->save()){
                     throw new \Exception($this->responseErrorMsg($order));
+                }
+
+                //生成打款记录
+                $config = $platModel->getParams();
+                $transferOrder = new OilJiayoulaTransferOrder([
+                    "mall_id"         => $platModel->mall_id,
+                    "order_sn"        => "JYL" . date("ymdHis") . rand(10000, 99999),
+                    "created_at"      => time(),
+                    "updated_at"      => time(),
+                    "status"          => "wait",
+                    "amount"          => 0.01,
+                    "bankUserName"    => isset($config['bankUserName']) ? $config['bankUserName'] : "",
+                    "bankCardNo"      => isset($config['bankCardNo']) ? $config['bankCardNo'] : "",
+                    "bankName"        => isset($config['bankName']) ? $config['bankName'] : "",
+                    "bankAccountType" => 2
+                ]);
+                if(!$transferOrder->save()){
+                    throw new \Exception($this->responseErrorMsg($transferOrder));
                 }
             }
 

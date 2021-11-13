@@ -68,7 +68,6 @@ abstract class BasePrepareForm extends BaseModel {
             }
             $supportPayTypes = array_diff($supportPayTypes, $notSupportPayTypes);
 
-
             $unionOrderNo = 'JX' . mb_substr(md5(uniqid()), 2);
             $paymentOrderUnion = new PaymentOrderUnion();
             $paymentOrderUnion->is_pay            = 0;
@@ -103,15 +102,6 @@ abstract class BasePrepareForm extends BaseModel {
                 $paymentOrder->payment_order_union_id = $paymentOrderUnion->id;
                 if(!$paymentOrder->save()){
                     throw new \Exception($this->responseErrorMsg($paymentOrder));
-                }
-            }
-
-
-            $supportPayTypes = OrderLogic::getPaymentTypeConfig();
-            if(in_array("wechat", $supportPayTypes) && \Yii::$app->appPlatform == "h5"){
-                $supportPayTypes = array_diff($supportPayTypes, ["wechat"]);
-                if(!in_array("alipay", $supportPayTypes)){
-                    $supportPayTypes[] = "alipay";
                 }
             }
 

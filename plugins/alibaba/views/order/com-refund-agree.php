@@ -61,8 +61,8 @@
                         <el-table-column label="状态" width="150">
                             <template slot-scope="scope">
                                 <span style="color:darkred;" v-if="scope.row.status == 'waitting'">待打款</span>
-                                <span style="color:darkgreen;" v-if="scope.row.status == 'cancel'">已打款</span>
-                                <span style="color:gray;" v-if="scope.row.status == 'paid'">已取消</span>
+                                <span style="color:darkgreen;" v-if="scope.row.status == 'paid'">已打款</span>
+                                <span style="color:gray;" v-if="scope.row.status == 'cancel'">已取消</span>
                             </template>
                         </el-table-column>
                         <el-table-column label="打款类型" width="150">
@@ -79,7 +79,12 @@
                             <template slot-scope="scope">
                                 <el-button @click="doPaid(scope.row, 'paid')" type="text" size="mini" circle v-if="scope.row.status == 'waitting'">
                                     <el-tooltip class="item" effect="dark" content="打款" placement="top">
-                                        <img src="statics/img/mall/pay.png" alt="">
+                                        <img src="statics/img/mall/pass.png" alt="">
+                                    </el-tooltip>
+                                </el-button>
+                                <el-button @click="doPaid(scope.row, 'cancel')" type="text" size="mini" circle v-if="scope.row.status == 'waitting'">
+                                    <el-tooltip class="item" effect="dark" content="取消" placement="top">
+                                        <img src="statics/img/mall/nopass.png" alt="">
                                     </el-tooltip>
                                 </el-button>
                             </template>
@@ -183,6 +188,7 @@
                                 instance.confirmButtonLoading = false;
                                 instance.confirmButtonText = '确定';
                                 if (e.data.code === 0) {
+                                    this.getOrderDetail();
                                     done();
                                 } else {
                                     this.$message.error(e.data.msg);

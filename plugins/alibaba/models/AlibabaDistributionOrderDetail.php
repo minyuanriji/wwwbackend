@@ -75,13 +75,14 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
         $trans && ($t = \Yii::$app->db->beginTransaction());
         try {
 
-            //用户提交的退款申请信息
-            $refundData = @json_decode($this->refund_json_data, true);
 
             $detail1688 = AlibabaDistributionOrderDetail1688::findOne(["order_detail_id" => $this->id]);
             if(!$detail1688){
                 throw new \Exception("[AlibabaDistributionOrderDetail1688] 1688订单信息不存在");
             }
+
+            //用户提交的退款申请信息
+            $refundData = @json_decode($this->refund_json_data, true);
 
             //获取1688该订单信息
             $app = AlibabaApp::findOne($detail1688->app_id);
@@ -99,12 +100,12 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
             $status = $res->result['baseInfo']['status'];
             $orderData1688 = $res->result;
 
-            /*if($status != "waitsellersend"){
+            //TODO 暂时由人工操作退款 阿里巴巴提交退款申请
+            /*
+             if($status != "waitsellersend"){
                 throw new \Exception("只允许已付款未发货的订单退款 [{$status}]");
             }
-
-            //阿里巴巴提交退款申请
-            $res = $distribution->requestWithToken(new CreateRefund([
+             $res = $distribution->requestWithToken(new CreateRefund([
                 "orderId"        => $detail1688->ali_order_id,
                 "orderEntryIds"  => json_encode([$detail1688->ali_order_id]),
                 "disputeRequest" => "refund",
@@ -121,13 +122,13 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
                 throw new \Exception($res->error);
             }*/
 
-            //更新1688订单信息
-            $detail1688->ali_refund_id = isset($res->refundId) ? $res->refundId : "";
+            //TODO 暂时由人工操作退款 更新1688订单信息
+            /*$detail1688->ali_refund_id = isset($res->refundId) ? $res->refundId : "";
             $detail1688->ali_orderdata = json_encode($orderData1688);
             $detail1688->updated_at    = time();
             if(!$detail1688->save()){
                 throw new \Exception(json_encode($detail1688->getErrors()));
-            }
+            }*/
 
             //更新订单详情，设置状态为已同意
             $this->refund_status = "agree";
@@ -136,15 +137,12 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
                 throw new \Exception(json_encode($this->getErrors()));
             }
 
-            //判断如果所有商品都申请了退款，退还运费
+            //判断如果所有商品都申请了退款，关闭订单
             $existCount = (int)static::find()->where([
                 "order_id"  => $this->order_id,
                 "is_delete" => 0
             ])->andWhere(["IN", "refund_status", ['refused','none','apply']])->count();
             if($existCount <= 0){
-                $this->total_price += $order->express_price;
-                $this->shopping_voucher_num += $order->shopping_voucher_express_use_num;
-
                 //关闭订单
                 $order->is_closed    = 1;
                 $order->updated_at   = time();

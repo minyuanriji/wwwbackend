@@ -37,9 +37,12 @@ class DistributionOrderRefundToRefundSubmitForm extends BaseModel{
             $returnData = [];
 
             $orderDetail = AlibabaDistributionOrderDetail::findOne($this->order_detail_id);
-            if(!$orderDetail){
+            if(!$orderDetail || $orderDetail->is_delete){
                 throw new \Exception("订单不存在");
             }
+
+            $refundData = !empty($orderDetail->refund_json_data) ? json_decode($orderDetail->refund_json_data, true) : [];
+            $skuLabels = $orderDetail['sku_labels'] ? @json_decode($orderDetail['sku_labels'], true) : [];
 
             $orderDetail1688 = AlibabaDistributionOrderDetail1688::findOne(["order_detail_id" => $orderDetail->id]);
 
@@ -48,14 +51,18 @@ class DistributionOrderRefundToRefundSubmitForm extends BaseModel{
                 throw new \Exception("商品不存在");
             }
 
-            $goodsInfo['name']    = $goods->name;
-            $goodsInfo['num']     = $orderDetail->num;
-            $goodsInfo['pic_url'] = $goods->cover_url;
+            $goodsInfo['name']       = $goods->name;
+            $goodsInfo['sku_labels'] = $skuLabels ? implode(",", $skuLabels) : "";
+            $goodsInfo['num']        = $orderDetail->num;
+            $goodsInfo['pic_url']    = $goods->cover_url;
             $goodsInfo['shopping_voucher_num'] = $orderDetail->shopping_voucher_num;
 
-            $detail['goods_info'] = $goodsInfo;
+            $detail['refund_status'] = $orderDetail->refund_status;
+            $detail['refund_data']   = $refundData;
+            $detail['is_refund']     = $orderDetail->is_refund;
+            $detail['goods_info']    = $goodsInfo;
             $detail['refund_shopping_voucher_num'] = $orderDetail->shopping_voucher_num;
-            $detail["refund_reason_list"] = AliRefundHelper::getReasonList($orderDetail, $orderDetail1688);
+            $detail["refund_reason_list"] = AppConfigLogic::getRefundReasonConfig();
 
             $data = $detail;
 

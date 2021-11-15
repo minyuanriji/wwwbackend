@@ -152,6 +152,9 @@ class GiftpacksDetailForm extends BaseModel{
     public static function viewNum(Giftpacks $giftpacks){
 
         $minNum = 2513;
+
+        $giftpacks->view_num = max($minNum, $giftpacks->view_num);
+
         $cache = \Yii::$app->getCache();
         $cacheKey = "GiftpacksViewNum:" . $giftpacks->id;
         $addNum = (int)$cache->get($cacheKey);

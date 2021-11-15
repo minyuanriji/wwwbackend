@@ -71,6 +71,7 @@ use yii\helpers\ArrayHelper;
  * @property int $complete_at 完成时间
  * @property string $location 定位
  * @property string $city_name 配送员
+ * @property int $expand_num 延长收货次数
  * @property string $city_info
  * @property OrderRefund[] $refund
  * @property OrderDetail $detail
@@ -246,7 +247,7 @@ class Order extends BaseActiveRecord
                 'updated_at', 'deleted_at'], 'required'],
             [['mall_id', 'user_id', 'mch_id', 'use_user_coupon_id', 'is_pay', 'pay_type',
                 'is_send', 'is_sale', 'is_confirm', 'cancel_status', 'is_delete', 'is_recycle', 'send_type',
-                'clerk_id', 'store_id', 'is_comment', 'sale_status', 'status', 'distance','address_id','province_id'], 'integer'],
+                'clerk_id', 'store_id', 'is_comment', 'sale_status', 'status', 'distance','address_id','province_id', 'expand_num'], 'integer'],
             [['total_price', 'total_pay_price', 'express_original_price', 'express_price', 'total_goods_price','use_score',
                 'total_goods_original_price', 'member_discount_price', 'coupon_discount_price',
                 'score_deduction_price', 'back_price','full_relief_price','integral_deduction_price',
@@ -333,6 +334,7 @@ class Order extends BaseActiveRecord
             'address_id'=>'地址id',
             'full_relief_price' =>'满减金额',
             'integral_deduction_price' =>'红包券抵扣金额',
+            'expand_num' =>'延长收货次数',
         ];
     }
 

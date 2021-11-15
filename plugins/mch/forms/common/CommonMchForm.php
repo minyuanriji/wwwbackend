@@ -12,6 +12,7 @@ use phpDocumentor\Reflection\Types\This;
 class CommonMchForm extends BaseModel
 {
     public $keyword;
+    public $keyword1;
     public $page;
     public $id;
     public $is_review_status;
@@ -27,14 +28,23 @@ class CommonMchForm extends BaseModel
             'review_status' => 1,
         ]);
 
-        if ($this->keyword) {
-            $mchIds = Store::find()->where(['like', 'name', $this->keyword])->select('mch_id');
-            $userIds = User::find()->where(['like', 'nickname', $this->keyword])->andWhere(['mall_id' => \Yii::$app->mall->id])->select('id');
-            $query->andWhere([
-                'or',
-                ['id' => $mchIds],
-                ['user_id' => $userIds],
-            ]);
+        switch ($this->keyword1)
+        {
+            case 'store_name':
+                $mchIds = Store::find()->andWhere(['like', 'name', $this->keyword])->select('mch_id');
+                $query->andWhere(['id' => $mchIds]);
+                break;
+            case 'user_name':
+                $userIds = User::find()->andWhere(['like', 'nickname', $this->keyword])->andWhere(['mall_id' => \Yii::$app->mall->id])->select('id');
+                $query->andWhere(['user_id' => $userIds]);
+                break;
+            case 'mch_id':
+                $query->andWhere(['id' => $this->keyword]);
+                break;
+            case 'mobile':
+                $query->andWhere(['mobile' => $this->keyword]);
+                break;
+            default;
         }
 
         if ($this->sort_prop && $this->sort_type) {

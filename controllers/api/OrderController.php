@@ -19,6 +19,7 @@ use app\forms\api\order\OrderClerkForm;
 use app\forms\api\order\OrderDetailForm;
 use app\forms\api\order\OrderEditForm;
 use app\forms\api\order\OrderExpressForm;
+use app\forms\api\order\OrderExtendedTimeForm;
 use app\forms\api\order\OrderForm;
 use app\forms\api\order\OrderListPayForm;
 use app\forms\api\order\OrderPayForm;
@@ -457,5 +458,18 @@ class OrderController extends ApiController
         $form->attributes = $this->requestData;
 
         return $this->asJson($form->info());
+    }
+
+    /**
+     * 订单延长收货时间
+     * 只能延长一次，7天
+     * @return \yii\web\Response
+     */
+    public function actionOrderExtendedReceivingTime()
+    {
+        $form = new OrderExtendedTimeForm();
+        $form->attributes = $this->requestData;
+
+        return $this->asJson($form->extended());
     }
 }

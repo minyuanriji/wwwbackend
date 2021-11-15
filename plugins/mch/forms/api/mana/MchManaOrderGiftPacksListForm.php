@@ -12,6 +12,7 @@ use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
+use app\plugins\mch\controllers\api\mana\MchAdminController;
 use app\plugins\mch\models\Mch;
 
 class MchManaOrderGiftPacksListForm extends BaseModel {

@@ -26,7 +26,7 @@ class MchStoreDetailForm extends BaseModel implements ICacheForm {
     }
 
     public function getCacheKey(){
-        return [(int)$this->store_id];
+        return [(int)$this->mch_id, (int)$this->store_id, $this->longitude, $this->latitude];
     }
 
     public function getSourceDataForm(){

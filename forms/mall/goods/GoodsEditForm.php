@@ -125,6 +125,7 @@ class GoodsEditForm extends BaseGoodsEdit
                 'code' => ApiCode::CODE_FAIL,
                 'msg' => $e->getMessage(),
                 'error' => [
+                    'file' => $e->getFile(),
                     'line' => $e->getLine(),
                 ]
             ];

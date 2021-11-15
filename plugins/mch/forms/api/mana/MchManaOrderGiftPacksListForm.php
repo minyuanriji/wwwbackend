@@ -96,6 +96,7 @@ class MchManaOrderGiftPacksListForm extends BaseModel {
                             $remarkArr[] = "已过期";
                         }
                     }
+                    $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
                     $item['remarks'] = implode("，", $remarkArr);
                 }
             }

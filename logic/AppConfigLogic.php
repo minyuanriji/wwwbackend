@@ -720,6 +720,7 @@ class AppConfigLogic
             $page_data = json_decode($model->page_data,true);
             if(!empty($page_data)){
                 foreach ($page_data as $val){
+                    if(!$val) continue;
                     $id = $val["id"];
                     if($id == "goods"){
                         $list = isset($val["data"]["list"]) ? $val["data"]["list"] : [];

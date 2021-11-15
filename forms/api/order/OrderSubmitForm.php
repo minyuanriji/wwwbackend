@@ -750,6 +750,9 @@ class OrderSubmitForm extends BaseModel
         foreach ($listData as &$item) {
             $item['shopping_voucher_use_num'] = 0;
             $item['shopping_voucher_decode_price'] = 0;
+
+
+
             foreach ($item['goods_list'] as &$goodsItem) {
                 $goodsItem['use_shopping_voucher'] = 0;
                 $goodsItem['use_shopping_voucher_decode_price'] = 0;

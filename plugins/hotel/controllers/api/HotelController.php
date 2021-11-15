@@ -20,14 +20,19 @@ class HotelController extends ApiController{
      */
     public function actionSimpleList(){
         $form = new HotelSimpleListForm();
-        $form->attributes = $this->requestData;
+        if(!empty($this->requestData['search_id'])){
+            $searchData = \Yii::$app->getCache()->get("hotel:" . $this->requestData['search_id']);
+            $form->attributes = $searchData;
+        }else{
+            $form->attributes = $this->requestData;
+        }
 
         if(empty($form->lng) || empty($form->lat)){
             $form->lng = static::$commonData['city_data']['longitude'];
             $form->lat = static::$commonData['city_data']['latitude'];
         }
 
-        $res = APICacheHelper::get($form);
+        $res = APICacheHelper::get($form, true);
         if($res['code'] == ApiCode::CODE_SUCCESS){
             $res = $res['data'];
         }

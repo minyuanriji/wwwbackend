@@ -55,16 +55,11 @@ class AlibabaDistributionRefundPaidForm extends BaseModel{
                 }
                 $msg = '拒绝打款';
             } elseif ($this->act == "paid") {
-                if ($this->aliRefundStatus != 'refundsuccess')
-                    throw new \Exception("1688退款未成功，暂时不能打款");
-
-                if ($orderRefund->refund_type == 'waitting')
-                    throw new \Exception("售后状态不正确");
-
                 $orderRefund->status = 'paid';
-                $orderRefund->remark = $this->content;
-                if (!$orderRefund->save())
+                $orderRefund->remark = $this->remark;
+                if (!$orderRefund->save()){
                     throw new \Exception($orderRefund->getErrors());
+                }
 
                 $user = User::findOne($orderRefund->user_id);
                 if(!$user || $user->is_delete){
@@ -87,14 +82,31 @@ class AlibabaDistributionRefundPaidForm extends BaseModel{
                             "source_id"   => $orderRefund->id,
                             "source_type" => '1688_distribution_order_detail_refund'
                         ]);
-                        $modifyForm->add($user, true);
+                        $modifyForm->add($user, false);
                         break;
                     default:
                 }
                 $msg = '打款成功';
             }
+
+            //如果订单已无待操作记录，设置状态未已完成
+            $count = AlibabaDistributionOrderRefund::find()->where([
+                "order_detail_id" => $orderDetail->id,
+                "status"          => "waitting"
+            ])->count();
+            if(!$count && $orderDetail->refund_status == "agree"){
+                $orderDetail->is_refund     = 1;
+                $orderDetail->refund_status = "finished";
+                $orderDetail->updated_at    = time();
+                if(!$orderDetail->save()){
+                    throw new \Exception($this->responseErrorMsg($orderDetail));
+                }
+            }
+
             $t->commit();
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, $msg);
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, $msg, [
+                "is_finished" => $orderDetail->refund_status == "finished" ? 1 : 0
+            ]);
         } catch (\Exception $e) {
             $t->rollBack();
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());

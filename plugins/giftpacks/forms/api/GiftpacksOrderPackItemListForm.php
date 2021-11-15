@@ -38,7 +38,7 @@ class GiftpacksOrderPackItemListForm extends BaseModel{
 
             $query = GiftpacksOrderItem::find()->alias("goi")
                         ->innerJoin(["go" => GiftpacksOrder::tableName()], "go.id=goi.order_id")
-                        ->innerJoin(["gpi" => GiftpacksItem::tableName()], "gpi.id=goi.pack_item_id")
+                        ->innerJoin(["gpi" => GiftpacksItem::tableName()], "gpi.id=goi.pack_item_id AND gpi.is_delete=0")
                         ->innerJoin(["s" => Store::tableName()], "s.id=gpi.store_id")
                         ->innerJoin(["g" => Goods::tableName()], "g.id=gpi.goods_id")
                         ->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");

@@ -74,8 +74,10 @@ class AlibabaDistributionOrderRefundListForm extends BaseModel
 
             if ($list) {
                 foreach ($list as &$item) {
+                    $item['refund_data'] = !empty($item['refund_json_data']) ? json_decode($item['refund_json_data'], true) : [];
                     $item['sku_labels'] = json_decode($item['sku_labels'], true);
-                    $item['total_shopping_voucher_price'] = $item['shopping_voucher_decode_price'] + $item['shopping_voucher_express_use_num'];
+                    $item['total_shopping_voucher_price'] = $item['shopping_voucher_decode_price'] + $item['shopping_voucher_express_decode_price'];
+                    $item['total_shopping_voucher_num'] = $item['shopping_voucher_use_num'] + $item['shopping_voucher_express_use_num'];
                 }
             }
 

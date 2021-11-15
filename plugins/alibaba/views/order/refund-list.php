@@ -34,56 +34,49 @@ echo $this->render("com-refund-agree");
 
                     <el-table-column label="订单信息">
                         <template slot-scope="scope">
-                            <div class="com-order-head" flex="cross:center">
-                                <div class="com-order-time">创建时间：{{ scope.row.created_at|dateTimeFormat('Y-m-d H:i:s') }}</div>
-                                <div class="com-order-user">
-                                    <span class="com-order-time">订单号：</span>{{scope.row.order_no}}
-                                    <span class="com-order-pay-user" style="margin-left: 20px">支付用户：</span>{{scope.row.nickname}}(ID:{{scope.row.user_id}})
+                            <div>订单日期：{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s') }}</div>
+                            <div>订单编号：{{scope.row.order_no}}</div>
+                            <div>商品费用：<span>￥{{scope.row.total_goods_price}}</span>（购物券抵：{{scope.row.shopping_voucher_decode_price}}）</div>
+                            <div>运费：<span>￥{{scope.row.express_original_price}}</span>（购物券抵：{{scope.row.shopping_voucher_express_decode_price}}）</div>
+                            <div>使用现金：{{scope.row.total_pay_price}}</div>
+                            <div>使用购物券：{{scope.row.total_shopping_voucher_num}}（抵扣{{scope.row.total_shopping_voucher_price}}元）</div>
+                            <div>支付用户：{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
+                            <div>支付日期：{{ scope.row.pay_at|dateTimeFormat('Y-m-d H:i:s') }}</div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="商品" width="350">
+                        <template slot-scope="scope">
+                            <div style="display:flex;align-items:center ">
+                                <div style="" >
+                                    <com-image :src="scope.row.cover_url"></com-image>
                                 </div>
-                            </div>
-                            <div>
-                                <com-image style="float: left;margin-right: 10px;height: 80px;width: 80px"
-                                           :src="scope.row.cover_url"></com-image>
-                                <div style="margin: 10px 0">{{ scope.row.goods_name }}（ID：{{scope.row.goods_id}}）</div>
-                                小计：<span style="color: red">{{ scope.row.unit_price }}</span>
-                                <span style="margin-left: 30px">数量：×
-                                    <span style="font-size: 16px;color: green">{{scope.row.num}}</span>
-                                </span>
-                                <div style="margin-top: 10px">
-                                    规格：{{ scope.row.sku_labels[0] }}
+                                <div style="margin-left:10px;">
+                                    <div style="">{{scope.row.goods_name }}（ID：{{scope.row.goods_id}}）</div>
+                                    <div>规格：{{ scope.row.sku_labels[0]}}</div>
                                 </div>
+                                <div style=";text-align:center;width:100px">X <span style="">{{scope.row.num}}</span></div>
                             </div>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="状态" width="130">
+                    <el-table-column label="状态" width="100" align="center">
                         <template slot-scope="scope">
                             <div v-if="scope.row.refund_status=='finished' && scope.row.is_refund == 1" style="color: red">已退款</div>
                             <div v-if="scope.row.refund_status=='apply'" style="color: red">申请中</div>
-                            <div v-if="scope.row.refund_status=='agree'" style="color: red">同意退款</div>
+                            <div v-if="scope.row.refund_status=='agree'" style="color: darkblue">同意退款</div>
                             <div v-if="scope.row.refund_status=='refused'" style="color: red">拒绝退款</div>
                         </template>
                     </el-table-column>
-
-                    <el-table-column label="退款金额" width="130">
+                    <el-table-column label="退款原因" width="200" align="center">
                         <template slot-scope="scope">
-                            <div v-if="scope.row.is_pay==1">
-                                <div v-if="scope.row.pay_type==1">现金：{{scope.row.total_price ?? 0}}</div>
-                                <div v-if="scope.row.pay_type==2">货到付款</div>
-                                <div v-if="scope.row.pay_type==3">购物券：
-                                    <span >
-                                    {{scope.row.shopping_voucher_decode_price ?? 0}}
-                                </span>
-                                </div>
-                                <div>运费：<span>{{ scope.row.shopping_voucher_express_use_num }}</span></div>
-                                <div>总计：<span>{{ scope.row.total_shopping_voucher_price }}</span></div>
-                            </div>
+                            <span style="color:gray">{{scope.row.refund_data.description}}</span>
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="支付时间" width="180">
+                    <el-table-column label="退款信息" width="130">
                         <template slot-scope="scope">
-                            {{ scope.row.pay_at|dateTimeFormat('Y-m-d H:i:s') }}
+                            <div>现金：<span >{{scope.row.total_pay_price}}</span></div>
+                            <div>购物券：<span >{{scope.row.shopping_voucher_use_num}}</span></div>
                         </template>
                     </el-table-column>
 

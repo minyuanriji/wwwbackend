@@ -74,6 +74,7 @@ class GiftpacksItemListForm extends BaseModel{
                         $item['expired_at'] = "";
                     }
                     $item['order_item_num'] = (int)$item['order_item_num'];
+                    $item['stock'] = $item['max_stock'] - $item['order_item_num']; //TODO 剩余库存
                 }
             }
 

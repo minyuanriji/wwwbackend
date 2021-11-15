@@ -9,15 +9,17 @@ use app\plugins\alibaba\models\AlibabaDistributionOrderDetail1688;
 
 class AlibabaDistributionOrderRefundApplyForm extends BaseModel{
 
-    public $id_1688;
-    public $reason_id;
-    public $description;
+    public $order_detail_id;
+    public $is_receipt;
+    public $pic_list;
+    public $reason;
+    public $refund_type;
+    public $remark;
 
     public function rules(){
         return [
-            [['id_1688', 'reason_id', 'description'], 'required'],
-            [['id_1688', 'reason_id'], 'integer'],
-            [['description'], 'string']
+            [['order_detail_id',  'reason'], 'required'],
+            [['remark', 'reason'], 'string']
         ];
     }
 
@@ -28,19 +30,15 @@ class AlibabaDistributionOrderRefundApplyForm extends BaseModel{
 
         try {
 
-            $orderDetail1688 = AlibabaDistributionOrderDetail1688::findOne($this->id_1688);
-            if(!$orderDetail1688){
-                throw new \Exception("订单[ID:{$this->id_1688}]不存在");
-            }
-
-            $orderDetail = AlibabaDistributionOrderDetail::findOne($orderDetail1688->order_detail_id);
+            $orderDetail = AlibabaDistributionOrderDetail::findOne($this->order_detail_id);
             if(!$orderDetail || $orderDetail->is_delete){
-                throw new \Exception("订单[ID:{$this->id_1688}]异常");
+                throw new \Exception("订单[ID:{$this->order_detail_id}]异常");
             }
 
             $orderDetail->applyRefund([
-                "reason_id"   => $this->reason_id,
-                "description" => $this->description
+                "reason_id"   => -1,
+                "description" => $this->reason,
+                "remark"      => $this->remark
             ]);
 
             return [
@@ -51,13 +49,8 @@ class AlibabaDistributionOrderRefundApplyForm extends BaseModel{
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg'  => $e->getMessage(),
-                /*'error' => [
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine()
-                ]*/
+                'msg'  => $e->getMessage()
             ];
         }
-
     }
 }

@@ -130,7 +130,7 @@ abstract class BaseGoodsEdit extends BaseModel
     {
         return [
             [['status', 'use_attr', 'goods_num', 'price'], 'required'],
-            [['use_attr', 'goods_num', 'virtual_sales', 'goods_weight', 'individual_share',
+            [['use_attr', 'goods_num',  'goods_weight', 'individual_share',
                 'share_type', 'attr_setting_type', 'sort', 'is_level',
                 'confine_count', 'give_score', 'give_score_type', 'forehead_score_type',
                 'accumulative', 'freight_id', 'pieces', 'is_level_alone', 'is_default_services', 'goods_warehouse_id',
@@ -154,7 +154,8 @@ abstract class BaseGoodsEdit extends BaseModel
             [['price', 'profit_price'], 'number', 'max' => 9999999],
             [['is_on_site_consumption', 'enable_upgrade_user_role', 'lianc_user_id'], 'number'],
             [['fulfil_price','full_relief_price'],'default','value'=>0],
-            [['integral_fee_rate'], 'integer', 'min' => 0, 'max' => 100]
+            [['integral_fee_rate'], 'integer', 'min' => 0, 'max' => 100],
+            [['virtual_sales'], 'safe']
         ];
     }
 
@@ -365,7 +366,7 @@ abstract class BaseGoodsEdit extends BaseModel
         $this->goodsWarehouse = $goodsWarehouse;
         // 商品
         $goods->goods_warehouse_id = $this->goods_warehouse_id;
-        $goods->virtual_sales = ($this->virtual_sales > 0) ?: rand(300, 900);
+        $goods->virtual_sales = intval(($this->virtual_sales > 0) ? $this->virtual_sales : rand(300, 900));
         $goods->price = $this->price;
         $goods->use_attr = $this->use_attr;
         $goods->attr_groups = \Yii::$app->serializer->encode($this->attrGroups);

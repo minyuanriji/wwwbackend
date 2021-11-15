@@ -23,7 +23,7 @@ class HotelSearchWaitForm extends HotelSearchForm{
 
         try {
 
-            sleep(1);
+            /*sleep(1);
 
             $searchData = static::getSearchDataByPrepareId($this->prepare_id);
             if(!$searchData){
@@ -45,7 +45,7 @@ class HotelSearchWaitForm extends HotelSearchForm{
                 $isFinished = empty($jobList) ? 1 : 0;
             }else{
 
-            }
+            }*/
 
             /*if($isFinished){
                 $cacheKey = "HotelSearchWaitTask:" . $this->prepare_id;
@@ -55,6 +55,10 @@ class HotelSearchWaitForm extends HotelSearchForm{
                     $cacheObj->set($cacheKey, intval($delayCount) + 1, 1800);
                 }
             }*/
+
+            $content = ["found_ids" => []];
+            $searchData['search_id'] = $this->prepare_id;
+            $isFinished = 1;
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

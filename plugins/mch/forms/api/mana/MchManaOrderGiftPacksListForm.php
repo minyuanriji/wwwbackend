@@ -20,12 +20,13 @@ class MchManaOrderGiftPacksListForm extends BaseModel {
     public $page;
     public $status; //状态：paid(待使用)，finished（已结束）,unpaid（待付款）
     public $mch_id;
+    public $keyword;
 
     public function rules(){
         return [
             [['status'], 'required'],
             [['page', 'mch_id'], 'integer'],
-            [['status'], 'string']
+            [['status', 'keyword'], 'string']
         ];
     }
 
@@ -63,6 +64,15 @@ class MchManaOrderGiftPacksListForm extends BaseModel {
                 ]);
             }elseif($this->status == "unpaid"){ //待付款
                 $query->andWhere(["go.pay_status" => "unpaid"]);
+            }
+
+            //关键词搜索
+            if(!empty($this->keyword)){
+                $query->andWhere([
+                    "OR",
+                    ["LIKE", "gi.name", $this->keyword],
+                    ["LIKE", "go.order_sn", $this->keyword]
+                ]);
             }
 
             $selects = ["go.id as order_id", "go.order_sn", "go.order_price", "go.created_at", "go.updated_at", "go.pay_status",

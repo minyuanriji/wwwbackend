@@ -931,28 +931,7 @@ class OrderSubmitForm extends BaseModel
         $shoppingVoucherUseData['enable'] = true;
 
         //确认收货可获得购物券数量
-        $gotShoppingVoucherNum = 0;
-        $goodsIdPrices = [];
-        foreach ($listData as &$item) {
-            foreach ($item['goods_list'] as $goods) {
-                $goodsIdPrices[$goods['id']] = $goods['total_price'];
-            }
-        }
-        if ($goodsIdPrices) {
-            $fromGoodsDatas = ShoppingVoucherFromGoods::find()->andWhere([
-                "AND",
-                ["is_delete" => 0],
-                ["IN", "goods_id", array_keys($goodsIdPrices)],
-                "start_at<'" . time() . "'"
-            ])->select(["goods_id", "give_value"])->asArray()->all();
-            if ($fromGoodsDatas) {
-                foreach ($fromGoodsDatas as $fromGoodsData) {
-                    $totalPrice = isset($goodsIdPrices[$fromGoodsData['goods_id']]) ? $goodsIdPrices[$fromGoodsData['goods_id']] : 0;
-                    $gotShoppingVoucherNum += (floatval($fromGoodsData['give_value']) / 100) * $totalPrice;
-                }
-            }
-        }
-
+        $gotShoppingVoucherNum = $this->gotShoppingVoucherNum($listData);
 
         return [
             'got_shopping_voucher_num' => round($gotShoppingVoucherNum, 2),
@@ -977,6 +956,42 @@ class OrderSubmitForm extends BaseModel
                 'related_user_id' => isset($this->form_data['related_user_id']) ? $this->form_data['related_user_id'] : null,
             ],
         ];
+    }
+
+    /**
+     * 计算可获得的购物券
+     * @param $listData
+     * @return float
+     */
+    public function gotShoppingVoucherNum($listData){
+        $gotShoppingVoucherNum = 0;
+
+        //支付商品费用可获得购物券
+        $goodsIdPrices = [];
+        foreach ($listData as &$item) {
+            foreach ($item['goods_list'] as $goods) {
+                $goodsIdPrices[$goods['id']] = $goods['total_price'];
+            }
+        }
+        if ($goodsIdPrices) {
+            $fromGoodsDatas = ShoppingVoucherFromGoods::find()->andWhere([
+                "AND",
+                ["is_delete" => 0],
+                ["IN", "goods_id", array_keys($goodsIdPrices)],
+                "start_at<'" . time() . "'"
+            ])->select(["goods_id", "give_value"])->asArray()->all();
+            if ($fromGoodsDatas) {
+                foreach ($fromGoodsDatas as $fromGoodsData) {
+                    $totalPrice = isset($goodsIdPrices[$fromGoodsData['goods_id']]) ? $goodsIdPrices[$fromGoodsData['goods_id']] : 0;
+                    $gotShoppingVoucherNum += (floatval($fromGoodsData['give_value']) / 100) * $totalPrice;
+                }
+            }
+        }
+
+        //支付运费可获得购物券数量
+
+
+        return $gotShoppingVoucherNum;
     }
 
     /**

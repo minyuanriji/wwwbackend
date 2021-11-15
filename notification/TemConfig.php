@@ -337,23 +337,21 @@ class TemConfig
      * */
     const STORE_PAY = 'zkMsjE9-pjgANoP5JsKAAFPpx2zi37q-0bLYy348wN4';
 
-    /*  @todo 	订单支付成功提醒
+    /*  @todo 订单支付成功通知(赠送购物券使用)
 
-        尊敬的会员，您好！您已消费成功，详情如下：
-        消费门店：积上下沙商贸城店
-        消费金额：2538元
-        获得积分：3538分
-        消费时间：42018年3月28日
-        当前可用积分：51338分
-        欢迎您再次光临！
+        您的订单已支付成功。 &gt;&gt;查看订单详情
+        用户名：123456789@qingpinji.com
+        订单号：2015698571200
+        订单金额：￥98.80
+        商品信息：星冰乐（焦糖味） 家乐氏香甜玉米片*2 乐天七彩爱情糖*3
+        如有问题请致电xxx客服热线400-8070028或直接在微信留言，客服在线时间为工作日10:00——18:00.客服人员将第一时间为您服务。
 
         {{first.DATA}}
-        消费门店：{{keyword1.DATA}}
-        消费金额：{{keyword2.DATA}}
-        获得积分：{{keyword3.DATA}}
-        消费时间：{{keyword4.DATA}}
-        当前可用积分：{{keyword5.DATA}}
+        用户名：{{keyword1.DATA}}
+        订单号：{{keyword2.DATA}}
+        订单金额：{{keyword3.DATA}}
+        商品信息：{{keyword4.DATA}}
         {{remark.DATA}}
      * */
-    const VOUCHER_ORDER_PAY = 'Z3yCFkv5uZAuKFMUfCP05Z3B_TSLa4tznFgnb7ir6U8';
+    const GIVE_SHOPPING_VOUCHER = 'BCCFMTDa0PNln8cDkShFjLQnH4hClMPayfkBPUWZChY';
 }

@@ -40,21 +40,17 @@ class StorePayVoucherNotification
         $store = Store::findOne(['mch_id' => $mchCheckoutOrder->mch_id, 'is_delete' => 0]);
         if(!$store) return;
 
-        $userVoucher = ShoppingVoucherUser::findOne(['user_id' => $voucher_log['user_id']]);
-        if(!$userVoucher) return;
-
         (new StorePayVoucherWeTplMsg([
             "mall_id"           => $voucher_log['mall_id'],
             "openid"            => $userInfo->openid,
-            "template_id"       => TemConfig::VOUCHER_ORDER_PAY,
+            "template_id"       => TemConfig::GIVE_SHOPPING_VOUCHER,
             "data"              => [
-                'first'     => '尊敬的用户，您好！您已消费成功，详情如下：',
-                'keyword1'  => $store->name,
-                'keyword2'  => $mchCheckoutOrder->order_price . '元',
-                'keyword3'  => $voucher_log['money'] . '购物券',
-                'keyword4'  => date('Y-m-d H:i:s', $mchCheckoutOrder->pay_at),
-                'keyword5'  => $userVoucher->money . '购物券',
-                'remark'    => '欢迎您再次光临！'
+                'first'     => '您的门店订单已支付成功。',
+                'keyword1'  => $user->nickname,
+                'keyword2'  => $mchCheckoutOrder->order_no,
+                'keyword3'  => $mchCheckoutOrder->order_price . '元',
+                'keyword4'  => '门店：' . $store->name,
+                'remark'    => '赠送购物券：'. $voucher_log['money'] .'，欢迎您再次光临！'
             ]
         ]))->send();
     }

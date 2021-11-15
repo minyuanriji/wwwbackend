@@ -45,9 +45,9 @@ class OrderExtendedTimeForm extends BaseModel
             if (!$orderResult->save())
                 throw new \Exception($orderResult->getErrorMessage());
 
-            $this->returnApiResultData(ApiCode::CODE_SUCCESS);
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS);
         } catch (\Exception $ex) {
-            throw new \Exception($ex->getMessage());
+            return $this->returnApiResultData($ex->getMessage());
         }
     }
 }

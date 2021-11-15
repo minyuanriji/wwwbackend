@@ -2,22 +2,25 @@
 
 namespace app\notification;
 
+use app\models\Goods;
+use app\models\GoodsWarehouse;
+use app\models\Order;
+use app\models\OrderDetail;
 use app\models\User;
 use app\models\UserInfo;
-use app\notification\jobs\HotelPayVoucherNotificationWeTplJob;
-use app\notification\wechat_template_message\HotelPayVoucherWeTplMsg;
-use app\plugins\addcredit\models\AddcreditOrder;
-use app\plugins\hotel\models\HotelOrder;
+use app\notification\jobs\OilPayVoucherNotificationWeTplJob;
+use app\notification\wechat_template_message\OilPayVoucherWeTplMsg;
+use app\plugins\oil\models\OilOrders;
 
-class HotelPayVoucherNotification
+class OilPayVoucherNotification
 {
     public static function send($voucher_log)
     {
-        /*(new HotelPayVoucherNotificationWeTplJob([
+        /*(new OilPayVoucherNotificationWeTplJob([
             "voucher_log" => $voucher_log
         ]))->execute(null);*/
 
-        \Yii::$app->queue->delay(0)->push(new HotelPayVoucherNotificationWeTplJob([
+        \Yii::$app->queue->delay(0)->push(new OilPayVoucherNotificationWeTplJob([
             "voucher_log" => $voucher_log
         ]));
     }
@@ -33,19 +36,19 @@ class HotelPayVoucherNotification
         ]);
         if(!$userInfo) return;
 
-        $hotelOrderResult = HotelOrder::findOne($voucher_log['source_id']);
-        if(!$hotelOrderResult) return;
+        $oilOrdersResult = OilOrders::findOne($voucher_log['source_id']);
+        if(!$oilOrdersResult) return;
 
-        (new HotelPayVoucherWeTplMsg([
+        (new OilPayVoucherWeTplMsg([
             "mall_id"           => $voucher_log['mall_id'],
             "openid"            => $userInfo->openid,
             "template_id"       => TemConfig::GIVE_SHOPPING_VOUCHER,
             "data"              => [
-                'first'     => '您的酒店订单已支付成功。',
+                'first'     => '您的加油订单已支付成功。',
                 'keyword1'  => $user->nickname,
-                'keyword2'  => $hotelOrderResult->order_no,
-                'keyword3'  => $hotelOrderResult->order_price . '元',
-                'keyword4'  => '酒店下单:' . $hotelOrderResult->order_price . '元',
+                'keyword2'  => $oilOrdersResult->order_no,
+                'keyword3'  => $oilOrdersResult->order_price . '元',
+                'keyword4'  => '加油订单',
                 'remark'    => '赠送’'. $voucher_log['money'] .'‘购物券，欢迎您再次光临！'
             ]
         ]))->send();

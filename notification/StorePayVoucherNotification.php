@@ -50,7 +50,7 @@ class StorePayVoucherNotification
                 'keyword2'  => $mchCheckoutOrder->order_no,
                 'keyword3'  => $mchCheckoutOrder->order_price . '元',
                 'keyword4'  => '门店：' . $store->name,
-                'remark'    => '赠送购物券：'. $voucher_log['money'] .'，欢迎您再次光临！'
+                'remark'    => '赠送’'. $voucher_log['money'] .'‘购物券，欢迎您再次光临！'
             ]
         ]))->send();
     }

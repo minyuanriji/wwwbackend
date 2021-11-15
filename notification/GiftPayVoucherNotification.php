@@ -49,7 +49,7 @@ class GiftPayVoucherNotification
                 'keyword2'  => $giftpacksOrderResult->order_sn,
                 'keyword3'  => $giftpacksOrderResult->order_price . '元',
                 'keyword4'  => '大礼包：' . $giftpacksResult->title,
-                'remark'    => '赠送购物券：'. $voucher_log['money'] .'，欢迎您再次光临！'
+                'remark'    => '赠送’'. $voucher_log['money'] .'‘购物券，欢迎您再次光临！'
             ]
         ]))->send();
     }

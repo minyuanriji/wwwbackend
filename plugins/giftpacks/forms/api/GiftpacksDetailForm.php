@@ -42,6 +42,8 @@ class GiftpacksDetailForm extends BaseModel{
                 throw new \Exception("大礼包不存在");
             }
 
+
+
             $detail = static::detail($giftpacks);
 
             $groupList = [];
@@ -130,7 +132,7 @@ class GiftpacksDetailForm extends BaseModel{
 
         $detail['is_finished']         = time() > $giftpacks->expired_at ? 1 : 0;
         $detail['expired_at']          = $giftpacks->expired_at;
-        $detail['view_num']            = intval(time()/1000000);
+        $detail['view_num']            = static::viewNum($giftpacks);
 
         $detail['item_count']          = static::getItemCount($giftpacks);
         $detail['sold_num']            = static::soldNum($giftpacks);
@@ -140,6 +142,32 @@ class GiftpacksDetailForm extends BaseModel{
 
 
         return $detail;
+    }
+
+    /**
+     * 获取浏览次数
+     * @param Giftpacks $giftpacks
+     * @return int
+     */
+    public static function viewNum(Giftpacks $giftpacks){
+
+        $minNum = 2513;
+        $cache = \Yii::$app->getCache();
+        $cacheKey = "GiftpacksViewNum:" . $giftpacks->id;
+        $addNum = (int)$cache->get($cacheKey);
+
+        if($addNum > 10){
+            $giftpacks->view_num += $addNum;
+            $giftpacks->save();
+            $addNum = 0;
+        }else{
+            $addNum++;
+        }
+        $cache->set($cacheKey, $addNum);
+
+        $viewNum = max($minNum, $giftpacks->view_num);
+
+        return ($viewNum + $addNum);
     }
 
     //获取拼单记录

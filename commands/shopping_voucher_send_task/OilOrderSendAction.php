@@ -46,7 +46,7 @@ class OilOrderSendAction extends Action{
                 }
                 $modifyForm = new ShoppingVoucherLogModifiyForm([
                     "money"       => $sendLog['money'],
-                    "desc"        => "话费充值获得赠送购物券",
+                    "desc"        => "支付加油券获得赠送购物券",
                     "source_id"   => $sendLog['source_id'],
                     "source_type" => $sendLog['source_type']
                 ]);

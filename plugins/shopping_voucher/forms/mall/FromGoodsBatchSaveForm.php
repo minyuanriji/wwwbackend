@@ -15,12 +15,13 @@ class FromGoodsBatchSaveForm extends BaseModel{
     public $give_type;
     public $give_value;
     public $start_at;
+    public $enable_express;
 
     public function rules(){
         return [
             [['is_all', 'give_type', 'give_value', 'start_at'], 'required'],
             [['do_page'], 'integer'],
-            [['list', 'do_search'], 'safe'],
+            [['list', 'do_search', 'enable_express'], 'safe'],
         ];
     }
 
@@ -58,11 +59,13 @@ class FromGoodsBatchSaveForm extends BaseModel{
                             "created_at" => time()
                         ]);
                     }
-                    $model->give_type  = 1;
-                    $model->give_value = max(0, min(100, $this->give_value));
-                    $model->updated_at = time();
-                    $model->is_delete  = 0;
-                    $model->start_at   = max(time(), strtotime($this->start_at));
+                    $model->give_type      = 1;
+                    $model->give_value     = max(0, min(100, $this->give_value));
+                    $model->updated_at     = time();
+                    $model->is_delete      = 0;
+                    $model->start_at       = max(time(), strtotime($this->start_at));
+                    $model->enable_express = $this->enable_express ? 1 : 0;
+
                     if(!$model->save()){
                         throw new \Exception($this->responseErrorMsg($model));
                     }

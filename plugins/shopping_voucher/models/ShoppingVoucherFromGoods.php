@@ -18,7 +18,7 @@ class ShoppingVoucherFromGoods extends BaseActiveRecord{
     public function rules(){
         return [
             [['mall_id', 'goods_id', 'give_type', 'give_value', 'created_at', 'updated_at'], 'required'],
-            [['deleted_at', 'is_delete', 'start_at'], 'safe']
+            [['deleted_at', 'is_delete', 'start_at', 'enable_express'], 'safe']
         ];
     }
 

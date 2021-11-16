@@ -253,7 +253,7 @@ class Order extends BaseActiveRecord
                 'shopping_voucher_use_num', 'shopping_voucher_decode_price'], 'number'],
             [['order_form', 'support_pay_types'], 'string'],
             [['pay_at', 'send_at', 'confirm_at', 'cancel_at', 'created_at', 'updated_at', 'deleted_at',
-                'comment_at', 'auto_cancel_at', 'auto_confirm_at', 'auto_sales_at','complete_at'], 'safe'],
+                'comment_at', 'auto_cancel_at', 'auto_confirm_at', 'auto_sales_at','complete_at', 'enable_express_got_shopping_voucher'], 'safe'],
             [['order_no', 'mobile', 'address', 'remark', 'words', 'seller_remark', 'express_no', 'offline_qrcode',
                 'sign', 'location', 'city_name', 'city_info'], 'string', 'max' => 255],
             [['name', 'customer_name', 'express'], 'string', 'max' => 65],

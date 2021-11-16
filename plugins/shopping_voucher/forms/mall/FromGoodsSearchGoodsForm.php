@@ -48,7 +48,7 @@ class FromGoodsSearchGoodsForm extends BaseModel {
             }
 
             $selects = ["g.id", "g.id as goods_id", "g.mall_id",  "gw.name", "gw.cover_pic",  "g.created_at"];
-            $selects = array_merge($selects, ["svfg.give_value", "svfg.give_type"]);
+            $selects = array_merge($selects, ["svfg.give_value", "svfg.give_type", "svfg.enable_express"]);
 
             $query->select($selects);
 

@@ -405,6 +405,8 @@ class OrderSubmitForm extends BaseModel
                     $order->order_type = "express_normal";
                 }
 
+                $order->enable_express_got_shopping_voucher = isset($orderItem['enable_express_got_shopping_voucher']) && $orderItem['enable_express_got_shopping_voucher'] ? 1 : 0;
+
                 if (!$order->save()) {
                     return $this->returnApiResultData(ApiCode::CODE_FAIL, (new BaseModel())->responseErrorMsg($order));
                 }
@@ -973,23 +975,40 @@ class OrderSubmitForm extends BaseModel
                 $goodsIdPrices[$goods['id']] = $goods['total_price'];
             }
         }
+        $enableExpressfromGoodsIds = [];
         if ($goodsIdPrices) {
             $fromGoodsDatas = ShoppingVoucherFromGoods::find()->andWhere([
                 "AND",
                 ["is_delete" => 0],
                 ["IN", "goods_id", array_keys($goodsIdPrices)],
                 "start_at<'" . time() . "'"
-            ])->select(["goods_id", "give_value"])->asArray()->all();
+            ])->select(["goods_id", "give_value", "enable_express"])->asArray()->all();
             if ($fromGoodsDatas) {
                 foreach ($fromGoodsDatas as $fromGoodsData) {
                     $totalPrice = isset($goodsIdPrices[$fromGoodsData['goods_id']]) ? $goodsIdPrices[$fromGoodsData['goods_id']] : 0;
                     $gotShoppingVoucherNum += (floatval($fromGoodsData['give_value']) / 100) * $totalPrice;
+                    if($fromGoodsData['enable_express']){
+                        $enableExpressfromGoodsIds[] = $fromGoodsData['goods_id'];
+                    }
+
                 }
             }
         }
 
         //支付运费可获得购物券数量
-
+        foreach ($listData as &$item) {
+            $item['enable_express_got_shopping_voucher'] = 0;
+            if(!$item['express_price'] > 0) continue;
+            //只要有满足一个商品支持运费送购物券
+            foreach($item['goods_list'] as $goodsItem){
+                if(in_array($goodsItem['id'], $enableExpressfromGoodsIds)){
+                    $item['enable_express_got_shopping_voucher'] = 1;
+                    $giveValue = 100; //默认按比例百分百赠送
+                    $gotShoppingVoucherNum += round(($giveValue/100) * floatval($item['express_price']), 2);
+                    break;
+                }
+            }
+        }
 
         return $gotShoppingVoucherNum;
     }

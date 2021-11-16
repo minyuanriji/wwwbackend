@@ -15,6 +15,7 @@ use app\plugins\shopping_voucher\models\ShoppingVoucherFromGoods;
 class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
 
     public $page;
+    public $stands_mall_id;
 
     public function rules(){
         return [
@@ -37,7 +38,7 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
             $query->innerJoin(["svfg" => ShoppingVoucherFromGoods::tableName()], "svfg.goods_id=g.id AND svfg.is_delete=0");
             $query->innerJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
 
-            $query->where(['g.is_delete' => 0,'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => $this->base_mall_id]);
+            $query->where(['g.is_delete' => 0,'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => $this->stands_mall_id ? $this->stands_mall_id : $this->base_mall_id]);
 
             $selects = ["g.id", "g.is_level", "g.is_show_sales", "gw.cover_pic", "g.goods_stock",
                 "g.max_deduct_integral", "g.mch_id", "gw.name", "gw.original_price", "g.price", "g.status",

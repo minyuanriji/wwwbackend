@@ -72,6 +72,7 @@
                     :data="list"
                     border
                     style="width: 100%">
+                <el-table-column prop="id" label="ID" width="100px"></el-table-column>
                 <el-table-column
                         prop="username"
                         label="账户"
@@ -83,35 +84,36 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column
+                <!--<el-table-column
                         prop=""
                         label="可创建小程序数量"
-                        width="150px"
-                >
+                        width="150px">
                     <template slot-scope="scope">
                         <span v-if="scope.row.mall_num == -1">无限制</span>
                         <span v-else>{{scope.row.mall_num}}</span>
                     </template>
-                </el-table-column>
-                <el-table-column
+                </el-table-column>-->
+               <!-- <el-table-column
                         label="已创建小程序数量"
                         width="150px"
                 >
                     <template slot-scope="scope">
                         {{scope.row.create_app_count}}
-<!--                        <a href="#" style="text-decoration:none; color: #409EFF;" @click="toMallList(scope.row)">{{scope.row.create_app_count}}</a>-->
+                        <a href="#" style="text-decoration:none; color: #409EFF;" @click="toMallList(scope.row)">{{scope.row.create_app_count}}</a>
                     </template>
-                </el-table-column>
+                </el-table-column>-->
                 <el-table-column
                         prop="expired_at"
                         :formatter="formatExpired"
                         width="180"
                         label="有效期">
                 </el-table-column>
-                <el-table-column
-                        fixed="right"
-                        label="操作"
-                        width="520">
+                <el-table-column prop="created_at" label="创建时间" width="260">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
+                    </template>
+                </el-table-column>
+                <el-table-column fixed="right" label="操作">
                     <template slot-scope="scope">
                         <el-button @click="edit(scope.row.id)" type="text" circle size="mini">
                             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
@@ -132,7 +134,7 @@
                 </el-table-column>
             </el-table>
 
-            <div style="text-align: right;margin: 20px 0;">
+            <div style="text-align: center;margin: 20px 0;">
                 <el-pagination
                         @current-change="pagination"
                         background

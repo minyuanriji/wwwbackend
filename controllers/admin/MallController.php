@@ -32,7 +32,7 @@ class MallController extends BaseController
                 $query->andWhere(['!=', 'id', 5]);
             }
             $count = $query->count();
-            $pagination = new \yii\data\Pagination(['totalCount' => intval($count)]);
+//            $pagination = new \yii\data\Pagination(['totalCount' => intval($count)]);
             $list = $query
                 ->with(['admin' => function ($query) {
                     /** @var Query $query */
@@ -40,12 +40,13 @@ class MallController extends BaseController
                 }])
                 ->with(
                     ['user' => function ($query) {
-                        $query->select('id,username,nickname');
+                        $query->select('id,username,nickname,mobile');
                     }]
                 )
-//                ->orderBy('id DESC')
-                ->offset($pagination->offset)
-                ->limit($pagination->limit)
+                ->orderBy('id DESC')
+                ->page($pagination)
+                /*->offset($pagination->offset)
+                ->limit($pagination->limit)*/
                 ->asArray()
                 ->all();
 

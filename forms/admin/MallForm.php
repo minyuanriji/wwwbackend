@@ -16,6 +16,7 @@ use app\models\Admin;
 use app\models\BaseModel;
 use app\models\Mall;
 use app\models\Option;
+use app\models\User;
 use app\plugins\mpwx\models\MpwxConfig;
 use EasyWeChat\Kernel\Exceptions\HttpException;
 use jianyan\easywechat\Wechat;
@@ -51,6 +52,10 @@ class MallForm extends BaseModel
             $model = new Mall();
             $model->admin_id = \Yii::$app->admin->id;
         }
+
+        $userResult = User::findOne($data["user_id"]);
+        if (!$userResult || $userResult->is_delete)
+            $this->returnApiResultData(ApiCode::CODE_FAIL, '该用户不存在');
 
         $t = \Yii::$app->db->beginTransaction();
         $model->name                = $data["name"];

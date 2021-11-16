@@ -61,7 +61,7 @@ class AdminForm extends BaseModel
             'u.is_delete' => 0,
             'u.mall_id' => \Yii::$app->admin->identity->mall_id
         ])->with(['mall' => function ($query) {
-            $query->andWhere(['is_delete' => 0,]);
+            $query->andWhere(['is_delete' => 0]);
         }]);
 
         if ($this->keyword) {
@@ -72,9 +72,7 @@ class AdminForm extends BaseModel
             $query->andWhere(['u.admin_type' => 2]);
         }
         $query->joinWith("adminInfo");
-        $count = $query->count();
-        $pagination = new Pagination(['totalCount' => $count, 'page' => $this->page - 1, 'pageSize' => $this->limit]);
-        $list = $query->orderBy('u.id DESC')->limit($pagination->limit)->offset($pagination->offset)->asArray()->all();
+        $list = $query->orderBy('u.id DESC')->page($pagination)->asArray()->all();
         foreach ($list as &$item) {
             $item['create_app_count'] = count($item['mall']);
         }

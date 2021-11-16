@@ -18,7 +18,7 @@ class FromGoodsController extends ApiController {
         $standsMallId = isset($headers['x-stands-mall-id']) && $headers['x-stands-mall-id'] == 26 ? $headers['x-stands-mall-id'] : 0;
 
         $form->base_mall_id   = \Yii::$app->mall->id;
-        $form->stands_mall_id = $standsMallId;
+        //$form->stands_mall_id = $standsMallId;
 
         $res = APICacheHelper::get($form);
         if($res['code'] == ApiCode::CODE_SUCCESS){

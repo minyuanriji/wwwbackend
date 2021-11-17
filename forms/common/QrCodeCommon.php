@@ -128,7 +128,7 @@ class QrCodeCommon extends BaseModel
             }
             $cacheData['token']      = $accessTokenArray;
             $cacheData['expired_at'] = time() + $accessTokenArray['expires_in'] - 600;
-            $cache->set($cacheKey);
+            $cache->set($cacheKey, $cacheData);
         }
 
         $this->accessToken = $accessTokenArray["access_token"];

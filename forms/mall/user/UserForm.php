@@ -569,7 +569,11 @@ class UserForm extends BaseModel
         $select .= ',u.id as uid,u.nickname';
 
         if ($this->keyword)
-            $query->andWhere(['or', ['like', 'u.nickname', $this->keyword]]);
+            $query->andWhere([
+                'or',
+                ['like', 'u.nickname', $this->keyword],
+                ['u.id' => $this->keyword]
+            ]);
 
 
         $list = $query->select($select)->page($pagination)

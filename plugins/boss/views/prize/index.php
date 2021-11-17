@@ -170,7 +170,7 @@
     <!-- 添加用户 -->
     <el-dialog title="添加股东" :visible.sync="changeOwnerDialogVisible" width="30%">
         <div class="input-item">
-            <el-input size="small" placeholder="请输入搜索内容" type="text" clearable  v-model="keyword">
+            <el-input size="small" placeholder="请输入搜索内容" type="text" clearable  v-model="keywords">
                 <el-button slot="append" @click="loadBossList('add')" icon="el-icon-search"></el-button>
             </el-input>
         </div>
@@ -242,6 +242,7 @@
             return {
                 list: [],
                 keyword: '',
+                keywords: '',
                 listLoading: false,
                 page: 1,
                 pageCount: 0,
@@ -449,7 +450,7 @@
                     params: {
                         r: 'plugin/boss/mall/prize/platform-users',
                         page: this.adminListForm.page,
-                        keyword: this.keyword,
+                        keyword: this.keywords,
                         award_id: this.consumer.id,
                         type: type,
                     }

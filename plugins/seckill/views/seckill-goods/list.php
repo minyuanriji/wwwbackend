@@ -4,11 +4,7 @@ Yii::$app->loadComponentView('com-rich-text');
 <div id="app" v-cloak>
     <el-card class="box-card" shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
-            <div>
-                <el-breadcrumb separator="/">
-                    <el-breadcrumb-item>秒杀商品列表</el-breadcrumb-item>
-                </el-breadcrumb>
-            </div>
+            <span>秒杀商品列表</span>
         </div>
 
         <div class="table-body">
@@ -99,13 +95,12 @@ Yii::$app->loadComponentView('com-rich-text');
                 </el-table-column>
             </el-table>
 
-            <div style="display: flex;justify-content: space-between;margin-top:20px;">
+            <div style="text-align: center;margin-top:20px;">
                 <el-pagination
                         background
                         layout="prev, pager, next"
                         :page-size="pagination.pageSize"
                         :total="pagination.total_count"
-                        style="float:right;margin:15px"
                         @current-change="pageChange"
                         v-if="pagination">
                 </el-pagination>
@@ -113,15 +108,13 @@ Yii::$app->loadComponentView('com-rich-text');
         </div>
 
         <el-dialog width="70%" title="添加商品" :visible.sync="goodsDialogVisible">
-            <template >
-                <div>
-                    <el-input @keyup.enter.native="toSearch" size="small" placeholder="请输入商品ID或名称搜索"
-                              v-model="mallGoodsSearch" clearable
-                              @clear="toSearch">
-                        <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
-                    </el-input>
-                </div>
-                <el-table v-loading="mallGoodsLoading" :data="mallGoods" border style="width: 100%" @selection-change="handleSelectionChange">
+            <template>
+                <el-input @keyup.enter.native="toSearch" size="small" placeholder="请输入商品ID或名称搜索"
+                          v-model="mallGoodsSearch" clearable
+                          @clear="toSearch">
+                    <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
+                </el-input>
+                <el-table v-loading="mallGoodsLoading" :data="mallGoods" border style="width: 100%;margin-top: 10px" @selection-change="handleSelectionChange">
                     <el-table-column width="75" >
                         <template slot-scope="scope">
                             <el-button @click="mallGoodsImport(scope.row)" type="text" circle size="mini">
@@ -539,7 +532,6 @@ Yii::$app->loadComponentView('com-rich-text');
                     }
                 }).then(e => {
                     if (e.data.code === 0) {
-                        self.$message.success(e.data.msg);
                         self.mallGoods = e.data.data.list;
                         self.mallGoodsPagination = e.data.data.pagination;
                         self.mallGoodsLoading=false;

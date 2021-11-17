@@ -92,7 +92,7 @@
                 </el-table-column>
             </el-table>
 
-            <div style="display: flex;justify-content: space-between;margin-top:20px;">
+            <div style="text-align: center;margin-top:20px;">
                 <el-pagination
                         v-if="pageCount > 0"
                         @current-change="pagination"

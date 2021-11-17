@@ -100,6 +100,18 @@ class GiftpacksOrderListForm extends BaseModel
                     } else {
                         $value['is_integral'] = 0;
                     }
+
+                   $voucherResult = ShoppingVoucherSendLog::find()->andWhere([
+                        'source_type' => 'from_giftpacks_order',
+                        'source_id' => $value['id'],
+                   ])->one();
+                   if ($voucherResult) {
+                       $value['voucher_num'] = $voucherResult->money;
+                       $value['voucher_status'] = $voucherResult->status;
+                   } else {
+                       $value['voucher_num'] = 0;
+                       $value['voucher_status'] = 'invalid';
+                   }
                 }
             }
 

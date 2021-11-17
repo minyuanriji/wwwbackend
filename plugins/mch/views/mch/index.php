@@ -9,7 +9,7 @@
         margin: 0 0 20px;
     }
 
-    .input-item .el-input__inner {
+/*    .input-item .el-input__inner {
         border-right: 0;
     }
 
@@ -23,7 +23,7 @@
         border: 1px solid #dcdfe6;
         border-right: 0;
         outline: 0;
-    }
+    }*/
 
     .input-item .el-input-group__append {
         background-color: #fff;
@@ -125,16 +125,19 @@
                     </el-button>
                 </template>
             </el-alert>
-            <el-form @submit.native.prevent="searchList" size="small" :inline="true" :model="search">
-                <el-form-item>
-                    <div class="input-item">
-                        <el-input  @keyup.enter.native="searchList" size="small" placeholder="请输入店铺名/用户名搜索" v-model="search.keyword" clearable
-                                  @clear='searchList'>
-                            <el-button slot="append" icon="el-icon-search" @click="searchList"></el-button>
-                        </el-input>
-                    </div>
-                </el-form-item>
-            </el-form>
+            <div class="input-item">
+                <el-input style="width: 400px" v-model="search.keyword" placeholder="请输入搜索内容" clearable size="small"
+                          @clear="clearSearch"
+                          @change="searchList"
+                          @input="triggeredChange">
+                    <el-select style="width: 130px" slot="prepend" v-model="search.keyword1">
+                        <el-option v-for="item in selectList" :key="item.value"
+                                   :label="item.name"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-input>
+            </div>
             <el-table
                     v-loading="listLoading"
                     :data="list"
@@ -270,7 +273,7 @@
                 </el-table-column>
             </el-table>
 
-            <div  flex="dir:right" style="margin-top: 20px;">
+            <div style="margin-top: 20px;text-align: center;">
                 <el-pagination
                     hide-on-single-page
                     @current-change="pagination"
@@ -308,6 +311,7 @@
 
                 search: {
                     keyword: '',
+                    keyword1: '',
                     sort_prop: '',
                     sort_type: '',
                 },
@@ -324,9 +328,27 @@
                 mch_id: 0,
                 id: null,
                 sort: 0,
+                selectList: [
+                    {value: 'store_name', name: '店铺名'},
+                    {value: 'user_name', name: '用户名'},
+                    {value: 'mch_id', name: '商户ID'},
+                    {value: 'mobile', name: '联系人手机号'},
+                ],
             };
         },
         methods: {
+            triggeredChange (){
+                if (this.search.keyword.length>0 && this.search.keyword1.length<=0) {
+                    alert('请选择搜索方式');
+                    this.search.keyword='';
+                }
+            },
+            clearSearch() {
+                this.page = 1;
+                this.search.keyword = '';
+                this.search.keyword1 = '';
+                this.getList();
+            },
             sortOrder (e) {
                 this.search.sort_prop = e.prop;
                 this.search.sort_type = e.order == "descending" ? 'DESC' : 'ASC';
@@ -354,6 +376,7 @@
                         r: 'plugin/mch/mall/mch/index',
                         page: self.page,
                         keyword: self.search.keyword,
+                        keyword1: self.search.keyword1,
                         sort_prop: self.search.sort_prop,
                         sort_type: self.search.sort_type,
                     },
@@ -362,6 +385,7 @@
                     self.listLoading = false;
                     self.list = e.data.data.list;
                     self.pageCount = e.data.data.pagination.page_count;
+                    self.loginRoute = e.data.data.url;
                 }).catch(e => {
                     console.log(e);
                 });
@@ -435,27 +459,6 @@
             searchList() {
                 this.page = 1;
                 this.getList();
-            },
-            // 员工登录入口
-            route() {
-                let self = this;
-                self.btnLoading = true;
-                request({
-                    params: {
-                        r: 'plugin/mch/mall/mch/route'
-                    },
-                    method: 'get',
-                    data: {}
-                }).then(e => {
-                    self.btnLoading = false;
-                    if (e.data.code === 0) {
-                        self.loginRoute = e.data.data.url;
-                    } else {
-                        self.$message.error(e.data.msg);
-                    }
-                }).catch(e => {
-                    console.log(e);
-                });
             },
             updatePasswordDialog(id) {
                 this.dialogFormVisible = true;

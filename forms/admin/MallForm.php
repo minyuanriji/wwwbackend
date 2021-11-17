@@ -14,8 +14,10 @@ use app\core\ApiCode;
 use app\logic\OptionLogic;
 use app\models\Admin;
 use app\models\BaseModel;
+use app\models\HomePage;
 use app\models\Mall;
 use app\models\Option;
+use app\models\User;
 use app\plugins\mpwx\models\MpwxConfig;
 use EasyWeChat\Kernel\Exceptions\HttpException;
 use jianyan\easywechat\Wechat;
@@ -51,6 +53,10 @@ class MallForm extends BaseModel
             $model = new Mall();
             $model->admin_id = \Yii::$app->admin->id;
         }
+
+        $userResult = User::findOne($data["user_id"]);
+        if (!$userResult || $userResult->is_delete)
+            $this->returnApiResultData(ApiCode::CODE_FAIL, '该用户不存在');
 
         $t = \Yii::$app->db->beginTransaction();
         $model->name                = $data["name"];
@@ -164,33 +170,41 @@ class MallForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo($this);
         }
-        $model = Admin::findOne($data["user_id"]);
-        $count = Mall::find()->where([
-            'admin_id' => $data["user_id"],
-            'is_delete' => 0,
-        ])->count();
-        if ($model->mall_num >= 0 && $count >= $model->mall_num && $model->admin_type != 1) {
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => '超出创建商城最大数量',
-            ];
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+            $model = Admin::findOne($data["user_id"]);
+            $count = Mall::find()->where([
+                'admin_id' => $data["user_id"],
+                'is_delete' => 0,
+            ])->count();
+            if ($model->mall_num >= 0 && $count >= $model->mall_num && $model->admin_type != 1)
+                throw new \Exception('超出创建商城最大数量');
+
+            $mall_model = Mall::findOne($data["id"]);
+            if (!$mall_model)
+                throw new \Exception('商城不存在');
+
+            $mall_model->admin_id = $data["user_id"];
+            if (!$mall_model->save())
+                throw new \Exception($mall_model->getErrorMessage());
+
+            $homePage = HomePage::findOne(['mall_id' => 5, 'is_delete' => 0]);
+            if (!$homePage)
+                throw new \Exception('商城mall_id:'. 5 . '不存在');
+
+            $pageModel = new HomePage([
+                'mall_id' => $mall_model->id,
+                'page_data' => $homePage->page_data,
+            ]);
+            if (!$pageModel->save())
+                throw new \Exception($pageModel->getErrorMessage());
+
+            $t->commit();
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '保存成功', $mall_model);
+        } catch (\Exception $e) {
+            $t->rollBack();
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
-        $mall_model = Mall::findOne($data["id"]);
-        if (!$mall_model) {
-            return [
-                'code' => ApiCode::CODE_FAIL,
-                'msg' => '商城不存在',
-            ];
-        }
-        $mall_model->admin_id = $data["user_id"];
-        if (!$mall_model->save()) {
-            return $this->responseErrorInfo($mall_model);
-        }
-        return [
-            'code' => ApiCode::CODE_SUCCESS,
-            'msg' => '保存成功。',
-            'data' => $mall_model,
-        ];
     }
 
     /**

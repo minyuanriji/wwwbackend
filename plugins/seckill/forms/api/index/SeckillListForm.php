@@ -101,7 +101,7 @@ class SeckillListForm extends BaseModel
                     if ($item['surplus_percentage'] > 1) {
                         $item['surplus_percentage'] = 1;
                     }
-//                    $item['surplus_percentage'] = $item['surplus_percentage'] * 100;
+                    $item['surplus_percentage'] = $item['surplus_percentage'] * 100;
                     if (!is_array($item['surplus_percentage'])) {
                         $item['surplus_percentage'] = (string)$item['surplus_percentage'];
                     }

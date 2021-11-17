@@ -67,8 +67,15 @@
             <div>
                 <span>子商城列表</span>
             </div>
-            <div style="float: right;margin-top: -5px">
+            <div style="float: right;margin-top: -25px">
 <!--                <el-button type="primary" @click="edit" size="small">回收站</el-button>-->
+                <div v-if="isInd">
+                    <el-button type="primary"
+                               size="small"
+                               @click="showCreateMallDialog()">添加小程序商城
+                    </el-button>
+                </div>
+                <span v-else>商城列表</span>
             </div>
         </div>
         <div class="table-body">
@@ -80,39 +87,45 @@
                         <el-button slot="append" @click="search" icon="el-icon-search"></el-button>
                     </el-input>
                 </div>
-                <div v-if="isInd">
-                    <el-button type="primary"
-                               size="small"
-                               @click="showCreateMallDialog()">添加小程序商城
-                    </el-button>
-                </div>
-                <span v-else>商城列表</span>
             </div>
             <el-table v-loading="searchLoading" border :data="list" style="margin-bottom: 20px">
-                <el-table-column prop="id" label="ID" width="60"></el-table-column>
-                <el-table-column prop="name" width="260" label="商城名称">
+                <el-table-column prop="id" label="ID" width="100"></el-table-column>
+                <el-table-column prop="name" width="220" label="商城名称">
                     <template slot-scope="scope">
                         <div>
-                            <span style="color: RGB(242,164,48)">{{scope.row.name}}</span>
+                            <span style="color: #1ed0ff">{{scope.row.name}}</span>
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column width="170" prop="username" label="归属账号">
+                <el-table-column width="210" prop="username" label="归属账号">
                     <template slot-scope="scope">
                         <div>
                             <span>{{scope.row.admin.username}}</span>
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column width="170" prop="nickname" label="绑定用户">
+                <el-table-column width="350" prop="nickname" label="绑定用户">
                     <template slot-scope="scope">
                         <div>
-                            <span>{{scope.row.user[0] ? scope.row.user[0].nickname : ''}}</span>
+                            <span v-if="scope.row.user[0]">
+                                {{scope.row.user[0].nickname}}
+                                (ID:{{scope.row.user[0].id}})
+                            </span>
                         </div>
                     </template>
                 </el-table-column>
+                <el-table-column width="150" prop="mobile" label="绑定用户手机号">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.user[0]">{{scope.row.user[0].mobile}}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column width="170" prop="expired_at_text" label="有效期"></el-table-column>
-                <el-table-column label="操作" width="380">
+                <el-table-column prop="created_at" label="创建时间" width="230">
+                    <template slot-scope="scope">
+                        <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" >
                     <template slot-scope="scope">
                         <el-button plain size="mini" @click="edit(scope.row)">编辑</el-button>
 
@@ -160,13 +173,13 @@
             </el-table>
 
             <el-pagination
-                    style="text-align: right"
+                    style="text-align: center"
                     v-if="pagination"
                     background
                     :page-size="pagination.pageSize"
                     @current-change="pageChange"
                     layout="prev, pager, next"
-                    :total="pagination.totalCount">
+                    :total="pagination.total_count">
             </el-pagination>
         </div>
     </el-card>
@@ -179,17 +192,17 @@
                 <el-input type="text" size="small" v-model="createMallForm.name" autocomplete="off"></el-input>
             </el-form-item>
 
-            <el-form-item label="app_id" prop="app_id">
+            <!--<el-form-item label="app_id" prop="app_id">
                 <el-input type="text" size="small" v-model="createMallForm.app_id" autocomplete="off"></el-input>
             </el-form-item>
-
+-->
             <el-form-item label="user_id" prop="user_id">
                 <el-input type="text" size="small" v-model="createMallForm.user_id" autocomplete="off"></el-input>
             </el-form-item>
 
-            <el-form-item label="app_secret" prop="app_secret">
+       <!--     <el-form-item label="app_secret" prop="app_secret">
                 <el-input type="text" size="small" v-model="createMallForm.app_secret" autocomplete="off"></el-input>
-            </el-form-item>
+            </el-form-item>-->
 
             <el-form-item prop="logo">
                 <label slot="label">
@@ -416,7 +429,7 @@
                 adminListLoading: false,
                 adminList: null,
                 adminListPagination: null,
-                mallListPage: 0,
+                mallListPage: 1,
             };
         },
         created() {

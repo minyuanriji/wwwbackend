@@ -80,6 +80,7 @@ class OrderDetailForm extends BaseModel
             $detail["remark"]                        = $order["remark"];
             $detail["is_pay"]                        = intval($order["is_pay"]);
             $detail['order_type']                    = $order['order_type'];
+            $detail['expand_num']                    = $order['expand_num'];
 
             $orderModel = new Order();
             // 订单状态

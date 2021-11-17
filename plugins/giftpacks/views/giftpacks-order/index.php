@@ -65,7 +65,7 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column label="赠送" width="150">
+                    <el-table-column label="赠送" width="170">
                         <template slot-scope="scope">
                             <div v-if="scope.row.integral_enable == 1 && scope.row.is_integral == 1 && scope.row.pay_status == 'paid'">红包：{{scope.row.integral_give_num}}</div>
                             <div v-if="scope.row.score_enable == 1 && scope.row.pay_status == 'paid'">
@@ -75,7 +75,12 @@
                                     {{scope.row.score_give_settings.period}}月<br/>
                                     {{scope.row.score_give_settings.expire}}（天）有效期<br/>
                                 </span>
-
+                            </div>
+                            <div>
+                                购物券：{{scope.row.voucher_num}}&nbsp;&nbsp;&nbsp;
+                                <span v-if="scope.row.voucher_status == 'success'" style="color: #13ce66">已发送</span>
+                                <span v-if="scope.row.voucher_status == 'invalid'" style="color: red">无效</span>
+                                <span v-if="scope.row.voucher_status == 'waiting'" style="color: orange">等待中</span>
                             </div>
                         </template>
                     </el-table-column>

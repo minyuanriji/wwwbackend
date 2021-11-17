@@ -6,6 +6,9 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\clerk\ClerkData;
 use app\models\Goods;
+use app\models\GoodsWarehouse;
+use app\models\Order;
+use app\models\OrderDetail;
 use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
 
@@ -59,26 +62,6 @@ class ClerkSweepInfoForm extends BaseModel
                     $result['name'] = $giftPacksResult['name'];
                     $result['goods_price'] = $giftPacksResult['goods_price'];
 
-                    switch ($clerkData->source_type)
-                    {
-                        case 'giftpacks_order_item':
-                            $result['type'] = 1;
-                            break;
-                        case 'normal_order':
-                            $result['type'] = 2;
-                            break;
-                        case 'baopin_order':
-                            $result['type'] = 3;
-                            break;
-                        case 'mch_normal_order':
-                            $result['type'] = 4;
-                            break;
-                        case 'mch_baopin_order':
-                            $result['type'] = 5;
-                            break;
-                        default:
-                            $result['type'] = 0;
-                    }
                     $infos = [];
                     if($giftOrderItemResult->max_num > 0){
                         $infos[] = "还剩".$giftOrderItemResult->current_num."次";
@@ -94,6 +77,58 @@ class ClerkSweepInfoForm extends BaseModel
                     $result['id'] = $clerkData->id;
                     $result['status'] = 'normal';
                 }
+            } elseif (
+                $clerkData->source_type == 'normal_order' ||
+                $clerkData->source_type == 'baopin_order' ||
+                $clerkData->source_type == 'mch_normal_order' ||
+                $clerkData->source_type == 'mch_baopin_order'
+            ) {
+                $orderResult = Order::find()->andWhere(['id' => $clerkData->source_id])->one();
+                if (!$orderResult) {
+                    $result['status'] = 'invalid';
+//                    throw new \Exception('订单不存在');
+                } else {
+                    $orderDetailResult = OrderDetail::find()->where(['order_id' => $orderResult->id])->with('goods.goodsWarehouse')->one();
+
+                    if (!$orderDetailResult) {
+                        $result['status'] = 'invalid';
+                    } else {
+                        $result['cover_pic'] = $orderDetailResult->goodsWarehouse->cover_pic;
+                        $result['name'] = $orderDetailResult->goodsWarehouse->name;
+                        $result['goods_price'] = $orderDetailResult->total_price;
+                    }
+
+                    $infos = [];
+                    if($orderResult->is_confirm == 1){
+                        $infos[] = "还剩0次";
+                    }else{
+                        $infos[] = "还剩1次";
+                    }
+                    $infos[] = "永久有效";
+                    $result['infos'] = implode("，", $infos);
+                    $result['id'] = $clerkData->id;
+                    $result['status'] = 'normal';
+                }
+            }
+            switch ($clerkData->source_type)
+            {
+                case 'giftpacks_order_item':
+                    $result['type'] = 1;
+                    break;
+                case 'normal_order':
+                    $result['type'] = 2;
+                    break;
+                case 'baopin_order':
+                    $result['type'] = 3;
+                    break;
+                case 'mch_normal_order':
+                    $result['type'] = 4;
+                    break;
+                case 'mch_baopin_order':
+                    $result['type'] = 5;
+                    break;
+                default:
+                    $result['type'] = 0;
             }
             return [
                 'code' => ApiCode::CODE_SUCCESS,

@@ -43,7 +43,7 @@ class MallController extends BaseController
                         $query->select('id,username,nickname,mobile');
                     }]
                 )
-                ->orderBy('id DESC')
+//                ->orderBy('id DESC')
                 ->page($pagination)
                 /*->offset($pagination->offset)
                 ->limit($pagination->limit)*/

@@ -41,26 +41,29 @@ class PriceLogNewGiftpacksOrderItemForm extends BaseModel{
                 $amount = $otherData['item_price'];
                 //$serviceFee = ($serviceFeeRate/100) * floatval($amount);
                 //$price = $amount - $serviceFee;
-                $otherData = [
-                    'amount'             => $amount,
-                    'transfer_rate'      => $mch->transfer_rate,
-                    'service_fee'        => 0,
-                    'giftpacks_order_id' => $orderItem->order_id,
-                    'order_item_id'      => $orderItem->id
-                ];
 
-                //生成待结算记录
-                $content = "来自大礼包订单[ID:".$orderItem->order_id."]的结算收益";
-                $priceLog = new MchPriceLog(array_merge($uniqueData, [
-                    "price"           => $amount,
-                    "created_at"      => time(),
-                    "updated_at"      => time(),
-                    "status"          => "unconfirmed",
-                    "content"         => $content,
-                    "other_json_data" => json_encode($otherData)
-                ]));
-                if(!$priceLog->save()){
-                    throw new \Exception(json_encode($priceLog->getErrors()));
+                if($amount > 0){
+                    $otherData = [
+                        'amount'             => $amount,
+                        'transfer_rate'      => $mch->transfer_rate,
+                        'service_fee'        => 0,
+                        'giftpacks_order_id' => $orderItem->order_id,
+                        'order_item_id'      => $orderItem->id
+                    ];
+
+                    //生成待结算记录
+                    $content = "来自大礼包订单[ID:".$orderItem->order_id."]的结算收益";
+                    $priceLog = new MchPriceLog(array_merge($uniqueData, [
+                        "price"           => $amount,
+                        "created_at"      => time(),
+                        "updated_at"      => time(),
+                        "status"          => "unconfirmed",
+                        "content"         => $content,
+                        "other_json_data" => json_encode($otherData)
+                    ]));
+                    if(!$priceLog->save()){
+                        throw new \Exception(json_encode($priceLog->getErrors()));
+                    }
                 }
             }
         }catch (\Exception $e){

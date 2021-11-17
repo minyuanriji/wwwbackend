@@ -848,6 +848,10 @@ class Menus
                         'route' => 'mall/mch-cash/index',
                     ],
                     [
+                        'name' => '商户待结算',
+                        'route' => 'mall/mch-price-log/index',
+                    ],
+                    [
                         'name' => '用户收益',
                         'route' => 'mall/finance/income-log',
                     ],

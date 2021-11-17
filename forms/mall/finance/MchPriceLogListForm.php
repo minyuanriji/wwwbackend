@@ -72,7 +72,7 @@ class MchPriceLogListForm extends BaseModel{
 
             $query->select(["mpl.*", "m.transfer_rate", "m.mobile", "s.name as store_name", "s.cover_url"]);
 
-            $list = $query->orderBy("mpl.id desc")->page($pagination, $this->limit, $this->page)->asArray()->all();
+            $list = $query->orderBy("mpl.id desc")->page($pagination, 10, $this->page)->asArray()->all();
             if($list){
                 foreach($list as &$item){
                     $otherData = @json_decode($item['other_json_data'], true);

@@ -235,6 +235,7 @@
             },
             loadData(status = -1) {
                 this.loading = true;
+                this.pagination = null;
                 request({
                     params: {
                         r: 'mall/mch-price-log/index',

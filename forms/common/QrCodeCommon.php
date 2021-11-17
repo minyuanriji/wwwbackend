@@ -113,12 +113,22 @@ class QrCodeCommon extends BaseModel
 
     private function wechat($scene, $width = 430, $page = null,$appForm = '')
     {
-        /** @var Wechat $wechat */
-        $wechat = \Yii::$app->wechat;
-        $accessTokenArray = $wechat->miniProgram->access_token->getToken();
+        $cache = \Yii::$app->getCache();
+        $cacheKey = "app/forms/common::wechat:getToken";
+        $cacheData = $cache->get($cacheKey);
+        if($cacheData && isset($cacheData['token']) && isset($cacheData['expired_at']) && $cacheData['expired_at'] > time()){
+            $accessTokenArray = $cacheData['token'];
+        }else{
+            /** @var Wechat $wechat */
+            $wechat = \Yii::$app->wechat;
+            $accessTokenArray = $wechat->miniProgram->access_token->getToken(true);
 //        $this->accessToken = \Yii::$app->wechat->getAccessToken();
-        if (!isset($accessTokenArray["access_token"])) {
-            throw new \Exception('微信配置有误');
+            if (!isset($accessTokenArray["access_token"])) {
+                throw new \Exception('微信配置有误');
+            }
+            $cacheData['token']      = $accessTokenArray;
+            $cacheData['expired_at'] = time() + $accessTokenArray['expires_in'] - 600;
+            $cache->set($cacheKey);
         }
 
         $this->accessToken = $accessTokenArray["access_token"];

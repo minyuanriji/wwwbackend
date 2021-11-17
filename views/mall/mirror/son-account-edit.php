@@ -138,7 +138,7 @@ Yii::$app->loadComponentView('com-dialog-template');
                     </el-date-picker>
                     <el-checkbox v-model="isCheckExpired" @change="checkExpiredAt">永久</el-checkbox>
                 </el-form-item>
-                <!--<el-form-item label="权限设置">
+                <el-form-item label="权限设置">
                     <div class="permissions-item" @click="clickAll" :class="{active:allIsCheck}">全选</div>
                     <div class="permissions-list">
                         <div v-for="item in permissionList" @click="clickItem(item)" :key="item.name"
@@ -146,7 +146,7 @@ Yii::$app->loadComponentView('com-dialog-template');
                         </div>
                     </div>
 
-                </el-form-item>-->
+                </el-form-item>
                 <el-form-item label="上传权限" v-if="storageShow()">
                     <div class="permissions-list">
                         <div v-for="(item, key) in storage" @click="clickStorage(key)" :key="item.name"

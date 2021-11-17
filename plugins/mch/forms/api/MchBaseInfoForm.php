@@ -114,9 +114,8 @@ class MchBaseInfoForm extends BaseModel{
 
             //获取商户待结算金额
             $fzAccountMoney = (float)MchPriceLog::find()->where([
-                "status" => "unconfirmed",
                 "mch_id" => $mchInfo['id']
-            ])->sum("price");
+            ])->andWhere(["IN", "status", ["unconfirmed", "confirmed"]])->sum("price");
             $baseData['stat']['fz_account_money'] = $fzAccountMoney;
 
             return [

@@ -192,12 +192,18 @@ class MallForm extends BaseModel
             if (!$homePage)
                 throw new \Exception('商城mall_id:'. 5 . '不存在');
 
-            $pageModel = new HomePage([
-                'mall_id' => $mall_model->id,
-                'page_data' => $homePage->page_data,
-            ]);
-            if (!$pageModel->save())
-                throw new \Exception($pageModel->getErrorMessage());
+            $bookHomePage = HomePage::findOne(['mall_id' => $mall_model->id]);
+            if ($bookHomePage) {
+                $bookHomePage->is_delete = 0;
+            } else {
+                $bookHomePage = new HomePage([
+                    'mall_id' => $mall_model->id,
+                    'page_data' => $homePage->page_data,
+                ]);
+            }
+
+            if (!$bookHomePage->save())
+                throw new \Exception($bookHomePage->getErrorMessage());
 
             $t->commit();
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '保存成功', $mall_model);

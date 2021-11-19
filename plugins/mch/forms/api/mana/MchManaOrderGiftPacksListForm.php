@@ -119,7 +119,7 @@ class MchManaOrderGiftPacksListForm extends BaseModel {
                     ["status" => 1],
                     ["source_type" => "giftpacks_order_item"],
                     ["IN", "source_id", $orderItemIds]
-                ])->asArray()->all();
+                ])->orderBy('created_at DESC')->asArray()->all();
                 if($rows){
                     foreach($rows as $row){
                         $row['updated_at'] = date("Y-m-d H:i:s", $row['updated_at']);

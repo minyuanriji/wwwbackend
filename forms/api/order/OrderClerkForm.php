@@ -174,7 +174,7 @@ class OrderClerkForm extends BaseModel
             }
 
             $appPlatform = \Yii::$app->appPlatform;
-            if($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_WECHAT){
+            if($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_WECHAT || $appPlatform == User::PLATFORM_APP){
                 $dir = "order/offline-qrcode/" . $order->id . time() . '.jpg';
                 $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
                 CommonLogic::createQrcode([], $this, $this->route . "?id=" . $clerkData->id, $dir);

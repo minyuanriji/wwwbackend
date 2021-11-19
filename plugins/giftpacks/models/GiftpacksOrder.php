@@ -4,6 +4,7 @@ namespace app\plugins\giftpacks\models;
 
 
 use app\models\BaseActiveRecord;
+use app\models\User;
 
 class GiftpacksOrder extends BaseActiveRecord
 {
@@ -26,8 +27,12 @@ class GiftpacksOrder extends BaseActiveRecord
 
     public function getGiftpacks()
     {
-        return $this->hasOne(Giftpacks::className(), ['id' => 'pack_id']);
+        return $this->hasOne(Giftpacks::class, ['id' => 'pack_id']);
     }
 
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ["id" => "user_id"]);
+    }
 
 }

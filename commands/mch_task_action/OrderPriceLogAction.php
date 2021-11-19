@@ -19,7 +19,7 @@ class OrderPriceLogAction extends BasePriceLogAction{
                     ->innerJoin(["o" => Order::tableName()], "o.id=od.order_id");
         $query->andWhere([
             "AND",
-            ["mpl.status" => "unconfirmed"],
+            ["mpl.status" => "confirmed"],
             ["mpl.source_type" => "order_detail"],
             "od.is_refund=0 OR (od.is_refund=1 AND od.refund_status=21)",
             ["o.is_delete" => 0],

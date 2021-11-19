@@ -39,6 +39,12 @@
                             <div>{{scope.row.give_value ? (scope.row.give_value+"%") : "-"}}</div>
                         </template>
                     </el-table-column>
+                    <el-table-column label="运费（运营费）">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.enable_express == 1" style="color:darkgreen">送购物券</span>
+                            <span v-if="scope.row.enable_express == 0" style="color:gray;">不送购物券</span>
+                        </template>
+                    </el-table-column>
                 </el-table>
 
                 <div style="display: flex;justify-content: space-between;margin-top:20px;">
@@ -62,7 +68,7 @@
         </el-dialog>
 
         <el-dialog width="30%" title="设置购物券赠送" :visible.sync="formDialogVisible" :close-on-click-modal="false">
-            <el-form ref="formData" :rules="formRule" label-width="15%" :model="formData" size="small">
+            <el-form ref="formData" :rules="formRule" label-width="30%" :model="formData" size="small">
                 <el-form-item :label="!formData.is_all ? '商品数' : '总页数'">
                     <span>{{formProgressData.total_num}}</span>
                 </el-form-item>
@@ -76,6 +82,15 @@
                 </el-form-item>
                 <el-form-item label="启动日期" prop="start_at">
                     <el-date-picker :disabled="formProgressData.loading" v-model="formData.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="运费（运营费）" prop="enable_express">
+                    <el-switch
+                            v-model="formData.enable_express"
+                            active-text="赠送购物券"
+                            inactive-text="不赠送"
+                            active-value="1"
+                            inactive-value="0">
+                    </el-switch>
                 </el-form-item>
             </el-form>
             <div v-if="!formProgressData.loading" slot="footer" class="dialog-footer">
@@ -118,7 +133,8 @@
                     do_search: null,
                     give_type: 1,
                     give_value: 0,
-                    start_at: ''
+                    start_at: '',
+                    enable_express: "0"
                 },
                 formRule:{
                     give_value: [

@@ -22,7 +22,7 @@ class MchPriceLog extends BaseActiveRecord
     {
         return [
             [['mall_id', 'mch_id', 'store_id', 'price', 'content', 'source_id', 'source_type', 'created_at', 'updated_at'], 'required'],
-            [['status', 'other_json_data'], 'safe'],
+            [['status', 'other_json_data', 'remark'], 'safe'],
         ];
     }
 

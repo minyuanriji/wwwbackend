@@ -140,13 +140,18 @@ class CheckoutOrderPayForm extends BaseModel {
                 throw new \Exception('结账单更新失败');
             }
 
+            //支持的支付方式
             $supportPayTypes = OrderLogic::getPaymentTypeConfig();
-            if(in_array("wechat", $supportPayTypes) && \Yii::$app->appPlatform == "h5"){
-                $supportPayTypes = array_diff($supportPayTypes, ["wechat"]);
-                if(!in_array("alipay", $supportPayTypes)){
-                    $supportPayTypes[] = "alipay";
-                }
+            $notSupportPayTypes = [];
+            if(in_array(\Yii::$app->appPlatform, [User::PLATFORM_H5, User::PLATFORM_APP]) ){
+                $notSupportPayTypes[] = "wechat";
+            }elseif(in_array(\Yii::$app->appPlatform, [User::PLATFORM_WECHAT, User::PLATFORM_MP_WX])){
+                $notSupportPayTypes[] = "alipay";
+            }else{
+                $notSupportPayTypes[] = "wechat";
+                $notSupportPayTypes[] = "alipay";
             }
+            $supportPayTypes = array_diff($supportPayTypes, $notSupportPayTypes);
 
             $union_id = 0;
 

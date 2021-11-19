@@ -25,7 +25,12 @@ class GiftpacksOrderItem extends BaseActiveRecord
 
     public function getGiftpacksItem()
     {
-        return $this->hasOne(GiftpacksItem::className(), ['id' => 'pack_item_id']);
+        return $this->hasOne(GiftpacksItem::class, ['id' => 'pack_item_id']);
+    }
+
+    public function getGiftpackOrder()
+    {
+        return $this->hasOne(GiftpacksOrder::class, ["id" => "order_id"]);
     }
 }
 

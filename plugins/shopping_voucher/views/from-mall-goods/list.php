@@ -61,6 +61,17 @@ echo $this->render("../com/com-tab-from");
                                 </div>
                             </template>
                         </el-table-column>
+                        <el-table-column label="赠送比例">
+                            <template slot-scope="scope">
+                                <div>{{scope.row.give_value ? (scope.row.give_value+"%") : "-"}}</div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="运费（运营费）">
+                            <template slot-scope="scope">
+                                <span v-if="scope.row.enable_express == 1" style="color:darkgreen">送购物券</span>
+                                <span v-if="scope.row.enable_express == 0" style="color:gray;">不送购物券</span>
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="scope" width="110" label="添加时间">
                             <template slot-scope="scope">
                                 {{scope.row.created_at|dateTimeFormat('Y-m-d')}}

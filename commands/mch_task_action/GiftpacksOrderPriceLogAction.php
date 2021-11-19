@@ -18,7 +18,7 @@ class GiftpacksOrderPriceLogAction extends BasePriceLogAction {
                     ->innerJoin(["goi" => GiftpacksOrderItem::tableName()], "goi.id=mpl.source_id")
                     ->innerJoin(["go" => GiftpacksOrder::tableName()], "go.id=goi.order_id");
         $query->where([
-            "mpl.status"      => "unconfirmed",
+            "mpl.status"      => "confirmed",
             "mpl.source_type" => "giftpacks_order_item",
             "go.pay_status"   => "paid",
             "go.is_delete"    => 0

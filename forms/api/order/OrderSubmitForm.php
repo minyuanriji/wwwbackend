@@ -405,6 +405,8 @@ class OrderSubmitForm extends BaseModel
                     $order->order_type = "express_normal";
                 }
 
+                $order->enable_express_got_shopping_voucher = isset($orderItem['enable_express_got_shopping_voucher']) && $orderItem['enable_express_got_shopping_voucher'] ? 1 : 0;
+
                 if (!$order->save()) {
                     return $this->returnApiResultData(ApiCode::CODE_FAIL, (new BaseModel())->responseErrorMsg($order));
                 }
@@ -750,6 +752,9 @@ class OrderSubmitForm extends BaseModel
         foreach ($listData as &$item) {
             $item['shopping_voucher_use_num'] = 0;
             $item['shopping_voucher_decode_price'] = 0;
+
+
+
             foreach ($item['goods_list'] as &$goodsItem) {
                 $goodsItem['use_shopping_voucher'] = 0;
                 $goodsItem['use_shopping_voucher_decode_price'] = 0;
@@ -928,28 +933,7 @@ class OrderSubmitForm extends BaseModel
         $shoppingVoucherUseData['enable'] = true;
 
         //确认收货可获得购物券数量
-        $gotShoppingVoucherNum = 0;
-        $goodsIdPrices = [];
-        foreach ($listData as &$item) {
-            foreach ($item['goods_list'] as $goods) {
-                $goodsIdPrices[$goods['id']] = $goods['total_price'];
-            }
-        }
-        if ($goodsIdPrices) {
-            $fromGoodsDatas = ShoppingVoucherFromGoods::find()->andWhere([
-                "AND",
-                ["is_delete" => 0],
-                ["IN", "goods_id", array_keys($goodsIdPrices)],
-                "start_at<'" . time() . "'"
-            ])->select(["goods_id", "give_value"])->asArray()->all();
-            if ($fromGoodsDatas) {
-                foreach ($fromGoodsDatas as $fromGoodsData) {
-                    $totalPrice = isset($goodsIdPrices[$fromGoodsData['goods_id']]) ? $goodsIdPrices[$fromGoodsData['goods_id']] : 0;
-                    $gotShoppingVoucherNum += (floatval($fromGoodsData['give_value']) / 100) * $totalPrice;
-                }
-            }
-        }
-
+        $gotShoppingVoucherNum = $this->gotShoppingVoucherNum($listData);
 
         return [
             'got_shopping_voucher_num' => round($gotShoppingVoucherNum, 2),
@@ -974,6 +958,59 @@ class OrderSubmitForm extends BaseModel
                 'related_user_id' => isset($this->form_data['related_user_id']) ? $this->form_data['related_user_id'] : null,
             ],
         ];
+    }
+
+    /**
+     * 计算可获得的购物券
+     * @param $listData
+     * @return float
+     */
+    public function gotShoppingVoucherNum($listData){
+        $gotShoppingVoucherNum = 0;
+
+        //支付商品费用可获得购物券
+        $goodsIdPrices = [];
+        foreach ($listData as &$item) {
+            foreach ($item['goods_list'] as $goods) {
+                $goodsIdPrices[$goods['id']] = $goods['total_price'];
+            }
+        }
+        $enableExpressfromGoodsIds = [];
+        if ($goodsIdPrices) {
+            $fromGoodsDatas = ShoppingVoucherFromGoods::find()->andWhere([
+                "AND",
+                ["is_delete" => 0],
+                ["IN", "goods_id", array_keys($goodsIdPrices)],
+                "start_at<'" . time() . "'"
+            ])->select(["goods_id", "give_value", "enable_express"])->asArray()->all();
+            if ($fromGoodsDatas) {
+                foreach ($fromGoodsDatas as $fromGoodsData) {
+                    $totalPrice = isset($goodsIdPrices[$fromGoodsData['goods_id']]) ? $goodsIdPrices[$fromGoodsData['goods_id']] : 0;
+                    $gotShoppingVoucherNum += (floatval($fromGoodsData['give_value']) / 100) * $totalPrice;
+                    if($fromGoodsData['enable_express']){
+                        $enableExpressfromGoodsIds[] = $fromGoodsData['goods_id'];
+                    }
+
+                }
+            }
+        }
+
+        //支付运费可获得购物券数量
+        foreach ($listData as &$item) {
+            $item['enable_express_got_shopping_voucher'] = 0;
+            if(!$item['express_price'] > 0) continue;
+            //只要有满足一个商品支持运费送购物券
+            foreach($item['goods_list'] as $goodsItem){
+                if(in_array($goodsItem['id'], $enableExpressfromGoodsIds)){
+                    $item['enable_express_got_shopping_voucher'] = 1;
+                    $giveValue = 100; //默认按比例百分百赠送
+                    $gotShoppingVoucherNum += round(($giveValue/100) * floatval($item['express_price']), 2);
+                    break;
+                }
+            }
+        }
+
+        return $gotShoppingVoucherNum;
     }
 
     /**

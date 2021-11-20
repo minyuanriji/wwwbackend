@@ -98,7 +98,7 @@ class StoreForm extends BaseModel
             foreach ($list as &$item) {
                 $apply_data = SerializeHelper::decode($item['json_apply_data']);
                 $item['store_name'] = $apply_data['store_name'];
-                $item['store_logo'] = 'http://yingmlife-1302693724.cos.ap-guangzhou.myqcloud.com/uploads/images/original/20210427/823e0e8a9fe145eb6f11551ead680011.png';
+                $item['store_logo'] = 'http://mingyuanriji.cn/web/static/header-logo.png';
                 unset($item['json_apply_data'],$apply_data);
             }
         }

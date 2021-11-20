@@ -54,6 +54,19 @@ class OrderController extends OrderManagerController
     }
 
     /**
+     * 统计金额
+     * @return \yii\web\Response
+     */
+    public function actionStatisticalAmount()
+    {
+        if (\Yii::$app->request->isGet) {
+            $form = new OrderForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->statistical());
+        }
+    }
+
+    /**
      * 订单总数
      * @return string|\yii\web\Response
      * @throws \Exception

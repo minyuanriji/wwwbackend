@@ -228,6 +228,7 @@
             toSearch() {
                 this.search.page = 1;
                 this.$emit('search', this.search);
+                this.$emit('statistica', this.search);
                 console.log(this.search);
                 //this.checkSearch();
             },

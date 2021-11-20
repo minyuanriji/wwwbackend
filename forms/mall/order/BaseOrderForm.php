@@ -150,8 +150,6 @@ abstract class BaseOrderForm extends BaseModel
             $query->andWhere(['!=', 'o.is_recycle', '1']);
         }
 
-        $Statistics[0] =  $this->Statistics($query);
-
         $list = $query->page($pagination)
             ->orderBy($this->order_by . 'o.created_at DESC')
             ->select(['o.*', 'u.nickname'])
@@ -291,9 +289,45 @@ abstract class BaseOrderForm extends BaseModel
                 'express_list' => Express::getExpressList(),
                 'export_list' => $this->getFieldsList(),
                 'plugins' => $menuList,
+            ]
+        ];
+    }
+
+    public function statistical()
+    {
+        if (!$this->validate()) {
+            return $this->responseErrorInfo();
+        }
+        $query = $this->where();
+
+        $this->getQuery($query);
+
+        try {
+            \Yii::$app->plugin->getPlugin('mch');
+            $query->with('mch.store', 'detail.goods.mch.store');
+        } catch (\Exception $exception) {
+
+        }
+
+        if (($this->app_clerk && $this->is_clerk == 1) || $this->clerk_id) {
+            $this->order_by = 'confirm_at desc,';
+        }
+        // 自定义条件
+        $query->andWhere($this->getExtraWhere());
+        //过滤拼团订单
+        $query->andWhere(['!=', 'o.sign', 'group_buy']);
+        if($this -> status == '-1'){
+            $query->andWhere(['!=', 'o.is_recycle', '1']);
+        }
+
+        $Statistics[0] =  $this->Statistics($query);
+        return [
+            'code' => ApiCode::CODE_SUCCESS,
+            'data' => [
                 'Statistics' => $Statistics,
             ]
         ];
+
     }
 
     protected function handleExtraData($list)

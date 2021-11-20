@@ -15,6 +15,6 @@ class BaseCommandController extends Controller{
     }
 
     public function commandOut($message){
-        echo $message . "\n";
+        echo "[".date("Y-m-d H:i:s", time())."]" . $message . "\n";
     }
 }

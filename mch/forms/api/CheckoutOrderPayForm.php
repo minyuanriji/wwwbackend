@@ -45,6 +45,12 @@ class CheckoutOrderPayForm extends BaseModel {
     public function create(){
 
         try {
+
+            $user = \Yii::$app->user->getIdentity();
+            if(!$user){
+                throw new \Exception('用户不存在');
+            }
+
             //获取商户信息
             $mchModel = Mch::findOne([
                 'id'            => $this->id,
@@ -53,6 +59,14 @@ class CheckoutOrderPayForm extends BaseModel {
             ]);
             if(!$mchModel){
                 throw new \Exception('商户信息不存在');
+            }
+
+            //用户与商户绑定关系
+            if(!$user->parent_id){
+                $user->parent_id = $mchModel->user_id;
+                if(!$user->save()){
+                    throw new \Exception($this->responseErrorMsg($user));
+                }
             }
             
             //门店信息

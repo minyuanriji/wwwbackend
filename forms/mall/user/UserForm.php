@@ -135,6 +135,7 @@ class UserForm extends BaseModel
             'AND',
             ['or', ['LIKE', 'u.nickname', $this->keyword], ['u.id' => $this->keyword], ['u.mobile' => $this->keyword]],
             ['u.mall_id' => \Yii::$app->mall->id],
+            'u.mobile is not null'
         ]);
         $list = $query->orderBy('nickname')->limit(30)->all();
 
@@ -142,7 +143,7 @@ class UserForm extends BaseModel
         /** @var User $item */
         foreach ($list as $item) {
             $newItem = ArrayHelper::toArray($item);
-            $newItem['avatar'] = $item->userInfo ? $item->userInfo->avatar_url : '';
+            //$newItem['avatar'] = $item->userInfo ? $item->userInfo->avatar_url : '';
             $platform = $item->userInfo ? $item->userInfo->platform : '';
             $newItem['nickname'] = User::getPlatformText($platform) . '（' . $item->nickname . '）';
             $newList[] = $newItem;

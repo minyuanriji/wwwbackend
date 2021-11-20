@@ -68,6 +68,7 @@ echo $this->render("com-refund-agree");
                     <el-table-column label="退款原因" width="200" align="center">
                         <template slot-scope="scope">
                             <span style="color:gray">{{scope.row.refund_data.description}}</span>
+                            <div>备注：{{scope.row.refund_data.remark}}</div>
                         </template>
                     </el-table-column>
 

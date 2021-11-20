@@ -18,8 +18,7 @@ Yii::$app->loadComponentView('order/com-city');
         padding: 20px;
         background-color: #fff;
         margin-bottom: 10px;
-        border-top-left-radius: 4px;
-        border-top-right-radius: 4px;
+        border-radius: 15px;
     }
 
     .com-order-list .header-box .title {
@@ -333,9 +332,20 @@ Yii::$app->loadComponentView('order/com-city');
                     @click="toRecycleAll">清空回收站
             </el-button>
         </div>
+        <el-card style="border-radius: 15px;margin-bottom: 15px">
+            <el-table :data="Statistics" style="width: 100%;" v-loading="statisticsLoading">
+                <el-table-column prop="TotalAmount" label="总金额"></el-table-column>
+                <el-table-column prop="ActualPayment" label="实际支付金额"></el-table-column>
+                <el-table-column prop="TotalItem" label="总件数"></el-table-column>
+                <el-table-column prop="RedAmount" label="红包抵扣金额"></el-table-column>
+                <el-table-column prop="integral" label="积分抵扣金额"></el-table-column>
+                <el-table-column prop="ShoppingVoucher" label="购物券抵扣金额"></el-table-column>
+            </el-table>
+        </el-card>
         <div class="table-body">
             <com-search
                     @search="toSearch"
+                    @statistica="statisticalAmount"
                     :plugins="plugins"
                     :tabs="tabs"
                     :active-name="activeName"
@@ -392,17 +402,6 @@ Yii::$app->loadComponentView('order/com-city');
                     :send-type="sendType"
                     :order="newOrder">
             </com-city>
-
-            <div>
-                <el-table :data="Statistics" style="width: 100%;">
-                    <el-table-column prop="TotalAmount" label="总金额"></el-table-column>
-                    <el-table-column prop="ActualPayment" label="实际支付金额"></el-table-column>
-                    <el-table-column prop="TotalItem" label="总件数"></el-table-column>
-                    <el-table-column prop="RedAmount" label="红包抵扣金额"></el-table-column>
-                    <el-table-column prop="integral" label="积分抵扣金额"></el-table-column>
-                    <el-table-column prop="ShoppingVoucher" label="购物券抵扣金额"></el-table-column>
-                </el-table>
-            </div>
 
             <div class="com-order-title">
                 <div v-for="(item,index) in orderTitle" :key="index" :style="{width: item.width}">{{item.name}}</div>
@@ -1136,6 +1135,7 @@ Yii::$app->loadComponentView('order/com-city');
                 citySendVisible: false, //同城配送发货
                 singleDialogVisible: false,// 电子面单弹框
                 newExpressSingle: [],
+                statisticsLoading: false,
             };
         },
         mounted() {
@@ -1156,6 +1156,7 @@ Yii::$app->loadComponentView('order/com-city');
                 this.search.page = localStorage.getItem('order_page');
             }
             this.getList();
+            this.statisticalAmount();
         },
         methods: {
             load () {
@@ -1416,7 +1417,6 @@ Yii::$app->loadComponentView('order/com-city');
                         this.export_list = e.data.data.export_list;
                         this.pagination = e.data.data.pagination;
                         this.plugins = e.data.data.plugins;
-                        this.Statistics = e.data.data.Statistics;
                     }
                 }).catch(e => {
                 });
@@ -1569,6 +1569,26 @@ Yii::$app->loadComponentView('order/com-city');
                         self.$message.error(e);
                     });
                 }).catch(() => {
+                });
+            },
+
+            //统计金额
+            statisticalAmount() {
+                this.statisticsLoading = true;
+                let params = {
+                    r: 'mall/order/statistical-amount'
+                };
+                Object.keys(this.search).map((key) => {
+                    params[key] = this.search[key]
+                });
+                request({
+                    params: params,
+                }).then(e => {
+                    this.statisticsLoading = false;
+                    if (e.data.code === 0) {
+                        this.Statistics = e.data.data.Statistics;
+                    }
+                }).catch(e => {
                 });
             },
         },

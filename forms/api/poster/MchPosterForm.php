@@ -53,7 +53,7 @@ class MchPosterForm extends GrafikaOption implements BasePoster
             }else{
                 $dir = "mch/checkout-order-qrcode/" . $mchModel->id . time() . '.jpg';
                 $imgUrl = \Yii::$app->request->hostInfo . "/runtime/image/" . $dir;
-                CommonLogic::createQrcode([], $this, $this->route . "?id=" . $mchModel->id . "&pid=" . $pid, $dir);
+                CommonLogic::createQrcode([], $this, $this->route . "?id=" . $mchModel->id . "&pid=" . $pid, $dir, \Yii::$app->appPlatform);
                 $codeUrl = $imgUrl;
             }
             $pos = imagettfbbox(14,0, $this->font_path, $store->name);

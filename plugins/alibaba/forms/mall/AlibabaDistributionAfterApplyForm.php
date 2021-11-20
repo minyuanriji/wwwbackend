@@ -14,12 +14,13 @@ class AlibabaDistributionAfterApplyForm extends BaseModel
     public $id;
     public $act;
     public $content;
+    public $refund_express;
 
     public function rules()
     {
         return [
             [['id', 'act'], 'required'],
-            [['id'], 'integer'],
+            [['id', 'refund_express'], 'integer'],
             [['content'], 'safe']
         ];
     }
@@ -43,7 +44,7 @@ class AlibabaDistributionAfterApplyForm extends BaseModel
                 if ($OrderDetail->refund_status == 'agree') {
                     throw new \Exception("不能重复确认操作！");
                 }
-                $refundArray = $OrderDetail->agreeRefund(false, $this->content);
+                $refundArray = $OrderDetail->agreeRefund(false, $this->content, $this->refund_express);
                 $result = $refundArray;
             } elseif ($this->act == "refused") { //拒绝
                 if ($OrderDetail->refund_status == 'finished')

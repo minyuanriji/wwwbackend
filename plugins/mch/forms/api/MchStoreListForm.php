@@ -54,7 +54,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
             if($list){
                 foreach($list as &$item){
 
-                    if(empty($item['cover_url'])){
+                    if(!preg_match("/^https?:\/\//i", trim($item['cover_url']))){
                         $item['cover_url'] =  $this->host_info . "/web/static/header-logo.png";
                     }
 
@@ -71,7 +71,19 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
                     $item['province']    = isset($cityData['province']['name']) ? $cityData['province']['name'] : "";
                     $item['city']        = isset($cityData['city']['name']) ? $cityData['city']['name'] : "";
                     $item['district']    = isset($cityData['district']['name']) ? $cityData['district']['name'] : "";
-                    $item['region_name'] = $item['district'] ? $item['district'] : ($item['city'] ? $item['city'] : $item['province']);
+
+                    //地址显示
+                    $item['region_name'] = "";
+                    if($item['distance_mi'] < 1000){
+                        $item['region_name'] = $item["address"];
+                    }elseif($item['distance_mi'] < 10000){
+                        $item['region_name'] = $item['district'];
+                    }else{
+                        $item['region_name'] = $item['city'];
+                    }
+                    if(empty($item['region_name'])){
+                        $item['region_name'] = $item['district'] ? $item['district'] : ($item['city'] ? $item['city'] : $item['province']);
+                    }
 
                     $item['remark'] = "";
                     if($item['shopping_voucher_give_value']){
@@ -143,7 +155,8 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
         }
 
         $selects = ["s.id", "s.mall_id", "s.cover_url", "s.name", "s.mobile", "s.address", "s.province_id", "s.city_id", "s.district_id",
-            "s.longitude", "s.latitude", "s.score", "m.mch_common_cat_id", "c.name as cat_name", "svfs.give_value as shopping_voucher_give_value"
+            "s.longitude", "s.latitude", "s.score", "m.mch_common_cat_id", "c.name as cat_name", "svfs.give_value as shopping_voucher_give_value",
+            "s.business_hours"
         ];
 
         if($this->longitude && $this->latitude){

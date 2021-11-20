@@ -208,6 +208,7 @@ class UserTeamForm extends BaseModel
             $query = UserRelationshipLinkForm::getSecondList($user, $userLink);
         }
         $select = ["u.id", "u.role_type", "u.avatar_url", "u.nickname", "u.mobile", "u.junior_at", "u.created_at"];
+        //$query->andWhere("u.mobile is not null");
         $users = $query->orderBy("u.id DESC")->select($select)->page($pagination, 10, max(1, $this->page))->all();
         $list = [];
         if($users){

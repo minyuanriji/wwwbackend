@@ -36,10 +36,8 @@ echo $this->render("com-refund-agree");
                         <template slot-scope="scope">
                             <div>订单日期：{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s') }}</div>
                             <div>订单编号：{{scope.row.order_no}}</div>
-                            <div>商品费用：<span>￥{{scope.row.total_goods_price}}</span>（购物券抵：{{scope.row.shopping_voucher_decode_price}}）</div>
-                            <div>运费：<span>￥{{scope.row.express_original_price}}</span>（购物券抵：{{scope.row.shopping_voucher_express_decode_price}}）</div>
-                            <div>使用现金：{{scope.row.total_pay_price}}</div>
-                            <div>使用购物券：{{scope.row.total_shopping_voucher_num}}（抵扣{{scope.row.total_shopping_voucher_price}}元）</div>
+                            <div>支付商品：￥{{scope.row.total_price}} + {{scope.row.shopping_voucher_num}}购物券</div>
+                            <div>支付运费：￥{{scope.row.express_price}} + {{scope.row.shopping_voucher_express_use_num}}购物券</div>
                             <div>支付用户：{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
                             <div>支付日期：{{ scope.row.pay_at|dateTimeFormat('Y-m-d H:i:s') }}</div>
                         </template>
@@ -70,13 +68,6 @@ echo $this->render("com-refund-agree");
                     <el-table-column label="退款原因" width="200" align="center">
                         <template slot-scope="scope">
                             <span style="color:gray">{{scope.row.refund_data.description}}</span>
-                        </template>
-                    </el-table-column>
-
-                    <el-table-column label="退款信息" width="130">
-                        <template slot-scope="scope">
-                            <div>现金：<span >{{scope.row.total_pay_price}}</span></div>
-                            <div>购物券：<span >{{scope.row.shopping_voucher_use_num}}</span></div>
                         </template>
                     </el-table-column>
 
@@ -120,6 +111,73 @@ echo $this->render("com-refund-agree");
         </el-tabs>
     </el-card>
 
+    <el-dialog title="同意退款" :visible.sync="agreeDialogVisible" width="40%">
+        <div>
+            <table class="grid-i" cellpadding="0" cellspacing="0" style="width:100%;">
+                <tr class="c2">
+                    <td class="label">订单日期：</td>
+                    <td colspan="3">{{agreeItem.created_at|dateTimeFormat('Y-m-d H:i:s') }}</td>
+                </tr>
+                <tr class="c2">
+                    <td class="label">订单编号：</td>
+                    <td colspan="3">{{agreeItem.order_no}}</td>
+                </tr>
+                <tr class="c2">
+                    <td class="label">支付商品：</td>
+                    <td colspan="3">￥{{agreeItem.total_price}} + {{agreeItem.shopping_voucher_num}}购物券</td>
+                </tr>
+                <tr class="c2">
+                    <td class="label">支付运费：</td>
+                    <td colspan="3">￥{{agreeItem.express_price}} + {{agreeItem.shopping_voucher_express_use_num}}购物券</td>
+                </tr>
+                <tr class="c4">
+                    <td class="label">支付用户：</td>
+                    <td>{{agreeItem.nickname}}（ID:{{agreeItem.user_id}}）</td>
+                    <td class="label">支付日期：</td>
+                    <td>{{ agreeItem.pay_at|dateTimeFormat('Y-m-d H:i:s') }}</td>
+                </tr>
+                <tr class="c2">
+                    <td class="label">商品信息：</td>
+                    <td colspan="3">
+                        <div style="display:flex;align-items:center ">
+                            <div style="" >
+                                <com-image :src="agreeItem.cover_url"></com-image>
+                            </div>
+                            <div style="margin-left:10px;">
+                                <div style="">{{agreeItem.goods_name }}（ID：{{agreeItem.goods_id}}）</div>
+                                <div>规格：{{ agreeItem.sku_labels[0]}}</div>
+                            </div>
+                            <div style=";text-align:center;width:100px">X <span style="">{{agreeItem.num}}</span></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="c2">
+                    <td class="label">退款原因：</td>
+                    <td colspan="3">质量问题</td>
+                </tr>
+                <tr class="c4">
+                    <td class="label">退款：</td>
+                    <td>
+                        <span style="color:darkred">￥{{agreeRefundPrice}}</span>
+                        +
+                        <span style="color:darkgreen">{{agreeRefundShoppingVoucher}}购物券</span>
+                    </td>
+                    <td class="label">退运费（运营费）：</td>
+                    <td>
+                        <el-switch v-model="agreeRefundExpress"
+                                   active-text="是"
+                                   inactive-text="否">
+                        </el-switch>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="agreeDialogVisible = false">取 消</el-button>
+            <el-button @click="agreeApply" type="primary">确 定</el-button>
+          </span>
+    </el-dialog>
+
     <com-refund-agree :order-detail-id="agreeEdit.orderDetailId" @close="close"></com-refund-agree>
 </div>
 <script>
@@ -142,17 +200,47 @@ echo $this->render("com-refund-agree");
                 exportList: [],
                 agreeEdit: {
                     orderDetailId: 0
-                }
+                },
+                agreeDialogVisible: false,
+                agreeItem: {cover_url: '', goods_id: '', sku_labels: [], num: 0},
+                agreeRefundExpress: false,
+                agreeRefundPrice: 0,
+                agreeRefundShoppingVoucher: 0
             };
         },
         mounted() {
             this.loadData();
         },
+        watch : {
+            agreeRefundExpress: function(val){
+                this.agreeRefundPrice = parseFloat(this.agreeItem.total_price);
+                this.agreeRefundShoppingVoucher = parseFloat(this.agreeItem.shopping_voucher_use_num);
+                if(this.agreeRefundExpress){
+                    this.agreeRefundPrice += parseFloat(this.agreeItem.express_price);
+                    this.agreeRefundShoppingVoucher += parseFloat(this.agreeItem.shopping_voucher_express_use_num);
+                }
+            },
+            agreeItem:function(agreeItem) {
+                this.agreeRefundPrice = parseFloat(agreeItem.total_price);
+                this.agreeRefundShoppingVoucher = parseFloat(agreeItem.shopping_voucher_use_num);
+                if(this.agreeRefundExpress){
+                    this.agreeRefundPrice += parseFloat(agreeItem.express_price);
+                    this.agreeRefundShoppingVoucher += parseFloat(agreeItem.shopping_voucher_express_use_num);
+                }
+                console.log(agreeItem);
+            }
+        },
         methods: {
             //同意退款操作
             agree(row){
+                this.agreeItem = row;
+                this.agreeDialogVisible = true;
+                this.agreeRefundExpress = false;
+
+            },
+            agreeApply(){
                 let that = this;
-                this.apply(row, "agree", function (rs){
+                this.apply(this.agreeItem, 'agree', function(){
                     that.agreeEdit.orderDetailId = row.id;
                 });
             },
@@ -238,6 +326,7 @@ echo $this->render("com-refund-agree");
                                     id: row.id,
                                     act: act,
                                     content: instance.inputValue,
+                                    refund_express: this.agreeRefundExpress ? 1 : 0
                                 }
                             }).then(e => {
                                 instance.confirmButtonLoading = false;
@@ -287,5 +376,13 @@ echo $this->render("com-refund-agree");
         padding: 20px;
         background-color: #fff;
     }
-
+    .grid-i th{padding:5px 0px 5px 0px;}
+    .grid-i th,.grid-i td{text-align:left;}
+    .grid-i td{padding:10px 10px;border:1px solid #ddd;border-bottom:none;}
+    .grid-i tr:last-child td{border-bottom:1px solid #ddd;}
+    .grid-i .label{border-left:none;font-weight:bold;padding:6px 6px 6px 0px;border-right:none;text-align:right;background:#f1f1f1;}
+    .grid-i td:first-child{border-left:1px solid #ddd;}
+    .grid-i .c4 td{width:30%}
+    .grid-i .c2 td{width:80%}
+    .grid-i .label{width:20% !important;}
 </style>

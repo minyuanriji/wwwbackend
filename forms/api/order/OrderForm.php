@@ -144,7 +144,6 @@ class OrderForm extends BaseModel
                 $newDetailExpress[] = $newDeItem;
             }
             $newItem['detailExpress'] = $newDetailExpress;
-
             $newItem['der_info'] = $detailExpressRelation;
             $newItem["location"] = $item["location"] == null ? "" : $item["location"];
             $newItem["city_name"] = $item["location"] == null ? "" : $item["city_name"];
@@ -154,7 +153,7 @@ class OrderForm extends BaseModel
                                                         "is_send","send_at","customer_name","express","express_no","is_sale","is_confirm","auto_cancel_at",
                                                         "auto_confirm_at","auto_sales_at","distance","city_mobile","location","city_name","city_info","clerk_id",
                                                         "store_id","sign","is_comment","comment_at","back_price","offline_qrcode","support_pay_types",
-                                                        "pay_at","cancel_status","score_deduction_price","send_type","confirm_at","name","mobile","address",
+                                                        "pay_at","score_deduction_price","send_type","confirm_at","name","mobile","address",
                                                         "remark","is_recycle"]);
              //商家信息
             $newItem['is_mch']   = 0;

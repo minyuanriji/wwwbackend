@@ -45,7 +45,7 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
                 "gw.unit", "g.use_attr", "gw.video_url", "g.virtual_sales", "g.use_virtual_sales"
             ];
 
-            $list = $query->orderBy(['g.sort' => SORT_ASC, 'g.id' => SORT_DESC])
+            $list = $query->orderBy("g.sort DESC,g.id DESC")
                 ->select($selects)
                 ->asArray()
                 ->groupBy('g.goods_warehouse_id')

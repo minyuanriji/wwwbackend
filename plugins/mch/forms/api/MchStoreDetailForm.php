@@ -67,6 +67,9 @@ class MchStoreDetailForm extends BaseModel implements ICacheForm {
             $detail['latitude']       = $store->latitude;
             $detail['longitude']      = $store->longitude;
             $detail['address']        = $store->address;
+            if(!preg_match("/^https?:\/\//i", trim($store->cover_url))){
+                $store->cover_url =  $this->host_info . "/web/static/header-logo.png";
+            }
             $detail['logo']           = $store->cover_url;
             $detail['phone']          = $store->mobile;
             $detail['score']          = $store->score;

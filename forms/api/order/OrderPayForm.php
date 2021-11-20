@@ -65,6 +65,19 @@ class OrderPayForm extends OrderPayFormBase
         if (empty($orders)) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL,"订单不存在或已失效");
         }
+        //如果有已取消的订单，无法支付
+        if(is_array($orders)){
+            foreach($orders as $order){
+                if($order->cancel_status != 0){
+                    return $this->returnApiResultData(ApiCode::CODE_FAIL, '已取消的订单无法支付');
+                }
+            }
+        }else{
+            if($orders->cancel_status != 0){
+                return $this->returnApiResultData(ApiCode::CODE_FAIL, '已取消的订单无法支付');
+            }
+        }
+
         $userModel = new User();
         $userData = $userModel->findIdentity(\Yii::$app->user->id);
         return $this->loadOrderPayData($orders, $userData);

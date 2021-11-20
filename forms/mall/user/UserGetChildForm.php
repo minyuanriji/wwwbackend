@@ -46,6 +46,7 @@ class UserGetChildForm extends BaseModel{
                 $userInfo = User::find()->alias("u")
                     ->innerJoin(["url" => UserRelationshipLink::tableName()], "url.user_id=u.id")
                     ->where(["u.id" => (int)$this->parent_id])
+                    ->andWhere("u.mobile is not null")
                     ->select(["u.*", "url.left", "url.right"])->asArray()->one();
                 if(!$userInfo){
                     throw new \Exception("用户不存在");

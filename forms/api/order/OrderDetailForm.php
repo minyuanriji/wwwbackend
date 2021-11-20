@@ -100,6 +100,7 @@ class OrderDetailForm extends BaseModel
             $cancel_at = !empty($order["cancel_at"]) ? date("Y-m-d H:i:s",$order["cancel_at"]):"";
             $cancel_at = empty($cancel_at) ? (!empty($order["auto_cancel_at"]) ? date("Y-m-d H:i:s",$order["auto_cancel_at"]):"") : $cancel_at;
             $detail["cancel_at"] = $cancel_at;
+            $detail['cancel_status'] = $order['cancel_status'] ? $order['cancel_status'] : 0;
             // 订单商品总数
             $detail['goods_num'] = 0;
             $detail['member_deduction_price_count'] = 0;

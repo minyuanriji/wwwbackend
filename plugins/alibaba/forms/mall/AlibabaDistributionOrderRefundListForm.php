@@ -68,7 +68,10 @@ class AlibabaDistributionOrderRefundListForm extends BaseModel
                 $query->andWhere(['ad.refund_status' => $this->status]);
             }
 
-            $select = ['ao.*', "ag.name as goods_name", "ag.cover_url", 'ad.*', "u.nickname"];
+            $select = ['ao.created_at', 'ao.order_no', 'ao.user_id', 'ao.express_price', 'ao.express_original_price',
+                'ao.shopping_voucher_use_num', 'ao.shopping_voucher_express_decode_price',
+                'ao.shopping_voucher_express_use_num',
+                'ao.pay_at', 'ao.pay_type', "ag.name as goods_name", "ag.cover_url", 'ad.*', "u.nickname"];
 
             $list = $query->select($select)->orderBy("ao.id DESC")->page($pagination)->asArray()->all();
 
@@ -76,8 +79,6 @@ class AlibabaDistributionOrderRefundListForm extends BaseModel
                 foreach ($list as &$item) {
                     $item['refund_data'] = !empty($item['refund_json_data']) ? json_decode($item['refund_json_data'], true) : [];
                     $item['sku_labels'] = json_decode($item['sku_labels'], true);
-                    $item['total_shopping_voucher_price'] = $item['shopping_voucher_decode_price'] + $item['shopping_voucher_express_decode_price'];
-                    $item['total_shopping_voucher_num'] = $item['shopping_voucher_use_num'] + $item['shopping_voucher_express_use_num'];
                 }
             }
 

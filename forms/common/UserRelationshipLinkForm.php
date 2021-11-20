@@ -103,6 +103,7 @@ class UserRelationshipLinkForm extends BaseModel{
         $query = User::find()->alias("u")->andWhere([
             "AND",
             "u.parent_id <> '".$user->ID."'",
+            "u.mobile is not null",
             ["IN", "u.id", static::userTeamQuery($user, $userLink)->select("ut.id")]
         ]);
         return $query;

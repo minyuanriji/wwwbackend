@@ -60,9 +60,10 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
      * 同意退款
      * @param boolean $trans
      * @param string $desc
+     * @param integer $refund_express 是否退运费
      * @throws \yii\db\Exception
      */
-    public function agreeRefund($trans = false, $desc = ""){
+    public function agreeRefund($trans = false, $desc = "", $refund_express = 0){
         if($this->refund_status != "apply"){
             throw new \Exception("只有申请中状态才允许同意退款操作");
         }
@@ -162,6 +163,68 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
                 "updated_at"      => time(),
                 "remark"          => "",
             ];
+
+            //退运费
+            if($refund_express){
+                $expressCommonRefundData = array_merge($commonRefundData, ["order_detail_id" => 0]);
+
+                //退现金（余额、支付宝或微信）
+                if($order->pay_type == 3 && $order->express_price > 0) { //余额支付
+                    if(!AlibabaDistributionOrderRefund::findOne([
+                        "mall_id"         => $this->mall_id,
+                        "order_id"        => $this->order_id,
+                        "user_id"         => $order->user_id,
+                        "refund_type"     => "balance",
+                        "order_detail_id" => 0,
+                    ])){
+                        $refund = new AlibabaDistributionOrderRefund(array_merge($expressCommonRefundData, [
+                            "refund_type"   => "balance",
+                            "refund_amount" => $order->express_price,
+                            "real_amount"   => $order->express_price
+                        ]));
+                        if(!$refund->save()){
+                            throw new \Exception(json_encode($refund->getErrors()));
+                        }
+                    }
+                }elseif($order->express_price > 0){
+                    if(!AlibabaDistributionOrderRefund::findOne([
+                        "mall_id"         => $this->mall_id,
+                        "order_id"        => $this->order_id,
+                        "user_id"         => $order->user_id,
+                        "refund_type"     => "money",
+                        "order_detail_id" => 0,
+                    ])){
+                        $refund = new AlibabaDistributionOrderRefund(array_merge($expressCommonRefundData, [
+                            "refund_type"   => "money",
+                            "refund_amount" => $order->express_price,
+                            "real_amount"   => $order->express_price
+                        ]));
+                        if(!$refund->save()){
+                            throw new \Exception(json_encode($refund->getErrors()));
+                        }
+                    }
+                }
+
+                //退购物券
+                if($order->shopping_voucher_express_use_num > 0){
+                    if(!AlibabaDistributionOrderRefund::findOne([
+                        "mall_id"         => $this->mall_id,
+                        "order_id"        => $this->order_id,
+                        "user_id"         => $order->user_id,
+                        "refund_type"     => "shopping_voucher",
+                        "order_detail_id" => 0,
+                    ])){
+                        $refund = new AlibabaDistributionOrderRefund(array_merge($expressCommonRefundData, [
+                            "refund_type"   => "shopping_voucher",
+                            "refund_amount" => $order->shopping_voucher_express_use_num,
+                            "real_amount"   => $order->shopping_voucher_express_use_num
+                        ]));
+                        if(!$refund->save()){
+                            throw new \Exception(json_encode($refund->getErrors()));
+                        }
+                    }
+                }
+            }
 
             //退现金（余额、支付宝或微信）
             if($this->total_price > 0){

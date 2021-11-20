@@ -92,9 +92,20 @@ class SmsForm extends BaseModel
         if (!$result) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL,'验证码不正确');
         }
-
-        $existMobile = User::find()->where(["mobile" => $this->mobile])->exists();
-        if($existMobile){
+        $existMobileUser = User::find()->where(["mobile" => $this->mobile])->one();
+        if($existMobileUser){
+            if(!\Yii::$app->user->isGuest){
+                if($existMobileUser->id != \Yii::$app->user->id){
+                    $identity = \Yii::$app->user->getIdentity();
+                    UserInfo::updateAll(["user_id" => $existMobileUser->id], ["user_id" => \Yii::$app->user->id]);
+                    $currentAccessToken = $identity->access_token;
+                    $identity->access_token = \Yii::$app->security->generateRandomString();
+                    $identity->save();
+                    $existMobileUser->access_token = $currentAccessToken;
+                    $existMobileUser->save();
+                }
+                return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"绑定成功",['mobile' => $this->mobile]);
+            }
             return $this->returnApiResultData(ApiCode::CODE_FAIL,'手机号”'.$this->mobile.'“已被其它账号绑定');
         }
 

@@ -179,6 +179,7 @@ class UserForm extends BaseModel
 
             $query = User::find()->alias('u')->select('u.id,u.nickname')
                 ->where(['u.is_inviter' => 1, 'u.mall_id' => \Yii::$app->mall->id])
+                ->andWhere("u.mobile is not null")
                 ->andWhere([
                     "OR",
                     ['LIKE', 'u.nickname', $this->keyword]
@@ -286,23 +287,22 @@ class UserForm extends BaseModel
             ->select('count(1)');
 
         $mall_members = MemberLevel::findAll(['mall_id' => $mall_id, 'status' => 1, 'is_delete' => 0]);
-
         $list = $query
             ->select(['u.id', 'u.role_type', 'u.static_integral', 'u.id as user_id', 'u.role_type', 'u.avatar_url', 'u.nickname', 'u.mobile', 'u.balance', 'u.level', 'u.score', 'u.static_score',
                 'u.created_at', 'u.parent_id', 'p.nickname as parent_nickname', 'p.role_type as parent_role_type', 'p.mobile as parent_mobile', "COALESCE(svu.money,0) AS `shop_voucher_money`",
-                '(u.income + u.income_frozen) as total_income',
-                'coupon_count' => $couponQuery,
-                'order_count' => $orderQuery,
-                'order_sum' => $orderSum,
-                'child_sum' => $childSum,
-                'order_sum_cancel' => $orderSumCancel,
-                'order_sum_refund' => $orderSumRefund,
-                'card_count' => $cardQuery])
+                '(u.income + u.income_frozen) as total_income', 'url.left as r_left', 'url.right as r_right',
+                //'coupon_count' => $couponQuery,
+                //'order_count' => $orderQuery,
+                //'order_sum' => $orderSum,
+                //'child_sum' => $childSum,
+                //'order_sum_cancel' => $orderSumCancel,
+                //'order_sum_refund' => $orderSumRefund,
+                //'card_count' => $cardQuery
+            ])
             ->page($pagination, $this->page_size)
             ->orderBy('u.id DESC')
             ->asArray()
             ->all();
-
         $roleTypes = [
             'store' => 'VIP会员',
             'partner' => '合伙人',
@@ -310,6 +310,50 @@ class UserForm extends BaseModel
             'user' => '用户'
         ];
         foreach ($list as &$v) {
+
+            $v['coupon_count'] = (int)UserCoupon::find()->where([
+                'mall_id'    => $mall_id,
+                'is_delete'  => 0,
+                'is_failure' => 0,
+                "user_id"    => $v['id']
+            ])->count();
+            //订单数量
+            $v['order_count'] = (int)Order::find()->where([
+                'mall_id'   => $mall_id,
+                'is_delete' => 0,
+                'user_id'   => $v['id'],
+                'is_pay'    => 1
+            ])->count();
+            //订单金额
+            $v['order_sum'] = (float)Order::find()->where([
+                'mall_id'   => $mall_id,
+                'is_delete' => 0,
+                'is_pay'    => 1,
+                'user_id'   => $v['id'],
+            ])->sum("total_price");
+            //团队人数
+            $v['child_sum'] = (int)UserRelationshipLink::find()->alias("c_url")
+                ->andWhere("c_url.left > '".$v['r_left']."' AND c_url.right < '".$v['r_right']."'")
+                ->count();
+            //取消的订单数
+            $v['order_sum_cancel'] = (int)Order::find()->where([
+                'mall_id'       => $mall_id,
+                'is_delete'     => 0,
+                'is_pay'        => 1,
+                'cancel_status' => 1,
+                'user_id'       => $v['id']
+            ])->sum("total_price");
+            //退款金额
+            $v['order_sum_refund'] = (float)Order::find()->alias('o')->where(['o.mall_id' => $mall_id, 'o.is_delete' => 0, 'o.is_pay' => 1])
+                ->leftJoin(['re' => OrderRefund::tableName()], 're.order_id=o.id')
+                ->andWhere(['re.type' => 1, 're.status' => 2])
+                ->andWhere(['o.user_id' => $v['id']])
+                ->sum("refund_price");
+            $v['card_count'] = (int)UserCard::find()->where([
+                'mall_id'   => $mall_id,
+                'is_delete' => 0,
+                'user_id'   => $v['id']
+            ])->count();
             if ($this->is_change_name) {
                 $v['nickname'] = User::getPlatformText($v['platform']) . '（' . $v['nickname'] . '）';
             }

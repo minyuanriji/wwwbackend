@@ -11,6 +11,7 @@ use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
 
 class AlibabaDistributionRefundPaidForm extends BaseModel{
 
+    public $order_detail_id;
     public $refund_id;
     public $act;
     public $remark;
@@ -18,7 +19,7 @@ class AlibabaDistributionRefundPaidForm extends BaseModel{
     public function rules()
     {
         return [
-            [['refund_id'], 'required'],
+            [['order_detail_id', 'refund_id'], 'required'],
             [['act', 'remark'], 'safe']
         ];
     }
@@ -41,8 +42,8 @@ class AlibabaDistributionRefundPaidForm extends BaseModel{
                 throw new \Exception("无法操作 {$orderRefund->status}");
             }
 
-            $orderDetail = AlibabaDistributionOrderDetail::findOne($orderRefund->order_detail_id);
-            if (!$orderDetail || $orderDetail->is_delete) {
+            $orderDetail = AlibabaDistributionOrderDetail::findOne($this->order_detail_id);
+            if (!$orderDetail || $orderDetail->is_delete || $orderDetail->order_id != $orderRefund->order_id) {
                 throw new \Exception("[AlibabaDistributionOrderDetail] 订单详情不存在");
             }
 
@@ -90,9 +91,12 @@ class AlibabaDistributionRefundPaidForm extends BaseModel{
             }
 
             //如果订单已无待操作记录，设置状态未已完成
-            $count = AlibabaDistributionOrderRefund::find()->where([
-                "order_detail_id" => $orderDetail->id,
-                "status"          => "waitting"
+            $isFinished = 0;
+            $count = AlibabaDistributionOrderRefund::find()->andWhere([
+                "AND",
+                ["status" => "waitting"],
+                ["order_id" => $orderRefund->order_id],
+                "order_detail_id='".$this->order_detail_id."' OR order_detail_id=0"
             ])->count();
             if(!$count && $orderDetail->refund_status == "agree"){
                 $orderDetail->is_refund     = 1;
@@ -101,11 +105,12 @@ class AlibabaDistributionRefundPaidForm extends BaseModel{
                 if(!$orderDetail->save()){
                     throw new \Exception($this->responseErrorMsg($orderDetail));
                 }
+                $isFinished = 1;
             }
 
             $t->commit();
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, $msg, [
-                "is_finished" => $orderDetail->refund_status == "finished" ? 1 : 0
+                "is_finished" => $isFinished
             ]);
         } catch (\Exception $e) {
             $t->rollBack();

@@ -74,7 +74,12 @@
                                 <span v-if="scope.row.refund_type == 'shopping_voucher'">购物券</span>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="refund_amount" label="金额/数量" width="200"></el-table-column>
+                        <el-table-column label="金额/数量" width="200">
+                            <template slot-scope="scope">
+                                <span>{{scope.row.refund_amount}}</span>
+                                <span v-if="scope.row.order_detail_id == 0" style="color:steelblue">（运费）</span>
+                            </template>
+                        </el-table-column>
                         <el-table-column label="操作">
                             <template slot-scope="scope">
                                 <el-button @click="doPaid(scope.row, 'paid')" type="text" size="mini" circle v-if="scope.row.status == 'waitting'">
@@ -181,6 +186,7 @@
                                 method: 'post',
                                 data: {
                                     refund_id: row.id,
+                                    order_detail_id:this.orderDetailId,
                                     act: act,
                                     remark: instance.inputValue
                                 }

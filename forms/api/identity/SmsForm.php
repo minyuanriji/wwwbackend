@@ -95,8 +95,11 @@ class SmsForm extends BaseModel
         $existMobileUser = User::find()->where(["mobile" => $this->mobile])->one();
         if($existMobileUser){
             if(!\Yii::$app->user->isGuest){
-                if($existMobileUser->id != \Yii::$app->user->id){
-                    $identity = \Yii::$app->user->getIdentity();
+                $identity = \Yii::$app->user->getIdentity();
+                if($existMobileUser->id != $identity->id){
+                    if(!empty($identity->mobile)){
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL,"已经绑定过手机号了,无需绑定");
+                    }
                     UserInfo::updateAll(["user_id" => $existMobileUser->id], ["user_id" => \Yii::$app->user->id]);
                     $currentAccessToken = $identity->access_token;
                     $identity->access_token = \Yii::$app->security->generateRandomString();

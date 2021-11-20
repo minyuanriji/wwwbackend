@@ -66,7 +66,16 @@ class AlibabaDistributionOrderDetailForm extends BaseModel{
                 $detail['ali_orderdata']['baseInfo']['refundStatus'] = "";
             }
 
-            $refundDatas = AlibabaDistributionOrderRefund::find()->asArray()->where(["order_detail_id" => $orderDetail->id])->all();
+            $refundDatas = AlibabaDistributionOrderRefund::find()->asArray()->andWhere([
+                "OR",
+                ["order_detail_id" => $orderDetail->id],
+                ["order_detail_id" => 0]
+            ])->all();
+            if($refundDatas){
+                foreach($refundDatas as &$refundData){
+                    $refundData['order_detail_id'] = (int)$refundData['order_detail_id'];
+                }
+            }
 
             $detail['refund_datas'] = $refundDatas ? $refundDatas : [];
 

@@ -213,24 +213,21 @@ echo $this->render("com-refund-agree");
         },
         watch : {
             agreeRefundExpress: function(val){
+                this.countRefundPrice();
+            },
+            agreeItem:function(agreeItem) {
+                this.countRefundPrice();
+            }
+        },
+        methods: {
+            countRefundPrice(){
                 this.agreeRefundPrice = parseFloat(this.agreeItem.total_price);
-                this.agreeRefundShoppingVoucher = parseFloat(this.agreeItem.shopping_voucher_use_num);
+                this.agreeRefundShoppingVoucher = parseFloat(this.agreeItem.shopping_voucher_num);
                 if(this.agreeRefundExpress){
                     this.agreeRefundPrice += parseFloat(this.agreeItem.express_price);
                     this.agreeRefundShoppingVoucher += parseFloat(this.agreeItem.shopping_voucher_express_use_num);
                 }
             },
-            agreeItem:function(agreeItem) {
-                this.agreeRefundPrice = parseFloat(agreeItem.total_price);
-                this.agreeRefundShoppingVoucher = parseFloat(agreeItem.shopping_voucher_use_num);
-                if(this.agreeRefundExpress){
-                    this.agreeRefundPrice += parseFloat(agreeItem.express_price);
-                    this.agreeRefundShoppingVoucher += parseFloat(agreeItem.shopping_voucher_express_use_num);
-                }
-                console.log(agreeItem);
-            }
-        },
-        methods: {
             //同意退款操作
             agree(row){
                 this.agreeItem = row;
@@ -331,6 +328,10 @@ echo $this->render("com-refund-agree");
                             }).then(e => {
                                 instance.confirmButtonLoading = false;
                                 if (e.data.code === 0) {
+                                    if(act == "agree"){
+                                        this.agreeDialogVisible = false;
+                                        this.doPayment(this.agreeItem);
+                                    }
                                     this.agreeEdit.agreeBackData = e.data.data;
                                     this.loadData(this.activeName);
                                     done();

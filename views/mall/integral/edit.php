@@ -214,7 +214,7 @@
             searchUser(cb) {
                 request({
                     params: {
-                        r: 'mall/user/get-can-bind-inviter',
+                        r: 'mall/user/search-user',
                         keyword: this.keyword,
                         user_id: this.form.user_id,
                     },

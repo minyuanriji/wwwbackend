@@ -160,6 +160,7 @@ class OrderDetailForm extends BaseModel
             $orderDetailData['mch'] = [];
             if(!empty($order['mch']['store'])){
                 $orderDetailData['is_mch'] = 1;
+                $orderDetailData['mch']['store_id']         = $order['mch']['store']['id'];
                 $orderDetailData['mch']['mch_id']           = $order['mch']['store']['mch_id'];
                 $orderDetailData['mch']['name']             = $order['mch']['store']['name'];
                 $orderDetailData['mch']['mobile']           = $order['mch']['store']['mobile'];

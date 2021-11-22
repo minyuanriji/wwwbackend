@@ -111,6 +111,7 @@ class MchManaOrderGiftPacksListForm extends BaseModel {
                     $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
                     $item['remarks'] = implode("，", $remarkArr);
                     $orderItemIds[] = $item['order_item_id'];
+                    $item['mobile'] = '***' . substr($item['mobile'], -4);
                 }
                 //获取核销记录
                 $clerkDatas = [];

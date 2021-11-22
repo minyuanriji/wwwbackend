@@ -44,6 +44,11 @@ class Plugin extends \app\plugins\Plugin
                 'route' => 'plugin/alibaba/mall/order/refund-list',
                 'icon' => 'el-icon-setting'
             ],
+            [
+                'name' => '商品交易异常问题',
+                'route' => 'plugin/alibaba/mall/abnormal-transaction/index',
+                'icon' => 'el-icon-setting'
+            ],
         ];
     }
 

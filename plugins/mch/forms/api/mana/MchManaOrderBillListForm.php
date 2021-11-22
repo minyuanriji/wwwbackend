@@ -44,7 +44,7 @@ class MchManaOrderBillListForm extends BaseModel {
             $query->andWhere(["mco.mch_id" => $this->mch_id ?: MchAdminController::$adminUser['mch_id']])
                 ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
-            $query->andWhere(['mco.is_pay' => $this->status]);
+            $query->andWhere(['mco.is_pay' => $this->status, 'mco.is_delete' => 0]);
 
             //关键词搜索
             if(!empty($this->keyword)){

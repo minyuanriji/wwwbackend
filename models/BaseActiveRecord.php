@@ -384,6 +384,12 @@ class BaseActiveRecord extends \yii\db\ActiveRecord
             $query->offset(($return['page'] - 1) * $return['page_size']);
             // $return['pagination'] = $pages;
             $return['list'] = $is_array ?  $query->AsArray()->all() : $query->all();
+            if ($return['list']) {
+                foreach ($return['list'] as &$item) {
+                    $total_money = (string)($item['before_money'] + $item['money']);
+                    $item['total_money'] = (float)substr($total_money, 0, strpos($total_money, '.') + 3);
+                }
+            }
             //if(YII_DEBUG) $return['sql']  = self::$_sql[] = $query->createCommand()->getRawSql();
         }catch (\Exception $exc){
             self::$error = $exc->getMessage();

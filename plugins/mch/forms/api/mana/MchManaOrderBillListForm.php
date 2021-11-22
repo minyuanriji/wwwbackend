@@ -41,10 +41,10 @@ class MchManaOrderBillListForm extends BaseModel {
             $query = MchCheckoutOrder::find()->alias('mco')
                 ->innerJoin(['u' => User::tableName()], 'mco.pay_user_id=u.id');
 
-            $query->andWhere(["m.id" => $this->mch_id ?: MchAdminController::$adminUser['mch_id']])
+            $query->andWhere(["mco.id" => $this->mch_id ?: MchAdminController::$adminUser['mch_id']])
                 ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
-            $query->andWhere(['is_pay' => $this->status]);
+            $query->andWhere(['mco.is_pay' => $this->status]);
 
             //关键词搜索
             if(!empty($this->keyword)){

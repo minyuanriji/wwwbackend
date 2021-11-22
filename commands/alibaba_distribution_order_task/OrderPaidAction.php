@@ -52,7 +52,8 @@ class OrderPaidAction extends Action{
                     //设置异常告警
                     $aliGoods = AlibabaDistributionGoodsList::findOne($orderDetail1688->goods_id);
                     $orderDetail = AlibabaDistributionOrderDetail::findOne($orderDetail1688->order_detail_id);
-                    AliGoodsHelper::setWarn($aliGoods, $orderDetail ? $orderDetail->sku_id : 0, $e->getMessage());
+                    $remark = "order_detail_id:" . $orderDetail1688->id . "#" . $e->getMessage();
+                    AliGoodsHelper::setWarn($aliGoods, $orderDetail ? $orderDetail->sku_id : 0, $remark);
 
                 }else{
                     $orderDetail1688->save();

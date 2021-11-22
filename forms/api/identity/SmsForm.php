@@ -100,7 +100,7 @@ class SmsForm extends BaseModel
                     if(!empty($identity->mobile)){
                         return $this->returnApiResultData(ApiCode::CODE_FAIL,"已经绑定过手机号了,无需绑定");
                     }
-                    UserInfo::updateAll(["user_id" => $existMobileUser->id], ["user_id" => \Yii::$app->user->id]);
+                    UserInfo::updateAll(["user_id" => $existMobileUser->id], ["user_id" => $identity->id]);
                     $currentAccessToken = $identity->access_token;
                     $identity->access_token = \Yii::$app->security->generateRandomString();
                     $identity->save();

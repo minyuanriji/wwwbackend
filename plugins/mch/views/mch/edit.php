@@ -37,14 +37,14 @@
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
                      <span style="color: #409EFF;cursor: pointer"
-                          @click="$navigate({r:'plugin/mch/mall/mch/index'})">商户列表</span>
+                           @click="$navigate({r:'plugin/mch/mall/mch/index'})">商户列表</span>
                 </el-breadcrumb-item>
-                <el-breadcrumb-item >编辑商户</el-breadcrumb-item>
+                <el-breadcrumb-item>编辑商户</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="form-body">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="160px" size="small">
-                 <el-tabs v-model="activeName">
+                <el-tabs v-model="activeName">
                     <el-tab-pane label="基本信息" name="basic">
                         <el-form-item label="绑定用户" prop="user_id">
                             <el-input style="display: none;" v-model="ruleForm.user_id"></el-input>
@@ -138,7 +138,7 @@
                         </el-form-item>
 
                         <el-form-item label="商户账号" prop="username">
-                            <el-input  v-model="ruleForm.username"></el-input>
+                            <el-input v-model="ruleForm.username"></el-input>
                         </el-form-item>
                         <el-form-item v-if="!ruleForm.admin_id" label="商户密码" prop="password">
                             <el-input type="password" v-model="ruleForm.password"></el-input>
@@ -188,7 +188,8 @@
                             <el-input v-model="ruleForm.service_mobile"></el-input>
                         </el-form-item>
                     </el-tab-pane>
-                    <el-tab-pane v-if="is_audit == 1 && ruleForm.form_data.length > 0"  label="自定义审核资料" name="customize_review">
+                    <el-tab-pane v-if="is_audit == 1 && ruleForm.form_data.length > 0" label="自定义审核资料"
+                                 name="customize_review">
                         <template v-for="item in ruleForm.form_data">
                             <el-form-item v-if="item.key == 'text'" :label="item.label">
                                 <el-input disabled v-model="item.value" type="text"></el-input>
@@ -246,11 +247,70 @@
                             <el-input v-model="ruleForm.settle_num"></el-input>
                         </el-form-item>
                     </el-tab-pane>
-                </el-tabs>
+                    <el-tab-pane label="购物券赠送" name="give_shopping_voucher">
+                        <el-alert title="说明：编辑完成请点击确定。" type="info" :closable="false" style="margin-bottom: 20px;color: red;"></el-alert>
+                        <el-form ref="formData" :rules="formRule" :model="formData" size="small">
+                            <el-form-item label="赠送比例" prop="give_value">
+                                <el-input type="number" min="0" max="100" placeholder="请输入内容" v-model="formData.give_value" style="width:260px;">
+                                    <template slot="append">%</template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="启动日期" prop="start_at">
+                                <el-date-picker v-model="formData.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                            </el-form-item>
+                        </el-form>
+                        <div class="dialog-footer">
+                            <el-button type="primary" @click="saveShoppingVoucher">确 定</el-button>
+                        </div>
+                    </el-tab-pane>
+                    <el-tab-pane label="积分赠送" name="give_score">
+                        <el-alert title="说明：编辑完成请点击确定。" type="info" :closable="false" style="margin-bottom: 20px;color: red;"></el-alert>
+                        <el-form ref="scoreFormData" :rules="scoreFormRule" :model="scoreFormData" size="small">
+                            <el-form-item label="返积分" prop="score_enable">
+                                <el-switch
+                                        v-model="scoreFormData.score_enable"
+                                        active-text="启用"
+                                        inactive-text="关闭">
+                                </el-switch>
+                                <div v-if="scoreFormData.score_enable">
+                                    <el-switch v-model="scoreFormData.score_give_settings.is_permanent" :active-value="1" :inactive-value="0" active-text="永久有效" inactive-text="限时有效"></el-switch>
 
+                                    <div style="margin-top:10px;width:250px">
+                                        <el-input type="number" :min="0" :max="100" v-model="scoreFormData.rate" placeholder="">
+                                            <template slot="append">%</template>
+                                        </el-input>
+                                    </div>
+
+                                    <div v-if="!scoreFormData.score_give_settings.is_permanent">
+                                        <div style="margin-top:10px;width:250px">
+                                            <el-input type="number" :min="0" v-model="scoreFormData.score_give_settings.period" placeholder="">
+                                                <template slot="append">月</template>
+                                            </el-input>
+                                        </div>
+                                        <div style="margin-top:10px;width:250px">
+                                            <el-input type="number" v-model="scoreFormData.score_give_settings.expire" placeholder="" >
+                                                <template slot="append">有效期(天)</template>
+                                            </el-input>
+                                        </div>
+                                    </div>
+                                </div>
+                            </el-form-item>
+
+                            <el-form-item label="启动日期" prop="start_at">
+                                <el-date-picker v-model="scoreFormData.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                            </el-form-item>
+
+                        </el-form>
+                        <div class="dialog-footer">
+                            <el-button type="primary" @click="saveScore">确 定</el-button>
+                        </div>
+                    </el-tab-pane>
+                </el-tabs>
             </el-form>
         </div>
-        <el-button class="button-item" :loading="btnLoading" type="primary" @click="store('ruleForm')" size="small">保存
+        <el-button class="button-item" :loading="btnLoading" type="primary"
+                   v-if="activeName == 'basic' || activeName == 'store' || activeName == 'customize_review' || activeName == 'settle_info'"                     @click="store('ruleForm')" size="small">
+            保存
         </el-button>
         <el-dialog title="用户列表" :visible.sync="dialogUsersVisible">
             <template>
@@ -284,10 +344,14 @@
                             label="昵称">
                         <template slot-scope="scope">
                             <div flex="dir:left">
-                                <img src="statics/img/mall/ali.png" v-if="scope.row.userInfo.platform == 'aliapp'" alt="">
-                                <img src="statics/img/mall/wx.png" v-else-if="scope.row.userInfo.platform == 'wxapp'" alt="">
-                                <img src="statics/img/mall/toutiao.png" v-else-if="scope.row.userInfo.platform == 'ttapp'" alt="">
-                                <img src="statics/img/mall/baidu.png" v-else-if="scope.row.userInfo.platform == 'bdapp'" alt="">
+                                <img src="statics/img/mall/ali.png" v-if="scope.row.userInfo.platform == 'aliapp'"
+                                     alt="">
+                                <img src="statics/img/mall/wx.png" v-else-if="scope.row.userInfo.platform == 'wxapp'"
+                                     alt="">
+                                <img src="statics/img/mall/toutiao.png"
+                                     v-else-if="scope.row.userInfo.platform == 'ttapp'" alt="">
+                                <img src="statics/img/mall/baidu.png" v-else-if="scope.row.userInfo.platform == 'bdapp'"
+                                     alt="">
                                 <span style="margin-left: 10px;">{{scope.row.nickname}}</span>
                             </div>
                         </template>
@@ -312,6 +376,46 @@
         el: '#app',
         data() {
             return {
+                scoreFormData: {
+                    list: [],
+                    rate:0,
+                    is_all:0,
+                    score_enable: false,
+                    do_page: 1,
+                    do_search: null,
+                    give_type: 1,
+                    give_value: 0,
+                    start_at: '',
+                    score_give_settings: {
+                        is_permanent: 0,
+                        integral_num: 0,
+                        period: 1,
+                        period_unit: "month",
+                        expire: 30
+                    }
+                },
+                scoreFormRule:{
+                    start_at:[
+                        {required: true, message: '启动日期不能为空', trigger: 'change'},
+                    ]
+                },
+                formData: {
+                    list: [],
+                    is_all:0,
+                    do_page: 1,
+                    do_search: null,
+                    give_type: 1,
+                    give_value: 0,
+                    start_at: ''
+                },
+                formRule:{
+                    give_value: [
+                        {required: true, message: '赠送比例不能为空', trigger: 'change'},
+                    ],
+                    start_at:[
+                        {required: true, message: '启动日期不能为空', trigger: 'change'},
+                    ]
+                },
                 ruleForm: {
                     user_id: 0,
                     status: '0',
@@ -334,7 +438,7 @@
                     service_mobile: '',
                     district: [],
                     form_data: [],
-                    integral_fee_rate:0,
+                    integral_fee_rate: 0,
                     settle_bank: '',
                     settle_realname: '',
                     settle_num: ''
@@ -387,11 +491,64 @@
                 activeName: 'basic',
             };
         },
-        watch: {
-
-        },
+        watch: {},
         methods: {
-
+            saveScore(){
+                let that = this;
+                let do_request = function(){
+                    that.btnLoading = true;
+                    request({
+                        params: {
+                            r: "plugin/integral_card/admin/from-store/batch-save"
+                        },
+                        method: "post",
+                        data: that.scoreFormData
+                    }).then(e => {
+                        that.btnLoading = true;
+                        if (e.data.code == 0) {
+                            that.$message.success('保存成功');
+                        } else {
+                            that.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        that.$message.error(e.data.msg);
+                        that.btnLoading = true;
+                    });
+                };
+                this.$refs['formData'].validate((valid) => {
+                    if (valid) {
+                        do_request();
+                    }
+                });
+            },
+            saveShoppingVoucher(){
+                let that = this;
+                let do_request = function(){
+                    that.btnLoading = true;
+                    request({
+                        params: {
+                            r: "plugin/shopping_voucher/mall/from-store/batch-save"
+                        },
+                        method: "post",
+                        data: that.formData
+                    }).then(e => {
+                        that.btnLoading = true;
+                        if (e.data.code == 0) {
+                            that.$message.success('保存成功');
+                        } else {
+                            that.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        that.$message.error(e.data.msg);
+                        that.btnLoading = true;
+                    });
+                };
+                this.$refs['formData'].validate((valid) => {
+                    if (valid) {
+                        do_request();
+                    }
+                });
+            },
             getDetail() {
                 this.cardLoading = true;
                 request({
@@ -405,6 +562,14 @@
                         this.review = e.data.data.review;
                         this.ruleForm = e.data.data.detail;
                         this.nickname = this.ruleForm.user.nickname;
+                        this.formData.list = e.data.data.detail.give_shopping_params;
+                        this.scoreFormData.list = e.data.data.detail.give_shopping_params;
+                        this.formData.give_value = e.data.data.detail.give_shopping_voucher.give_value;
+                        this.formData.start_at = e.data.data.detail.give_shopping_voucher.start_at;
+                        this.scoreFormData.rate = e.data.data.detail.give_score.rate;
+                        this.scoreFormData.start_at = e.data.data.detail.give_score.start_at;
+                        this.scoreFormData.score_give_settings = e.data.data.detail.give_score.score_give_settings;
+                        this.scoreFormData.score_enable = e.data.data.detail.give_score.score_enable;
                     }
                 }).catch(e => {
                 });
@@ -420,8 +585,8 @@
                             },
                             method: 'post',
                             data: {
-                                form        : self.ruleForm,
-                                is_review   : self.is_review
+                                form: self.ruleForm,
+                                is_review: self.is_review
                             }
                         }).then(e => {
                             self.btnLoading = false;

@@ -8,9 +8,11 @@ use app\models\DistrictArr;
 use app\models\BaseModel;
 use app\models\Store;
 use app\models\User;
+use app\plugins\integral_card\models\ScoreFromStore;
 use app\plugins\mch\forms\common\CommonMchForm;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 use phpDocumentor\Reflection\Types\Null_;
 
 class MchForm extends BaseModel
@@ -106,6 +108,52 @@ class MchForm extends BaseModel
             $detail['username'] = $detail['mchAdmin']['username'];
             $detail['password'] = $detail['mchAdmin']['password'];
             $detail['admin_id'] = $detail['mchAdmin']['id'];
+
+            //编辑购物券赠送所需参数
+            $detail['give_shopping_params'][0]['id'] = $this->id;
+            $detail['give_shopping_params'][0]['mall_id'] = \Yii::$app->mall->id;
+            $detail['give_shopping_params'][0]['store_id'] = $detail['store']['id'];
+            $detail['give_shopping_params'][0]['name'] = $detail['store']['name'];
+            $detail['give_shopping_params'][0]['cover_url'] = $detail['store']['cover_url'];
+
+            //获取购物券赠送比列
+            $shoppingVoucherResult = ShoppingVoucherFromStore::findOne([
+                "mall_id" => \Yii::$app->mall->id,
+                "store_id" => $detail['store']['id']
+            ]);
+            if ($shoppingVoucherResult) {
+                $detail['give_shopping_voucher']['give_value'] = $shoppingVoucherResult->give_value;
+                $detail['give_shopping_voucher']['start_at'] = date('Y-m-d', $shoppingVoucherResult->start_at);
+            } else {
+                $detail['give_shopping_voucher']['give_value'] = 0;
+                $detail['give_shopping_voucher']['start_at'] = 0;
+            }
+
+            //获取积分赠送比例
+            $scoreResult = ScoreFromStore::findOne([
+                "mall_id" => \Yii::$app->mall->id,
+                "store_id" => $detail['store']['id']
+            ]);
+            $scoreGiveSettings = [
+                "is_permanent" => 0,
+                "integral_num" => 0,
+                "period"       => 1,
+                "period_unit"  => "month",
+                "expire"       => 30
+            ];
+            if ($scoreResult) {
+                $detail['give_score']['start_at'] = date("Y-m-d H:i:s", $scoreResult->start_at ?: time());
+                $detail['give_score']['score_give_settings'] = array_merge($scoreGiveSettings,
+                    !empty($scoreResult->score_setting) ? (array)@json_decode($scoreResult->score_setting, true) : []);
+                $detail['give_score']['score_give_settings']['is_permanent'] = (int)$detail['give_score']['score_give_settings']['is_permanent'];
+                $detail['give_score']['rate'] = (float)$scoreResult->rate;
+                $detail['give_score']['score_enable'] = $scoreResult->enable_score > 0 ? true : false;
+            } else {
+                $detail['give_score']['rate'] = 0;
+                $detail['give_score']['start_at'] = 0;
+                $detail['give_score']['score_give_settings'] = [];
+                $detail['give_score']['score_enable'] = false;
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

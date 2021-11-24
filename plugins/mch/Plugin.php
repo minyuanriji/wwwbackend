@@ -64,6 +64,12 @@ class Plugin extends \app\plugins\Plugin
                 ]
             ],
             [
+                'name' => '连锁店管理',
+                'route' => 'plugin/mch/mall/group/list',
+                'icon' => 'el-icon-star-on',
+                'action' => []
+            ],
+            [
                 'name' => '商家分佣',
                 'route' => 'plugin/mch/mall/distribution/list',
                 'icon' => 'el-icon-star-on',

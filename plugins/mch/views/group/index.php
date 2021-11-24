@@ -114,24 +114,24 @@
             <el-form @submit.native.prevent="searchList" size="small" :inline="true" :model="search">
                 <el-form-item>
                     <div class="input-item">
-                        <el-input  @keyup.enter.native="searchList" size="small" placeholder="请输入关键词搜索" v-model="search.keyword" clearable
+                        <el-input  @keyup.enter.native="searchList" size="big" placeholder="请输入关键词搜索" v-model="search.keyword" clearable
                                    @clear='searchList'>
-                            <el-button slot="append" icon="el-icon-search" ></el-button>
+                            <el-button @click="searchList" slot="append" icon="el-icon-search" ></el-button>
                         </el-input>
                     </div>
                 </el-form-item>
             </el-form>
             <el-table v-loading="listLoading" :data="list" border style="width: 100%">
                 <el-table-column prop="id" label="ID" width="60"> </el-table-column>
-                <el-table-column :show-overflow-tooltip="true" label="名称" width="200">
+                <el-table-column :show-overflow-tooltip="true" label="名称" width="350">
                     <template slot-scope="scope">
                         <div flex="cross:center">
                             <com-image width="25" height="25" :src="scope.row.cover_url"></com-image>
-                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.name}}</div>
+                            <div style="margin-left: 10px;width: 300px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.name}}</div>
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="描述" width="350"></el-table-column>
+                <el-table-column label="手机号" prop="mobile" width="150"></el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
                         <el-button @click="edit(scope.row.id)" type="text" circle size="mini">
@@ -139,11 +139,16 @@
                                 <img src="statics/img/mall/edit.png" alt="">
                             </el-tooltip>
                         </el-button>
+                        <el-button @click="deleteIt(scope.row)" type="text" circle size="mini">
+                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                <img src="statics/img/mall/del.png" alt="">
+                            </el-tooltip>
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
 
-            <div  flex="dir:right" style="margin-top: 20px;">
+            <div flex="dir:right" style="margin-top: 20px;">
                 <el-pagination
                     hide-on-single-page
                     @current-change="pagination"
@@ -206,6 +211,37 @@
                         r: 'plugin/mch/mall/group/edit',
                     });
                 }
+            },
+            deleteIt(item){
+                let self = this;
+                self.$confirm('删除该条数据, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.listLoading = true;
+                    request({
+                        params: {
+                            r: 'plugin/mch/mall/group/delete',
+                        },
+                        method: 'post',
+                        data: {
+                            id: item.id,
+                        }
+                    }).then(e => {
+                        self.listLoading = false;
+                        if (e.data.code === 0) {
+                            self.getList();
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        self.$message.error("请求失败");
+                        self.listLoading = false;
+                    });
+                }).catch(() => {
+
+                });
             },
             searchList() {
                 this.page = 1;

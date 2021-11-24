@@ -6,17 +6,20 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\Store;
 use app\plugins\mch\models\Mch;
-use app\plugins\mch\models\MchGroup;
+use app\plugins\mch\models\MchGroupItem;
 
-class MchGroupForm extends BaseModel{
+class MchGroupItemListForm extends BaseModel{
 
-    public $page;
+    public $group_id;
     public $keyword;
+    public $keyword1;
+    public $page;
 
     public function rules(){
         return [
-            [['page'], 'safe'],
-            [['keyword'], 'trim']
+            [['group_id'], 'required'],
+            [['keyword', 'keyword1'], 'string'],
+            [['page'], 'default', 'value' => 1],
         ];
     }
 
@@ -28,23 +31,23 @@ class MchGroupForm extends BaseModel{
 
         try {
 
-            $query = MchGroup::find()->alias("mg")->where([
-                "mg.is_delete" => 0
-            ]);
-            $query->innerJoin(["m" => Mch::tableName()], "m.id=mg.mch_id");
-            $query->innerJoin(["s" => Store::tableName()], "s.id=mg.store_id");
+            $query = MchGroupItem::find()->alias("mgi")
+                ->innerJoin(["m" => Mch::tableName()], "m.id=mgi.mch_id")
+                ->innerJoin(["s" => Store::tableName()], "s.id=mgi.store_id")
+                ->where(["mgi.group_id" => $this->group_id]);
 
             if(!empty($this->keyword)){
                 $query->andWhere([
                     "OR",
+                    ["m.id" => $this->keyword],
                     ["m.mobile" => $this->keyword],
                     ["LIKE", "s.name", $this->keyword]
                 ]);
             }
 
-            $query->select(["mg.*", "m.mobile", "s.name", "s.cover_url"]);
+            $query->select(["mgi.*", "m.mobile", "s.name", "s.cover_url"]);
 
-            $list = $query->orderBy("mg.id DESC")->page($pagination, 20, $this->page)->asArray()->all();
+            $list = $query->orderBy("mgi.id DESC")->page($pagination, 20, $this->page)->asArray()->all();
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
@@ -60,5 +63,4 @@ class MchGroupForm extends BaseModel{
             ];
         }
     }
-
 }

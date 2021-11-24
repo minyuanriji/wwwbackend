@@ -106,7 +106,12 @@ class OrderController extends ApiController
         $form = new OrderSubmitForm();
         $form->form_data = $this->requestData;
         $mallPaymentTypes = OrderLogic::getPaymentTypeConfig();
-
+        $headers = \Yii::$app->request->headers;
+        if(isset($headers["x-stands-mall-id"]) && !empty($headers["x-stands-mall-id"]) && $headers["x-stands-mall-id"] != 5){
+            $form->mall_id = $headers["x-stands-mall-id"];
+        }else{
+            $form->mall_id = \Yii::$app->mall->id;
+        }
         return $this->asJson($form->setSupportPayTypes($mallPaymentTypes)->doSubmitOrder());
     }
     

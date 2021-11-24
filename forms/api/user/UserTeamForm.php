@@ -37,11 +37,13 @@ class UserTeamForm extends BaseModel
     //分佣订单状态
     public $status='';
 
+    public $keywords;
+
     public function rules()
     {
         return [
             [['page', 'limit', 'flag','status'], 'integer'],
-            [['sign'], 'string'],
+            [['sign', 'keywords'], 'string'],
             ['page', 'default', 'value' => 1],
             ['limit', 'default', 'value' => 20],
         ];
@@ -328,6 +330,13 @@ class UserTeamForm extends BaseModel
             /*["o.is_delete" => 0],
             ["o.is_recycle" => 0]*/
          ]);
+
+        if ($this->keywords) {
+            $query->andWhere([
+                'and',
+                ['like', 'u.nickname', $this->keywords]
+            ]);
+        }
 
         if(is_numeric($this->status)){
             if($this->status == 0){

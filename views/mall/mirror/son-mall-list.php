@@ -89,15 +89,15 @@
                 </div>
             </div>
             <el-table v-loading="searchLoading" border :data="list" style="margin-bottom: 20px">
-                <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column prop="name" width="220" label="商城名称">
+                <el-table-column prop="id" label="ID" width="70"></el-table-column>
+                <el-table-column prop="name" width="150" label="商城名称">
                     <template slot-scope="scope">
                         <div>
                             <span style="color: #1ed0ff">{{scope.row.name}}</span>
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column width="210" prop="username" label="归属账号">
+                <el-table-column width="160" prop="username" label="归属账号">
                     <template slot-scope="scope">
                         <div>
                             <span>{{scope.row.admin.username}}</span>
@@ -119,7 +119,7 @@
                         <span v-if="scope.row.user[0]">{{scope.row.user[0].mobile}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column width="170" prop="expired_at_text" label="有效期"></el-table-column>
+                <el-table-column width="120" prop="expired_at_text" label="有效期"></el-table-column>
                 <el-table-column prop="created_at" label="创建时间" width="230">
                     <template slot-scope="scope">
                         <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>

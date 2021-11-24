@@ -53,7 +53,7 @@ class CartForm extends BaseModel
 
             //查询条件
             $wheres = [
-                'mall_id' => \Yii::$app->mall->id,
+//                'mall_id' => \Yii::$app->mall->id,
                 'user_id' => $user_id,
                 'sign' => '',
             ];

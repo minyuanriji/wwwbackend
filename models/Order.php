@@ -590,6 +590,11 @@ class Order extends BaseActiveRecord
         return $this->hasOne(PaymentOrder::className(), ['order_no' => 'order_no']);
     }
 
+    public function getMall()
+    {
+        return $this->hasOne(Mall::className(), ['id' => 'mall_id']);
+    }
+
     public function getOrderActionStatus($order)
     {
         $data['is_express_send'] = 0;

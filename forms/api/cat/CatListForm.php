@@ -139,6 +139,7 @@ class CatListForm extends BaseModel implements ICacheForm
         $keys[] = intval($this->cat_id);
         $keys[] = intval($this->mch_id);
         $keys[] = intval($this->select_cat_id);
+        $keys[] = intval($this->mall_id);
         return $keys;
     }
 }

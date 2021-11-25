@@ -33,11 +33,12 @@ class GoodsListForm extends BaseModel implements ICacheForm
     public $label;
     public $order;
     public $orderBy;
+    public $mall_id;
 
     public function rules()
     {
         return [
-            [['page', 'limit', 'cat_id'], 'integer'],
+            [['page', 'limit', 'cat_id', 'mall_id'], 'integer'],
             [['keyword', 'label', 'order', 'orderBy'], 'string'],
             [['page'], 'default', 'value' => 1],
             [['limit'], 'default', 'value' => 10],
@@ -46,7 +47,7 @@ class GoodsListForm extends BaseModel implements ICacheForm
 
     public function getCacheKey(){
         return [
-            (int)$this->page, (int)$this->limit, (int)$this->cat_id,
+            (int)$this->page, (int)$this->limit, (int)$this->cat_id, (int)$this->mall_id,
             (int)$this->limit, $this->keyword, $this->label, $this->order, $this->orderBy
         ];
     }
@@ -56,12 +57,12 @@ class GoodsListForm extends BaseModel implements ICacheForm
             return $this->returnApiResultData();
         }
         $catIds = [];
-        $catList = GoodsCats::find()->where(['parent_id' => $this->cat_id, 'is_delete' => 0, 'status' => 1])->all();
+        $catList = GoodsCats::find()->where(['parent_id' => $this->cat_id, 'is_delete' => 0, 'status' => 1, 'mall_id' => $this->mall_id])->all();
         $catIds[] = $this->cat_id;
         if (count($catList) > 0) {
             foreach ($catList as $cat) {
                 $catIds[] = $cat['id'];
-                $catChildList = GoodsCats::find()->where(['parent_id' => $cat->id, 'is_delete' => 0, 'status' => 1])->select('id')->asArray()->all();
+                $catChildList = GoodsCats::find()->where(['parent_id' => $cat->id, 'is_delete' => 0, 'status' => 1, 'mall_id' => $this->mall_id])->select('id')->asArray()->all();
 
                 foreach ($catChildList as $c) {
                     $catIds[] = $c['id'];
@@ -72,7 +73,7 @@ class GoodsListForm extends BaseModel implements ICacheForm
             $query = Goods::find()
                 ->alias('g')
                 ->with(['goodsWarehouse', 'attr'])
-                ->where(['g.is_delete' => 0,'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => \Yii::$app->mall->id,])
+                ->where(['g.is_delete' => 0,'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => $this->mall_id])
                 ->leftJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
             if ($this->keyword) {
                 $query->keyword($this->keyword, [

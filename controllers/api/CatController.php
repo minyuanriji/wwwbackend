@@ -29,11 +29,16 @@ class CatController extends ApiController
     {
         $form = new CatListForm();
         $form->attributes = $this->requestData;
-        $form->mall_id = \Yii::$app->mall->id;
-
+//        $form->mall_id = \Yii::$app->mall->id;
+        $headers = \Yii::$app->request->headers;
+        if(isset($headers["x-stands-mall-id"]) && !empty($headers["x-stands-mall-id"]) && $headers["x-stands-mall-id"] != 5){
+            $form->mall_id = $headers["x-stands-mall-id"];
+        }else{
+            $form->mall_id = \Yii::$app->mall->id;
+        }
         \Yii::$app->trigger(StatisticsBrowseLog::EVEN_STATISTICS_LOG,
             new StatisticsEvent([
-                'mall_id'     => \Yii::$app->mall->id,
+                'mall_id'     => $form->mall_id ?: \Yii::$app->mall->id,
                 'browse_type' => 1,
                 'user_id'     => \Yii::$app->user->id,
                 'user_ip'     => $_SERVER['REMOTE_ADDR']

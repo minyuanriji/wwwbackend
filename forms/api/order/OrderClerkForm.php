@@ -119,7 +119,7 @@ class OrderClerkForm extends BaseModel
             $order = Order::find()->where([
                 'id'        => $this->id,
                 'is_delete' => 0,
-                'mall_id'   => \Yii::$app->mall->id,
+//                'mall_id'   => \Yii::$app->mall->id,
                 'user_id'   => \Yii::$app->user->id,
                 'send_type' => 1,
             ])->one();

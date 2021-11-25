@@ -224,6 +224,12 @@ class OrderController extends ApiController
         $form->pic_list = isset($this->requestData["pic_list"])?json_encode($this->requestData["pic_list"]):"";
         unset($this->requestData["pic_list"]);
         $form->attributes = $this->requestData;
+        $headers = \Yii::$app->request->headers;
+        if(isset($headers["x-stands-mall-id"]) && !empty($headers["x-stands-mall-id"]) && $headers["x-stands-mall-id"] != 5){
+            $form->mall_id = $headers["x-stands-mall-id"];
+        }else{
+            $form->mall_id = \Yii::$app->mall->id;
+        }
         return $form->submit();
     }
 
@@ -307,6 +313,12 @@ class OrderController extends ApiController
     {
         $form = new  OrderCommentForm();
         $form->attributes = $this->requestData;
+        $headers = \Yii::$app->request->headers;
+        if(isset($headers["x-stands-mall-id"]) && !empty($headers["x-stands-mall-id"]) && $headers["x-stands-mall-id"] != 5){
+            $form->mall_id = $headers["x-stands-mall-id"];
+        }else{
+            $form->mall_id = \Yii::$app->mall->id;
+        }
         return $form->comment();
     }
 

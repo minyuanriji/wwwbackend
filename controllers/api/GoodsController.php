@@ -103,6 +103,12 @@ class GoodsController extends ApiController
         $form->attributes = $this->requestData;
         $form->is_login   = !\Yii::$app->user->isGuest;
         $form->login_uid  = $form->is_login ? \Yii::$app->user->id : 0;
+        $headers = \Yii::$app->request->headers;
+        if(isset($headers["x-stands-mall-id"]) && !empty($headers["x-stands-mall-id"]) && $headers["x-stands-mall-id"] != 5){
+            $form->mall_id = $headers["x-stands-mall-id"];
+        }else{
+            $form->mall_id = \Yii::$app->mall->id;
+        }
 
         $res = APICacheHelper::get($form);
         if($res['code'] == ApiCode::CODE_SUCCESS){

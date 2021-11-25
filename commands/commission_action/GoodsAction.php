@@ -180,7 +180,7 @@ class GoodsAction extends Action{
                 }
             }
 
-            $parentDatas = $this->controller->getCommissionParentRuleDatas($orderDetailData['user_id'], $orderDetailData['goods_id'], 'goods', $liancUserId);
+            $parentDatas = $this->controller->getCommissionParentRuleDatas($orderDetailData['user_id'], $orderDetailData['goods_id'], 'goods', $liancUserId, $orderDetailData['mall_id']);
 
             //通过相关规则键获取分佣规则进行分佣
             foreach($parentDatas as $parentData){

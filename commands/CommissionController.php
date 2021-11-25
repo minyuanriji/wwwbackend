@@ -66,11 +66,12 @@ class CommissionController extends BaseCommandController{
      * @param $user_id
      * @param $item_id
      * @param $item_type
+     * @param $mall_id
      * @param $lianc_user_id 品牌商ID。如果消费用户是品牌商直推的，品牌商临时升级成分公司
      * @return array
      * @throws \Exception
      */
-    public function getCommissionParentRuleDatas($user_id, $item_id, $item_type, $lianc_user_id = null){
+    public function getCommissionParentRuleDatas($user_id, $item_id, $item_type, $lianc_user_id = null, $mall_id = 5){
 
         //获取支付用户信息
         $user = User::findOne($user_id);
@@ -203,6 +204,7 @@ class CommissionController extends BaseCommandController{
                 "AND",
                 ["cr.is_delete"  => 0],
                 ['cr.item_type'  => $item_type],
+                ['cr.mall_id'    => $mall_id],
                 ['crc.role_type' => $parentData['role_type']],
                 ['crc.level'     => $currentLevel]
             ]);

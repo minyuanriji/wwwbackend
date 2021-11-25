@@ -34,7 +34,8 @@ class FromGoodsSearchGoodsForm extends BaseModel {
             $query->orderBy("g.id DESC");
             $query->where([
                 "g.mch_id" => 0,
-                "g.is_delete" => 0
+                "g.is_delete" => 0,
+                "g.mall_id" => \Yii::$app->mall->id
             ]);
 
             //指定商品ID

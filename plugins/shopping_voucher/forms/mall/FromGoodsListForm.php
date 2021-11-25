@@ -28,7 +28,7 @@ class FromGoodsListForm extends BaseModel {
         try {
 
             $commonData = ["is_open" => 0, "give_value"  => "", "start_at" => ""];
-            $fromGoods = ShoppingVoucherFromGoods::findOne(["goods_id" => 0]);
+            $fromGoods = ShoppingVoucherFromGoods::findOne(["goods_id" => 0, "mall_id" => \Yii::$app->mall->id]);
             if($fromGoods){
                 $commonData["is_open"]    = !$fromGoods->is_delete ? 1 : 0;
                 $commonData["give_value"] = $fromGoods->give_value;
@@ -37,7 +37,7 @@ class FromGoodsListForm extends BaseModel {
 
             $pagination = null;
 
-            $query = ShoppingVoucherFromGoods::find()->alias("svfg")->where(["svfg.is_delete" => 0]);
+            $query = ShoppingVoucherFromGoods::find()->alias("svfg")->where(["svfg.is_delete" => 0, "svfg.mall_id" => \Yii::$app->mall->id]);
             $query->innerJoin(["g" => Goods::tableName()], "g.id=svfg.goods_id");
             $query->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");
 

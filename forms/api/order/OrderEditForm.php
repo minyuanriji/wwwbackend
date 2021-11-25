@@ -43,7 +43,7 @@ class OrderEditForm extends BaseModel
             /* @var Order $order */
             $order = Order::find()->where([
                 'id' => $this->order_id,
-                'mall_id' => \Yii::$app->mall->id,
+//                'mall_id' => \Yii::$app->mall->id,
                 'user_id' => \Yii::$app->user->id,
                 'is_delete' => 0,
             ])->one();
@@ -78,7 +78,7 @@ class OrderEditForm extends BaseModel
         try {
             /* @var Order $order */
             $order = Order::find()->where([
-                'mall_id' => \Yii::$app->mall->id,
+//                'mall_id' => \Yii::$app->mall->id,
                 'user_id' => \Yii::$app->user->id,
                 'is_delete' => 0,
                 'id' => $this->order_id,
@@ -142,7 +142,7 @@ class OrderEditForm extends BaseModel
      */
     public function remindSend(){
         $order = Order::getOrderInfo([
-            'mall_id' => \Yii::$app->mall->id,
+//            'mall_id' => \Yii::$app->mall->id,
             'user_id' => \Yii::$app->user->id,
             'is_delete' => 0,
             'id' => $this->order_id,

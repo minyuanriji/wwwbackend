@@ -30,6 +30,7 @@ class SearchGoodsForm extends BaseModel{
         $query->andWhere([
             "AND",
             ["g.is_delete" => 0],
+            ["g.mall_id" => \Yii::$app->mall->id],
             ["gw.is_delete" => 0],
             "(g.mch_id=0 OR g.mch_id IS NULL)"
         ]);

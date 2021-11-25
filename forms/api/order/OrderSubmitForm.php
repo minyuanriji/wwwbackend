@@ -1922,7 +1922,7 @@ class OrderSubmitForm extends BaseModel
             if ($goodsItem['freight_id'] != -1) {
                 //获取快递规则
                 $postageRule = PostageRules::findOne([
-                    'mall_id' => \Yii::$app->mall->id,
+//                    'mall_id' => \Yii::$app->mall->id,
                     'id' => $goodsItem['freight_id'],
                     'is_delete' => 0,
                     'mch_id' => $expressItem['mch']['id'],
@@ -1931,7 +1931,7 @@ class OrderSubmitForm extends BaseModel
                 if (!$postageRule) {
                     //获取默认规则
                     $postageRule = PostageRules::findOne([
-                        'mall_id' => \Yii::$app->mall->id,
+                        'mall_id' => $this->mall_id ?: \Yii::$app->mall->id,
                         'status' => 1,
                         'is_delete' => 0,
                         'mch_id' => $expressItem['mch']['id'],
@@ -1939,7 +1939,7 @@ class OrderSubmitForm extends BaseModel
                 }
             } else {
                 $postageRule = PostageRules::findOne([
-                    'mall_id' => \Yii::$app->mall->id,
+                    'mall_id' => $this->mall_id ?: \Yii::$app->mall->id,
                     'status' => 1,
                     'is_delete' => 0,
                     'mch_id' => $expressItem['mch']['id'],

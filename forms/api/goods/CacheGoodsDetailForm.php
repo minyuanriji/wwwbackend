@@ -54,7 +54,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                 'is_recycle' => 0,
                 'id'         => $this->id,
                 'status'     => 1,
-                'mall_id'    => $this->mall_id
+//                'mall_id'    => $this->mall_id
             ]);
             if (!$goods) {
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, '该商品不存在或者已下架！');

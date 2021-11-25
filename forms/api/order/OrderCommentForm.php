@@ -21,12 +21,13 @@ class OrderCommentForm extends BaseModel
 {
     public $commentData;
     public $order_id;
+    public $mall_id;
 
     public function rules()
     {
         return [
             [['order_id', 'commentData'], 'required'],
-            [['order_id'], 'integer'],
+            [['order_id', 'mall_id'], 'integer'],
         ];
     }
 
@@ -68,7 +69,7 @@ class OrderCommentForm extends BaseModel
                 } else {
                     $orderComments = new OrderComments();
                 }
-                $orderComments->mall_id = \Yii::$app->mall->id;
+                $orderComments->mall_id = $this->mall_id ?: \Yii::$app->mall->id;
                 $orderComments->mch_id = $order->mch_id;
                 $orderComments->order_detail_id = $orderDetail->id;
                 $orderComments->order_id = $orderDetail->order_id;

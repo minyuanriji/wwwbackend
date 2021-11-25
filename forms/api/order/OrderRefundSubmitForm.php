@@ -37,12 +37,13 @@ class OrderRefundSubmitForm extends BaseModel
     public $refund_type = 0;
 
     public $refund_total_price;
+    public $mall_id;
 
     public function rules()
     {
         return [
             [['order_detail_id','reason', 'type', 'pic_list', 'refund_price', 'reason'], 'required'],
-            [['order_detail_id','is_receipt', 'type'], 'integer'],
+            [['order_detail_id','is_receipt', 'type', 'mall_id'], 'integer'],
             [['refund_price'],'number'],
             [['remark', 'reason'], 'string'],
             [['refund_total_price'],'safe']
@@ -112,7 +113,7 @@ class OrderRefundSubmitForm extends BaseModel
             // 生成售后订单
             $t = \Yii::$app->db->beginTransaction();
             $orderRefund = new OrderRefund();
-            $orderRefund->mall_id = \Yii::$app->mall->id;
+            $orderRefund->mall_id = $this->mall_id ?: \Yii::$app->mall->id;
             $orderRefund->mch_id = $orderDetail->order->mch_id;
             $orderRefund->user_id = \Yii::$app->user->id;
             $orderRefund->order_id = $orderDetail->order_id;
@@ -175,7 +176,7 @@ class OrderRefundSubmitForm extends BaseModel
     private function checkIsRefund()
     {
         $orderRefund = OrderRefund::find()->where([
-            'mall_id' => \Yii::$app->mall->id,
+            'mall_id' => $this->mall_id ?: \Yii::$app->mall->id,
             'order_detail_id' => $this->order_detail_id,
             'is_delete' => 0
         ])->one();

@@ -10,11 +10,13 @@ use app\plugins\oil\models\OilPlateforms;
 use app\plugins\oil\models\OilProduct;
 
 class OilOrderUseForm extends BaseModel{
+
     public $id;
+    public $use_province;
 
     public function rules(){
         return [
-            [['id'], 'required']
+            [['id', 'use_province'], 'required']
         ];
     }
 
@@ -51,6 +53,22 @@ class OilOrderUseForm extends BaseModel{
             }
 
             if(in_array($status['status'], ["unconfirmed", "wait"])){
+
+                $provinces = ["2088" => "广西", "1941" => "广东"];
+                if(!isset($provinces[$this->use_province])){
+                    throw new \Exception("暂只持广西、广东地区进行加油");
+                }
+                if($platModel->province_id != $this->use_province){
+                    $platModel->province_id = $this->use_province;
+                    $platModel->province    = $provinces[$this->use_province];
+                    $platModel->city_id     = 0;
+                    $platModel->city        = "";
+                    $platModel->district_id = "";
+                    $platModel->address     = $provinces[$this->use_province];
+                    if(!$platModel->save()){
+                        throw new \Exception($this->responseErrorMsg($platModel));
+                    }
+                }
 
                 if(empty($platModel->class_dir) || !class_exists($platModel->class_dir)){
                     throw new \Exception("类{$platModel->class_dir}丢失");

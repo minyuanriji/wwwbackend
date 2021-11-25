@@ -34,9 +34,9 @@ class GoodsConsumeLogListForm extends BaseModel
         if (!$this->validate()) return $this->responseErrorInfo();
 
         try {
-            $query = CommissionGoodsPriceLog::find()->alias('cg')->where([
+            $query = CommissionGoodsPriceLog::find()->alias('cg')/*->where([
                 'cg.mall_id' => \Yii::$app->mall->id,
-            ]);
+            ])*/;
             $query->innerJoin(["o" => Order::tableName()], "o.id=cg.order_id");
             $query->innerJoin(["g" => Goods::tableName()], "g.id=cg.goods_id");
             $query->innerJoin(["gw" => GoodsWarehouse::tableName()], "gw.id=g.goods_warehouse_id");

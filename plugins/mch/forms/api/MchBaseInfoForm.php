@@ -11,6 +11,7 @@ use app\models\Goods;
 use app\models\Order;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
+use app\plugins\mch\models\MchGroup;
 use app\plugins\mch\models\MchPriceLog;
 
 /**
@@ -117,6 +118,13 @@ class MchBaseInfoForm extends BaseModel{
                 "mch_id" => $mchInfo['id']
             ])->andWhere(["IN", "status", ["unconfirmed", "confirmed"]])->sum("price");
             $baseData['stat']['fz_account_money'] = $fzAccountMoney;
+
+            //判断是否总店账号
+            $mchGroup = MchGroup::findOne([
+                "mch_id"    => $this->mch_id,
+                "is_delete" => 0
+            ]);
+            $baseData['mch_group_id'] = $mchGroup ? $mchGroup->id : 0;
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

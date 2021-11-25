@@ -28,9 +28,11 @@ class MchMApiController extends ApiController{
 
         $cleanSubHeader = false;
         try {
-            if($beforeAction && $this->check_auth){
+            $headers = \Yii::$app->request->headers;
 
-                $headers = \Yii::$app->request->headers;
+
+
+            if($beforeAction && $this->check_auth){
                 $subMchId = $headers['x-sub-mch-id'];
                 $mchData = null;
                 if($subMchId){

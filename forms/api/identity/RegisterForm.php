@@ -195,18 +195,18 @@ class RegisterForm extends BaseModel
             $stepM    = (int)date("i") + $stepS;
             $stepH    = (int)date("H") + $stepM;
             $randUid  = $startNum + $stepH + $stepM + $stepS;
-            while(User::findOne($randUid)){
+            /*while(User::findOne($randUid)){
                 $randUid += rand(0, 5);
-            }
+            }*/
 
             $user = new User();
-            $user->id = $randUid;
+            //$user->id = $randUid;
             $user->username = $this->mobile;
             $user->mobile = $this->mobile;
             $user->mall_id = $this->mall_id;
             $user->access_token = \Yii::$app->security->generateRandomString();
             $user->auth_key = \Yii::$app->security->generateRandomString();
-            $user->nickname = "";
+            $user->nickname = uniqid();
             $user->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
             $user->avatar_url = "";
             $user->last_login_at = time();

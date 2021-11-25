@@ -47,7 +47,7 @@
                 <el-tab-pane label="基本信息" name="basic">
                     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" size="small">
                         <el-form-item label="总店" prop="mch_id">
-                            <template v-if="isNew">
+                            <template v-if="!ruleForm.mch_id">
                                 <el-card class="box-card" >
                                     <el-input size="big" style="width:350px;" @keyup.enter.native="searchMchList" size="small" placeholder="搜索商户~" v-model="searchMch.keyword" clearable
                                               @clear='searchMchList'>
@@ -90,9 +90,6 @@
                                         </el-pagination>
                                     </div>
                                 </el-card>
-                                <el-button @click="saveGroup" style="margin-top:20px;" :loading="btnLoading" type="primary" size="big">
-                                    保存
-                                </el-button>
                             </template>
                             <template v-else>
                                 <el-card v-loading="cardLoading" class="box-card">
@@ -110,6 +107,11 @@
                                     </div>
                                 </el-card>
                             </template>
+
+                            <el-button v-if="isNew && ruleForm.mch_id > 0" @click="saveGroup" style="margin-top:20px;" :loading="btnLoading" type="primary" size="big">
+                                保存
+                            </el-button>
+
                         </el-form-item>
 
                     </el-form>
@@ -319,6 +321,7 @@
                 });
             },
             chooseIt(item){
+
                 this.name = item.store.name;
                 this.cover_url = item.store.cover_url;
                 this.ruleForm.mch_id = item.id;

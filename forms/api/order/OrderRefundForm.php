@@ -26,12 +26,14 @@ use app\models\mysql\Order as OrderModel;
 class OrderRefundForm extends BaseModel
 {
     public $order_detail_id;// 订单详情ID
+    public $mall_id;
 
     public function rules()
     {
         return [
             [['order_detail_id'], 'required'],
             [['order_detail_id'], 'integer'],
+            [['mall_id'], 'safe']
         ];
     }
 
@@ -133,7 +135,7 @@ class OrderRefundForm extends BaseModel
 
         /** @var OrderRefund $orderRefund */
         $orderRefund = OrderRefund::find()->alias('o')->where([
-            'o.mall_id' => \Yii::$app->mall->id,
+            'o.mall_id' => $this->mall_id ?: \Yii::$app->mall->id,
             'o.order_detail_id' => $this->order_detail_id,
             'o.user_id' => \Yii::$app->user->id,
             'o.is_delete' => 0,

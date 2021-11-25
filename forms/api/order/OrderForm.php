@@ -41,11 +41,12 @@ class OrderForm extends BaseModel
     public $offline_used;
     public $order_refund_id;
     public $keywords;
+    public $mall_id;
 
     public function rules()
     {
         return [
-            [['page', 'limit', 'status', 'id', 'offline', 'offline_used'], 'integer'],
+            [['page', 'limit', 'status', 'id', 'offline', 'offline_used', 'mall_id'], 'integer'],
             ['page', 'default', 'value' => 1],
             ['limit', 'default', 'value' => 20],
             ['order_refund_id', 'safe'],
@@ -70,6 +71,7 @@ class OrderForm extends BaseModel
             $form->sale_status = 0;
         }
         $form->is_detail = 1;
+        $form->mall_id = $this->mall_id;
         $form->is_goods = 1;
         $form->is_comment = 1;
         $form->page = $this->page;
@@ -96,7 +98,8 @@ class OrderForm extends BaseModel
         foreach ($list as $item) {
             $newItem = ArrayHelper::toArray($item);
             $mall = $item->mall ? ArrayHelper::toArray($item->mall) : [];
-            $newItem['mall_name'] = $mall['name'];
+            $newItem['mall_name'] = $mall['name'] ?: "补商汇官方商城";
+            $newItem['mall_logo'] = $mall['logo'] ?: "https://www.mingyuanriji.cn/web/static/app/icon.png";
             $newItem['comments'] = $item->comments ? ArrayHelper::toArray($item->comments) : [];
             $newItem['detail'] = $item->detail ? ArrayHelper::toArray($item->detail) : [];
             $newItem['status_text'] = $order->orderStatusText($item);
@@ -183,7 +186,7 @@ class OrderForm extends BaseModel
     {
         try {
             $list = OrderRefund::find()->where([
-                'mall_id' => \Yii::$app->mall->id,
+                'mall_id' => $this->mall_id ?: \Yii::$app->mall->id,
                 'user_id' => \Yii::$app->user->id,
                 'is_delete' => 0,
             ])->with(['detail.goods.goodsWarehouse'])
@@ -249,7 +252,7 @@ class OrderForm extends BaseModel
         try {
             /* @var Order $order */
             $order = OrderRefund::find()->where([
-                'mall_id' => \Yii::$app->mall->id,
+//                'mall_id' => \Yii::$app->mall->id,
                 'user_id' => \Yii::$app->user->id,
                 'is_delete' => 0,
                 'id' => $this->order_refund_id,

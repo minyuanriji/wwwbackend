@@ -25,12 +25,13 @@ class CollectForm extends BaseModel
     public $limit = 10;
     public $type = 'goods';
     public $id;
+    public $mall_id;
 
 
     public function rules()
     {
         return [
-            [['goods_id', 'page', 'limit','id'], 'integer'],
+            [['goods_id', 'page', 'limit','id', 'mall_id'], 'integer'],
             ['page', 'default', 'value' => 1],
             ['limit', 'default', 'value' => 20],
             [['type'], 'string']
@@ -77,7 +78,7 @@ class CollectForm extends BaseModel
         $collect = new GoodsCollect();
         $collect->goods_id = $this->goods_id;
         $collect->user_id = \Yii::$app->user->id;
-        $collect->mall_id = \Yii::$app->mall->id;
+        $collect->mall_id = $this->mall_id;
         if (!$collect->save()) {
             return $this->returnApiResultData();
         }
@@ -101,7 +102,7 @@ class CollectForm extends BaseModel
         if ($this->type == 'goods') {
             $list = GoodsCollect::find()
                 ->with('goods')
-                ->where(['mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, 'user_id' => \Yii::$app->user->id])
+                ->where(['is_delete' => 0, 'user_id' => \Yii::$app->user->id])
                 ->page($pagination, $this->limit, $this->page)
                 ->all();
             /**
@@ -139,7 +140,7 @@ class CollectForm extends BaseModel
     {
 
 //        if ($this->type == 'goods') {
-            $goods_collect = GoodsCollect::findOne(['id' => $this->id, 'is_delete' => 0, 'mall_id' => \Yii::$app->mall->id, 'user_id' => \Yii::$app->user->id]);
+            $goods_collect = GoodsCollect::findOne(['id' => $this->id, 'is_delete' => 0, 'user_id' => \Yii::$app->user->id]);
             if (!$goods_collect) {
                 return $this->returnApiResultData(ApiCode::CODE_FAIL, '该收藏不存在或已被删除');
             }

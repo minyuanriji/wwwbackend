@@ -17,7 +17,8 @@ class BaseController extends MchMApiController{
     public function actionInfo(){
         $form = new MchBaseInfoForm();
         $form->attributes = $this->requestData;
-        $form->mch_id = $this->mch_id;
+        $form->mch_id     = $this->mch_id;
+        $form->host_info  = \Yii::$app->request->getHostInfo();
         return $this->asJson($form->get());
     }
 

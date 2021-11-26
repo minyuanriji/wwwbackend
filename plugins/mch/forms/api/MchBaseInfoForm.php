@@ -11,6 +11,7 @@ use app\models\Goods;
 use app\models\Order;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
+use app\plugins\mch\models\MchGroup;
 use app\plugins\mch\models\MchPriceLog;
 
 /**
@@ -75,6 +76,9 @@ class MchBaseInfoForm extends BaseModel{
             $baseData['store']['province'] = $city['province'] ? $city['province']['name'] : '';
             $baseData['store']['city'] = $city['city'] ? $city['city']['name'] : '';
             $baseData['store']['district'] = $city['district'] ? $city['district']['name'] : '';
+            if(!preg_match("/^https?:\/\//i", trim($baseData['store']['cover_url']))){
+                $baseData['store']['cover_url'] =  $this->host_info . "/web/static/header-logo.png";
+            }
 
             $baseData['mch_status']  = $mchInfo['mch_status'];
             $baseData['category']    = $mchInfo['category'];
@@ -117,6 +121,13 @@ class MchBaseInfoForm extends BaseModel{
                 "mch_id" => $mchInfo['id']
             ])->andWhere(["IN", "status", ["unconfirmed", "confirmed"]])->sum("price");
             $baseData['stat']['fz_account_money'] = $fzAccountMoney;
+
+            //判断是否总店账号
+            $mchGroup = MchGroup::findOne([
+                "mch_id"    => $this->mch_id,
+                "is_delete" => 0
+            ]);
+            $baseData['mch_group_id'] = $mchGroup ? $mchGroup->id : 0;
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

@@ -12,6 +12,8 @@ use app\plugins\mch\forms\api\MchApplyOperationLogSaveForm;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
 use app\plugins\mch\models\MchApplyOperationLog;
+use app\plugins\mch\models\MchGroup;
+use app\plugins\mch\models\MchGroupItem;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 
 class MchApplyPassForm extends BaseModel{
@@ -84,6 +86,21 @@ class MchApplyPassForm extends BaseModel{
 
             //设置二维码支付完成操作处理
             static::setCheckoutOrderPaidAction($mch, $store);
+
+            $mchGroup = MchGroup::findOne($applyModel->mch_group_id);
+            if($mchGroup && !$mchGroup->is_delete){
+                $mchGroupItem = new MchGroupItem([
+                    "mall_id"   => $mchGroup->mall_id,
+                    "group_id"   => $mchGroup->id,
+                    "mch_id"     => $mch->id,
+                    "store_id"   => $store->id,
+                    "created_at" => time(),
+                    "updated_at" => time()
+                ]);
+                if(!$mchGroupItem->save()){
+                    throw new \Exception($this->responseErrorMsg($mchGroupItem));
+                }
+            }
 
             $trans->commit();
 

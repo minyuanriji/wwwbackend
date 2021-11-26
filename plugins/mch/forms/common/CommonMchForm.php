@@ -28,24 +28,26 @@ class CommonMchForm extends BaseModel
             'review_status' => 1,
         ]);
 
-        switch ($this->keyword1)
-        {
-            case 'store_name':
-                $mchIds = Store::find()->andWhere(['like', 'name', $this->keyword])->select('mch_id');
-                $query->andWhere(['id' => $mchIds]);
-                break;
-            case 'user_name':
-                $userIds = User::find()->andWhere(['like', 'nickname', $this->keyword])->andWhere(['mall_id' => \Yii::$app->mall->id])->select('id');
-                $query->andWhere(['user_id' => $userIds]);
-                break;
-            case 'mch_id':
-                $query->andWhere(['id' => $this->keyword]);
-                break;
-            case 'mobile':
-                $query->andWhere(['mobile' => $this->keyword]);
-                break;
-            default;
+        if(!empty($this->keyword1) && !empty($this->keyword)){
+            switch ($this->keyword1){
+                case 'store_name':
+                    $mchIds = Store::find()->andWhere(['like', 'name', $this->keyword])->select('mch_id');
+                    $query->andWhere(['id' => $mchIds]);
+                    break;
+                case 'user_name':
+                    $userIds = User::find()->andWhere(['like', 'nickname', $this->keyword])->andWhere(['mall_id' => \Yii::$app->mall->id])->select('id');
+                    $query->andWhere(['user_id' => $userIds]);
+                    break;
+                case 'mch_id':
+                    $query->andWhere(['id' => $this->keyword]);
+                    break;
+                case 'mobile':
+                    $query->andWhere(['mobile' => $this->keyword]);
+                    break;
+                default;
+            }
         }
+
 
         if ($this->sort_prop && $this->sort_type) {
             $orderBy = $this->sort_prop . ' ' . $this->sort_type;

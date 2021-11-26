@@ -136,7 +136,7 @@ class Card extends BaseActiveRecord{
 
             $mallSettings = AppConfigLogic::getMallSettingConfig(["web_url"]);
             $host = isset($mallSettings["web_url"]) ? urldecode($mallSettings["web_url"]) : "";
-//            $path = "/h5/#/pages/user/integral/rechargeCard?mall_id=".$card_info['mall_id']."&source=".User::SOURCE_SHARE_POSTER;
+//            $path = "/h5/#/pages/user/integral/rechargeCard?mall_id=".$card_info['mall_id']."&pid=9&source=".User::SOURCE_SHARE_POSTER;
             $path = "/h5/#/pages/user/integral/rechargeCard?mall_id=".$card_info['mall_id']."&pid=".$card_info['user_id']."&source=".User::SOURCE_SHARE_POSTER;
             $url = $host . $path;
             // var_dump($create_index);die;

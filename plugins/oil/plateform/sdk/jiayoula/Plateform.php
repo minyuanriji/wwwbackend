@@ -16,10 +16,11 @@ class Plateform extends BasePlateform
         $appSecret = isset($config['appSecret']) ? $config['appSecret'] : "";
         try {
 
-            $params['appId']     = $appId;
-            $params['orderNo']   = $order->order_no;
-            $params['amount']    = floatval($product->price);
-            $params['timestamp'] = time();
+            $params['appId']      = $appId;
+            $params['orderNo']    = $order->order_no;
+            $params['amount']     = floatval($product->price);
+            $params['timestamp']  = time();
+            $params['couponType'] = $order->province_id == 2088 ? 1 : 0; //券码类型，0-广东，1-广西【不参与签名】
             $signStr = "orderNo=".$params['orderNo']."&amount=".$params['amount']."&timestamp=".$params['timestamp']."&appSecret={$appSecret}";
             $params['signature'] = strtolower(md5($signStr));
 

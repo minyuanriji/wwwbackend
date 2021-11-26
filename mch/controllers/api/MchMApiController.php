@@ -6,6 +6,8 @@ use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
 use app\core\ApiCode;
 use app\plugins\mch\models\Mch;
+use app\plugins\mch\models\MchGroup;
+use app\plugins\mch\models\MchGroupItem;
 use app\plugins\mch\models\MchSubAccount;
 
 class MchMApiController extends ApiController{
@@ -28,9 +30,9 @@ class MchMApiController extends ApiController{
 
         $cleanSubHeader = false;
         try {
-            if($beforeAction && $this->check_auth){
+            $headers = \Yii::$app->request->headers;
 
-                $headers = \Yii::$app->request->headers;
+            if($beforeAction && $this->check_auth){
                 $subMchId = $headers['x-sub-mch-id'];
                 $mchData = null;
                 if($subMchId){
@@ -60,11 +62,34 @@ class MchMApiController extends ApiController{
                     throw new \Exception("商户不存在");
                 }
 
-                $this->mch_id  = $mchData['id'];
-                $this->mchData = $mchData;
+                //分店管理
+                $_mchData = null;
+                if(!empty($this->requestData['man_mch_id']) || !empty($headers['x-man-mch-id'])){
+                    $mchGroup = MchGroup::findOne([
+                        "mch_id"    => $mchData['id'],
+                        "is_delete" => 0
+                    ]);
+                    if($mchGroup){
+                        $manMchId = !empty($this->requestData['man_mch_id']) ? $this->requestData['man_mch_id'] : $headers['x-man-mch-id'];
+                        $mchGroupItem = MchGroupItem::findOne([
+                            "group_id" => $mchGroup->id,
+                            "mch_id"   => $manMchId
+                        ]);
+                        if($mchGroupItem){
+                            $_mchData = Mch::find()->where([
+                                'id'            => $mchGroupItem->mch_id,
+                                'review_status' => Mch::REVIEW_STATUS_CHECKED,
+                                'is_delete'     => 0
+                            ])->with(["store"])->asArray()->one();
+                        }
+                    }
+                }
 
-                $this->checkAuth($action);
+                $this->mch_id  = $_mchData ? $_mchData['id'] : $mchData['id'];
+                $this->mchData = $_mchData ? $_mchData : $mchData;
             }
+
+            $this->checkAuth($action);
         }catch (\Exception $e){
             \Yii::$app->response->data = [
                 'code' => ApiCode::CODE_FAIL,

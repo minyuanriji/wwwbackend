@@ -405,7 +405,7 @@ abstract class BaseOrderForm extends BaseModel
         /** @var Order $model */
         $model = $this->orderModel;
         $query = $model::find()->alias('o')->where([
-            'o.mall_id' => \Yii::$app->mall->id,
+//            'o.mall_id' => \Yii::$app->mall->id,
             'o.is_delete' => 0
         ])->leftJoin(['u' => User::tableName()], 'u.id = o.user_id');
 

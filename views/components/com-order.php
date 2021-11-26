@@ -737,7 +737,7 @@ Yii::$app->loadComponentView('order/com-city');
                                     <!-- 发货 -->
                                     <el-tooltip class="item" effect="dark" content="发货" placement="top">
                                         <img class="com-order-icon" @click="openExpress(item,'send')"
-                                             v-if="item.is_send_show"
+                                             v-if="item.is_send_show && item.mall_id == 5"
                                              src="statics/img/mall/order/send.png" alt="">
                                     </el-tooltip>
                                     <!-- 同城配送发货 选择配送员 -->    <!-- 到店自提也可发货 -->

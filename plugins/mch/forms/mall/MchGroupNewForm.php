@@ -38,6 +38,10 @@ class MchGroupNewForm extends BaseModel{
                 throw new \Exception("商户[ID:{$this->mch_id}]数据异常");
             }
 
+            if(MchGroupItem::findOne(["mch_id" => $this->mch_id])){
+                throw new \Exception("商户[ID:{$this->mch_id}]已是总店或其它分店");
+            }
+
             $mchGroup = MchGroup::findOne(["mch_id" => $this->mch_id]);
             if($mchGroup){
                 if(!$mchGroup->is_delete){

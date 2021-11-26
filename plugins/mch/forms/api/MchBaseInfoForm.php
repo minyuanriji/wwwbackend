@@ -76,6 +76,9 @@ class MchBaseInfoForm extends BaseModel{
             $baseData['store']['province'] = $city['province'] ? $city['province']['name'] : '';
             $baseData['store']['city'] = $city['city'] ? $city['city']['name'] : '';
             $baseData['store']['district'] = $city['district'] ? $city['district']['name'] : '';
+            if(!preg_match("/^https?:\/\//i", trim($baseData['store']['cover_url']))){
+                $baseData['store']['cover_url'] =  $this->host_info . "/web/static/header-logo.png";
+            }
 
             $baseData['mch_status']  = $mchInfo['mch_status'];
             $baseData['category']    = $mchInfo['category'];

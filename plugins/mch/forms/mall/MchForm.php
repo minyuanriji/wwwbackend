@@ -186,9 +186,11 @@ class MchForm extends BaseModel
                 throw new \Exception('商户不存在');
             }
 
+            $bindUserId = $model->user_id;
+
             $model->is_delete = 1;
             $model->user_id   = 0;
-            $model->mobile   = Null;
+            $model->mobile   = null;
             if (!$model->save()) {
                 throw new \Exception($this->responseErrorMsg($model));
             }
@@ -197,17 +199,11 @@ class MchForm extends BaseModel
             $admin = Admin::find()->where(['mch_id' => $model->id])->one();
             $admin && $admin->delete();
 
-            /** @var User $user */
-            $user = User::find()->where(['mch_id' => $model->id])->one();
-            if ($user) {
-                $user->mch_id = 0;
-                if (!$user->save()) {
-                    throw new \Exception($this->responseErrorMsg($user));
-                }
-            }
+            //清空用户关联的商户ID
+            User::updateAll(["mch_id" => 0], ["mch_id" => $model->id]);
 
             //修改资料审核状态
-            $mchApply = MchApply::find()->where(['user_id' => $user->id])->one();
+            $mchApply = MchApply::find()->where(['user_id' => $bindUserId])->one();
             if ($mchApply) {
                 $mchApply->status = 'applying';
                 if (!$mchApply->save())

@@ -60,9 +60,24 @@ class LoginFilter extends ActionFilter
                     "mch_id"   => $manMchId
                 ]);
                 if($mchGroupItem){
-                    $_adminUser = MchAdminUser::find()->with(["mch", "store"])->where([
-                        "mch_id" => $mchGroupItem->mch_id
-                    ])->asArray()->one();
+                    $mch = Mch::findOne($mchGroupItem->mch_id);
+                    $store = Store::findOne(["mch_id" => $mchGroupItem->mch_id]);
+                    $_adminUser = MchAdminUser::find()->where([
+                        "mobile" => $mch->mobile,
+                        "is_sub" => 0
+                    ])->one();
+                    if(!$_adminUser){
+                        $_adminUser = new MchAdminUser([
+                            "mall_id"    => $mch->mall_id,
+                            "mch_id"     => $mch->id,
+                            "mobile"     => $mch->mobile,
+                            "created_at" => time()
+                        ]);
+                    }
+                    $_adminUser = $_adminUser->getAttributes();
+                    $_adminUser['access_token'] = \Yii::$app->security->generateRandomString();
+                    $_adminUser['mch']          = $mch->getAttributes();
+                    $_adminUser['store']        = $store->getAttributes();
                 }
             }
         }

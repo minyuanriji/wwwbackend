@@ -6,6 +6,7 @@ namespace app\plugins\mch\forms\common\apply;
 use app\core\ApiCode;
 use app\helpers\CityHelper;
 use app\models\BaseModel;
+use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
 
 class MchApplyInfoForm extends BaseModel{
@@ -28,6 +29,14 @@ class MchApplyInfoForm extends BaseModel{
             $applyModel = MchApply::findOne([
                 "user_id" => $this->user_id
             ]);
+            if($applyModel && $applyModel->status == "passed"){
+                $mch = Mch::findOne(["user_id" => $this->user_id]);
+                if(!$mch || $mch->is_delete || $mch->review_status != Mch::REVIEW_STATUS_CHECKED){
+                    $applyModel->status = "applying'";
+                    $applyModel->updated_at = time();
+                    $applyModel->save();
+                }
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

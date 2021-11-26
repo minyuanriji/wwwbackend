@@ -38,18 +38,17 @@ class MchGroupNewForm extends BaseModel{
                 throw new \Exception("商户[ID:{$this->mch_id}]数据异常");
             }
 
-            if(MchGroupItem::findOne(["mch_id" => $this->mch_id])){
-                throw new \Exception("商户[ID:{$this->mch_id}]已是总店或其它分店");
+            $mchGroup = MchGroup::findOne(["mch_id" => $this->mch_id]);
+            if($mchGroup && !$mchGroup->is_delete){
+                throw new \Exception("商户[ID:{$this->mch_id}]已是连锁总店");
             }
 
-            $mchGroup = MchGroup::findOne(["mch_id" => $this->mch_id]);
-            if($mchGroup){
-                if(!$mchGroup->is_delete){
-                    throw new \Exception("商户[ID:{$this->mch_id}]已是连锁总店");
-                }
-                $mchGroup->is_delete = 0;
-                $mchGroup->deleted_at = 0;
-            }else{
+            $mchGroupItem = MchGroupItem::findOne(["mch_id" => $this->mch_id]);
+            if($mchGroupItem && $mchGroupItem->mch_id != $mchGroup->mch_id){
+                throw new \Exception("商户[ID:{$this->mch_id}]分店不能设置成为总店");
+            }
+
+            if(!$mchGroup){
                 $mchGroup = new MchGroup([
                     "mall_id"    => $mch->mall_id,
                     "mch_id"     => $mch->id,
@@ -57,7 +56,8 @@ class MchGroupNewForm extends BaseModel{
                     "created_at" => time()
                 ]);
             }
-
+            $mchGroup->is_delete = 0;
+            $mchGroup->deleted_at = 0;
             $mchGroup->updated_at = time();
             if(!$mchGroup->save()){
                 throw new \Exception($this->responseErrorMsg($mchGroup));

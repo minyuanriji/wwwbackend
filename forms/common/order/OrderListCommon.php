@@ -118,9 +118,10 @@ class OrderListCommon extends BaseModel
         }
 
         $this->query = $query = Order::find()->alias('o')->where([
-            'o.mall_id' => \Yii::$app->mall->id,
+//            'o.mall_id' => \Yii::$app->mall->id,
             'o.is_delete' => 0,
         ]);
+
 
         foreach ($this->attributes as $key => $value) {
             $method = $this->getMethod($key);

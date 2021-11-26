@@ -25,7 +25,6 @@ class OrderController extends MchAdminController {
     public function actionBill(){
         $form = new MchManaOrderBillListForm();
         $form->attributes = $this->requestData;
-        $form->mch_id     = $this->mch_id;
         return $this->asJson($form->getList());
     }
 

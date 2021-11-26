@@ -74,7 +74,7 @@ class OrderForm extends BaseModel
         $form->is_comment = 1;
         $form->page = $this->page;
         $form->is_recycle = 0;
-        $form->relations = ['mch.store', 'detailExpress.expressRelation.orderDetail','detail.expressRelation','detail.refund', 'detailExpressRelation.orderExpress'];
+        $form->relations = ['mch.store', 'detailExpress.expressRelation.orderDetail','detail.expressRelation','detail.refund', 'detailExpressRelation.orderExpress', 'mall'];
 
         if($this->offline){ //核销
             $form->status = null;
@@ -90,12 +90,13 @@ class OrderForm extends BaseModel
         }
 
         $list = $form->search();
-
         $newList = [];
         $order = new Order();
         /* @var Order[] $list */
         foreach ($list as $item) {
             $newItem = ArrayHelper::toArray($item);
+            $mall = $item->mall ? ArrayHelper::toArray($item->mall) : [];
+            $newItem['mall_name'] = $mall['name'];
             $newItem['comments'] = $item->comments ? ArrayHelper::toArray($item->comments) : [];
             $newItem['detail'] = $item->detail ? ArrayHelper::toArray($item->detail) : [];
             $newItem['status_text'] = $order->orderStatusText($item);

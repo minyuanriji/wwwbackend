@@ -128,6 +128,7 @@ class OrderSubmitForm extends BaseModel
     public $status = 0;
 
     public $form_data;
+    public $mall_id;
 
     public $goodsTotalPriceService;
 
@@ -309,7 +310,7 @@ class OrderSubmitForm extends BaseModel
             $event_data = array();//事件参数
             foreach ($data['list'] as $orderItem) {
                 $order = new Order();
-                $order->mall_id = \Yii::$app->mall->id;
+                $order->mall_id = $this->mall_id ?: \Yii::$app->mall->id;
                 $order->user_id = $user->getId();
                 $order->order_no = Order::getOrderNo('S');;
                 $order->total_price = $orderItem['total_price'];
@@ -518,7 +519,7 @@ class OrderSubmitForm extends BaseModel
         $query = Cart::find()->alias("c")->andWhere([
             "AND",
             ["c.user_id" => (int)\Yii::$app->user->id],
-            ["IN", "c.id", ($cartIds ? $cartIds : [])],
+            ["IN", "c.id", ($cartIds ?: [])],
             ["c.is_delete" => 0]
         ]);
         $query->leftJoin("{{%goods}} g", "g.id=c.goods_id");
@@ -1102,7 +1103,7 @@ class OrderSubmitForm extends BaseModel
         /** @var Goods $goods */
         $goods = Goods::find()->with('goodsWarehouse')->where([
             'id' => $goodsItem['id'],
-            'mall_id' => \Yii::$app->mall->id,
+//            'mall_id' => \Yii::$app->mall->id,
             'status' => 1,
             'is_delete' => 0,
         ])->one();
@@ -2879,7 +2880,7 @@ class OrderSubmitForm extends BaseModel
     {
         if ($goods->mch_id > 0) {
             $mch = Mch::findOne([
-                'mall_id' => \Yii::$app->mall->id,
+//                'mall_id' => \Yii::$app->mall->id,
                 'is_delete' => 0,
                 'review_status' => 1,
                 'id' => $goods->mch_id

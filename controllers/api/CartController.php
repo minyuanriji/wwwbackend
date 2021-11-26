@@ -70,6 +70,12 @@ class CartController extends ApiController
     public function actionAdd(){
         $cartAddForm = new CartAddForm();
         $cartAddForm->attributes = $this->requestData;
+        $headers = \Yii::$app->request->headers;
+        if(isset($headers["x-stands-mall-id"]) && !empty($headers["x-stands-mall-id"]) && $headers["x-stands-mall-id"] != 5){
+            $cartAddForm->mall_id = $headers["x-stands-mall-id"];
+        }else{
+            $cartAddForm->mall_id = \Yii::$app->mall->id;
+        }
         $res = $cartAddForm->addCart();
         return $this->asJson($res);
     }

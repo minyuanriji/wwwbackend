@@ -42,7 +42,10 @@ class MchManaGroupItemListForm extends BaseModel{
             $query = MchGroupItem::find()->alias("mgi")
                 ->innerJoin(["m" => Mch::tableName()], "m.id=mgi.mch_id")
                 ->innerJoin(["s" => Store::tableName()], "s.id=mgi.store_id")
-                ->where(["mgi.group_id" => $mchGroup->id]);
+                ->where([
+                    "mgi.group_id" => $mchGroup->id,
+                    "m.is_delete"  => 0
+                ]);
             $query->andWhere("mgi.mch_id <> '{$mchId}'");
 
             $query->select(["mgi.*", "m.mobile", "s.name", "s.cover_url",

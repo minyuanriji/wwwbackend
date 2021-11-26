@@ -199,7 +199,7 @@ class MchForm extends BaseModel
 
             /** @var User $user */
             $user = User::find()->where(['mch_id' => $model->id])->one();
-            if (!$user) {
+            if ($user) {
                 $user->mch_id = 0;
                 if (!$user->save()) {
                     throw new \Exception($this->responseErrorMsg($user));

@@ -29,7 +29,8 @@ class MchGroupForm extends BaseModel{
         try {
 
             $query = MchGroup::find()->alias("mg")->where([
-                "mg.is_delete" => 0
+                "mg.is_delete" => 0,
+                "m.is_delete"  => 0
             ]);
             $query->innerJoin(["m" => Mch::tableName()], "m.id=mg.mch_id");
             $query->innerJoin(["s" => Store::tableName()], "s.id=mg.store_id");

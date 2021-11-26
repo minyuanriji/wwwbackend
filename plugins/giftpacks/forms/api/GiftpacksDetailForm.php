@@ -92,7 +92,7 @@ class GiftpacksDetailForm extends BaseModel{
                 }
             }
 
-            $detail['sold_num'] += 300;
+            $detail['sold_num'] += $this->pack_id == 13 ? 1000 : 300;
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

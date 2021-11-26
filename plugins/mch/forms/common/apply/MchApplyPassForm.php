@@ -90,7 +90,7 @@ class MchApplyPassForm extends BaseModel{
             $mchGroup = MchGroup::findOne($applyModel->mch_group_id);
             if($mchGroup && !$mchGroup->is_delete){
                 $mchGroupItem = new MchGroupItem([
-                    "mall_id"   => $mchGroup->mall_id,
+                    "mall_id"    => $mchGroup->mall_id,
                     "group_id"   => $mchGroup->id,
                     "mch_id"     => $mch->id,
                     "store_id"   => $store->id,

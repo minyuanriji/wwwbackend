@@ -34,7 +34,10 @@ class MchGroupItemListForm extends BaseModel{
             $query = MchGroupItem::find()->alias("mgi")
                 ->innerJoin(["m" => Mch::tableName()], "m.id=mgi.mch_id")
                 ->innerJoin(["s" => Store::tableName()], "s.id=mgi.store_id")
-                ->where(["mgi.group_id" => $this->group_id]);
+                ->where([
+                    "mgi.group_id" => $this->group_id,
+                    "m.is_delete" => 0
+                ]);
 
             if(!empty($this->keyword)){
                 $query->andWhere([

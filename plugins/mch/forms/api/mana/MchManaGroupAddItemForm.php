@@ -34,7 +34,7 @@ class MchManaGroupAddItemForm extends BaseModel{
         return [
             [['name', 'realname', 'address', 'latitude', 'longitude', 'provice_id', 'district_id', 'city_id',
              'mobile', 'captcha', 'license_name', 'license_pic', 'zk'], 'required'],
-            [['zk'], 'integer'],
+            [['zk'], 'number'],
             [['license_num'], 'safe']
         ];
     }

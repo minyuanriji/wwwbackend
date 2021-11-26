@@ -44,12 +44,6 @@ class CartController extends ApiController
     public function actionIndex(){
         $cartForm = new CartForm();
         $cartForm->attributes = $this->requestData;
-        $headers = \Yii::$app->request->headers;
-        if(isset($headers["x-stands-mall-id"]) && !empty($headers["x-stands-mall-id"]) && $headers["x-stands-mall-id"] != 5){
-            $cartForm->mall_id = $headers["x-stands-mall-id"];
-        }else{
-            $cartForm->mall_id = \Yii::$app->mall->id;
-        }
         return $this->asJson($cartForm->getCartList());
     }
 
@@ -63,6 +57,12 @@ class CartController extends ApiController
     public function actionModify(){
         $cartEditForm = new CartEditForm();
         $cartEditForm->list = isset($this->requestData["list"])?$this->requestData["list"]:$this->requestData;
+        $headers = \Yii::$app->request->headers;
+        if(isset($headers["x-stands-mall-id"]) && !empty($headers["x-stands-mall-id"]) && $headers["x-stands-mall-id"] != 5){
+            $cartEditForm->mall_id = $headers["x-stands-mall-id"];
+        }else{
+            $cartEditForm->mall_id = \Yii::$app->mall->id;
+        }
         return $this->asJson($cartEditForm->modifyCart());
     }
 

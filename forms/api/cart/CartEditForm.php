@@ -19,11 +19,13 @@ use app\models\GoodsAttr;
 class CartEditForm extends BaseModel
 {
     public $list;
+    public $mall_id;
 
     public function rules()
     {
         return [
             [['list'], 'trim'],
+            [['mall_id'], 'safe'],
         ];
     }
 
@@ -77,7 +79,7 @@ class CartEditForm extends BaseModel
 
                 if ($item['num'] > 0) {
                     $array[] = [
-                        \Yii::$app->mall->id,
+                        $this->mall_id ?: \Yii::$app->mall->id,
                         $user_id,
                         $item['attr'],
                         $item['goods_id'],

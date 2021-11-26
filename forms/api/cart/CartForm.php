@@ -26,12 +26,11 @@ class CartForm extends BaseModel
 {
     public $page;
     public $limit;
-    public $mall_id;
 
     public function rules()
     {
         return [
-            [['limit', 'mall_id'], 'integer'],
+            [['limit'], 'integer'],
             [['limit'], 'default', 'value' => 10],
         ];
     }
@@ -54,7 +53,7 @@ class CartForm extends BaseModel
 
             //查询条件
             $wheres = [
-                'mall_id' => $this->mall_id ?: \Yii::$app->mall->id,
+//                'mall_id' => \Yii::$app->mall->id,
                 'user_id' => $user_id,
                 'sign' => '',
             ];

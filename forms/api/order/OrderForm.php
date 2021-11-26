@@ -71,7 +71,7 @@ class OrderForm extends BaseModel
             $form->sale_status = 0;
         }
         $form->is_detail = 1;
-        $form->mall_id = $this->mall_id;
+        $form->mall_id = $this->mall_id ?: \Yii::$app->mall->id;
         $form->is_goods = 1;
         $form->is_comment = 1;
         $form->page = $this->page;
@@ -186,7 +186,7 @@ class OrderForm extends BaseModel
     {
         try {
             $list = OrderRefund::find()->where([
-                'mall_id' => $this->mall_id ?: \Yii::$app->mall->id,
+//                'mall_id' => $this->mall_id ?: \Yii::$app->mall->id,
                 'user_id' => \Yii::$app->user->id,
                 'is_delete' => 0,
             ])->with(['detail.goods.goodsWarehouse'])

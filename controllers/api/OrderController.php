@@ -150,12 +150,12 @@ class OrderController extends ApiController
     {
         $form = new OrderForm();
         $form->attributes = $this->requestData;
-        $headers = \Yii::$app->request->headers;
+        /*$headers = \Yii::$app->request->headers;
         if(isset($headers["x-stands-mall-id"]) && !empty($headers["x-stands-mall-id"]) && $headers["x-stands-mall-id"] != 5){
             $form->mall_id = $headers["x-stands-mall-id"];
         }else{
             $form->mall_id = \Yii::$app->mall->id;
-        }
+        }*/
         return $form->getOrderList();
     }
 

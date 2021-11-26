@@ -203,12 +203,10 @@ class MchForm extends BaseModel
             User::updateAll(["mch_id" => 0], ["mch_id" => $model->id]);
 
             //修改资料审核状态
-            $mchApply = MchApply::find()->where(['user_id' => $bindUserId])->one();
-            if ($mchApply) {
-                $mchApply->status = 'applying';
-                if (!$mchApply->save())
-                    throw new \Exception($mchApply->getErrors());
-            }
+            MchApply::updateAll([
+                "status"     => "applying",
+                "updated_at" => time()
+            ], ["user_id" => $bindUserId]);
 
             //清理连锁店信息
             MchGroup::deleteAll(["mch_id" => $model->id]);

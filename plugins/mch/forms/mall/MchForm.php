@@ -12,6 +12,8 @@ use app\plugins\integral_card\models\ScoreFromStore;
 use app\plugins\mch\forms\common\CommonMchForm;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
+use app\plugins\mch\models\MchGroup;
+use app\plugins\mch\models\MchGroupItem;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 use phpDocumentor\Reflection\Types\Null_;
 
@@ -198,12 +200,10 @@ class MchForm extends BaseModel
             /** @var User $user */
             $user = User::find()->where(['mch_id' => $model->id])->one();
             if (!$user) {
-                throw new \Exception('商户账号不存在');
-            }
-
-            $user->mch_id = 0;
-            if (!$user->save()) {
-                throw new \Exception($this->responseErrorMsg($user));
+                $user->mch_id = 0;
+                if (!$user->save()) {
+                    throw new \Exception($this->responseErrorMsg($user));
+                }
             }
 
             //修改资料审核状态
@@ -214,6 +214,9 @@ class MchForm extends BaseModel
                     throw new \Exception($mchApply->getErrors());
             }
 
+            //清理连锁店信息
+            MchGroup::deleteAll(["mch_id" => $model->id]);
+            MchGroupItem::deleteAll(["mch_id" => $model->id]);
 
             $transaction->commit();
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '删除成功');

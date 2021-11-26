@@ -17,6 +17,7 @@ class InfoController extends MchAdminController {
     public function actionBase(){
         $form = new MchManaInfoBaseForm();
         $form->attributes = $this->requestData;
+        $form->host_info  = \Yii::$app->request->getHostInfo();
         return $this->asJson($form->get());
     }
 

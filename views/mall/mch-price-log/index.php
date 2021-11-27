@@ -11,8 +11,8 @@
             <div class="table-body">
 
                 <div style="display: flex;">
-                    <div style="width: 30%">
-                        <div style="float: left;margin-top: 5px">打款时间：</div>
+                    <div>
+                        <div style="float: left;margin-top: 5px">下单时间：</div>
                         <el-date-picker size="small" v-model="date" type="datetimerange"
                                         style="float: left"
                                         value-format="yyyy-MM-dd HH:mm:ss"

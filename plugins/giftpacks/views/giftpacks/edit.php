@@ -158,6 +158,10 @@ Yii::$app->loadComponentView('com-rich-text');
                 </el-card>
             </el-form-item>
 
+            <el-form-item label="虚拟销量" prop="virtual_sales">
+                <el-input v-model="formData.virtual_sales" type="number"></el-input>
+            </el-form-item>
+
             <el-form-item label="详情" prop="detail">
                 <com-rich-text v-model="formData.detail" :value="formData.detail"></com-rich-text>
             </el-form-item>
@@ -196,7 +200,8 @@ Yii::$app->loadComponentView('com-rich-text');
                 period_unit: "month",
                 expire: 30
             },
-            detail: ''
+            detail: '',
+            virtual_sales: 0,
         };
     }
     const editApp = new Vue({

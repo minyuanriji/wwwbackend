@@ -32,7 +32,6 @@ class OilOrderUseForm extends BaseModel{
         $t = \Yii::$app->db->beginTransaction();
         try {
 
-
             if(!$order || $order->pay_status != "paid"){
                 throw new \Exception("订单不存在或未支付");
             }
@@ -58,15 +57,15 @@ class OilOrderUseForm extends BaseModel{
                 if(!isset($provinces[$this->use_province])){
                     throw new \Exception("暂只持广西、广东地区进行加油");
                 }
-                if($platModel->province_id != $this->use_province){
-                    $platModel->province_id = $this->use_province;
-                    $platModel->province    = $provinces[$this->use_province];
-                    $platModel->city_id     = 0;
-                    $platModel->city        = "";
-                    $platModel->district_id = "";
-                    $platModel->address     = $provinces[$this->use_province];
-                    if(!$platModel->save()){
-                        throw new \Exception($this->responseErrorMsg($platModel));
+                if($order->province_id != $this->use_province){
+                    $order->province_id = $this->use_province;
+                    $order->province    = $provinces[$this->use_province];
+                    $order->city_id     = 0;
+                    $order->city        = "";
+                    $order->district_id = "";
+                    $order->address     = $provinces[$this->use_province];
+                    if(!$order->save()){
+                        throw new \Exception($this->responseErrorMsg($order));
                     }
                 }
 

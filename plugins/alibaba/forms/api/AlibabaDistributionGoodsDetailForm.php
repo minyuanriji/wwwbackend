@@ -163,6 +163,12 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             //规格分组
             $detail['sku_group_list'] = $this->skuGroupList($detail['sku_infos'], $detail['sku_list']);
 
+            foreach($detail['sku_list'] as &$skuItem){
+                $detail['price'] = min($detail['price'], $skuItem['price']);
+                $detail['shopping_voucher'] = min($detail['shopping_voucher'], $skuItem['shopping_voucher']);
+            }
+            $detail['shopping_voucher'] += $detail['freight_price'];
+
             return new APICacheDataForm([
                 "sourceData" => [
                     'code' => ApiCode::CODE_SUCCESS,

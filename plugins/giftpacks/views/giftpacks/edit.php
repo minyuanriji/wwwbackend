@@ -287,6 +287,7 @@ Yii::$app->loadComponentView('com-rich-text');
                                 self.$message.success(e.data.msg);
                                 self.hide();
                                 self.savedCallFn();
+                                location.reload();
                             } else {
                                 self.$message.error(e.data.msg);
                             }

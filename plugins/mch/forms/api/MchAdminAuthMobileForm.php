@@ -67,9 +67,7 @@ class MchAdminAuthMobileForm extends BaseModel{
                     ]);
                 } else {
                     if ($adminUser->mch_id != $mch->id) {
-                        $adminUser = new MchAdminUser([
-                            "mch_id"     => $mch->id,
-                        ]);
+                        $adminUser->mch_id = $mch->id;
                     }
                 }
             }

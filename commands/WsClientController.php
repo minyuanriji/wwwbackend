@@ -24,10 +24,11 @@ class WsClientController extends BaseCommandController {
                     ]);
                     $cli->close();
                     if($cli->body != "SUCCESS"){
+                        $this->commandOut($cli->body);
                         if($form->fail_try > 3){
                             $this->commandOut("队列[ID:".$form->queue_tag."]失败超过3次，丢弃");
                         }else{
-                            $this->commandOut("队列[ID:".$form->queue_tag."]失败重新加入队列");
+                            $this->commandOut("队列[ID:".$form->queue_tag."]重新加入队列");
                             $form->fail_try += 1;
                             WebSocketRequestForm::add($form);
                         }

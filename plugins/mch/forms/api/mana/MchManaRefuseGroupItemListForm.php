@@ -47,16 +47,16 @@ class MchManaRefuseGroupItemListForm extends BaseModel{
             if ($mchApplyResult) {
                 foreach ($mchApplyResult as &$item) {
                     $item['json_apply_data'] = json_decode($item['json_apply_data'], true);
-                    $param['store_name'] = $item['json_apply_data']['store_name'];
-                    $param['store_logo'] = 'https://www.mingyuanriji.cn/web/static/header-logo.png';
+                    $param['name'] = $item['json_apply_data']['store_name'];
+                    $param['cover_url'] = 'https://www.mingyuanriji.cn/web/static/header-logo.png';
                     $param['mobile'] = $item['mobile'];
                     $param['remark'] = $item['remark'];
                     $city = CityHelper::reverseData($item['json_apply_data']['store_district_id'], $item['json_apply_data']['store_city_id'], $item['json_apply_data']['store_province_id']);
                     $param['province'] = !empty($city['province']['name']) ? $city['province']['name'] : "";
                     $param['city'] = !empty($city['city']['name']) ? $city['city']['name'] : "";
                     $param['district'] = !empty($city['district']['name']) ? $city['district']['name'] : "";
-                    $param['store_address'] = $item['json_apply_data']['store_address'];
-                    $param['id'] = $item['id'];
+                    $param['address'] = $item['json_apply_data']['store_address'];
+                    $param['mch_apply_id'] = $item['id'];
                     $list[] = $param;
                 }
             }

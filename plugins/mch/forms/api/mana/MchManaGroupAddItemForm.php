@@ -47,7 +47,7 @@ class MchManaGroupAddItemForm extends BaseModel{
 
         try {
 
-            $mchId = $this->mch_id ? $this->mch_id : MchAdminController::$adminUser['mch_id'];
+            $mchId = $this->mch_id ?: MchAdminController::$adminUser['mch_id'];
             $mchGroup = MchGroup::findOne([
                 "mch_id" => $mchId
             ]);
@@ -120,6 +120,7 @@ class MchManaGroupAddItemForm extends BaseModel{
                 "settle_realname"         => ""
             ];
 
+            $applyModel->realname        = $this->realname;
             $applyModel->user_id         = $user->id;
             $applyModel->status          = "verifying";
             $applyModel->updated_at      = time();

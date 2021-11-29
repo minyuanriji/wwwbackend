@@ -60,9 +60,9 @@ class OilOrderUseForm extends BaseModel{
                 if($order->province_id != $this->use_province){
                     $order->province_id = $this->use_province;
                     $order->province    = $provinces[$this->use_province];
-                    $order->city_id     = 0;
-                    $order->city        = "";
-                    $order->district_id = "";
+                    $order->city_id     = -1;
+                    $order->city        = "-1";
+                    $order->district_id = "-1";
                     $order->address     = $provinces[$this->use_province];
                     if(!$order->save()){
                         throw new \Exception($this->responseErrorMsg($order));

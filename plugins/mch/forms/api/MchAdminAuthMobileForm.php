@@ -65,6 +65,10 @@ class MchAdminAuthMobileForm extends BaseModel{
                         "mobile"     => $mch->mobile,
                         "created_at" => time()
                     ]);
+                } else {
+                    if ($adminUser->mch_id != $mch->id) {
+                        $adminUser->mch_id = $mch->id;
+                    }
                 }
             }
             $adminUser->last_login_at    = time();

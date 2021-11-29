@@ -1,6 +1,7 @@
 <?php
 namespace app\plugins\mch\controllers\api\mana;
 
+use app\mch\forms\api\mch_set\SetAccountForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountIncomeLogForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountInfoForm;
 use app\plugins\mch\forms\api\mana\MchManaAccountLogForm;
@@ -22,9 +23,15 @@ class AccountController extends MchAdminController {
      * @throws \yii\db\Exception
      */
     public function actionSetPwd(){
-        $form = new MchManaAccountSetPwdForm();
+        /*$form = new MchManaAccountSetPwdForm();
         $form->attributes = $this->requestData;
-        return $form->save();
+        return $form->save();*/
+
+        $form = new SetAccountForm();
+        $form->attributes = $this->requestData;
+        $form->mch_id     = MchAdminController::$adminUser['mch_id'];
+        $form->mall_id    = MchAdminController::$adminUser['mall_id'];
+        $this->asJson($form->save());
     }
 
     /**

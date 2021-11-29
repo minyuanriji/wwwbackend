@@ -260,7 +260,7 @@
                             </el-form-item>
                         </el-form>
                         <div class="dialog-footer">
-                            <el-button type="primary" @click="saveShoppingVoucher">确 定</el-button>
+                            <el-button type="primary" :loading="giveLoading" @click="saveShoppingVoucher">确 定</el-button>
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="积分赠送" name="give_score">
@@ -302,7 +302,7 @@
 
                         </el-form>
                         <div class="dialog-footer">
-                            <el-button type="primary" @click="saveScore">确 定</el-button>
+                            <el-button type="primary" :loading="giveLoading" @click="saveScore">确 定</el-button>
                         </div>
                     </el-tab-pane>
                 </el-tabs>
@@ -470,6 +470,7 @@
                     ],
                 },
                 btnLoading: false,
+                giveLoading: false,
                 tableLoading: false,
                 cardLoading: false,
                 commonCats: [],
@@ -496,7 +497,7 @@
             saveScore(){
                 let that = this;
                 let do_request = function(){
-                    that.btnLoading = true;
+                    that.giveLoading = true;
                     request({
                         params: {
                             r: "plugin/integral_card/admin/from-store/batch-save"
@@ -504,7 +505,7 @@
                         method: "post",
                         data: that.scoreFormData
                     }).then(e => {
-                        that.btnLoading = true;
+                        that.giveLoading = false;
                         if (e.data.code == 0) {
                             that.$message.success('保存成功');
                         } else {
@@ -512,7 +513,7 @@
                         }
                     }).catch(e => {
                         that.$message.error(e.data.msg);
-                        that.btnLoading = true;
+                        that.giveLoading = false;
                     });
                 };
                 this.$refs['formData'].validate((valid) => {
@@ -524,7 +525,7 @@
             saveShoppingVoucher(){
                 let that = this;
                 let do_request = function(){
-                    that.btnLoading = true;
+                    that.giveLoading = true;
                     request({
                         params: {
                             r: "plugin/shopping_voucher/mall/from-store/batch-save"
@@ -532,7 +533,7 @@
                         method: "post",
                         data: that.formData
                     }).then(e => {
-                        that.btnLoading = true;
+                        that.giveLoading = false;
                         if (e.data.code == 0) {
                             that.$message.success('保存成功');
                         } else {
@@ -540,7 +541,7 @@
                         }
                     }).catch(e => {
                         that.$message.error(e.data.msg);
-                        that.btnLoading = true;
+                        that.giveLoading = false;
                     });
                 };
                 this.$refs['formData'].validate((valid) => {

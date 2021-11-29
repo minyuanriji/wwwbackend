@@ -13,10 +13,12 @@ class MchApplyInfoForm extends BaseModel{
 
     public $user_id;
 
+    public $mch_apply_id;
+
     public function rules(){
         return [
             [['user_id'], 'required'],
-            [['user_id'], 'integer'],
+            [['user_id', 'mch_apply_id'], 'integer'],
         ];
     }
 
@@ -26,9 +28,13 @@ class MchApplyInfoForm extends BaseModel{
         }
 
         try {
-            $applyModel = MchApply::findOne([
-                "user_id" => $this->user_id
-            ]);
+            if ($this->mch_apply_id) {
+                $applyModel = MchApply::findOne(['id' => $this->mch_apply_id, 'status' => 'refused']);
+            } else {
+                $applyModel = MchApply::findOne([
+                    "user_id" => $this->user_id
+                ]);
+            }
             if($applyModel && $applyModel->status == "passed"){
                 $mch = Mch::findOne(["user_id" => $this->user_id]);
                 if(!$mch || $mch->is_delete || $mch->review_status != Mch::REVIEW_STATUS_CHECKED){

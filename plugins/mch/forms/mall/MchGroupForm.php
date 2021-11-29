@@ -5,6 +5,7 @@ namespace app\plugins\mch\forms\mall;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\Store;
+use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchGroup;
 
@@ -43,9 +44,27 @@ class MchGroupForm extends BaseModel{
                 ]);
             }
 
-            $query->select(["mg.*", "m.mobile", "s.name", "s.cover_url"]);
+            $query->select(["mg.*", "m.user_id", "m.mobile", "s.name", "s.cover_url"]);
 
             $list = $query->orderBy("mg.id DESC")->page($pagination, 20, $this->page)->asArray()->all();
+
+            if ($list) {
+                foreach ($list as &$item) {
+                    if ($item['user_id']) {
+                        $userResult = User::findOne($item['user_id']);
+                        if ($userResult) {
+                            $item['user_name'] = $userResult->nickname;
+                            $item['avatar_url'] = $userResult->avatar_url;
+                        } else {
+                            $item['user_name'] = '';
+                            $item['avatar_url'] = '';
+                        }
+                    } else {
+                        $item['user_name'] = '';
+                        $item['avatar_url'] = '';
+                    }
+                }
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

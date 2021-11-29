@@ -35,6 +35,17 @@ class LoginFilter extends ActionFilter
             ])->asArray()->one();
             if($adminUser && $adminUser['token_expired_at'] > time()){
                 $isLogin = true;
+                if (
+                    $adminUser['mch'] && ($adminUser['mch']['is_delete'] || $adminUser['mch']['review_status'] != Mch::REVIEW_STATUS_CHECKED)                  ){
+                    $mch = Mch::findOne($adminUser['mch_id']);
+                    if(!$mch || $mch->is_delete || $mch->review_status != Mch::REVIEW_STATUS_CHECKED){
+                        \Yii::$app->response->data = [
+                            'code' => ApiCode::CODE_MCH_NOT_LOGIN,
+                            'msg' => '商户不存在,请重新登陆。',
+                        ];
+                        return false;
+                    }
+                }
             }
         }
         if (!$isLogin) {

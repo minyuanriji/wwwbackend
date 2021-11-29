@@ -39,7 +39,6 @@ class GiftpacksGroupOrderListForm extends BaseModel
                 $query->andWhere([
                     'or',
                     ["LIKE", "gg.id", $this->keyword],
-                    ["LIKE", "gg.order_sn", $this->keyword],
                     ["LIKE", "g.title", $this->keyword],
                 ]);
             }

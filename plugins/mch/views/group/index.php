@@ -132,6 +132,15 @@
                     </template>
                 </el-table-column>
                 <el-table-column label="手机号" prop="mobile" width="150"></el-table-column>
+                <el-table-column label="绑定用户" prop="user" width="350">
+                    <template slot-scope="scope">
+                        <div flex="cross:center">
+                            <com-image width="50" height="50" :src="scope.row.avatar_url"></com-image>
+                            <div style="margin-left: 10px;width: 300px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.user_name}}(ID:{{scope.row.user_id}})</div>
+                        </div>
+                    </template>
+                </el-table-column>
+                <el-table-column label="商户ID" prop="mch_id" width="100"></el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
                         <el-button @click="edit(scope.row.id)" type="text" circle size="mini">

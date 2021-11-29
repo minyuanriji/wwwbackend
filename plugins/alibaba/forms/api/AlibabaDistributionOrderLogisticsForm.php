@@ -81,19 +81,24 @@ class AlibabaDistributionOrderLogisticsForm extends BaseModel{
      */
     private function getExpressCode(Distribution $distribution, $token, $name){
         $expressList = Express::getExpressList();
-        $pattern = "/(快递|速递|快运|速运)/";
-        if(preg_match($pattern, $name, $matches)){
-            $tail = $matches[1];
-            $str = substr($name, 0, strpos($name, $matches[1]));
-            //$str = preg_replace($pattern, "", $name);
-            $similars = [];
-            foreach($expressList as $item){
-                if(strpos($item['name'], $str) !== FALSE){
-                    $similars[] = $item;
+        if(preg_match("/邮政/", $name)){
+            return "EMS";
+        }else{
+            $pattern = "/(快递|速递|快运|速运)/";
+            if(preg_match($pattern, $name, $matches)){
+                $tail = $matches[1];
+                $str = substr($name, 0, strpos($name, $matches[1]));
+                //$str = preg_replace($pattern, "", $name);
+                $similars = [];
+                foreach($expressList as $item){
+                    if(strpos($item['name'], $str) !== FALSE){
+                        $similars[] = $item;
+                    }
                 }
+                return !empty($similars) ? $similars[0]['code'] : null;
             }
-            return !empty($similars) ? $similars[0]['code'] : null;
         }
+
         return null;
     }
 

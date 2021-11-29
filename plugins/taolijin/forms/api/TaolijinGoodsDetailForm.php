@@ -52,6 +52,7 @@ class TaolijinGoodsDetailForm extends BaseModel{
         }
 
         $details['pic_url'] = json_decode($details['pic_url']);
+        $details['extra_data'] = json_decode($goods->ali_other_data, true);
 
         return $details;
     }

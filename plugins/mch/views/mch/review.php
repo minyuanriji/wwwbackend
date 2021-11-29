@@ -275,7 +275,6 @@
                         cor_realname: '请输入',
                         province: '',
                         city: '',
-                        province: ''
                     },
                     rules: {
                         store_name: [

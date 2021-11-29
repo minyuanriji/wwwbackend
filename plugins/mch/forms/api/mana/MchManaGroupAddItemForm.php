@@ -4,12 +4,14 @@ namespace app\plugins\mch\forms\api\mana;
 
 use app\core\ApiCode;
 use app\forms\api\identity\RegisterForm;
+use app\forms\api\identity\SmsForm;
 use app\models\BaseModel;
 use app\models\User;
 use app\plugins\mch\controllers\api\mana\MchAdminController;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
 use app\plugins\mch\models\MchGroup;
+use function Webmozart\Assert\Tests\StaticAnalysis\string;
 
 class MchManaGroupAddItemForm extends BaseModel{
 
@@ -46,6 +48,12 @@ class MchManaGroupAddItemForm extends BaseModel{
         }
 
         try {
+
+            $smsForm = new SmsForm();
+            $smsForm->captcha = $this->captcha;
+            $smsForm->mobile = $this->mobile;
+            if(!$smsForm->checkCode())
+                throw new \Exception('验证码不正确');
 
             $mchId = $this->mch_id ?: MchAdminController::$adminUser['mch_id'];
             $mchGroup = MchGroup::findOne([
@@ -111,7 +119,7 @@ class MchManaGroupAddItemForm extends BaseModel{
                 "license_num"             => $this->license_num,
                 "license_pic"             => $this->license_pic,
                 "settle_discount"         => $this->zk,
-                "store_mch_common_cat_id" => $mchModel->mch_common_cat_id,
+                "store_mch_common_cat_id" => (string)$mchModel->mch_common_cat_id,
                 "cor_num"                 => "",
                 "cor_pic1"                => "",
                 "cor_pic2"                => "",

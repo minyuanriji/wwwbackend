@@ -34,9 +34,10 @@ class QueryOrderAction extends BaseObject
             if (!$AddcreditPlateformsInfo) {
                 throw new \Exception("无法获取ADDCREDIT ID " . $this->AddcreditOrder->plateform_id . " 平台信息", ApiCode::CODE_FAIL);
             }
-            $plateforms_param = json_decode($AddcreditPlateformsInfo->json_param,true);
+            $configs = Helpers::getPlateConfig($this->AddcreditPlateforms->json_param);
+
             $post_param = [
-                'userid'         => $plateforms_param['id'],
+                'userid'         => $configs['app_id'],
                 'out_trade_nums' => $this->AddcreditOrder->order_no,
             ];
             ksort($post_param);
@@ -44,7 +45,7 @@ class QueryOrderAction extends BaseObject
             foreach ($post_param as $key => $item) {
                 $param_str .= $key . '=' . $item . '&';
             }
-            $sign_str = $param_str . 'apikey=' . $plateforms_param['secret_key'];
+            $sign_str = $param_str . 'apikey=' . $configs['secret_key'];
             $sign = strtoupper(md5($sign_str));
             $param_str .= "&sign=" . $sign;
             $response = Request::http_get(Config::ORDER_QUERY . '?' . $param_str);

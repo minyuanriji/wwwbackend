@@ -13,8 +13,6 @@ class PlateformsEditForm extends BaseModel
     public $name;
     public $sdk_dir;
     public $ratio;
-    public $cyd_id;
-    public $secret_key;
     public $parent_id;
     public $transfer_rate;
     public $class_dir;
@@ -23,14 +21,15 @@ class PlateformsEditForm extends BaseModel
     public $allow_plats;
     public $pattern_deny;
     public $region_deny;
+    public $params;
 
     public function rules()
     {
         return [
-            [['name', 'sdk_dir', 'ratio', 'cyd_id', 'secret_key','parent_id', 'class_dir', 'transfer_rate'], 'required'],
-            [['ratio', 'id', 'parent_id','transfer_rate', 'enable_fast', 'enable_slow'], 'integer'],
-            [['name', 'sdk_dir', 'secret_key', 'allow_plats', 'pattern_deny'], 'string'],
-            [['region_deny'], 'safe']
+            [['name', 'sdk_dir', 'ratio', 'class_dir', 'transfer_rate'], 'required'],
+            [['ratio', 'id', 'parent_id','transfer_rate', 'enable_fast', 'enable_slow','parent_id'], 'integer'],
+            [['name', 'sdk_dir', 'allow_plats', 'pattern_deny'], 'string'],
+            [['region_deny', 'params'], 'safe']
         ];
     }
 
@@ -41,30 +40,29 @@ class PlateformsEditForm extends BaseModel
         }
         try {
             if ($this->id) {
-                $plateforms = AddcreditPlateforms::findOne(['id' => $this->id]);
-                if (!$plateforms) {
+                $plateforms = AddcreditPlateforms::findOne($this->id);
+                if (!$plateforms)
                     throw new \Exception('数据异常,该条数据不存在');
-                }
+
             } else {
                 $plateforms = new AddcreditPlateforms();
                 $plateforms->mall_id = \Yii::$app->mall->id;
             }
-            $plateforms->name = $this->name;
-            $plateforms->sdk_dir = $this->sdk_dir;
-            $plateforms->created_at = $plateforms->updated_at = time();
-            $plateforms->ratio = $this->ratio;
-            $plateforms->parent_id = $this->parent_id;
-            $plateforms->transfer_rate = $this->transfer_rate;
-            $plateforms->class_dir = $this->class_dir;
-            $plateforms->enable_fast = (int)$this->enable_fast;
-            $plateforms->enable_slow = (int)$this->enable_slow;
-            $plateforms->json_param = json_encode(['id' => $this->cyd_id, 'secret_key' => $this->secret_key]);
-            $plateforms->allow_plats = $this->allow_plats;
-            $plateforms->pattern_deny = $this->pattern_deny;
-            $plateforms->region_deny  = !empty($this->region_deny) ? json_encode($this->region_deny) : "";
-            if (!$plateforms->save()) {
-                throw new \Exception('保存失败');
-            }
+            $plateforms->name           = $this->name;
+            $plateforms->sdk_dir        = $this->sdk_dir;
+            $plateforms->ratio          = $this->ratio;
+            $plateforms->parent_id      = $this->parent_id ?? 0;
+            $plateforms->transfer_rate  = $this->transfer_rate;
+            $plateforms->class_dir      = $this->class_dir;
+            $plateforms->enable_fast    = (int)$this->enable_fast;
+            $plateforms->enable_slow    = (int)$this->enable_slow;
+            $plateforms->allow_plats    = $this->allow_plats;
+            $plateforms->pattern_deny   = $this->pattern_deny;
+            $plateforms->region_deny    = !empty($this->region_deny) ? json_encode($this->region_deny) : "";
+            $plateforms->json_param     = !empty($this->params) ? json_encode($this->params) : "";
+            if (!$plateforms->save())
+                throw new \Exception($plateforms->getErrorMessage());
+
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '保存成功');
         } catch (\Exception $e) {
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());

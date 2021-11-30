@@ -7,11 +7,9 @@ use app\plugins\addcredit\plateform\result\SubmitResult;
 class SubmitFastAction extends BaseAction {
 
     public function run(){
-        $configs = @json_decode($this->plateModel->json_param, true);
-        $appKey = isset($configs['app_key']) ? $configs['app_key'] : "";
-        $appSecret = isset($configs['app_secret']) ? $configs['app_secret'] : "";
+        $configs = $this->getPlateConfig();
 
-        $req = new Req($configs['host'], $appKey, $appSecret);
+        $req = new Req($configs['host'], $configs['app_key'], $configs['app_secret']);
         $params['orderId']   = $this->orderModel->order_no;
         $params['mobile']    = $this->orderModel->mobile;
         $params['amount']    = $this->orderModel->order_price;

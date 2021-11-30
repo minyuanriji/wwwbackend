@@ -80,29 +80,27 @@ class PlateformsForm extends BaseModel
 
     public function getDetail()
     {
-        $detail = AddcreditPlateforms::find()->where([
-            'id' => $this->id,
-        ])->asArray()->one();
-        if ($detail) {
-            $json_param = json_decode($detail['json_param'],true);
-            $detail['cyd_id'] = isset($json_param['id']) ? $json_param['id'] : "";
-            $detail['secret_key'] = isset($json_param['secret_key']) ? $json_param['secret_key'] : "";
-            $user = User::findOne($detail['parent_id']);
-            $detail['parent_name'] = $user ? $user->nickname : "";
-            $detail['product_json_data'] = json_decode($detail['product_json_data'], true);
-            $detail['enable_fast'] = (string)$detail['enable_fast'];
-            $detail['enable_slow'] = (string)$detail['enable_slow'];
-            $detail['region_deny'] = !empty($detail['region_deny']) ? json_decode($detail['region_deny'], true) : [];
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '请求成功',
-                'data' => $detail
-            ];
-        }
-        return [
-            'code' => ApiCode::CODE_FAIL,
-            'msg' => '请求失败',
-        ];
+        $detail = AddcreditPlateforms::find()->where(['id' => $this->id])->asArray()->one();
+        if (!$detail)
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, '请求话费详情数据异常！');
+
+        $user = $detail['parent_id'] ? User::findOne($detail['parent_id']) : null;
+        $result['id']                   = $detail['id'];
+        $result['name']                 = $detail['name'];
+        $result['sdk_dir']              = $detail['sdk_dir'];
+        $result['class_dir']            = $detail['class_dir'];
+        $result['params']               = !empty($detail['json_param']) ? json_decode($detail['json_param'], true) : [];
+        $result['ratio']                = $detail['ratio'];
+        $result['parent_name']          = $user ? $user->nickname : "";
+        $result['transfer_rate']        = $detail['transfer_rate'];
+        $result['product_json_data']    = json_decode($detail['product_json_data'], true);
+        $result['enable_fast']          = (string)$detail['enable_fast'];
+        $result['enable_slow']          = (string)$detail['enable_slow'];
+        $result['pattern_deny']         = $detail['pattern_deny'];
+        $result['region_deny']          = !empty($detail['region_deny']) ? json_decode($detail['region_deny'], true) : [];
+        $result['allow_plats']          = $detail['allow_plats'];
+
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', $result ?? []);
     }
 
     //弃用

@@ -5,15 +5,12 @@ namespace app\plugins\addcredit\plateform\sdk\kcb_sdk;
 use app\core\ApiCode;
 use app\plugins\addcredit\forms\common\Request;
 use app\plugins\addcredit\plateform\result\SubmitResult;
-use app\plugins\addcredit\forms\common\TelType;
-use app\plugins\shopping_voucher\models\AddcreditOrderThirdParty;
 use yii\base\BaseObject;
 
 class SubmitOrderAction extends BaseObject
 {
     public $AddcreditOrder;
     public $AddcreditPlateforms;
-    public $requestNum;
 
     /**
      * 第三方需要参数
@@ -40,13 +37,13 @@ class SubmitOrderAction extends BaseObject
     {
         $SubmitResult = new SubmitResult();
         try {
-            $plateforms_param = json_decode($this->AddcreditPlateforms->json_param,true);
+            $configs = Helpers::getPlateConfig($this->AddcreditPlateforms->json_param);
             $orderNo = $this->AddcreditOrder->order_no;
             $param = [
                 'out_trade_num'    => $orderNo,
                 'product_id'       => $this->AddcreditOrder->product_id,
                 'account'          => $this->AddcreditOrder->mobile,
-                'userid'           => $plateforms_param['id'],
+                'userid'           => $configs['app_id'],
                 'notify_url'       => "https://www.mingyuanriji.cn/web/pay-notify/telephone.php",
                 'amount'           => 0,
             ];
@@ -55,7 +52,7 @@ class SubmitOrderAction extends BaseObject
             foreach ($param as $key => $item) {
                 $param_str .= $key . '=' . $item . '&';
             }
-            $sign_str = $param_str . 'apikey=' . $plateforms_param['secret_key'];
+            $sign_str = $param_str . 'apikey=' . $configs['secret_key'];
             $sign = strtoupper(md5($sign_str));
             $param_str .= "&sign=" . $sign;
             $response = Request::http_get(Config::PHONE_BILL_SUBMIT . '?' . $param_str);

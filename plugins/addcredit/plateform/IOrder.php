@@ -13,10 +13,9 @@ interface IOrder
      * 提交订单
      * @param AddcreditOrder $orderModel
      * @param AddcreditPlateforms $plateform
-     * @param $requestNum
      * @return SubmitResult
      */
-    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform, $requestNum);
+    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform);
 
     /**
      * 查询订单
@@ -33,10 +32,4 @@ interface IOrder
      */
     public function query(AddcreditOrder $orderModel);
 
-    /**
-     * 账户余额查询
-     * @param  $plateforms_params
-     * @return QueryResult
-     */
-    public function accountBalanceQuery($plateforms_params);
 }

@@ -19,19 +19,16 @@ abstract class BaseAction
 
     public function getPlateConfig ()
     {
-        $config['app_key'] = '';
-        $config['app_secret'] = '';
-        $config['host'] = '';
-        if (is_string($this->plateModel->json_param)) {
-            $params = @json_decode($this->plateModel->json_param, true);
-            foreach ($params as $item) {
-                if (isset($item['name']) && $item['name']) {
-                    if ($item['name'] == 'app_key' || $item['name'] == 'app_secret' || $item['name'] == 'host') {
-                        $config[$item['name']] = $item['value'];
-                    }
-                }
+        $paramArray = @json_decode($this->plateModel->json_param, true);
+        $data = [];
+        if($paramArray){
+            foreach($paramArray as $item){
+                $data[$item['name']] = $item['value'];
             }
         }
-        return $config;
+        $data['host']       = isset($data['host']) ?? '';
+        $data['app_key']    = isset($data['app_key']) ?? '';
+        $data['app_secret'] = isset($data['app_secret']) ?? '';
+        return $data;
     }
 }

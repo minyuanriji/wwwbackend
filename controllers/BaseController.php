@@ -35,7 +35,7 @@ class BaseController extends \yii\web\Controller
         header("Access-Control-Request-Headers:*");
         header("Access-Control-Allow-Credentials:true");
         header("Access-Control-Request-Method:*");
-        header("Access-Control-Allow-Headers: Origin,x-access-token,x-app-platform, x-parent-id,x-city-id,x-longitude,x-latitude,x-mall-id,x-source, X-Requested-With,x-stands-mall-id, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, Cache-Control,Authorization");
+        header("Access-Control-Allow-Headers: Origin,x-access-token,x-app-platform, x-parent-id,x-city-id,x-longitude,x-latitude,x-mall-id,x-source, X-Requested-With,x-stands-mall-id, X-Requested-With, Content-Type, Accept, Connection, User-Agent, Cookie, Cache-Control,Authorization,x-man-mch-id");
 
         $this->mall_id = \Yii::$app->getMallId();
         if (!$this->mall_id) {

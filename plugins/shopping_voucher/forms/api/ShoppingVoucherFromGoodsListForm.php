@@ -10,6 +10,7 @@ use app\models\BaseModel;
 use app\models\Goods;
 use app\models\GoodsWarehouse;
 use app\models\OrderDetail;
+use app\models\PostageRules;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromGoods;
 
 class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
@@ -40,9 +41,9 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
 
             $query->where(['g.is_delete' => 0,'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => ($this->base_mall_id)]);
 
-            $selects = ["g.id", "g.is_level", "g.is_show_sales", "gw.cover_pic", "g.goods_stock",
+            $selects = ["g.id", "g.is_level", "g.is_show_sales", "gw.cover_pic", "g.goods_stock", "g.freight_id",
                 "g.max_deduct_integral", "g.mch_id", "gw.name", "gw.original_price", "g.price", "g.status",
-                "gw.unit", "g.use_attr", "gw.video_url", "g.virtual_sales", "g.use_virtual_sales"
+                "gw.unit", "g.use_attr", "gw.video_url", "g.virtual_sales", "g.use_virtual_sales", "svfg.enable_express"
             ];
 
             $list = $query->orderBy("g.sort DESC,g.id DESC")
@@ -98,6 +99,13 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
                 if(isset($fromGoodsRates[$detail['id']])){
                     $rate = $fromGoodsRates[$detail['id']];
                     $detail['got_shopping_voucher_num'] = round((floatval($rate)/100) * floatval($detail['price']), 2);
+                    if ($detail['enable_express'] && $detail['freight_id']) {
+                        $freight = PostageRules::findOne(['id' => $detail['freight_id'], 'is_delete' => 0]);
+                        if ($freight && $freight->detail) {
+                            $freightDetail = @json_decode($freight->detail, true);
+                            $detail['got_shopping_voucher_num'] += $freightDetail[0]['firstPrice'];
+                        }
+                    }
                 }
             }
 

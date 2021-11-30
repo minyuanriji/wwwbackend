@@ -84,8 +84,7 @@ class WsServerController extends BaseCommandController {
         $token = $param['request']->post['notify_mobile'];
         $fd = $this->getClientId($token);
         if(empty($fd) || !$param['ws']->isEstablished($fd)){
-            $this->commandOut("客户端：" . $token. "已断开");
-            $param['response']->end("ERROR");
+            $param['response']->end("客户端：" . $token. "已断开");
         }else{
             $this->commandOut("客户端：" . $token. "付款成功");
             $param['ws']->push($fd, $text);

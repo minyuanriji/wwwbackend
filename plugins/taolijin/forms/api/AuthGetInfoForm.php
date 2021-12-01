@@ -69,6 +69,7 @@ class AuthGetInfoForm extends BaseModel{
             return [
                 "code" => ApiCode::CODE_SUCCESS,
                 "data" => [
+                    "user_id"   => \Yii::$app->user->id,
                     "need_auth" => $isNeedAuth ? 1 : 0
                 ]
             ];

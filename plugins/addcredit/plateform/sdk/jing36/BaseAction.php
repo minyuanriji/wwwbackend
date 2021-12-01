@@ -16,4 +16,19 @@ abstract class BaseAction
     }
 
     abstract public function run();
+
+    public function getPlateConfig ()
+    {
+        $paramArray = @json_decode($this->plateModel->json_param, true);
+        $data = [];
+        if($paramArray){
+            foreach($paramArray as $item){
+                $data[$item['name']] = $item['value'];
+            }
+        }
+        $data['host']       = isset($data['host']) ?? '';
+        $data['app_key']    = isset($data['app_key']) ?? '';
+        $data['app_secret'] = isset($data['app_secret']) ?? '';
+        return $data;
+    }
 }

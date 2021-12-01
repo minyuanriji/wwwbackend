@@ -10,12 +10,11 @@ use app\plugins\addcredit\plateform\result\QueryResult;
 class PlateForm implements IOrder
 {
 
-    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform, $requestNum)
+    public function submit(AddcreditOrder $orderModel, AddcreditPlateforms $plateform)
     {
         return (new SubmitOrderAction([
             'AddcreditOrder'    => $orderModel,
             'AddcreditPlateforms' => $plateform,
-            'requestNum' => $requestNum,
         ]))->run();
     }
 
@@ -23,13 +22,6 @@ class PlateForm implements IOrder
     {
         return (new QueryOrderAction([
             'AddcreditOrder' => $orderModel,
-        ]))->run();
-    }
-
-    public function accountBalanceQuery($plateforms_params)
-    {
-        return (new AccountBalanceQueryAction([
-            'plateforms_params' => $plateforms_params,
         ]))->run();
     }
 

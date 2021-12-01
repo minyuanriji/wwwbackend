@@ -18,7 +18,7 @@ class PlateForm implements IOrder
      * @param $requestNum
      * @return SubmitResult
      */
-    public function submit(AddcreditOrder $addcreditOrder, AddcreditPlateforms $plateform, $requestNum)
+    public function submit(AddcreditOrder $addcreditOrder, AddcreditPlateforms $plateform)
     {
         if($addcreditOrder->recharge_type == "fast"){ //快充
             $action = new SubmitFastAction($addcreditOrder, $plateform);

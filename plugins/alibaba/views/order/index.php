@@ -4,6 +4,9 @@
             <el-tab-pane label="全部" name="all"></el-tab-pane>
             <el-tab-pane label="支付成功" name="paid"></el-tab-pane>
             <el-tab-pane label="未支付" name="unpaid"></el-tab-pane>
+            <div style="float: right;margin-top: 20px">
+                <com-export-dialog :action_url="'<?= Yii::$app->request->baseUrl . '/index.php?r=plugin/alibaba/mall/order/index' ?>'" :field_list='exportList' :params="search" ></com-export-dialog>
+            </div>
             <div class="table-body">
                 <span style="height: 32px;">支付时间：</span>
                 <el-date-picker
@@ -117,17 +120,14 @@
                     </el-table-column>-->
                 </el-table>
                 <div flex="box:last cross:center">
-                    <div></div>
-                    <div>
-                        <el-pagination
-                                v-if="list.length > 0"
-                                style="display: inline-block;float: right;"
-                                background :page-size="pagination.pageSize"
-                                @current-change="pageChange"
-                                layout="prev, pager, next" :current-page="pagination.current_page"
-                                :total="pagination.total_count">
-                        </el-pagination>
-                    </div>
+                    <el-pagination
+                            v-if="list.length > 0"
+                            style="display: inline-block;float: right;"
+                            background :page-size="pagination.pageSize"
+                            @current-change="pageChange"
+                            layout="prev, pager, next" :current-page="pagination.current_page"
+                            :total="pagination.total_count">
+                    </el-pagination>
                 </div>
             </div>
         </el-tabs>
@@ -186,6 +186,7 @@
                     if (e.data.code == 0) {
                         this.list = e.data.data.list;
                         this.pagination = e.data.data.pagination;
+                        this.exportList = e.data.data.export_list;
                     } else {
                         this.$message.error(e.data.msg);
                     }
@@ -209,6 +210,7 @@
             },
 
             handleClick(tab, event) {
+                this.search.status = this.activeName;
                 this.loadData(this.activeName)
             },
 

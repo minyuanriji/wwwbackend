@@ -38,7 +38,6 @@ class PlateformsController extends Controller
                 $form = new PlateformsEditForm();
                 $form->attributes = \Yii::$app->request->post('form');
                 $res = $form->save();
-
                 return $this->asJson($res);
             } else {
                 $form = new PlateformsForm();

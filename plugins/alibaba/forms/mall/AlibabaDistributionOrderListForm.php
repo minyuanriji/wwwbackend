@@ -3,6 +3,7 @@
 namespace app\plugins\alibaba\forms\mall;
 
 use app\core\ApiCode;
+use app\forms\mall\export\AlibabaOrderExport;
 use app\models\BaseModel;
 use app\models\IntegralLog;
 use app\models\User;
@@ -14,6 +15,7 @@ use app\plugins\alibaba\models\AlibabaDistributionOrderDetail1688;
 use app\plugins\commission\models\CommissionGiftpacksPriceLog;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksOrder;
+use yii\base\BaseObject;
 
 class AlibabaDistributionOrderListForm extends BaseModel
 {
@@ -22,13 +24,15 @@ class AlibabaDistributionOrderListForm extends BaseModel
     public $start_time;
     public $end_time;
     public $status;
+    public $fields;
+    public $flag;
 
     public function rules()
     {
         return [
             [['page'], 'integer'],
             [['keyword', 'status'], 'string'],
-            [['start_time', 'end_time'], 'safe']
+            [['start_time', 'end_time', 'fields', 'flag'], 'safe']
         ];
     }
 
@@ -73,7 +77,16 @@ class AlibabaDistributionOrderListForm extends BaseModel
 
             $select = ['ao.*', "ag.name as goods_name", "ag.cover_url", 'ad.*', "u.nickname", "aod.status", "aod.do_error"];
 
-            $list = $query->select($select)->orderBy("ao.id DESC")->page($pagination)->asArray()->all();
+            $query->select($select);
+
+            if ($this->flag == "EXPORT") {
+                $new_query = clone $query;
+                $exp = new AlibabaOrderExport();
+                $exp->fieldsKeyList = $this->fields;
+                $exp->export($new_query, 'ao.');
+                return false;
+            }
+            $list = $query->orderBy("ao.id DESC")->page($pagination)->asArray()->all();
 
             if ($list) {
                 foreach ($list as &$item) {
@@ -87,7 +100,8 @@ class AlibabaDistributionOrderListForm extends BaseModel
                 '',
                 [
                     'list' => $list ?: [],
-                    'pagination' => $pagination
+                    'pagination' => $pagination,
+                    'export_list' => (new AlibabaOrderExport())->fieldsList(),
                 ]
             );
         } catch (\Exception $e) {

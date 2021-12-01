@@ -23,7 +23,16 @@ class OrderController extends Controller
             $form->attributes = \Yii::$app->request->get();
             return $this->asJson($form->getList());
         } else {
-            return $this->render('index');
+            if (\Yii::$app->request->post('flag') === 'EXPORT') {
+                $fields = explode(',', \Yii::$app->request->post('fields'));
+                $form = new AlibabaDistributionOrderListForm();
+                $form->attributes = \Yii::$app->request->post();
+                $form->fields = $fields;
+                $form->getList();
+                return false;
+            } else {
+                return $this->render('index');
+            }
         }
     }
 

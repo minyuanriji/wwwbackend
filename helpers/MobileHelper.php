@@ -21,22 +21,20 @@ class MobileHelper
         $cacheKey = "MobileHelper::getInfo:{$mobile}";
 
         $cacheData = $cacheObj->get($cacheKey);
-        if(!$refresh && $cacheData){
-            $info = $cacheData;
-        }else{
-            $mobileService = new TenCloud15700();
-            $queryResult = $mobileService->queryMobileInfo($mobile);
-            if($queryResult instanceof QueryMobileInfoResult){
-                if($queryResult->code == QueryMobileInfoResult::CODE_SUCC){
-                    $info['province'] = $queryResult->province;
-                    $info['city']     = $queryResult->city;
-                    $info['platName'] = $queryResult->platName;
-                    $info['platCode'] = $queryResult->platCode;
-                    $cacheObj->set($cacheKey, $info);
-                }
+        if(!$refresh && $cacheData && isset($cacheData['platCode']) && $cacheData['platCode']){
+            return $cacheData;
+        }
+        $mobileService = new TenCloud15700();
+        $queryResult = $mobileService->queryMobileInfo($mobile);
+        if($queryResult instanceof QueryMobileInfoResult){
+            if($queryResult->code == QueryMobileInfoResult::CODE_SUCC){
+                $info['province'] = $queryResult->province;
+                $info['city']     = $queryResult->city;
+                $info['platName'] = $queryResult->platName;
+                $info['platCode'] = $queryResult->platCode;
+                $cacheObj->set($cacheKey, $info);
             }
         }
-
         return $info;
     }
 

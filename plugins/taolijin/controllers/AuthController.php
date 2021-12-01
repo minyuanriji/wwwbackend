@@ -18,11 +18,13 @@ class AuthController extends Controller{
 
         $setting = @json_decode($aliModel->settings_data, true);
 
+        $state = "{$ali_id}_" . uniqid();
+
         $hostInfo = \Yii::$app->getRequest()->getHostInfo();
         $hostInfo = "https://dev.mingyuanriji.cn";
         $redirectUri = "{$hostInfo}/web/index.php?r=plugin/taolijin/auth/ali-auth&ali_id={$ali_id}";
 
-        $authUrl  = "https://oauth.m.taobao.com/authorize?response_type=code&client_id=" . $setting['app_key'] . "&redirect_uri={$redirectUri}&state=".uniqid()."&view=wap";
+        $authUrl  = "https://oauth.m.taobao.com/authorize?response_type=code&client_id=" . $setting['app_key'] . "&redirect_uri={$redirectUri}&state={$state}&view=wap";
 
         header("Location: {$authUrl}");
         exit;

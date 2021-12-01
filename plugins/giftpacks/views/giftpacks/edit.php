@@ -3,7 +3,7 @@ Yii::$app->loadComponentView('com-rich-text');
 ?>
 <div id="edit_app" v-cloak>
 
-    <el-dialog :title="dailogTitle" :visible.sync="dialogFormVisible">
+    <el-dialog :title="dailogTitle" :visible.sync="dialogFormVisible" :before-close="cancelDialog">
 
         <el-form :rules="rules" ref="formData" label-width="110px" :model="formData" size="small">
             <el-form-item label="标题" prop="title">
@@ -168,7 +168,7 @@ Yii::$app->loadComponentView('com-rich-text');
         </el-form>
 
         <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button @click="cancelDialog()">取 消</el-button>
             <el-button :loading="btnLoading" type="primary" @click="save()">确 定</el-button>
         </div>
     </el-dialog>
@@ -246,6 +246,10 @@ Yii::$app->loadComponentView('com-rich-text');
             savedCallFn : null
         },
         methods: {
+            cancelDialog () {
+                this.dialogFormVisible = false;
+                location.reload();
+            },
             show(title, row, fn){
                 this.dailogTitle = title;
                 this.dialogFormVisible = true;

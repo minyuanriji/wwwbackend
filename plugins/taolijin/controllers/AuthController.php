@@ -20,7 +20,7 @@ class AuthController extends Controller{
 
         $hostInfo = \Yii::$app->getRequest()->getHostInfo();
         $hostInfo = "https://dev.mingyuanriji.cn";
-        $redirectUri = "{$hostInfo}/web/index.php?r=plugin/taolijin/auth/ali-auth";
+        $redirectUri = "{$hostInfo}/web/index.php?r=plugin/taolijin/auth/ali-auth&ali_id={$ali_id}";
 
         $authUrl  = "https://oauth.m.taobao.com/authorize?response_type=code&client_id=" . $setting['app_key'] . "&redirect_uri={$redirectUri}&state=".uniqid()."&view=wap";
 

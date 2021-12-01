@@ -25,8 +25,8 @@ abstract class TbkBaseHandle{
         return $this;
     }
 
-    public function execute($class){
-        $result = $this->ali->getClient()->execute($this->request);
+    public function execute($class, $session = null, $bestUrl = null){
+        $result = $this->ali->getClient()->execute($this->request, $session, $bestUrl);
         return new $class($result);
     }
 }

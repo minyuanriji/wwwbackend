@@ -92,7 +92,8 @@ class GiftpacksDetailForm extends BaseModel{
                 }
             }
 
-            $detail['sold_num'] += $this->pack_id == 13 ? 1000 : 300;
+//            $detail['sold_num'] += $this->pack_id == 13 ? 1000 : 300;
+            $detail['sold_num']  += $detail['virtual_sales'];
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
@@ -139,6 +140,7 @@ class GiftpacksDetailForm extends BaseModel{
 
         $detail['pic_url']             = !empty($giftpacks->pic_url) ? json_decode($giftpacks->pic_url, true) : [];
         $detail['detail']              = $giftpacks->detail;
+        $detail['virtual_sales']       = $giftpacks->virtual_sales;
 
 
         return $detail;

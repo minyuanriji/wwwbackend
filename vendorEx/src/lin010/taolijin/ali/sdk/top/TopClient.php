@@ -224,7 +224,6 @@ class TopClient
 			try {
 				$request->check();
 			} catch (Exception $e) {
-
 				$result->code = $e->getCode();
 				$result->msg = $e->getMessage();
 				return $result;

@@ -73,7 +73,7 @@ class AuthController extends Controller{
                     }
                 }
 
-                exit("您已成功授权！");
+                exit("您已成功授权！请稍后...");
             }
         }
 

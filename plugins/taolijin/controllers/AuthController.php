@@ -73,7 +73,7 @@ class AuthController extends Controller{
                     }
                 }
 
-                exit("您已成功授权！请稍后...");
+                exit("<div style='text-align:center;margin-top:30px;'>您已成功授权！请稍后...</div>");
             }
         }
 

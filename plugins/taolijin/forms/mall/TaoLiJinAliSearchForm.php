@@ -33,7 +33,8 @@ class TaoLiJinAliSearchForm extends BaseModel {
                 "page_size"   => "12",
                 "page_no"     => (string)$this->page,
                 "adzone_id"   => $acc->adzone_id,
-                "material_id" => "13366"
+                "material_id" => "13366",
+                "item_id"     => "588875086307"
             ]);
 
             if(!empty($res->code)){

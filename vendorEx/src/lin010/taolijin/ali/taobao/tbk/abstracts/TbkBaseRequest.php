@@ -4,6 +4,8 @@ namespace lin010\taolijin\ali\taobao\tbk\abstracts;
 
 abstract class TbkBaseRequest{
 
+    const CODE_FAIL = -1;
+
     protected $apiParas = [];
 
     public function __set($name, $value){

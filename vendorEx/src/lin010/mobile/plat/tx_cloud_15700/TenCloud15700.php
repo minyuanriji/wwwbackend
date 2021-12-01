@@ -83,7 +83,7 @@ class TenCloud15700 implements IService
                 $queryResult->platCode = "10000";
             }elseif(preg_match("/移动/", $queryResult->platName)) {
                 $queryResult->platCode = "10086";
-            }elseif(preg_match("/电信/", $queryResult->platName)){
+            }elseif(preg_match("/联通/", $queryResult->platName)){
                 $queryResult->platCode = "10010";
             }
         }catch (\Exception $e){

@@ -28,7 +28,9 @@ echo $this->render("com-edit");
                 <el-table-column sortable="custom" prop="id" width="110" label="ID"></el-table-column>
                 <el-table-column width="150" label="联盟类型">
                     <template slot-scope="scope">
-                        <span v-if="scope.row.ali_type == 'ali'">淘宝联盟</span>
+                        <a :href="'?r=plugin/taolijin/mall/order/list&ali_id='+scope.row.id">
+                            <span v-if="scope.row.ali_type == 'ali'">淘宝联盟</span>
+                        </a>
                     </template>
                 </el-table-column>
                 <el-table-column width="150" label="是否使用">

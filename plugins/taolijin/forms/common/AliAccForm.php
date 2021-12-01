@@ -21,6 +21,16 @@ class AliAccForm extends BaseModel{
     }
 
     /**
+     * @param string $type
+     * @return AliAccForm
+     */
+    public static function getByModel(TaolijinAli $aliModel){
+        $data['id'] = $aliModel->id;
+        $data['settings_data'] = json_decode($aliModel->settings_data, true);
+        return new AliAccForm($data);
+    }
+
+    /**
      * 获取一个可用的账号
      * @param string $type
      * @return AliAccForm

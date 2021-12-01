@@ -20,7 +20,7 @@
                 </el-date-picker>
 
                 <div class="input-item" style="width:300px;margin-bottom:20px;display:inline-block;">
-                    <el-input @keyup.enter.native="toSearch" size="small" placeholder="订单ID/订单编号/大礼包名称" v-model="search.keyword" clearable @clear="toSearch">
+                    <el-input @keyup.enter.native="toSearch" size="small" placeholder="订单ID/大礼包名称" v-model="search.keyword" clearable @clear="toSearch">
                         <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
                     </el-input>
                 </div>

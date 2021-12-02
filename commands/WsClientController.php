@@ -21,7 +21,6 @@ class WsClientController extends BaseCommandController {
             $mchMessage->updated_at = time();
             $mchMessage->save();
 
-            $mchMessage->status     = 1;
             $mchMessage->try_count += 1;
 
             try {
@@ -33,7 +32,15 @@ class WsClientController extends BaseCommandController {
                         "token_expired_at > '".time()."'"
                     ])->asArray()->select(["access_token"])->all();
                 if($adminUsers){
-                    $base64Data = TencentCloudAudioHelper::request($mchMessage->content);
+
+                    $cache = \Yii::$app->getCache();
+                    $cachekey = "WsClientController:audio" . md5($mchMessage->content);
+                    $base64Data = $cache->get($cachekey);
+                    if(!$base64Data){
+                        $base64Data = TencentCloudAudioHelper::request($mchMessage->content);
+                        $cache->set($cachekey, $base64Data);
+                    }
+
                     foreach($adminUsers as $adminUser){
 
                         if(empty($adminUser['access_token'])) continue;
@@ -53,8 +60,14 @@ class WsClientController extends BaseCommandController {
                             if($cli->body != "SUCCESS") {
                                 $mchMessage->status = 0;
                                 $mchMessage->fail_reason = $cli->body;
+                            }else{
+                                //只要有一个成功了就不再提示
+                                $mchMessage->status = 1;
                             }
                         });
+
+                        sleep(1);
+
                     }
                 }
 

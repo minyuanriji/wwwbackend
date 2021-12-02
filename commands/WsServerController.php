@@ -82,21 +82,25 @@ class WsServerController extends BaseCommandController {
      * @param $param
      */
     public function requestActionMchPaidNotify($param){
-        $text = !empty($param['request']->post['notify_data']) ? $param['request']->post['notify_data'] : "";
-        $token = $param['request']->post['notify_mobile'];
-        $fd = $this->getClientId($token);
-        $this->commandOut("通知商户付款>>>>>>开始");
-        $this->commandOut("token:{$token}");
-        $this->commandOut("fd:{$fd}");
-        if(empty($fd) || !$param['ws']->isEstablished($fd)){
-            $this->commandOut("通知商户付款>>>>>>失败");
-            $param['response']->end("客户端已断开");
-        }else{
-            $this->commandOut("通知商户付款>>>>>>成功");
-            $param['ws']->push($fd, $text);
-            $param['response']->end("SUCCESS");
+        try {
+            $text = !empty($param['request']->post['notify_data']) ? $param['request']->post['notify_data'] : "";
+            $token = $param['request']->post['notify_mobile'];
+            $fd = $this->getClientId($token);
+            $this->commandOut("通知商户付款>>>>>>开始");
+            $this->commandOut("token:{$token}");
+            $this->commandOut("fd:{$fd}");
+            if(empty($fd) || !$param['ws']->isEstablished($fd)){
+                $this->commandOut("通知商户付款>>>>>>失败");
+                $param['response']->end("客户端已断开");
+            }else{
+                $this->commandOut("通知商户付款>>>>>>成功");
+                $param['ws']->push($fd, $text);
+                $param['response']->end("SUCCESS");
+            }
+            $this->commandOut("通知商户付款>>>>>>结束");
+        }catch (\Exception $e){
+            $this->commandOut($e->getMessage());
         }
-        $this->commandOut("通知商户付款>>>>>>结束");
     }
 
     /**

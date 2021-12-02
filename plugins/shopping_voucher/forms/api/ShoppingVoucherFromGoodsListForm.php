@@ -99,8 +99,16 @@ class ShoppingVoucherFromGoodsListForm extends BaseModel implements ICacheForm {
                 if(isset($fromGoodsRates[$detail['id']])){
                     $rate = $fromGoodsRates[$detail['id']];
                     $detail['got_shopping_voucher_num'] = round((floatval($rate)/100) * floatval($detail['price']), 2);
-                    if ($detail['enable_express'] && $detail['freight_id']) {
-                        $freight = PostageRules::findOne(['id' => $detail['freight_id'], 'is_delete' => 0]);
+                    if ($detail['enable_express']) {
+                        if ($detail['freight_id']) {
+                            $freight = PostageRules::findOne(['id' => $detail['freight_id'], 'is_delete' => 0]);
+                        } else {
+                            $freight = PostageRules::findOne([
+                                'mall_id' => \Yii::$app->mall->id,
+                                'status' => 1,
+                                'is_delete' => 0,
+                            ]);
+                        }
                         if ($freight && $freight->detail) {
                             $freightDetail = @json_decode($freight->detail, true);
                             $detail['got_shopping_voucher_num'] += $freightDetail[0]['firstPrice'];

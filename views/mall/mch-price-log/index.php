@@ -6,7 +6,6 @@
         <el-tab-pane label="已结算" name="success"></el-tab-pane>
         <el-tab-pane label="已取消" name="canceled"></el-tab-pane>
 
-
         <el-card shadow="never" body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
             <div class="table-body">
 
@@ -25,9 +24,11 @@
                         <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入"
                                   v-model="search.keyword" clearable @clear="goSearch">
                             <el-select slot="prepend" v-model="search.kw_type" placeholder="请选择" size="small" style="width:120px;">
-                                <el-option label="商家昵称" value="store_name"></el-option>
-                                <el-option label="商家ID" value="mch_id"></el-option>
-                                <el-option label="商家手机号" value="mch_mobile"></el-option>
+                                <el-option v-for="item in item_type_options"
+                                           :key="item.value"
+                                           :label="item.label"
+                                           :value="item.value">
+                                </el-option>
                             </el-select>
                             <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
                         </el-input>
@@ -108,8 +109,8 @@
                             <div>（服务费{{scope.row.transfer_rate}}%）</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="备注" prop="remark" width="230"></el-table-column>
-                    <el-table-column label="操作">
+                    <el-table-column label="备注" prop="remark" width="230" v-if="activeName != 'unconfirmed'"></el-table-column>
+                    <el-table-column label="操作" v-if="activeName == 'unconfirmed'">
                         <template slot-scope="scope">
                             <div v-if="scope.row.status == 'unconfirmed'">
                                 <el-button @click="doConfirm('confirmed', scope.row.id)" type="text" size="mini" circle >
@@ -173,6 +174,28 @@
                     status: '',
                     address: null,
                 },
+                item_type_options: [
+                    {
+                        value: 'store_name',
+                        label: '商家昵称'
+                    },
+                    {
+                        value: 'mch_id',
+                        label: '商家ID'
+                    },
+                    {
+                        value: 'mch_mobile',
+                        label: '商家手机号'
+                    },
+                    {
+                        value: 'order_no',
+                        label: '订单编号'
+                    },
+                    {
+                        value: 'pay_user_id',
+                        label: '支付用户ID'
+                    },
+                ]
             };
         },
         mounted() {

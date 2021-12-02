@@ -75,6 +75,13 @@ class MchStoreDetailForm extends BaseModel implements ICacheForm {
             $detail['score']          = $store->score;
             $detail['business_hours'] = $store->business_hours;
             $detail['pic_urls']       = @json_decode($store->pic_url, true);
+            if ($detail['pic_urls']) {
+                foreach ($detail['pic_urls'] as &$urls) {
+                    if (isset($urls['pic_url'])) {
+                        $urls = $urls['pic_url'];
+                    }
+                }
+            }
             $detail['pic_urls']       = is_array($detail['pic_urls']) ? $detail['pic_urls'] : [];
             $detail['description']    = $store->description;
             $detail['scope']          = $store->scope;

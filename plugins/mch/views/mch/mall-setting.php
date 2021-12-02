@@ -20,8 +20,8 @@
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="160px" size="small">
                 <el-row>
                     <el-col :span="12">
-                        <el-form-item label="是否开启分销" prop="is_share">
-                            <el-radio-group v-model="ruleForm.is_share" class="ml-24">
+                        <el-form-item label="是否开启分销" prop="is_distribution">
+                            <el-radio-group v-model="ruleForm.is_distribution" class="ml-24">
                                 <el-radio :label="1">开启</el-radio>
                                 <el-radio :label="0">关闭</el-radio>
                             </el-radio-group>
@@ -39,7 +39,7 @@
         data() {
             return {
                 ruleForm: {
-                    is_share: 0,
+                    is_distribution: 0,
                 },
                 rules: {},
                 btnLoading: false,
@@ -65,6 +65,7 @@
             store(formName) {
                 this.$refs[formName].validate((valid) => {
                     let self = this;
+                    console.log(self.ruleForm);
                     if (valid) {
                         self.btnLoading = true;
                         request({
@@ -74,6 +75,7 @@
                             method: 'post',
                             data: {
                                 form: self.ruleForm,
+                                mch_id:getQuery('mch_id'),
                             }
                         }).then(e => {
                             self.btnLoading = false;

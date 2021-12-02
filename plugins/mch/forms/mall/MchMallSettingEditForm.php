@@ -9,21 +9,21 @@ use app\plugins\mch\models\MchMallSetting;
 class MchMallSettingEditForm extends BaseModel
 {
     public $id;
-    public $is_share;
+    public $is_distribution;
     public $mch_id;
 
     public function rules()
     {
         return [
-            [['id', 'is_share', 'mch_id'], 'integer'],
-            [['is_share', 'mch_id'], 'required'],
+            [['id', 'is_distribution', 'mch_id'], 'integer'],
+            [['is_distribution', 'mch_id'], 'required'],
         ];
     }
 
     public function save()
     {
         if (!$this->validate()) {
-            return $this->responseErrorMsg();
+            return $this->responseErrorInfo();
         }
 
         try {
@@ -39,7 +39,7 @@ class MchMallSettingEditForm extends BaseModel
                 $model->mch_id = $this->mch_id;
             }
 
-            $model->is_share = $this->is_share;
+            $model->is_distribution = $this->is_distribution;
             $res = $model->save();
 
             if (!$res) {

@@ -52,6 +52,14 @@ class MchGroupItemListForm extends BaseModel{
 
             $list = $query->orderBy("mgi.id DESC")->page($pagination, 20, $this->page)->asArray()->all();
 
+            if ($list) {
+                foreach ($list as &$item) {
+                    if (empty($item['cover_url'])) {
+                        $item['cover_url'] = 'https://dev.mingyuanriji.cn/web/static/header-logo.png';
+                    }
+                }
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [

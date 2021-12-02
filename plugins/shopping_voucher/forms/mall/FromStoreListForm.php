@@ -142,8 +142,10 @@ class FromStoreListForm extends BaseModel {
                     $item['address'] = str_replace($item['province'], "", $item['address']);
                     $item['address'] = str_replace($item['city'], "", $item['address']);
                     $item['address'] = str_replace($item['district'], "", $item['address']);
-                    $item['transfer_rate'] = floatval((100 - $item['transfer_rate'])/100) * 10;
                     $item['start_at'] = date("Y-m-d", $item['start_at'] ? $item['start_at'] : time());
+
+                    $transfer_rate = (100 - $item['transfer_rate']) / 100 * 10;
+                    $item['transfer_rate'] = (float)substr($transfer_rate, 0, strpos($transfer_rate, '.') + 3);
                 }
             }
 

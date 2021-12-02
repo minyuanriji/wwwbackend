@@ -23,7 +23,7 @@ class MallSettingForm extends BaseModel
             $setting = $this->getDefault();
         }
 
-        $setting['is_share'] = (int)$setting['is_share'];
+        $setting['is_distribution'] = (int)$setting['is_distribution'];
 
         return $setting;
     }
@@ -31,7 +31,7 @@ class MallSettingForm extends BaseModel
     private function getDefault()
     {
         return [
-            'is_share' => 0,
+            'is_distribution' => 0,
         ];
     }
 }

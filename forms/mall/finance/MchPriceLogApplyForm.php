@@ -14,7 +14,16 @@ class MchPriceLogApplyForm extends BaseModel{
 
     public function rules(){
         return [
-            [['id', 'act', 'content'], 'required']
+            [['id', 'act', 'content'], 'required', 'message'=>'{attribute}不能为空']
+        ];
+    }
+
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'act' => '操作方法',
+            'content' => '备注信息',
         ];
     }
 

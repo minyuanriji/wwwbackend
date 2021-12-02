@@ -21,6 +21,10 @@ class WsClientController extends BaseCommandController {
                 $mchMessage->updated_at = time();
                 $mchMessage->save();
 
+
+                $mchMessage->status     = 1;
+                $mchMessage->try_count += 1;
+
                 //获取客户端TOKEN
                 $adminUsers = MchAdminUser::find()->andWhere([
                         "AND",
@@ -39,20 +43,20 @@ class WsClientController extends BaseCommandController {
                             ]);
                             $cli->close();
                             if($cli->body != "SUCCESS") {
-                                throw new \Exception("请求失败");
+                                $this->commandOut($cli->body);
+                                $mchMessage->status = 0;
                             }
                         });
                     }
-                    $mchMessage->status = 1;
-                    if(!$mchMessage->save()){
-                        throw new \Exception(json_encode($mchMessage->getErrors()));
-                    }
-                    $this->commandOut("通知商户[ID:{$mchMessage->mch_id}]付款成功");
                 }
+
+                if(!$mchMessage->save()){
+                    throw new \Exception(json_encode($mchMessage->getErrors()));
+                }
+                $this->commandOut("通知商户[ID:{$mchMessage->mch_id}]付款成功");
 
             }catch (\Exception $e){
                 $this->commandOut($e->getMessage());
-                $mchMessage->try_count += 1;
                 if($mchMessage->try_count > 3){
                     $mchMessage->status = 1;
                     $this->commandOut("通知商户[ID:{$mchMessage->mch_id}]付款失败。" . $e->getMessage());

@@ -308,11 +308,16 @@ class OrderSubmitForm extends BaseModel
 
             $districtArr = new DistrictArr();
             $event_data = array();//事件参数
-            foreach ($data['list'] as $orderItem) {
+            foreach ($data['list'] as $key => $orderItem) {
                 $order = new Order();
-                $order->mall_id = $this->mall_id ?: \Yii::$app->mall->id;
+                if (isset($orderItem['goods_list'][$key]['goods_attr']->goods['mall_id'])) {
+                    $goods_mall_id = $orderItem['goods_list'][$key]['goods_attr']->goods['mall_id'];
+                } else {
+                    $goods_mall_id = \Yii::$app->mall->id;
+                }
+                $order->mall_id = $goods_mall_id;
                 $order->user_id = $user->getId();
-                $order->order_no = Order::getOrderNo('S');;
+                $order->order_no = Order::getOrderNo('S');
                 $order->total_price = $orderItem['total_price'];
                 $order->total_pay_price = $orderItem['total_price'];
                 $order->express_original_price = $orderItem['express_price'];

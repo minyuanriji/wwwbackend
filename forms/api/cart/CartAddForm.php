@@ -101,7 +101,7 @@ class CartAddForm extends BaseModel
 
             if (empty($cart)) {
                 $cart = new Cart();
-                $cart->mall_id   = $this->mall_id ?: \Yii::$app->mall->id;
+                $cart->mall_id   = $goods->mall_id;
                 $cart->user_id   = \Yii::$app->user->id;
                 $cart->goods_id  = $this->goods_id;
                 $cart->attr_id   = $this->attr;

@@ -54,6 +54,7 @@ class WsClientController extends BaseCommandController {
                 $mchMessage->try_count += 1;
                 if($mchMessage->try_count > 3){
                     $mchMessage->status = 1;
+                    $this->commandOut("通知商户[ID:{$mchMessage->mch_id}]付款失败。" . $e->getMessage());
                 }
                 $mchMessage->fail_reason = $e->getMessage();
                 $mchMessage->save();

@@ -2,47 +2,65 @@
 namespace app\commands;
 
 
-use app\forms\common\WebSocketRequestForm;
+use app\plugins\mch\models\MchAdminUser;
+use app\plugins\mch\models\MchMessage;
 
 class WsClientController extends BaseCommandController {
 
-    const REQUEST_MESSAGE_CACHE_KEY = "WEBSOCKET_CLIENT_LIST:";
-
     public function actionListen(){
         while (true){
-            $form = WebSocketRequestForm::one();
-            if(!empty($form)){
-                \Swoole\Coroutine\run(function () use($form){
-                    $cli = new \Swoole\Coroutine\Http\Client('127.0.0.1', 9515);
-                    //$data = "PAID:" . json_encode(["text" => "11111", "url" => "https://img-qn.51miz.com/preview/sound/00/27/20/51miz-S272046-BC428C3F.mp3"]);
-                    //$cli->get('/?action=MchPaidNotify&notify_mobile=13422078495&notify_data=' . $data);
-                    $data = $form->notify_data;
-                    $cli->post('/', [
-                        "action"        => $form->action,
-                        "notify_mobile" => $form->notify_mobile,
-                        "notify_data"   => $form->notify_data
-                    ]);
-                    $cli->close();
-                    if($cli->body != "SUCCESS"){
-                        $this->commandOut($cli->body);
-                        if($form->fail_try > 3){
-                            $this->commandOut("队列[ID:".$form->queue_tag."]失败超过3次，丢弃");
-                        }else{
-                            $this->commandOut("队列[ID:".$form->queue_tag."]重新加入队列");
-                            $form->fail_try += 1;
-                            WebSocketRequestForm::add($form);
-                        }
-                    }else{
-                        $this->commandOut("队列[ID:".$form->queue_tag."]操作成功");
+            try {
+                $mchMessage = MchMessage::find()->where([
+                    "type"   => "paid_notify_voice",
+                    "status" => 0
+                ])->orderBy("updated_at ASC")->one();
+
+                if(!$mchMessage) continue;
+
+                $mchMessage->updated_at = time();
+                $mchMessage->save();
+
+                //获取客户端TOKEN
+                $adminUsers = MchAdminUser::find()->andWhere([
+                        "AND",
+                        ["mch_id" => $mchMessage->mch_id],
+                        "token_expired_at > '".time()."'"
+                    ])->asArray()->select(["access_token"])->all();
+                if($adminUsers){
+                    $base64Data = TencentCloudAudioHelper::request($mchMessage->content);
+                    foreach($adminUsers as $adminUser){
+                        \Swoole\Coroutine\run(function () use($base64Data, $adminUser, $mchMessage){
+                            $cli = new \Swoole\Coroutine\Http\Client('127.0.0.1', 9515);
+                            $cli->post('/', [
+                                "action"        => "MchPaidNotify",
+                                "notify_mobile" => $adminUser['access_token'],
+                                "notify_data"   => $base64Data
+                            ]);
+                            $cli->close();
+                            if($cli->body != "SUCCESS") {
+                                throw new \Exception($cli->body);
+                            }
+                        });
                     }
-                });
+                    $mchMessage->status = 1;
+                    if(!$mchMessage->save()){
+                        throw new \Exception(json_encode($mchMessage->getErrors()));
+                    }
+                    $this->commandOut("通知商户[ID:{$mchMessage->mch_id}]付款成功");
+                }
+
+            }catch (\Exception $e){
+                $this->commandOut($e->getMessage());
+                $mchMessage->try_count += 1;
+                if($mchMessage->try_count > 3){
+                    $mchMessage->status = 1;
+                }
+                $mchMessage->fail_reason = $e->getMessage();
+                $mchMessage->save();
             }
-            $this->sleep(1);
+            $this->sleep(3);
         }
-
-
     }
-
 
 }
 

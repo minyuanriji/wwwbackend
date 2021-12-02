@@ -10,20 +10,20 @@ class WsClientController extends BaseCommandController {
 
     public function actionListen(){
         while (true){
+            $mchMessage = MchMessage::find()->where([
+                "type"   => "paid_notify_voice",
+                "status" => 0
+            ])->orderBy("updated_at ASC")->one();
+
+            if(!$mchMessage) continue;
+
+            $mchMessage->updated_at = time();
+            $mchMessage->save();
+
+            $mchMessage->status     = 1;
+            $mchMessage->try_count += 1;
+
             try {
-                $mchMessage = MchMessage::find()->where([
-                    "type"   => "paid_notify_voice",
-                    "status" => 0
-                ])->orderBy("updated_at ASC")->one();
-
-                if(!$mchMessage) continue;
-
-                $mchMessage->updated_at = time();
-                $mchMessage->save();
-
-
-                $mchMessage->status     = 1;
-                $mchMessage->try_count += 1;
 
                 //获取客户端TOKEN
                 $adminUsers = MchAdminUser::find()->andWhere([
@@ -58,7 +58,7 @@ class WsClientController extends BaseCommandController {
                 if(!$mchMessage->save()){
                     throw new \Exception(json_encode($mchMessage->getErrors()));
                 }
-                
+
                 $this->commandOut("通知商户[ID:{$mchMessage->mch_id}]付款成功");
 
             }catch (\Exception $e){

@@ -45,14 +45,20 @@ class WsClientController extends BaseCommandController {
                             if($cli->body != "SUCCESS") {
                                 $this->commandOut($cli->body);
                                 $mchMessage->status = 0;
+                                $mchMessage->fail_reason = $cli->body;
                             }
                         });
                     }
                 }
 
+                if(!$mchMessage->status){
+                    throw new \Exception("error " . $mchMessage->fail_reason);
+                }
+
                 if(!$mchMessage->save()){
                     throw new \Exception(json_encode($mchMessage->getErrors()));
                 }
+                
                 $this->commandOut("通知商户[ID:{$mchMessage->mch_id}]付款成功");
 
             }catch (\Exception $e){

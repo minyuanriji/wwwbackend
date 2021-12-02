@@ -32,9 +32,9 @@ class QueryOrderAction extends BaseObject
         try {
             $AddcreditPlateformsInfo = AddcreditPlateforms::findOne($this->AddcreditOrder->plateform_id);
             if (!$AddcreditPlateformsInfo) {
-                throw new \Exception("无法获取ADDCREDIT ID " . $this->AddcreditOrder->plateform_id . " 平台信息", ApiCode::CODE_FAIL);
+                throw new \Exception("无法获取ADDCREDIT ID " . $this->AddcreditOrder->plateform_id . " 平台信息");
             }
-            $configs = Helpers::getPlateConfig($this->AddcreditPlateforms->json_param);
+            $configs = Helpers::getPlateConfig($AddcreditPlateformsInfo->json_param);
 
             $post_param = [
                 'userid'         => $configs['app_id'],

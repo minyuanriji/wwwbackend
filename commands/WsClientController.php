@@ -43,7 +43,6 @@ class WsClientController extends BaseCommandController {
                             ]);
                             $cli->close();
                             if($cli->body != "SUCCESS") {
-                                $this->commandOut($cli->body);
                                 $mchMessage->status = 0;
                                 $mchMessage->fail_reason = $cli->body;
                             }

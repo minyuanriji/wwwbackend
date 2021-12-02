@@ -2,6 +2,7 @@
 namespace app\commands;
 
 
+use app\helpers\tencent_cloud\TencentCloudAudioHelper;
 use app\plugins\mch\models\MchAdminUser;
 use app\plugins\mch\models\MchMessage;
 

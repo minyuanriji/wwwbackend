@@ -44,7 +44,7 @@ class StoreController extends ApiController {
         $form->login_uid  = $form->is_login ? \Yii::$app->user->id : 0;
         $form->host_info  = \Yii::$app->request->getHostInfo();
 
-        $res = APICacheHelper::get($form);
+        $res = APICacheHelper::get($form, true);
         if($res['code'] == ApiCode::CODE_SUCCESS){
             $res = $res['data'];
         }

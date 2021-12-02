@@ -128,14 +128,14 @@
                         <el-button @click="newItem.dialogVisible = true" type="primary" size="big">添加店铺</el-button>
                     </div>
                     <el-table v-loading="searchItem.listLoading" :data="searchItem.list" border style="margin-top:10px;">
-                        <el-table-column prop="id" label="商户ID" width="100" align="center"></el-table-column>
-                        <el-table-column label="商户名称" width="260">
+                        <el-table-column prop="id" label="ID" width="100" align="center"></el-table-column>
+                        <el-table-column label="商户名称" width="500">
                             <template slot-scope="scope">
                                 <div flex="cross:center">
                                     <com-image width="25" height="25" :src="scope.row.cover_url"></com-image>
-                                    <div style="margin-left: 10px;width: 200px;overflow:hidden;text-overflow: ellipsis;">
+                                    <div style="margin-left: 10px;width: 300px;overflow:hidden;text-overflow: ellipsis;">
                                         <span v-if="scope.row.mch_id == ruleForm.mch_id" style="color:darkgreen">【总店】</span>
-                                        {{scope.row.name}}
+                                        {{scope.row.name}}(商户ID:{{scope.row.mch_id}})
                                     </div>
                                 </div>
                             </template>

@@ -218,6 +218,8 @@
                         if (e.data.code == 0) {
                             if(!that.formData.is_all){
                                 that.formProgressData.finished_num = that.formProgressData.total_num;
+                                that.formDialogVisible=false;
+                                that.$emit('close');
                                 that.$emit('update');
                             }else{
                                 that.formProgressData.finished_num = that.formData.do_page;
@@ -225,6 +227,8 @@
                                     that.formData.do_page++;
                                     do_request();
                                 }else{
+                                    that.formDialogVisible=false;
+                                    that.$emit('close');
                                     that.$emit('update');
                                 }
                             }

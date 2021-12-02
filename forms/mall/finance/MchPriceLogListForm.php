@@ -8,6 +8,7 @@ use app\models\Order;
 use app\models\OrderDetail;
 use app\models\Store;
 use app\models\User;
+use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchPriceLog;
@@ -67,6 +68,31 @@ class MchPriceLogListForm extends BaseModel{
                 case "mch_mobile": //商家手机号
                     $query->andWhere(["m.mobile" => $this->keyword]);
                     break;
+                case "order_no": //订单编号
+                    $giftOrder = GiftpacksOrder::find()->where(['like', 'order_sn', $this->keyword])->select('id');
+                    $giftOrderItemIds = GiftpacksOrderItem::find()->where(['order_id' => $giftOrder])->select('id');
+
+                    $orderIds = Order::find()->where(['like', 'order_no', $this->keyword])->select('id');
+                    $detailIds = OrderDetail::find()->where(['order_id' => $orderIds])->select('id');
+                    $query->andWhere([
+                        'or',
+                        ['source_id' => $giftOrderItemIds],
+                        ['source_id' => $detailIds]
+                    ]);
+                    break;
+                case 'pay_user_id':
+                    $giftOrder = GiftpacksOrder::find()->where(['user_id' => $this->keyword])->select('id');
+                    $giftOrderItemIds = GiftpacksOrderItem::find()->where(['order_id' => $giftOrder])->select('id');
+
+                    $orderIds = Order::find()->where(['user_id' => $this->keyword])->select('id');
+                    $detailIds = OrderDetail::find()->where(['order_id' => $orderIds])->select('id');
+                    $query->andWhere([
+                        'or',
+                        ['source_id' => $giftOrderItemIds],
+                        ['source_id' => $detailIds]
+                    ]);
+                    break;
+                default;
                 }
             }
 
@@ -83,7 +109,7 @@ class MchPriceLogListForm extends BaseModel{
                         $orderItemInfo = GiftpacksOrderItem::find()->with([
                             "giftpacksItem", "giftpackOrder", "giftpackOrder.giftpacks", "giftpackOrder.user"
                         ])->where(["id" => $item['source_id']])->asArray()->one();
-                        $item['order_item_info'] = $orderItemInfo ? $orderItemInfo : [];
+                        $item['order_item_info'] = $orderItemInfo ?: [];
                         if(isset($item['order_item_info']['giftpackOrder'])){
                             $item['order_item_info']['giftpackOrder']['integral_deduction_price'] = (float)$item['order_item_info']['giftpackOrder']['integral_deduction_price'];
                             $item['user'] = isset($item['order_item_info']['giftpackOrder']['user']) ? $item['order_item_info']['giftpackOrder']['user'] : [];
@@ -102,6 +128,10 @@ class MchPriceLogListForm extends BaseModel{
                         $item['order_detail'] = $orderDetail ? $orderDetail->getAttributes() : [];
                         $item['order'] = $order ? $order->getAttributes() : [];
                         $item['user'] = $user ? $user->getAttributes() : [];
+                    }
+
+                    if (empty($item['cover_url'])) {
+                        $item['cover_url'] = 'https://dev.mingyuanriji.cn/web/static/header-logo.png';
                     }
                 }
             }

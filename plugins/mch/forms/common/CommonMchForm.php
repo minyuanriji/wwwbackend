@@ -64,6 +64,9 @@ class CommonMchForm extends BaseModel
         if($list){
             foreach($list as &$item){
                 $item['name'] = $item['store']['name'];
+                if (empty($item['store']['cover_url'])) {
+                    $item['store']['cover_url'] = 'https://dev.mingyuanriji.cn/web/static/header-logo.png';
+                }
             }
         }
 

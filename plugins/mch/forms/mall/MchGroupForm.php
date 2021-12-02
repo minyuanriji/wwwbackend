@@ -63,6 +63,10 @@ class MchGroupForm extends BaseModel{
                         $item['user_name'] = '';
                         $item['avatar_url'] = '';
                     }
+
+                    if (empty($item['cover_url'])) {
+                        $item['cover_url'] = 'https://dev.mingyuanriji.cn/web/static/header-logo.png';
+                    }
                 }
             }
 

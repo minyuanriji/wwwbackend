@@ -69,6 +69,7 @@ class MchController extends Controller
             if (\Yii::$app->request->isPost) {
                 $form = new MchMallSettingEditForm();
                 $form->attributes = \Yii::$app->request->post('form');
+                $form->mch_id = \Yii::$app->request->post('mch_id');
                 return $this->asJson($form->save());
             } else {
                 $form = new MchMallSettingForm();

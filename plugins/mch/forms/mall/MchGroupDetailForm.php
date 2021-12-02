@@ -31,6 +31,9 @@ class MchGroupDetailForm extends BaseModel{
             if(!$mchGroup){
                 throw new \Exception("连锁总店[ID:{$this->id}]记录信息不存在");
             }
+            if (empty($mchGroup['store']['cover_url'])) {
+                $mchGroup['store']['cover_url'] = 'https://dev.mingyuanriji.cn/web/static/header-logo.png';
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

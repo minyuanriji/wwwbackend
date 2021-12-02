@@ -14,6 +14,7 @@ use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchAdminUser;
+use app\plugins\mch\models\MchMessage;
 
 class CheckoutOrderPaidHandler {
 
@@ -78,12 +79,7 @@ class CheckoutOrderPaidHandler {
 
                 $status = 1;
 
-                $adminUser = MchAdminUser::findOne(["mch_id" => $mch->id]);
-                if($adminUser && $adminUser->access_token){
-                    static::voiceNotify($adminUser->access_token, "补商汇到账" . $checkoutOrder->order_price . "元");
-                }
-
-                static::voiceNotify($mch->mobile, "补商汇到账" . $checkoutOrder->order_price . "元");
+                static::voiceNotify($mch, "补商汇到账" . $checkoutOrder->order_price . "元");
 
             }catch (\Exception $e){
                 $t->rollBack();
@@ -104,11 +100,23 @@ class CheckoutOrderPaidHandler {
 
     /**
      * 通知商户支付成功了
-     * @param $token
+     * @param $mch
      * @param $text
      */
-    public static function voiceNotify($token, $text){
-        $base64Data = TencentCloudAudioHelper::request($text);
+    public static function voiceNotify(Mch $mch, $text){
+        $mchMessage = new MchMessage([
+            "mall_id"    => $mch->mall_id,
+            "mch_id"     => $mch->id,
+            "type"       => "paid_notify_voice",
+            "content"    => $text,
+            "status"     => 0,
+            "created_at" => time(),
+            "updated_at" => time(),
+            "try_count"  => 0
+        ]);
+        $mchMessage->save();
+
+        /*$base64Data = TencentCloudAudioHelper::request($text);
 
         if(!empty($base64Data)){
             $data = [
@@ -122,7 +130,7 @@ class CheckoutOrderPaidHandler {
                 'notify_mobile' => $token,
                 'notify_data'   => "PAID:" . json_encode($data)
             ]));
-        }
+        }*/
     }
 
 }

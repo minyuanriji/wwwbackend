@@ -2,6 +2,8 @@
 namespace app\commands;
 
 
+use app\plugins\mch\models\MchClient;
+
 class WsServerController extends BaseCommandController {
 
     const CLIENT_REL_MOBILE_CACHE_KEY_PREFIX = "WEBSOCKET_CLIENT_LIST:";
@@ -83,13 +85,18 @@ class WsServerController extends BaseCommandController {
         $text = !empty($param['request']->post['notify_data']) ? $param['request']->post['notify_data'] : "";
         $token = $param['request']->post['notify_mobile'];
         $fd = $this->getClientId($token);
+        $this->commandOut("通知商户付款>>>>>>开始");
+        $this->commandOut("token:{$token}");
+        $this->commandOut("fd:{$fd}");
         if(empty($fd) || !$param['ws']->isEstablished($fd)){
-            $param['response']->end("客户端：" . $token. "已断开");
+            $this->commandOut("通知商户付款>>>>>>失败");
+            $param['response']->end("客户端已断开");
         }else{
-            $this->commandOut("客户端：" . $token. "付款成功");
+            $this->commandOut("通知商户付款>>>>>>成功");
             $param['ws']->push($fd, $text);
             $param['response']->end("SUCCESS");
         }
+        $this->commandOut("通知商户付款>>>>>>结束");
     }
 
     /**
@@ -99,7 +106,7 @@ class WsServerController extends BaseCommandController {
     public function messageActionRelMobile($param){
         if(!empty($param['data']['content'])){
             $mobile = $param['data']['content'];
-            $this->setClientId($mobile, $param['frame']->fd);
+            $this->setClientId($mobile, $param);
             $param['ws']->push($param['frame']->fd, "客户端".$param['frame']->fd . "<=>{$mobile}关联成功\n");
         }
     }
@@ -111,7 +118,7 @@ class WsServerController extends BaseCommandController {
     public function messageActionRelToken($param){
         if(!empty($param['data']['content'])){
             $token = $param['data']['content'];
-            $this->setClientId($token, $param['frame']->fd);
+            $this->setClientId($token, $param);
             $param['ws']->push($param['frame']->fd, "客户端".$param['frame']->fd."<=>{$token}关联成功\n");
         }
     }
@@ -122,10 +129,8 @@ class WsServerController extends BaseCommandController {
      * @return integer
      */
     public function getClientId($token){
-        $cache = \Yii::$app->getCache();
-        $content = $cache->get(self::CLIENT_LIST_CACHE_KEY);
-        $clientDatas = $content ? json_decode($content, true) : [];
-        return isset($clientDatas[$token]) ? $clientDatas[$token] : null;
+        $mchClient = MchClient::findOne(["token" => $token]);
+        return $mchClient ? $mchClient->fd : null;
     }
 
     /**
@@ -134,27 +139,32 @@ class WsServerController extends BaseCommandController {
      * @return string
      */
     public function getClientToken($fd){
-        $cache = \Yii::$app->getCache();
-        $content = $cache->get(self::CLIENT_LIST_CACHE_KEY);
-        $tokenDatas = array_flip(($content ? json_decode($content, true) : []));
-        return isset($tokenDatas[$fd]) ? $tokenDatas[$fd] : null;
+        $mchClient = MchClient::findOne(["fd" => $fd]);
+        return $mchClient ? $mchClient->token : null;
     }
 
     /**
      * 设置客户端ID
      * @param $token
-     * @param $fd
+     * @param $param
      */
-    public function setClientId($token, $fd){
-        $content = \Yii::$app->getCache()->get(self::CLIENT_LIST_CACHE_KEY);
-        $clientDatas = $content ? json_decode($content, true) : [];
-
-        if(!isset($clientDatas[$token])){
-            $this->commandOut("客户端[ID:{$fd}，Token:{$token}]连接正常");
+    public function setClientId($token, $param){
+        try {
+            $mchClient = MchClient::findOne(["token" => $token]);
+            if(!$mchClient){
+                $mchClient = new MchClient([
+                    "token"      => $token,
+                    "created_at" => time()
+                ]);
+            }
+            $mchClient->fd         = $param['frame']->fd;
+            $mchClient->updated_at = time();
+            if(!$mchClient->save()){
+                throw new \Exception(json_encode($mchClient->getErrors()));
+            }
+        }catch (\Exception $e){
+            $this->commandOut($e->getMessage());
         }
-
-        $clientDatas[$token] = $fd;
-        \Yii::$app->getCache()->set(self::CLIENT_LIST_CACHE_KEY, json_encode($clientDatas));
     }
 
     /**
@@ -162,12 +172,18 @@ class WsServerController extends BaseCommandController {
      * @param $token
      */
     public function cleanClient($token){
-        $content = \Yii::$app->getCache()->get(self::CLIENT_LIST_CACHE_KEY);
-        $clientDatas = $content ? json_decode($content, true) : [];
-        if(isset($clientDatas[$token])){
-            unset($clientDatas[$token]);
+        try {
+            $mchClient = MchClient::findOne(["token" => $token]);
+            if($mchClient){
+                $mchClient->fd         = uniqid();
+                $mchClient->updated_at = time();
+                if(!$mchClient->save()){
+                    throw new \Exception(json_encode($mchClient->getErrors()));
+                }
+            }
+        }catch (\Exception $e){
+            $this->commandOut($e->getMessage());
         }
-        \Yii::$app->getCache()->set(self::CLIENT_LIST_CACHE_KEY, json_encode($clientDatas));
     }
 
     /**

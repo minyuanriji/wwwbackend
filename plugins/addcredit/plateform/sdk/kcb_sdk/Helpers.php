@@ -13,8 +13,8 @@ class Helpers
                 $data[$item['name']] = $item['value'];
             }
         }
-        $data['app_id']         = isset($data['app_id']) ?? '';
-        $data['secret_key']     = isset($data['secret_key']) ?? '';
+        $data['app_id']         = $data['app_id'] ?? '';
+        $data['secret_key']     = $data['secret_key'] ?? '';
         return $data;
     }
 }

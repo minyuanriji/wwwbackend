@@ -26,9 +26,9 @@ abstract class BaseAction
                 $data[$item['name']] = $item['value'];
             }
         }
-        $data['host']       = isset($data['host']) ?? '';
-        $data['app_key']    = isset($data['app_key']) ?? '';
-        $data['app_secret'] = isset($data['app_secret']) ?? '';
+        $data['host']       = $data['host'] ?? '';
+        $data['app_key']    = $data['app_key'] ?? '';
+        $data['app_secret'] = $data['app_secret'] ?? '';
         return $data;
     }
 }

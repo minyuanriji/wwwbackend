@@ -183,6 +183,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
             $mchInfo = [];
             if($mchModel && $mchModel->store){
                 $mchInfo = $mchModel->store->getAttributes();
+                $mchInfo['store_id'] = $mchInfo['id'] ?? 0;
             }
 
             //商品是否是爆品

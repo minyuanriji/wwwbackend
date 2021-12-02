@@ -10,6 +10,7 @@ class WsClientController extends BaseCommandController {
 
     public function actionListen(){
         while (true){
+
             $mchMessage = MchMessage::find()->where([
                 "type"   => "paid_notify_voice",
                 "status" => 0
@@ -39,7 +40,11 @@ class WsClientController extends BaseCommandController {
                             $cli->post('/', [
                                 "action"        => "MchPaidNotify",
                                 "notify_mobile" => $adminUser['access_token'],
-                                "notify_data"   => $base64Data
+                                "notify_data"   => "PAID:" . json_encode([
+                                    "text"       => $mchMessage->content,
+                                    "base64Data" => $base64Data,
+                                    "url"        => ""
+                                ])
                             ]);
                             $cli->close();
                             if($cli->body != "SUCCESS") {

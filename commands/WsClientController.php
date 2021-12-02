@@ -39,7 +39,7 @@ class WsClientController extends BaseCommandController {
                             ]);
                             $cli->close();
                             if($cli->body != "SUCCESS") {
-                                throw new \Exception($cli->body);
+                                throw new \Exception("请求失败");
                             }
                         });
                     }

@@ -95,13 +95,13 @@ class CartAddForm extends BaseModel
                 'user_id' => \Yii::$app->user->id,
                 'goods_id' => $this->goods_id,
                 'attr_id' => $this->attr,
-                'mall_id' => $this->mall_id,
+                'mall_id' => \Yii::$app->mall->id,
                 'is_delete' => 0,
             ]);
 
             if (empty($cart)) {
                 $cart = new Cart();
-                $cart->mall_id   = $this->mall_id ?: \Yii::$app->mall->id;
+                $cart->mall_id   = \Yii::$app->mall->id;
                 $cart->user_id   = \Yii::$app->user->id;
                 $cart->goods_id  = $this->goods_id;
                 $cart->attr_id   = $this->attr;
@@ -117,7 +117,7 @@ class CartAddForm extends BaseModel
                 \Yii::$app->trigger(Cart::EVENT_CART_ADD, new CartEvent(['cartIds' => [$cart->id]]));
                 return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"加入购物车成功", [
                     "cart_id" => $cart->id,
-                    'cart_num' => Cart::find()->where(['buy_now' => 0, 'user_id' => \Yii::$app->user->id, 'mall_id' => $this->mall_id, 'is_delete' => 0])->count()
+                    'cart_num' => Cart::find()->where(['buy_now' => 0, 'user_id' => \Yii::$app->user->id, 'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0])->count()
                 ]);
             } else {
                 return $this->returnApiResultData(999,"",$cart);

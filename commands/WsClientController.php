@@ -35,6 +35,9 @@ class WsClientController extends BaseCommandController {
                 if($adminUsers){
                     $base64Data = TencentCloudAudioHelper::request($mchMessage->content);
                     foreach($adminUsers as $adminUser){
+
+                        if(empty($adminUser['access_token'])) continue;
+
                         \Swoole\Coroutine\run(function () use($base64Data, $adminUser, $mchMessage){
                             $cli = new \Swoole\Coroutine\Http\Client('127.0.0.1', 9515);
                             $cli->post('/', [

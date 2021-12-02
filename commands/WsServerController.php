@@ -151,6 +151,9 @@ class WsServerController extends BaseCommandController {
     public function setClientId($token, $param){
         $mchClient = MchClient::findOne(["token" => $token]);
         try {
+
+            MchClient::updateAll(["fd" => uniqid()], "fd='".$param['frame']->fd."'");
+
             if(!$mchClient){
                 $mchClient = new MchClient([
                     "token"      => $token,
@@ -164,7 +167,6 @@ class WsServerController extends BaseCommandController {
             }
         }catch (\Exception $e){
             $this->commandOut($e->getMessage());
-            $param['ws']->close($mchClient->fd, true);
         }
     }
 

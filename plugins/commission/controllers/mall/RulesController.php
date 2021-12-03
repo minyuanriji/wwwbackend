@@ -10,8 +10,10 @@ use app\plugins\commission\forms\mall\SearchAddcreditForm;
 use app\plugins\commission\forms\mall\SearchGiftPacksForm;
 use app\plugins\commission\forms\mall\SearchGoodsForm;
 use app\plugins\commission\forms\mall\SearchHotelForm;
+use app\plugins\commission\forms\mall\SearchOilForm;
 use app\plugins\commission\forms\mall\SearchStoreForm;
 use app\plugins\Controller;
+use yii\helpers\Json;
 
 class RulesController extends Controller{
 
@@ -43,7 +45,7 @@ class RulesController extends Controller{
 
     /**
      * 删除规则
-     * @return string|yii\web\Response
+     * @return Json|\yii\web\Response
      */
     public function actionDelete(){
         $form = new CommissionRuleDeleteForm();
@@ -53,7 +55,7 @@ class RulesController extends Controller{
 
     /**
      * 打开或者关闭商品独立分佣规则
-     * @return string|yii\web\Response
+     * @return Json|\yii\web\Response
      */
     public function actionCommissionGoodsOpen(){
         $form = new CommissionRuleOpenForm();
@@ -63,7 +65,7 @@ class RulesController extends Controller{
 
     /**
      * 打开或者关闭门店独立分佣规则
-     * @return string|yii\web\Response
+     * @return Json|\yii\web\Response
      */
     public function actionCommissionStoreOpen(){
         $form = new CommissionRuleOpenForm();
@@ -73,7 +75,7 @@ class RulesController extends Controller{
 
     /**
      * 加载商品
-     * @return string|yii\web\Response
+     * @return Json|\yii\web\Response
      */
     public function actionSearchGoods(){
         $form = new SearchGoodsForm();
@@ -83,7 +85,7 @@ class RulesController extends Controller{
 
     /**
      * 加载门店
-     * @return string|yii\web\Response
+     * @return Json|\yii\web\Response
      */
     public function actionSearchStore(){
         $form = new SearchStoreForm();
@@ -93,7 +95,7 @@ class RulesController extends Controller{
 
     /**
      * 加载酒店
-     * @return string|yii\web\Response
+     * @return Json|\yii\web\Response
      */
     public function actionSearchHotel(){
         $form = new SearchHotelForm();
@@ -103,7 +105,7 @@ class RulesController extends Controller{
 
     /**
      * 加载话费平台
-     * @return string|yii\web\Response
+     * @return Json|\yii\web\Response
      */
     public function actionSearchAddcredit(){
         $form = new SearchAddcreditForm();
@@ -113,10 +115,20 @@ class RulesController extends Controller{
 
     /**
      * 加载大礼包
-     * @return string|yii\web\Response
+     * @return Json|\yii\web\Response
      */
     public function actionSearchGiftPacks(){
         $form = new SearchGiftPacksForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->search());
+    }
+
+    /**
+     * 加载加油平台
+     * @return Json|\yii\web\Response
+     */
+    public function actionSearchOil(){
+        $form = new SearchOilForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->search());
     }

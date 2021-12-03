@@ -30,6 +30,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                                 <el-radio :disabled="ruleForm.item_type == 'addcredit' || radioDisabled == false ? false : true" :label="'addcredit'">话费直推分佣</el-radio>
                                 <el-radio :disabled="ruleForm.item_type == 'addcredit_3r' || radioDisabled == false ? false : true" :label="'addcredit_3r'">话费消费分佣</el-radio>
                                 <el-radio :disabled="ruleForm.item_type == 'giftpacks' || radioDisabled == false ? false : true" :label="'giftpacks'">大礼包消费分佣</el-radio>
+                                <el-radio :disabled="ruleForm.item_type == 'oil_3r' || radioDisabled == false ? false : true" :label="'oil_3r'">加油消费分佣</el-radio>
                             </el-radio-group>
                         </el-form-item>
 
@@ -100,26 +101,55 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                                 <el-button @click="chooseGiftPacksDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
                             </el-form-item>
 
+                            <el-form-item v-if="ruleForm.item_type == 'oil_3r'" :label="'选择加油平台'" prop="item_id">
+                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
+                                    <div flex="cross:top cross:center">
+                                        <div style="display:block;">{{choice.name}}</div>
+                                    </div>
+                                </div>
+                                <el-button @click="chooseOilDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
+                            </el-form-item>
+
                         </template>
 
                         <el-form-item label="设置规则">
 
-                            <com-commission-store-rule-edit v-if="ruleForm.item_type == 'store'" @number = "newNumber" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains" :commiss_value = "commissonValue"></com-commission-store-rule-edit>
+                            <com-commission-store-rule-edit
+                                    v-if="ruleForm.item_type == 'store'"
+                                    @number = "newNumber"
+                                    @update="updateCommissionRule"
+                                    :ctype="commissionType"
+                                    :chains="commissionRuleChains"
+                                    :commiss_value = "commissonValue">
+                            </com-commission-store-rule-edit>
 
                             <com-commission-rule-edit
                                     v-if="ruleForm.item_type == 'goods' ||
                                           ruleForm.item_type == 'checkout' ||
                                           ruleForm.item_type == 'addcredit_3r' ||
-                                          ruleForm.item_type == 'giftpacks'"
+                                          ruleForm.item_type == 'giftpacks' ||
+                                          ruleForm.item_type == 'oil_3r'"
                                     @update="updateCommissionRule"
                                     :item-type="ruleForm.item_type"
                                     :ctype="commissionType"
                                     :chains="commissionRuleChains">
                             </com-commission-rule-edit>
 
-                            <com-commission-hotel-rule-edit v-if="ruleForm.item_type == 'hotel' || ruleForm.item_type == 'addcredit'" @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"  @levelparam = "newLevelParam"  :commission_hotel_value = "commissionHotelValue"></com-commission-hotel-rule-edit>
+                            <com-commission-hotel-rule-edit
+                                    v-if="ruleForm.item_type == 'hotel' || ruleForm.item_type == 'addcredit'"
+                                    @update="updateCommissionRule"
+                                    :ctype="commissionType"
+                                    :chains="commissionRuleChains"
+                                    @levelparam = "newLevelParam"
+                                    :commission_hotel_value = "commissionHotelValue">
+                            </com-commission-hotel-rule-edit>
 
-                            <com-commission-hotel_3r-rule-edit v-if="ruleForm.item_type == 'hotel_3r'"  @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-hotel_3r-rule-edit>
+                            <com-commission-hotel_3r-rule-edit
+                                    v-if="ruleForm.item_type == 'hotel_3r'"
+                                    @update="updateCommissionRule"
+                                    :ctype="commissionType"
+                                    :chains="commissionRuleChains">
+                            </com-commission-hotel_3r-rule-edit>
 
                         </el-form-item>
 
@@ -428,6 +458,42 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
 
     </el-dialog>
 
+    <!-- 选择加油平台 -->
+    <el-dialog title="设置加油平台" :visible.sync="ChooseOil.dialog_visible" width="30%">
+        <el-input @keyup.enter.native="loadOilList"
+                  size="small" placeholder="搜索名称"
+                  v-model="ChooseOil.search.keyword"
+                  clearable @clear="toOilSearch"
+                  style="width:300px;">
+            <el-button slot="append" icon="el-icon-search" @click="toOilSearch"></el-button>
+        </el-input>
+        <el-table v-loading="ChooseOil.loadding" :data="ChooseOil.list">
+            <el-table-column label="" width="100">
+                <template slot-scope="scope">
+                    <el-link @click="confirmChooseOil(scope.row)" icon="el-icon-edit" type="primary">选择</el-link>
+                </template>
+            </el-table-column>
+            <el-table-column property="id" label="加油平台ID" width="150"></el-table-column>
+            <el-table-column label="平台名称">
+                <template slot-scope="scope">
+                    {{scope.row.name}}
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <div style="text-align: right;margin-top:15px;">
+            <el-pagination
+                    v-if="ChooseOil.pagination.page_count > 1"
+                    style="display: inline-block;"
+                    background :page-size="ChooseOil.pagination.pageSize"
+                    @current-change="OilPageChange"
+                    layout="prev, pager, next" :current-page="ChooseOil.pagination.current_page"
+                    :total="ChooseOil.pagination.total_count">
+            </el-pagination>
+        </div>
+
+    </el-dialog>
+
 </div>
 <script>
     const app = new Vue({
@@ -520,6 +586,21 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                     }
                 },
                 ChooseGiftPacks: {
+                    dialog_visible: false,
+                    loadding: false,
+                    list: [],
+                    search: {
+                        keyword: '',
+                        page: 1,
+                    },
+                    pagination: {
+                        pageSize: 10,
+                        current_page: 1,
+                        total_count: 0,
+                        page_count: 0
+                    }
+                },
+                ChooseOil: {
                     dialog_visible: false,
                     loadding: false,
                     list: [],
@@ -936,6 +1017,51 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                     }
                 }).catch(e => {
                     self.ChooseGiftPacks.loadding = false;
+                    self.$message.error("request fail");
+                });
+            },
+
+            //--------------选择加油-----------------
+            confirmChooseOil(row){
+                this.ruleForm.item_id = row.id;
+                this.choice.name = row.name;
+                this.choice.pic = row.thumb_url;
+                this.ChooseOil.dialog_visible = false;
+            },
+            chooseOilDialog(){
+                this.ChooseOil.dialog_visible = true;
+                this.loadOilList();
+            },
+            OilPageChange(page){
+                this.ChooseOil.search.page = page;
+                this.loadOilList();
+            },
+            toOilSearch(){
+                this.ChooseOil.search.page = 1;
+                this.loadOilList();
+            },
+            loadOilList(){
+                let self = this;
+                self.ChooseOil.loadding = true;
+                request({
+                    params: {
+                        r: "plugin/commission/mall/rules/search-oil"
+                    },
+                    method: 'post',
+                    data: {
+                        page: self.ChooseOil.search.page,
+                        keyword: self.ChooseOil.search.keyword
+                    }
+                }).then(e => {
+                    self.ChooseOil.loadding = false;
+                    if (e.data.code === 0) {
+                        self.ChooseOil.list = e.data.data.list;
+                        self.ChooseOil.pagination = e.data.data.pagination;
+                    } else {
+                        self.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    self.ChooseOil.loadding = false;
                     self.$message.error("request fail");
                 });
             },

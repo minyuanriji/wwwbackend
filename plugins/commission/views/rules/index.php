@@ -55,9 +55,7 @@
 <div id="app" v-cloak>
     <el-card class="box-card" shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
-            <div>
-                <span>规则列表</span>
-            </div>
+            <span>规则列表</span>
         </div>
 
         <div class="table-body">
@@ -93,6 +91,7 @@
                         <div v-if="scope.row.item_type == 'addcredit'">话费直推分佣</div>
                         <div v-if="scope.row.item_type == 'addcredit_3r'">话费消费分佣</div>
                         <div v-if="scope.row.item_type == 'giftpacks'">大礼包消费分佣</div>
+                        <div v-if="scope.row.item_type == 'oil_3r'">加油消费分佣</div>
                     </template>
                 </el-table-column>
                 <el-table-column label="对象名称">
@@ -106,6 +105,7 @@
                             <div v-if="scope.row.item_type == 'addcredit'">全部话费直推</div>
                             <div v-if="scope.row.item_type == 'addcredit_3r'">全部话费消费分佣</div>
                             <div v-if="scope.row.item_type == 'giftpacks'">全部大礼包消费分佣</div>
+                            <div v-if="scope.row.item_type == 'oil_3r'">全部加油消费分佣</div>
                         </div>
                         <div v-else>
                             <div v-if="scope.row.item_type == 'checkout' || scope.row.item_type == 'store'">
@@ -122,6 +122,9 @@
                             </div>
                             <div v-if="scope.row.item_type == 'giftpacks'">
                                 大礼包：{{scope.row.giftpacks_name}}[ID:{{scope.row.item_id}}]
+                            </div>
+                            <div v-if="scope.row.item_type == 'oil_3r'">
+                                加油：{{scope.row.oil_name}}[ID:{{scope.row.item_id}}]
                             </div>
                         </div>
                     </template>
@@ -210,6 +213,10 @@
                     {
                         value: 'giftpacks',
                         label: '大礼包消费'
+                    },
+                    {
+                        value: 'oil_3r',
+                        label: '加油消费'
                     },
                 ]
             };

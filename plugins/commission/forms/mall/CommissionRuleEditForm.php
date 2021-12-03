@@ -11,6 +11,7 @@ use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\commission\models\CommissionRuleChain;
 use app\plugins\commission\models\CommissionRules;
 use app\plugins\hotel\models\Hotels;
+use app\plugins\oil\models\OilPlateforms;
 
 class CommissionRuleEditForm extends BaseModel
 {
@@ -42,37 +43,42 @@ class CommissionRuleEditForm extends BaseModel
 
             if(!$this->apply_all_item && empty($this->item_id)){
                 if ($this->item_type == 'goods') {
-                    throw new \Exception("请设置商品", ApiCode::CODE_FAIL);
+                    throw new \Exception("请设置商品");
                 } else if ($this->item_type == 'store' || $this->item_type == 'checkout') {
-                    throw new \Exception("请设置门店", ApiCode::CODE_FAIL);
+                    throw new \Exception("请设置门店");
                 } else if ($this->item_type == 'hotel_3r' || $this->item_type == 'hotel')  {
-                    throw new \Exception("请设置酒店", ApiCode::CODE_FAIL);
-                } else if ($this->item_type == 'addcredit' || $this->item_type == 'addcredit_3r')  {
-                    throw new \Exception("请设置话费平台", ApiCode::CODE_FAIL);
+                    throw new \Exception("请设置酒店");
+                } else if ($this->item_type == 'addcredit' || $this->item_type == 'addcredit_3r' || $this->item_type == 'oil_3r')  {
+                    throw new \Exception("请设置平台");
                 }
             }
 
             if(!empty($this->item_id)){
                 if($this->item_type == 'goods'){
                     $itemObject = Goods::findOne($this->item_id);
-                    if(!$itemObject){
-                        throw new \Exception("商品不存在", ApiCode::CODE_FAIL);
-                    }
+                    if(!$itemObject)
+                        throw new \Exception("商品不存在");
+
                 }elseif ($this->item_type == 'store' || $this->item_type == 'checkout') {
                     $itemObject = Store::findOne($this->item_id);
-                    if(!$itemObject){
-                        throw new \Exception("门店不存在", ApiCode::CODE_FAIL);
-                    }
+                    if(!$itemObject)
+                        throw new \Exception("门店不存在");
+
                 } elseif ($this->item_type == 'hotel_3r' || $this->item_type == 'hotel') {
                     $itemObject = Hotels::findOne($this->item_id);
-                    if(!$itemObject){
-                        throw new \Exception("酒店不存在", ApiCode::CODE_FAIL);
-                    }
+                    if(!$itemObject)
+                        throw new \Exception("酒店不存在");
+
                 } elseif ($this->item_type == 'addcredit_3r' || $this->item_type == 'addcredit') {
                     $itemObject = AddcreditPlateforms::findOne($this->item_id);
-                    if(!$itemObject){
-                        throw new \Exception("话费平台不存在", ApiCode::CODE_FAIL);
-                    }
+                    if(!$itemObject)
+                        throw new \Exception("话费平台不存在");
+
+                } elseif ($this->item_type == 'oil_3r') {
+                    $itemObject = OilPlateforms::findOne($this->item_id);
+                    if(!$itemObject)
+                        throw new \Exception("平台不存在");
+
                 }
             }
 

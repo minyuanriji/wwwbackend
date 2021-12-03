@@ -109,22 +109,23 @@
                             <div>（服务费{{scope.row.transfer_rate}}%）</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="备注" prop="remark" width="230" v-if="activeName != 'unconfirmed'"></el-table-column>
+                    <el-table-column label="备注" prop="remark"  v-if="activeName != 'unconfirmed'">
+                        <template slot-scope="scope">
+                            <div>{{scope.row.remark}}</div>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作" v-if="activeName == 'unconfirmed'">
                         <template slot-scope="scope">
-                            <div v-if="scope.row.status == 'unconfirmed'">
-                                <el-button @click="doConfirm('confirmed', scope.row.id)" type="text" size="mini" circle >
-                                    <el-tooltip class="item" effect="dark" content="确认" placement="top">
-                                        <img src="statics/img/mall/pass.png" alt="">
-                                    </el-tooltip>
-                                </el-button>
-                                <el-button @click="doConfirm('canceled', scope.row.id)" type="text" size="mini" circle>
-                                    <el-tooltip class="item" effect="dark" content="取消" placement="top">
-                                        <img src="statics/img/mall/nopass.png" alt="">
-                                    </el-tooltip>
-                                </el-button>
-                            </div>
-                            <div v-else>-</div>
+                            <el-button @click="doConfirm('confirmed', scope.row.id)" type="text" size="mini" circle >
+                                <el-tooltip class="item" effect="dark" content="确认" placement="top">
+                                    <img src="statics/img/mall/pass.png" alt="">
+                                </el-tooltip>
+                            </el-button>
+                            <el-button @click="doConfirm('canceled', scope.row.id)" type="text" size="mini" circle>
+                                <el-tooltip class="item" effect="dark" content="取消" placement="top">
+                                    <img src="statics/img/mall/nopass.png" alt="">
+                                </el-tooltip>
+                            </el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -223,6 +224,7 @@
                             }).then(e => {
                                 instance.confirmButtonLoading = false;
                                 if (e.data.code === 0) {
+                                    this.$message.success(e.data.msg);
                                     this.loadData(this.activeName);
                                     done();
                                 } else {

@@ -12,6 +12,7 @@ use app\plugins\addcredit\models\AddcreditPlateforms;
 use app\plugins\commission\models\CommissionRuleChain;
 use app\plugins\commission\models\CommissionRules;
 use app\plugins\hotel\models\Hotels;
+use app\plugins\oil\models\OilPlateforms;
 
 class CommissionRuleDetailForm extends BaseModel
 {
@@ -47,9 +48,8 @@ class CommissionRuleDetailForm extends BaseModel
                 $rule = CommissionRules::findOne($this->id);
             }
 
-            if(!$rule){
+            if(!$rule)
                 throw new \Exception("无法获取规则记录");
-            }
 
             $rows = CommissionRuleChain::find()->where([
                 "rule_id" => $rule->id
@@ -102,6 +102,13 @@ class CommissionRuleDetailForm extends BaseModel
                     }else{
                         $ruleData['item_id'] = 0;
                     }
+                } else if ($ruleData['item_type'] == "oil_3r"){
+                    $oil_plate = OilPlateforms::findOne($ruleData['item_id']);
+                    if($oil_plate){
+                        $ruleData['name'] = $oil_plate->name;
+                    }else{
+                        $ruleData['item_id'] = 0;
+                    }
                 }
             }
 
@@ -109,7 +116,7 @@ class CommissionRuleDetailForm extends BaseModel
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     'rule'   => $ruleData,
-                    'chains' => $rows ? $rows : [],
+                    'chains' => $rows ?: [],
                     'store' => $this->store_id ? [$this->getStore($this->store_id)] : []
                 ]
             ];

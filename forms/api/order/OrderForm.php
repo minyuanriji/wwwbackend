@@ -166,6 +166,13 @@ class OrderForm extends BaseModel
                     $newItem['mch_info'] = $mchStore->getAttributes();
                 }
             }
+            if (isset($newItem['mch_info']['cover_url']) && empty($newItem['mch_info']['cover_url'])) {
+                if (isset(\Yii::$app->params['store_default_avatar']) && \Yii::$app->params['store_default_avatar']) {
+                    $newItem['mch_info']['cover_url'] = \Yii::$app->params['store_default_avatar'];
+                } else {
+                    $newItem['mch_info']['cover_url'] = [];
+                }
+            }
 
              $newList[] = $newItem;
         }

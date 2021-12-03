@@ -24,13 +24,15 @@ class TaolijinGoodsSearchForm extends BaseModel{
 
             $query = TaolijinGoods::find()->where(["is_delete" => 0, "status" => 1]);
 
-            $selects = ["id", "deduct_integral", "price", "name", "cover_pic", "unit", "gift_price", "ali_type"];
+            $selects = ["id", "deduct_integral", "price", "name", "cover_pic", "unit", "gift_price", "ali_type", "virtual_sales"];
 
             $list = $query->select($selects)->asArray()->page($pagination, 20, $this->page)->all();
 
             if($list){
                 $aliTexts = ["jd" => "京东", "ali" => "阿里巴巴"];
                 foreach($list as &$item){
+                    $item['sales'] = sprintf("已售%s%s", 0 + $item['virtual_sales'], $item['unit']);
+                    unset($item['virtual_sales']);
                     $item['ali_text'] = isset($aliTexts[$item['ali_type']]) ? $aliTexts[$item['ali_type']] : "";
                 }
             }

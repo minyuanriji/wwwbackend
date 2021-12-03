@@ -106,6 +106,9 @@ Yii::$app->loadComponentView('com-rich-text');
                                 <template slot="append">元</template>
                             </el-input>
                         </el-form-item>
+                        <el-form-item label="虚拟销量" prop="virtual_sales">
+                            <el-input type="number" min="0" v-model="formData.virtual_sales" style="width:60%;"></el-input>
+                        </el-form-item>
                         <el-form-item label="单位" prop="unit">
                             <el-input v-model="formData.unit" style="width:60%;"></el-input>
                         </el-form-item>
@@ -135,6 +138,7 @@ Yii::$app->loadComponentView('com-rich-text');
             cover_pic: "",
             pic_url: [],
             video_url: "",
+            virtual_sales: 0,
             unit: "件",
             status: "1",
 

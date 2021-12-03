@@ -18,6 +18,7 @@ class TaoLiJinGoodsEditForm extends BaseModel {
     public $cover_pic;
     public $pic_url;
     public $video_url;
+    public $virtual_sales;
     public $unit;
     public $gift_price;
     public $ali_type;
@@ -31,7 +32,7 @@ class TaoLiJinGoodsEditForm extends BaseModel {
             [['deduct_integral', 'price', 'name', 'cover_pic', 'unit', 'gift_price', 'ali_type',
               'ali_unique_id', 'ali_rate', 'ali_other_data'], 'required'],
             [['id'], 'integer'],
-            [['status', 'pic_url', 'video_url', 'detail', 'ali_url'], 'safe']
+            [['status', 'pic_url', 'video_url', 'detail', 'ali_url', 'virtual_sales'], 'safe']
         ];
     }
 
@@ -59,6 +60,7 @@ class TaoLiJinGoodsEditForm extends BaseModel {
             $goods->cover_pic       = $this->cover_pic;
             $goods->pic_url         = json_encode($this->pic_url);
             $goods->video_url       = $this->video_url;
+            $goods->virtual_sales   = (int)$this->virtual_sales;
             $goods->unit            = $this->unit;
             $goods->gift_price      = $this->gift_price;
             $goods->ali_type        = $this->ali_type;

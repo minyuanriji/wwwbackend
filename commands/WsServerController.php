@@ -133,7 +133,12 @@ class WsServerController extends BaseCommandController {
      * @return integer
      */
     public function getClientId($token){
-        $mchClient = MchClient::findOne(["token" => $token]);
+        $mchClient = null;
+        try {
+            $mchClient = MchClient::findOne(["token" => $token]);
+        }catch (\Exception $e){
+            $this->commandOut($e->getMessage());
+        }
         return $mchClient ? $mchClient->fd : null;
     }
 
@@ -143,7 +148,12 @@ class WsServerController extends BaseCommandController {
      * @return string
      */
     public function getClientToken($fd){
-        $mchClient = MchClient::findOne(["fd" => $fd]);
+        $mchClient = null;
+        try {
+            $mchClient = MchClient::findOne(["fd" => $fd]);
+        }catch (\Exception $e){
+            $this->commandOut($e->getMessage());
+        }
         return $mchClient ? $mchClient->token : null;
     }
 
@@ -153,9 +163,9 @@ class WsServerController extends BaseCommandController {
      * @param $param
      */
     public function setClientId($token, $param){
-        $mchClient = MchClient::findOne(["token" => $token]);
-        try {
 
+        try {
+            $mchClient = MchClient::findOne(["token" => $token]);
             MchClient::updateAll(["fd" => uniqid()], "fd='".$param['frame']->fd."'");
 
             if(!$mchClient){

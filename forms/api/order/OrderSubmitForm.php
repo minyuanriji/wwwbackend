@@ -310,7 +310,7 @@ class OrderSubmitForm extends BaseModel
             $event_data = array();//事件参数
             foreach ($data['list'] as $orderItem) {
                 $order = new Order();
-                $order->mall_id = $this->mall_id ?: \Yii::$app->mall->id;
+                $order->mall_id = \Yii::$app->mall->id;
                 $order->user_id = $user->getId();
                 $order->order_no = Order::getOrderNo('S');;
                 $order->total_price = $orderItem['total_price'];

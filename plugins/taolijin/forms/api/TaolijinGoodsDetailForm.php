@@ -3,7 +3,9 @@ namespace app\plugins\taolijin\forms\api;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\plugins\taolijin\models\TaolijinAli;
 use app\plugins\taolijin\models\TaolijinGoods;
+use app\plugins\taolijin\models\TaolijinUserAuth;
 
 class TaolijinGoodsDetailForm extends BaseModel{
 
@@ -27,10 +29,25 @@ class TaolijinGoodsDetailForm extends BaseModel{
                 throw new \Exception("商品不存在");
             }
 
+            //用户授权
+            $userNeedAuth = false;
+            $aliModel = TaolijinAli::findOne($goods->ali_id);
+            if(!$aliModel || $aliModel->is_delete){
+                throw new \Exception("联盟信息[ID:{$goods->ali_id}]不存在");
+            }
+            $userAuth = TaolijinUserAuth::findOne([
+                "ali_id"  => $aliModel->id,
+                "user_id" => \Yii::$app->user->id
+            ]);
+            if(!$userAuth || $userAuth->access_token_expire_at < time()){
+                $userNeedAuth = true;
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    'detail' => static::getDetail($goods)
+                    'auth_req' => $userNeedAuth ? 1 : 0,
+                    'detail'   => static::getDetail($goods)
                 ]
             ];
         }catch (\Exception $e){
@@ -42,7 +59,7 @@ class TaolijinGoodsDetailForm extends BaseModel{
     }
 
     public static function getDetail(TaolijinGoods $goods){
-        $attrs = ["id", "mall_id", "deduct_integral", "price", "name", "cover_pic", "pic_url",
+        $attrs = ["id", "ali_id", "mall_id", "deduct_integral", "price", "name", "cover_pic", "pic_url",
             "video_url", "unit", "gift_price", "ali_type", "detail"];
         $details = [];
         foreach($attrs as $attr){

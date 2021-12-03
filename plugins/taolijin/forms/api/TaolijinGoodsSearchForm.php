@@ -4,29 +4,41 @@ namespace app\plugins\taolijin\forms\api;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\taolijin\models\TaolijinGoods;
+use app\plugins\taolijin\models\TaolijinGoodsCatRelation;
 
 class TaolijinGoodsSearchForm extends BaseModel{
 
     public $page;
+    public $cat_id;
 
     public function rules(){
         return [
-            [['page'], 'integer']
+            [['cat_id'], 'required'],
+            [['page', 'cat_id'], 'integer']
         ];
     }
 
     public function get(){
+
         if(!$this->validate()){
             return $this->responseErrorInfo();
         }
 
         try {
 
-            $query = TaolijinGoods::find()->where(["is_delete" => 0, "status" => 1]);
+            $query = TaolijinGoods::find()->alias("g")->where(["g.is_delete" => 0, "g.status" => 1]);
+            if($this->cat_id){
+                $query->innerJoin(["gr" => TaolijinGoodsCatRelation::tableName()], "gr.goods_id=g.id");
+                $query->andWhere([
+                    "AND",
+                    ["gr.cat_id" => $this->cat_id],
+                    ["gr.is_delete" => 0]
+                ]);
+            }
 
-            $selects = ["id", "deduct_integral", "price", "name", "cover_pic", "unit", "gift_price", "ali_type", "virtual_sales"];
+            $selects = ["g.id", "g.deduct_integral", "g.price", "g.name", "g.cover_pic", "g.unit", "g.gift_price", "g.ali_type", "g.virtual_sales"];
 
-            $list = $query->select($selects)->asArray()->page($pagination, 20, $this->page)->all();
+            $list = $query->orderBy("g.id DESC")->select($selects)->asArray()->page($pagination, 20, $this->page)->all();
 
             if($list){
                 $aliTexts = ["jd" => "京东", "ali" => "阿里巴巴"];

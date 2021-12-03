@@ -12,7 +12,7 @@ class TaoLiJinCatChildrenListForm extends BaseModel{
 
     public function rules(){
         return [
-            [['id', 'mch_id', 'sort'], 'integer']
+            [['id'], 'integer']
         ];
     }
 

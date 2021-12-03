@@ -224,6 +224,7 @@
                             }).then(e => {
                                 instance.confirmButtonLoading = false;
                                 if (e.data.code === 0) {
+                                    this.$message.success(e.data.msg);
                                     this.loadData(this.activeName);
                                     done();
                                 } else {

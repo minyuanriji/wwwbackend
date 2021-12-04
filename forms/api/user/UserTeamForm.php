@@ -333,8 +333,9 @@ class UserTeamForm extends BaseModel
 
         if ($this->keywords) {
             $query->andWhere([
-                'and',
-                ['like', 'u.nickname', $this->keywords]
+                'or',
+                ['like', 'u.nickname', $this->keywords],
+                ['u.id' => $this->keywords],
             ]);
         }
 

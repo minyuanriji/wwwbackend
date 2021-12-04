@@ -44,6 +44,10 @@ class OilOrderListForm extends BaseModel {
                 ]);
             }
 
+            if($this->status && $this->status != 'all') {
+                $query->andWhere(['o.pay_status' => $this->status]);
+            }
+
             if (!empty($this->date_start) && !empty($this->date_end)) {
                 $query->andFilterWhere(['between', 'o.pay_at', $this->date_start, $this->date_end]);
             }

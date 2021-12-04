@@ -97,6 +97,7 @@ class OrderForm extends BaseModel
             $newItem = ArrayHelper::toArray($item);
             $mall = $item->mall ? ArrayHelper::toArray($item->mall) : [];
             $newItem['mall_name'] = $mall['name'];
+            $newItem['mall_logo'] = $mall['logo'] ?: 'https://www.mingyuanriji.cn/web/static/fillShop.png';
             $newItem['comments'] = $item->comments ? ArrayHelper::toArray($item->comments) : [];
             $newItem['detail'] = $item->detail ? ArrayHelper::toArray($item->detail) : [];
             $newItem['status_text'] = $order->orderStatusText($item);

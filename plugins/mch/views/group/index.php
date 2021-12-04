@@ -5,7 +5,6 @@
     }
 
     .input-item {
-        width: 250px;
         margin: 0 0 20px;
     }
 
@@ -117,6 +116,12 @@
                         <el-input  @keyup.enter.native="searchList" size="big" placeholder="请输入关键词搜索" v-model="search.keyword" clearable
                                    @clear='searchList'>
                             <el-button @click="searchList" slot="append" icon="el-icon-search" ></el-button>
+                            <el-select style="width: 130px" slot="prepend" v-model="search.keyword1">
+                                <el-option v-for="item in selectList" :key="item.value"
+                                           :label="item.name"
+                                           :value="item.value">
+                                </el-option>
+                            </el-select>
                         </el-input>
                     </div>
                 </el-form-item>
@@ -181,8 +186,27 @@
                 pageCount: 0,
                 search: {
                     keyword: '',
+                    keyword1: 'mch_mobile',
                 },
-                btnLoading: false
+                btnLoading: false,
+                selectList : [
+                    {
+                        name : '商户手机号',
+                        value : 'mch_mobile',
+                    },
+                    {
+                        name : '店铺名',
+                        value : 'store_name',
+                    },
+                    {
+                        name : '用户ID',
+                        value : 'user_id',
+                    },
+                    {
+                        name : '商户ID',
+                        value : 'mch_id',
+                    },
+                ],
             };
         },
         methods: {
@@ -198,7 +222,8 @@
                     params: {
                         r: 'plugin/mch/mall/group/list',
                         page: self.page,
-                        keyword: self.search.keyword
+                        keyword: self.search.keyword,
+                        keyword1: self.search.keyword1
                     },
                     method: 'get',
                 }).then(e => {

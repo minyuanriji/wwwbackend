@@ -81,7 +81,7 @@ class MchManaOrderGiftPacksListForm extends BaseModel {
                 "u.nickname", "u.mobile", "u.avatar_url", "u.id as user_id", "m.id as mch_id", "s.id as store_id",
                 "s.name as store_name"
             ];
-            $list = $query->orderBy("go.id DESC")->select($selects)->asArray()->page($pagination, 10, $this->page)->all();
+            $list = $query->orderBy("go.id DESC,goi.id DESC")->select($selects)->asArray()->page($pagination, 10, $this->page)->all();
             if($list){
                 $orderItemIds = [];
                 foreach($list as &$item){

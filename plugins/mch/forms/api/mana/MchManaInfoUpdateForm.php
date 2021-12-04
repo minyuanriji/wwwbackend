@@ -19,14 +19,26 @@ class MchManaInfoUpdateForm extends BaseModel {
     public $longitude;
     public $latitude;
     public $address;
+    public $description;
+    public $start_business_time;
+    public $end_business_time;
 
     public function rules(){
         return array_merge(parent::rules(), [
             [['name', 'cover_url', 'province_id', 'city_id', 'longitude', 'latitude', 'address'], 'required'],
             [['province_id', 'city_id'], 'integer'],
-            [['cover_url', 'name', 'longitude', 'latitude', 'address'], 'string'],
-            [['district_id'], 'safe']
+            [['cover_url', 'name', 'longitude', 'latitude', 'address', 'description'], 'string'],
+            [['district_id', 'start_business_time', 'end_business_time'], 'safe'],
+            ['description', 'checkDetail']
         ]);
+    }
+
+    public function checkDetail($attribute, $params)
+    {
+        $detail = $this->description;
+        if (strlen($detail) > 255) {
+            $this->addError($attribute, "店铺介绍最大字节不能大于255！");
+        }
     }
 
     public function save(){
@@ -59,6 +71,8 @@ class MchManaInfoUpdateForm extends BaseModel {
             $mchStore->longitude   = $this->longitude;
             $mchStore->latitude    = $this->latitude;
             $mchStore->address     = $this->address;
+            $mchStore->description          = $this->description;
+            $mchStore->business_hours       = $this->start_business_time . '-' . $this->end_business_time;
             if(!$mchStore->save()){
                 throw new \Exception($this->responseErrorMsg($mchStore));
             }

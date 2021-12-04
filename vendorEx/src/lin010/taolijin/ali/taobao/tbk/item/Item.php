@@ -5,6 +5,8 @@ namespace lin010\taolijin\ali\taobao\tbk\item;
 use lin010\taolijin\ali\taobao\tbk\abstracts\TbkBaseHandle;
 use lin010\taolijin\ali\taobao\tbk\item\convert\TbkItemConvertRequest;
 use lin010\taolijin\ali\taobao\tbk\item\convert\TbkItemConvertResponse;
+use lin010\taolijin\ali\taobao\tbk\item\info\TbkItemInfoGetRequest;
+use lin010\taolijin\ali\taobao\tbk\item\info\TbkItemInfoGetResponse;
 
 class Item extends TbkBaseHandle {
 

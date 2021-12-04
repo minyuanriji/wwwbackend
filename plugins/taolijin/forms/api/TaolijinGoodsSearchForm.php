@@ -2,11 +2,16 @@
 namespace app\plugins\taolijin\forms\api;
 
 use app\core\ApiCode;
+use app\core\BasePagination;
+use app\forms\api\APICacheDataForm;
+use app\forms\api\ICacheForm;
 use app\models\BaseModel;
+use app\plugins\taolijin\forms\common\AliAccForm;
 use app\plugins\taolijin\models\TaolijinGoods;
 use app\plugins\taolijin\models\TaolijinGoodsCatRelation;
+use lin010\taolijin\Ali;
 
-class TaolijinGoodsSearchForm extends BaseModel{
+class TaolijinGoodsSearchForm extends BaseModel implements ICacheForm {
 
     public $page;
     public $cat_id;
@@ -18,7 +23,11 @@ class TaolijinGoodsSearchForm extends BaseModel{
         ];
     }
 
-    public function get(){
+
+    /**
+     * @return APICacheDataForm
+     */
+    public function getSourceDataForm(){
 
         if(!$this->validate()){
             return $this->responseErrorInfo();
@@ -26,7 +35,7 @@ class TaolijinGoodsSearchForm extends BaseModel{
 
         try {
 
-            $query = TaolijinGoods::find()->alias("g")->where(["g.is_delete" => 0, "g.status" => 1]);
+            /*$query = TaolijinGoods::find()->alias("g")->where(["g.is_delete" => 0, "g.status" => 1]);
             if($this->cat_id){
                 $query->innerJoin(["gr" => TaolijinGoodsCatRelation::tableName()], "gr.goods_id=g.id");
                 $query->andWhere([
@@ -47,16 +56,39 @@ class TaolijinGoodsSearchForm extends BaseModel{
                     unset($item['virtual_sales']);
                     $item['ali_text'] = isset($aliTexts[$item['ali_type']]) ? $aliTexts[$item['ali_type']] : "";
                 }
-            }
+            }*/
 
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '请求成功',
-                'data' => [
-                    'list'       => $list ? $list : [],
-                    'pagination' => $pagination,
+            $pageSize = 12;
+
+            $acc = AliAccForm::get("ali");
+
+            $ali = new Ali($acc->app_key, $acc->secret_key);
+            $res = $ali->material->search([
+                "page_size"   => (string)$pageSize,
+                "page_no"     => (string)$this->page,
+                "adzone_id"   => $acc->adzone_id,
+                "sort"        => "total_sales_desc",
+                "material_id" => "6268",
+                "q"           => "玩具",
+                "cat"         => ""
+            ]);
+            if(!empty($res->code)){
+                throw new \Exception($res->msg);
+            }
+            $data = $res->getData();
+
+            $pagination = new BasePagination(['totalCount' => $data['count'], 'pageSize' => $pageSize, 'page' => $this->page]);
+
+            return new APICacheDataForm([
+                "sourceData" => [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'msg' => '请求成功',
+                    'data' => [
+                        'list'       => $this->onlySales($ali, $data['list']),
+                        'pagination' => $pagination,
+                    ]
                 ]
-            ];
+            ]);
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,
@@ -65,4 +97,54 @@ class TaolijinGoodsSearchForm extends BaseModel{
         }
     }
 
+    /**
+     * 过滤掉非营销主推商品
+     * @param Ali $acc
+     * @param $list
+     */
+    private function onlySales(Ali $ali, $list){
+        if(!$list) return [];
+
+        $num_iids = [];
+        foreach($list as $item){
+            $num_iids[] = $item['item_id'];
+        }
+        $res = $ali->item->infoGet([
+            "num_iids" => implode(",", $num_iids)
+        ]);
+        if(!empty($res->code)){
+            throw new \Exception($res->msg);
+        }
+
+        $allowItemIds = [];
+        $results = $res->getResult();
+        foreach($results as $result){
+            if(isset($result['material_lib_type'])){
+                $types = explode(",", $result['material_lib_type']);
+                if(in_array(1, $types)){
+                    $allowItemIds[] = $result['num_iid'];
+                }
+            }
+        }
+        $newList = [];
+        foreach($list as $item){
+            if(in_array($item['item_id'], $allowItemIds)){
+                $newList[] = [
+                    'item_id'       => $item['item_id'],
+                    'url'           => $item['url'],
+                    'pict_url'      => $item['pict_url'],
+                    'volume'        => $item['volume'],
+                    'reserve_price' => $item['reserve_price']
+                ];
+            }
+        }
+        return $newList;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCacheKey(){
+        return [$this->page, $this->cat_id, $this->is_login, $this->login_uid];
+    }
 }

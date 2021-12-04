@@ -5,6 +5,7 @@ use app\plugins\Controller;
 use app\plugins\taolijin\forms\mall\TaoLiJinGoodsDeletesForm;
 use app\plugins\taolijin\forms\mall\TaoLiJinGoodsEditForm;
 use app\plugins\taolijin\forms\mall\TaoLiJinGoodsListForm;
+use app\plugins\taolijin\forms\mall\TaoLiJinGoodsLoadAliDataForm;
 
 class GoodsController extends Controller{
 
@@ -43,4 +44,13 @@ class GoodsController extends Controller{
         return $this->asJson($form->recycle());
     }
 
+    /**
+     * 加载联盟数据
+     * @return string|\yii\web\Response
+     */
+    public function actionLoadAliData(){
+        $form = new TaoLiJinGoodsLoadAliDataForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->getData());
+    }
 }

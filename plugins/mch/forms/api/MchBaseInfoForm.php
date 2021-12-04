@@ -140,8 +140,10 @@ class MchBaseInfoForm extends BaseModel{
                     }
                     $baseData['store']['business_hours'] = $business_hours;
                 } else {
-                    $baseData['store']['business_hours'] = [];
+                    $baseData['store']['business_hours'] = ['08:00', '22:00'];
                 }
+            } else {
+                $baseData['store']['business_hours'] = ['08:00', '22:00'];
             }
 
             return [

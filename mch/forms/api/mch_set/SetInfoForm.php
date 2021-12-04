@@ -38,7 +38,7 @@ class SetInfoForm extends BaseModel{
     public function checkDetail($attribute, $params)
     {
         $detail = $this->description;
-        if (strlen($detail) > 1000) {
+        if (strlen($detail) > 255) {
             $this->addError($attribute, "店铺介绍最大字节不能大于255！");
         }
     }

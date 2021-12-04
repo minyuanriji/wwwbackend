@@ -111,6 +111,9 @@ echo $this->render("com-edit");
         },
         mounted() {
             this.loadData();
+            if(getQuery("act") == "getInviteCode"){
+                this.newInviteCode();
+            }
         },
         methods: {
             newAcc(){
@@ -172,6 +175,30 @@ echo $this->render("com-edit");
                     }
                 }).catch(e => {
                     that.$message.error(e.data.msg);
+                    that.loading = false;
+                });
+            },
+            newInviteCode(){
+                let that = this;
+                that.loading = true;
+                request({
+                    params: {
+                        r: 'plugin/taolijin/mall/ali/new-invite-code'
+                    },
+                    method: 'post',
+                    data: {
+                        open_uid: getQuery("open_uid"),
+                        ali_id: getQuery("ali_id"),
+                        access_token: getQuery("access_token")
+                    }
+                }).then(e => {
+                    that.loading = false;
+                    if (e.data.code == 0) {
+                        that.editAcc(e.data.data.ali_data);
+                    } else {
+                        that.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
                     that.loading = false;
                 });
             },

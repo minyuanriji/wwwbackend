@@ -21,14 +21,26 @@ class SetInfoForm extends BaseModel{
     public $latitude;
     public $address;
     public $store_mch_common_cat_id;
+    public $description;
+    public $start_business_time;
+    public $end_business_time;
 
     public function rules(){
         return array_merge(parent::rules(), [
             [['mch_id', 'name', 'cover_url', 'province_id', 'city_id', 'longitude', 'latitude', 'address', 'store_mch_common_cat_id'], 'required'],
             [['mch_id', 'province_id', 'city_id', 'store_mch_common_cat_id'], 'integer'],
-            [['cover_url', 'name', 'longitude', 'latitude', 'address'], 'string'],
-            [['district_id'], 'safe']
+            [['cover_url', 'name', 'longitude', 'latitude', 'address', 'description'], 'string'],
+            [['district_id', 'start_business_time', 'end_business_time'], 'safe'],
+            ['description', 'checkDetail']
         ]);
+    }
+
+    public function checkDetail($attribute, $params)
+    {
+        $detail = $this->description;
+        if (strlen($detail) > 255) {
+            $this->addError($attribute, "店铺介绍最大字节不能大于255！");
+        }
     }
 
     public function save(){
@@ -53,14 +65,16 @@ class SetInfoForm extends BaseModel{
                 throw new \Exception("经纬度坐标格式有误");
             }
 
-            $mchStore->cover_url   = $this->cover_url;
-            $mchStore->name        = $this->name;
-            $mchStore->province_id = $this->province_id;
-            $mchStore->city_id     = $this->city_id;
-            $mchStore->district_id = $this->district_id;
-            $mchStore->longitude   = $this->longitude;
-            $mchStore->latitude    = $this->latitude;
-            $mchStore->address     = $this->address;
+            $mchStore->cover_url            = $this->cover_url;
+            $mchStore->name                 = $this->name;
+            $mchStore->province_id          = $this->province_id;
+            $mchStore->city_id              = $this->city_id;
+            $mchStore->district_id          = $this->district_id;
+            $mchStore->longitude            = $this->longitude;
+            $mchStore->latitude             = $this->latitude;
+            $mchStore->address              = $this->address;
+            $mchStore->description          = $this->description;
+            $mchStore->business_hours       = $this->start_business_time . '-' . $this->end_business_time;
             if(!$mchStore->save()){
                 throw new \Exception($this->responseErrorMsg($mchStore));
             }

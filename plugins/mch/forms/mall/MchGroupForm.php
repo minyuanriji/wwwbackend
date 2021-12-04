@@ -13,11 +13,12 @@ class MchGroupForm extends BaseModel{
 
     public $page;
     public $keyword;
+    public $keyword1;
 
     public function rules(){
         return [
             [['page'], 'safe'],
-            [['keyword'], 'trim']
+            [['keyword', 'keyword1'], 'trim']
         ];
     }
 
@@ -36,12 +37,23 @@ class MchGroupForm extends BaseModel{
             $query->innerJoin(["m" => Mch::tableName()], "m.id=mg.mch_id");
             $query->innerJoin(["s" => Store::tableName()], "s.id=mg.store_id");
 
-            if(!empty($this->keyword)){
-                $query->andWhere([
-                    "OR",
-                    ["m.mobile" => $this->keyword],
-                    ["LIKE", "s.name", $this->keyword]
-                ]);
+            if (!empty($this->keyword1) && !empty($this->keyword)) {
+                switch ($this->keyword1)
+                {
+                    case 'mch_mobile':
+                        $query->andWhere(["m.mobile" => $this->keyword]);
+                        break;
+                    case 'store_name':
+                        $query->andWhere(['and', ["LIKE", "s.name", $this->keyword]]);
+                        break;
+                    case 'user_id':
+                        $query->andWhere(['m.user_id' => $this->keyword]);
+                        break;
+                    case 'mch_id':
+                        $query->andWhere(["m.id" => $this->keyword]);
+                        break;
+                    default:
+                }
             }
 
             $query->select(["mg.*", "m.user_id", "m.mobile", "s.name", "s.cover_url"]);

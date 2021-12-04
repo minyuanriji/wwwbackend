@@ -129,6 +129,23 @@ class MchBaseInfoForm extends BaseModel{
             ]);
             $baseData['mch_group_id'] = $mchGroup ? $mchGroup->id : 0;
 
+            if ($baseData['store']['business_hours']) {
+                $business_hours = explode('-', $baseData['store']['business_hours']);
+                if (count($business_hours) <= 1) {
+                    $business_hours = explode('~', $baseData['store']['business_hours']);
+                }
+                if ($business_hours > 1) {
+                    foreach ($business_hours as &$item) {
+                        $item = trim($item);
+                    }
+                    $baseData['store']['business_hours'] = $business_hours;
+                } else {
+                    $baseData['store']['business_hours'] = ['08:00', '22:00'];
+                }
+            } else {
+                $baseData['store']['business_hours'] = ['08:00', '22:00'];
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [

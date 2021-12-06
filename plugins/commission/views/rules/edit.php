@@ -191,9 +191,11 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
             <el-pagination
                     v-if="ChooseStore.pagination.page_count > 1"
                     style="display: inline-block;"
-                    background :page-size="ChooseStore.pagination.pageSize"
+                    background
+                    :page-size="ChooseStore.pagination.pageSize"
                     @current-change="storePageChange"
-                    layout="prev, pager, next" :current-page="ChooseStore.pagination.current_page"
+                    layout="prev, pager, next"
+                    :current-page="ChooseStore.pagination.current_page"
                     :total="ChooseStore.pagination.total_count">
             </el-pagination>
         </div>
@@ -239,12 +241,12 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
 
         <div style="text-align: right;margin-top:15px;">
             <el-pagination
-                    v-if="ChooseStore.pagination.page_count > 1"
+                    v-if="ChooseHotel.pagination.page_count > 1"
                     style="display: inline-block;"
-                    background :page-size="ChooseStore.pagination.pageSize"
-                    @current-change="storePageChange"
-                    layout="prev, pager, next" :current-page="ChooseStore.pagination.current_page"
-                    :total="ChooseStore.pagination.total_count">
+                    background :page-size="ChooseHotel.pagination.pageSize"
+                    @current-change="HotelPageChange"
+                    layout="prev, pager, next" :current-page="ChooseHotel.pagination.current_page"
+                    :total="ChooseHotel.pagination.total_count">
             </el-pagination>
         </div>
 
@@ -335,12 +337,12 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
 
         <div style="text-align: right;margin-top:15px;">
             <el-pagination
-                    v-if="ChooseStore.pagination.page_count > 1"
+                    v-if="ChooseAddcredit.pagination.page_count > 1"
                     style="display: inline-block;"
-                    background :page-size="ChooseStore.pagination.pageSize"
-                    @current-change="storePageChange"
-                    layout="prev, pager, next" :current-page="ChooseStore.pagination.current_page"
-                    :total="ChooseStore.pagination.total_count">
+                    background :page-size="ChooseAddcredit.pagination.pageSize"
+                    @current-change="AddcreditPageChange"
+                    layout="prev, pager, next" :current-page="ChooseAddcredit.pagination.current_page"
+                    :total="ChooseAddcredit.pagination.total_count">
             </el-pagination>
         </div>
 
@@ -836,7 +838,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 this.choice.pic = row.cover_pic;
                 this.ChooseStore.dialog_visible = false;
             },
-            StorePageChange(page){
+            storePageChange(page){
                 this.ChooseStore.search.page = page;
                 this.loadStoreList();
             },

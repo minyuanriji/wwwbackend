@@ -46,6 +46,14 @@ class SearchStoreForm extends BaseModel {
 
         $list = $query->select($select)->asArray()->page($pagination, 10, $this->page)->all();
 
+        if ($list) {
+            foreach ($list as &$item) {
+                if (empty($item['cover_pic'])) {
+                    $item['cover_pic'] = \Yii::$app->params['store_default_avatar'];
+                }
+            }
+        }
+
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'msg' => '请求成功',

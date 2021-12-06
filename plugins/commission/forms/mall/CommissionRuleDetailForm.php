@@ -75,7 +75,7 @@ class CommissionRuleDetailForm extends BaseModel
                     $store = Store::findOne($ruleData['item_id']);
                     if($store){
                         $ruleData['name'] = $store->name;
-                        $ruleData['pic']  = $store->cover_url;
+                        $ruleData['pic']  = $store->cover_url ?: \Yii::$app->params['store_default_avatar'];
                     }else{
                         $ruleData['item_id'] = 0;
                     }

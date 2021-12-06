@@ -46,6 +46,12 @@ class TaoLiJinCatDetailForm extends BaseModel{
 
             $newDetail['parents'] = $parents;
 
+            if($detail->ali_type == "ali"){ //淘宝联盟
+                $newDetail['ali_custom_data'] = $detail->ali_custom_data ? @json_decode($detail->ali_custom_data, true) : [];
+            }else{
+                $newDetail['ali_custom_data'] = [];
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [

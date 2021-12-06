@@ -26,6 +26,11 @@
                         </div>
                     </div>
                 </el-form-item>
+                <el-form-item label="联盟类型" prop="ali_type">
+                    <el-select v-model="ruleForm.ali_type" placeholder="请选择" style="width:200px;" @change="setCustomParams">
+                        <el-option label="淘宝联盟" value="ali"></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item v-if="currentCatLevelShow == 2 && currentCatShow.value" label="一级分类">
                     <div flex="dir:left">
                         <div>{{currentCatShow.label}}</div>
@@ -70,6 +75,45 @@
                     <com-gallery :url="ruleForm.pic_url" :show-delete="true" @deleted="ruleForm.pic_url = ''"
                                  width="80px" height="80px">
                     </com-gallery>
+                </el-form-item>
+                <el-form-item label="联盟类目" prop="ali_cat_id"  v-if="ruleForm.ali_type">
+                    <el-input v-model="ruleForm.ali_cat_id"></el-input>
+                </el-form-item>
+                <el-form-item label="类目配置" v-if="ruleForm.ali_type == 'ali'">
+                    <el-card class="box-card">
+                        <el-table :data="ruleForm.ali_custom_data" border style="width: 100%">
+                            <el-table-column label="名称" width="200">
+                                <template slot-scope="scope">
+                                    <el-input v-model="scope.row.name" type="text" v-if="!scope.row.is_sys"></el-input>
+                                    <span v-else>{{scope.row.name}}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="描述" width="200">
+                                <template slot-scope="scope">
+                                    <el-input v-model="scope.row.desc" type="text" v-if="!scope.row.is_sys"></el-input>
+                                    <span v-else>{{scope.row.desc}}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="内容" align="center">
+                                <template slot-scope="scope">
+                                    <el-input v-model="scope.row.value" ></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" align="center" width="80" >
+                                <template slot-scope="scope">
+                                    <el-button @click="removeCustomParam(scope.row)" type="text" circle size="mini" v-if="scope.row.is_sys == 0">
+                                        <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                            <img src="statics/img/mall/del.png" alt="">
+                                        </el-tooltip>
+                                    </el-button>
+                                    <span v-else>-</span>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div style="padding-top:20px;">
+                            <el-link @click="newCustomParam" icon="el-icon-plus" type="primary">新增自定义参数</el-link>
+                        </div>
+                    </el-card>
                 </el-form-item>
             </el-form>
         </div>
@@ -143,6 +187,10 @@
             <el-button type="primary" size="small" @click="imageDialogVisible = false">我知道了</el-button>
         </div>
     </el-dialog>
+
+    <el-dialog title="选择联盟类目" :visible.sync="AliCat.dialogVisible" width="50%">
+
+    </el-dialog>
 </div>
 <script>
     const app = new Vue({
@@ -150,14 +198,20 @@
         data() {
             return {
                 ruleForm: {
+                    ali_cat_id: '',
+                    ali_type: '',
                     pic_url: '',
                     parent_id: 0,
                     status: 1,
-                    sort: 100
+                    sort: 100,
+                    ali_custom_data: []
                 },
                 parentIds: [],
                 options: [],
                 rules: {
+                    ali_type: [
+                        {required: true, message: '请选择联盟类型', trigger: 'change'},
+                    ],
                     name: [
                         {required: true, message: '请输入分类名称', trigger: 'change'},
                         {max: 16, message: '最多输入16个字符', trigger: 'change'},
@@ -187,9 +241,30 @@
                     image_url: ''
                 },
                 currentRadioKey: 1,
+                AliCat: {
+                    dialogVisible: false
+                }
             };
         },
         methods: {
+            removeCustomParam(param){
+                let i, newParamList = [];
+                for(i=0; i < this.ruleForm.ali_custom_data.length; i++){
+                    if(this.ruleForm.ali_custom_data[i].name != param.name){
+                        newParamList.push(this.ruleForm.ali_custom_data[i]);
+                    }
+                }
+                this.ruleForm.ali_custom_data = newParamList;
+            },
+            newCustomParam(){
+                this.ruleForm.ali_custom_data.push({
+                    type: "text",
+                    name: "",
+                    value: "",
+                    desc: "",
+                    is_sys: 0
+                });
+            },
             store(formName) {
                 this.$refs[formName].validate((valid) => {
                     let self = this;
@@ -302,6 +377,7 @@
                     if (e.data.code === 0) {
                         self.ruleForm = e.data.data.detail;
                         self.handleData();
+                        self.setCustomParams();
                     } else {
                         self.$message.error(e.data.msg);
                     }
@@ -331,7 +407,7 @@
                             value: item.id
                         }
                     }
-                })
+                });
             },
             changeParent(catLevel) {
                 if (this.ruleForm.id) {
@@ -418,12 +494,47 @@
 
                 return '';
             },
+            //设置联盟自定义参数
+            setCustomParams(){
+                if(!this.ruleForm.ali_type) return;
+                let baseJsonParams;
+                if(this.ruleForm.ali_type == "ali"){ //淘宝联盟
+                    baseJsonParams = {
+                        end_tk_rate: {type: "text", name: "end_tk_rate", value: "", desc: "佣金比率上限", is_sys: 1},
+                        start_tk_rate: {type: "text", name: "start_tk_rate", value: "", desc: "佣金比率下限", is_sys: 1},
+                        q:{type: "text", name: "q", value: "", desc: "限定查询词", is_sys: 1},
+                        material_id:{type: "text", name: "material_id", value: "", desc: "物料ID", is_sys: 1}
+                    };
+                }else{
+                    baseJsonParams = {};
+                }
+                let i, customParamList = [], name, newParamList = [];
+                for(i=0; i < this.ruleForm.ali_custom_data.length; i++){
+                    name = typeof this.ruleForm.ali_custom_data[i]['name'] != "undefined" ? this.ruleForm.ali_custom_data[i].name.trim() : '';
+                    if(name.length <= 0) continue;
+                    if(typeof baseJsonParams[name] != "undefined"){ //固定参数
+                        baseJsonParams[name] = this.ruleForm.ali_custom_data[i];
+                    }else{ //动态参数
+                        customParamList.push(this.ruleForm.ali_custom_data[i]);
+                    }
+                }
+                for(name in baseJsonParams){
+                    newParamList.push(baseJsonParams[name]);
+                }
+                for(i=0; i < customParamList.length; i++){
+                    newParamList.push(customParamList[i]);
+                }
+                this.ruleForm.ali_custom_data = newParamList;
+            }
         },
         mounted: function () {
             if (getQuery('id')) {
                 this.getDetail();
+            }else{
+                this.setCustomParams();
             }
             this.getOptions();
+
         }
     });
 </script>

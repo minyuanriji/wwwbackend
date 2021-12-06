@@ -3,6 +3,7 @@
 namespace app\plugins\taolijin\controllers\mall;
 
 use app\plugins\Controller;
+use app\plugins\taolijin\forms\mall\TaoLiJinAliGetCatForm;
 use app\plugins\taolijin\forms\mall\TaoLiJinCatAllListForm;
 use app\plugins\taolijin\forms\mall\TaoLiJinCatChildrenListForm;
 use app\plugins\taolijin\forms\mall\TaoLiJinCatDeleteForm;
@@ -82,5 +83,15 @@ class CatController extends Controller{
         $form = new TaoLiJinCatDeleteForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->destroy());
+    }
+
+    /**
+     * 获取联盟分类
+     * @return \yii\web\Response
+     */
+    public function actionGetAliCat(){
+        $form = new TaoLiJinAliGetCatForm();
+        $form->attributes = \Yii::$app->request->get();
+        return $this->asJson($form->get());
     }
 }

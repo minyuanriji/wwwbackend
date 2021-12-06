@@ -4,6 +4,7 @@ namespace app\plugins\taolijin\forms\common;
 
 use app\models\BaseModel;
 use app\plugins\taolijin\models\TaolijinAli;
+use app\plugins\taolijin\models\TaolijinAliInvitecode;
 
 class AliAccForm extends BaseModel{
 
@@ -56,4 +57,15 @@ class AliAccForm extends BaseModel{
         return new AliAccForm($data);
     }
 
+    /**
+     * 获取一个淘宝联盟邀请码
+     * @return string
+     */
+    public function getAliInviteCode(){
+        $row = TaolijinAliInvitecode::find()->where([
+            "ali_id" => $this->id,
+            "is_delete" => 0
+        ])->select(["code"])->orderBy("updated_at DESC")->one();
+        return $row ? $row['code'] : null;
+    }
 }

@@ -7,8 +7,10 @@ use app\forms\api\APICacheDataForm;
 use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\plugins\taolijin\forms\common\AliAccForm;
+use app\plugins\taolijin\models\TaolijinCats;
 use app\plugins\taolijin\models\TaolijinGoods;
 use app\plugins\taolijin\models\TaolijinGoodsCatRelation;
+use app\plugins\taolijin\models\TaolijinUserAliBind;
 use lin010\taolijin\Ali;
 
 class TaolijinGoodsSearchForm extends BaseModel implements ICacheForm {
@@ -18,7 +20,6 @@ class TaolijinGoodsSearchForm extends BaseModel implements ICacheForm {
 
     public function rules(){
         return [
-            [['cat_id'], 'required'],
             [['page', 'cat_id'], 'integer']
         ];
     }
@@ -58,35 +59,10 @@ class TaolijinGoodsSearchForm extends BaseModel implements ICacheForm {
                 }
             }*/
 
-            $pageSize = 12;
-
-            $acc = AliAccForm::get("ali");
-
-            $ali = new Ali($acc->app_key, $acc->secret_key);
-            $res = $ali->material->search([
-                "page_size"   => (string)$pageSize,
-                "page_no"     => (string)$this->page,
-                "adzone_id"   => $acc->adzone_id,
-                "sort"        => "total_sales_desc",
-                "material_id" => "6268",
-                "q"           => "玩具",
-                "cat"         => ""
-            ]);
-            if(!empty($res->code)){
-                throw new \Exception($res->msg);
-            }
-            $data = $res->getData();
-
-            $pagination = new BasePagination(['totalCount' => $data['count'], 'pageSize' => $pageSize, 'page' => $this->page]);
-
             return new APICacheDataForm([
                 "sourceData" => [
                     'code' => ApiCode::CODE_SUCCESS,
-                    'msg' => '请求成功',
-                    'data' => [
-                        'list'       => $this->onlySales($ali, $data['list']),
-                        'pagination' => $pagination,
-                    ]
+                    'data' => $this->searchAli()
                 ]
             ]);
         }catch (\Exception $e){
@@ -98,11 +74,79 @@ class TaolijinGoodsSearchForm extends BaseModel implements ICacheForm {
     }
 
     /**
-     * 过滤掉非营销主推商品
+     * 搜索淘宝联盟
+     * @return array
+     * @throws \Exception
+     */
+    private function searchAli(){
+        $searchOption = [];
+
+        $catModel = $this->cat_id ? TaolijinCats::findOne($this->cat_id) : null;
+        if($catModel){
+            if(!$catModel){
+                throw new \Exception("类目不存在");
+            }
+
+            $params = $catModel->getParams();
+
+            if(!empty($params['material_id']))   $searchOption['material_id'] = $params['material_id'];
+            if(!empty($params['q']))             $searchOption['q'] = $params['q'];
+            if(!empty($params['start_tk_rate'])) $searchOption['start_tk_rate'] = $params['start_tk_rate'];
+            if(!empty($params['end_tk_rate']))   $searchOption['end_tk_rate'] = $params['end_tk_rate'];
+        }
+
+        $pageSize = 12;
+
+        $acc = AliAccForm::get("ali");
+        $inviteCode = $acc->getAliInviteCode();
+        if(empty($inviteCode)){
+            throw new \Exception("联盟邀请码未生成！请联系客服进行处理");
+        }
+
+        $returnData = [
+            'ali_id'        => $acc->id,
+            'ali_type'      => 'ali',
+            'no_special_id' => 0,
+            'list'          => null,
+            'pagination'    => null,
+        ];
+
+        //私域用户关系获取
+        $bindData = TaolijinUserAliBind::findOne([
+            "ali_id"      => $acc->id,
+            "user_id"     => $this->login_uid,
+            "invite_code" => $inviteCode
+        ]);
+        if($bindData){
+            $ali = new Ali($acc->app_key, $acc->secret_key);
+            $res = $ali->material->search(array_merge($searchOption, [
+                "page_size"   => (string)$pageSize,
+                "page_no"     => (string)$this->page,
+                "adzone_id"   => $acc->adzone_id,
+                "special_id"  => $bindData->special_id
+            ]));
+            if(!empty($res->code)){
+                throw new \Exception($res->msg);
+            }
+            $data = $res->getData();
+
+            $pagination = new BasePagination(['totalCount' => $data['count'], 'pageSize' => $pageSize, 'page' => $this->page]);
+
+            $returnData['list']       = $this->aliOnlySales($ali, $data['list']);
+            $returnData['pagination'] = $pagination;
+        }else{
+            $returnData['no_special_id'] = 1;
+        }
+
+        return $returnData;
+    }
+
+    /**
+     * 过滤掉非淘宝联盟营销主推商品
      * @param Ali $acc
      * @param $list
      */
-    private function onlySales(Ali $ali, $list){
+    private function aliOnlySales(Ali $ali, $list){
         if(!$list) return [];
 
         $num_iids = [];

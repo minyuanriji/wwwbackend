@@ -104,17 +104,26 @@ class CheckoutOrderPaidHandler {
      * @param $text
      */
     public static function voiceNotify(Mch $mch, $text){
-        $mchMessage = new MchMessage([
-            "mall_id"    => $mch->mall_id,
-            "mch_id"     => $mch->id,
-            "type"       => "paid_notify_voice",
-            "content"    => $text,
-            "status"     => 0,
-            "created_at" => time(),
-            "updated_at" => time(),
-            "try_count"  => 0
-        ]);
-        $mchMessage->save();
+
+        $rows = MchAdminUser::find()->andWhere([
+            "AND",
+            ["mch_id" => $mch->id],
+            "token_expired_at > '".time()."'"
+        ])->asArray()->select(["id"])->all();
+        foreach($rows as $row){
+            $mchMessage = new MchMessage([
+                "mall_id"       => $mch->mall_id,
+                "mch_id"        => $mch->id,
+                "type"          => "paid_notify_voice",
+                "content"       => $text,
+                "status"        => 0,
+                "created_at"    => time(),
+                "updated_at"    => time(),
+                "try_count"     => 0,
+                "admin_user_id" => $row['id']
+            ]);
+            $mchMessage->save();
+        }
 
         /*$base64Data = TencentCloudAudioHelper::request($text);
 

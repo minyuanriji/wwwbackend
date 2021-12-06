@@ -19,7 +19,7 @@ class MchMessage extends BaseActiveRecord{
     public function rules(){
         return [
             [['mch_id', 'mall_id', 'type', 'content', 'status',  'created_at', 'updated_at'], 'required'],
-            [['fail_reason', 'try_count'], 'safe']
+            [['fail_reason', 'try_count', 'admin_user_id'], 'safe']
         ];
     }
 }

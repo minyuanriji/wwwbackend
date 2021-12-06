@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\taolijin\forms\common\AliAccForm;
 use app\plugins\taolijin\models\TaolijinAli;
+use app\plugins\taolijin\models\TaolijinUserAliBind;
 use app\plugins\taolijin\models\TaolijinUserAuth;
 use lin010\taolijin\Ali;
 
@@ -46,19 +47,38 @@ class AuthBindAliSpecialIdForm extends BaseModel{
                 throw new \Exception("联盟邀请码未生成！请联系客服进行处理");
             }
 
-            $ali = new Ali($acc->app_key, $acc->secret_key);
-            $res = $ali->publisher->save($userAuth->access_token, [
-                "inviter_code" => $inviteCode,
-                "info_type"    => "2"
+            $bindData = TaolijinUserAliBind::findOne([
+                "ali_id"      => $aliModel->id,
+                "user_id"     => \Yii::$app->user->id,
+                "invite_code" => $inviteCode
             ]);
-            print_r($res);
-            exit;
+            if(!$bindData){
+                $ali = new Ali($acc->app_key, $acc->secret_key);
+                $res = $ali->publisher->save($userAuth->access_token, [
+                    "inviter_code" => $inviteCode,
+                    "info_type"    => "2"
+                ]);
+                if(!empty($res->code)){
+                    throw new \Exception($res->msg);
+                }
+                $specialId = $res->getSpecialId();
+                if(!$specialId){
+                    throw new \Exception("special id获取失败");
+                }
 
-            if(!empty($res->code)){
-                throw new \Exception($res->msg);
+                $bindData = new TaolijinUserAliBind([
+                    "mall_id"     => $aliModel->mall_id,
+                    "ali_id"      => $aliModel->id,
+                    "user_id"     => \Yii::$app->user->id,
+                    "invite_code" => $inviteCode,
+                    "special_id"  => $specialId,
+                    "created_at"  => time(),
+                    "updated_at"  => time()
+                ]);
+                if(!$bindData->save()){
+                    throw new \Exception($this->responseErrorMsg($bindData));
+                }
             }
-
-            $res->getSpecialId();
 
             return [
                 "code" => ApiCode::CODE_SUCCESS,

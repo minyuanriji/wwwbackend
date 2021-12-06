@@ -22,17 +22,13 @@ class WsClientController extends BaseCommandController {
             $mchMessage->save();
 
             $mchMessage->try_count += 1;
+            $mchMessage->status = 1;
 
             try {
 
                 //获取客户端TOKEN
-                $adminUsers = MchAdminUser::find()->andWhere([
-                        "AND",
-                        ["mch_id" => $mchMessage->mch_id],
-                        "token_expired_at > '".time()."'"
-                    ])->asArray()->select(["access_token"])->all();
-                if($adminUsers){
-
+                $adminUser = MchAdminUser::findOne($mchMessage->admin_user_id);
+                if($adminUser && $adminUser->access_token){
                     $cache = \Yii::$app->getCache();
                     $cachekey = "WsClientController:audio" . md5($mchMessage->content);
                     $base64Data = $cache->get($cachekey);
@@ -41,40 +37,28 @@ class WsClientController extends BaseCommandController {
                         $cache->set($cachekey, $base64Data);
                     }
 
-                    foreach($adminUsers as $adminUser){
-
-                        if(empty($adminUser['access_token'])) continue;
-
-                        \Swoole\Coroutine\run(function () use($base64Data, $adminUser, $mchMessage){
-                            $cli = new \Swoole\Coroutine\Http\Client('127.0.0.1', 9515);
-                            $cli->post('/', [
-                                "action"        => "MchPaidNotify",
-                                "notify_mobile" => $adminUser['access_token'],
-                                "notify_data"   => "PAID:" . json_encode([
-                                    "text"       => $mchMessage->content,
-                                    "base64Data" => $base64Data,
-                                    "url"        => ""
-                                ])
-                            ]);
-                            $cli->close();
-                            if($cli->body != "SUCCESS") {
-                                $mchMessage->status = 0;
-                                $mchMessage->fail_reason = $cli->body;
-                            }else{
-                                //只要有一个成功了就不再提示
-                                $mchMessage->status = 1;
-                            }
-                        });
-
-                        sleep(1);
-
-                    }
+                    \Swoole\Coroutine\run(function () use($base64Data, $adminUser, $mchMessage){
+                        $cli = new \Swoole\Coroutine\Http\Client('127.0.0.1', 9515);
+                        $cli->post('/', [
+                            "action"        => "MchPaidNotify",
+                            "notify_mobile" => $adminUser->access_token,
+                            "notify_data"   => "PAID:" . json_encode([
+                                "text"       => $mchMessage->content,
+                                "base64Data" => $base64Data,
+                                "url"        => ""
+                            ])
+                        ]);
+                        $cli->close();
+                        if($cli->body != "SUCCESS") {
+                            $mchMessage->status = 0;
+                            $mchMessage->fail_reason = $cli->body;
+                        }
+                    });
                 }
 
-                if(!$mchMessage->status){
-                    throw new \Exception("error " . $mchMessage->fail_reason);
+                if($mchMessage->try_count > 3) {
+                    $mchMessage->status = 1;
                 }
-
                 if(!$mchMessage->save()){
                     throw new \Exception(json_encode($mchMessage->getErrors()));
                 }

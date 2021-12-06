@@ -112,8 +112,8 @@
                         <el-badge
                                 :value="item.count.num"
                                 class="item"
-                                v-if="item.value==0 || item.value==1 || item.value==2"
-                        />
+                                v-if="item.value==0 || item.value==1 || item.value==2">
+                        </el-badge>
                     </div>
                 </el-tab-pane>
             </el-tabs>

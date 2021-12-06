@@ -18,6 +18,7 @@ class AuthGetInfoForm extends BaseModel{
             [['ali_id'], 'required']
         ];
     }
+
     public function getInfo(){
 
         if(!$this->validate()){

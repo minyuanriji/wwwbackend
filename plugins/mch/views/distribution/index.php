@@ -139,7 +139,7 @@
                 </el-table-column>
                 <el-table-column label="分佣信息" width="200">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.rule_id > 0" style="color:green">已设置</div>
+                        <div v-if="scope.row.rule_id > 0 && scope.row.is_delete == 0" style="color:green">已设置</div>
                         <div v-else style="color:gray">未设置</div>
                     </template>
                 </el-table-column>

@@ -28,7 +28,7 @@ class MchDistributionListForm extends BaseModel{
         $query->innerJoin(["u" => User::tableName()], "u.mch_id=m.id");
         $query->leftJoin(["cr" => CommissionRules::tableName()], "cr.item_id=s.id AND cr.item_type='checkout'");
 
-        $query->select(["s.id", "cr.id as rule_id", "s.name", "s.cover_url", "u.id as user_id", "u.nickname", "u.avatar_url"]);
+        $query->select(["s.id", "cr.id as rule_id", "s.name", "s.cover_url", "u.id as user_id", "u.nickname", "u.avatar_url", "cr.is_delete"]);
 
         $query->andWhere(["m.review_status" => Mch::REVIEW_STATUS_CHECKED]);
 

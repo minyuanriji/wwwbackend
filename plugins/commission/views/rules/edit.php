@@ -21,16 +21,8 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 <el-card v-loading="cardLoading" style="margin-top: 10px" shadow="never">
                     <el-col>
                         <el-form-item label="对象类型" prop="item_type">
-                            <el-radio-group v-model="ruleForm.item_type">
-                                <el-radio :disabled="ruleForm.item_type == 'goods' || radioDisabled == false ? false : true" :label="'goods'">商品消费分佣</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'checkout' || radioDisabled == false ? false : true" :label="'checkout'">门店二维码收款</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'store' || radioDisabled == false ? false : true" :label="'store'">门店直推分佣</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'hotel' || radioDisabled == false ? false : true" :label="'hotel'">酒店直推分佣</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'hotel_3r' || radioDisabled == false ? false : true" :label="'hotel_3r'">酒店消费分佣</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'addcredit' || radioDisabled == false ? false : true" :label="'addcredit'">话费直推分佣</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'addcredit_3r' || radioDisabled == false ? false : true" :label="'addcredit_3r'">话费消费分佣</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'giftpacks' || radioDisabled == false ? false : true" :label="'giftpacks'">大礼包消费分佣</el-radio>
-                                <el-radio :disabled="ruleForm.item_type == 'oil_3r' || radioDisabled == false ? false : true" :label="'oil_3r'">加油消费分佣</el-radio>
+                            <el-radio-group v-model="ruleForm.item_type" @change="radioChange" v-for="item in type">
+                                <el-radio :disabled="radioDisabled" :label="item.value" style="margin-left: 10px">{{item.name}}</el-radio>
                             </el-radio-group>
                         </el-form-item>
 
@@ -44,7 +36,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                         <!-- 选择一个商品/门店/酒店/话费 -->
                         <template v-if="!ruleForm.apply_all_item">
 
-                            <el-form-item v-if="ruleForm.item_type == 'goods'" :label="'选择商品'" prop="item_id">
+                            <el-form-item :label="subLabel" prop="item_id">
                                 <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
                                     <div style="padding-right: 10px;">
                                         <com-image mode="aspectFill" :src="choice.pic"></com-image>
@@ -53,61 +45,7 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                                         <div style="display:block;">{{choice.name}}</div>
                                     </div>
                                 </div>
-                                <el-button @click="chooseGoodsDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
-                            </el-form-item>
-
-                            <el-form-item v-if="ruleForm.item_type == 'store' || ruleForm.item_type == 'checkout'"  :label="'选择门店'" prop="item_id">
-                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
-                                    <div style="padding-right: 10px;">
-                                        <com-image mode="aspectFill" :src="choice.pic"></com-image>
-                                    </div>
-                                    <div flex="cross:top cross:center">
-                                        <div style="display:block;">{{choice.name}}</div>
-                                    </div>
-                                </div>
-                                <el-button @click="chooseStoreDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
-                            </el-form-item>
-
-                            <el-form-item v-if="ruleForm.item_type == 'hotel_3r' || ruleForm.item_type == 'hotel'" :label="'选择酒店'" prop="item_id">
-                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
-                                    <div style="padding-right: 10px;">
-                                        <com-image mode="aspectFill" :src="choice.pic"></com-image>
-                                    </div>
-                                    <div flex="cross:top cross:center">
-                                        <div style="display:block;">{{choice.name}}</div>
-                                    </div>
-                                </div>
-                                <el-button @click="chooseHotelDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
-                            </el-form-item>
-
-                            <el-form-item v-if="ruleForm.item_type == 'addcredit' || ruleForm.item_type == 'addcredit_3r'" :label="'选择话费平台'" prop="item_id">
-                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
-                                    <div flex="cross:top cross:center">
-                                        <div style="display:block;">{{choice.name}}</div>
-                                    </div>
-                                </div>
-                                <el-button @click="chooseAddcreditDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
-                            </el-form-item>
-
-                            <el-form-item v-if="ruleForm.item_type == 'giftpacks'" :label="'选择大礼包'" prop="item_id">
-                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
-                                    <div style="padding-right: 10px;">
-                                        <com-image mode="aspectFill" :src="choice.pic"></com-image>
-                                    </div>
-                                    <div flex="cross:top cross:center">
-                                        <div style="display:block;">{{choice.name}}</div>
-                                    </div>
-                                </div>
-                                <el-button @click="chooseGiftPacksDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
-                            </el-form-item>
-
-                            <el-form-item v-if="ruleForm.item_type == 'oil_3r'" :label="'选择加油平台'" prop="item_id">
-                                <div v-if="ruleForm.item_id > 0" flex="box:first" style="margin-bottom:5px;width:350px;padding:10px 10px;border:1px solid #ddd;">
-                                    <div flex="cross:top cross:center">
-                                        <div style="display:block;">{{choice.name}}</div>
-                                    </div>
-                                </div>
-                                <el-button @click="chooseOilDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
+                                <el-button @click="chooseDialog" icon="el-icon-edit" type="primary" size="small">设置</el-button>
                             </el-form-item>
 
                         </template>
@@ -639,6 +577,45 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 commissionRuleChains: [],
                 commissionHotelValue:[],
                 radioDisabled:false,
+                subLabel: '选择商品',
+                type : [
+                    {
+                        name:'商品消费分佣',
+                        value:'goods',
+                    },
+                    {
+                        name:'门店二维码收款',
+                        value:'checkout',
+                    },
+                    {
+                        name:'门店直推分佣',
+                        value:'store',
+                    },
+                    {
+                        name:'酒店直推分佣',
+                        value:'hotel',
+                    },
+                    {
+                        name:'酒店消费分佣',
+                        value:'hotel_3r',
+                    },
+                    {
+                        name:'话费直推分佣',
+                        value:'addcredit',
+                    },
+                    {
+                        name:'话费消费分佣',
+                        value:'addcredit_3r',
+                    },
+                    {
+                        name:'大礼包消费分佣',
+                        value:'giftpacks',
+                    },
+                    {
+                        name:'加油消费分佣',
+                        value:'oil_3r',
+                    },
+                ],
             }
         },
         mounted: function () {
@@ -684,10 +661,13 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                         self.ruleForm.apply_all_item = data.rule.apply_all_item == 1 ? true : false;
                         self.ruleForm.item_id        = data.rule.item_id;
                         self.commissionType          = data.rule.commission_type;
-                        self.commissonValue          = data.chains[0].commisson_value;
+                        if (data.chains.length > 0) {
+                            self.commissonValue      = data.chains[0].commisson_value;
+                        }
                         self.commissionRuleChains    = data.chains;
                         self.choice.name             = data.rule.name;
                         self.choice.pic              = data.rule.pic;
+                        this.getSingleName(self.ruleForm.item_type);
                     }
                 }).catch(e => {
                 })
@@ -752,16 +732,68 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 });
             },
 
+            //改变类型时修改单独设置名称
+            radioChange (e) {
+                this.getSingleName(e);
+            },
+
+            //获取单个设置名称
+            getSingleName (type) {
+                var that = this;
+                console.log(type);
+                if (type == 'goods') {
+                    that.subLabel = '选择商品';
+                }
+                if (type == 'store' || type == 'checkout') {
+                    that.subLabel = '选择门店';
+                }
+                if (type == 'hotel_3r' || type == 'hotel') {
+                    that.subLabel = '选择酒店';
+                }
+                if (type == 'addcredit_3r' || type == 'addcredit') {
+                    that.subLabel = '选择话费';
+                }
+                if (type == 'giftpacks') {
+                    that.subLabel = '选择大礼包';
+                }
+                if (type == 'oil_3r') {
+                    that.subLabel = '选择加油平台';
+                }
+            },
+
+            chooseDialog () {
+                if (this.ruleForm.item_type == 'goods') {
+                    this.ChooseGoods.dialog_visible = true;
+                    this.loadGoodsList();
+                }
+                if (this.ruleForm.item_type == 'store' || this.ruleForm.item_type == 'checkout') {
+                    this.ChooseStore.dialog_visible = true;
+                    this.loadStoreList();
+                }
+                if (this.ruleForm.item_type == 'hotel_3r' || this.ruleForm.item_type == 'hotel') {
+                    this.ChooseHotel.dialog_visible = true;
+                    this.loadHotelList();
+                }
+                if (this.ruleForm.item_type == 'addcredit_3r' || this.ruleForm.item_type == 'addcredit') {
+                    this.ChooseAddcredit.dialog_visible = true;
+                    this.loadAddcreditList();
+                }
+                if (this.ruleForm.item_type == 'giftpacks') {
+                    this.ChooseGiftPacks.dialog_visible = true;
+                    this.loadGiftPacksList();
+                }
+                if (this.ruleForm.item_type == 'oil_3r') {
+                    this.ChooseOil.dialog_visible = true;
+                    this.loadOilList();
+                }
+            },
+
             //--------------选择商品-----------------------------
             confirmChooseGoods(row){
                 this.ruleForm.item_id = row.id;
                 this.choice.name = row.name;
                 this.choice.pic = row.cover_pic;
                 this.ChooseGoods.dialog_visible = false;
-            },
-            chooseGoodsDialog(){
-                this.ChooseGoods.dialog_visible = true;
-                this.loadGoodsList();
             },
             goodsPageChange(page){
                 this.ChooseGoods.search.page = page;
@@ -804,10 +836,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 this.choice.pic = row.cover_pic;
                 this.ChooseStore.dialog_visible = false;
             },
-            chooseStoreDialog(){
-                this.ChooseStore.dialog_visible = true;
-                this.loadStoreList();
-            },
             StorePageChange(page){
                 this.ChooseStore.search.page = page;
                 this.loadStoreList();
@@ -849,10 +877,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 this.choice.pic = row.thumb_url;
                 this.ChooseHotel.dialog_visible = false;
             },
-            chooseHotelDialog(){
-                this.ChooseHotel.dialog_visible = true;
-                this.loadHotelList();
-            },
             HotelPageChange(page){
                 this.ChooseHotel.search.page = page;
                 this.loadHotelList();
@@ -893,10 +917,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 this.choice.name = row.name;
                 this.choice.pic = row.thumb_url;
                 this.ChooseAddcredit.dialog_visible = false;
-            },
-            chooseAddcreditDialog(){
-                this.ChooseAddcredit.dialog_visible = true;
-                this.loadAddcreditList();
             },
             AddcreditPageChange(page){
                 this.ChooseAddcredit.search.page = page;
@@ -983,10 +1003,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 this.choice.pic = row.cover_pic;
                 this.ChooseGiftPacks.dialog_visible = false;
             },
-            chooseGiftPacksDialog(){
-                this.ChooseGiftPacks.dialog_visible = true;
-                this.loadGiftPacksList();
-            },
             GiftPacksPageChange(page){
                 this.ChooseGiftPacks.search.page = page;
                 this.loadGiftPacksList();
@@ -1027,10 +1043,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                 this.choice.name = row.name;
                 this.choice.pic = row.thumb_url;
                 this.ChooseOil.dialog_visible = false;
-            },
-            chooseOilDialog(){
-                this.ChooseOil.dialog_visible = true;
-                this.loadOilList();
             },
             OilPageChange(page){
                 this.ChooseOil.search.page = page;

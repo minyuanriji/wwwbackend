@@ -91,7 +91,8 @@
             loadData(){
                 this.loading = true;
                 let params = {
-                    r: 'plugin/taolijin/mall/ali/search'
+                    r: 'plugin/taolijin/mall/ali/search',
+                    ali_id: getQuery("ali_id")
                 };
                 params = Object.assign(params, this.search);
                 let that = this;

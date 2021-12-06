@@ -15,6 +15,7 @@ class AuthController extends Controller{
 
         $userId = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
         $aliId  = isset($_GET['ali_id']) ? intval($_GET['ali_id']) : 0;
+        $doUrl  = isset($_GET['do_url']) ? urldecode(trim($_GET['do_url'])) : '';
 
         $state = uniqid();
 
@@ -25,6 +26,10 @@ class AuthController extends Controller{
             $cacheKey = "AuthController::actionAliAuth:" . $_GET['state'];
             $data = $cache->get($cacheKey);
             if($data){
+
+                $doUrl = isset($data['do_url']) ? $data['do_url'] : null;
+
+
                 $cache->set($cacheKey, null);
                 $aliModel = TaolijinAli::findOne([
                     "id"       => isset($data['ali_id']) ? $data['ali_id'] : 0,
@@ -73,6 +78,17 @@ class AuthController extends Controller{
                     }
                 }
 
+                //执行回调地址
+                if(!empty($doUrl)){
+                    $doUrl = preg_replace("/access_token=.*&?/i", "", $doUrl);
+                    $doUrl = preg_replace("/open_uid=.*&?/i", "", $doUrl);
+                    $doUrl .= strrpos($doUrl, "?") > 0 ? "&" : "?";
+                    $doUrl .= "access_token=" . $tokenData['access_token'];
+                    $doUrl .= "&open_uid=" . $tokenData['taobao_open_uid'];
+                    header("Location:{$doUrl}");
+                    exit;
+                }
+
                 return $this->renderPartial('@app/plugins/' . $this->module->id . '/views/ali_auth');
             }
         }
@@ -93,7 +109,8 @@ class AuthController extends Controller{
 
         $cache->set($cacheKey, [
             "ali_id"  => $aliId,
-            "user_id" => $userId
+            "user_id" => $userId,
+            "do_url"  => $doUrl
         ]);
 
         header("Location: {$authUrl}");

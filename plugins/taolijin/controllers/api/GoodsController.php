@@ -2,6 +2,8 @@
 namespace app\plugins\taolijin\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
+use app\core\ApiCode;
+use app\helpers\APICacheHelper;
 use app\plugins\ApiController;
 use app\plugins\taolijin\forms\api\TaolijinGoodsCatListForm;
 use app\plugins\taolijin\forms\api\TaolijinGoodsDetailForm;
@@ -25,7 +27,16 @@ class GoodsController extends ApiController{
     public function actionSearch(){
         $form = new TaolijinGoodsSearchForm();
         $form->attributes = $this->requestData;
-        return $this->asJson($form->get());
+        $form->is_login   = !\Yii::$app->user->isGuest;
+        $form->login_uid  = $form->is_login ? \Yii::$app->user->id : 0;
+        $form->host_info  = \Yii::$app->request->getHostInfo();
+
+        $res = APICacheHelper::get($form);
+        if($res['code'] == ApiCode::CODE_SUCCESS){
+            $res = $res['data'];
+        }
+
+        return $this->asJson($res);
     }
 
     /**

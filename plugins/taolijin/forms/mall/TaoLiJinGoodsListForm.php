@@ -4,10 +4,12 @@ namespace app\plugins\taolijin\forms\mall;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\plugins\taolijin\models\TaolijinAli;
 use app\plugins\taolijin\models\TaolijinGoods;
 
 class TaoLiJinGoodsListForm extends BaseModel{
 
+    public $ali_id;
     public $page;
     public $keyword;
     public $sort_prop;
@@ -15,6 +17,7 @@ class TaoLiJinGoodsListForm extends BaseModel{
 
     public function rules(){
         return array_merge(parent::rules(), [
+            [['ali_id'], 'required'],
             [['page'], 'integer'],
             [['keyword', 'sort_prop', 'sort_type'], 'safe']
         ]);
@@ -28,7 +31,12 @@ class TaoLiJinGoodsListForm extends BaseModel{
 
         try {
 
-            $query = TaolijinGoods::find()->where(["is_delete" => 0]);
+            $aliModel = TaolijinAli::findOne($this->ali_id);
+            if(!$aliModel || $aliModel->is_delete){
+                throw new \Exception("联盟数据不存在");
+            }
+
+            $query = TaolijinGoods::find()->where(["is_delete" => 0, "ali_id" => $aliModel->id]);
             if (!empty($this->keyword)) {
                 $query->andWhere([
                     'or',
@@ -69,6 +77,7 @@ class TaoLiJinGoodsListForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'msg' => '请求成功',
                 'data' => [
+                    'ali_data'   => $aliModel->getAttributes(),
                     'list'       => $list ? $list : [],
                     'pagination' => $pagination,
                 ]

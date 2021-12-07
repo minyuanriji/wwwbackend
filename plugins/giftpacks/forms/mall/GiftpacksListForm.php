@@ -34,9 +34,6 @@ class GiftpacksListForm extends BaseModel{
             }
 
             $orderBy = null;
-            if(!empty($this->sort_prop)){
-
-            }
 
             if(empty($orderBy)){
                 $orderBy = "id " . (!$this->sort_type   ? "DESC" : "ASC");
@@ -62,7 +59,7 @@ class GiftpacksListForm extends BaseModel{
                             !empty($item['score_give_settings']) ? (array)@json_decode($item['score_give_settings']) : []);
                     $item['score_give_settings']['is_permanent'] = (int)$item['score_give_settings']['is_permanent'];
 
-                    $item['shopping_voucher_setting'] = $this->getShoppingVoucherSetting($item->id);
+                    $item['shopping_voucher_setting'] = $this->getShoppingVoucherSetting($item['id']);
                 }
             }
 

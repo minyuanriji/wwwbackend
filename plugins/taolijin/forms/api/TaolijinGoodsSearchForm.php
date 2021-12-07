@@ -17,9 +17,11 @@ class TaolijinGoodsSearchForm extends BaseModel implements ICacheForm {
 
     public $page;
     public $cat_id;
+    public $kw;
 
     public function rules(){
         return [
+            [['kw'], 'trim'],
             [['page', 'cat_id'], 'integer']
         ];
     }
@@ -68,7 +70,11 @@ class TaolijinGoodsSearchForm extends BaseModel implements ICacheForm {
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg'  => $e->getMessage()
+                'msg'  => $e->getMessage(),
+                'error' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ];
         }
     }
@@ -93,6 +99,10 @@ class TaolijinGoodsSearchForm extends BaseModel implements ICacheForm {
             if(!empty($params['q']))             $searchOption['q'] = $params['q'];
             if(!empty($params['start_tk_rate'])) $searchOption['start_tk_rate'] = $params['start_tk_rate'];
             if(!empty($params['end_tk_rate']))   $searchOption['end_tk_rate'] = $params['end_tk_rate'];
+        }
+
+        if(!empty($this->kw)){
+            $searchOption['q'] = $this->kw;
         }
 
         $pageSize = 12;
@@ -164,7 +174,7 @@ class TaolijinGoodsSearchForm extends BaseModel implements ICacheForm {
         $results = $res->getResult();
         foreach($results as $result){
             if(isset($result['material_lib_type'])){
-                $types = explode(",", $result['material_lib_type']);
+                $types = !is_array($result['material_lib_type']) ? explode(",", $result['material_lib_type']) : $result['material_lib_type'];
                 if(in_array(1, $types)){
                     $allowItemIds[] = $result['num_iid'];
                 }
@@ -174,6 +184,7 @@ class TaolijinGoodsSearchForm extends BaseModel implements ICacheForm {
         foreach($list as $item){
             if(in_array($item['item_id'], $allowItemIds)){
                 $newList[] = [
+                    'title'         => $item['title'],
                     'item_id'       => $item['item_id'],
                     'url'           => $item['url'],
                     'pict_url'      => $item['pict_url'],

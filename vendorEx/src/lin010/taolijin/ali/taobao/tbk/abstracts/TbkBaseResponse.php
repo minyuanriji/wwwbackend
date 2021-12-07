@@ -16,6 +16,6 @@ abstract class TbkBaseResponse{
 
     protected function setCode(){
         $this->code = isset($this->result->code) ? $this->result->code : "";
-        $this->msg  = isset($this->result->msg) ? $this->result->msg : "";
+        $this->msg  = isset($this->result->sub_msg) ? $this->result->sub_msg : (isset($this->result->msg) ? $this->result->msg : "");
     }
 }

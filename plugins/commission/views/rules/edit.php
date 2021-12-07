@@ -737,6 +737,8 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
             //改变类型时修改单独设置名称
             radioChange (e) {
                 this.getSingleName(e);
+                this.choice.name = '';
+                this.choice.pic = '';
             },
 
             //获取单个设置名称

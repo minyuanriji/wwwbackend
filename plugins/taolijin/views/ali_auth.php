@@ -10,6 +10,10 @@
 <strong>Please enable JavaScript to continue.</strong>
 </noscript>
 <div id="app"></div>
+<style type="text/css">
+html {font-size: 37.5%;/*6 ÷ 16 × 100% = 37.5%*/}
+body {font-size: 1.4rem;/*1.4 × 6px = 8.4px */}
+</style>
 </body>
 <div style="text-align: center;margin-top:30px;">授权成功！请稍后...
     <span id="counter">5</span>

@@ -10,6 +10,7 @@ use app\plugins\giftpacks\forms\mall\GiftpacksItemListForm;
 use app\plugins\giftpacks\forms\mall\GiftpacksListForm;
 use app\plugins\giftpacks\forms\mall\GiftpacksSaveItemForm;
 use app\plugins\giftpacks\forms\mall\GiftpacksSearchStoreForm;
+use app\plugins\giftpacks\forms\mall\GiftpacksShoppingVoucherSettingSaveForm;
 
 class GiftpacksController extends Controller{
 
@@ -95,5 +96,18 @@ class GiftpacksController extends Controller{
         $form = new GiftpacksDeleteItemForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->delete());
+    }
+
+    /**
+     * 购物券设置
+     * @return \yii\web\Response
+     */
+    public function actionShoppingVoucherSetting()
+    {
+        $form = new GiftpacksShoppingVoucherSettingSaveForm();
+
+        $form->attributes = \Yii::$app->request->post();
+
+        return $this->asJson($form->save());
     }
 }

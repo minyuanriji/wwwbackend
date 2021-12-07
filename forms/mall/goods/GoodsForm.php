@@ -17,6 +17,8 @@ use app\models\GoodsCatRelation;
 use app\models\GoodsCats;
 use app\models\GoodsWarehouse;
 use app\models\MallGoods;
+use app\plugins\addcredit\plateform\sdk\kcb_sdk\Helpers;
+use app\plugins\shopping_voucher\models\ShoppingVoucherFromGoods;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
@@ -180,12 +182,22 @@ class GoodsForm extends GoodsBase
             ]);
             $detail['real_sales'] = GoodsEditForm::real_sales($this->id) ?: 0;
 
+            $shoppingDetail = ShoppingVoucherFromGoods::find()->where([
+                "mall_id"  => $detail['mall_id'],
+                "goods_id" => $this->id
+            ])->asArray()->one();
+
+            if ($shoppingDetail) {
+                $shoppingDetail['start_at'] = date('Y-m-d H:i:s', $shoppingDetail['start_at']);
+            }
+
             if ($detail) {
                 return [
                     'code' => ApiCode::CODE_SUCCESS,
                     'msg' => '请求成功',
                     'data' => [
-                        'detail' => $detail
+                        'detail' => $detail,
+                        'shopping_voucher_setting' => $shoppingDetail ?: [],
                     ]
                 ];
             }

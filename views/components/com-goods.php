@@ -1156,15 +1156,41 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         </com-goods-area>
                     </el-tab-pane>
 
+                    <el-tab-pane label="购物券设置" name="shopping_setting" v-if="goods_id > 0">
+                        <el-form ref="shoppingFormData" :rules="shoppingFormRule" label-width="30%" :model="shoppingFormData" size="small">
+                            <el-form-item label="赠送比例" prop="give_value">
+                                <el-input :disabled="formProgressData.loading" type="number" min="0" max="100" placeholder="请输入内容" v-model="shoppingFormData.give_value" style="width:260px;">
+                                    <template slot="append">%</template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="启动日期" prop="start_at">
+                                <el-date-picker :disabled="formProgressData.loading" v-model="shoppingFormData.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                            </el-form-item>
+                            <el-form-item label="运费（运营费）" prop="enable_express">
+                                <el-switch
+                                        v-model="shoppingFormData.enable_express"
+                                        active-text="赠送购物券"
+                                        inactive-text="不赠送"
+                                        active-value="1"
+                                        inactive-value="0">
+                                </el-switch>
+                            </el-form-item>
+                        </el-form>
+                        <div style="margin-left: 500px">
+                            <el-button type="primary" @click="shoppingSave">确 定</el-button>
+                        </div>
+                    </el-tab-pane>
+
                     <slot name="tab_pane"></slot>
                 </el-tabs>
             </el-form>
-            <div class="bottom-div" flex="cross:center" v-if="is_save_btn == 1">
+            <div class="bottom-div" flex="cross:center" v-if="is_save_btn == 1 && activeName != 'shopping_setting'">
                 <el-button class="button-item" :loading="btnLoading" type="primary" size="small" @click="store('ruleForm')">保存
                 </el-button>
                 <el-button class="button-item" size="small" @click="showPreview">预览</el-button>
             </div>
         </div>
+
         <com-preview ref="preview" :rule-form="ruleForm" @submit="store('ruleForm')" :preview-info="previewInfo">
             <template slot="preview">
                 <slot name="preview"></slot>
@@ -1173,7 +1199,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 <slot name="preview_end"></slot>
             </template>
         </com-preview>
-
 
         <com-dialog-select
                 @close="closeLiancDlgSelect"
@@ -1605,12 +1630,32 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     is_order_sales:"0",
                     
                 },
+                //购物券设置
+                shoppingFormData: {
+                    give_type: 1,
+                    give_value: 0,
+                    start_at: '',
+                    enable_express: "0",
+                    goods_id: 0,
+                },
+                shoppingFormRule:{
+                    give_value: [
+                        {required: true, message: '赠送比例不能为空', trigger: 'change'},
+                    ],
+                    start_at:[
+                        {required: true, message: '启动日期不能为空', trigger: 'change'},
+                    ]
+                },
+                formProgressData:{
+                    loading: false,
+                }
             };
         },
         created() {
             if (getQuery('id')) {
                 this.getDetail(getQuery('id'));
                 this.goods_id = getQuery('id');
+                this.shoppingFormData.goods_id = getQuery('id');
             }
             if (this.is_distribution == 1) {
                 this.getPermissions();
@@ -1671,6 +1716,36 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             }
         },
         methods: {
+            //购物券设置保存
+            shoppingSave(){
+                let that = this;
+                let do_request = function(){
+                    that.formProgressData.loading = true;
+                    request({
+                        params: {
+                            r: "mall/goods/shopping-save"
+                        },
+                        method: "post",
+                        data: that.shoppingFormData
+                    }).then(e => {
+                        that.formProgressData.loading = false;
+                        if (e.data.code == 0) {
+                            that.$message.success(e.data.msg);
+                        } else {
+                            that.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        that.$message.error(e.data.msg);
+                        that.formProgressData.loading = true;
+                    });
+                };
+                this.$refs['shoppingFormData'].validate((valid) => {
+                    if (valid) {
+                        do_request();
+                    }
+                });
+            },
+
             clearLiancUser(){
                 this.forLiancDlgSelect.selection = {nickname: '', id: 0}
             },
@@ -2034,6 +2109,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     if (e.data.code == 0) {
                         let detail = e.data.data.detail;
                         this.detail_data = e.data.data.detail;
+                        this.shoppingFormData = e.data.data.shopping_voucher_setting;
+
                         // 初始化自定义商品名
                         this.getGoodsNameDiy();
 

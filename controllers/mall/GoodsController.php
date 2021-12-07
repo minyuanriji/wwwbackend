@@ -24,6 +24,7 @@ use app\forms\mall\goods\LabelEditForm;
 use app\forms\mall\goods\LabelForm;
 use app\forms\mall\goods\LabelListForm;
 use app\forms\mall\goods\RecommendSettingForm;
+use app\forms\mall\goods\ShoppingSettingSaveForm;
 use app\forms\mall\goods\TaobaoCsvForm;
 use app\forms\mall\goods\TransferForm;
 use app\models\Label;
@@ -127,7 +128,18 @@ class GoodsController extends MallController
         }
     }
 
+    //购物券设置
+    public function actionShoppingSave ()
+    {
+        if (\Yii::$app->request->isPost) {
 
+            $form = new ShoppingSettingSaveForm();
+
+            $form->attributes = \Yii::$app->request->post();
+
+            return $this->asJson($form->save());
+        }
+    }
 
 
     /**
@@ -152,7 +164,6 @@ class GoodsController extends MallController
 
         return $this->render('label');
     }
-
 
     /**
      * @Author: 广东七件事 ganxiaohao
@@ -202,7 +213,6 @@ class GoodsController extends MallController
             }
         }
     }
-
 
     /**
      * @Author: 广东七件事 ganxiaohao
@@ -262,7 +272,6 @@ class GoodsController extends MallController
         return $this->asJson($res);
     }
 
-
     /**
      * @Author: 广东七件事 ganxiaohao
      * @Date: 2020-04-25
@@ -278,7 +287,6 @@ class GoodsController extends MallController
 
         return $this->asJson($res);
     }
-
 
     /**
      * @Author: 广东七件事 ganxiaohao
@@ -297,7 +305,7 @@ class GoodsController extends MallController
         return $this->asJson($form->applyStatus());
     }
 
-// 商品采集
+    // 商品采集
     public function actionCollect()
     {
         $form = new CopyForm();
@@ -344,7 +352,6 @@ class GoodsController extends MallController
         }
     }
 
-
     /**
      * @Author: 广东七件事 ganxiaohao
      * @Date: 2020-04-25
@@ -359,7 +366,6 @@ class GoodsController extends MallController
         $res = $form->batchDestroy();
         return $this->asJson($res);
     }
-
 
     /**
      * @Author: 广东七件事 ganxiaohao

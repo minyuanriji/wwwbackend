@@ -22,8 +22,8 @@ class ShoppingSettingSaveForm extends BaseModel
     {
         return [
             [['goods_id'], 'required'],
-            [['give_type', 'give_value', 'enable_express', 'goods_id'], 'integer'],
-            [['start_at'], 'safe']
+            [['give_type', 'enable_express', 'goods_id'], 'integer'],
+            [['start_at', 'give_value'], 'safe']
         ];
     }
 

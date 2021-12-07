@@ -365,7 +365,6 @@ Yii::$app->loadComponentView('com-rich-text');
                     }
                 });
             },
-
             handleClick(tab, event) {
 
             },

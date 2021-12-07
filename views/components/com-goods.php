@@ -1636,7 +1636,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     give_value: 0,
                     start_at: '',
                     enable_express: "0",
-                    goods_id: 0,
                 },
                 shoppingFormRule:{
                     give_value: [
@@ -1655,7 +1654,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             if (getQuery('id')) {
                 this.getDetail(getQuery('id'));
                 this.goods_id = getQuery('id');
-                this.shoppingFormData.goods_id = getQuery('id');
             }
             if (this.is_distribution == 1) {
                 this.getPermissions();
@@ -1719,6 +1717,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             //购物券设置保存
             shoppingSave(){
                 let that = this;
+                this.shoppingFormData.goods_id = getQuery('id');
                 let do_request = function(){
                     that.formProgressData.loading = true;
                     request({
@@ -1731,6 +1730,13 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         that.formProgressData.loading = false;
                         if (e.data.code == 0) {
                             that.$message.success(e.data.msg);
+                            if (that.referrer.page > 1) {
+                                url = Qs.stringify(that.referrer);
+                            } else {
+                                url = 'r=mall/goods/index';
+                            }
+                            console.log(url);
+                            window.location.href = _baseUrl + '/index.php?' + url;
                         } else {
                             that.$message.error(e.data.msg);
                         }

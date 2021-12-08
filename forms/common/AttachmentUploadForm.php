@@ -150,129 +150,135 @@ class AttachmentUploadForm extends Model
      */
     public function save()
     {
-        if (!$this->validateFileExt("file")) {
-            $msg = '不支持' . $this->file->getExtension() . '的文件！';
+        try {
+            if (!$this->validateFileExt("file")) {
+                $msg = '不支持' . $this->file->getExtension() . '的文件！';
+                if (in_array($this->file->getExtension(), $this->videoExt)) {
+                    $msg = "视频仅支持 ".join($this->videoExt)." 格式";
+                }
+                throw new \Exception($msg);
+            }
+
+            if (!$this->validateFileSize("file"))
+                throw new \Exception('视频大小不超过'.$this->maxSize."mb");
+
+            $dateFolder = date('Ymd');
+            if(in_array($this->file->getExtension(), $this->binaryExt)){
+                $this->type = 'binary';
+                $this->savePath = '/uploads/binary/original/' . $dateFolder . '/';
+            }
+            if (in_array($this->file->getExtension(), $this->imageExt)) {
+                $this->type = 'image';
+                $this->savePath = '/uploads/images/original/' . $dateFolder . '/';
+            }
             if (in_array($this->file->getExtension(), $this->videoExt)) {
-                $msg = "视频仅支持 ".join($this->videoExt)." 格式";
+                $this->type = 'video';
+                $this->savePath = '/uploads/video/original/' . $dateFolder . '/';
             }
-            return ['code' => ApiCode::CODE_FAIL, 'msg' => $msg];
-        }
-
-        if (!$this->validateFileSize("file")) {
-            return ['code' => ApiCode::CODE_FAIL, 'msg' => '视频大小不超过'.$this->maxSize."mb"];
-        }
-
-        $dateFolder = date('Ymd');
-        if(in_array($this->file->getExtension(), $this->binaryExt)){
-            $this->type = 'binary';
-            $this->savePath = '/uploads/binary/original/' . $dateFolder . '/';
-         }
-        if (in_array($this->file->getExtension(), $this->imageExt)) {
-            $this->type = 'image';
-            $this->savePath = '/uploads/images/original/' . $dateFolder . '/';
-        }
-        if (in_array($this->file->getExtension(), $this->videoExt)) {
-            $this->type = 'video';
-            $this->savePath = '/uploads/video/original/' . $dateFolder . '/';
-        }
-        if (in_array($this->file->getExtension(), $this->docExt)) {
-            $this->type = 'doc';
-            if($this->file->getExtension()=='pem') {
-                $this->savePath = '/uploads/doc/original/cert/mall_' . ($this->mall_id ?: 0) . '/' . date('YmdHis') . '/';
-            }else{
-                $this->savePath = '/uploads/doc/original/' . $dateFolder . '/';
+            if (in_array($this->file->getExtension(), $this->docExt)) {
+                $this->type = 'doc';
+                if($this->file->getExtension()=='pem') {
+                    $this->savePath = '/uploads/doc/original/cert/mall_' . ($this->mall_id ?: 0) . '/' . date('YmdHis') . '/';
+                }else{
+                    $this->savePath = '/uploads/doc/original/' . $dateFolder . '/';
+                }
             }
-        }
-        $this->baseWebPath = \Yii::$app->basePath . '/web';
-        $this->baseWebUrl = \Yii::$app->request->hostInfo . \Yii::$app->request->baseUrl;
-        if ($this->file->getExtension() == 'pem') {
-            $this->saveName = $this->file->name;
-        }elseif(!empty($this->customSaveName)){
-            $this->saveName = $this->customSaveName;
-        } else {
-            $tempName = !empty($this->file->tempName) ? $this->file->tempName : $this->file->name;
-            $this->saveName = md5_file($tempName) . '.' . $this->file->getExtension();
-        }
+            $this->baseWebPath = \Yii::$app->basePath . '/web';
+            $this->baseWebUrl = \Yii::$app->request->hostInfo . \Yii::$app->request->baseUrl;
+            if ($this->file->getExtension() == 'pem') {
+                $this->saveName = $this->file->name;
+            }elseif(!empty($this->customSaveName)){
+                $this->saveName = $this->customSaveName;
+            } else {
+                $tempName = !empty($this->file->tempName) ? $this->file->tempName : $this->file->name;
+                $this->saveName = md5_file($tempName) . '.' . $this->file->getExtension();
+            }
 
-        $this->saveFile = $this->baseWebPath . $this->savePath . $this->saveName;
-        //保存到本地
-        $this->attachmentStorage = AttachmentStorage::findOne(['admin_id' => $this->admin_id, 'status' => AttachmentStorage::STATUS_ON]);
+            $this->saveFile = $this->baseWebPath . $this->savePath . $this->saveName;
+            //保存到本地
+            $this->attachmentStorage = AttachmentStorage::findOne(['admin_id' => $this->admin_id, 'status' => AttachmentStorage::STATUS_ON]);
 
-        if ($this->file->getExtension() == 'pem') {
-            $res = $this->saveToLocal();
-        } else {
-            if (!$this->attachmentStorage) {
+            if ($this->file->getExtension() == 'pem') {
                 $res = $this->saveToLocal();
-            }
-            if ($this->attachmentStorage) {
-                list($width, $height) = getimagesize($this->file->tempName);
-                $LocalImage = [];
-                if ($width > 3000 || $height > 3000) {
-                    $LocalImage = $this->saveToLocalThumb();
+            } else {
+                if (!$this->attachmentStorage) {
+                    $res = $this->saveToLocal();
                 }
-                switch ($this->attachmentStorage->type) {
-                    case 2:
-                        $this->oss = OssSetting::findOne(['mall_id' => $this->mall_id, 'admin_id' => $this->admin_id, 'id' => $this->attachmentStorage->setting_id, 'is_delete' => 0]);
-                        if (!$this->oss) {
-                            return ['code' => ApiCode::CODE_FAIL, 'msg' => '阿里云对象储存配置错误'];
-                        }
-                        $res = $this->saveToAliOss();
-                        break;
-                    case 3:
-                        $this->cos = CosSetting::findOne(['admin_id' => $this->admin_id, 'id' => $this->attachmentStorage->setting_id, 'is_delete' => 0]);
-                        if (!$this->cos) {
-                            return ['code' => ApiCode::CODE_FAIL, 'msg' => '腾讯云对象储存配置错误'];
-                        }
-                        $res = $this->saveToCos(0, $LocalImage);
-                        break;
-                    case 4:
-                        $this->qiniu = QiniuSetting::findOne(['mall_id' => $this->mall_id, 'admin_id' => $this->admin_id, 'id' => $this->attachmentStorage->setting_id, 'is_delete' => 0]);
-                        if (!$this->qiniu) {
-                            return ['code' => ApiCode::CODE_FAIL, 'msg' => '七牛云对象储存配置错误'];
-                        }
-                        $res = $this->saveToQiniu();
-                        break;
-                    default:
-                        $res = $this->saveToLocal();
-                        break;
-                }
-            }
-        }
+                if ($this->attachmentStorage) {
+                    list($width, $height) = getimagesize($this->file->tempName);
+                    $LocalImage = [];
+                    if ($width > 3000 || $height > 3000) {
+                        $LocalImage = $this->saveToLocalThumb();
+                    }
+                    switch ($this->attachmentStorage->type) {
+                        case 2:
+                            $this->oss = OssSetting::findOne(['mall_id' => $this->mall_id, 'admin_id' => $this->admin_id, 'id' => $this->attachmentStorage->setting_id, 'is_delete' => 0]);
+                            if (!$this->oss)
+                                throw new \Exception('阿里云对象储存配置错误');
 
-        if ($res) {
-            if($this->type == "video"){
-                $fileName = 'video_'.date("YmdHis").'.jpg';
-                $path = $this->baseWebPath.'/uploads/video/original/';
-                $filePath = '/uploads/video/original/'.$fileName;
-                $saveViedoImg = $path.$fileName;
-                $url = $this->baseWebUrl.$filePath;
-                \Yii::warning("attachmentUploadForm save saveViedoImg=".$saveViedoImg);
+                            $res = $this->saveToAliOss();
+                            break;
+                        case 3:
+                            $this->cos = CosSetting::findOne(['admin_id' => $this->admin_id, 'id' => $this->attachmentStorage->setting_id, 'is_delete' => 0]);
+                            if (!$this->cos)
+                                throw new \Exception('腾讯云对象储存配置错误');
 
-                $set_result = $this->mkdirs($path);
-                if (!$set_result) {
-                    return ['code' => ApiCode::CODE_FAIL, 'msg' => '创建文件夹失败'];
+                            $res = $this->saveToCos(0, $LocalImage);
+                            break;
+                        case 4:
+                            $this->qiniu = QiniuSetting::findOne(['mall_id' => $this->mall_id, 'admin_id' => $this->admin_id, 'id' => $this->attachmentStorage->setting_id, 'is_delete' => 0]);
+                            if (!$this->qiniu)
+                                throw new \Exception('七牛云对象储存配置错误');
+
+                            $res = $this->saveToQiniu();
+                            break;
+                        default:
+                            $res = $this->saveToLocal();
+                            break;
+                    }
                 }
-                //截取视频图片，并上传到第三方图片存储平台
-                VideoLogic::getVideoImage(trim($res['url']),trim($saveViedoImg));
-                $imgUrl = CommonLogic::uploadImgToCloudStorage($saveViedoImg,$filePath,$url);
-                $res['thumb_url'] = $imgUrl;
             }
-            $attachment = new AttachmentInfo();
-            $attachment->mall_id = empty($this->mall_id) ? 0 : $this->mall_id;
-            $attachment->admin_id = $this->admin_id;
-            $attachment->url = $res['url'];
-            $attachment->thumb_url = $res['thumb_url'];
-            $attachment->type = $this->type;
-            $attachment->created_at = time();
-            $attachment->name = $res['name'];
-            $attachment->size = $this->file->size;
-            $attachment->group_id = $this->group_id;
-            $attachment->from = $this->from;
-            if (!$attachment->save()) {
-                return ['code' => ApiCode::CODE_FAIL, 'msg' => '上传失败', 'error' => $attachment->getErrors()];
+
+            if ($res) {
+                if($this->type == "video"){
+                    $fileName = 'video_'.date("YmdHis").'.jpg';
+                    $path = $this->baseWebPath.'/uploads/video/original/';
+                    $filePath = '/uploads/video/original/'.$fileName;
+                    $saveViedoImg = $path.$fileName;
+                    $url = $this->baseWebUrl.$filePath;
+                    \Yii::warning("attachmentUploadForm save saveViedoImg=".$saveViedoImg);
+
+                    $set_result = $this->mkdirs($path);
+                    if (!$set_result)
+                        throw new \Exception('创建文件夹失败');
+
+                    //截取视频图片，并上传到第三方图片存储平台
+                    VideoLogic::getVideoImage(trim($res['url']),trim($saveViedoImg));
+                    $imgUrl = CommonLogic::uploadImgToCloudStorage($saveViedoImg,$filePath,$url);
+                    $res['thumb_url'] = $imgUrl;
+                }
+                $attachment = new AttachmentInfo();
+                $attachment->mall_id = empty($this->mall_id) ? 0 : $this->mall_id;
+                $attachment->admin_id = $this->admin_id;
+                $attachment->url = $res['url'];
+                $attachment->thumb_url = $res['thumb_url'];
+                $attachment->type = $this->type;
+                $attachment->created_at = time();
+                $attachment->name = $res['name'];
+                $attachment->size = $this->file->size;
+                $attachment->group_id = $this->group_id;
+                $attachment->from = $this->from;
+                if (!$attachment->save())
+                    throw new \Exception('上传失败:' . $attachment->getErrors());
+
             }
+            return ['code' => ApiCode::CODE_SUCCESS, 'msg' => 'success', 'data' => $res];
+        } catch (\Exception $e) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
         }
-        return ['code' => ApiCode::CODE_SUCCESS, 'msg' => 'success', 'data' => $res];
     }
 
     /**

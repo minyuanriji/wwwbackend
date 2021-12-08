@@ -66,7 +66,7 @@ class RechargeRecordForm extends BaseModel
                     'list' => $result,
                     'money_list' => $this->rechargeMoneyList(),
                     'mobile' => $mobile ? $mobile['mobile'] : (string)$user->mobile,
-                    'use_red_envelopes' => $user->dynamic_integral > 0 ? 1 : 0,
+                    'use_red_envelopes' => ($user->dynamic_integral > 0 || $user->static_integral > 0) ? 1 : 0,
                     'pagination' => $pagination,
                 ],
                 'msg' => '',

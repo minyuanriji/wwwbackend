@@ -107,6 +107,10 @@ class GiftpacksItemDetailForm extends BaseModel{
         }
         $item['infos'] = implode("，", $infos);
 
+        if (empty($item['cover_url'])) {
+            $item['cover_url'] = \Yii::$app->params['store_default_avatar'];
+        }
+
         return $item;
     }
 }

@@ -50,6 +50,7 @@ Yii::$app->loadComponentView('com-goods');
                    :mch_id="mch_id"
                    :get_goods_url="'plugin/mch/mall/goods/edit/&mch_id=' + mch_id"
                    url="plugin/mch/mall/goods/edit"
+                   :referrer="url"
                    ref="appGoods">
         </com-goods>
     </el-card>

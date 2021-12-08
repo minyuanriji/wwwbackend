@@ -71,12 +71,12 @@ class OrderCheckDiscountTypeForm extends BaseModel
             $user_voucher = ShoppingVoucherUser::findOne(['user_id' => \Yii::$app->user->id]);
 
             //判断积分是否可以使用
-            if ($user->score > 0 && $user->total_score && $user->static_score && $max_score > 0) {
+            if (($user->score > 0 || $user->total_score > 0 || $user->static_score > 0) && $max_score > 0) {
                 $returnDate['use_score'] = 1;
             }
 
             //判断红包是否可以使用
-            if ($user->static_integral > 0 && $user->dynamic_integral > 0 && $max_red_envelopes > 0) {
+            if (($user->static_integral > 0 || $user->dynamic_integral > 0) && $max_red_envelopes > 0) {
                 $returnDate['use_red_envelopes'] = 1;
             }
 

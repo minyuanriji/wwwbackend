@@ -43,6 +43,7 @@ abstract class BasePrepareForm extends BaseModel {
             return $this->responseErrorInfo();
         }
 
+        $t = \Yii::$app->db->beginTransaction();
         try {
 
             //用户信息判断
@@ -118,8 +119,11 @@ abstract class BasePrepareForm extends BaseModel {
             $data["union_id"]            = $paymentOrderUnion->id;
             $data["is_send"]             = 1;
 
+            $t->commit();
+
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"", $data);
         }catch (\Exception $e){
+            $t->rollBack();
             return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());
         }
     }

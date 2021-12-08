@@ -24,6 +24,7 @@ use app\forms\mall\goods\LabelEditForm;
 use app\forms\mall\goods\LabelForm;
 use app\forms\mall\goods\LabelListForm;
 use app\forms\mall\goods\RecommendSettingForm;
+use app\forms\mall\goods\ShoppingSettingExchangeSaveForm;
 use app\forms\mall\goods\ShoppingSettingSaveForm;
 use app\forms\mall\goods\TaobaoCsvForm;
 use app\forms\mall\goods\TransferForm;
@@ -128,12 +129,25 @@ class GoodsController extends MallController
         }
     }
 
-    //购物券设置
+    //赠送购物券设置
     public function actionShoppingSave ()
     {
         if (\Yii::$app->request->isPost) {
 
             $form = new ShoppingSettingSaveForm();
+
+            $form->attributes = \Yii::$app->request->post();
+
+            return $this->asJson($form->save());
+        }
+    }
+
+    //购物券兑换价设置
+    public function actionShoppingExchangeSave ()
+    {
+        if (\Yii::$app->request->isPost) {
+
+            $form = new ShoppingSettingExchangeSaveForm();
 
             $form->attributes = \Yii::$app->request->post();
 

@@ -209,6 +209,9 @@ class AttachmentUploadForm extends Model
                     $LocalImage = [];
                     if ($width > 3000 || $height > 3000) {
                         $LocalImage = $this->saveToLocalThumb();
+                        if (!isset($LocalImage['code']) || $LocalImage['code'] != ApiCode::CODE_SUCCESS) {
+                            throw new \Exception($LocalImage['msg'] ?? '未知错误');
+                        }
                     }
                     switch ($this->attachmentStorage->type) {
                         case 2:
@@ -223,7 +226,7 @@ class AttachmentUploadForm extends Model
                             if (!$this->cos)
                                 throw new \Exception('腾讯云对象储存配置错误');
 
-                            $res = $this->saveToCos(0, $LocalImage);
+                            $res = $this->saveToCos(0, $LocalImage['data']);
                             break;
                         case 4:
                             $this->qiniu = QiniuSetting::findOne(['mall_id' => $this->mall_id, 'admin_id' => $this->admin_id, 'id' => $this->attachmentStorage->setting_id, 'is_delete' => 0]);
@@ -345,60 +348,68 @@ class AttachmentUploadForm extends Model
 
     public function saveToLocalThumb()
     {
-        $dateFolder = date('Ymd');
-        $this->url = $this->baseWebUrl . "/" . $this->savePath . $this->saveName;
-        if (!is_dir($this->baseWebPath . $this->savePath)) {
-            if (!make_dir($this->baseWebPath . $this->savePath)) {
-                throw new \Exception('上传失败，创建文件夹失败`'
-                    . $this->baseWebPath
-                    . $this->savePath
-                    . '`，请检查目录写入权限。');
-            }
-        }
-        if (!$this->file->saveAs($this->saveFile)) {
-            if (!copy($this->file->tempName, $this->saveFile)) {
-                throw new \Exception('文件保存失败，请检查目录写入权限。');
-            }
-        }
-        if ($this->type == 'image') {
-            $this->saveThumbFolder = '/uploads/images/thumbs/' . $dateFolder . '/';
-            $saveThumbName = $this->baseWebPath . $this->saveThumbFolder . $this->saveName;
-            if (!is_dir($this->baseWebPath . $this->saveThumbFolder)) {
-                if (!make_dir($this->baseWebPath . $this->saveThumbFolder)) {
+        try {
+            $dateFolder = date('Ymd');
+            $this->url = $this->baseWebUrl . "/" . $this->savePath . $this->saveName;
+            if (!is_dir($this->baseWebPath . $this->savePath)) {
+                if (!make_dir($this->baseWebPath . $this->savePath)) {
                     throw new \Exception('上传失败，创建文件夹失败`'
                         . $this->baseWebPath
-                        . $this->saveThumbFolder
+                        . $this->savePath
                         . '`，请检查目录写入权限。');
                 }
             }
-            //裁剪图片存入本地
-            $editor = Grafika::createEditor(get_supported_image_lib());
-            /**
-             * @var ImageInterface $image
-             */
-            $editor->open($image, $this->saveFile);
-            $editor->resizeFit($image, 3000, 3000);
-            $editor->save($image, $saveThumbName);
-            $this->thumb_url = $this->baseWebUrl . $this->saveThumbFolder . $this->saveName;
-        }
+            if (!$this->file->saveAs($this->saveFile)) {
+                if (!copy($this->file->tempName, $this->saveFile)) {
+                    throw new \Exception('文件保存失败，请检查目录写入权限。');
+                }
+            }
+            if ($this->type == 'image') {
+                $this->saveThumbFolder = '/uploads/images/thumbs/' . $dateFolder . '/';
+                $saveThumbName = $this->baseWebPath . $this->saveThumbFolder . $this->saveName;
+                if (!is_dir($this->baseWebPath . $this->saveThumbFolder)) {
+                    if (!make_dir($this->baseWebPath . $this->saveThumbFolder)) {
+                        throw new \Exception('上传失败，创建文件夹失败`'
+                            . $this->baseWebPath
+                            . $this->saveThumbFolder
+                            . '`，请检查目录写入权限。');
+                    }
+                }
+                //裁剪图片存入本地
+                $editor = Grafika::createEditor(get_supported_image_lib());
+                /**
+                 * @var ImageInterface $image
+                 */
+                $editor->open($image, $this->saveFile);
+                $editor->resizeFit($image, 3000, 3000);
+                $editor->save($image, $saveThumbName);
+                $this->thumb_url = $this->baseWebUrl . $this->saveThumbFolder . $this->saveName;
+            }
 
-/*        if ($this->file->getExtension() == 'pem') {
-            $this->thumb_url = $this->savePath . $this->file->name;
-            $this->url = $this->savePath . $this->file->name;
-        }*/
+            /*        if ($this->file->getExtension() == 'pem') {
+                        $this->thumb_url = $this->savePath . $this->file->name;
+                        $this->url = $this->savePath . $this->file->name;
+                    }*/
 
-        $result = [
-            'url'           => $this->url,
-            'url_link'      => $this->baseWebPath . $this->savePath . $this->saveName,
+            $result = [
+                'url'           => $this->url,
+                'url_link'      => $this->baseWebPath . $this->savePath . $this->saveName,
 //            'extension' => $this->file->getExtension(),
 //            'size'      => $this->file->size,
 //            'type'      => $this->type,
 //            'name'      => $this->file->name,
-            'thumb_url'     => $this->thumb_url,
-            'thumb_link'    => $this->baseWebPath . $this->saveThumbFolder . $this->saveName,
-        ];
+                'thumb_url'     => $this->thumb_url,
+                'thumb_link'    => $this->baseWebPath . $this->saveThumbFolder . $this->saveName,
+            ];
 
-        return $result;
+            return ['code' => ApiCode::CODE_SUCCESS, 'data' => $result, 'msg' => ''];
+        } catch (\Exception $e) {
+            return [
+                'code' => ApiCode::CODE_FAIL,
+                'msg'  => $e->getMessage()
+            ];
+        }
+
     }
 
     /**

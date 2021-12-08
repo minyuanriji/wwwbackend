@@ -183,14 +183,14 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         <com-add-cat ref="cats" :new-cats="ruleForm.cats" @select="selectCat"></com-add-cat>
                                     </el-form-item>
                                     <!-- mch -->
-                                    <el-form-item v-if="is_mch" label="多商户分类" prop="mchCats">
+                                    <!--<el-form-item v-if="is_mch" label="多商户分类" prop="mchCats">
                                         <el-tag style="margin-right: 5px" v-for="(item,index) in mchCats" :key="item.value" v-model="ruleForm.mchCats" type="warning" closable disable-transitions @close="destroyCat_2(item.value,index)">{{item.label}}
                                         </el-tag>
                                         <el-button type="primary" @click="$refs.mchCats.openDialog()">选择分类</el-button>
                                         <el-button type="text" @click="$navigate({r:'mall/cat/edit'}, true)">添加分类
                                         </el-button>
                                         <com-add-cat ref="mchCats" :new-cats="ruleForm.mchCats" :mch_id="mch_id" @select="selectMchCat"></com-add-cat>
-                                    </el-form-item>
+                                    </el-form-item>-->
                                 </el-col>
                             </el-row>
                         </el-card>

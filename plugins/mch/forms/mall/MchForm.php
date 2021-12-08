@@ -30,11 +30,12 @@ class MchForm extends BaseModel
     public $address;
     public $sort_prop;
     public $sort_type;
+    public $account;
 
     public function rules()
     {
         return [
-            [['keyword', 'keyword1', 'switch_type', 'password', 'sort_prop', 'sort_type'], 'string'],
+            [['keyword', 'keyword1', 'switch_type', 'password', 'sort_prop', 'sort_type', 'account'], 'string'],
             [['id', 'sort', 'level'], 'integer'],
             [['page'], 'default', 'value' => 1],
             [['address'], 'safe'],
@@ -273,27 +274,48 @@ class MchForm extends BaseModel
     public function updatePassword()
     {
         try {
-            if (!$this->password) {
+            if(empty($this->account))
+                throw new \Exception('请填写新账号');
+
+            if (!$this->password)
                 throw new \Exception('请填写新密码');
-            }
+
             $admin = Admin::find()->where([
-                'mch_id' => $this->id,
+                'username' => $this->account,
                 'mall_id' => \Yii::$app->mall->id,
                 'is_delete' => 0,
             ])->one();
+
+            if ($admin && $admin->mch_id != $this->id) {
+                throw new \Exception('商户账号已存在！');
+            }
+
+            if ($this->password) {
+                if (preg_match('/[\x{4e00}-\x{9fa5}]/u', $this->password) > 0) {
+                    throw new \Exception('密码不能包含中文字符');
+                }
+            }
+
+            // 商户账号创建
+            $admin = Admin::findOne(['mch_id' => $this->id]);
             if (!$admin) {
-                throw new \Exception('商户账号不存在');
+                $admin = new Admin();
+                $admin->mch_id          = $this->id;
+                $admin->mall_id         = \Yii::$app->mall->id;
+                $admin->auth_key        = \Yii::$app->security->generateRandomString();
+                $admin->access_token    = \Yii::$app->security->generateRandomString();
+                $admin->admin_type      = Admin::ADMIN_TYPE_OPERATE;
             }
 
             $admin->password = \Yii::$app->getSecurity()->generatePasswordHash($this->password);
-            $res = $admin->save();
-            if (!$res) {
+            $admin->username = $this->account;
+            if (!$admin->save()) {
                 throw new \Exception($this->responseErrorMsg($admin));
             }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'msg' => '密码更新成功',
+                'msg' => '账号密码更新成功',
             ];
         } catch (\Exception $e) {
             return [

@@ -2,14 +2,14 @@
 Yii::$app->loadComponentView('com-goods');
 ?>
 <style>
-    /* STOP */
+/*    !* STOP *!
     #pane-first,#pane-second {
         pointer-events: none !important;
     }
     .el-switch {
         opacity: .6;
     }
-    /* input hidden */
+    !* input hidden *!
     .el-input__inner {
         background-color: #F5F7FA;
         border-color: #E4E7ED;
@@ -20,10 +20,10 @@ Yii::$app->loadComponentView('com-goods');
     .el-form-item.is-success .el-input__inner, .el-form-item.is-success .el-input__inner:focus, .el-form-item.is-success .el-textarea__inner, .el-form-item.is-success .el-textarea__inner:focus {
         border-color: #E4E7ED
     }
-    /* preview */
+    !* preview *!
     .el-dialog__footer {
         opacity: 0;
-    }
+    }*/
 </style>
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 0 0;">
@@ -73,9 +73,9 @@ Yii::$app->loadComponentView('com-goods');
                 }
             }
         },
-        mounted(){
+        /*mounted(){
             let bottom_div= document.getElementsByClassName("bottom-div")[0];
             bottom_div.removeChild(bottom_div.children[0]);
-        },
+        },*/
     });
 </script>

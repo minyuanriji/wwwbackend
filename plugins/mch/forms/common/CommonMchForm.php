@@ -58,7 +58,7 @@ class CommonMchForm extends BaseModel
         $query->andWhere(['!=', 'mobile', '']);
 
         $list = $query->orderBy($orderBy)
-            ->with('user', 'store', 'category')
+            ->with('user', 'store', 'category', 'mchAdmin')
             ->page($pagination)->asArray()->all();
 
         if($list){

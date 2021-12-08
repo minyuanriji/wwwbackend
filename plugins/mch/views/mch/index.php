@@ -259,8 +259,8 @@
                                 <img src="statics/img/plugins/setting.png" alt="">
                             </el-tooltip>
                         </el-button>
-                        <el-button @click="updatePasswordDialog(scope.row.id)" type="text" size="mini" circle>
-                            <el-tooltip class="item" effect="dark" content="修改密码" placement="top">
+                        <el-button @click="updatePasswordDialog(scope.row)" type="text" size="mini" circle>
+                            <el-tooltip class="item" effect="dark" content="修改账户信息" placement="top">
                                 <img src="statics/img/mall/change.png" alt="">
                             </el-tooltip>
                         </el-button>
@@ -284,14 +284,17 @@
             </div>
         </div>
 
-        <el-dialog title="修改密码" :visible.sync="dialogFormVisible" width="30%">
+        <el-dialog title="修改账户信息" :visible.sync="dialogFormVisible" width="30%" :before-close="handleClose">
             <el-form size="small" @submit.native.prevent="" :model="form" :rules="passwordRules" ref="form">
+                <el-form-item label="新账号" prop="account">
+                    <el-input v-model="form.account" autocomplete="off"></el-input>
+                </el-form-item>
                 <el-form-item label="新密码" prop="password">
                     <el-input type="password" v-model="form.password" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button @click="handleClose()">取 消</el-button>
                 <el-button :loading="btnLoading" type="primary" @click="updatePassword('form')">确 定</el-button>
             </div>
         </el-dialog>
@@ -317,9 +320,13 @@
                 },
                 dialogFormVisible: false,
                 form: {
+                    account: '',
                     password: '',
                 },
                 passwordRules: {
+                    account: [
+                        {required: true, message: '请输入新账号', trigger: 'change'},
+                    ],
                     password: [
                         {required: true, message: '请输入新密码', trigger: 'change'},
                     ],
@@ -337,6 +344,11 @@
             };
         },
         methods: {
+            handleClose () {
+                this.dialogFormVisible = false;
+                this.form.account = '';
+                this.form.password = '';
+            },
             triggeredChange (){
                 if (this.search.keyword.length>0 && this.search.keyword1.length<=0) {
                     alert('请选择搜索方式');
@@ -460,9 +472,13 @@
                 this.page = 1;
                 this.getList();
             },
-            updatePasswordDialog(id) {
+            updatePasswordDialog(row) {
                 this.dialogFormVisible = true;
-                this.mch_id = id;
+                this.mch_id = row.id;
+                if (row.mchAdmin) {
+                    this.form.account = row.mchAdmin.username;
+                    this.form.password = row.mchAdmin.password;
+                }
             },
             updatePassword(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -483,6 +499,7 @@
                             if (e.data.code == 0) {
                                 self.$message.success(e.data.msg);
                                 self.dialogFormVisible = false;
+                                this.getList();
                             } else {
                                 self.$message.error(e.data.msg);
                             }

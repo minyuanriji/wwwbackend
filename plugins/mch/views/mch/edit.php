@@ -137,12 +137,12 @@
                             <el-input type="number" v-model.number="ruleForm.sort"></el-input>
                         </el-form-item>
 
-                        <el-form-item label="商户账号" prop="username">
+                        <!--<el-form-item label="商户账号" prop="username">
                             <el-input v-model="ruleForm.username"></el-input>
                         </el-form-item>
                         <el-form-item v-if="!ruleForm.admin_id" label="商户密码" prop="password">
                             <el-input type="password" v-model="ruleForm.password"></el-input>
-                        </el-form-item>
+                        </el-form-item>-->
 
                     </el-tab-pane>
                     <el-tab-pane label="店铺信息" name="store">

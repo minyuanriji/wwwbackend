@@ -1003,8 +1003,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             </el-row>
                         </el-card>
 
-
-
                         <!-- 商品详情 -->
                         <slot name="before_detail"></slot>
                         <el-card shadow="never" class="mt-24" v-if="is_detail == 1">

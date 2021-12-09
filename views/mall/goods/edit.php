@@ -35,7 +35,11 @@ $mchId = Yii::$app->admin->identity->mch_id;
         data() {
             return {
                 form: {},
-                url: 'mall/goods/index',
+                url: {
+                    r: 'mall/goods/index',
+                    sign:'mch',
+                    page:1,
+                },
                 is_mch: <?= $mchId > 0 ? 1 : 0 ?>,
                 mch_id: <?= $mchId ?>,
             }
@@ -44,7 +48,8 @@ $mchId = Yii::$app->admin->identity->mch_id;
             if(getQuery('page') > 1) {
                 this.url = {
                     r: 'mall/goods/index',
-                    page: getQuery('page')
+                    page: getQuery('page'),
+                    sign:'mch',
                 }
             }
         },

@@ -1308,7 +1308,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             },
             // 保存之后返回地址
             referrer: {
-                type: String,
                 default: 'mall/goods/index'
             },
             is_mch: {
@@ -1753,12 +1752,12 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     }).then(e => {
                         if (e.data.code == 0) {
                             that.$message.success(e.data.msg);
-                            if (that.referrer) {
-                                url = 'r=' + that.referrer;
+                            if (that.referrer.sign == 'mall' || that.referrer.sign == 'mch') {
+                                url = 'r=' + that.referrer.r + '&page=' + that.referrer.page;
                             } else {
                                 url = 'r=mall/goods/index';
                             }
-                            console.log(url);
+                            console.log(that.referrer.page);
                             window.location.href = _baseUrl + '/index.php?' + url;
                         } else {
                             that.$message.error(e.data.msg);
@@ -1790,8 +1789,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         that.formProgressData.loading = false;
                         if (e.data.code == 0) {
                             that.$message.success(e.data.msg);
-                            if (that.referrer) {
-                                url = 'r=' + that.referrer;
+                            if (that.referrer.sign == 'mall' || that.referrer.sign == 'mch') {
+                                url = 'r=' + that.referrer.r + '&page=' + that.referrer.page;
                             } else {
                                 url = 'r=mall/goods/index';
                             }
@@ -2141,8 +2140,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             if (e.data.code === 0) {
                                 //保存成功
                                 self.$message.success(e.data.msg);
-                                if (this.referrer) {
-                                    url = 'r=' + this.referrer;
+                                if (that.referrer.sign == 'mall' || that.referrer.sign == 'mch') {
+                                    url = 'r=' + that.referrer.r + '&page=' + that.referrer.page;
                                 } else {
                                     url = 'r=mall/goods/index';
                                 }

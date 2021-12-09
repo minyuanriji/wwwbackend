@@ -14,6 +14,7 @@ use app\models\User;
 use app\plugins\mch\models\Goods;
 use app\plugins\mch\models\MchGoods;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromGoods;
+use app\plugins\shopping_voucher\models\ShoppingVoucherTargetGoods;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -127,13 +128,19 @@ class GoodsForm extends BaseModel
                 $shoppingDetail['start_at'] = date('Y-m-d H:i:s', $shoppingDetail['start_at']);
             }
 
+            $shoppingExchange = ShoppingVoucherTargetGoods::find()->where([
+                "mall_id"  => $detail['mall_id'],
+                "goods_id" => $this->id
+            ])->asArray()->one();
+
             if ($detail) {
                 return [
                     'code' => ApiCode::CODE_SUCCESS,
                     'msg' => '请求成功',
                     'data' => [
                         'detail' => $detail,
-                        'shopping_voucher_setting' => $shoppingDetail ?: []
+                        'shopping_voucher_setting' => $shoppingDetail ?: [],
+                        'shopping_voucher_Exchange' => $shoppingExchange ?: [],
                     ]
                 ];
             }

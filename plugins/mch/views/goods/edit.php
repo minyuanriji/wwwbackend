@@ -61,7 +61,11 @@ Yii::$app->loadComponentView('com-goods');
         data() {
             return {
                 form: {},
-                url: 'plugin/mch/mall/goods/index',
+                url : {
+                    r: 'plugin/mch/mall/goods/index',
+                    sign:'mall',
+                    page:1,
+                },
                 is_mch: 1,
                 mch_id: parseInt(getQuery('mch_id')),
             }
@@ -70,7 +74,8 @@ Yii::$app->loadComponentView('com-goods');
             if (getQuery('page') > 1) {
                 this.url = {
                     r: 'plugin/mch/mall/goods/index',
-                    page: getQuery('page')
+                    page: getQuery('page'),
+                    sign:'mall',
                 }
             }
         },

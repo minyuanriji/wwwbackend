@@ -63,7 +63,7 @@ Yii::$app->loadComponentView('com-goods');
                 form: {},
                 url : {
                     r: 'plugin/mch/mall/goods/index',
-                    sign:'mall',
+                    sign:'mch',
                     page:1,
                 },
                 is_mch: 1,
@@ -75,7 +75,7 @@ Yii::$app->loadComponentView('com-goods');
                 this.url = {
                     r: 'plugin/mch/mall/goods/index',
                     page: getQuery('page'),
-                    sign:'mall',
+                    sign:'mch',
                 }
             }
         },

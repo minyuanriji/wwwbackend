@@ -1308,7 +1308,14 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             },
             // 保存之后返回地址
             referrer: {
-                default: 'mall/goods/index'
+                type: Object,
+                default: function() {
+                    return {
+                        r: 'mall/goods/index',
+                        sign: 'mch',
+                        page:1,
+                    }
+                }
             },
             is_mch: {
                 type: Number,
@@ -2140,8 +2147,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             if (e.data.code === 0) {
                                 //保存成功
                                 self.$message.success(e.data.msg);
-                                if (that.referrer.sign == 'mall' || that.referrer.sign == 'mch') {
-                                    url = 'r=' + that.referrer.r + '&page=' + that.referrer.page;
+                                if (self.referrer.sign == 'mall' || self.referrer.sign == 'mch') {
+                                    url = 'r=' + self.referrer.r + '&page=' + self.referrer.page;
                                 } else {
                                     url = 'r=mall/goods/index';
                                 }

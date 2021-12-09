@@ -89,6 +89,7 @@ Yii::$app->loadComponentView('com-goods-list');
                 },
                 id: null,
                 btnLoading: false,
+                goods_page: 1,
             };
         },
         methods: {
@@ -177,11 +178,13 @@ Yii::$app->loadComponentView('com-goods-list');
                 });
             },
             edit(row) {
+                this.goods_page = localStorage.getItem('goods_page');
                 if (row) {
                     navigateTo({
                         r: 'plugin/mch/mall/goods/edit',
                         id: row.id,
-                        mch_id: row.mch_id
+                        mch_id: row.mch_id,
+                        page:this.goods_page
                     });
                 } else {
                     navigateTo({

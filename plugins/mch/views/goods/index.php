@@ -103,7 +103,7 @@ Yii::$app->loadComponentView('com-goods-list');
                     self.listLoading = true;
                     request({
                         params: {
-                            r: 'mall/goods/destroy',
+                            r: 'mall/goods/put-recycle',
                         },
                         method: 'post',
                         data: {
@@ -113,8 +113,8 @@ Yii::$app->loadComponentView('com-goods-list');
                     }).then(e => {
                         self.listLoading = false;
                         if (e.data.code === 0) {
-                            self.list.splice(index, 1);
                             self.$message.success(e.data.msg);
+                            location.reload();
                         } else {
                             self.$message.error(e.data.msg);
                         }

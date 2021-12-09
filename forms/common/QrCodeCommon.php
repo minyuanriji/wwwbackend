@@ -127,7 +127,7 @@ class QrCodeCommon extends BaseModel
                 throw new \Exception('微信配置有误');
             }
             $cacheData['token']      = $accessTokenArray;
-            $cacheData['expired_at'] = time() + $accessTokenArray['expires_in'] - 600;
+            $cacheData['expired_at'] = time() + $accessTokenArray['expires_in'] - 1800;
             $cache->set($cacheKey, $cacheData);
         }
 

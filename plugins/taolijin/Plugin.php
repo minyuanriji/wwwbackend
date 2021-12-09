@@ -44,6 +44,11 @@ class Plugin extends \app\plugins\Plugin
                 'route' => 'plugin/taolijin/mall/cat/index',
                 'icon' => 'el-icon-setting'
             ],
+            [
+                'name' => '订单管理',
+                'route' => 'plugin/taolijin/mall/order/list',
+                'icon' => 'el-icon-setting'
+            ],
         ];
     }
 

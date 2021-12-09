@@ -3,6 +3,7 @@
 namespace app\plugins\taolijin\models;
 
 use app\models\BaseActiveRecord;
+use app\models\User;
 
 class TaolijinUserAliBind extends BaseActiveRecord
 {
@@ -22,4 +23,11 @@ class TaolijinUserAliBind extends BaseActiveRecord
         ];
     }
 
+    /**
+     * 获取用户
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser(){
+        return $this->hasOne(User::class, ["id" => "user_id"]);
+    }
 }

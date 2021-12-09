@@ -8,6 +8,7 @@ use app\models\Order;
 use app\models\OrderDetail;
 use app\models\Store;
 use app\models\User;
+use app\plugins\giftpacks\models\GiftpacksItem;
 use app\plugins\giftpacks\models\GiftpacksOrder;
 use app\plugins\giftpacks\models\GiftpacksOrderItem;
 use app\plugins\mch\models\Mch;
@@ -113,6 +114,18 @@ class MchPriceLogListForm extends BaseModel{
                         if(isset($item['order_item_info']['giftpackOrder'])){
                             $item['order_item_info']['giftpackOrder']['integral_deduction_price'] = (float)$item['order_item_info']['giftpackOrder']['integral_deduction_price'];
                             $item['user'] = isset($item['order_item_info']['giftpackOrder']['user']) ? $item['order_item_info']['giftpackOrder']['user'] : [];
+                        }
+                        if(isset($item['order_item_info']['giftpackOrder']['giftpacks']['score_give_settings'])){
+                            $item['order_item_info']['giftpackOrder']['giftpacks']['score_give_settings'] = @json_decode($item['order_item_info']['giftpackOrder']['giftpacks']['score_give_settings'], true);
+                        }
+                        $giftpacksItem = GiftpacksItem::findOne($item['order_item_info']['giftpacksItem']['id']);
+                        if ($giftpacksItem) {
+                            $query = GiftpacksItem::find()->where([
+                                'pack_id' => $giftpacksItem->pack_id
+                            ]);
+                            $item['summary_price_calculation'] = $query->sum('item_price');
+                            $count_query = clone $query;
+                            $item['goods_count'] = $count_query->count();
                         }
                     }
                     //商品订单

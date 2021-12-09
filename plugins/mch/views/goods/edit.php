@@ -2,14 +2,14 @@
 Yii::$app->loadComponentView('com-goods');
 ?>
 <style>
-    /* STOP */
+/*    !* STOP *!
     #pane-first,#pane-second {
         pointer-events: none !important;
     }
     .el-switch {
         opacity: .6;
     }
-    /* input hidden */
+    !* input hidden *!
     .el-input__inner {
         background-color: #F5F7FA;
         border-color: #E4E7ED;
@@ -20,10 +20,10 @@ Yii::$app->loadComponentView('com-goods');
     .el-form-item.is-success .el-input__inner, .el-form-item.is-success .el-input__inner:focus, .el-form-item.is-success .el-textarea__inner, .el-form-item.is-success .el-textarea__inner:focus {
         border-color: #E4E7ED
     }
-    /* preview */
+    !* preview *!
     .el-dialog__footer {
         opacity: 0;
-    }
+    }*/
 </style>
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 0 0;">
@@ -50,6 +50,7 @@ Yii::$app->loadComponentView('com-goods');
                    :mch_id="mch_id"
                    :get_goods_url="'plugin/mch/mall/goods/edit/&mch_id=' + mch_id"
                    url="plugin/mch/mall/goods/edit"
+                   :referrer="url"
                    ref="appGoods">
         </com-goods>
     </el-card>
@@ -60,7 +61,11 @@ Yii::$app->loadComponentView('com-goods');
         data() {
             return {
                 form: {},
-                url: 'plugin/mch/mall/goods/index',
+                url : {
+                    r: 'plugin/mch/mall/goods/index',
+                    sign:'mch',
+                    page:1,
+                },
                 is_mch: 1,
                 mch_id: parseInt(getQuery('mch_id')),
             }
@@ -69,13 +74,14 @@ Yii::$app->loadComponentView('com-goods');
             if (getQuery('page') > 1) {
                 this.url = {
                     r: 'plugin/mch/mall/goods/index',
-                    page: getQuery('page')
+                    page: getQuery('page'),
+                    sign:'mch',
                 }
             }
         },
-        mounted(){
+        /*mounted(){
             let bottom_div= document.getElementsByClassName("bottom-div")[0];
             bottom_div.removeChild(bottom_div.children[0]);
-        },
+        },*/
     });
 </script>

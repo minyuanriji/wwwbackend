@@ -93,7 +93,7 @@ try {
             <el-button @click="upDown(1)" size="mini">上架</el-button>
             <el-button @click="upDown(0)" size="mini">下架</el-button>
         </template>
-        <el-button v-if="isShowDelete" @click="allDelete" size="mini">删除</el-button>
+<!--        <el-button v-if="isShowDelete" @click="allDelete" size="mini">删除</el-button>-->
         <el-button v-if="isShowBatchButton" @click="batchSetting" size="mini">批量设置</el-button>
 
         <el-dialog

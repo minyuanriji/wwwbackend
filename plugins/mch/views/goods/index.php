@@ -89,6 +89,7 @@ Yii::$app->loadComponentView('com-goods-list');
                 },
                 id: null,
                 btnLoading: false,
+                goods_page: 1,
             };
         },
         methods: {
@@ -102,7 +103,7 @@ Yii::$app->loadComponentView('com-goods-list');
                     self.listLoading = true;
                     request({
                         params: {
-                            r: 'mall/goods/destroy',
+                            r: 'mall/goods/put-recycle',
                         },
                         method: 'post',
                         data: {
@@ -112,8 +113,8 @@ Yii::$app->loadComponentView('com-goods-list');
                     }).then(e => {
                         self.listLoading = false;
                         if (e.data.code === 0) {
-                            self.list.splice(index, 1);
                             self.$message.success(e.data.msg);
+                            location.reload();
                         } else {
                             self.$message.error(e.data.msg);
                         }
@@ -177,11 +178,13 @@ Yii::$app->loadComponentView('com-goods-list');
                 });
             },
             edit(row) {
+                this.goods_page = localStorage.getItem('goods_page');
                 if (row) {
                     navigateTo({
                         r: 'plugin/mch/mall/goods/edit',
                         id: row.id,
-                        mch_id: row.mch_id
+                        mch_id: row.mch_id,
+                        page:this.goods_page
                     });
                 } else {
                     navigateTo({

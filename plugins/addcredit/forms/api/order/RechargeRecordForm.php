@@ -60,16 +60,16 @@ class RechargeRecordForm extends BaseModel
             $mobile = AddcreditOrder::find()->andWhere(['user_id' => $user->id, 'mall_id' => \Yii::$app->mall->id])
                 ->select('mobile')->asArray()->orderBy('created_at DESC')->one();
 
-
-
             return [
                 'code' => ApiCode::CODE_SUCCESS,
-                'data' => $result,
-                'money_list' => $this->rechargeMoneyList(),
-                'mobile' => $mobile ? $mobile['mobile'] : (string)$user->mobile,
+                'data' => [
+                    'list' => $result,
+                    'money_list' => $this->rechargeMoneyList(),
+                    'mobile' => $mobile ? $mobile['mobile'] : (string)$user->mobile,
+                    'use_red_envelopes' => ($user->dynamic_integral > 0 || $user->static_integral > 0) ? 1 : 0,
+                    'pagination' => $pagination,
+                ],
                 'msg' => '',
-                'pagination' => $pagination,
-
             ];
         } catch (\Exception $e) {
             return [

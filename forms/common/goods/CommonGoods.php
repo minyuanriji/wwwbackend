@@ -45,13 +45,13 @@ class CommonGoods extends BaseModel
      */
     public function getGoods($id, $asArray = false)
     {
-        if (\Yii::$app->mchId) {
+        /*if (\Yii::$app->mchId) {
             $mchId = \Yii::$app->mchId;
         } elseif (isset(\Yii::$app->admin->identity) && \Yii::$app->admin->identity->mch_id > 0) {
             $mchId = \Yii::$app->admin->identity->mch_id;
         } else {
             $mchId = 0;
-        }
+        }*/
         $query = Goods::find()->with(['attr.memberPrice', 'goodsWarehouse.cats'])
             ->with(['services' => function ($query) {
                 $query->via->andWhere(['is_delete' => 0]);
@@ -59,7 +59,7 @@ class CommonGoods extends BaseModel
             ->with(['cards' => function ($query) {
                 $query->via->andWhere(['is_delete' => 0]);
             }])
-            ->where(['id' => $id, 'mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, 'is_recycle' => 0, 'mch_id' => $mchId]);
+            ->where(['id' => $id, 'is_delete' => 0, 'is_recycle' => 0]);//, 'mall_id' => \Yii::$app->mall->id, 'mch_id' => $mchId
 
         return $query->asArray($asArray)->one();
     }

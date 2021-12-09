@@ -13,6 +13,7 @@ namespace app\controllers\api;
 use app\controllers\api\filters\LoginFilter;
 use app\core\ApiCode;
 use app\forms\api\order\ConsumeVerificationInfoForm;
+use app\forms\api\order\OrderCheckDiscountTypeForm;
 use app\forms\api\order\OrderClerkLogForm;
 use app\forms\api\order\OrderCommentForm;
 use app\forms\api\order\OrderClerkForm;
@@ -67,6 +68,13 @@ class OrderController extends ApiController
         $result = (new OrderCommon()) -> getOneNavData($data['nav_id']);
         return $this -> asJson($result);
 
+    }
+
+    public function actionCheckOrderDiscountType ()
+    {
+        $form = new OrderCheckDiscountTypeForm();
+        $form->attributes = $this->requestData;
+        return $form->check();
     }
     
 

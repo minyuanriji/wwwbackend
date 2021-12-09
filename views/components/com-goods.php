@@ -183,14 +183,14 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         <com-add-cat ref="cats" :new-cats="ruleForm.cats" @select="selectCat"></com-add-cat>
                                     </el-form-item>
                                     <!-- mch -->
-                                    <el-form-item v-if="is_mch" label="多商户分类" prop="mchCats">
+                                    <!--<el-form-item v-if="is_mch" label="多商户分类" prop="mchCats">
                                         <el-tag style="margin-right: 5px" v-for="(item,index) in mchCats" :key="item.value" v-model="ruleForm.mchCats" type="warning" closable disable-transitions @close="destroyCat_2(item.value,index)">{{item.label}}
                                         </el-tag>
                                         <el-button type="primary" @click="$refs.mchCats.openDialog()">选择分类</el-button>
                                         <el-button type="text" @click="$navigate({r:'mall/cat/edit'}, true)">添加分类
                                         </el-button>
                                         <com-add-cat ref="mchCats" :new-cats="ruleForm.mchCats" :mch_id="mch_id" @select="selectMchCat"></com-add-cat>
-                                    </el-form-item>
+                                    </el-form-item>-->
                                 </el-col>
                             </el-row>
                         </el-card>
@@ -1003,8 +1003,6 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             </el-row>
                         </el-card>
 
-
-
                         <!-- 商品详情 -->
                         <slot name="before_detail"></slot>
                         <el-card shadow="never" class="mt-24" v-if="is_detail == 1">
@@ -1156,7 +1154,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         </com-goods-area>
                     </el-tab-pane>
 
-                    <el-tab-pane label="购物券设置" name="shopping_setting" v-if="goods_id > 0">
+                    <el-tab-pane label="赠送购物券设置" name="shopping_setting" v-if="goods_id > 0">
                         <el-form ref="shoppingFormData" :rules="shoppingFormRule" label-width="30%" :model="shoppingFormData" size="small">
                             <el-form-item label="赠送比例" prop="give_value">
                                 <el-input :disabled="formProgressData.loading" type="number" min="0" max="100" placeholder="请输入内容" v-model="shoppingFormData.give_value" style="width:260px;">
@@ -1181,10 +1179,27 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         </div>
                     </el-tab-pane>
 
+                    <el-tab-pane label="购物券兑换价设置" name="shopping_exchange" v-if="goods_id > 0">
+                        <el-form ref="shoppingExchangeFormData"
+                                 :rules="shoppingExchangeFormRule"
+                                 label-width="30%"
+                                 :model="shoppingExchangeFormData"
+                                 size="small">
+                            <el-form-item label="购物券价" prop="exchange_rate">
+                                <el-input type="number" placeholder="请输入内容" v-model="shoppingExchangeFormData.exchange_rate" style="width:260px;">
+                                    <template slot="append">券</template>
+                                </el-input>
+                            </el-form-item>
+                        </el-form>
+                        <div style="margin-left: 500px">
+                            <el-button type="primary" @click="shoppingExchangeSave">确 定</el-button>
+                        </div>
+                    </el-tab-pane>
+
                     <slot name="tab_pane"></slot>
                 </el-tabs>
             </el-form>
-            <div class="bottom-div" flex="cross:center" v-if="is_save_btn == 1 && activeName != 'shopping_setting'">
+            <div class="bottom-div" flex="cross:center" v-if="is_save_btn == 1 && activeName != 'shopping_setting' && activeName != 'shopping_exchange'">
                 <el-button class="button-item" :loading="btnLoading" type="primary" size="small" @click="store('ruleForm')">保存
                 </el-button>
                 <el-button class="button-item" size="small" @click="showPreview">预览</el-button>
@@ -1293,7 +1308,14 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             },
             // 保存之后返回地址
             referrer: {
-                default: 'mall/goods/index'
+                type: Object,
+                default: function() {
+                    return {
+                        r: 'mall/goods/index',
+                        sign: 'mch',
+                        page:1,
+                    }
+                }
             },
             is_mch: {
                 type: Number,
@@ -1630,7 +1652,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     is_order_sales:"0",
                     
                 },
-                //购物券设置
+                //赠送购物券设置
                 shoppingFormData: {
                     give_type: 1,
                     give_value: 0,
@@ -1647,7 +1669,16 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 },
                 formProgressData:{
                     loading: false,
-                }
+                },
+                //购物券兑换设置
+                shoppingExchangeFormData: {
+                    exchange_rate: 0,
+                },
+                shoppingExchangeFormRule:{
+                    exchange_rate: [
+                        {required: true, message: '购物券价不能为空', trigger: 'change'},
+                    ],
+                },
             };
         },
         created() {
@@ -1714,6 +1745,41 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
             }
         },
         methods: {
+            //购物券兑换价设置
+            shoppingExchangeSave(){
+                let that = this;
+                this.shoppingExchangeFormData.goods_id = getQuery('id');
+                let do_request = function(){
+                    request({
+                        params: {
+                            r: "mall/goods/shopping-exchange-save"
+                        },
+                        method: "post",
+                        data: that.shoppingExchangeFormData
+                    }).then(e => {
+                        if (e.data.code == 0) {
+                            that.$message.success(e.data.msg);
+                            if (that.referrer.sign == 'mall' || that.referrer.sign == 'mch') {
+                                url = 'r=' + that.referrer.r + '&page=' + that.referrer.page;
+                            } else {
+                                url = 'r=mall/goods/index';
+                            }
+                            console.log(that.referrer.page);
+                            window.location.href = _baseUrl + '/index.php?' + url;
+                        } else {
+                            that.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        that.$message.error(e.data.msg);
+                    });
+                };
+                this.$refs['shoppingExchangeFormData'].validate((valid) => {
+                    if (valid) {
+                        do_request();
+                    }
+                });
+            },
+
             //购物券设置保存
             shoppingSave(){
                 let that = this;
@@ -1730,8 +1796,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         that.formProgressData.loading = false;
                         if (e.data.code == 0) {
                             that.$message.success(e.data.msg);
-                            if (that.referrer.page > 1) {
-                                url = Qs.stringify(that.referrer);
+                            if (that.referrer.sign == 'mall' || that.referrer.sign == 'mch') {
+                                url = 'r=' + that.referrer.r + '&page=' + that.referrer.page;
                             } else {
                                 url = 'r=mall/goods/index';
                             }
@@ -2081,8 +2147,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             if (e.data.code === 0) {
                                 //保存成功
                                 self.$message.success(e.data.msg);
-                                if (this.referrer.page > 1) {
-                                    url = Qs.stringify(this.referrer);
+                                if (self.referrer.sign == 'mall' || self.referrer.sign == 'mch') {
+                                    url = 'r=' + self.referrer.r + '&page=' + self.referrer.page;
                                 } else {
                                     url = 'r=mall/goods/index';
                                 }
@@ -2116,6 +2182,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         let detail = e.data.data.detail;
                         this.detail_data = e.data.data.detail;
                         this.shoppingFormData = e.data.data.shopping_voucher_setting;
+                        this.shoppingExchangeFormData.exchange_rate = e.data.data.shopping_voucher_Exchange.voucher_price;
+
 
                         // 初始化自定义商品名
                         this.getGoodsNameDiy();

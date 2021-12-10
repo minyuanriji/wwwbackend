@@ -325,7 +325,9 @@
         },
         methods: {
             getGiftDetails(row) {
-                this.details = row.order_item_info.giftpackOrder.giftpacks;
+                if (row.order_item_info) {
+                    this.details = row.order_item_info.giftpackOrder.giftpacks;
+                }
                 this.dialogVisible = true;
                 this.gift_goods_info.goods_count = row.goods_count;
                 this.gift_goods_info.summary_price_calculation = row.summary_price_calculation;

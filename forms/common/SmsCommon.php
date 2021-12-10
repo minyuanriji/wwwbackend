@@ -70,7 +70,7 @@ class SmsCommon extends BaseModel
                 ]
             ],
             'captcha' => [
-                'title' => '发送短信验证码设置',
+                'title' => '通用验证码设置',
                 'content' => '例如：模板内容：您的验证码为89757，请勿告知他人。',
                 'support_mch' => false,
                 'loading' => false,
@@ -79,6 +79,19 @@ class SmsCommon extends BaseModel
                         'key' => 'template_variable',
                         'value' => '模板变量',
                         'desc' => '例如：模板内容：您的验证码为${code}，请勿告知他人。，则只需填写code'
+                    ]
+                ]
+            ],
+            'user_registration' => [
+                'title' => '用户注册验证码',
+                'content' => '例如：您正在申请手机注册，验证码为：695432，请勿泄露他人。',
+                'support_mch' => false,
+                'loading' => false,
+                'variable' => [
+                    [
+                        'key' => 'code',
+                        'value' => '模板变量',
+                        'desc' => '您正在申请手机注册，验证码为：${code}，请勿泄露他人！'
                     ]
                 ]
             ],

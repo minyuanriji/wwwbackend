@@ -1,5 +1,6 @@
 <?php
 echo $this->render('../components/com-commission-rule-edit');
+echo $this->render('../components/com-commission-checkout-rule-edit');
 echo $this->render('../components/com-commission-store-rule-edit');
 echo $this->render('../components/com-commission-hotel-rule-edit');
 echo $this->render('../components/com-commission-hotel_3r-rule-edit');
@@ -52,6 +53,14 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
 
                         <el-form-item label="设置规则">
 
+                            <com-commission-checkout-rule-edit
+                                    v-if="ruleForm.item_type == 'checkout'"
+                                    @update="updateCommissionRule"
+                                    :ctype="commissionType"
+                                    :chains="commissionRuleChains"
+                                    :commiss_value = "commissonValue">
+                            </com-commission-checkout-rule-edit>
+
                             <com-commission-store-rule-edit
                                     v-if="ruleForm.item_type == 'store'"
                                     @number = "newNumber"
@@ -63,7 +72,6 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
 
                             <com-commission-rule-edit
                                     v-if="ruleForm.item_type == 'goods' ||
-                                          ruleForm.item_type == 'checkout' ||
                                           ruleForm.item_type == 'addcredit_3r' ||
                                           ruleForm.item_type == 'giftpacks' ||
                                           ruleForm.item_type == 'oil_3r'"
@@ -72,6 +80,8 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                                     :ctype="commissionType"
                                     :chains="commissionRuleChains">
                             </com-commission-rule-edit>
+
+
 
                             <com-commission-hotel-rule-edit
                                     v-if="ruleForm.item_type == 'hotel' || ruleForm.item_type == 'addcredit'"

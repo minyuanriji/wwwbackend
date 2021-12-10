@@ -62,16 +62,13 @@ class CommissionController extends BaseCommandController{
     }
 
     /**
-     * 获取要分佣的父级列表
+     * 获取上级信息
      * @param $user_id
-     * @param $item_id
-     * @param $item_type
      * @param $lianc_user_id 品牌商ID。如果消费用户是品牌商直推的，品牌商临时升级成分公司
      * @return array
      * @throws \Exception
      */
-    public function getCommissionParentRuleDatas($user_id, $item_id, $item_type, $lianc_user_id = null){
-
+    public function getCommissionParents($user_id, $lianc_user_id = null){
         //获取支付用户信息
         $user = User::findOne($user_id);
         $userLink = UserRelationshipLink::findOne(["user_id" => $user_id]);
@@ -162,6 +159,22 @@ class CommissionController extends BaseCommandController{
             $newParentDatas = $tmpDatas;
         }
 
+        return $newParentDatas;
+    }
+
+    /**
+     * 获取要分佣的父级列表
+     * @param $user_id
+     * @param $item_id
+     * @param $item_type
+     * @param $lianc_user_id 品牌商ID。如果消费用户是品牌商直推的，品牌商临时升级成分公司
+     * @return array
+     * @throws \Exception
+     */
+    public function getCommissionParentRuleDatas($user_id, $item_id, $item_type, $lianc_user_id = null){
+
+        $newParentDatas = $this->getCommissionParents($user_id, $lianc_user_id);
+
         //生成相关规则键
         $parentDatas = [];
         while(!empty($newParentDatas)){
@@ -175,7 +188,8 @@ class CommissionController extends BaseCommandController{
         }
 
         $getChainRuleData = function(ActiveQuery $query, $item_id){
-            //商品独立设置规则
+
+            //独立设置规则
             $newQuery = clone $query;
             $newQuery->andWhere([
                 "AND",

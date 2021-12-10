@@ -23,7 +23,7 @@ class CommissionRuleEditForm extends BaseModel
     public $commission_type;
     public $commission_chains_json;
 
-    const role_type = ['store','hotel', 'partner', 'user', 'branch_office'];
+    const role_type = ['store','hotel', 'pingji', 'partner', 'user', 'branch_office'];
 
     public function rules(){
         return [

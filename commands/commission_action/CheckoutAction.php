@@ -6,6 +6,8 @@ namespace app\commands\commission_action;
 use app\models\IncomeLog;
 use app\models\User;
 use app\plugins\commission\models\CommissionCheckoutPriceLog;
+use app\plugins\commission\models\CommissionRuleChain;
+use app\plugins\commission\models\CommissionRules;
 use app\plugins\mch\models\MchCheckoutOrder;
 use yii\base\Action;
 
@@ -46,10 +48,11 @@ class CheckoutAction extends Action{
 
         foreach($checkoutOrders as $checkoutOrder){
             try {
-                $parentDatas = $this->controller->getCommissionParentRuleDatas($checkoutOrder['pay_user_id'], $checkoutOrder['store_id'], 'checkout');
+
+                $parentDatas = $this->controller->getCommissionParents($checkoutOrder['pay_user_id']);
 
                 //计算分公司、合伙人、VIP会员分佣值
-                $this->setCommissoinValues($parentDatas);
+                $this->setCommissoinValues($checkoutOrder, $parentDatas);
 
                 //通过相关规则键获取分佣规则进行分佣
                 foreach($parentDatas as $parentData) {
@@ -75,7 +78,7 @@ class CheckoutAction extends Action{
 
                     //新公式
                     $ruleData['role_type'] = $parentData['role_type'];
-                    $ruleData['ver'] = "2021/10/29";
+                    $ruleData['ver'] = "2021/12/10";
                     $ruleData['profit_price'] = ($transferRate/100) * $checkoutOrder['order_price'];
                     $price = $ruleData['profit_price'] * $ruleData['commisson_value'];
 
@@ -148,12 +151,75 @@ class CheckoutAction extends Action{
 
     /**
      * 设置分佣值
+     * @param $checkoutOrder
      * @param $parentDatas
      * @return void
      */
-    private function setCommissoinValues(&$parentDatas){
+    private function setCommissoinValues($checkoutOrder, &$parentDatas){
+
+        //生成规则键
+        $keyArr = [];
+        foreach($parentDatas as $parentData){
+            $keyArr[] = $parentData['role_type'];
+        }
+        $keyStr = implode("#", $keyArr) . "#all";
+
+        //优先使用独立规则
+        $rule = CommissionRules::findOne([
+            "item_type"      => "checkout",
+            "item_id"        => $checkoutOrder['store_id'],
+            "apply_all_item" => 0,
+            "is_delete"      => 0
+        ]);
+
+        //通用规则
+        if(!$rule){
+            $rule = CommissionRules::findOne([
+                "item_type"      => "checkout",
+                "apply_all_item" => 1,
+                "is_delete"      => 0
+            ]);
+        }
+
+        if(!$rule){
+            throw new \Exception("无法获取分佣规则");
+        }
+
+        $chains = CommissionRuleChain::find()->where([
+            "unique_key" => $keyStr,
+            "rule_id"    => $rule->id
+        ])->asArray()->all();
+
+        $tmpParentDatas = [];
+        foreach($parentDatas as $parentData){
+            if(isset($parentData['pingji']) && $parentData['pingji']){
+                $tmpParentDatas['pingji'] = $parentData;
+            }else{
+                $tmpParentDatas[$parentData['role_type']] = $parentData;
+            }
+        }
+
+        if($chains){
+            foreach($chains as $chain){
+                if(isset($tmpParentDatas[$chain['role_type']])){
+                    $tmpParentDatas[$chain['role_type']]['rule_data'] = [
+                        'rule_id'         => $chain['rule_id'],
+                        'commission_type' => $rule->commission_type,
+                        'level'           => $chain['level'],
+                        'commisson_value' => floatval($chain['commisson_value']/100)
+                    ];
+                }
+            }
+        }
+
+        $parentDatas = [];
+        foreach($tmpParentDatas as &$parentData){
+            $parentData['rule_data'] = isset($parentData['rule_data']) ? $parentData['rule_data'] : null;
+            $parentDatas[] = $parentData;
+        }
+
         //分佣规则
-        $fitRules = [
+        /*$fitRules = [
             "branch_office#partner#partner#store" => [
                 "branch_office" => 0.034,
                 "pingji"        => 0.016,
@@ -184,6 +250,12 @@ class CheckoutAction extends Action{
                 "partner"       => 0,
                 "store"         => 0.02
             ],
+            "branch_office" => [
+                "branch_office" => 0.15,
+                "pingji"        => 0,
+                "partner"       => 0,
+                "store"         => 0
+            ],
             "partner#partner" => [
                 "branch_office" => 0,
                 "pingji"        => 0.03,
@@ -195,12 +267,6 @@ class CheckoutAction extends Action{
                 "pingji"        => 0,
                 "partner"       => 0.08,
                 "store"         => 0.02
-            ],
-            "branch_office" => [
-                "branch_office" => 0.15,
-                "pingji"        => 0,
-                "partner"       => 0,
-                "store"         => 0
             ],
             "partner" => [
                 "branch_office" => 0,
@@ -235,6 +301,6 @@ class CheckoutAction extends Action{
             }elseif(isset($rule[$parentData['role_type']])){
                 $parentData['rule_data']['commisson_value'] = $rule[$parentData['role_type']];
             }
-        }
+        }*/
     }
 }

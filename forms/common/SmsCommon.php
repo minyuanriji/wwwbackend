@@ -84,14 +84,14 @@ class SmsCommon extends BaseModel
             ],
             'user_registration' => [
                 'title' => '用户注册验证码',
-                'content' => '例如：您正在申请手机注册，验证码为：695432，请勿泄露他人。',
+                'content' => '例如：模板内容：您正在申请手机注册，验证码为:${code}，请勿泄露他人。',
                 'support_mch' => false,
                 'loading' => false,
                 'variable' => [
                     [
                         'key' => 'template_variable',
                         'value' => '模板变量',
-                        'desc' => '您正在申请手机注册，验证码为：${code}，请勿泄露他人！'
+                        'desc' => '例如：模板内容：您正在申请手机注册，验证码为：${code}，请勿泄露他人！'
                     ]
                 ]
             ],

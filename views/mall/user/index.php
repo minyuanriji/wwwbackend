@@ -169,7 +169,7 @@
                     <el-radio v-model="integralForm.type" label="2">扣除</el-radio>
                 </el-form-item>
                 <el-form-item label="积分数" prop="num" size="small">
-                    <el-input oninput="this.value = this.value.replace(/[^0-9]/g, '');" v-model="integralForm.num"
+                    <el-input  v-model="integralForm.num" type="number"
                               :max="999999999"></el-input>
                 </el-form-item>
                 <el-form-item label="充值图片" prop="pic_url">

@@ -27,7 +27,6 @@ class ScoreForm extends BaseModel
             [['num', 'type', 'user_id'], 'required'],
             [['type', 'user_id'], 'integer'],
             [['pic_url', 'remark'], 'string', 'max' => 255],
-            [['num'], 'integer', 'min' => 1, 'max' => 999999999],
         ];
     }
     public function attributeLabels()
@@ -45,7 +44,7 @@ class ScoreForm extends BaseModel
     {
         if (!$this->validate()) {
             return $this->responseErrorInfo();
-        };
+        }
 
         try {
             $admin = \Yii::$app->admin->identity;
@@ -56,10 +55,10 @@ class ScoreForm extends BaseModel
             ];
             if ($this->type == 1) {
                 $desc = "管理员： " . $admin->username . " 后台操作账号：" . $user->nickname . " 积分充值：" . $this->num . " 积分";
-                \Yii::$app->currency->setUser($user)->score->add((int)$this->num, $desc, json_encode($custom_desc));
+                \Yii::$app->currency->setUser($user)->score->add($this->num, $desc, json_encode($custom_desc));
             } else {
                 $desc = "管理员： " . $admin->username . " 后台操作账号：" . $user->nickname . " 积分扣除：" . $this->num . " 积分";
-                \Yii::$app->currency->setUser($user)->score->sub((int)$this->num, $desc, json_encode($custom_desc));
+                \Yii::$app->currency->setUser($user)->score->sub($this->num, $desc, json_encode($custom_desc));
             }
             return [
                 'code' => ApiCode::CODE_SUCCESS,

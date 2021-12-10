@@ -31,7 +31,7 @@ use Yii;
  * @property int $parent_id 第一父级ID（直推人id）
  * @property int $second_parent_id 第二推荐人id
  * @property int $third_parent_id 第三推荐人id
- * @property int $score 当前积分
+ * @property float $score 当前积分
  * @property string $avatar_url 头像
  * @property int $total_score 总积分
  * @property float $balance 当前余额
@@ -39,6 +39,7 @@ use Yii;
  * @property float $total_income 总收益
  * @property float $income 已收益
  * @property float $income_frozen 冻结收益
+ * @property float $static_integral 静态红包
  * @property int $junior_at 成为下级时间
  * @property int $is_delete 是否删除
  * @property int $is_blacklist 是否黑名单

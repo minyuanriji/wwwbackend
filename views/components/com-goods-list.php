@@ -509,7 +509,7 @@ Yii::$app->loadComponentView('goods/com-batch');
             }
 
             // 搜索条件从缓存中获取
-            let search = this.getCookie('search');
+            /*let search = this.getCookie('search');
             if (search) {
                 let newSearch = JSON.parse(search);
                 this.search.keyword = newSearch.keyword;
@@ -522,7 +522,7 @@ Yii::$app->loadComponentView('goods/com-batch');
                         self.newActiveName = newSearch.status;
                     }
                 })
-            }
+            }*/
             this.getList();
         },
         methods: {

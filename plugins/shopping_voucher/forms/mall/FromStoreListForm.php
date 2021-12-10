@@ -145,7 +145,11 @@ class FromStoreListForm extends BaseModel {
                     $item['start_at'] = date("Y-m-d", $item['start_at'] ? $item['start_at'] : time());
 
                     $transfer_rate = (100 - $item['transfer_rate']) / 100 * 10;
-                    $item['transfer_rate'] = (float)substr($transfer_rate, 0, strpos($transfer_rate, '.') + 3);
+                    if (strpos($transfer_rate, '.')) {
+                        $item['transfer_rate'] = (float)substr($transfer_rate, 0, strpos($transfer_rate, '.') + 3);
+                    } else {
+                        $item['transfer_rate'] = $transfer_rate;
+                    }
                 }
             }
 

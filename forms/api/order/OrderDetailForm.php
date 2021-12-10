@@ -74,6 +74,7 @@ class OrderDetailForm extends BaseModel
             $detail["coupon_discount_price"]         = $order["integral_deduction_price"];
             $detail["score_deduction_price"]         = $order["score_deduction_price"];
             $detail["shopping_voucher_decode_price"] = $order["shopping_voucher_decode_price"];
+            $detail["shopping_voucher_use_num"]      = $order["shopping_voucher_use_num"];
             $detail["name"]                          = $order["name"];
             $detail["mobile"]                        = $order["mobile"];
             $detail["address"]                       = $order["address"];

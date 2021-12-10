@@ -39,6 +39,8 @@ use yii\web\UploadedFile;
  * @package app\forms\common
  * @Notes 附件上传
  */
+set_time_limit(0);
+ini_set("memory_limit", "1024M");
 class AttachmentUploadForm extends Model
 {
     /** @var UploadedFile */

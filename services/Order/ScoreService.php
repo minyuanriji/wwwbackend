@@ -214,13 +214,18 @@ class ScoreService
 
     public function getItemScore()
     {
+        $user_score = (string)$this->user_score;
+        if (strpos($user_score, '.')) {
+            $user_score = (float)substr($user_score, 0, strpos($user_score, '.') + 3);
+        }
+
         return $this->item['score'] = [
             'use'                  => $this->use_score,
             'use_num'              => $this->user_use_score,//intval($this->user_use_score),
             'deduction_price'      => $this->user_use_score,//intval($this->user_use_score),
             'can_use'              => $this->user_use_score > 0 ? true : false,
             'score_price'          => $this->score_price,
-            'user_score'           => $this->user_score,
+            'user_score'           => $user_score,
             'user_remaining_score' => $this->user_remaining_score,
         ];
     }

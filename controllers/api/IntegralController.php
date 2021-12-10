@@ -57,7 +57,11 @@ class IntegralController extends ApiController
         if ($integral_list && isset($integral_list['list'])) {
             foreach ($integral_list['list'] as $key => $item) {
                 $total_money = (string)($item['before_money'] + $item['money']);
-                $integral_list['list'][$key]['total_money'] = (float)substr($total_money, 0, strpos($total_money, '.') + 3);
+                if (strpos($total_money, '.')) {
+                    $integral_list['list'][$key]['total_money'] = (float)substr($total_money, 0, strpos($total_money, '.') + 3);
+                } else {
+                    $integral_list['list'][$key]['total_money'] = $total_money;
+                }
             }
         }
         return $this->success('success', compact('wallet', 'integral_list'));

@@ -78,7 +78,7 @@
                     </el-table-column>
                     <el-table-column label="礼包信息" width="260">
                         <template slot-scope="scope">
-                            <div flex="cross:center">
+                            <div flex="cross:center" v-if="scope.row.order_item_info">
                                 <com-image :src="scope.row.order_item_info.giftpackOrder.giftpacks.cover_pic"></com-image>
                                 <div style="margin-left: 10px;">
                                     <div>

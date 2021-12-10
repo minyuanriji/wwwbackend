@@ -89,7 +89,7 @@ class SmsCommon extends BaseModel
                 'loading' => false,
                 'variable' => [
                     [
-                        'key' => 'code',
+                        'key' => 'template_variable',
                         'value' => '模板变量',
                         'desc' => '您正在申请手机注册，验证码为：${code}，请勿泄露他人！'
                     ]

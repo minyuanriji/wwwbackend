@@ -105,6 +105,9 @@ class MchPriceLogListForm extends BaseModel{
                     $otherData = @json_decode($item['other_json_data'], true);
                     $item['transfer_rate'] = isset($otherData['transfer_rate']) ? $otherData['transfer_rate'] : $item['transfer_rate'];
                     $item['user'] = [];
+                    $item['summary_price_calculation'] = 0;
+                    $item['goods_count'] = 0;
+                    $item['order_item_info'] = [];
                     //大礼包
                     if($item['source_type'] == "giftpacks_order_item"){
                         $orderItemInfo = GiftpacksOrderItem::find()->with([

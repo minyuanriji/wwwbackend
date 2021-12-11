@@ -296,6 +296,26 @@
                             </div>
                         </td>
                     </tr>
+                    <tr class="c4">
+                        <td class="label">上级用户信息：</td>
+                        <td>
+                            <div flex="cross:center" v-if="infoDialog.parentUserInfo">
+                                <com-image :src="infoDialog.parentUserInfo.avatar_url"></com-image>
+                                <div style="margin-left: 10px;">
+                                    <div>
+                                        {{ infoDialog.parentUserInfo.nickname }}
+                                        （ID：{{ infoDialog.parentUserInfo.id }}）
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="label">上级等级：</td>
+                        <td>
+                            <div v-if="infoDialog.parentUserInfo">
+                                {{infoDialog.parentUserInfo.role_type}}
+                            </div>
+                        </td>
+                    </tr>
                 </table>
             </el-card>
 

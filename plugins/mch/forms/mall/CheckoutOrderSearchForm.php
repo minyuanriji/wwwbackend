@@ -192,6 +192,22 @@ class CheckoutOrderSearchForm extends BaseModel
                     if (empty($list[$key]['cover_url']) || $list[$key]['cover_url'] == '/') {
                         $list[$key]['cover_url'] = \Yii::$app->params['store_default_avatar'];
                     }
+
+                    //获取上级用户信息
+                    $list[$key]['parentUserInfo'] = [];
+                    if (isset($row['mch']['user']['parent_id'])) {
+                        $parentUserInfo = User::find()
+                            ->where(['id' => $row['mch']['user']['parent_id'], 'is_delete' => 0])
+                            ->select(["id", "nickname", "avatar_url", "role_type"])
+                            ->one();
+                        if ($parentUserInfo) {
+                            $role_type = $parentUserInfo->getUserLevel();
+                            $list[$key]['parentUserInfo']['id'] = $parentUserInfo->id;
+                            $list[$key]['parentUserInfo']['nickname'] = $parentUserInfo->nickname;
+                            $list[$key]['parentUserInfo']['avatar_url'] = $parentUserInfo->avatar_url;
+                            $list[$key]['parentUserInfo']['role_type'] = $role_type['name'];
+                        }
+                    }
                 }
             }
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [

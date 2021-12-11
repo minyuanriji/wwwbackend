@@ -38,9 +38,13 @@ class CommissionCheckoutPriceLog extends BaseActiveRecord
         if ($consumption) {
             foreach ($consumption as $key => $item) {
                 $nickname = $item->user->nickname;
+                $avatar_url = $item->user->avatar_url;
+                $userLevel = $item->user->getUserLevel();
                 $item = ArrayHelper::toArray($item);
                 $list[$key] = $item;
                 $list[$key]['nickname'] = $nickname;
+                $list[$key]['avatar_url'] = $avatar_url;
+                $list[$key]['role_type'] = $userLevel['name'];
             }
         }
         return $list;

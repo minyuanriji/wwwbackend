@@ -107,7 +107,9 @@ class CheckoutOrderSearchForm extends BaseModel
                 $query->andWhere($regionWhere);
             }
 
-            $query->select(["mco.*", 'u.nickname', 's.cover_url', 's.name', 'm.transfer_rate', 's.id as store_id']);
+            $query->with('mch.user');
+
+            $query->select(["mco.*", 'u.nickname', 'm.user_id as store_user_id', 'u.avatar_url', 's.cover_url', 's.name', 'm.transfer_rate', 's.id as store_id']);
 
             $list = $query->page($pagination, self::limit)->orderBy("mco.id DESC")->asArray()->all();
 
@@ -169,11 +171,15 @@ class CheckoutOrderSearchForm extends BaseModel
                         $list[$key]['direct_push_status'] = $directPushCommission->status;
                         $list[$key]['direct_push_user_id'] = $directPushCommission->user->id;
                         $list[$key]['direct_push_user_nickname'] = $directPushCommission->user->nickname;
+                        $list[$key]['direct_push_user_avatar_url'] = $directPushCommission->user->avatar_url;
+                        $list[$key]['direct_push_user_role_type'] = (new User())::getRoleType($directPushCommission->user->role_type);
                     } else {
                         $list[$key]['direct_push_price'] = 0;
                         $list[$key]['direct_push_status'] = -1;
                         $list[$key]['direct_push_user_id'] = 0;
                         $list[$key]['direct_push_user_nickname'] = '';
+                        $list[$key]['direct_push_user_avatar_url'] = '';
+                        $list[$key]['direct_push_user_role_type'] = '';
                     }
 
                     //获取消费分佣
@@ -182,6 +188,10 @@ class CheckoutOrderSearchForm extends BaseModel
                     ], 'user_id,price,status');
 
                     $list[$key]['consumption'] = $consumptionCommission;
+
+                    if (empty($list[$key]['cover_url']) || $list[$key]['cover_url'] == '/') {
+                        $list[$key]['cover_url'] = \Yii::$app->params['store_default_avatar'];
+                    }
                 }
             }
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [

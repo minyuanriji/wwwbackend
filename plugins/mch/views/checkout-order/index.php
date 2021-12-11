@@ -44,7 +44,7 @@
     }
 
     .grid-i .label {
-        width: 20% !important;
+        width: 15% !important;
     }
 
     .bill-info {
@@ -273,18 +273,8 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="label">订单号：</td>
-                        <td>{{ infoDialog.order_no }}</td>
-                    </tr>
-                    <tr class="c4">
-                        <td class="label">mch_id(商户ID)：</td>
-                        <td>{{ infoDialog.mch_id }}</td>
-                        <td class="label">折扣：</td>
-                        <td><span style="color: rgb(30,208,255)">{{ infoDialog.discount }}</span>折</td>
-                    </tr>
-                    <tr class="c2">
                         <td class="label">绑定用户：</td>
-                        <td colspan="3">
+                        <td>
                             <div flex="cross:center" v-if="infoDialog.mch">
                                 <com-image :src="infoDialog.mch.user.avatar_url"></com-image>
                                 <div style="margin-left: 10px;">
@@ -295,6 +285,13 @@
                                 </div>
                             </div>
                         </td>
+
+                    </tr>
+                    <tr class="c4">
+                        <td class="label">mch_id(商户ID)：</td>
+                        <td>{{ infoDialog.mch_id }}</td>
+                        <td class="label">折扣：</td>
+                        <td><span style="color: rgb(30,208,255)">{{ infoDialog.discount }}</span>折</td>
                     </tr>
                     <tr class="c4">
                         <td class="label">上级用户信息：</td>
@@ -325,6 +322,8 @@
                 </div>
                 <table class="grid-i" style="width:100%;">
                     <tr class="c4">
+                        <td class="label">订单号：</td>
+                        <td>{{ infoDialog.order_no }}</td>
                         <td class="label">支付用户信息：</td>
                         <td>
                             <div flex="cross:center">
@@ -337,9 +336,6 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="label">支付时间：</td>
-                        <td v-if="infoDialog.is_pay > 0">{{ infoDialog.format_pay_time }}</td>
-                        <td v-else></td>
                     </tr>
                     <tr class="c4">
                         <td class="label">支付现金：</td>
@@ -347,10 +343,14 @@
                         <td class="label">支付红包：</td>
                         <td>{{ infoDialog.integral_deduction_price }}</td>
                     </tr>
-                    <tr class="c2">
+                    <tr class="c4">
                         <td class="label">总支付：</td>
-                        <td colspan="3" v-if="infoDialog.is_pay > 0">{{ infoDialog.order_price }}</td>
-                        <td colspan="3" v-else style="color: red">未支付</td>
+                        <td v-if="infoDialog.is_pay > 0">{{ infoDialog.order_price }}</td>
+                        <td v-else style="color: red">未支付</td>
+
+                        <td class="label">支付时间：</td>
+                        <td v-if="infoDialog.is_pay > 0">{{ infoDialog.format_pay_time }}</td>
+                        <td v-else></td>
                     </tr>
                 </table>
             </el-card>
@@ -389,7 +389,7 @@
                     <div slot="header" class="clearfix">
                         <span>直推</span>
                     </div>
-                    <table class="grid-i" style="width:100%;">
+                    <table class="grid-i" style="width:100%;" v-if="infoDialog.direct_push_user_id > 0">
                         <tr class="c4">
                             <td class="label">昵称：</td>
                             <td>
@@ -397,7 +397,7 @@
                                     <com-image :src="infoDialog.direct_push_user_avatar_url"></com-image>
                                     <div style="margin-left: 10px;">
                                         {{ infoDialog.direct_push_user_nickname }}
-                                        （ID：{{  infoDialog.direct_push_user_id}}）
+                                        （ID：{{  infoDialog.direct_push_user_id }}）
                                     </div>
                                 </div>
                             </td>
@@ -416,6 +416,27 @@
                                 <span v-if="infoDialog.direct_push_status == -1" style="color: red">无效</span>
                                 <span v-if="infoDialog.direct_push_status == 0">待结算</span>
                                 <span v-if="infoDialog.direct_push_status == 1" style="color: #13ce66">已结算</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="grid-i" style="width:100%;" v-else-if="infoDialog.parentUserInfo">
+                        <tr class="c4" >
+                            <td class="label">昵称：</td>
+                            <td>
+                                <div flex="cross:center">
+                                    <com-image :src="infoDialog.parentUserInfo.avatar_url"></com-image>
+                                    <div style="margin-left: 10px;">
+                                        <div>
+                                            {{ infoDialog.parentUserInfo.nickname }}
+                                            （ID：{{ infoDialog.parentUserInfo.id }}）
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="label">等级：</td>
+                            <td>
+                                {{infoDialog.parentUserInfo.role_type}}
+                                <span v-if="infoDialog.parentUserInfo.role_type == '普通用户'" style="color: red">(不分佣)</span>
                             </td>
                         </tr>
                     </table>

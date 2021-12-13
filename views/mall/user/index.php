@@ -122,7 +122,7 @@
                             动态积分：{{scope.row.score}}
                         </div>
                         <div>
-                            静态积分：<el-button type="text" @click="$navigate({r: 'mall/user/score-log', user_id:scope.row.user_id})"
+                            静态积分：<el-button type="text" @click="$navigate({r: 'mall/finance/score-log', user_id:scope.row.user_id})"
                                             v-text="scope.row.static_score"></el-button>
                         </div>
                     </template>

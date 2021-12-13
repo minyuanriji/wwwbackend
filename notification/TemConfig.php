@@ -354,4 +354,18 @@ class TemConfig
         {{remark.DATA}}
      * */
     const GIVE_SHOPPING_VOUCHER = 'BCCFMTDa0PNln8cDkShFjLQnH4hClMPayfkBPUWZChY';
+
+    /*  @todo 消费成功通知(赠送购物券使用)
+
+        您的好友消费啦
+        顾客：小明
+        消费时间：2017-05-05
+        请查看您的收益详情
+
+        {{first.DATA}}
+        顾客：{{keyword1.DATA}}
+        消费时间：{{keyword2.DATA}}
+        {{remark.DATA}}
+     * */
+    const CONSUMPTION_SUCCESS_REMINDER = 'WCZtMYLBCxY2_C_ACtcN75pHQsxjMa4Hw0e5mPFm9bM';
 }

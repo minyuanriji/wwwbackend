@@ -35,34 +35,34 @@
                         <div>{{scope.row.nickname}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="scope" label="余额" width="400">
+                <el-table-column prop="scope" label="余额" width="300">
                     <template slot-scope="scope">
                         <div>当前余额：{{scope.row.balance}}</div>
                         <br>
                         <div>累计余额：{{scope.row.total_balance}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="scope" label="积分" width="400">
+                <el-table-column prop="scope" label="积分" width="300">
                     <template slot-scope="scope">
                         <div>当前积分：{{scope.row.score}}</div>
                         <br>
                         <div>累计积分：{{scope.row.total_score}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="scope" label="收益" width="400">
+                <el-table-column prop="scope" label="收益" width="300">
                     <template slot-scope="scope">
                         <div>当前收益：{{scope.row.commission}}</div>
                         <br>
                         <div>累计收益：{{scope.row.total_income}}</div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="scope" label="优惠券数量" width="400">
+                <!--<el-table-column prop="scope" label="优惠券数量" width="400">
                     <template slot-scope="scope">
                         <div>{{scope.row.coupon_count}}</div>
 
                     </template>
                 </el-table-column>
-
+-->
             </el-table>
 
             <!--工具条 批量操作和分页-->

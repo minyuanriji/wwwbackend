@@ -9,6 +9,7 @@ use app\notification\OilPayVoucherNotification;
 use app\notification\StorePayVoucherNotification;
 use app\notification\AddcreditRechargeNotification;
 use app\notification\VoucherConsumptionNotification;
+use app\notification\ShoppingVoucherIncomeNotification;
 
 class PluginShoppingVoucherLog
 {
@@ -23,7 +24,7 @@ class PluginShoppingVoucherLog
     {
         foreach ($rows as $row)
         {
-            if (isset($row['source_type'])) {
+           /* if (isset($row['source_type'])) {
                 if (in_array($row['source_type'], self::VOUCHER_TYPE)) {
                     if ($row['type'] == 1) {
                         switch ($row['source_type'])
@@ -54,7 +55,7 @@ class PluginShoppingVoucherLog
                                 break;
                             default;
                         }
-                    }/* else {
+                    } else {
                         switch ($row['source_type'])
                         {
                             case 1:
@@ -63,9 +64,15 @@ class PluginShoppingVoucherLog
                                 break;
                             default;
                         }
-                    }*/
+                    }
                     \Yii::error('IncomeLogNotice:' . json_encode($row) . '---time:' . date("Y-m-d H:i:s", time()));
                 }
+            }*/
+
+            //2021-12-13改为统一模板
+            if (isset($row['source_type']) && $row['type'] == 1) {
+                ShoppingVoucherIncomeNotification::send($row);
+                \Yii::error('IncomeLogNotice:' . json_encode($row) . '---time:' . date("Y-m-d H:i:s", time()));
             }
         }
     }

@@ -117,8 +117,7 @@ class ScoreLogListForm extends BaseModel
         $query = ScoreLog::find()->alias('b')->where([
             'b.mall_id' => \Yii::$app->mall->id,
         ])->innerJoin(["u" => User::tableName()], "u.id=b.user_id")
-            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]])
-            ->select(["b.*", "u.nickname", "u.mobile"]);
+            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
 
         if (!empty($this->keyword)) {
             $query->andWhere([

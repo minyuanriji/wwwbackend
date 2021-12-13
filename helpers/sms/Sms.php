@@ -69,11 +69,12 @@ class Sms
     /**
      * 发送短信验证码
      * @param string $mobile
+     * @param string $type
      * @return bool
      * @throws NoGatewayAvailableException
      * @throws \Exception
      */
-    public function sendCaptcha(string $mobile)
+    public function sendCaptcha(string $mobile, $type = '')
     {
         $validateDate = strtotime(date('Y-m-d H:i:s', time() - $this->minutes * 60));
         $ValidateCode = ValidateCode::find()->where([
@@ -93,7 +94,11 @@ class Sms
                 $sms_phone_list = [];
             }
             if (!in_array($mobile, $sms_phone_list)) {
-                $message = new CaptchaMessage($captcha, $this->smsConfig['captcha']);
+                $smsConfig = $this->smsConfig['captcha'];
+                if ($type == 'reg') {//注册
+                    $smsConfig = $this->smsConfig['user_registration'];
+                }
+                $message = new CaptchaMessage($captcha, $smsConfig);
                 $results = $this->easySms->send($mobile, $message);
                 $ValidateCode = new ValidateCode();
                 $ValidateCode->target = $mobile;

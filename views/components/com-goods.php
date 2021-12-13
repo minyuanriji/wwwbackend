@@ -1155,28 +1155,36 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     </el-tab-pane>
 
                     <el-tab-pane label="赠送购物券设置" name="shopping_setting" v-if="goods_id > 0">
-                        <el-form ref="shoppingFormData" :rules="shoppingFormRule" label-width="30%" :model="shoppingFormData" size="small">
-                            <el-form-item label="赠送比例" prop="give_value">
-                                <el-input :disabled="formProgressData.loading" type="number" min="0" max="100" placeholder="请输入内容" v-model="shoppingFormData.give_value" style="width:260px;">
-                                    <template slot="append">%</template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item label="启动日期" prop="start_at">
-                                <el-date-picker :disabled="formProgressData.loading" v-model="shoppingFormData.start_at" type="date" placeholder="选择日期"></el-date-picker>
-                            </el-form-item>
-                            <el-form-item label="运费（运营费）" prop="enable_express">
+                            <el-form ref="shoppingFormData" :rules="shoppingFormRule" label-width="30%" :model="shoppingFormData" size="small" >
+                                赠送购物券设置
                                 <el-switch
-                                        v-model="shoppingFormData.enable_express"
-                                        active-text="赠送购物券"
-                                        inactive-text="不赠送"
-                                        active-value="1"
-                                        inactive-value="0">
+                                        v-model="shoppingSwitchOpen"
+                                        active-text="开启"
+                                        inactive-text="关闭">
                                 </el-switch>
-                            </el-form-item>
-                        </el-form>
-                        <div style="margin-left: 500px">
-                            <el-button type="primary" @click="shoppingSave">确 定</el-button>
-                        </div>
+                                <div v-if="shoppingSwitchOpen">
+                                    <el-form-item label="赠送比例" prop="give_value">
+                                        <el-input :disabled="formProgressData.loading" type="number" min="0" max="100" placeholder="请输入内容" v-model="shoppingFormData.give_value" style="width:260px;">
+                                            <template slot="append">%</template>
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item label="启动日期" prop="start_at">
+                                        <el-date-picker :disabled="formProgressData.loading" v-model="shoppingFormData.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                                    </el-form-item>
+                                    <el-form-item label="运费（运营费）" prop="enable_express">
+                                        <el-switch
+                                                v-model="shoppingFormData.enable_express"
+                                                active-text="赠送购物券"
+                                                inactive-text="不赠送"
+                                                active-value="1"
+                                                inactive-value="0">
+                                        </el-switch>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                            <div style="margin-left: 500px"  v-if="shoppingSwitchOpen">
+                                <el-button type="primary" @click="shoppingSave">确 定</el-button>
+                            </div>
                     </el-tab-pane>
 
                     <el-tab-pane label="购物券兑换价设置" name="shopping_exchange" v-if="goods_id > 0">
@@ -1185,13 +1193,21 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                  label-width="30%"
                                  :model="shoppingExchangeFormData"
                                  size="small">
-                            <el-form-item label="购物券价" prop="exchange_rate">
-                                <el-input type="number" placeholder="请输入内容" v-model="shoppingExchangeFormData.exchange_rate" style="width:260px;">
-                                    <template slot="append">券</template>
-                                </el-input>
-                            </el-form-item>
+                            购物券兑换价设置
+                            <el-switch
+                                    v-model="shoppingExchangeSwitchOpen"
+                                    active-text="开启"
+                                    inactive-text="关闭">
+                            </el-switch>
+                            <div v-if="shoppingExchangeSwitchOpen">
+                                <el-form-item label="购物券价" prop="exchange_rate">
+                                    <el-input type="number" placeholder="请输入内容" v-model="shoppingExchangeFormData.exchange_rate" style="width:260px;">
+                                        <template slot="append">券</template>
+                                    </el-input>
+                                </el-form-item>
+                            </div>
                         </el-form>
-                        <div style="margin-left: 500px">
+                        <div style="margin-left: 500px" v-if="shoppingExchangeSwitchOpen">
                             <el-button type="primary" @click="shoppingExchangeSave">确 定</el-button>
                         </div>
                     </el-tab-pane>
@@ -1670,6 +1686,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 formProgressData:{
                     loading: false,
                 },
+                shoppingSwitchOpen : false,
                 //购物券兑换设置
                 shoppingExchangeFormData: {
                     exchange_rate: 0,
@@ -1679,6 +1696,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         {required: true, message: '购物券价不能为空', trigger: 'change'},
                     ],
                 },
+                shoppingExchangeSwitchOpen:false,
             };
         },
         created() {
@@ -2184,6 +2202,13 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         this.shoppingFormData = e.data.data.shopping_voucher_setting;
                         this.shoppingExchangeFormData.exchange_rate = e.data.data.shopping_voucher_Exchange.voucher_price;
 
+                        if (this.shoppingFormData.id > 0) {
+                            this.shoppingSwitchOpen = true;
+                        }
+
+                        if (this.shoppingExchangeFormData.exchange_rate > 0) {
+                            this.shoppingExchangeSwitchOpen = true;
+                        }
 
                         // 初始化自定义商品名
                         this.getGoodsNameDiy();

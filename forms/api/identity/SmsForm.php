@@ -20,6 +20,7 @@ class SmsForm extends BaseModel
     public $mobile;
     public $captcha;
     public $key;
+    public $type;
 
     public function rules()
     {
@@ -27,6 +28,7 @@ class SmsForm extends BaseModel
             [['mobile'], 'required'],
             [['mobile'], PhoneNumberValidator::className()],
             [['captcha',"key"], 'string'],
+            [['type'], 'safe']
         ];
     }
 
@@ -62,7 +64,7 @@ class SmsForm extends BaseModel
             if(!$res || $res['status'] == 0) {
                 throw new \Exception('验证码功能未开启');
             }
-            $sms->sendCaptcha($this->mobile);
+            $sms->sendCaptcha($this->mobile, $this->type);
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"验证码获取成功");
         } catch (\Exception $exception) {
             if($exception instanceof NoGatewayAvailableException) {

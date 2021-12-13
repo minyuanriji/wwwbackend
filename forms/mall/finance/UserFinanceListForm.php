@@ -37,29 +37,27 @@ class UserFinanceListForm extends BaseModel
 
     public function getList()
     {
-        if (!$this->validate()) {
-            return $this->responseErrorInfo();
-        };
+        if (!$this->validate()) return $this->responseErrorInfo();
+
         $query = User::find()
             ->select('id,nickname,avatar_url,balance,total_balance,income,total_income,total_score,score')
-            ->where([
-                'mall_id' => \Yii::$app->mall->id,
-            ])
-            ->where(['like', 'nickname', $this->keyword])
-            ->orderBy('id desc');
-        if ($this->user_id) {
+            ->where(['mall_id' => \Yii::$app->mall->id]);
+
+        if ($this->keyword)
+            $query->where(['like', 'nickname', $this->keyword]);
+
+        if ($this->user_id)
             $query->andWhere(['user_id' => $this->user_id]);
-        }
-        if ($this->start_date && $this->end_date) {
+
+        if ($this->start_date && $this->end_date)
             $query->andWhere(['<', 'created_at', strtotime($this->end_date)])
                 ->andWhere(['>', 'created_at', strtotime($this->start_date)]);
-        }
-        $list = $query->page($pagination, $this->limit)->asArray()->all();
-        foreach ($list as &$item) {
+
+        $list = $query->orderBy('id desc')->page($pagination, $this->limit)->asArray()->all();
+        /*foreach ($list as &$item) {
                 $couponList=UserCoupon::getList(['user_id'=>$item['id']]);
                 $item['coupon_count']=count($couponList);
-        }
-
+        }*/
 
         return [
             'code' => ApiCode::CODE_SUCCESS,
@@ -68,8 +66,5 @@ class UserFinanceListForm extends BaseModel
                 'pagination' => $pagination
             ]
         ];
-
     }
-
-
 }

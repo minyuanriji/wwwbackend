@@ -51,8 +51,13 @@ class OilOrderUseForm extends BaseModel{
                 throw new \Exception("平台[ID:{$product->plat_id}信息不存在");
             }
 
-            if(in_array($status['status'], ["unconfirmed", "wait"])){
+            //获取平台操作对象
+            if(empty($platModel->class_dir) || !class_exists($platModel->class_dir)){
+                throw new \Exception("类{$platModel->class_dir}丢失");
+            }
+            $platObj = new $platModel->class_dir($platModel);
 
+            if($status['status'] == "unconfirmed"){ //生成兑换码
                 $provinces = ["2088" => "广西", "1941" => "广东"];
                 if(!isset($provinces[$this->use_province])){
                     throw new \Exception("暂只持广西、广东地区进行加油");
@@ -69,12 +74,8 @@ class OilOrderUseForm extends BaseModel{
                     }
                 }
 
-                if(empty($platModel->class_dir) || !class_exists($platModel->class_dir)){
-                    throw new \Exception("类{$platModel->class_dir}丢失");
-                }
-
-                $platObj = new $platModel->class_dir($platModel);
                 $res = $platObj->submit($order, $product);
+                //$res = '{"code":0,"message":"\u6210\u529f","data":{"orderNo":"OIL202112131004581143910570","couponCode":"790176"},"requestId":"ac10ee02163679823918141651"}';
                 if($res){
                     $responseData = @json_decode($res, true);
                 }
@@ -84,7 +85,21 @@ class OilOrderUseForm extends BaseModel{
                     throw new \Exception("数据请求失败！请联系客服进行处理");
                 }
 
-                $order->order_status       = "finished";
+                $order->order_status       = "wait"; //状态变更为待使用（已生成兑换码）
+                $order->updated_at         = time();
+                $order->plat_response_data = json_encode($responseData);
+                if(!$order->save()){
+                    throw new \Exception($this->responseErrorMsg($order));
+                }
+            }elseif($status['status'] == "wait"){
+
+                $res = $platObj->exchange($order, $product);
+                if(!isset($res['code']) || $res['code'] != 0){
+                    $responseData = @json_decode($res, true);
+                    throw new \Exception(isset($res['message']) ? $res['message'] : "兑换失败");
+                }
+
+                $order->order_status       = "finished"; //状态变更为已完成
                 $order->updated_at         = time();
                 $order->plat_response_data = json_encode($responseData);
                 if(!$order->save()){
@@ -121,17 +136,26 @@ class OilOrderUseForm extends BaseModel{
 
             $t->commit();
 
-            $config = $platModel->getParams();
+            //兑换码获取
+            $couponCode = "";
             $responseData = json_decode($order->plat_response_data, true);
+            if(isset($responseData['data'])){
+                $couponCode = isset($responseData['data']['couponCode']) ? $responseData['data']['couponCode'] : "";
+            }
+
+            //平台配置信息
+            $config = $platModel->getParams();
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
-                    "mobile"      => $order->mobile,
-                    "couponCode"  => $responseData['data']['couponCode'],
-                    "mpwx_path"   => isset($config['mpwx_path']) ? $config['mpwx_path'] : "",
-                    "mpwx_app_id" => isset($config['mpwx_app_id']) ? $config['mpwx_app_id'] : "",
-                    "mpwx_pic"    => isset($config['mpwx_pic']) ? $config['mpwx_pic'] : ""
+                    "order_status" => $order->order_status,
+                    "province_id"  => $order->province_id,
+                    "mobile"       => $order->mobile,
+                    "couponCode"   => $couponCode,
+                    "mpwx_path"    => isset($config['mpwx_path']) ? $config['mpwx_path'] : "",
+                    "mpwx_app_id"  => isset($config['mpwx_app_id']) ? $config['mpwx_app_id'] : "",
+                    "mpwx_pic"     => isset($config['mpwx_pic']) ? $config['mpwx_pic'] : ""
                 ]
             ];
         }catch (\Exception $e){

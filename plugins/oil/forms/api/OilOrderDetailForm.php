@@ -51,6 +51,7 @@ class OilOrderDetailForm extends BaseModel{
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
                     "order_status" => $order->order_status,
+                    "province_id"  => $order->province_id,
                     "mobile"       => $order->mobile,
                     "couponCode"   => $couponCode,
                     "mpwx_path"    => isset($config['mpwx_path']) ? $config['mpwx_path'] : "",

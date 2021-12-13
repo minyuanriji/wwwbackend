@@ -266,6 +266,7 @@
                     <el-tab-pane label="积分赠送" name="give_score">
                         <el-alert title="说明：编辑完成请点击确定。" type="info" :closable="false" style="margin-bottom: 20px;color: red;"></el-alert>
                         <el-form ref="scoreFormData" :rules="scoreFormRule" :model="scoreFormData" size="small">
+
                             <el-form-item label="返积分" prop="score_enable">
                                 <el-switch
                                         v-model="scoreFormData.score_enable"
@@ -296,12 +297,14 @@
                                 </div>
                             </el-form-item>
 
-                            <el-form-item label="启动日期" prop="start_at">
-                                <el-date-picker v-model="scoreFormData.start_at" type="date" placeholder="选择日期"></el-date-picker>
-                            </el-form-item>
+                            <div v-if="scoreFormData.score_enable">
+                                <el-form-item label="启动日期" prop="start_at">
+                                    <el-date-picker v-model="scoreFormData.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                                </el-form-item>
+                            </div>
 
                         </el-form>
-                        <div class="dialog-footer">
+                        <div class="dialog-footer" v-if="scoreFormData.score_enable">
                             <el-button type="primary" :loading="giveLoading" @click="saveScore">确 定</el-button>
                         </div>
                     </el-tab-pane>

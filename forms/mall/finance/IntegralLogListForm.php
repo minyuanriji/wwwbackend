@@ -19,12 +19,13 @@ class IntegralLogListForm extends BaseModel
     public $source_type;
     public $flag;
     public $fields;
+    public $kw_type;
 
     public function rules()
     {
         return [
             [['page', 'limit', 'user_id'], 'integer'],
-            [['keyword', 'start_date', 'end_date', 'source_type', 'flag'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'source_type', 'flag', 'kw_type'], 'trim'],
             [['fields'], 'safe'],
 
         ];
@@ -47,11 +48,23 @@ class IntegralLogListForm extends BaseModel
             $query->andWhere(['il.user_id' => $this->user_id]);
         }
 
-        if (!empty($this->keyword)) {
-            $query->andWhere([
-                "OR",
-                "u.nickname LIKE '%" . $this->keyword . "%'"
-            ]);
+        if (!empty($this->keyword) && !empty($this->kw_type)) {
+            switch ($this->kw_type)
+            {
+                case 'mobile':
+                    $query->andWhere(['u.mobile' => $this->keyword]);
+                    break;
+                case 'user_id':
+                    $query->andWhere(['il.user_id' => $this->keyword]);
+                    break;
+                case 'nickname':
+                    $query->andWhere([
+                        "OR",
+                        "u.nickname LIKE '%" . $this->keyword . "%'"
+                    ]);
+                    break;
+                default:
+            }
         }
 
         if ($this->source_type) {

@@ -185,7 +185,8 @@ class GoodsForm extends GoodsBase
 
             $shoppingDetail = ShoppingVoucherFromGoods::find()->where([
                 "mall_id"  => $detail['mall_id'],
-                "goods_id" => $this->id
+                "goods_id" => $this->id,
+                "is_delete" => 0,
             ])->asArray()->one();
 
             if ($shoppingDetail) {
@@ -194,7 +195,8 @@ class GoodsForm extends GoodsBase
 
             $shoppingExchange = ShoppingVoucherTargetGoods::find()->where([
                 "mall_id"  => $detail['mall_id'],
-                "goods_id" => $this->id
+                "goods_id" => $this->id,
+                "is_delete" => 0,
             ])->asArray()->one();
 
             if ($detail) {

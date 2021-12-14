@@ -187,49 +187,60 @@ Yii::$app->loadComponentView('com-rich-text');
             <el-tab-pane label="购物券设置" name="shopping_setting" v-if="shoppingFormData.gift_id > 0">
                 <el-form ref="shoppingFormData" :rules="shoppingFormRule" label-width="15%" :model="shoppingFormData"
                          size="small">
-                    <el-form-item label="赠送比例" prop="give_value">
-                        <div>
-                            <el-input :disabled="shoppingFormProgressData.loading" type="number" min="0" max="100"
-                                      placeholder="请输入内容" v-model="shoppingFormData.give_value" style="width:260px;">
-                                <el-select v-model="shoppingFormData.give_type" slot="prepend" placeholder="请选择"
-                                           style="width:110px;">
-                                    <el-option label="按比例" value="1"></el-option>
-                                    <el-option label="按固定值" value="2"></el-option>
-                                </el-select>
-                                <template slot="append">{{shoppingFormData.give_type == 1 ? "%" : "券"}}</template>
-                            </el-input>
-                        </div>
-                        <el-table :data="shoppingFormData.recommender" border style="margin-top:10px;width:100%">
-                            <el-table-column label="级别" width="110" align="center">
-                                <template slot-scope="scope">
-                                    <span v-if="scope.row.type == 'branch_office'">分公司</span>
-                                    <span v-if="scope.row.type == 'partner'">合伙人</span>
-                                    <span v-if="scope.row.type == 'store'">VIP会员</span>
-                                    <span v-if="scope.row.type == 'user'">普通用户</span>
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="比例">
-                                <template slot-scope="scope">
-                                    <el-input type="number" min="0" max="100" placeholder="请输入内容"
-                                              v-model="scope.row.give_value" style="width:260px;">
-                                        <el-select v-model="scope.row.give_type" slot="prepend" placeholder="请选择"
-                                                   style="width:110px;">
-                                            <el-option label="按比例" value="1"></el-option>
-                                            <el-option label="按固定值" value="2"></el-option>
-                                        </el-select>
-                                        <template slot="append">{{scope.row.give_type == 1 ? "%" : "券"}}</template>
-                                    </el-input>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                    </el-form-item>
-                    <el-form-item label="启动日期" prop="start_at">
-                        <el-date-picker :disabled="shoppingFormProgressData.loading" v-model="shoppingFormData.start_at"
-                                        type="date"
-                                        placeholder="选择日期"></el-date-picker>
-                    </el-form-item>
+                    <div style="margin-left: 36px;margin-bottom: 20px">
+                        赠送购物券设置
+                        <el-switch
+                                v-model="shoppingSwitchOpen"
+                                active-text="开启"
+                                inactive-text="关闭">
+                        </el-switch>
+                    </div>
+
+                    <div v-if="shoppingSwitchOpen">
+                        <el-form-item label="赠送比例" prop="give_value">
+                            <div>
+                                <el-input :disabled="shoppingFormProgressData.loading" type="number" min="0" max="100"
+                                          placeholder="请输入内容" v-model="shoppingFormData.give_value" style="width:300px;">
+                                    <el-select v-model="shoppingFormData.give_type" slot="prepend" placeholder="请选择"
+                                               style="width:110px;">
+                                        <el-option label="按比例" value="1"></el-option>
+                                        <el-option label="按固定值" value="2"></el-option>
+                                    </el-select>
+                                    <template slot="append">{{shoppingFormData.give_type == 1 ? "%" : "券"}}</template>
+                                </el-input>
+                            </div>
+                            <el-table :data="shoppingFormData.recommender" border style="margin-top:10px;width:100%">
+                                <el-table-column label="级别" width="110" align="center">
+                                    <template slot-scope="scope">
+                                        <span v-if="scope.row.type == 'branch_office'">分公司</span>
+                                        <span v-if="scope.row.type == 'partner'">合伙人</span>
+                                        <span v-if="scope.row.type == 'store'">VIP会员</span>
+                                        <span v-if="scope.row.type == 'user'">普通用户</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="比例">
+                                    <template slot-scope="scope">
+                                        <el-input type="number" min="0" max="100" placeholder="请输入内容"
+                                                  v-model="scope.row.give_value" style="width:260px;">
+                                            <el-select v-model="scope.row.give_type" slot="prepend" placeholder="请选择"
+                                                       style="width:110px;">
+                                                <el-option label="按比例" value="1"></el-option>
+                                                <el-option label="按固定值" value="2"></el-option>
+                                            </el-select>
+                                            <template slot="append">{{scope.row.give_type == 1 ? "%" : "券"}}</template>
+                                        </el-input>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </el-form-item>
+                        <el-form-item label="启动日期" prop="start_at">
+                            <el-date-picker :disabled="shoppingFormProgressData.loading" v-model="shoppingFormData.start_at"
+                                            type="date"
+                                            placeholder="选择日期"></el-date-picker>
+                        </el-form-item>
+                    </div>
                 </el-form>
-                <div style="float: right">
+                <div style="float: right" v-if="shoppingSwitchOpen">
                     <el-button type="primary" @click="shoppingSave">确 定</el-button>
                 </div>
             </el-tab-pane>
@@ -332,7 +343,8 @@ Yii::$app->loadComponentView('com-rich-text');
                     {required: true, message: '请选择支付模式', trigger: 'change'}
                 ]
             },
-            savedCallFn: null
+            savedCallFn: null,
+            shoppingSwitchOpen:false,
         },
         methods: {
             shoppingSave() {
@@ -386,6 +398,7 @@ Yii::$app->loadComponentView('com-rich-text');
                     this.formData['score_enable'] = scoreEnable;
                     this.shoppingFormData = row.shopping_voucher_setting;
                     this.shoppingFormData.gift_id = row.id;
+                    this.shoppingSwitchOpen = row.shopping_voucher_setting.is_open == 1 ? true : false;
                 } else {
                     this.formData = initFormData();
                 }

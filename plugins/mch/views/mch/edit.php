@@ -250,16 +250,25 @@
                     <el-tab-pane label="购物券赠送" name="give_shopping_voucher">
                         <el-alert title="说明：编辑完成请点击确定。" type="info" :closable="false" style="margin-bottom: 20px;color: red;"></el-alert>
                         <el-form ref="formData" :rules="formRule" :model="formData" size="small">
-                            <el-form-item label="赠送比例" prop="give_value">
-                                <el-input type="number" min="0" max="100" placeholder="请输入内容" v-model="formData.give_value" style="width:260px;">
-                                    <template slot="append">%</template>
-                                </el-input>
+                            <el-form-item label="返购物券" prop="enable">
+                                <el-switch
+                                        v-model="formData.enable"
+                                        active-text="启用"
+                                        inactive-text="关闭">
+                                </el-switch>
                             </el-form-item>
-                            <el-form-item label="启动日期" prop="start_at">
-                                <el-date-picker v-model="formData.start_at" type="date" placeholder="选择日期"></el-date-picker>
-                            </el-form-item>
+                            <div v-if="formData.enable">
+                                <el-form-item label="赠送比例" prop="give_value">
+                                    <el-input type="number" min="0" max="100" placeholder="请输入内容" v-model="formData.give_value" style="width:260px;">
+                                        <template slot="append">%</template>
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item label="启动日期" prop="start_at">
+                                    <el-date-picker v-model="formData.start_at" type="date" placeholder="选择日期"></el-date-picker>
+                                </el-form-item>
+                            </div>
                         </el-form>
-                        <div class="dialog-footer">
+                        <div class="dialog-footer" v-if="formData.enable">
                             <el-button type="primary" :loading="giveLoading" @click="saveShoppingVoucher">确 定</el-button>
                         </div>
                     </el-tab-pane>
@@ -409,7 +418,8 @@
                     do_search: null,
                     give_type: 1,
                     give_value: 0,
-                    start_at: ''
+                    start_at: '',
+                    enable:false,
                 },
                 formRule:{
                     give_value: [
@@ -570,6 +580,7 @@
                         this.scoreFormData.list = e.data.data.detail.give_shopping_params;
                         this.formData.give_value = e.data.data.detail.give_shopping_voucher.give_value;
                         this.formData.start_at = e.data.data.detail.give_shopping_voucher.start_at;
+                        this.formData.enable = e.data.data.detail.give_shopping_voucher.enable;
                         this.scoreFormData.rate = e.data.data.detail.give_score.rate;
                         this.scoreFormData.start_at = e.data.data.detail.give_score.start_at;
                         this.scoreFormData.score_give_settings = e.data.data.detail.give_score.score_give_settings;

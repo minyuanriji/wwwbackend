@@ -127,9 +127,11 @@ class MchForm extends BaseModel
             if ($shoppingVoucherResult) {
                 $detail['give_shopping_voucher']['give_value'] = $shoppingVoucherResult->give_value;
                 $detail['give_shopping_voucher']['start_at'] = date('Y-m-d', $shoppingVoucherResult->start_at);
+                $detail['give_shopping_voucher']['enable'] = $shoppingVoucherResult->is_delete ? false : true;
             } else {
                 $detail['give_shopping_voucher']['give_value'] = 0;
                 $detail['give_shopping_voucher']['start_at'] = 0;
+                $detail['give_shopping_voucher']['enable'] = false;
             }
 
             //获取积分赠送比例

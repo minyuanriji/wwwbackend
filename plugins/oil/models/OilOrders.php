@@ -21,7 +21,7 @@ class OilOrders extends BaseActiveRecord
               'created_at', 'updated_at', 'pay_status', 'province_id', 'province', 'city_id', 'city',
               'location', 'poi_type'], 'required'],
             [['address', 'district_id', 'district', 'pay_at', 'pay_price', 'pay_type', 'integral_deduction_price',
-              'integral_fee_rate'], 'safe']
+              'integral_fee_rate', 'transfer_rate', 'transfer_amount'], 'safe']
         ];
     }
 

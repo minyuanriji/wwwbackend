@@ -62,13 +62,13 @@ class Plateform extends BasePlateform
         $appId = isset($config['appId']) ? $config['appId'] : "";
         $appSecret = isset($config['appSecret']) ? $config['appSecret'] : "";
         try {
-
             //兑换码获取
             $couponCode = "";
             $responseData = json_decode($order->plat_response_data, true);
             if(isset($responseData['data'])){
                 $couponCode = isset($responseData['data']['couponCode']) ? $responseData['data']['couponCode'] : "";
             }
+
 
             $params['appId']      = $appId;
             $params['mobile']     = $order->mobile;

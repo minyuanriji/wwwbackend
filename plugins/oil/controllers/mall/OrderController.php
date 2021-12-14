@@ -4,6 +4,7 @@ namespace app\plugins\oil\controllers\mall;
 
 use app\plugins\Controller;
 use app\plugins\oil\forms\mall\OilOrderListForm;
+use app\plugins\oil\forms\mall\OilOrderUpdateStatusForm;
 
 class OrderController extends Controller{
 
@@ -21,4 +22,13 @@ class OrderController extends Controller{
         }
     }
 
+    /**
+     * 更新订单
+     * @return string|\yii\web\Response
+     */
+    public function actionUpdateStatus(){
+        $form = new OilOrderUpdateStatusForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->update());
+    }
 }

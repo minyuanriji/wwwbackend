@@ -84,9 +84,9 @@
                     </el-table-column>
 
 
-                    <el-table-column label="操作">
+                    <el-table-column label="操作" align="center">
                         <template slot-scope="scope">
-                            <el-button type="primary" v-if="scope.row.order_status == 'unconfirmed'">主要按钮</el-button>
+                            <el-button @click="updateStatus('finished', scope.row)" type="danger" v-if="scope.row.order_status == 'wait'" size="small">兑换加油券</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -132,6 +132,28 @@
             this.loadData();
         },
         methods: {
+            updateStatus(act, row){
+                if(!confirm("确定要执行此操作吗？"))
+                    return;
+                this.loading = true;
+                request({
+                    params: {
+                        r: 'plugin/oil/mall/order/update-status',
+                    },
+                    method: 'post',
+                    data: {act:act, id:row.id}
+                }).then(e => {
+                    this.loading = false;
+                    if (e.data.code == 0) {
+                        this.loadData(this.activeName)
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    this.$message.error("请求失败");
+                    this.loading = false;
+                })
+            },
             // 日期搜索
             changeTime() {
                 if (this.search.time) {
@@ -202,21 +224,10 @@
         color: #909399;
     }
 
-    .export-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 2;
-    }
 
     .table-body {
         padding: 20px;
         background-color: #fff;
     }
 
-    .table-body .el-button {
-        padding: 0!important;
-        border: 0;
-        margin: 0 5px;
-    }
 </style>

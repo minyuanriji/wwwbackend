@@ -124,7 +124,7 @@ class OilOrderUseForm extends BaseModel{
                     $transferOrder = new OilJiayoulaTransferOrder([
                         "mall_id"         => $platModel->mall_id,
                         "oil_order_id"    => $order->id,
-                        "order_sn"        => "JYL" . date("ymdHis") . rand(10000, 99999),
+                        "order_sn"        => "JYL_" . $order->order_no,
                         "created_at"      => time(),
                         "updated_at"      => time(),
                         "status"          => "wait",

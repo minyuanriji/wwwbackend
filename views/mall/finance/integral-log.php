@@ -26,28 +26,27 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                     end-placeholder="结束日期">
                     </el-date-picker>
                 </div>
-                <div style="width: 15%">
-                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="keyword" clearable @clear="search">
+                <div style="width: 30%">
+                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入关键词搜索" v-model="keyword" clearable @clear="search">
+                        <el-select slot="prepend" v-model="kw_type" placeholder="请选择" size="small"
+                                   style="width:120px;">
+                            <el-option v-for="item in item_type_options"
+                                       :key="item.value"
+                                       :label="item.label"
+                                       :value="item.value">
+                            </el-option>
+                        </el-select>
                         <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                     </el-input>
                 </div>
                 <div style="width: 18%">
                     类型
-                    <el-tooltip class="item" effect="dark" content="只有选择订单或者商家扫码类型，才能筛选省市区" placement="bottom">
-                        <i class="el-icon-question"></i>
-                    </el-tooltip>
                     <el-select style="width: 120px;" size="small" v-model="source_type" @change='search'>
-                        <el-option key="" label="全部" value=""></el-option>
-                        <el-option key="order" label="订单" value="order"></el-option>
-<!--                        <el-option key="order_refund" label="订单退款" value="order_refund"></el-option>-->
-                        <el-option key="mch_checkout_order" label="商家扫码" value="mch_checkout_order"></el-option>
-                        <el-option key="admin" label="管理员操作" value="admin"></el-option>
-                        <el-option key="hotel_order" label="酒店订单" value="hotel_order"></el-option>
-                        <el-option key="hotel_order_refund" label="酒店订单退款" value="hotel_order_refund"></el-option>
-                        <el-option key="giftpacks_order" label="大礼包订单" value="giftpacks_order"></el-option>
-                        <el-option key="giftpacks_group_payorder" label="大礼包拼单" value="giftpacks_group_payorder"></el-option>
-                        <el-option key="giftpacks_group_pay_order_refund" label="大礼包拼单退款" value="giftpacks_group_pay_order_refund"></el-option>
-                        <el-option key="tlj_exchange" label="礼金商品兑换" value="tlj_exchange"></el-option>
+                        <el-option v-for="item in type_options"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
                     </el-select>
                 </div>
             </div>
@@ -198,6 +197,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 },
                 date: '',
                 keyword: '',
+                kw_type: '',
                 form: [],
                 pagination: null,
                 listLoading: false,
@@ -206,6 +206,63 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 Statistics: '',
                 page: 1,
                 export_list: [],
+                item_type_options: [
+                    {
+                        value: 'mobile',
+                        label: '手机号'
+                    },
+                    {
+                        value: 'user_id',
+                        label: '用户ID'
+                    },
+                    {
+                        value: 'nickname',
+                        label: '昵称'
+                    },
+                ],
+                type_options:[
+                    {
+                        value:'',
+                        label:'全部',
+                    },
+                    {
+                        value:'order',
+                        label:'订单',
+                    },
+                    {
+                        value:'mch_checkout_order',
+                        label:'商家扫码',
+                    },
+                    {
+                        value:'admin',
+                        label:'管理员操作',
+                    },
+                    {
+                        value:'hotel_order',
+                        label:'酒店订单',
+                    },
+                    {
+                        value:'hotel_order_refund',
+                        label:'酒店订单退款',
+                    },
+                    {
+                        value:'giftpacks_order',
+                        label:'大礼包订单',
+                    },
+                    {
+                        value:'giftpacks_group_payorder',
+                        label:'大礼包拼单',
+                    },
+                    {
+                        value:'giftpacks_group_pay_order_refund',
+                        label:'大礼包拼单退款',
+                    },
+                    {
+                        value:'tlj_exchange',
+                        label:'礼金商品兑换',
+                    },
+
+                ],
             };
         },
         methods: {
@@ -291,6 +348,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     date: this.date,
                     user_id: getQuery('user_id'),
                     keyword: this.keyword,
+                    kw_type: this.kw_type,
                     source_type: this.source_type,
                 };
                 if (this.date) {

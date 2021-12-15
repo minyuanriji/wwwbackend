@@ -30,7 +30,7 @@ Yii::$app->loadComponentView('order/com-city');
     }
 
     .com-order-list .com-order-item .el-button {
-        padding: 0;
+        /*padding: 0;*/
     }
 
     .com-order-list .change .el-input__inner {
@@ -172,7 +172,6 @@ Yii::$app->loadComponentView('order/com-city');
     }
 
     .com-order-list .share-benefit {
-        display: flex;
         align-items: center;
         width: 15%;
         text-align: center;
@@ -310,6 +309,58 @@ Yii::$app->loadComponentView('order/com-city');
     .express-single-box .label {
         margin-right: 10px;
     }
+
+    .gift-statistics {
+        flex:1;
+    }
+
+    .grid-i th {
+        padding: 5px 0px 5px 0px;
+    }
+
+    .grid-i th, .grid-i td {
+        text-align: left;
+    }
+
+    .grid-i td {
+        padding: 10px 10px;
+        border: 1px solid #ddd;
+        border-bottom: none;
+    }
+
+    .grid-i tr:last-child td {
+        border-bottom: 1px solid #ddd;
+    }
+
+    .grid-i .label {
+        border-left: none;
+        font-weight: bold;
+        padding: 6px 6px 6px 0px;
+        border-right: none;
+        text-align: right;
+        background: #f1f1f1;
+    }
+
+    .grid-i td:first-child {
+        border-left: 1px solid #ddd;
+    }
+
+    .grid-i .c4 td {
+        width: 30%
+    }
+
+    .grid-i .c2 td {
+        width: 80%
+    }
+
+    .grid-i .label {
+        width: 15% !important;
+    }
+
+    .bill-info {
+        border-radius: 10px;
+    }
+
 </style>
 <template id="com-order-list" ref="appOrder">
     <div class="com-order-list" style="margin-bottom: 20px;">
@@ -692,17 +743,23 @@ Yii::$app->loadComponentView('order/com-city');
 
                         <div class="share-benefit" :style="{width:orderTitle[2].width}"
                              style="padding: 10px 0;border-right: 1px solid #EBEEF5;">
-                            <template>
-                                <ul class="infinite-list" v-infinite-scroll="load" style="">
-                                    <li v-for="(nav,index) in item.share_profit" class="infinite-list-item" style="font-size:1px;text-align: left;margin: 10px;">
-                                        昵称：{{nav.nickname}}(ID:{{nav.user_id}})
-                                        <span style="margin-left: 10px;">佣金：{{ nav.price }}</span>
-                                        <span v-if="nav.status == -1">状态：无效</span>
-                                        <span v-if="nav.status == 0">状态：待结算</span>
-                                        <span v-if="nav.status == 1">状态：已结算</span>
-                                    </li>
-                                </ul>
-                            </template>
+                            <div style="width: 70%;float: left;height: 100%;display: flex;flex-direction: column;">
+                                <div class="gift-statistics">
+                                    <span>总分佣：{{item.gift_statistics.total_commission > 0 ? item.gift_statistics.total_commission : 0}}</span>
+                                </div>
+                                <!--<div class="gift-statistics">
+                                    <span>总红包：00000</span>
+                                </div>
+                                <div class="gift-statistics">
+                                    <span>总积分：00000</span>
+                                </div>-->
+                                <div class="gift-statistics">
+                                    <span>总购物券：{{item.gift_statistics.total_shopping_voucher > 0 ? item.gift_statistics.total_shopping_voucher : 0}}</span>
+                                </div>
+                            </div>
+                            <div style="width: 30%;float: right;height: 100%;line-height: 100%;display: flex;justify-content:center;align-items:Center;">
+                                <el-button type="primary" round size="small"  @click="getOrderInfo(item)">详情</el-button>
+                            </div>
                         </div>
 
                         <div v-if="isShowAction" class="com-order-info" :style="{width:orderTitle[3].width}"
@@ -918,6 +975,124 @@ Yii::$app->loadComponentView('order/com-city');
                 </el-button>
             </div>
         </el-dialog>
+
+        <el-dialog width="50%" title="赠送明细" :visible.sync="orderInfoDialogVisible">
+            <div v-for="(item, itemKey) in giveInfo.detail" :key="itemKey">
+                <el-card class="bill-info" style="margin-top:10px;padding:20px;">
+                    <el-card class="bill-info" style="margin-top:10px;">
+                        <div slot="header" class="clearfix">
+                            <span>商品信息</span>
+                        </div>
+                        <table class="grid-i" style="width:100%;">
+                            <tr class="c4">
+                                <td class="label">商品：</td>
+                                <td>
+                                    <div flex="cross:center">
+                                        <com-image :src="item.goods.goodsWarehouse.cover_pic"></com-image>
+                                        <div style="margin-left: 10px;">
+                                            {{ item.goods.goodsWarehouse.name }}
+                                            （ID：{{  item.id }}）
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="label">价格：</td>
+                                <td>
+                                    {{ item.goods_info.goods_attr.original_price }}
+                                </td>
+                            </tr>
+                            <tr class="c4">
+                                <td class="label">赠送购物券：</td>
+                                <td>
+                                    {{ item.shoppingVoucher.money }}
+                                    <span v-if="item.shoppingVoucher.status == 'invalid'" style="color: red">(无效)</span>
+                                    <span v-else-if="item.shoppingVoucher.status == 'success'" style="color: green">(已发送)</span>
+                                    <span v-else-if="item.shoppingVoucher.status == 'waiting'" style="color: red">(待发送)</span>
+                                    <span v-else style="color: red" >不赠送</span>
+                                </td>
+                                <td class="label">赠送红包：</td>
+                                <td>
+                                    开发中...
+                                    <!--<span v-if="infoDialog.score_status == 'invalid' || infoDialog.score_status == ''"
+                                          style="color: red">(无效)</span>
+                                    <span v-if="infoDialog.score_status == 'success'" style="color: green">(已发送)</span>
+                                    <span v-if="infoDialog.score_status == 'waiting'" style="color: red">(待发送)</span>-->
+                                </td>
+                            </tr>
+                            <tr class="c2" >
+                                <td class="label">赠送积分：</td>
+                                <td colspan="3">
+                                    开发中...
+                                    <!--<div v-if="details.score_enable > 0">
+                                        <span v-if="details.score_give_settings.is_permanent>0" class="spacing">
+                                            永久积分
+                                        </span>
+                                                    <span v-else class="spacing">
+                                            限时积分
+                                        </span>
+                                                    <span class="spacing">数量：{{ details.score_give_settings.integral_num }}</span>
+                                                    <span class="spacing">
+                                            时长：{{ details.score_give_settings.period }}
+                                            <span v-if="details.score_give_settings.period_unit=='month'">月</span>
+                                        </span>
+                                        <span class="spacing">有效期：{{ details.score_give_settings.expire }}天</span>
+                                    </div>-->
+                                </td>
+                            </tr>
+                        </table>
+                    </el-card>
+                    <el-card class="bill-info" style="margin-top:10px;">
+                        <div slot="header" class="clearfix">
+                            <span>
+                                佣金
+                                <span v-if="item.commission.length <= 0" style="color: red">
+                                    (不返佣)
+                                </span>
+                            </span>
+                        </div>
+                        <el-table :data="item.commission" border style="width: 100%" v-if="item.commission.length > 0">
+                            <el-table-column label="昵称" align="center" width="200">
+                                <template slot-scope="scope">
+                                    <div flex="cross:center">
+                                        <com-image :src="scope.row.avatar_url"></com-image>
+                                        <div style="margin-left: 10px;">
+                                            {{scope.row.nickname}}
+                                            （ID：{{ scope.row.user_id }}）
+                                        </div>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="等级" width="100">
+                                <template slot-scope="scope">
+                                    {{scope.row.role_type}}
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="金额" width="100">
+                                <template slot-scope="scope">
+                                    {{scope.row.price}}
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="状态" width="100" align="center">
+                                <template slot-scope="scope">
+                                    <span v-if="scope.row.status == -1" style="color: red">无效</span>
+                                    <span v-if="scope.row.status == 0">待结算</span>
+                                    <span v-if="scope.row.status == 1" style="color: #13ce66">已结算</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="购买时商品利润">
+                                <template slot-scope="scope">
+                                    {{scope.row.rule_data_json.profit_price}}
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="购买时分佣比列">
+                                <template slot-scope="scope">
+                                    {{scope.row.rule_data_json.commisson_value}}%
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-card>
+                </el-card>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -928,10 +1103,10 @@ Yii::$app->loadComponentView('order/com-city');
                 type: Array,
                 default: function () {
                     return [
-                        {width: '40%', name: '订单信息'},
-                        {width: '10%', name: '实付金额'},
-                        {width: '35%', name: '分润信息'},
-                        {width: '15%', name: '操作'}
+                        {width: '45%', name: '订单信息'},
+                        {width: '17%', name: '实付金额'},
+                        {width: '17%', name: '赠送统计'},
+                        {width: '21%', name: '操作'}
                     ]
                 }
             },
@@ -1136,6 +1311,9 @@ Yii::$app->loadComponentView('order/com-city');
                 singleDialogVisible: false,// 电子面单弹框
                 newExpressSingle: [],
                 statisticsLoading: false,
+                orderInfoDialogVisible: false,
+                giveInfo : {},
+
             };
         },
         mounted() {
@@ -1159,6 +1337,11 @@ Yii::$app->loadComponentView('order/com-city');
             this.statisticalAmount();
         },
         methods: {
+            getOrderInfo(row) {
+                console.log(row);
+                this.orderInfoDialogVisible = true;
+                this.giveInfo = row;
+            },
             load () {
                 //this.count += 2
             },

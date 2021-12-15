@@ -14,12 +14,13 @@ class ShoppingVoucherLogListForm extends BaseModel{
     public $start_date;
     public $end_date;
     public $keyword;
+    public $kw_type;
     public $source_type;
 
     public function rules(){
         return [
             [['page', 'limit'], 'integer'],
-            [['keyword', 'start_date', 'end_date', 'source_type'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'source_type', 'kw_type'], 'trim'],
         ];
     }
 
@@ -47,13 +48,20 @@ class ShoppingVoucherLogListForm extends BaseModel{
                 $query->andWhere(['source_type' => $this->source_type]);
             }
 
-            if($this->keyword){
-                $query->andWhere([
-                    "OR",
-                    ["u.id" => (int)$this->keyword],
-                    ["LIKE", "u.nickname", $this->keyword],
-                    ["LIKE", "u.mobile", $this->keyword]
-                ]);
+            if ($this->keyword && $this->kw_type) {
+                switch ($this->kw_type)
+                {
+                    case "mobile":
+                        $query->andWhere(['u.mobile' => $this->keyword]);
+                        break;
+                    case "user_id":
+                        $query->andWhere(['u.id' => $this->keyword]);
+                        break;
+                    case "nickname":
+                        $query->andWhere(['like', 'u.nickname', $this->keyword]);
+                        break;
+                    default:
+                }
             }
 
             $query->select(["l.*", "u.nickname", "u.role_type", "u.avatar_url"]);
@@ -99,13 +107,20 @@ class ShoppingVoucherLogListForm extends BaseModel{
                 $query->andWhere(['source_type' => $this->source_type]);
             }
 
-            if($this->keyword){
-                $query->andWhere([
-                    "OR",
-                    ["u.id" => (int)$this->keyword],
-                    ["LIKE", "u.nickname", $this->keyword],
-                    ["LIKE", "u.mobile", $this->keyword]
-                ]);
+            if ($this->keyword && $this->kw_type) {
+                switch ($this->kw_type)
+                {
+                    case "mobile":
+                        $query->andWhere(['u.mobile' => $this->keyword]);
+                        break;
+                    case "user_id":
+                        $query->andWhere(['u.id' => $this->keyword]);
+                        break;
+                    case "nickname":
+                        $query->andWhere(['like', 'u.nickname', $this->keyword]);
+                        break;
+                    default:
+                }
             }
 
             $query->select(["l.*", "u.nickname", "u.role_type", "u.avatar_url"]);

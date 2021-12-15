@@ -25,13 +25,14 @@ class UserFinanceListForm extends BaseModel
     public $start_date;
     public $end_date;
     public $keyword;
+    public $kw_type;
     public $user_id;
 
     public function rules()
     {
         return [
             [['page', 'limit', 'user_id'], 'integer'],
-            [['keyword', 'start_date', 'end_date'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'kw_type'], 'trim'],
         ];
     }
 
@@ -41,11 +42,23 @@ class UserFinanceListForm extends BaseModel
 
         $query = User::find()
             ->select('id,nickname,avatar_url,balance,total_balance,income,total_income,total_score,score')
-            ->where(['mall_id' => \Yii::$app->mall->id]);
+            ->andWhere(['and', ['mall_id' => \Yii::$app->mall->id], ['!=', 'mobile', ''], ['IS NOT', 'mobile', NULL], ['is_delete' => 0]]);
 
-        if ($this->keyword)
-            $query->where(['like', 'nickname', $this->keyword]);
-
+        if ($this->keyword && $this->kw_type) {
+            switch ($this->kw_type)
+            {
+                case "mobile":
+                    $query->andWhere(['mobile' => $this->keyword]);
+                    break;
+                case "user_id":
+                    $query->andWhere(['id' => $this->keyword]);
+                    break;
+                case "nickname":
+                    $query->andWhere(['like', 'nickname', $this->keyword]);
+                    break;
+                default:
+            }
+        }
         if ($this->user_id)
             $query->andWhere(['user_id' => $this->user_id]);
 

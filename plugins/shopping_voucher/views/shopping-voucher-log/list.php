@@ -9,7 +9,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                 <div style="float: right;margin: -5px 0">
                     <el-button @click="handleRecharge" type="primary" size="small">充值购物券</el-button>
                 </div>
-                <div style="margin: 30px 0" v-loading="statisticsLoading">
+                <div style="margin-top: 15px" v-loading="statisticsLoading">
                     <div style="display: flex;justify-content: space-evenly">
                         <div>
                             <div style="text-align: center">总收入</div>
@@ -40,7 +40,15 @@ Yii::$app->loadComponentView('com-dialog-select');
                             end-placeholder="结束日期">
             </el-date-picker>
             <div class="input-item">
-                <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称、手机号搜索" v-model="searchData.keyword" clearable @clear="search">
+                <el-input @keyup.enter.native="search" size="small" placeholder="请输入搜索" v-model="searchData.keyword" clearable @clear="search">
+                    <el-select slot="prepend" v-model="searchData.kw_type" placeholder="请选择" size="small"
+                               style="width:120px;">
+                        <el-option v-for="item in item_type_options"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
@@ -49,19 +57,8 @@ Yii::$app->loadComponentView('com-dialog-select');
                 <el-tooltip class="item" effect="dark" content="只有选择订单或者商家扫码类型，才能筛选省市区" placement="bottom">
                     <i class="el-icon-question"></i>
                 </el-tooltip>
-                <el-select style="width: 120px;" size="small" v-model="searchData.source_type" @change='typeChange'>
-                    <el-option key="" label="全部" value=""></el-option>
-                    <el-option key="target_order" label="商城订单-消费" value="target_order"></el-option>
-                    <el-option key="from_order_cancel" label="订单取消" value="from_order_cancel"></el-option>
-                    <el-option key="admin" label="管理员操作" value="admin"></el-option>
-                    <el-option key="from_order_refund" label="订单退款" value="from_order_refund"></el-option>
-                    <el-option key="from_mch_checkout_order" label="商家扫码订单" value="from_mch_checkout_order"></el-option>
-                    <el-option key="target_alibaba_distribution_order" label="1688订单" value="target_alibaba_distribution_order"></el-option>
-                    <el-option key="1688_distribution_order_detail_refund" label="1688订单退款" value="1688_distribution_order_detail_refund"></el-option>
-                    <el-option key="from_hotel_order" label="酒店订单" value="from_hotel_order"></el-option>
-                    <el-option key="from_addcredit_order" label="话费订单" value="from_addcredit_order"></el-option>
-                    <el-option key="from_giftpacks_order" label="大礼包订单" value="from_giftpacks_order"></el-option>
-                    <el-option key="from_order_detail" label="商城订单-获取" value="from_order_detail"></el-option>
+                <el-select style="width: 150px;" size="small" v-model="searchData.source_type" @change='typeChange'>
+                    <el-option v-for="item in type_options" :key="item.value" :value="item.value" :label="item.label"></el-option>
                 </el-select>
             </div>
             <el-table :data="list" border style="width: 100%" v-loading="loading">
@@ -90,17 +87,15 @@ Yii::$app->loadComponentView('com-dialog-select');
             </el-table>
 
             <!--工具条 批量操作和分页-->
-            <el-col :span="24" class="toolbar">
-                <el-pagination
-                        background
-                        layout="prev, pager, next"
-                        @current-change="pageChange"
-                        :page-size="pagination.pageSize"
-                        :total="pagination.total_count"
-                        style="float:right;margin:15px"
-                        v-if="pagination">
-                </el-pagination>
-            </el-col>
+            <el-pagination
+                    background
+                    layout="prev, pager, next"
+                    @current-change="pageChange"
+                    :page-size="pagination.pageSize"
+                    :total="pagination.total_count"
+                    style="margin:15px;text-align: center"
+                    v-if="pagination">
+            </el-pagination>
         </div>
 
         <!-- 充值收益 -->
@@ -186,6 +181,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                 },
                 searchData: {
                     keyword: '',
+                    kw_type: '',
                     start_date: '',
                     end_at: '',
                     source_type: '',
@@ -195,7 +191,70 @@ Yii::$app->loadComponentView('com-dialog-select');
                 list: [],
                 pagination: null,
                 loading: false,
-
+                item_type_options: [
+                    {
+                        value: 'mobile',
+                        label: '手机号'
+                    },
+                    {
+                        value: 'user_id',
+                        label: '用户ID'
+                    },
+                    {
+                        value: 'nickname',
+                        label: '昵称'
+                    },
+                ],
+                type_options:[
+                    {
+                        label:'全部',
+                        value:''
+                    },
+                    {
+                        label:'商城订单-消费',
+                        value:'target_order'
+                    },
+                    {
+                        label:'订单取消',
+                        value:'from_order_cancel'
+                    },
+                    {
+                        label:'管理员操作',
+                        value:'admin'
+                    },
+                    {
+                        label:'订单退款',
+                        value:'from_order_refund'
+                    },
+                    {
+                        label:'商家扫码订单',
+                        value:'from_mch_checkout_order'
+                    },
+                    {
+                        label:'1688订单',
+                        value:'target_alibaba_distribution_order'
+                    },
+                    {
+                        label:'1688订单退款',
+                        value:'1688_distribution_order_detail_refund'
+                    },
+                    {
+                        label:'酒店订单',
+                        value:'from_hotel_order'
+                    },
+                    {
+                        label:'话费订单',
+                        value:'from_addcredit_order'
+                    },
+                    {
+                        label:'大礼包订单',
+                        value:'from_giftpacks_order'
+                    },
+                    {
+                        label:'商城订单-获取',
+                        value:'from_order_detail'
+                    },
+                ],
             };
         },
         methods: {
@@ -272,6 +331,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     start_date: this.searchData.start_date,
                     end_date: this.searchData.end_date,
                     keyword: this.searchData.keyword,
+                    kw_type: this.searchData.kw_type,
                     source_type: this.searchData.source_type,
                 };
                 request({
@@ -297,6 +357,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     start_date: this.searchData.start_date,
                     end_date: this.searchData.end_date,
                     keyword: this.searchData.keyword,
+                    kw_type: this.searchData.kw_type,
                     source_type: this.searchData.source_type,
                 };
                 request({
@@ -328,7 +389,6 @@ Yii::$app->loadComponentView('com-dialog-select');
 
     .input-item {
         display: inline-block;
-        width: 250px;
         margin: 0 0 20px 20px;
     }
 

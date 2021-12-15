@@ -9,6 +9,26 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 <div style="float: right;margin: -5px 0">
                     <com-export-dialog :field_list='export_list' :params="searchData" @selected="exportConfirm"></com-export-dialog>
                 </div>
+                <div style="margin-top: 20px">
+                    <div style="display: flex;justify-content: space-evenly">
+                        <div>
+                            <div style="text-align: center">总收入</div>
+                            <div id="assets">{{Statistics.income}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">总支出</div>
+                            <div id="assets">{{Statistics.expend}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页收入</div>
+                            <div id="assets">{{Statistics.currentIncome}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页支出</div>
+                            <div id="assets">{{Statistics.currentExpend}}元</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="table-body">
@@ -22,9 +42,17 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                     end-placeholder="结束日期">
                     </el-date-picker>
                 </div>
-                <div style="width: 15%">
-                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称、手机号搜索" v-model="keyword" clearable
+                <div style="width: 21%">
+                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入搜索" v-model="keyword" clearable
                               @clear="search">
+                        <el-select slot="prepend" v-model="kw_type" placeholder="请选择" size="small"
+                                   style="width:120px;">
+                            <el-option v-for="item in item_type_options"
+                                       :key="item.value"
+                                       :label="item.label"
+                                       :value="item.value">
+                            </el-option>
+                        </el-select>
                         <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                     </el-input>
                 </div>
@@ -34,13 +62,12 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                         <i class="el-icon-question"></i>
                     </el-tooltip>
                     <el-select size="small" v-model="type" @change='searchType' class="select" placeholder="请选择类型">
-                        <el-option key="" label="全部" value=""></el-option>
-                        <el-option key="order" label="订单" value="order"></el-option>
-                        <el-option key="mch_checkout_order" label="商家扫码" value="mch_checkout_order"></el-option>
-                        <el-option key="admin" label="管理员充值" value="admin"></el-option>
-                        <el-option key="order_refund" label="订单退款" value="order_refund"></el-option>
-                        <el-option key="user_cash" label="用户提现余额" value="user_cash"></el-option>
-                        <el-option key="giftpacks_order" label="大礼包订单" value="giftpacks_order"></el-option>
+                        <el-option v-for="item in type_options"
+                                    :key="item.value"
+                                    :value="item.value"
+                                    :label="item.label"
+                                    >
+                        </el-option>
                     </el-select>
                 </div>
                 <div style="width: 16%" v-if="levelShow">
@@ -64,27 +91,8 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     </el-cascader>
                 </div>
             </div>
-            <div style="margin: 30px 0">
-                <div style="display: flex;justify-content: space-evenly">
-                    <div>
-                        <div style="text-align: center">总收入</div>
-                        <div id="assets">{{Statistics.income}}元</div>
-                    </div>
-                    <div>
-                        <div style="text-align: center">总支出</div>
-                        <div id="assets">{{Statistics.expend}}元</div>
-                    </div>
-                    <div>
-                        <div style="text-align: center">当页收入</div>
-                        <div id="assets">{{Statistics.currentIncome}}元</div>
-                    </div>
-                    <div>
-                        <div style="text-align: center">当页支出</div>
-                        <div id="assets">{{Statistics.currentExpend}}元</div>
-                    </div>
-                </div>
-            </div>
-            <el-table :data="form" border style="width: 100%" v-loading="listLoading">
+
+            <el-table :data="form" border style="width: 100%;margin-top: 15px" v-loading="listLoading">
 
                 <el-table-column prop="id" label="ID" width="80"></el-table-column>
 
@@ -142,12 +150,14 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             return {
                 searchData: {
                     keyword: '',
+                    kw_type: '',
                     date: '',
                     start_date: '',
                     end_date: '',
                 },
                 date: '',
                 keyword: getQuery("user_id"),
+                kw_type:'',
                 form: [],
                 pageCount: 0,
                 listLoading: false,
@@ -181,11 +191,56 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 },
                 levelShow:false,
                 export_list: [],
+                type_options:[
+                    {
+                        label : '全部',
+                        value : ''
+                    },
+                    {
+                        label : '订单',
+                        value : 'order'
+                    },
+                    {
+                        label : '商家扫码',
+                        value : 'mch_checkout_order'
+                    },
+                    {
+                        label : '管理员充值',
+                        value : 'admin'
+                    },
+                    {
+                        label : '订单退款',
+                        value : 'order_refund'
+                    },
+                    {
+                        label : '用户提现余额',
+                        value : 'user_cash'
+                    },
+                    {
+                        label : '大礼包订单',
+                        value : 'giftpacks_order'
+                    },
+                ],
+                item_type_options: [
+                    {
+                        label:'手机号',
+                        value:'mobile',
+                    },
+                    {
+                        label:'用户ID',
+                        value:'user_id',
+                    },
+                    {
+                        label:'昵称',
+                        value:'nickname',
+                    }
+                ],
             };
         },
         methods: {
             exportConfirm() {
                 this.searchData.keyword = this.keyword;
+                this.searchData.kw_type = this.kw_type;
                 this.searchData.date = this.date;
                 this.searchData.type = this.type;
                 this.searchData.level = this.level;
@@ -222,6 +277,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                         date: this.date,
                         user_id: getQuery('user_id'),
                         keyword: this.keyword,
+                        kw_type: this.kw_type,
                         start_date: this.searchData.start_date,
                         end_date: this.searchData.end_date,
                         type: this.type,

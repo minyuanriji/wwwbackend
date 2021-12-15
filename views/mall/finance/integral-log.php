@@ -13,6 +13,26 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 <div style="float: right;margin-right: 20px" >
                     <el-button @click="handleIntegral" type="primary" size="small">红包充值</el-button>
                 </div>
+                <div style="margin-top: 15px">
+                    <div style="display: flex;justify-content: space-evenly">
+                        <div>
+                            <div style="text-align: center">总收入</div>
+                            <div id="assets">{{Statistics.income}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">总支出</div>
+                            <div id="assets">{{Statistics.expend}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页收入</div>
+                            <div id="assets">{{Statistics.currentIncome}}元</div>
+                        </div>
+                        <div>
+                            <div style="text-align: center">当页支出</div>
+                            <div id="assets">{{Statistics.currentExpend}}元</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="table-body">
@@ -51,27 +71,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 </div>
             </div>
 
-            <div style="margin: 30px 0">
-                <div style="display: flex;justify-content: space-evenly">
-                    <div>
-                        <div style="text-align: center">总收入</div>
-                        <div id="assets">{{Statistics.income}}元</div>
-                    </div>
-                    <div>
-                        <div style="text-align: center">总支出</div>
-                        <div id="assets">{{Statistics.expend}}元</div>
-                    </div>
-                    <div>
-                        <div style="text-align: center">当页收入</div>
-                        <div id="assets">{{Statistics.currentIncome}}元</div>
-                    </div>
-                    <div>
-                        <div style="text-align: center">当页支出</div>
-                        <div id="assets">{{Statistics.currentExpend}}元</div>
-                    </div>
-                </div>
-            </div>
-            <el-table :data="form" border style="width: 100%" v-loading="listLoading">
+            <el-table :data="form" border style="width: 100%;margin-top: 15px" v-loading="listLoading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
                 <el-table-column label="昵称">
                     <template slot-scope="scope">
@@ -96,16 +96,14 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             </el-table>
 
             <!--工具条 批量操作和分页-->
-            <el-col :span="24" class="toolbar">
-                <el-pagination
-                        @current-change="pageChange"
-                        :page-size="pagination.pageSize"
-                        layout="prev, pager, next, jumper"
-                        :total="pagination.total_count"
-                        style="text-align: center;margin-top: 20px;"
-                        v-if="pagination">
-                </el-pagination>
-            </el-col>
+            <el-pagination
+                    @current-change="pageChange"
+                    :page-size="pagination.pageSize"
+                    layout="prev, pager, next, jumper"
+                    :total="pagination.total_count"
+                    style="text-align: center;margin-top: 20px;"
+                    v-if="pagination">
+            </el-pagination>
         </div>
 
         <!-- 充值收益 -->
@@ -190,6 +188,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 btnLoading: false,
                 searchData: {
                     keyword: '',
+                    kw_type: '',
                     date: '',
                     start_date: '',
                     end_date: '',
@@ -336,6 +335,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             },
             exportConfirm() {
                 this.searchData.keyword = this.keyword;
+                this.searchData.kw_type = this.kw_type;
                 this.searchData.date = this.date;
                 this.searchData.start_date = this.date[0];
                 this.searchData.end_date = this.date[1];

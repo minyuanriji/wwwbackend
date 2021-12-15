@@ -27,7 +27,7 @@ class OilOrderUseForm extends BaseModel{
         }
 
         $order = OilOrders::findOne($this->id);
-        $responseData = [];
+        $responseData = $responseData2 = [];
 
         $t = \Yii::$app->db->beginTransaction();
         try {
@@ -93,34 +93,42 @@ class OilOrderUseForm extends BaseModel{
                 }
             }elseif($status['status'] == "wait"){
 
-                $res = $platObj->exchange($order, $product);
-                if(!isset($res['code']) || $res['code'] != 0){
-                    $responseData = @json_decode($res, true);
-                    throw new \Exception(isset($res['message']) ? $res['message'] : "兑换失败");
-                }
+                $responseData = json_decode($order->plat_response_data, true);
 
-                $order->order_status       = "finished"; //状态变更为已完成
-                $order->updated_at         = time();
-                $order->plat_response_data = json_encode($responseData);
-                if(!$order->save()){
-                    throw new \Exception($this->responseErrorMsg($order));
+                $res = $platObj->exchange($order, $product);
+                $responseData2 = $res ? @json_decode($res, true) : [];
+                $responseData['exchange'] = $responseData2;
+
+                if(!isset($responseData2['code']) || $responseData2['code'] != 0){
+                    throw new \Exception(isset($responseData2['message']) ? $responseData2['message'] : "兑换失败");
                 }
 
                 $config = $platModel->getParams();
 
+                //计算出服务费
+                $transferRate = isset($config['transferRate']) ? max(8, intval($config['transferRate'])) : 8;
+                $transferAmount = round(((100 - $transferRate)/100) * floatval($order->order_price), 2);
+
+                $order->order_status       = "finished"; //状态变更为已完成
+                $order->updated_at         = time();
+                $order->plat_response_data = json_encode($responseData);
+                $order->transfer_rate      = $transferRate;
+                $order->transfer_amount    = $transferAmount;
+                if(!$order->save()){
+                    throw new \Exception($this->responseErrorMsg($order));
+                }
+
                 //生成打款记录
                 $transferOrder = OilJiayoulaTransferOrder::findOne(["oil_order_id" => $order->id]);
                 if(!$transferOrder){
-                    $transferRate = isset($config['transferRate']) ? max(8, intval($config['transferRate'])) : 8;
-                    $amount = ((100 - $transferRate)/100) * floatval($order->order_price);
                     $transferOrder = new OilJiayoulaTransferOrder([
                         "mall_id"         => $platModel->mall_id,
                         "oil_order_id"    => $order->id,
-                        "order_sn"        => "JYL" . date("ymdHis") . rand(10000, 99999),
+                        "order_sn"        => "JYL_" . $order->order_no,
                         "created_at"      => time(),
                         "updated_at"      => time(),
                         "status"          => "wait",
-                        "amount"          => round($amount, 2),
+                        "amount"          => $transferAmount,
                         "originAmount"    => $order->order_price,
                         "transferRate"    => $transferRate,
                         "bankUserName"    => isset($config['bankUserName']) ? $config['bankUserName'] : "",

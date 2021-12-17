@@ -69,11 +69,11 @@ class Plugin extends \app\plugins\Plugin
                 'icon' => 'el-icon-star-on',
                 'action' => []
             ],
-            [
+            /*[
                 'name' => '商家分佣',
                 'route' => 'plugin/mch/mall/distribution/list',
                 'icon' => 'el-icon-star-on',
-            ],
+            ],*/
             [
                 'name' => '入驻申请',
                 'route' => 'plugin/mch/mall/mch/review',

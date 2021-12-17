@@ -38,6 +38,8 @@ abstract class MchEditFormBase extends BaseModel
     public $settle_bank;
     public $settle_realname;
     public $settle_num;
+    public $longitude;
+    public $latitude;
 
     /**
      * @var Mch
@@ -53,7 +55,7 @@ abstract class MchEditFormBase extends BaseModel
                 'province_id', 'city_id', 'district_id', 'integral_fee_rate'], 'integer'],
             [['mobile', 'address', 'logo', 'service_mobile', 'password'], 'string', 'max' => 255],
             [['username', 'realname', 'wechat', 'name', 'username', 'password'], 'string', 'max' => 65],
-            [['bg_pic_url', 'service_mobile', 'settle_bank', 'settle_realname', 'settle_num'], 'safe']
+            [['bg_pic_url', 'service_mobile', 'settle_bank', 'settle_realname', 'settle_num', 'longitude', 'latitude'], 'safe']
         ];
     }
 
@@ -172,6 +174,8 @@ abstract class MchEditFormBase extends BaseModel
         $store->province_id = $this->province_id;
         $store->city_id = $this->city_id;
         $store->district_id = $this->district_id;
+        $store->longitude = $this->longitude;
+        $store->latitude = $this->latitude;
         $res = $store->save();
         if (!$res) {
             throw new \Exception($this->responseErrorMsg($store));

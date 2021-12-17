@@ -85,6 +85,10 @@ class MchForm extends BaseModel
 
             $detail['latitude_longitude'] = $detail['store']['longitude'] && $detail['store']['latitude'] ?
                 $detail['store']['latitude'] . ',' . $detail['store']['longitude'] : '';
+
+            $detail['lng'] = $detail['store']['longitude'] ?? '';
+            $detail['lat'] = $detail['store']['latitude'] ?? '';
+
             $detail['address'] = $detail['store']['address'];
             $detail['logo'] = $detail['store']['cover_url'];
             $detail['service_mobile'] = $detail['store']['mobile'];

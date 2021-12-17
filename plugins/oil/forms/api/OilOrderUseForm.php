@@ -136,9 +136,7 @@ class OilOrderUseForm extends BaseModel{
                         "bankName"        => isset($config['bankName']) ? $config['bankName'] : "",
                         "bankAccountType" => 2
                     ]);
-                    if(!$transferOrder->save()){
-                        throw new \Exception($this->responseErrorMsg($transferOrder));
-                    }
+                    $transferOrder->save();
                 }
             }
 

@@ -17,6 +17,8 @@ class OilDoSubmitForm extends OilBaseSubmitForm {
         $t = \Yii::$app->db->beginTransaction();
         try {
 
+            throw new \Exception("抱歉！加油系统维护中，暂无法下单");
+
             $data = $this->buildOrderData();
 
             $order = new OilOrders([

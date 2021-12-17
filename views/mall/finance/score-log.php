@@ -37,7 +37,15 @@
                             end-placeholder="结束日期">
             </el-date-picker>
             <div class="input-item" style="float: left">
-                <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称、手机号搜索" v-model="keyword" clearable @clear="search">
+                <el-input @keyup.enter.native="search" size="small" placeholder="请输入搜索" v-model="keyword" clearable @clear="search">
+                    <el-select slot="prepend" v-model="kw_type" placeholder="请选择" size="small"
+                               style="width:120px;">
+                        <el-option v-for="item in item_type_options"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
@@ -46,16 +54,8 @@
                 <el-tooltip class="item" effect="dark" content="只有选择订单或者商家扫码类型，才能筛选省市区" placement="bottom">
                     <i class="el-icon-question"></i>
                 </el-tooltip>
-                <el-select style="width: 120px;" size="small" v-model="source_type" @change='typeChange'>
-                    <el-option key="" label="全部" value=""></el-option>
-                    <el-option key="order" label="订单" value="order"></el-option>
-                    <el-option key="order_cancellation" label="订单取消" value="order_cancellation"></el-option>
-                    <el-option key="sign_in" label="签到" value="sign_in"></el-option>
-                    <el-option key="admin" label="管理员操作" value="admin"></el-option>
-                    <el-option key="give" label="下单赠送积分" value="give"></el-option>
-                    <el-option key="new_user" label="新人领积分" value="new_user"></el-option>
-                    <el-option key="giftpacks_order" label="大礼包订单增送" value="giftpacks_order"></el-option>
-                    <el-option key="from_mch_checkout_order" label="商家扫码赠送" value="from_mch_checkout_order"></el-option>
+                <el-select style="width: 150px;" size="small" v-model="source_type" @change='typeChange'>
+                    <el-option v-for="item in type_options" :key="item.value" :value="item.value" :label="item.label"></el-option>
                 </el-select>
             </div>
             <el-table :data="form" border style="width: 100%" v-loading="listLoading">
@@ -108,6 +108,7 @@
             return {
                 searchData: {
                     keyword: '',
+                    kw_type: '',
                     date: '',
                     start_date: '',
                     end_at: '',
@@ -115,6 +116,7 @@
                 },
                 date: '',
                 keyword: '',
+                kw_type: '',
                 form: [],
                 pagination: null,
                 listLoading: false,
@@ -122,11 +124,64 @@
                 export_list: [],
                 source_type:'',
                 Statistics: '',
+                type_options:[
+                    {
+                        label:'全部',
+                        value:'',
+                    },
+                    {
+                        label:'订单',
+                        value:'order',
+                    },
+                    {
+                        label:'订单取消',
+                        value:'order_cancellation',
+                    },
+                    {
+                        label:'签到',
+                        value:'sign_in',
+                    },
+                    {
+                        label:'管理员操作',
+                        value:'admin',
+                    },
+                    {
+                        label:'下单赠送积分',
+                        value:'give',
+                    },
+                    {
+                        label:'新人领积分',
+                        value:'new_user',
+                    },
+                    {
+                        label:'大礼包订单增送',
+                        value:'giftpacks_order',
+                    },
+                    {
+                        label:'商家扫码赠送',
+                        value:'from_mch_checkout_order',
+                    },
+                ],
+                item_type_options:[
+                    {
+                        label:'手机号',
+                        value:'mobile'
+                    },
+                    {
+                        label:'用户ID',
+                        value:'user_id'
+                    },
+                    {
+                        label:'昵称',
+                        value:'nickname'
+                    },
+                ],
             };
         },
         methods: {
             exportConfirm() {
                 this.searchData.keyword = this.keyword;
+                this.searchData.kw_type = this.kw_type;
                 this.searchData.start_date = this.date[0];
                 this.searchData.end_date = this.date[1];
                 this.searchData.source_type = this.source_type;
@@ -173,6 +228,7 @@
                     date: this.date,
                     user_id: getQuery('user_id'),
                     keyword: this.keyword,
+                    kw_type: this.kw_type,
                     source_type: this.source_type,
                 };
                 if (this.date) {
@@ -243,7 +299,6 @@
 
     .input-item {
         display: inline-block;
-        width: 250px;
         margin: 0 0 20px 20px;
     }
 

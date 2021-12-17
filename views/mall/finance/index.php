@@ -23,6 +23,14 @@
             <div class="input-item">
                 <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="keyword" clearable
                           @clear="search">
+                    <el-select slot="prepend" v-model="kw_type" placeholder="请选择" size="small"
+                               style="width:120px;">
+                        <el-option v-for="item in item_type_options"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
@@ -87,21 +95,37 @@
             return {
                 searchData: {
                     keyword: '',
+                    kw_type: '',
                     date: '',
                     start_date: '',
                     end_at: '',
                 },
                 date: '',
                 keyword: '',
+                kw_type: '',
                 form: [],
                 pagination: null,
                 listLoading: false,
-
+                item_type_options: [
+                    {
+                        value: 'mobile',
+                        label: '手机号'
+                    },
+                    {
+                        value: 'user_id',
+                        label: '用户ID'
+                    },
+                    {
+                        value: 'nickname',
+                        label: '昵称'
+                    },
+                ],
             };
         },
         methods: {
             exportConfirm() {
                 this.searchData.keyword = this.keyword;
+                this.searchData.kw_type = this.kw_type;
                 this.searchData.start_date = this.date[0];
                 this.searchData.end_date = this.date[1];
             },
@@ -123,6 +147,7 @@
                     date: this.date,
                     user_id: getQuery('user_id'),
                     keyword: this.keyword,
+                    kw_type: this.kw_type,
                 };
                 if (this.date) {
                     Object.assign(params, {
@@ -161,7 +186,6 @@
 
     .input-item {
         display: inline-block;
-        width: 250px;
         margin: 0 0 20px 20px;
     }
 

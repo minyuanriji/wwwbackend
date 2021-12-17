@@ -26,13 +26,14 @@ class BalanceLogListForm extends BaseModel
     public $address;
     public $flag;
     public $fields;
+    public $kw_type;
 
     public function rules()
     {
         return [
             [['page', 'limit', 'user_id', 'level'], 'integer'],
             [['type'], 'string'],
-            [['keyword', 'start_date', 'end_date', 'flag'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'flag', 'kw_type'], 'trim'],
             [['address', 'fields'], 'safe'],
         ];
     }
@@ -49,9 +50,22 @@ class BalanceLogListForm extends BaseModel
                 'b.mall_id' => \Yii::$app->mall->id,
             ])->innerJoin(['u' => User::tableName()], 'u.id=b.user_id')
                 ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
-            if ($this->keyword) {
-                $query->andWhere(['or', ['like', 'u.nickname', $this->keyword], ['like', 'u.mobile', $this->keyword]]);
+
+            if ($this->keyword && $this->kw_type) {
+                switch ($this->kw_type) {
+                    case "mobile":
+                        $query->andWhere(['u.mobile' => $this->keyword]);
+                        break;
+                    case "user_id":
+                        $query->andWhere(['u.id' => $this->keyword]);
+                        break;
+                    case "nickname":
+                        $query->andWhere(['like', 'u.nickname', $this->keyword]);
+                        break;
+                    default:
+                }
             }
+
             if ($this->user_id) {
                 $query->andWhere(['b.user_id' => $this->user_id]);
             }

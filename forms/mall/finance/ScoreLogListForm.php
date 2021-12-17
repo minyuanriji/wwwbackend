@@ -16,6 +16,7 @@ class ScoreLogListForm extends BaseModel
     public $start_date;
     public $end_date;
     public $keyword;
+    public $kw_type;
     public $user_id;
     public $source_type;
     public $flag;
@@ -25,7 +26,7 @@ class ScoreLogListForm extends BaseModel
     {
         return [
             [['page', 'limit', 'user_id'], 'integer'],
-            [['keyword', 'start_date', 'end_date', 'source_type', 'flag'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'source_type', 'flag', 'kw_type'], 'trim'],
             [['fields'], 'safe'],
 
         ];
@@ -42,12 +43,19 @@ class ScoreLogListForm extends BaseModel
           ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]])
           ->select(["b.*", "u.nickname", "u.mobile"]);
 
-        if (!empty($this->keyword)) {
-            $query->andWhere([
-                "OR",
-                ['u.mobile' => $this->keyword],
-                ['LIKE', 'u.nickname', $this->keyword]
-            ]);
+        if ($this->keyword && $this->kw_type) {
+            switch ($this->kw_type) {
+                case "mobile":
+                    $query->andWhere(['u.mobile' => $this->keyword]);
+                    break;
+                case "user_id":
+                    $query->andWhere(['u.id' => $this->keyword]);
+                    break;
+                case "nickname":
+                    $query->andWhere(['like', 'u.nickname', $this->keyword]);
+                    break;
+                default:
+            }
         }
 
         if ($this->user_id) {

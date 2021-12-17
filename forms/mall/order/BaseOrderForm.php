@@ -31,6 +31,8 @@ use app\models\Store;
 use app\models\User;
 use app\plugins\advance\models\AdvanceOrder;
 use app\plugins\commission\models\CommissionGoodsPriceLog;
+use app\plugins\shopping_voucher\models\ShoppingVoucherLog;
+use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 use yii\db\Query;
 use app\services\mall\order\OrderSendService;
 use app\models\mysql\UserAddress;
@@ -268,12 +270,16 @@ abstract class BaseOrderForm extends BaseModel
             $item['new_express_single'] = $order->getExpressSingleList($item);
             $item["created_at"] = date("Y-m-d H:i:s",$item["created_at"]);
 
-            $item['share_profit'] = CommissionGoodsPriceLog::find()->alias('cg')
-                ->leftJoin(["u" => User::tableName()], "cg.user_id = u.id")
-                ->where(['order_id' => $item['id']])
-                ->select(['cg.id', 'cg.user_id','cg.price', 'cg.status', 'u.nickname'])
-                ->asArray()
-                ->all();
+            if (isset($item['detail']) && $item['detail']) {
+                foreach ($item['detail'] as &$order_detail) {
+                    $order_detail = array_merge($order_detail, $this->getGiveInfo($order_detail['id']));
+                }
+            }
+
+            $item['gift_statistics'] = $this->giftStatistics(
+                $item['id'],
+                isset($item['detail']) ? array_column($item['detail'], 'id') : []
+            );
         }
 
         $menuList        = \Yii::$app->role->getDistributionMenu();
@@ -291,6 +297,79 @@ abstract class BaseOrderForm extends BaseModel
                 'plugins' => $menuList,
             ]
         ];
+    }
+
+    //获取赠送明细
+    private function getGiveInfo ($order_detail_id)
+    {
+        return [
+            'commission'        => $this->getCommission($order_detail_id),
+
+            'shoppingVoucher'   => $this->getShoppingVoucher($order_detail_id),
+        ];
+    }
+
+    //获取分佣列表
+    private function getCommission($order_detail_id)
+    {
+        $result = [];
+        $commission = CommissionGoodsPriceLog::findAll(['order_detail_id' => $order_detail_id]);
+        if ($commission) {
+            foreach ($commission as $key => $value) {
+                $result[$key]['price'] = $value->price;
+                $result[$key]['nickname'] = $value->user->nickname;
+                $result[$key]['avatar_url'] = $value->user->avatar_url;
+                $result[$key]['role_type'] = $value->user->getUserLevel()['name'];
+                $result[$key]['user_id'] = $value->user_id;
+                $result[$key]['status'] = $value->status;
+                $result[$key]['rule_data_json'] = @json_decode($value->rule_data_json, true);
+            }
+        }
+        return $result;
+    }
+
+    //获取购物券
+    private function getShoppingVoucher ($detail_id)
+    {
+        $log =  ShoppingVoucherLog::find()->andWhere(['source_id' => $detail_id, 'source_type' => 'from_order_detail'])->select('id,money')->asArray()->one();
+
+        $sendLog = ShoppingVoucherSendLog::find()->andWhere(['source_id' => $detail_id, 'source_type' => 'from_order_detail'])->select('status')->asArray()->one();
+
+        if ($log && $sendLog) {
+            $return = array_merge($log, $sendLog);
+        }
+
+        return $return ?? [];
+    }
+
+    //获取赠送总统计
+    private function giftStatistics($order_id, $detail_id = [])
+    {
+        return [
+            'total_commission' => $this->getTotalCommission($order_id),//总分佣
+
+            'total_shopping_voucher' => $this->getTotalShoppingVoucher($detail_id),//总购物券
+
+            /*'total_score' => $this->getTotalScore($order_id),//总积分
+
+            'total_red_envelopes' => $this->getTotalRedEnvelopes($order_id),//总红包*/
+        ];
+    }
+
+    //获取总分佣
+    private function getTotalCommission ($order_id)
+    {
+        return CommissionGoodsPriceLog::find()->where(['order_id' => $order_id])->sum('price');
+    }
+
+    //获取总购物券
+    private function getTotalShoppingVoucher ($detail_id)
+    {
+        return ShoppingVoucherLog::find()->andWhere([
+            'and',
+            ['in', 'source_id', $detail_id],
+            ['source_type' => 'from_order_detail']
+        ])->sum('money');
     }
 
     public function statistical()

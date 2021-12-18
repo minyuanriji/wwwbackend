@@ -199,6 +199,7 @@
             pagination(currentPage) {
                 let self = this;
                 self.page = currentPage;
+                self.clickPayId = [];
                 self.getList();
             },
             getList() {

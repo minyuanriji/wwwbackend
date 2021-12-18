@@ -182,8 +182,12 @@
                             </el-cascader>
                         </el-form-item>
                         <el-form-item label="店铺地址" prop="address">
-                            <el-input v-model="ruleForm.address"></el-input>
+                            <el-input v-model="ruleForm.address" @change="searchKeyword"></el-input>
                         </el-form-item>
+
+                        <!-- 渲染地图的div容器 -->
+                        <div id="map" style="width:900px;height:400px;margin-left: 165px;margin-bottom: 15px"></div>
+
                         <el-form-item label="客服电话" prop="service_mobile">
                             <el-input v-model="ruleForm.service_mobile"></el-input>
                         </el-form-item>
@@ -383,6 +387,7 @@
         </el-dialog>
     </el-card>
 </div>
+<script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=O3DBZ-IFH3W-KKIRN-RZPNQ-AOSH3-EGB5N"></script>
 <script>
     const app = new Vue({
         el: '#app',
@@ -503,10 +508,57 @@
                 dialogImg: false,
                 click_img: '',
                 activeName: 'basic',
+                longitude: "113.667636",
+                latitude: "34.754152"
             };
         },
         watch: {},
         methods: {
+            initMap() {
+                let address = "";
+                let that = this;
+                var center = new qq.maps.LatLng(that.latitude, that.longitude);
+                var map = new qq.maps.Map(document.getElementById('map'), {
+                    center: center,
+                    zoom: 13,
+                    disableDefaultUI: true,
+                });
+                var marker = new qq.maps.Marker({
+                    position: center,
+                    map: map
+                });
+                var infoWin = new qq.maps.InfoWindow({
+                    map: map
+                });
+                var geocoder = new qq.maps.Geocoder({
+                    complete: function(res) {
+                        console.log(res);
+                        address = res.detail.nearPois[0].name;
+                        that.ruleForm.address = res.detail.nearPois[0].name;
+                        that.getRegionId(res.detail.addressComponents);
+                    }
+                });
+                qq.maps.event.addListener(map, "click", function(event) {
+                    this.longitude = event.latLng.getLat();
+                    this.latitude = event.latLng.getLng();
+                    that.ruleForm.latitude = event.latLng.getLat();
+                    that.ruleForm.longitude = event.latLng.getLng();
+
+                    console.log(event);
+                    let lat = new qq.maps.LatLng(this.longitude, this.latitude);
+                    geocoder.getAddress(lat);
+                    setTimeout(() => {
+                        infoWin.open();
+                        infoWin.setContent(
+                            '<div style="text-align:center;white-space:nowrap;">' +
+                            address +
+                            "</div>"
+                        );
+                        infoWin.setPosition(event.latLng);
+                    }, 200);
+                });
+            },
+
             saveScore(){
                 let that = this;
                 let do_request = function(){
@@ -584,7 +636,13 @@
                         this.scoreFormData.rate = e.data.data.detail.give_score.rate;
                         this.scoreFormData.start_at = e.data.data.detail.give_score.start_at;
                         this.scoreFormData.score_give_settings = e.data.data.detail.give_score.score_give_settings;
-                        this.scoreFormData.score_enable = e.data.data.detail.give_score.score_enable;
+                        if (e.data.data.detail.lng != '') {
+                            this.longitude = e.data.data.detail.lng;
+                        }
+                        if (e.data.data.detail.lat != '') {
+                            this.latitude = e.data.data.detail.lat;
+                        }
+                        this.initMap();
                     }
                 }).catch(e => {
                 });
@@ -720,6 +778,27 @@
             dialogImgShow(imgUrl) {
                 this.dialogImg = true;
                 this.click_img = imgUrl;
+            },
+            getRegionId (res) {
+                if (this.district !== undefined && this.district.length > 0) {
+                    for (let i in this.district){
+                        if (this.district[i].name == res.province && this.district[i].level == 'province') {
+                            this.ruleForm.district[0] = this.district[i].id;
+                            for (let c in this.district[i].list){
+                                if (this.district[i].list[c].name == res.city && this.district[i].list[c].level == 'city') {
+                                    this.ruleForm.district[1] = this.district[i].list[c].id;
+                                    for (let d in this.district[i].list[c].list){
+                                        if (this.district[i].list[c].list[d].name == res.district && this.district[i].list[c].list[d].level == 'district') {
+                                            this.ruleForm.district[2] = this.district[i].list[c].list[d].id;
+                                            console.log( this.ruleForm.district);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
             }
         },
         mounted: function () {

@@ -25,6 +25,7 @@ class CashListForm extends BaseModel
     public $start_date;
     public $end_date;
     public $keyword;
+    public $kw_type;
     public $platform;
     public $fields;
     public $flag;
@@ -36,7 +37,7 @@ class CashListForm extends BaseModel
         return [
             [['page', 'limit', 'status', 'user_id'], 'integer'],
             [['fields'], 'safe'],
-            [['keyword', 'start_date', 'end_date', 'flag'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'flag', 'kw_type'], 'trim'],
         ];
     }
 
@@ -58,9 +59,23 @@ class CashListForm extends BaseModel
             ->select('c.*,u.nickname,u.mobile,u.avatar_url');
 
         $query->orderBy(['c.status' => SORT_ASC, 'c.created_at' => SORT_DESC]);
-        if ($this->keyword) {
-            $query->andWhere(['or', ['like', 'u.nickname', $this->keyword], ['like', 'u.mobile', $this->keyword]]);
+
+        if ($this->keyword && $this->kw_type) {
+            switch ($this->kw_type)
+            {
+                case "mobile":
+                    $query->andWhere(['u.mobile' => $this->keyword]);
+                    break;
+                case "user_id":
+                    $query->andWhere(['u.id' => $this->keyword]);
+                    break;
+                case "nickname":
+                    $query->andWhere(['like', 'u.nickname', $this->keyword]);
+                    break;
+                default:
+            }
         }
+
         if ($this->start_date && $this->end_date) {
             $query->andWhere(['<', 'c.updated_at', strtotime($this->end_date)])
                 ->andWhere(['>', 'c.updated_at', strtotime($this->start_date)]);

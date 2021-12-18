@@ -1,17 +1,14 @@
 <div id="app" v-cloak>
     <el-tabs v-model="activeName" @tab-click="handleClick" style="border-radius: 15px">
 
-        <el-tab-pane label="全部" name="all"></el-tab-pane>
-        <el-tab-pane label="未审核" name="no_confirm"></el-tab-pane>
-        <el-tab-pane label="待打款" name="no_paid"></el-tab-pane>
-        <el-tab-pane label="已打款" name="paid"></el-tab-pane>
-        <el-tab-pane label="拒绝" name="refuse"></el-tab-pane>
-        <el-tab-pane label="已驳回" name="return"></el-tab-pane>
+        <el-tab-pane v-for="item in header_tab" :label="item.label" :name="item.name"></el-tab-pane>
 
         <el-card style="border-radius: 15px">
             <div style="float: right;margin-right: 10px;margin-bottom: 10px">
-                <com-export-dialog :field_list='export_list' :params="searchData"
-                                   @selected="exportConfirm"></com-export-dialog>
+                <com-export-dialog :field_list='export_list'
+                                   :params="searchData"
+                                   @selected="exportConfirm">
+                </com-export-dialog>
             </div>
             <div style="margin-top:10px" v-loading="statisticsLoading">
                 <div style="display: flex;justify-content: space-evenly">
@@ -47,9 +44,12 @@
                                     end-placeholder="结束日期">
                     </el-date-picker>
                 </div>
-                <div style="width: 16%">
-                    <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入商户名称搜索"
+                <div style="width: 20%">
+                    <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入搜索"
                               v-model="search.keyword" clearable @clear="goSearch">
+                        <el-select slot="prepend" v-model="search.kw_type" placeholder="请选择" size="small" style="width:120px;">
+                            <el-option v-for="item in select_keyword_option" :label="item.label" :key="item.value" :value="item.value"></el-option>
+                        </el-select>
                         <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
                     </el-input>
                 </div>
@@ -188,6 +188,7 @@
                 date: '',
                 search: {
                     keyword: '',
+                    kw_type: '',
                     status: '',
                     start_date: '',
                     end_at: ''
@@ -228,12 +229,53 @@
                 export_list: [],
                 searchData: {
                     keyword: '',
+                    kw_type: '',
                     start_date: '',
                     end_date: '',
                     status: '',
                     level: '',
                     address: null,
                 },
+                header_tab:[
+                    {
+                        label:'全部',
+                        name:'all'
+                    },
+                    {
+                        label:'未审核',
+                        name:'no_confirm'
+                    },
+                    {
+                        label:'待打款',
+                        name:'no_paid'
+                    },
+                    {
+                        label:'已打款',
+                        name:'paid'
+                    },
+                    {
+                        label:'拒绝',
+                        name:'refuse'
+                    },
+                    {
+                        label:'已驳回',
+                        name:'return'
+                    },
+                ],
+                select_keyword_option:[
+                    {
+                        label:'店铺名',
+                        value:'store_name',
+                    },
+                    {
+                        label:'商户ID',
+                        value:'mch_id',
+                    },
+                    {
+                        label:'手机号',
+                        value:'mobile',
+                    },
+                ],
             };
         },
         mounted() {
@@ -308,6 +350,7 @@
                         start_date: this.search.start_date,
                         end_date: this.search.end_date,
                         keyword: this.search.keyword,
+                        kw_type: this.search.kw_type,
                         level: this.level,
                         address: this.address,
                     },
@@ -336,6 +379,7 @@
                         start_date: this.search.start_date,
                         end_date: this.search.end_date,
                         keyword: this.search.keyword,
+                        kw_type: this.search.kw_type,
                         level: this.level,
                         address: this.address,
                     },
@@ -359,6 +403,7 @@
             },
             exportConfirm() {
                 this.searchData.keyword = this.search.keyword;
+                this.searchData.kw_type = this.search.kw_type;
                 this.searchData.start_date = this.search.start_date;
                 this.searchData.end_date = this.search.end_date;
                 this.searchData.level = this.level;

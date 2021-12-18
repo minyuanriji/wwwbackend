@@ -52,6 +52,7 @@ use Yii;
  * @property int $inviter_at 推荐资格升级时间
  * @property int $source 用户来源
  * @property int $is_examine 是否有审核资格
+ * @property int $lock_parent 锁住上级
  * @property User $parent
  * @property User $secondParent
  * @property User $thirdParent

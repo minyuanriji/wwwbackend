@@ -62,7 +62,7 @@ class CheckoutOrderPayForm extends BaseModel {
             }
 
             //用户与商户绑定关系
-            if(!$user->parent_id || $user->parent_id == GLOBAL_PARENT_ID){
+            if((!$user->parent_id || $user->parent_id == GLOBAL_PARENT_ID) && !$user->lock_parent){
                 $user->parent_id = $mchModel->user_id;
                 if(!$user->save()){
                     throw new \Exception($this->responseErrorMsg($user));

@@ -4,11 +4,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
 
 <div id="app" v-cloak>
     <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="全部" name="-1"></el-tab-pane>
-        <el-tab-pane label="未审核" name="0"></el-tab-pane>
-        <el-tab-pane label="待打款" name="1"></el-tab-pane>
-        <el-tab-pane label="已打款" name="2"></el-tab-pane>
-        <el-tab-pane label="驳回" name="3"></el-tab-pane>
+        <el-tab-pane v-for="item in header_tab" :name="item.name" :label="item.label"></el-tab-pane>
 
         <el-card style="border-radius: 15px;margin-bottom: 10px">
             <div style="float: right">
@@ -45,8 +41,11 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                             @change="selectDateTime"
                             end-placeholder="结束日期">
             </el-date-picker>
-            <div class="input-item" style="margin-left:15px;display:inline-block;width:300px;">
+            <div class="input-item" style="margin-left:15px;display:inline-block;width:350px;">
                 <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入昵称搜索" v-model="search.keyword" clearable @clear="goSearch">
+                    <el-select slot="prepend" v-model="search.kw_type" placeholder="请选择" size="small" style="width:120px;">
+                        <el-option v-for="item in select_keyword_option" :label="item.label" :key="item.value" :value="item.value"></el-option>
+                    </el-select>
                     <el-button slot="append" icon="el-icon-search" @click="goSearch"></el-button>
                 </el-input>
             </div>
@@ -162,6 +161,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 date: '',
                 search: {
                     keyword: '',
+                    kw_type: '',
                     status: -1,
                     start_date: '',
                     end_at: ''
@@ -174,10 +174,47 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 Statistics: '',
                 searchData: {
                     keyword: '',
+                    kw_type: '',
                     start_date: '',
                     end_date: '',
                     status: '',
                 },
+                header_tab: [
+                    {
+                        label:'全部',
+                        name: -1,
+                    },
+                    {
+                        label:'未审核',
+                        name: 0,
+                    },
+                    {
+                        label:'待打款',
+                        name: 1,
+                    },
+                    {
+                        label:'已打款',
+                        name: 2,
+                    },
+                    {
+                        label:'驳回',
+                        name: 3,
+                    },
+                ],
+                select_keyword_option:[
+                    {
+                        label:'手机号',
+                        value:'mobile',
+                    },
+                    {
+                        label:'昵称',
+                        value:'nickname',
+                    },
+                    {
+                        label:'用户ID',
+                        value:'user_id',
+                    },
+                ],
             };
         },
         mounted() {
@@ -192,6 +229,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             },
             exportConfirm() {
                 this.searchData.keyword = this.search.keyword;
+                this.searchData.kw_type = this.search.kw_type;
                 this.searchData.start_date = this.search.start_date;
                 this.searchData.end_date = this.search.end_date;
                 this.searchData.status = this.search.status;
@@ -219,6 +257,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                         start_date: this.search.start_date,
                         end_date: this.search.end_date,
                         keyword: this.search.keyword,
+                        kw_type: this.search.kw_type,
                         user_id: getQuery('user_id'),
                     },
                     method: 'get'

@@ -23,6 +23,7 @@ class MchCashListForm extends BaseModel{
     public $start_date;
     public $end_date;
     public $keyword;
+    public $kw_type;
     public $status;
     public $level;
     public $address;
@@ -32,7 +33,7 @@ class MchCashListForm extends BaseModel{
     public function rules(){
         return [
             [['page', 'limit', 'level'], 'integer'],
-            [['keyword', 'start_date', 'end_date', 'status', 'flag'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'status', 'flag', 'kw_type'], 'trim'],
             [['address', 'fields'], 'safe'],
         ];
     }
@@ -42,8 +43,6 @@ class MchCashListForm extends BaseModel{
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-        $currentApply = 0;
-        $currentActual = 0;
         $query = MchCash::find()->alias("mc");
         $query->leftJoin(["eto" => EfpsTransferOrder::tableName()], "mc.order_no=eto.outTradeNo");
         $query->leftJoin(["s" => Store::tableName()], "s.mch_id=mc.mch_id");
@@ -52,8 +51,20 @@ class MchCashListForm extends BaseModel{
             "mc.status", "mc.transfer_status", "m.account_money", "mc.order_no", "mc.service_fee_rate", "mc.updated_at",
             "eto.remark", "mc.content", "mc.type_data"]);
 
-        if ($this->keyword) {
-            $query->andWhere(["like", "s.name", $this->keyword]);
+        if ($this->keyword && $this->kw_type) {
+            switch ($this->kw_type)
+            {
+                case "mobile":
+                    $query->andWhere(['m.mobile' => $this->keyword]);
+                    break;
+                case "mch_id":
+                    $query->andWhere(['mc.mch_id' => $this->keyword]);
+                    break;
+                case "store_name":
+                    $query->andWhere(["like", "s.name", $this->keyword]);
+                    break;
+                default:
+            }
         }
 
         if ($this->start_date && $this->end_date) {
@@ -61,20 +72,30 @@ class MchCashListForm extends BaseModel{
                 ->andWhere(['>', 'mc.updated_at', strtotime($this->start_date)]);
         }
 
-        if($this->status == "no_confirm"){
-            $query->andWhere(["mc.status" => 0]);
-        }elseif($this->status == "no_paid"){
-            $query->andWhere(["mc.status" => 1]);
-            $query->andWhere(["mc.transfer_status" => 0]);
-        }elseif($this->status == "paid"){
-            $query->andWhere(["mc.status" => 1]);
-            $query->andWhere(["mc.transfer_status" => 1]);
-        }elseif($this->status == "refuse"){
-            $query->andWhere(["mc.status" => 2]);
-            $query->andWhere(["mc.transfer_status" => 0]);
-        }elseif($this->status == "return"){
-            $query->andWhere(["mc.status" => 2]);
-            $query->andWhere(["mc.transfer_status" => 2]);
+        if (!empty($this->status)) {
+            switch ($this->status)
+            {
+                case "no_confirm":
+                    $query->andWhere(["mc.status" => 0]);
+                break;
+                case "no_paid":
+                    $query->andWhere(["mc.status" => 1]);
+                    $query->andWhere(["mc.transfer_status" => 0]);
+                    break;
+                case "paid":
+                    $query->andWhere(["mc.status" => 1]);
+                    $query->andWhere(["mc.transfer_status" => 1]);
+                    break;
+                case "refuse":
+                    $query->andWhere(["mc.status" => 2]);
+                    $query->andWhere(["mc.transfer_status" => 0]);
+                    break;
+                case "return":
+                    $query->andWhere(["mc.status" => 2]);
+                    $query->andWhere(["mc.transfer_status" => 2]);
+                    break;
+                default:
+            }
         }
 
         if ($this->level && $this->address) {
@@ -127,8 +148,20 @@ class MchCashListForm extends BaseModel{
         $query->leftJoin(["m" => Mch::tableName()], "m.id=s.mch_id");
         $query->select(["mc.money", "mc.fact_price", "mc.transfer_status"]);
 
-        if ($this->keyword) {
-            $query->andWhere(["like", "s.name", $this->keyword]);
+        if ($this->keyword && $this->kw_type) {
+            switch ($this->kw_type)
+            {
+                case "mobile":
+                    $query->andWhere(['m.mobile' => $this->keyword]);
+                    break;
+                case "mch_id":
+                    $query->andWhere(['mc.mch_id' => $this->keyword]);
+                    break;
+                case "store_name":
+                    $query->andWhere(["like", "s.name", $this->keyword]);
+                    break;
+                default:
+            }
         }
 
         if ($this->start_date && $this->end_date) {
@@ -136,20 +169,30 @@ class MchCashListForm extends BaseModel{
                 ->andWhere(['>', 'mc.updated_at', strtotime($this->start_date)]);
         }
 
-        if($this->status == "no_confirm"){
-            $query->andWhere(["mc.status" => 0]);
-        }elseif($this->status == "no_paid"){
-            $query->andWhere(["mc.status" => 1]);
-            $query->andWhere(["mc.transfer_status" => 0]);
-        }elseif($this->status == "paid"){
-            $query->andWhere(["mc.status" => 1]);
-            $query->andWhere(["mc.transfer_status" => 1]);
-        }elseif($this->status == "refuse"){
-            $query->andWhere(["mc.status" => 2]);
-            $query->andWhere(["mc.transfer_status" => 0]);
-        }elseif($this->status == "return"){
-            $query->andWhere(["mc.status" => 2]);
-            $query->andWhere(["mc.transfer_status" => 2]);
+        if (!empty($this->status)) {
+            switch ($this->status)
+            {
+                case "no_confirm":
+                    $query->andWhere(["mc.status" => 0]);
+                    break;
+                case "no_paid":
+                    $query->andWhere(["mc.status" => 1]);
+                    $query->andWhere(["mc.transfer_status" => 0]);
+                    break;
+                case "paid":
+                    $query->andWhere(["mc.status" => 1]);
+                    $query->andWhere(["mc.transfer_status" => 1]);
+                    break;
+                case "refuse":
+                    $query->andWhere(["mc.status" => 2]);
+                    $query->andWhere(["mc.transfer_status" => 0]);
+                    break;
+                case "return":
+                    $query->andWhere(["mc.status" => 2]);
+                    $query->andWhere(["mc.transfer_status" => 2]);
+                    break;
+                default:
+            }
         }
 
         if ($this->level && $this->address) {

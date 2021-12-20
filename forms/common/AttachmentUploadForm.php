@@ -595,7 +595,7 @@ class AttachmentUploadForm extends Model
     }
 
     public static function get_mime_type($file) {
-        if (function_exists('finfo_open')) {
+        if (phpversion() >= '5.3.0') {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $mimetype = finfo_file($finfo, $file);
             finfo_close($finfo);

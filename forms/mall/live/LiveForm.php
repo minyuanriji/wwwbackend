@@ -7,6 +7,7 @@
 
 namespace app\forms\mall\live;
 
+use app\controllers\api\SetToken;
 use app\core\ApiCode;
 use app\forms\common\QrCodeCommon;
 use app\forms\mall\live\CommonLive;
@@ -55,6 +56,15 @@ class LiveForm extends BaseModel
                     'limit' => $this->limit,
                 ]);
                 $res = json_decode($res->getBody()->getContents(), true);
+                if ($res['errcode'] == 40001) {
+                    $token = (new SetToken())->getToken();
+                    $api = "https://api.weixin.qq.com/wxa/business/getliveinfo?access_token={$token}";
+                    $res = CommonLive::post($api, [
+                        'start' => $this->page * $this->limit - $this->limit,
+                        'limit' => $this->limit,
+                    ]);
+                    $res = json_decode($res->getBody()->getContents(), true);
+                }
             } catch (\Exception $exception) {
                 $res = [
                     'errcode' => 0,

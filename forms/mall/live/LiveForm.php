@@ -58,6 +58,15 @@ class LiveForm extends BaseModel
                     'limit' => $this->limit,
                 ]);
                 $res = json_decode($res->getBody()->getContents(), true);
+                if ($res['errcode'] == 40001) {
+                    $token = (new SetToken())->SetToken();
+                    $api = "https://api.weixin.qq.com/wxa/business/getliveinfo?access_token={$token}";
+                    $res = CommonLive::post($api, [
+                        'start' => $this->page * $this->limit - $this->limit,
+                        'limit' => $this->limit,
+                    ]);
+                    $res = json_decode($res->getBody()->getContents(), true);
+                }
             } catch (\Exception $exception) {
                 $res = [
                     'errcode' => 0,
@@ -181,7 +190,7 @@ class LiveForm extends BaseModel
     public function getQrCode()
     {
         $token = \Yii::$app->security->generateRandomString();
-        $form = new CommonQrCode();
+        $form = new QrCodeCommon();
         $form->appPlatform = APP_PLATFORM_WXAPP;
 
         $result = $form->getQrCode(['type' => 9, 'room_id' => $this->room_id], 430, 'plugin-private://wx2b03c6e691cd7370/pages/live-player-plugin'

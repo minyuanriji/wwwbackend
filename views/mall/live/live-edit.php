@@ -152,6 +152,16 @@
                                  width="80px" height="80px">
                     </com-gallery>
                 </el-form-item>
+                <el-form-item label="购物直播频道封面图" prop="channel_cover_img" >
+                    <com-attachment :multiple="false" :max="1" v-model="ruleForm.channel_cover_img">
+                        <el-tooltip effect="dark" content="建议像素800*640,大小不超过1M" placement="top">
+                            <el-button style="margin-bottom: 10px;" size="mini">选择图片</el-button>
+                        </el-tooltip>
+                    </com-attachment>
+                    <com-gallery :url="ruleForm.channel_cover_img" :show-delete="true" @deleted="ruleForm.channel_cover_img = ''"
+                                 width="80px" height="80px">
+                    </com-gallery>
+                </el-form-item>
             </el-form>
         </div>
         <el-button class="button-item" :loading="btnLoading" type="primary" @click="store('ruleForm')" size="small">    保存
@@ -166,6 +176,7 @@
                 ruleForm: {
                     name: '',
                     cover_img: '',
+                    channel_cover_img: '',
                     anchor_name: '',
                     anchor_wechat: '',
                     share_img: '',
@@ -194,6 +205,9 @@
                     ],
                     share_img: [
                         {required: true, message: '请选择直播分享图', trigger: 'blur'},
+                    ],
+                    channel_cover_img: [
+                        {required: true, message: '请选择购物直播频道封面图', trigger: 'blur'},
                     ],
                 },
                 btnLoading: false,

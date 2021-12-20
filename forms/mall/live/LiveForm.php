@@ -12,6 +12,7 @@ use app\core\ApiCode;
 use app\forms\common\QrCodeCommon;
 use app\forms\mall\live\CommonLive;
 use app\models\BaseModel;
+use app\models\User;
 
 class LiveForm extends BaseModel
 {
@@ -191,7 +192,7 @@ class LiveForm extends BaseModel
     {
         $token = \Yii::$app->security->generateRandomString();
         $form = new QrCodeCommon();
-        $form->appPlatform = APP_PLATFORM_WXAPP;
+        $form->appPlatform = User::PLATFORM_MP_WX;
 
         $result = $form->getQrCode(['type' => 9, 'room_id' => $this->room_id], 430, 'plugin-private://wx2b03c6e691cd7370/pages/live-player-plugin'
         );

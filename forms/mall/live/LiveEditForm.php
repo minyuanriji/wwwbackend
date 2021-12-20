@@ -7,6 +7,7 @@
 
 namespace app\forms\mall\live;
 
+use app\controllers\api\SetToken;
 use app\core\ApiCode;
 use app\forms\mall\live\CommonUpload;
 use app\models\BaseModel;
@@ -62,12 +63,13 @@ class LiveEditForm extends BaseModel
 
         try {
             $this->checkData();
-            $accessToken = CommonLive::checkAccessToken();
-            $coverImgId = (new CommonUpload())->uploadImage($accessToken, $this->cover_img, 2);
-            $shareImgId = (new CommonUpload())->uploadImage($accessToken, $this->share_img, 1);
+//            $accessToken = CommonLive::checkAccessToken();
+            $token = (new SetToken())->getToken();
+
+            $coverImgId = (new CommonUpload())->uploadImage($token, $this->cover_img, 2);
+            $shareImgId = (new CommonUpload())->uploadImage($token, $this->share_img, 1);
             // 接口每天上限调用10000次
-            $api = "https://api.weixin.qq.com/wxaapi/broadcast/room/create?access_token={$accessToken}";
-            $res = CommonLive::post($api, [
+            $data = [
                 'name' => $this->name,
                 'coverImg' => $coverImgId,
                 'startTime' => strtotime($this->start_time),
@@ -80,7 +82,9 @@ class LiveEditForm extends BaseModel
                 'closeLike' => $this->close_like,
                 'closeGoods' => $this->close_goods,
                 'closeComment' => $this->close_comment,
-            ]);
+            ];
+            $api = "https://api.weixin.qq.com/wxaapi/broadcast/room/create?access_token={$token}";
+            $res = CommonLive::post($api, $data);
             $res = json_decode($res->getBody()->getContents(), true);
 
             if ($res['errcode'] != 0) {

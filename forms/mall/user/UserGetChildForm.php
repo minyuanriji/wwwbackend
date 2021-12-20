@@ -14,6 +14,7 @@ class UserGetChildForm extends BaseModel{
     public $page;
     public $parent_id;
     public $keyword;
+    public $kw_type;
     public $role_type;
     public $start_date;
     public $end_date;
@@ -22,7 +23,7 @@ class UserGetChildForm extends BaseModel{
     public function rules(){
         return [
             [['parent_id'], 'required'],
-            [['keyword', 'start_date', 'end_date', 'role_type', 'team_type'], 'trim'],
+            [['keyword', 'start_date', 'end_date', 'role_type', 'team_type', 'kw_type'], 'trim'],
             [['page'], 'safe']
         ];
     }
@@ -60,12 +61,22 @@ class UserGetChildForm extends BaseModel{
                 ]);
             }
 
-            $query->keyword($this->keyword, [
-                'OR',
-                ['like', 'u.nickname', $this->keyword],
-                ['like', 'u.mobile', $this->keyword],
-                ['like', 'u.id', $this->keyword],
-            ]);
+            if ($this->keyword && $this->kw_type) {
+                switch ($this->kw_type)
+                {
+                    case "mobile":
+                        $query->andWhere(['u.mobile' => $this->keyword]);
+                        break;
+                    case "user_id":
+                        $query->andWhere(['u.id' => $this->keyword]);
+                        break;
+                    case "nickname":
+                        $query->andWhere(['like', 'u.nickname', $this->keyword]);
+                        break;
+                    default:
+                }
+            }
+
 
             if ($this->start_date && $this->end_date) {
                 $query->andWhere(['<', 'u.created_at', strtotime($this->end_date)])

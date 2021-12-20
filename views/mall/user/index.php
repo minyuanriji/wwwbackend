@@ -23,8 +23,16 @@
                 <el-option v-for="item in allPlatform" :label="item.name" :value="item.value"></el-option>
             </el-select>
             <div class="input-item" style="width:300px;">
-                <el-input @keyup.enter.native="search" size="small" placeholder="请输入ID/昵称/手机号" v-model="keyword"
+                <el-input @keyup.enter.native="search" size="small" placeholder="请输入搜索" v-model="keyword"
                           clearable @clear="search">
+                    <el-select slot="prepend" v-model="kw_type" placeholder="请选择" size="small"
+                               style="width:120px;">
+                        <el-option v-for="item in item_type_options"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
@@ -295,12 +303,14 @@
             return {
                 searchData: {
                     keyword: '',
+                    kw_type: '',
                 },
                 platform: '',
                 member_level: '0',
                 role_type: '',
                 mall_members: [],
                 keyword: '',
+                kw_type: '',
                 form: [],
                 member: [],
                 pageCount: 0,
@@ -411,6 +421,20 @@
                         value:'bdapp',
                     },
                 ],
+                item_type_options: [
+                    {
+                        label:'手机号',
+                        value:'mobile',
+                    },
+                    {
+                        label:'用户ID',
+                        value:'user_id',
+                    },
+                    {
+                        label:'昵称',
+                        value:'nickname',
+                    }
+                ],
             }
         },
         methods: {
@@ -451,6 +475,7 @@
                         page: self.recommandData.page,
                         parent_id: self.recommandData.id,
                         keyword: self.recommandData.keyword,
+                        kw_type: self.recommandData.kw_type,
                         role_type: self.recommandData.role_type,
                         start_date: self.recommandData.start_date,
                         end_date: self.recommandData.end_date,
@@ -476,6 +501,7 @@
             },
             exportConfirm() {
                 this.searchData.keyword = this.keyword;
+                this.searchData.kw_type = this.kw_type;
             },
             //积分
             integralPicUrl(e) {
@@ -571,6 +597,7 @@
                         role_type: this.role_type,
                         platform: this.platform,
                         keyword: this.keyword,
+                        kw_type: this.kw_type,
                     },
                 }).then(e => {
                     if (e.data.code === 0) {

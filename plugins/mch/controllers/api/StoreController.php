@@ -2,12 +2,22 @@
 namespace app\plugins\mch\controllers\api;
 
 use app\controllers\api\ApiController;
+use app\controllers\api\filters\LoginFilter;
 use app\core\ApiCode;
 use app\helpers\APICacheHelper;
 use app\plugins\mch\forms\api\MchStoreDetailForm;
 use app\plugins\mch\forms\api\MchStoreListForm;
 
 class StoreController extends ApiController {
+
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+            'login' => [
+                'class' => LoginFilter::class,
+            ],
+        ]);
+    }
 
     /**
      * 获取商户

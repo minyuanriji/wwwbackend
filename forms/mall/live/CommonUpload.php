@@ -2,7 +2,7 @@
 
 namespace app\forms\mall\live;
 
-use app\forms\AttachmentUploadForm;
+use app\forms\common\AttachmentUploadForm;
 use app\models\BaseModel;
 use Grafika\Grafika;
 

@@ -42,6 +42,7 @@ class UserForm extends BaseModel
     public $role_type;
     public $page_size;
     public $keyword;
+    public $kw_type;
     public $type;
     public $platform;
     public $user_id;
@@ -69,7 +70,7 @@ class UserForm extends BaseModel
             [['fields', 'is_lianc', 'lock_parent'], 'safe'],
             [['keyword', 'platform'], 'default', 'value' => ''],
             [['is_change_name'], 'boolean'],
-            [['role_type', 'search'], 'string']
+            [['role_type', 'search', 'kw_type'], 'string']
         ];
     }
 
@@ -242,12 +243,22 @@ class UserForm extends BaseModel
             $query->leftJoin(['i' => UserInfo::tableName()], 'i.user_id = u.id');
             $query->keyword($this->platform, ['i.platform' => $this->platform]);
         }
-        $query->keyword($this->keyword, [
-            'OR',
-            ['like', 'u.nickname', $this->keyword],
-            ['like', 'u.mobile', $this->keyword],
-            ['like', 'u.id', $this->keyword],
-        ]);
+
+        if ($this->keyword && $this->kw_type) {
+            switch ($this->kw_type)
+            {
+                case "mobile":
+                    $query->andWhere(['u.mobile' => $this->keyword]);
+                    break;
+                case "user_id":
+                    $query->andWhere(['u.id' => $this->keyword]);
+                    break;
+                case "nickname":
+                    $query->andWhere(['like', 'u.nickname', $this->keyword]);
+                    break;
+                default:
+            }
+        }
 
         if(!empty($this->role_type)){
             $query->andWhere(["u.role_type" => $this->role_type]);
@@ -264,7 +275,7 @@ class UserForm extends BaseModel
             $exp->export($new_query);
             return false;
         }
-        $cardQuery = UserCard::find()->where(['mall_id' => $mall_id, 'is_delete' => 0])
+        /*$cardQuery = UserCard::find()->where(['mall_id' => $mall_id, 'is_delete' => 0])
             ->andWhere('user_id = u.id')->select('count(1)');
         $couponQuery = UserCoupon::find()->where(['mall_id' => $mall_id, 'is_delete' => 0,'is_failure' => 0])
             ->andWhere('user_id = u.id')->select('count(1)');
@@ -285,7 +296,7 @@ class UserForm extends BaseModel
         //用户下级数量
         $childSum = UserRelationshipLink::find()->alias("c_url")
             ->andWhere("c_url.left > url.left AND c_url.right < url.right")
-            ->select('count(1)');
+            ->select('count(1)');*/
 
         $mall_members = MemberLevel::findAll(['mall_id' => $mall_id, 'status' => 1, 'is_delete' => 0]);
         $list = $query

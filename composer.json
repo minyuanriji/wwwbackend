@@ -45,7 +45,8 @@
 	"xingwenge/canal_php": "dev-master",
     "phpoffice/phpspreadsheet": "dev-master",
     "ext-bcmath": "*",
-    "lin010/taolijin": "dev-main"
+    "lin010/taolijin": "dev-main",
+    "ext-fileinfo": "*"
   },
   "require-dev": {
     "yiisoft/yii2-debug": "~2.1.0",

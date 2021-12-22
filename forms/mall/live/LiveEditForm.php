@@ -7,6 +7,7 @@
 
 namespace app\forms\mall\live;
 
+use app\controllers\api\SetToken;
 use app\core\ApiCode;
 use app\forms\mall\live\CommonUpload;
 use app\models\BaseModel;
@@ -20,6 +21,7 @@ class LiveEditForm extends BaseModel
     public $anchor_name;
     public $anchor_wechat;
     public $share_img;
+    public $channel_cover_img;
     public $type;
     public $screen_type;
     public $close_like;
@@ -29,8 +31,8 @@ class LiveEditForm extends BaseModel
     public function rules()
     {
         return [
-            [['name', 'cover_img', 'start_time', 'end_time', 'anchor_name', 'anchor_wechat', 'share_img', 'type', 'screen_type', 'close_like', 'close_goods', 'close_comment'], 'required'],
-            [['name', 'cover_img', 'start_time', 'end_time', 'anchor_name', 'anchor_wechat', 'share_img'], 'string'],
+            [['name', 'cover_img', 'start_time', 'end_time', 'anchor_name', 'anchor_wechat', 'share_img', 'type', 'screen_type', 'close_like', 'close_goods', 'close_comment', 'channel_cover_img'], 'required'],
+            [['name', 'cover_img', 'start_time', 'end_time', 'anchor_name', 'anchor_wechat', 'share_img', 'channel_cover_img'], 'string'],
             [['type', 'screen_type', 'close_like', 'close_goods', 'close_comment'], 'integer'],
             [['name', 'anchor_name', 'anchor_wechat'], 'trim'],
         ];
@@ -46,6 +48,7 @@ class LiveEditForm extends BaseModel
             'anchor_name' => '主播昵称',
             'anchor_wechat' => '主播微信号',
             'share_img' => '分享图片',
+            'channel_cover_img' => '购物直播频道封面图',
             'type' => '直播间类型',
             'screen_type' => '横屏、竖屏',
             'close_like' => '是否关闭点赞',
@@ -62,12 +65,14 @@ class LiveEditForm extends BaseModel
 
         try {
             $this->checkData();
-            $accessToken = CommonLive::checkAccessToken();
-            $coverImgId = (new CommonUpload())->uploadImage($accessToken, $this->cover_img, 2);
-            $shareImgId = (new CommonUpload())->uploadImage($accessToken, $this->share_img, 1);
+//            $accessToken = CommonLive::checkAccessToken();
+            $token = (new SetToken())->getToken();
+
+            $coverImgId         = (new CommonUpload())->uploadImage($token, $this->cover_img, 2);
+            $shareImgId         = (new CommonUpload())->uploadImage($token, $this->share_img, 1);
+            $channelCoverImgId  = (new CommonUpload())->uploadImage($token, $this->channel_cover_img, 1);
             // 接口每天上限调用10000次
-            $api = "https://api.weixin.qq.com/wxaapi/broadcast/room/create?access_token={$accessToken}";
-            $res = CommonLive::post($api, [
+            $data = [
                 'name' => $this->name,
                 'coverImg' => $coverImgId,
                 'startTime' => strtotime($this->start_time),
@@ -80,7 +85,10 @@ class LiveEditForm extends BaseModel
                 'closeLike' => $this->close_like,
                 'closeGoods' => $this->close_goods,
                 'closeComment' => $this->close_comment,
-            ]);
+                'feedsImg' => $channelCoverImgId,
+            ];
+            $api = "https://api.weixin.qq.com/wxaapi/broadcast/room/create?access_token={$token}";
+            $res = CommonLive::post($api, $data);
             $res = json_decode($res->getBody()->getContents(), true);
 
             if ($res['errcode'] != 0) {

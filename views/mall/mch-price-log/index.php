@@ -44,7 +44,7 @@
                             <span v-if="scope.row.source_type == 'order_detail'">商品订单</span>
                         </template>
                     </el-table-column>
-                    <el-table-column label="订单信息" width="300">
+                    <el-table-column label="订单信息" width="280">
                         <template slot-scope="scope">
                             <div v-if="scope.row.source_type == 'giftpacks_order_item'">
                                 <div>订单编号：{{scope.row.order_item_info.giftpackOrder.order_sn}}</div>
@@ -76,7 +76,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="礼包信息" width="260">
+                    <el-table-column label="产品信息" width="260">
                         <template slot-scope="scope">
                             <div flex="cross:center" v-if="scope.row.order_item_info != ''">
                                 <com-image :src="scope.row.order_item_info.giftpackOrder.giftpacks.cover_pic"></com-image>
@@ -86,6 +86,19 @@
                                     </div>
                                     <div>
                                         ID：{{scope.row.order_item_info.giftpackOrder.giftpacks.id}}
+                                        <el-button type="primary" size="mini" @click="getGiftDetails(scope.row)">详 情
+                                        </el-button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div flex="cross:center" v-else-if="scope.row.goods_info != ''">
+                                <com-image :src="scope.row.goods_info.goods_attr.cover_pic"></com-image>
+                                <div style="margin-left: 10px;">
+                                    <div>
+                                        {{scope.row.goods_info.goods_attr.name}}
+                                    </div>
+                                    <div>
+                                        ID：{{scope.row.goods_info.goods_attr.goods_id}}
                                         <el-button type="primary" size="mini" @click="getGiftDetails(scope.row)">详 情
                                         </el-button>
                                     </div>
@@ -327,6 +340,22 @@
             getGiftDetails(row) {
                 if (row.order_item_info != '') {
                     this.details = row.order_item_info.giftpackOrder.giftpacks;
+                }
+                if (row.goods_info != '') {
+                    this.details.cover_pic = row.goods_info.goods_attr.cover_pic;
+                    this.details.title = row.goods_info.goods_attr.name;
+                    this.details.price = row.goods_info.goods_attr.price;
+                    this.details.score_enable = 0;
+                    this.details.group_enable = 0;
+                    this.details.integral_enable = 0;
+                    this.details.expired_at = 0;
+                    this.details.max_stock = row.goods_info.goods_stock;
+                    this.details.descript = row.goods_info.product;
+                    if (row.order.pay_type == 1) {
+                        this.details.allow_currency = 'money';
+                    } else {
+                        this.details.allow_currency = 'integral';
+                    }
                 }
                 this.dialogVisible = true;
                 this.gift_goods_info.goods_count = row.goods_count;

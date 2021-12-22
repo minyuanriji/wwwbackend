@@ -35,7 +35,7 @@ class ShoppingVoucherIncomeNotification
                 'first'     => '您好，您已消费成功',
                 'keyword1'  => $user->nickname,
                 'keyword2'  => date('Y-m-d H:i:s', $voucher_log['created_at']),
-                'remark'    => $voucher_log['desc'] . '’'. $voucher_log['money'] .'‘，欢迎您再次光临！'
+                'remark'    => $voucher_log['desc'] . $voucher_log['money'] .'，欢迎您再次光临！'
             ]
         ]))->send();
     }

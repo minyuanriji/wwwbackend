@@ -161,7 +161,8 @@ class WechatController extends ApiController
             'chooseWXPay',
             'getLocation',
             'checkJsApi',
-            'openAddress'
+            'openAddress',
+            'hideMenuItems',
         ], $debug = false, $beta = false, $json = false);
         return $this->asJson(['code' => ApiCode::CODE_SUCCESS, 'msg' => '请求成功', 'data' => ['config' => $res]]);
 

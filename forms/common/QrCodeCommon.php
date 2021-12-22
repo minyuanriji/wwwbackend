@@ -96,11 +96,11 @@ class QrCodeCommon extends BaseModel
                 ];
             }elseif ($appPlatform == User::PLATFORM_H5 || $appPlatform == User::PLATFORM_WECHAT || $appPlatform == User::PLATFORM_MP_WX) {
                 return $this->wechat($scene, $width, $page, $appPlatform);
-            } elseif ($appPlatform == APP_PLATFORM_MP_ALI) {
+            } elseif ($appPlatform == User::PLATFORM_MP_ALI) {
                 return $this->alipay($scene, \Yii::$app->mall->id, $page, '二维码');
-            } elseif ($appPlatform == APP_PLATFORM_MP_TT) {
+            } elseif ($appPlatform == User::PLATFORM_MP_TT) {
                 return $this->toutiao($scene, $width, $page);
-            } elseif ($appPlatform == APP_PLATFORM_MP_BD) {
+            } elseif ($appPlatform == User::PLATFORM_MP_BD) {
                 throw new \Exception('百度小程序暂不支持二维码生成');
             } else {
                 throw new \Exception($appPlatform . '平台不存在');

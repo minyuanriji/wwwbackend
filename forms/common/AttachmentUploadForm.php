@@ -576,7 +576,7 @@ class AttachmentUploadForm extends Model
         $pathInfo = pathinfo($localFilePath);
         $name = $pathInfo['basename'];
         $size = filesize($localFilePath);
-        $type = mimetype_from_filename($localFilePath);
+        $type = self::get_mime_type($localFilePath);
         return new UploadedFile([
             'name' => $name,
             'type' => $type,
@@ -592,5 +592,18 @@ class AttachmentUploadForm extends Model
         if  (!$this->mkdirs(dirname( $dir ),  $mode ))  return  FALSE;
 
         return  @ mkdir ( $dir ,  $mode );
+    }
+
+    public static function get_mime_type($file) {
+        if (phpversion() >= '5.3.0') {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimetype = finfo_file($finfo, $file);
+            finfo_close($finfo);
+        }
+        else {
+            $mimetype = mime_content_type($file);
+        }
+        if (empty($mimetype)) $mimetype = 'application/octet-stream';
+        return $mimetype;
     }
 }

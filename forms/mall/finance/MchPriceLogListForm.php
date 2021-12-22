@@ -108,6 +108,7 @@ class MchPriceLogListForm extends BaseModel{
                     $item['summary_price_calculation'] = 0;
                     $item['goods_count'] = 0;
                     $item['order_item_info'] = [];
+                    $item['goods_info'] = [];
                     //大礼包
                     if($item['source_type'] == "giftpacks_order_item"){
                         $orderItemInfo = GiftpacksOrderItem::find()->with([
@@ -142,8 +143,13 @@ class MchPriceLogListForm extends BaseModel{
                             $user = User::findOne($order->user_id);
                         }
                         $item['order_detail'] = $orderDetail ? $orderDetail->getAttributes() : [];
+                        $item['goods_info'] = $orderDetail ? $orderDetail->decodeGoodsInfo() : [];
+                        $item['goods_info']['goods_stock'] = $orderDetail->goods->goods_stock;
+                        $item['goods_info']['product'] = $orderDetail->goodsWarehouse->product;
                         $item['order'] = $order ? $order->getAttributes() : [];
                         $item['user'] = $user ? $user->getAttributes() : [];
+                        $item['summary_price_calculation'] = $item['price'];
+                        $item['goods_count'] = 1;
                     }
 
                     if (empty($item['cover_url'])) {

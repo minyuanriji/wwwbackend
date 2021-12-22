@@ -7,10 +7,12 @@
 
 namespace app\forms\mall\live;
 
+use app\controllers\api\SetToken;
 use app\core\ApiCode;
 use app\forms\common\QrCodeCommon;
 use app\forms\mall\live\CommonLive;
 use app\models\BaseModel;
+use app\models\User;
 
 class LiveForm extends BaseModel
 {
@@ -32,11 +34,13 @@ class LiveForm extends BaseModel
     {
         try {
 //            $accessToken = \Yii::$app->getWechat()->getAccessToken();
-            $wechat = \Yii::$app->wechat;
+            /*$wechat = \Yii::$app->wechat;
             $accessTokenArray = $wechat->miniProgram->access_token->getToken();
             if (!$accessTokenArray) {
                 throw new \Exception('微信配置有误');
-            }
+            }*/
+            $token = (new SetToken())->getToken();
+
         } catch (\Exception $exception) {
             return [
                 'code' => ApiCode::CODE_FAIL,
@@ -49,12 +53,21 @@ class LiveForm extends BaseModel
         if (!$res || $this->is_refresh) {
             try {
                 // 接口每天上限调用10000次
-                $api = "https://api.weixin.qq.com/wxa/business/getliveinfo?access_token={$accessTokenArray["access_token"]}";
+                $api = "https://api.weixin.qq.com/wxa/business/getliveinfo?access_token={$token}";
                 $res = CommonLive::post($api, [
                     'start' => $this->page * $this->limit - $this->limit,
                     'limit' => $this->limit,
                 ]);
                 $res = json_decode($res->getBody()->getContents(), true);
+                if ($res['errcode'] == 40001) {
+                    $token = (new SetToken())->SetToken();
+                    $api = "https://api.weixin.qq.com/wxa/business/getliveinfo?access_token={$token}";
+                    $res = CommonLive::post($api, [
+                        'start' => $this->page * $this->limit - $this->limit,
+                        'limit' => $this->limit,
+                    ]);
+                    $res = json_decode($res->getBody()->getContents(), true);
+                }
             } catch (\Exception $exception) {
                 $res = [
                     'errcode' => 0,
@@ -178,8 +191,8 @@ class LiveForm extends BaseModel
     public function getQrCode()
     {
         $token = \Yii::$app->security->generateRandomString();
-        $form = new CommonQrCode();
-        $form->appPlatform = APP_PLATFORM_WXAPP;
+        $form = new QrCodeCommon();
+        $form->appPlatform = User::PLATFORM_MP_WX;
 
         $result = $form->getQrCode(['type' => 9, 'room_id' => $this->room_id], 430, 'plugin-private://wx2b03c6e691cd7370/pages/live-player-plugin'
         );

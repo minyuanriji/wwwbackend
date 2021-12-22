@@ -10,15 +10,6 @@ use app\plugins\mch\forms\api\MchStoreListForm;
 
 class StoreController extends ApiController {
 
-    public function behaviors()
-    {
-        return array_merge(parent::behaviors(), [
-            'login' => [
-                'class' => LoginFilter::class,
-            ],
-        ]);
-    }
-
     /**
      * 获取商户
      * @return \yii\web\Response

@@ -29,7 +29,7 @@ class SharePosterForm extends GrafikaOption implements BasePoster
         \Yii::warning("appPlatform result:".json_encode(\Yii::$app->appPlatform));
         if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
             $file = $this->qrcode($option, [
-                ['pid' => \Yii::$app->user->id,'source'=>User::SOURCE_SHARE_POSTER,'mall_id'=>\Yii::$app->mall->id],
+                ['pid' => \Yii::$app->user->id,'mall_id'=>\Yii::$app->mall->id],//'source'=>User::SOURCE_SHARE_POSTER,
                 280,
                 $path
             ], $this);

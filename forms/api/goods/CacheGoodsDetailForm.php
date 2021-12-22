@@ -85,6 +85,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
             $info['cover_pic'] = $wareHouse->cover_pic;
             $info['video_url'] = $wareHouse->video_url;
             $info['detail'] = $wareHouse->detail;
+            $info['product'] = $wareHouse->product;
             $info['unit'] = $goods->unit;
             $info['sales'] = $goods->sales;
             $info['is_show_sales'] = $goods->is_show_sales;

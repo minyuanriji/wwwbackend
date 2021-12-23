@@ -9,12 +9,13 @@ class MchSharePosterForm extends SharePosterForm {
     public $route;
     public $name;
     public $mch_id;
+    public $store_id;
 
     public function rules(){
         return [
             [['route'], 'required'],
             [['route', 'name'], 'string'],
-            [['mch_id'], 'integer']
+            [['mch_id', 'store_id'], 'integer']
         ];
     }
 
@@ -29,7 +30,7 @@ class MchSharePosterForm extends SharePosterForm {
     }
 
     public function getSharePoster(){
-        return parent::get($this->route);
+        return parent::get($this->route, 0, $this->store_id);
     }
 
     protected function h5Path(){

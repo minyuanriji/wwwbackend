@@ -81,6 +81,7 @@ class UserLogic
      * @throws \yii\base\Exception
      */
     public static function userRegister($userData, $user = [],$parent_id=0,$stands_mall_id = 0){
+        echo 'time1:' . microtime(true) . PHP_EOL;
         $userData = self::loadUserFields($userData,$stands_mall_id);
         $transaction = \Yii::$app->db->beginTransaction();
         try{
@@ -94,17 +95,17 @@ class UserLogic
                     }
                 }
                 //生成用户的ID
-                $startNum = (int)date("ymd");
+                /*$startNum = (int)date("ymd");
                 $stepS    = (int)date("s");
                 $stepM    = (int)date("i") + $stepS;
                 $stepH    = (int)date("H") + $stepM;
                 $randUid  = $startNum + $stepH + $stepM + $stepS;
                 while(User::findOne($randUid)){
                     $randUid += rand(0, 5);
-                }
+                }*/
 
                 $user = new User();
-                $user->id = $randUid;
+//                $user->id = $randUid;
                 if (isset($userData["mobile"]) && $userData["mobile"]) {
                     $user->mobile = $userData["mobile"];
                 }

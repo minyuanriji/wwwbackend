@@ -8,6 +8,7 @@
 
 namespace app\controllers\mall;
 
+use app\controllers\api\SetToken;
 use app\forms\common\QrCodeCommon;
 use app\forms\mall\live\GoodsEditForm;
 use app\forms\mall\live\GoodsForm;
@@ -121,5 +122,10 @@ class LiveController extends MallController
         $form = new LiveForm();
         $form->attributes = \Yii::$app->request->get();
         return $this->asJson($form->getQrCode());
+    }
+
+    public function actionRefreshToken ()
+    {
+        return $this->asJson((new SetToken())->refreshToken());
     }
 }

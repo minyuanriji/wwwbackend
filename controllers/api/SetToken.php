@@ -66,4 +66,23 @@ class SetToken
         return $result;
     }
 
+    public function refreshToken()
+    {
+        $access_token = \Yii::$app->redis->get('app/forms/common::wechat:getToken');
+        if ($access_token) {
+            $url = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=".$access_token;
+            $result = $this->httpRequest($url);
+            $data = json_decode($result,true);
+            if($data['errcode'] == '40001'){
+                $access_token = $this->SetToken();
+            }
+        } else {
+            $access_token = $this->SetToken();
+        }
+        return [
+            'code' => 0,
+            'data' => $access_token,
+        ];
+    }
+
 }

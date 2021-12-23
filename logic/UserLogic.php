@@ -81,7 +81,6 @@ class UserLogic
      * @throws \yii\base\Exception
      */
     public static function userRegister($userData, $user = [],$parent_id=0,$stands_mall_id = 0){
-        echo 'time1:' . microtime(true) . PHP_EOL;
         $userData = self::loadUserFields($userData,$stands_mall_id);
         $transaction = \Yii::$app->db->beginTransaction();
         try{

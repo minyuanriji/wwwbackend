@@ -12,7 +12,7 @@ use app\models\User;
 class SharePosterForm extends GrafikaOption implements BasePoster
 {
     use CustomizeFunction;
-    public function get($path = "pages/index/index", $stands_mall_id = 0, $store_id = 0)
+    public function get($path = "pages/index/index", $stands_mall_id = 0, $sid = 0)
     {
 
         $default = (new \app\forms\mall\poster\PosterForm())->getDefault()['share'];
@@ -29,7 +29,7 @@ class SharePosterForm extends GrafikaOption implements BasePoster
         \Yii::warning("appPlatform result:".json_encode(\Yii::$app->appPlatform));
         if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
             $file = $this->qrcode($option, [
-                ['pid' => \Yii::$app->user->id,'mall_id'=>\Yii::$app->mall->id, 'sid' => $store_id],//'source'=>User::SOURCE_SHARE_POSTER,
+                ['pid' => \Yii::$app->user->id,'mall_id'=>\Yii::$app->mall->id, 'sid' => $sid],//'source'=>User::SOURCE_SHARE_POSTER,
                 280,
                 $path
             ], $this);

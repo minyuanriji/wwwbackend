@@ -42,7 +42,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                             end-placeholder="结束日期">
             </el-date-picker>
             <div class="input-item" style="margin-left:15px;display:inline-block;width:350px;">
-                <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入昵称搜索" v-model="search.keyword" clearable @clear="goSearch">
+                <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入搜索" v-model="search.keyword" clearable @clear="goSearch" @input="triggeredChange">
                     <el-select slot="prepend" v-model="search.kw_type" placeholder="请选择" size="small" style="width:120px;">
                         <el-option v-for="item in select_keyword_option" :label="item.label" :key="item.value" :value="item.value"></el-option>
                     </el-select>
@@ -221,6 +221,12 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             this.loadData();
         },
         methods: {
+            triggeredChange (){
+                if (this.search.keyword.length>0 && this.search.kw_type.length<=0) {
+                    alert('请选择搜索方式');
+                    this.search.keyword='';
+                }
+            },
             goSearch() {
                 if (this.date == null) {
                     this.date = ''

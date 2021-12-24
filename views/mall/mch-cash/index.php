@@ -46,7 +46,7 @@
                 </div>
                 <div style="width: 20%">
                     <el-input @keyup.enter.native="goSearch" size="small" placeholder="请输入搜索"
-                              v-model="search.keyword" clearable @clear="goSearch">
+                              v-model="search.keyword" clearable @clear="goSearch" @input="triggeredChange">
                         <el-select slot="prepend" v-model="search.kw_type" placeholder="请选择" size="small" style="width:120px;">
                             <el-option v-for="item in select_keyword_option" :label="item.label" :key="item.value" :value="item.value"></el-option>
                         </el-select>
@@ -282,6 +282,12 @@
             this.loadData(this.activeName);
         },
         methods: {
+            triggeredChange (){
+                if (this.search.keyword.length>0 && this.search.kw_type.length<=0) {
+                    alert('请选择搜索方式');
+                    this.search.keyword='';
+                }
+            },
             goSearch() {
                 if (this.date == null) {
                     this.date = ''

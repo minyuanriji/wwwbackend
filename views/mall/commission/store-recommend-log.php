@@ -90,14 +90,14 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="scope" width="180" label="添加时间">
+                <el-table-column prop="scope" label="添加时间">
                     <template slot-scope="scope">
                         {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
                     </template>
                 </el-table-column>
 
             </el-table>
-            <div style="text-align: right;margin: 20px 0;">
+            <div style="text-align: center;margin-top: 20px">
                 <el-pagination @current-change="pagination" background layout="prev, pager, next"
                                :page-count="pageCount"></el-pagination>
             </div>

@@ -40,7 +40,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                             end-placeholder="结束日期">
             </el-date-picker>
             <div class="input-item">
-                <el-input @keyup.enter.native="search" size="small" placeholder="请输入搜索" v-model="searchData.keyword" clearable @clear="search">
+                <el-input @keyup.enter.native="search" size="small" placeholder="请输入搜索" v-model="searchData.keyword" clearable @clear="search" @input="triggeredChange">
                     <el-select slot="prepend" v-model="searchData.kw_type" placeholder="请选择" size="small"
                                style="width:120px;">
                         <el-option v-for="item in item_type_options"
@@ -258,6 +258,12 @@ Yii::$app->loadComponentView('com-dialog-select');
             };
         },
         methods: {
+            triggeredChange (){
+                if (this.searchData.keyword.length>0 && this.searchData.kw_type.length<=0) {
+                    alert('请选择搜索方式');
+                    this.searchData.keyword='';
+                }
+            },
             typeChange(e) {
                 console.log(e);
                 this.page = 1;

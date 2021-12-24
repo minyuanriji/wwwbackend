@@ -65,7 +65,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="nickname" label="收益人信息" width="400">
+                <el-table-column prop="nickname" label="收益人信息" width="350">
                     <template slot-scope="scope">
                         <com-image mode="aspectFill"
                                    style="float: left;margin-right: 8px"
@@ -84,7 +84,7 @@
                     <template slot-scope="scope"><b style="color: red">{{scope.row.price}}</b></template>
                 </el-table-column>
 
-                <el-table-column label="状态" width="180">
+                <el-table-column label="状态" width="130">
                     <template slot-scope="scope">
                         <div v-if="scope.row.status == -1" style="color: red">无效</div>
                         <div v-if="scope.row.status == 0">待结算</div>
@@ -92,14 +92,14 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="scope" width="180" label="添加时间">
+                <el-table-column prop="scope" label="添加时间">
                     <template slot-scope="scope">
                         {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
                     </template>
                 </el-table-column>
 
             </el-table>
-            <div style="text-align: right;margin: 20px 0;">
+            <div style="text-align: center;margin-top: 20px">
                 <el-pagination @current-change="pagination" background layout="prev, pager, next"
                                :page-count="pageCount"></el-pagination>
             </div>

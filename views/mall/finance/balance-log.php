@@ -44,7 +44,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 </div>
                 <div style="width: 21%">
                     <el-input @keyup.enter.native="search" size="small" placeholder="请输入搜索" v-model="keyword" clearable
-                              @clear="search">
+                              @clear="search" @input="triggeredChange">
                         <el-select slot="prepend" v-model="kw_type" placeholder="请选择" size="small"
                                    style="width:120px;">
                             <el-option v-for="item in item_type_options"
@@ -238,6 +238,12 @@ Yii::$app->loadComponentView('com-user-finance-stat');
             };
         },
         methods: {
+            triggeredChange (){
+                if (this.keyword.length>0 && this.kw_type.length<=0) {
+                    alert('请选择搜索方式');
+                    this.keyword='';
+                }
+            },
             exportConfirm() {
                 this.searchData.keyword = this.keyword;
                 this.searchData.kw_type = this.kw_type;

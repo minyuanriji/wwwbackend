@@ -43,7 +43,8 @@ class BossListForm extends BaseModel
         $pagination = null;
         $query = Boss::find()->alias('d')->with(['user'])
             ->where(['d.is_delete' => 0, 'd.mall_id' => $mall->id])
-            ->leftJoin(['u' => User::tableName()], 'u.id = d.user_id');
+            ->leftJoin(['u' => User::tableName()], 'u.id = d.user_id')
+            ->andWhere(['and', ['!=', 'u.mobile', ''], ['IS NOT', 'u.mobile', NULL], ['u.is_delete' => 0]]);
         if ($this->keyword) {
             $query->andWhere([
                 'or',

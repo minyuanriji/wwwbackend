@@ -117,6 +117,7 @@ class QrCodeCommon extends BaseModel
         $cacheKey = "app/forms/common::wechat:getToken";
         $cacheData = $cache->get($cacheKey);
         if($cacheData && isset($cacheData['token']) && isset($cacheData['expired_at']) && $cacheData['expired_at'] > time()){
+            @file_put_contents(__DIR__ . "/debug", json_encode($cacheData));
             $accessTokenArray = $cacheData['token'];
         }else{
             /** @var Wechat $wechat */

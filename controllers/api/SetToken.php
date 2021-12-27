@@ -97,9 +97,11 @@ class SetToken
 
     public function refreshToken()
     {
-        $access_token = \Yii::$app->redis->get('app/forms/common::wechat:getToken');
-        if ($access_token) {
-            $url = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=".$access_token;
+        $cache = \Yii::$app->getCache();
+        $cacheData = $cache->get(self::CACHE_KEY);
+        if($cacheData && isset($cacheData['token']) && isset($cacheData['expired_at']) && $cacheData['expired_at'] > time()) {
+            $accessTokenArray = $cacheData['token'];
+            $url = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=".$accessTokenArray;
             $result = $this->httpRequest($url);
             $data = json_decode($result,true);
             if($data['errcode'] == '40001'){

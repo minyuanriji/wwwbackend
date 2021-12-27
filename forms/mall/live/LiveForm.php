@@ -59,15 +59,6 @@ class LiveForm extends BaseModel
                     'limit' => $this->limit,
                 ]);
                 $res = json_decode($res->getBody()->getContents(), true);
-                if ($res['errcode'] == 40001) {
-                    $token = (new SetToken())->SetToken();
-                    $api = "https://api.weixin.qq.com/wxa/business/getliveinfo?access_token={$token}";
-                    $res = CommonLive::post($api, [
-                        'start' => $this->page * $this->limit - $this->limit,
-                        'limit' => $this->limit,
-                    ]);
-                    $res = json_decode($res->getBody()->getContents(), true);
-                }
             } catch (\Exception $exception) {
                 $res = [
                     'errcode' => 0,

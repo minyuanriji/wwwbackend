@@ -19,7 +19,7 @@ class SetToken
             $accessTokenArray = $this->SetToken();
         }
 
-        return $accessTokenArray;
+        return $accessTokenArray['access_token'];
 
 
         /*$access_token = \Yii::$app->redis->get('app/forms/common::wechat:getToken');
@@ -97,11 +97,9 @@ class SetToken
 
     public function refreshToken()
     {
-        $cache = \Yii::$app->getCache();
-        $cacheData = $cache->get(self::CACHE_KEY);
-        if($cacheData && isset($cacheData['token']) && isset($cacheData['expired_at']) && $cacheData['expired_at'] > time()) {
-            $accessTokenArray = $cacheData['token'];
-            $url = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=".$accessTokenArray;
+        $access_token = $this->getToken();
+        if ($access_token) {
+            $url = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=".$access_token;
             $result = $this->httpRequest($url);
             $data = json_decode($result,true);
             if($data['errcode'] == '40001'){

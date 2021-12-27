@@ -823,10 +823,10 @@ class Menus
                         'name' => '余额记录',
                         'route' => 'mall/finance/balance-log',
                     ],
-                    [
+                    /*[
                         'name' => '余额收支',
                         'route' => 'mall/user/balance-log',
-                    ],
+                    ],*/
                     [
                         'name' => '积分记录',
                         'route' => 'mall/finance/score-log',
@@ -858,6 +858,10 @@ class Menus
                     [
                         'name' => '财务设置',
                         'route' => 'mall/finance/setting',
+                    ],
+                    [
+                        'name' => '商户收益',
+                            'route' => 'mall/finance/mch-income-log',
                     ],
                     [
                         'name' => '卡券管理',

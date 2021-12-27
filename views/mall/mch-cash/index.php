@@ -79,12 +79,16 @@
         <el-card shadow="never" style="border:0;border-radius: 15px;margin-top: 15px"
                  body-style="background-color: #f3f3f3;padding: 0 0;position: relative;">
             <div class="table-body">
+                <el-alert title="说明：点击基本信息可查看详细记录" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
+
                 <el-table :data="list" size="small" border v-loading="loading" style="margin-bottom: 15px">
                     <el-table-column label="基本信息">
                         <template slot-scope="scope">
-                            <com-image mode="aspectFill" :src="scope.row.cover_url"
-                                       style="float: left;margin-right: 10px"></com-image>
-                            <div>{{scope.row.name}}</div>
+                            <div  @click="$navigate({r: 'mall/finance/mch-income-log', mch_id:scope.row.mch_id})">
+                                <com-image mode="aspectFill" :src="scope.row.cover_url"
+                                           style="float: left;margin-right: 10px"></com-image>
+                                <div>{{scope.row.name}}</div>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column label="账户信息">

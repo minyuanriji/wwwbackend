@@ -19,6 +19,7 @@ use app\forms\mall\finance\IncomeLogListForm;
 use app\forms\mall\finance\IncomeModifiedForm;
 use app\forms\mall\finance\IntegralLogListForm;
 use app\forms\mall\finance\IntegralModifiedForm;
+use app\forms\mall\finance\MchIncomeLogListForm;
 use app\forms\mall\finance\ScoreLogListForm;
 use app\forms\mall\finance\SettingForm;
 use app\forms\mall\finance\TransmitCheckForm;
@@ -472,4 +473,31 @@ class FinanceController extends MallController
         $form->attributes = \Yii::$app->getRequest()->post();
         return $this->asJson($form->modified());
     }
+
+    /**
+     * Notes:商户收益明细
+     * User: Administrator
+     * Date: 2021/12/27 14:47
+     * @return false|string|\yii\web\Response
+     */
+    public function actionMchIncomeLog()
+    {
+        if (\Yii::$app->request->isAjax) {
+            $form = new MchIncomeLogListForm();
+            $form->attributes = \Yii::$app->request->get();
+            return $this->asJson($form->getList());
+        } else {
+            if (\Yii::$app->request->post('flag') === 'EXPORT') {
+                $fields = explode(',', \Yii::$app->request->post('fields'));
+                $form = new IncomeLogListForm();
+                $form->attributes = \Yii::$app->request->post();
+                $form->fields = $fields;
+                $form->getList();
+                return false;
+            } else {
+                return $this->render('mch-income-log');
+            }
+        }
+    }
+
 }

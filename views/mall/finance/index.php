@@ -21,7 +21,7 @@
         <div class="table-body">
 
             <div class="input-item">
-                <el-input @keyup.enter.native="search" size="small" placeholder="请输入昵称搜索" v-model="keyword" clearable
+                <el-input @keyup.enter.native="search" size="small" placeholder="请输入关键词搜索" v-model="keyword" clearable
                           @clear="search" @input="triggeredChange">
                     <el-select slot="prepend" v-model="kw_type" placeholder="请选择" size="small"
                                style="width:120px;">

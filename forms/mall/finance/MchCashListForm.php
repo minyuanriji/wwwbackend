@@ -125,6 +125,9 @@ class MchCashListForm extends BaseModel{
             foreach($list as &$item){
                 $typeData = @json_decode($item['type_data'], true);
                 $item = array_merge($item, is_array($typeData) ? $typeData : []);
+                if (isset($item['cover_url']) && empty($item['cover_url'])) {
+                    $item['cover_url'] = \Yii::$app->params['store_default_avatar'];
+                }
             }
         }
 

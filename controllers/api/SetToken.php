@@ -3,28 +3,57 @@
 namespace app\controllers\api;
 
 use app\models\mysql\PluginMpwxConfig;
+use jianyan\easywechat\Wechat;
 
 class SetToken
 {
+    const CACHE_KEY = "app/forms/common::wechat:getToken";
+
     public function getToken()
     {
-        $access_token = \Yii::$app->redis->get('app/forms/common::wechat:getToken');
+        $cache = \Yii::$app->getCache();
+        $cacheData = $cache->get(self::CACHE_KEY);
+        if($cacheData && isset($cacheData['token']) && isset($cacheData['expired_at']) && $cacheData['expired_at'] > time()) {
+            $accessTokenArray = $cacheData['token'];
+        } else {
+            $accessTokenArray = $this->SetToken();
+        }
+
+        return $accessTokenArray;
+
+
+        /*$access_token = \Yii::$app->redis->get('app/forms/common::wechat:getToken');
         if (empty($access_token)) {
             $access_token = $this->SetToken();
         }
-        return $access_token;
+        return $access_token;*/
     }
 
     public function SetToken()
     {
-        $config = (new PluginMpwxConfig())->getConfig();
+        /** @var Wechat $wechat */
+        $cache = \Yii::$app->getCache();
+        $cacheKey = self::CACHE_KEY;
+        $wechat = \Yii::$app->wechat;
+        $accessTokenArray = $wechat->miniProgram->access_token->getToken(true);
+        if (!isset($accessTokenArray["access_token"])) {
+            throw new \Exception('微信配置有误');
+        }
+        $cacheData['token']      = $accessTokenArray;
+        $cacheData['expired_at'] = time() + $accessTokenArray['expires_in'] - 1800;
+        $cache->set($cacheKey, $cacheData);
+
+        return $accessTokenArray;
+
+
+        /*$config = (new PluginMpwxConfig())->getConfig();
         $tokenUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" . $config['app_id'] . "&secret=" . $config['secret'];
         $getArr = [];
         $tokenArr = json_decode($this->send_post($tokenUrl, $getArr, "GET"));
         $access_token = $tokenArr->access_token;
         \Yii::$app->redis->set('app/forms/common::wechat:getToken', $access_token);
         \Yii::$app->redis->expire('app/forms/common::wechat:getToken', 5400);
-        return $access_token;
+        return $access_token;*/
     }
 
     function send_post($url, $post_data, $method = 'POST')

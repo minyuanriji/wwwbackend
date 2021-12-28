@@ -30,14 +30,14 @@ class Plugin extends \app\plugins\Plugin{
                 'route' => 'plugin/commission/mall/rules/index',
                 'icon' => 'el-icon-setting',
             ],
-            [
+            /*[
                 'name' => '客户列表',
                 'route' => 'plugin/commission/mall/users/list',
                 'icon' => 'el-icon-setting',
                 'action' => [
 
                 ]
-            ],
+            ],*/
         ];
     }
 

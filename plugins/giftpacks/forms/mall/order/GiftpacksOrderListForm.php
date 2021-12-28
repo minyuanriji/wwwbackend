@@ -17,6 +17,7 @@ class GiftpacksOrderListForm extends BaseModel
 {
     public $page;
     public $keyword;
+    public $kw_type;
     public $start_time;
     public $end_time;
     public $status;
@@ -27,7 +28,7 @@ class GiftpacksOrderListForm extends BaseModel
     {
         return [
             [['page'], 'integer'],
-            [['keyword', 'status'], 'string'],
+            [['keyword', 'status', 'kw_type'], 'string'],
             [['pack_id', 'pack_item_id', 'start_time', 'end_time'], 'safe']
         ];
     }
@@ -45,13 +46,23 @@ class GiftpacksOrderListForm extends BaseModel
                     ->leftJoin(["g" => Giftpacks::tableName()], "go.pack_id = g.id")
                     ->leftJoin(["u" => User::tableName()], "go.user_id = u.id");
 
-            if (!empty($this->keyword)) {
-                $query->andWhere([
-                    'or',
-                    ["LIKE", "go.id", $this->keyword],
-                    ["LIKE", "go.order_sn", $this->keyword],
-                    ["LIKE", "g.title", $this->keyword],
-                ]);
+            if (!empty($this->keyword) && !empty($this->kw_type)) {
+                switch ($this->kw_type)
+                {
+                    case 'order_id':
+                        $query->andWhere(['go.id' => $this->keyword]);
+                        break;
+                    case 'order_no':
+                        $query->andWhere(["LIKE", "go.order_sn", $this->keyword]);
+                        break;
+                    case 'gift_name':
+                        $query->andWhere(["LIKE", "g.title", $this->keyword]);
+                        break;
+                    case 'user_id':
+                        $query->andWhere(['go.user_id' => $this->keyword]);
+                        break;
+                    default:
+                }
             }
 
             if ($this->start_time && $this->end_time) {
@@ -92,8 +103,9 @@ class GiftpacksOrderListForm extends BaseModel
                     $value['share_profit'] = CommissionGiftpacksPriceLog::find()->alias('cg')
                         ->leftJoin(["u" => User::tableName()], "cg.user_id = u.id")
                         ->where(['order_id' => $value['id']])
-                        ->select(['cg.id', 'cg.order_id', 'cg.pack_id', 'cg.user_id', 'cg.price', 'cg.status', 'u.nickname', ])
-                        ->asArray()->all();
+                        ->select(['cg.id', 'cg.order_id', 'cg.pack_id', 'cg.user_id', 'cg.price', 'cg.status', 'u.nickname'])
+                        ->asArray()
+                        ->all();
 
                     if ($value['integral_enable']) {
                         $value['is_integral'] = IntegralLog::findOne(['source_type' => 'giftpacks_order', 'source_id' => $value['id']]) ? 1 : 0;

@@ -471,6 +471,8 @@ Yii::$app->loadComponentView('com-dialog-template');
                 return false;
             },
             templateShow() {
+                return false;
+
                 if (this.permissions) {
                     for (let i in this.permissions) {
                         if (this.permissions[i].name == 'diy' && this.permissions[i].isCheck) {

@@ -30,7 +30,7 @@ use Yii;
  * @property int $app_share_title 自定义分享标题
  * @property string $pic_list
  * @property string $detail
- * @property string $abstracts 摘要
+ * @property string $abstract 摘要
  * @property TopicType $topicType
  * @property TopicFavorite $favorite
  */
@@ -54,7 +54,7 @@ class Topic extends BaseActiveRecord
             [['mall_id', 'type', 'layout', 'sort', 'read_count', 'agree_count', 'virtual_read_count', 'virtual_agree_count', 'virtual_favorite_count', 'is_chosen', 'is_delete'], 'integer'],
             [['content', 'pic_list', 'detail'], 'string'],
             [['deleted_at', 'created_at', 'updated_at'], 'safe'],
-            [['title', 'sub_title', 'cover_pic', 'qrcode_pic', 'abstracts'], 'string', 'max' => 255],
+            [['title', 'sub_title', 'cover_pic', 'qrcode_pic', 'abstract'], 'string', 'max' => 255],
             [['app_share_title'], 'string', 'max' => 65],
         ];
     }
@@ -88,7 +88,7 @@ class Topic extends BaseActiveRecord
             'updated_at' => 'Updated At',
             'pic_list' => '多图模式  图片列表',
             'detail' => '新版专题详情',
-            'abstracts' => '摘要',
+            'abstract' => '摘要',
         ];
     }
 

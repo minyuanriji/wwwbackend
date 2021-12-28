@@ -14,6 +14,7 @@ use app\plugins\mch\forms\common\CommonMchForm;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchApply;
 use app\plugins\mch\models\MchApplyOperationLog;
+use Google\Protobuf\Api;
 
 class MchExamineLogForm extends BaseModel
 {
@@ -40,10 +41,7 @@ class MchExamineLogForm extends BaseModel
             return $this->responseErrorMsg();
         }
 
-        $query = MchApplyOperationLog::find()->select([
-            '*',
-            "DATE_FORMAT(FROM_UNIXTIME(created_at),'%Y-%m-%d %H:%i:%s') as created_at"
-        ])->where([
+        $query = MchApplyOperationLog::find()->where([
             'mall_id' => \Yii::$app->mall->id,
         ]);
 
@@ -63,19 +61,15 @@ class MchExamineLogForm extends BaseModel
             ]);
         }
 
-        $query->with('mchApply');
-        $list = $query->orderBy(['created_at' => SORT_DESC])->page($pagination)->asArray()->all();
+        $list = $query->with('mchApply')->orderBy(['id' => SORT_DESC])->page($pagination)->asArray()->all();
         if ($list) {
             foreach ($list as &$item) {
-                if ($item['mchApply']) {
-                    if ($item['mchApply']['json_apply_data']) {
-                        $item['store_name'] = json_decode($item['mchApply']['json_apply_data'], true)['store_name'];
-                    } else {
-                        $item['store_name'] = '';
-                    }
+                if ($item['mchApply'] && $item['mchApply']['json_apply_data']) {
+                    $item['store_name'] = json_decode($item['mchApply']['json_apply_data'], true)['store_name'];
                 } else {
                     $item['store_name'] = '';
                 }
+
                 if ($item['operation_terminal'] == MchApplyOperationLog::OPERATION_TERMINAL_RECEPTION) {
                     $item['operation_terminal_type'] = '前台';
                     $user = User::findOne($item['user_id']);
@@ -85,13 +79,18 @@ class MchExamineLogForm extends BaseModel
                     $admin = Admin::findOne($item['user_id']);
                     $item['nickname'] = $admin ? $admin->username : '';
                 }
+
                 $item['operation_status'] = self::operation[$item['operation']];
-                unset($item['mchApply'], $item['operation'],  $item['operation_terminal']);
+
+                $item['created_at'] = date('Y-m-d H:i:s', $item['created_at']);
+
+                unset($item['mchApply'], $item['operation'], $item['operation_terminal']);
             }
         }
-        return [
+
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
             'list' => $list,
             'pagination' => $pagination
-        ];
+        ]);
     }
 }

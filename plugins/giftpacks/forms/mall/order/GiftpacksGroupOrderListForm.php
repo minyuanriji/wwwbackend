@@ -7,11 +7,13 @@ use app\models\BaseModel;
 use app\models\User;
 use app\plugins\giftpacks\models\Giftpacks;
 use app\plugins\giftpacks\models\GiftpacksGroup;
+use app\plugins\giftpacks\models\GiftpacksGroupPayOrder;
 
 class GiftpacksGroupOrderListForm extends BaseModel
 {
     public $page;
     public $keyword;
+    public $kw_type;
     public $start_time;
     public $end_time;
     public $status;
@@ -20,7 +22,7 @@ class GiftpacksGroupOrderListForm extends BaseModel
     {
         return [
             [['page'], 'integer'],
-            [['keyword', 'status'], 'string'],
+            [['keyword', 'status', 'kw_type'], 'string'],
             [['start_time', 'end_time'], 'safe']
         ];
     }
@@ -35,12 +37,22 @@ class GiftpacksGroupOrderListForm extends BaseModel
             $query = GiftpacksGroup::find()->alias('gg')
                     ->leftJoin(["g" => Giftpacks::tableName()], "gg.pack_id = g.id")
                     ->leftJoin(["u" => User::tableName()], "gg.user_id = u.id");
-            if (!empty($this->keyword)) {
-                $query->andWhere([
-                    'or',
-                    ["LIKE", "gg.id", $this->keyword],
-                    ["LIKE", "g.title", $this->keyword],
-                ]);
+
+            if (!empty($this->keyword) && !empty($this->kw_type)) {
+                switch ($this->kw_type)
+                {
+                    case 'group_id':
+                        $query->andWhere(['gg.id' => $this->keyword]);
+                        break;
+                    case 'gift_name':
+                        $query->andWhere(["LIKE", "g.title", $this->keyword]);
+                        break;
+                    case 'user_id':
+                        $group_ids = GiftpacksGroupPayOrder::find()->where(['user_id' => $this->keyword])->select('group_id');
+                        $query->andWhere(["in", "gg.id", $group_ids]);
+                        break;
+                    default:
+                }
             }
 
             if ($this->start_time && $this->end_time) {

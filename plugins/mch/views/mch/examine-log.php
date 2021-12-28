@@ -153,7 +153,6 @@
                         prop="created_at"
                         width="220">
                 </el-table-column>
-
             </el-table>
 
             <div  flex="dir:right" style="margin-top: 20px;">
@@ -206,8 +205,8 @@
                     },
                     method: 'get',
                 }).then(e => {
-                    self.list = e.data.list;
-                    self.pageCount = e.data.pagination.page_count;
+                    self.list = e.data.data.list;
+                    self.pageCount = e.data.data.pagination.page_count;
                 }).catch(e => {
                     console.log(e);
                     self.list = e.data.list;

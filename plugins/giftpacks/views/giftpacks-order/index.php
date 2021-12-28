@@ -19,8 +19,16 @@
                         end-placeholder="结束日期">
                 </el-date-picker>
 
-                <div class="input-item" style="width:300px;margin-bottom:20px;display:inline-block;">
-                    <el-input @keyup.enter.native="toSearch" size="small" placeholder="订单ID/订单编号/大礼包名称" v-model="search.keyword" clearable @clear="toSearch">
+                <div class="input-item" style="width:420px;margin-bottom:20px;display:inline-block;">
+                    <el-input @keyup.enter.native="toSearch" size="small" placeholder="请输入关键词搜索" v-model="search.keyword" clearable @clear="toSearch">
+                        <el-select slot="prepend" v-model="search.kw_type" placeholder="请选择" size="small"
+                                   style="width:120px;">
+                            <el-option v-for="item in item_type_options"
+                                       :key="item.value"
+                                       :label="item.label"
+                                       :value="item.value">
+                            </el-option>
+                        </el-select>
                         <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
                     </el-input>
                 </div>
@@ -112,18 +120,15 @@
                         </template>
                     </el-table-column>-->
                 </el-table>
-                <div flex="box:last cross:center">
-                    <div></div>
-                    <div>
-                        <el-pagination
-                                v-if="list.length > 0"
-                                style="display: inline-block;float: right;"
-                                background :page-size="pagination.pageSize"
-                                @current-change="pageChange"
-                                layout="prev, pager, next" :current-page="pagination.current_page"
-                                :total="pagination.total_count">
-                        </el-pagination>
-                    </div>
+                <div>
+                    <el-pagination
+                            v-if="list.length > 0"
+                            style="text-align: center"
+                            background :page-size="pagination.pageSize"
+                            @current-change="pageChange"
+                            layout="prev, pager, next" :current-page="pagination.current_page"
+                            :total="pagination.total_count">
+                    </el-pagination>
                 </div>
             </div>
         </el-tabs>
@@ -137,6 +142,7 @@
                 passengersData: [],
                 search: {
                     keyword: '',
+                    kw_type: 'order_id',
                     status: 'all',
                     start_time: '',
                     end_time: '',
@@ -147,6 +153,24 @@
                 list: [],
                 pagination: null,
                 exportList: [],
+                item_type_options:[
+                    {
+                        label:'订单ID',
+                        value:'order_id',
+                    },
+                    {
+                        label:'订单编号',
+                        value:'order_no',
+                    },
+                    {
+                        label:'大礼包名称',
+                        value:'gift_name',
+                    },
+                    {
+                        label:'支付用户ID',
+                        value:'user_id',
+                    },
+                ],
             };
         },
         mounted() {
@@ -173,6 +197,7 @@
                         status: status,
                         page: page,
                         keyword: this.search.keyword,
+                        kw_type: this.search.kw_type,
                         start_time: this.search.start_time,
                         end_time: this.search.end_time,
                     },

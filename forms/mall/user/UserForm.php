@@ -136,24 +136,26 @@ class UserForm extends BaseModel
             'AND',
             ['or', ['LIKE', 'u.nickname', $this->keyword], ['u.id' => $this->keyword], ['u.mobile' => $this->keyword]],
             ['u.mall_id' => \Yii::$app->mall->id],
-            'u.mobile is not null'
+            'u.mobile is not null',
+            "u.mobile != ''",
+            "u.is_delete = 0",
         ]);
-        $list = $query->orderBy('nickname')->limit(30)->all();
+        $list = $query->orderBy('id DESC')->limit(100)->all();
 
         $newList = [];
         /** @var User $item */
-        foreach ($list as $item) {
+        /*foreach ($list as $item) {
             $newItem = ArrayHelper::toArray($item);
             //$newItem['avatar'] = $item->userInfo ? $item->userInfo->avatar_url : '';
-            $platform = $item->userInfo ? $item->userInfo->platform : '';
-            $newItem['nickname'] = User::getPlatformText($platform) . '（' . $item->nickname . '）';
+//            $platform = $item->userInfo ? $item->userInfo->platform : '';
+//            $newItem['nickname'] = User::getPlatformText($platform) . '（' . $item->nickname . '）';
             $newList[] = $newItem;
-        }
+        }*/
 
         return [
             'code' => ApiCode::CODE_SUCCESS,
             'data' => [
-                'list' => $newList
+                'list' => $list
             ]
         ];
     }

@@ -40,6 +40,7 @@ class CustomizeForm extends BaseModel
     public $limit = 10;
     public $page = 1;
     public $keyword;
+    public $kw_type;
     public $level;
     public $start_date;
     public $end_date;
@@ -53,7 +54,7 @@ class CustomizeForm extends BaseModel
             [['end_style'], 'integer'],
             [['end_style'], 'default', 'value' => 0],
             [['limit', 'page'], 'integer'],
-            [['keyword', 'start_date', 'end_date'], 'string'],
+            [['keyword', 'start_date', 'end_date', 'kw_type'], 'string'],
             [['keyword'], 'string', 'max' => 255],
             [['level'],'integer']
         ];
@@ -71,7 +72,6 @@ class CustomizeForm extends BaseModel
             'line_font' => '分割线颜色',
             'end_bg' => '下半部背景颜色',
             'end_style' => '下半部颜色配置',
-
             'not_signed_icon' => '未签到图标',
             'signed_icon' => '已签到图标',
             'head_bg' => '头部背景图',
@@ -144,42 +144,35 @@ class CustomizeForm extends BaseModel
         $query = User::find()->where([
             'mall_id' => $mall_id,
         ]);
+
+        if ($this->keyword && $this->kw_type) {
+            switch ($this->kw_type)
+            {
+                case "user_id":
+                    $query->andWhere(['id' => $this->keyword]);
+                    break;
+                case "mobile":
+                    $query->andWhere(['mobile' => $this->keyword]);
+                    break;
+                case "nickname":
+                    $query->andWhere(['like', 'nickname', $this->keyword]);
+                    break;
+                default:
+            }
+        }
+
         //搜索
-        if (!empty($this->keyword)){
-            $query->keyword($this->keyword, [
-                'OR',
-                ['like', 'nickname', $this->keyword],
-                ['like', 'mobile', $this->keyword],
-                ['like', 'id', $this->keyword],
-                ['like', 'username', $this->keyword],
-            ]);
-        }
-        if (!empty($this->level)){
-            $query->keyword($this->level, ['level' => $this->level]);
-        }
-
-        //排序
-        $orderByColumn = "id";
-        $orderByType = " desc";
-        $orderBy = $orderByColumn." ".$orderByType;
-
-        $query->asArray()->orderBy($orderBy);
+        $query->keyword($this->level, ['level' => $this->level]);
 
         $params["limit"] = $this->limit;
-        $params["page"] = $this->page;
+        $params["page"]  = $this->page;
 
-        $fields = ['id','nickname','avatar_url','username','mobile','level'];
-
-        if(!empty($fields)){
-            $query->select($fields);
-        }
-        $pagination = null;
-        if(isset($params["limit"]) && isset($params["page"])){
-            $query->page($pagination, $params['limit'], $params['page']);
-        }
-
-        $list = $query->asArray()->all();
-
+        $list = $query->andWhere(['and', ['IS NOT', 'mobile', NULL], ['!=', 'mobile', ''], ['is_delete' => 0]])
+            ->select(['id','nickname','avatar_url','username','mobile','level'])
+            ->orderBy('id DESC')
+            ->page($pagination, $params["limit"], $params["page"])
+            ->asArray()
+            ->all();
 
         //获取到用户积分以及其他信息
         $common = new Common();

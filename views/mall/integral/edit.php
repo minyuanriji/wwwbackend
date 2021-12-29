@@ -63,11 +63,6 @@
         <div slot="header" class="clearfix">
             <div flex="cross:center box:first">
                 <div><span @click="$navigate({r:'mall/integral/index'})" class="text">自动发放积分</span>/自动发放积分编辑</div>
-                <div flex="dir:right">
-                    <div>
-                        <el-button class="button-item" type="primary" size="small" :loading=btnLoading @click="onSubmit">提交</el-button>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="form-body">
@@ -91,11 +86,11 @@
                 </el-form-item>
 
                 <el-form-item label="面值" prop="integral_num">
-                    <el-input style="width: 220px" type="number"  v-model="form.integral_num"></el-input>
+                    <el-input style="width: 220px" type="number" min="0" v-model="form.integral_num"></el-input>
                 </el-form-item>
 
                 <el-form-item label="周期" prop="period">
-                    <el-input style="width: 220px" type="number" v-model="form.period"></el-input>
+                    <el-input style="width: 220px" type="number" min="0" v-model="form.period"></el-input>
                 </el-form-item>
 
                 <el-form-item label="周期单位">
@@ -113,7 +108,7 @@
                 </el-form-item>
 
                 <el-form-item label="有效天数" prop="effective_days">
-                    <el-input style="width: 220px" type="number" v-model="form.effective_days"></el-input>
+                    <el-input style="width: 220px" type="number" min="0" v-model="form.effective_days"></el-input>
                 </el-form-item>
 
                 <el-form-item label="下次发放时间" prop="next_publish_time">
@@ -131,6 +126,9 @@
                     <span style="color: red">注意：请填写10分钟之后的时间</span>
                 </el-form-item>
             </el-form>
+            <div style="margin-left: 200px">
+                <el-button class="button-item" type="primary" size="small" :loading=btnLoading @click="onSubmit">提交</el-button>
+            </div>
         </div>
     </el-card>
 </section>

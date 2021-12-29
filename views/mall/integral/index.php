@@ -142,7 +142,7 @@
             <div>
                 <el-pagination
                         v-if="pagination"
-                        style="display: inline-block;float: right;"
+                        style="text-align: center"
                         background
                         :page-size="pagination.pageSize"
                         @current-change="pageChange"

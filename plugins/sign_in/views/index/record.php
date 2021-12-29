@@ -24,19 +24,28 @@
                     <el-option v-for="item in member" :key="item.level" :label="item.name" :value="item.level"></el-option>
                 </el-select>
 
+                <div class="input-item">
+                    <el-input @keyup.enter.native="search" size="small" placeholder="请输入关键词搜索" v-model="search.keyword" clearable
+                              @clear="searchs" @input="triggeredChange">
+                        <el-select slot="prepend" v-model="search.kw_type" placeholder="请选择" size="small"
+                                   style="width:120px;">
+                            <el-option v-for="item in item_type_options"
+                                       :key="item.value"
+                                       :label="item.label"
+                                       :value="item.value">
+                            </el-option>
+                        </el-select>
+                        <el-button slot="append" icon="el-icon-search" @click="searchs"></el-button>
+                    </el-input>
+                </div>
 
-                <el-form-item>
-                    <el-input style="width: 200px" v-model="search.keyword" placeholder="ID/会员昵称/姓名/手机号"></el-input>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" plain @click="searchs">搜索</el-button>
-                </el-form-item>
+
             </el-form>
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-table :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;"
                           @selection-change="handleSelectionChange">
                     <el-table-column align='center' type="selection" width="60"></el-table-column>
-                    <el-table-column prop="id" label="会员ID" width="60"></el-table-column>
+                    <el-table-column prop="id" label="会员ID" width="100"></el-table-column>
                     <el-table-column prop="nickname"  label="会员">
 
                         <template slot-scope="scope">
@@ -96,18 +105,15 @@
                     </el-table-column>
                 </el-table>
             </el-tabs>
-            <div flex="box:last cross:center">
-                <div></div>
-                <div>
-                    <el-pagination
-                            v-if="list.length > 0"
-                            style="display: inline-block;float: right;"
-                            background :page-size="pagination.pageSize"
-                            @current-change="pageChange"
-                            layout="prev, pager, next" :current-page="pagination.current_page"
-                            :total="pagination.total_count">
-                    </el-pagination>
-                </div>
+            <div>
+                <el-pagination
+                        v-if="list.length > 0"
+                        style="text-align: center"
+                        background :page-size="pagination.pageSize"
+                        @current-change="pageChange"
+                        layout="prev, pager, next" :current-page="pagination.current_page"
+                        :total="pagination.total_count">
+                </el-pagination>
             </div>
         </div>
     </el-card>
@@ -118,6 +124,7 @@
         data: {
             searchData: {
                 keyword: '',
+                kw_type: '',
                 start_time: '',
                 end_at: '',
                 level:''
@@ -129,6 +136,7 @@
             mall_members: [],
             search: {
                 keywords: '',
+                kw_type: 'user_id',
                 start_time: '',
                 end_at: '',
                 level:''
@@ -156,7 +164,21 @@
             edit: {
                 show: false,
             },
-            choose_list: []
+            choose_list: [],
+            item_type_options: [
+                {
+                    value: 'user_id',
+                    label: '用户ID'
+                },
+                {
+                    value: 'mobile',
+                    label: '手机号'
+                },
+                {
+                    value: 'nickname',
+                    label: '昵称'
+                },
+            ],
         },
         mounted() {
             this.loadData();
@@ -174,6 +196,7 @@
                 this.search.status = this.activeName
             },
             exportConfirm() {
+                this.searchData.kw_type = this.kw_type;
                 this.searchData.keyword = this.keyword;
                 this.searchData.level = this.level;
                 this.searchData.start_time = this.start_time;
@@ -187,6 +210,7 @@
                         r: 'plugin/sign_in/mall/index/record',
                         page: page,
                         keyword: this.search.keyword,
+                        kw_type: this.search.kw_type,
                         level: this.search.level,
                         start_time: this.search.start_time,
                         end_at: this.search.end_at,
@@ -296,7 +320,6 @@
     }
 
     .input-item {
-        width: 250px;
         margin: 0 0 20px;
         display: inline-block;
     }

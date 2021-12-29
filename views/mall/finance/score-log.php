@@ -6,7 +6,7 @@
                 <div style="float: right;">
                     <com-export-dialog :field_list='export_list' :params="searchData" @selected="exportConfirm"></com-export-dialog>
                 </div>
-                <div style="margin: 30px 0" v-loading="statisticsLoading">
+                <div style="margin-top: 20px" v-loading="statisticsLoading">
                     <div style="display: flex;justify-content: space-evenly">
                         <div>
                             <div style="text-align: center">总收入</div>

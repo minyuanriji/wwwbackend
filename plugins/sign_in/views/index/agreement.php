@@ -18,11 +18,6 @@ Yii::$app->loadComponentView('com-rich-text');
         overflow: hidden;
     }
 
-    .form-body {
-        display: flex;
-        justify-content: center;
-    }
-
     .form-body .el-form {
         width: 450px;
         margin-top: 10px;
@@ -99,17 +94,14 @@ Yii::$app->loadComponentView('com-rich-text');
 </style>
 <div id="app" v-cloak>
     <el-card shadow="never" v-loading="loading">
-        <div style="margin-bottom: 20px">签到规则</div>
         <div class='form-body' ref="body">
-            <el-form label-position="left" label-width="150px" :model="form" ref="form">
+            <el-form label-position="left"  :model="form" ref="form">
 
-                <el-form-item label="签到规则" style="width: 600px;">
+                <el-form-item label="" style="width: 1000px;">
                     <com-rich-text :simple-attachment="true" v-model="form.rule"></com-rich-text>
                 </el-form-item>
-                <!-- 分割线 -->
-                <hr :style="line" class="line">
                 <el-form-item>
-                    <el-button class="submit-btn" type="primary" @click="submit" :loading="submitLoading">保存</el-button>
+                    <el-button style="margin-left: 500px" class="submit-btn" type="primary" @click="submit" :loading="submitLoading">保存</el-button>
                 </el-form-item>
             </el-form>
         </div>

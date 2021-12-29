@@ -512,7 +512,91 @@ abstract class BaseOrderForm extends BaseModel
 
         $query->keyword($this->platform, ['u.platform' => $this->platform]);
 
-        $query->keyword($this->status == 0, [
+        switch ($this->status)
+        {
+            case 0:
+                $query->andWhere([
+                    'AND',
+                    ['o.is_pay' => 0, 'o.is_recycle' => 0],
+                    ['not', ['o.pay_type' => 2]],
+                    ['not', ['o.cancel_status' => 1]],
+                    ['o.is_send' => 0],
+                    ['o.sale_status' => 0],
+                ]);
+                break;
+            case 1:
+                $query->andWhere([
+                    'AND',
+                    ['o.is_recycle' => 0, 'o.is_send' => 0],
+                    ['or', ['o.is_pay' => 1], ['o.pay_type' => 2]],
+                    ['o.cancel_status' => 0],
+                    ['o.sale_status' => 0],
+                ]);
+                break;
+            case 2:
+                $query->andWhere([
+                    'AND',
+                    ['o.is_send' => 1, 'o.is_confirm' => 0, 'o.is_recycle' => 0],
+                    ['or', ['o.is_pay' => 1], ['o.pay_type' => 2]],
+                    ['not', ['o.cancel_status' => 1]],
+                    ['o.sale_status' => 0],
+                ]);
+                break;
+            case 3:
+                $query->andWhere([
+                    'AND',
+                    ['o.is_send' => 1, 'o.is_confirm' => 1, 'o.is_recycle' => 0],
+                    ['or', ['o.is_pay' => 1], ['o.pay_type' => 2]],
+                    ['not', ['o.cancel_status' => 1]],
+                    ['o.sale_status' => 0],
+                    ['o.is_sale' => 1],
+                ]);
+                break;
+            case 4:
+                $query->andWhere([
+                    'AND',
+                    ['o.cancel_status' => 2, 'o.is_recycle' => 0],
+                    ['o.sale_status' => 0],
+                ]);
+                break;
+            case 5:
+                $query->andWhere(['o.is_recycle' => 0, 'o.cancel_status' => 1]);
+                break;
+            case 7:
+                $query->andWhere(['o.is_recycle' => 1]);
+                break;
+            case 8:
+                $query->andWhere([
+                    'AND',
+                    ['o.is_recycle' => 0, 'o.is_send' => 0],
+                    ['o.cancel_status' => 0]
+                ]);
+                break;
+            default:
+        }
+        $query->keyword($this->sign, ['o.sign' => $this->sign]);
+
+        switch ($this->pay_type)
+        {
+            case 0://红包
+                $query->andWhere(['AND', ['>','o.integral_deduction_price','0']]);
+                break;
+            case 1://余额
+                $query->andWhere(['o.pay_type' => 3]);
+                break;
+            case 2://现金
+                $query->andWhere(['o.pay_type' => 1]);
+                break;
+            case 3://积分
+                $query->andWhere(['AND', ['>','o.score_deduction_price','0']]);
+                break;
+            case 4://购物券
+                $query->andWhere(['AND', ['>','o.shopping_voucher_decode_price','0']]);
+                break;
+            default:
+        }
+
+        /*$query->keyword($this->status == 0, [
                 'AND',
                 ['o.is_pay' => 0, 'o.is_recycle' => 0],
                 ['not', ['o.pay_type' => 2]],
@@ -548,18 +632,19 @@ abstract class BaseOrderForm extends BaseModel
                 ['o.sale_status' => 0],
             ])
             ->keyword($this->status == 5, ['o.is_recycle' => 0, 'o.cancel_status' => 1])
-            ->keyword($this->status == 7, ['o.is_recycle' => 1])->keyword($this->sign, ['o.sign' => $this->sign])
+            ->keyword($this->status == 7, ['o.is_recycle' => 1])
+            ->keyword($this->sign, ['o.sign' => $this->sign])
             ->keyword($this->status == 8, [
                 'AND',
                 ['o.is_recycle' => 0, 'o.is_send' => 0],
                 ['o.cancel_status' => 0]
-            ]);
+            ]);*/
 
-        $query->keyword($this->pay_type == 0, ['AND', ['>','o.integral_deduction_price','0']])//红包
+        /*$query->keyword($this->pay_type == 0, ['AND', ['>','o.integral_deduction_price','0']])//红包
             ->keyword($this->pay_type == 1, ['o.pay_type' => 3])//余额
             ->keyword($this->pay_type == 2, ['o.pay_type' => 1])//现金
             ->keyword($this->pay_type == 3, ['AND', ['>','o.score_deduction_price','0']])//积分
-            ->keyword($this->pay_type == 4, ['AND', ['>','o.shopping_voucher_decode_price','0']]);//购物券
+            ->keyword($this->pay_type == 4, ['AND', ['>','o.shopping_voucher_decode_price','0']]);//购物券*/
 
         if ($this->user_id) {
             $query->andWhere(['o.user_id' => $this->user_id]);

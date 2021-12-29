@@ -93,6 +93,7 @@ class ModuleForm extends BaseModel
         $counts = array_count_values($counts);
         foreach ($list as $key => $item) {
             $list[$key]['useCount'] = $counts[$item['id']] ?? 0;
+            $list[$key]['created_at'] = date('Y-m-d H:i:s', $item['created_at']);
         }
 
         return [

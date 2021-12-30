@@ -86,7 +86,7 @@ Yii::$app->loadPluginComponentView('agent-level');
                         </template>
                     </el-table-column>
                     <el-table-column label="推荐人" prop="parent_name"></el-table-column>
-                    <el-table-column width='200' label="下级用户">
+                    <!--<el-table-column width='200' label="下级用户">
                         <template slot-scope="scope">
                             <template v-for="(item, key, index) in share_name" v-if="scope.row[key] !== undefined">
                                 <el-button type="text" @click="dialogChildShow(scope.row, index + 1)">
@@ -95,7 +95,7 @@ Yii::$app->loadPluginComponentView('agent-level');
                                 <br>
                             </template>
                         </template>
-                    </el-table-column>
+                    </el-table-column>-->
                     <el-table-column label="经销商等级" width="120" prop="level">
                         <template slot-scope="scope">
                             <el-tag size="small" type="info" v-if="scope.row.level == 0">默认等级</el-tag>

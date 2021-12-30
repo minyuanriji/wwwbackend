@@ -1,6 +1,7 @@
 <template id="distribution-edit">
     <el-dialog :visible.sync="edit.visible" width="20%" title="添加分销商">
         <div>
+            <el-alert title="说明：用户通过扫商户二维码进行付款，成功后可获得赠送购物券" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
             <el-form @submit.native.prevent size="small" label-width="150px">
                 <el-form-item label="用户昵称">
                     <el-autocomplete size="small" v-model="edit.nickname" value-key="nickname" @keyup.enter.native="keyUp"

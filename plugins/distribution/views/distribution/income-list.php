@@ -14,7 +14,6 @@
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <span>提成明细</span>
-
         </div>
         <div class="table-body">
 
@@ -23,47 +22,46 @@
                 <el-table :data="list" border v-loading="loading" size="small" style="margin-bottom: 15px;">
 
                     <el-table-column prop="id" width="80" label="ID"></el-table-column>
-                    <el-table-column prop="created_at" width="200" label="提成时间"></el-table-column>
-                    <el-table-column prop="order_no" width="200" label="订单编号"></el-table-column>
-                    <el-table-column label="基本信息" width="400">
+                    <el-table-column prop="order_no" width="220" label="订单编号"></el-table-column>
+                    <el-table-column label="基本信息" width="260">
                         <template slot-scope="scope">
                             <com-image style="float: left;margin-right: 5px;" mode="aspectFill"
                                        :src="scope.row.avatar_url"></com-image>
                             <div>{{scope.row.nickname}}</div>
                         </template>
                     </el-table-column>
-                    <el-table-column label="分销信息" width="400">
+                    <el-table-column label="分销信息" width="150">
                         <template slot-scope="scope">
                             <div>分销等级：{{scope.row.distribution_level_name}}</div>
 
                         </template>
                     </el-table-column>
-                    <el-table-column label="结算金额" prop="goods_price" width="200"></el-table-column>
-                    <el-table-column label="提成金额" prop="price" width="200"></el-table-column>
-                    <el-table-column label="订单状态" prop="status" width="200"></el-table-column>
-                    <el-table-column label="提成状态" prop="is_price" width="200"></el-table-column>
-                    <el-table-column label="操作" width="200">
-
+                    <el-table-column label="结算金额" prop="goods_price" width="130"></el-table-column>
+                    <el-table-column label="提成金额" prop="price" width="130"></el-table-column>
+                    <el-table-column label="订单状态" prop="status" width="130"></el-table-column>
+                    <el-table-column label="提成状态" prop="is_price" width="130"></el-table-column>
+                    <el-table-column prop="created_at" width="160" label="提成时间"></el-table-column>
+                    <el-table-column label="操作" >
                         <template slot-scope="scope">
-                            <div><span @click="$navigate({r:'plugin/distribution/mall/distribution/income-detail'})"
-                                       class="text">查看详情</span></div>
+                            <!--<div>
+                                <span @click="$navigate({r:'plugin/distribution/mall/distribution/income-detail'})"
+                                       class="text">
+                                    查看详情
+                                </span>
+                            </div>-->
                         </template>
                     </el-table-column>
 
                 </el-table>
             </el-tabs>
-            <div flex="box:last cross:center">
-                <div></div>
-                <div>
-                    <el-pagination
-                            v-if="list.length > 0"
-                            style="display: inline-block;float: right;"
-                            background :page-size="pagination.pageSize"
-                            @current-change="pageChange"
-                            layout="prev, pager, next" :current-page="pagination.current_page"
-                            :total="pagination.total_count">
-                    </el-pagination>
-                </div>
+            <div style="text-align: center">
+                <el-pagination
+                        v-if="list.length > 0"
+                        background :page-size="pagination.pageSize"
+                        @current-change="pageChange"
+                        layout="prev, pager, next" :current-page="pagination.current_page"
+                        :total="pagination.total_count">
+                </el-pagination>
             </div>
         </div>
     </el-card>

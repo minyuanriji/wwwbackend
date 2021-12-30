@@ -47,7 +47,7 @@
                     btnLoading: false,
                 },
                 level_list: [],
-                level: 0
+                level: ''
             }
         },
         watch: {

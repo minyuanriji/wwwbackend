@@ -86,17 +86,17 @@ Yii::$app->loadComponentView('com-select-cat');
                                     <div>
 
                                         <el-form-item label="省代">
-                                            <el-input v-model.number="ruleForm.province_price" type="number">
+                                            <el-input v-model.number="ruleForm.province_price" type="number" min="0">
                                                 <template slot="append">%</template>
                                             </el-input>
                                         </el-form-item>
                                         <el-form-item label="市代">
-                                            <el-input v-model.number="ruleForm.city_price" type="number">
+                                            <el-input v-model.number="ruleForm.city_price" type="number" min="0">
                                                 <template slot="append">%</template>
                                             </el-input>
                                         </el-form-item>
                                         <el-form-item label="区代">
-                                            <el-input v-model.number="ruleForm.district_price" type="number">
+                                            <el-input v-model.number="ruleForm.district_price" type="number" min="0">
                                                 <template slot="append">%</template>
                                             </el-input>
                                         </el-form-item>

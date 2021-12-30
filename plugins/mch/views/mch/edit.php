@@ -636,6 +636,7 @@
                         this.scoreFormData.rate = e.data.data.detail.give_score.rate;
                         this.scoreFormData.start_at = e.data.data.detail.give_score.start_at;
                         this.scoreFormData.score_give_settings = e.data.data.detail.give_score.score_give_settings;
+                        this.scoreFormData.score_enable = e.data.data.detail.give_score.score_enable;
                         if (e.data.data.detail.lng != '') {
                             this.longitude = e.data.data.detail.lng;
                         }

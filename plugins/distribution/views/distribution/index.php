@@ -145,18 +145,14 @@ Yii::$app->loadPluginComponentView('distribution-level');
                     </el-table-column>
                 </el-table>
             </el-tabs>
-            <div flex="box:last cross:center">
-                <div></div>
-                <div>
-                    <el-pagination
-                            v-if="list.length > 0"
-                            style="display: inline-block;float: right;"
-                            background :page-size="pagination.pageSize"
-                            @current-change="pageChange"
-                            layout="prev, pager, next" :current-page="pagination.current_page"
-                            :total="pagination.total_count">
-                    </el-pagination>
-                </div>
+            <div style="text-align: center">
+                <el-pagination
+                        v-if="list.length > 0"
+                        background :page-size="pagination.pageSize"
+                        @current-change="pageChange"
+                        layout="prev, pager, next" :current-page="pagination.current_page"
+                        :total="pagination.total_count">
+                </el-pagination>
             </div>
         </div>
     </el-card>

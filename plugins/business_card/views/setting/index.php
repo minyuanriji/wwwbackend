@@ -101,7 +101,8 @@ Yii::$app->loadComponentView('com-select-cat');
                     </el-col>
                 </el-card>
             </el-form>
-            <el-button :loading="btnLoading" class="button-item" type="primary" style="margin-top: 24px;"
+            <el-button :loading="btnLoading" class="button-item" type="primary"
+                       style="margin: 24px 70px"
                        @click="store('ruleForm')" size="small">保存
             </el-button>
         </div>
@@ -145,7 +146,9 @@ Yii::$app->loadComponentView('com-select-cat');
                     this.loading = false;
                     if (e.data.code == 0) {
                       this.ruleForm = Object.assign(this.ruleForm, e.data.data.setting);
- 
+                      if (this.ruleForm.company_img == null || this.ruleForm.company_img == '') {
+                          this.ruleForm.company_img = [];
+                      }
                     }
                 }).catch(e => {
                     this.loading = false;
@@ -231,5 +234,11 @@ Yii::$app->loadComponentView('com-select-cat');
     .el-input-group__append {
         background-color: #fff;
         color: #353535;
+    }
+
+    .add-image-btn {
+        border: 1px solid RGB(205,209,217);
+        width: 100px;
+        height: 100px;
     }
 </style>

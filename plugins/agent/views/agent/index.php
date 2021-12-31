@@ -102,12 +102,10 @@ Yii::$app->loadPluginComponentView('agent-level');
                             <el-tag size="small" v-else>{{scope.row.level_name}}</el-tag>
                         </template>
                     </el-table-column>
-                    </el-table-column>
                     <el-table-column label="时间" width="200">
                         <template slot-scope="scope">
                             <div>成为经销商时间：<br>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
                         </template>
-                    </el-table-column>
                     </el-table-column>
                     <el-table-column label="备注信息" prop="remarks"></el-table-column>
                     

@@ -15,12 +15,13 @@ use app\plugins\boss\models\BossAwardSentLog;
 class BossAwardsExamineListForm extends BaseModel
 {
     public $keyword;
+    public $kw_type;
     public $page;
 
     public function rules()
     {
         return [
-            [['keyword'], 'trim'],
+            [['keyword', 'kw_type'], 'trim'],
             [['page', ], 'integer'],
             [['page'], 'default', 'value' => 1]
         ];
@@ -32,16 +33,25 @@ class BossAwardsExamineListForm extends BaseModel
         if (!$this->validate()) {
             return $this->responseErrorInfo();
         }
-        $sent_list = BossAwardSentLog::find()
+        $boss_query = BossAwardSentLog::find()->alias('b')
             ->with(['bossAwardEachLog' => function ($query) {
                 $query->select('id,awards_cycle');
             }])
             ->with(['user' => function ($query) {
-                $query->select('id,nickname,mobile')
-                    ->keyword($this->keyword, ['or',['like', 'nickname', $this->keyword],['like', 'mobile', $this->keyword]]);
+                $query->select('id,nickname,mobile');
             }])
-            ->page($pagination, 20, $this->page)
-            ->orderBy(['id' => SORT_DESC])
+            ->leftJoin(['u' => User::tableName()], 'u.id=b.user_id');
+            if ($this->keyword && $this->kw_type) {
+                if ($this->kw_type == 'mobile') {
+                    $boss_query->andWhere(['u.mobile' => $this->keyword]);
+                } elseif ($this->kw_type == 'user_id') {
+                    $boss_query->andWhere(['u.id' => $this->keyword]);
+                } elseif ($this->kw_type == 'nickname') {
+                    $boss_query->andWhere(['like', 'u.nickname', $this->keyword]);
+                }
+            }
+        $sent_list = $boss_query->page($pagination)
+            ->orderBy(['b.id' => SORT_DESC])
             ->asArray()
             ->all();
         if ($sent_list) {

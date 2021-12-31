@@ -8,10 +8,18 @@
         <div class="table-body">
             <div class="input-item">
                 <el-input @keyup.enter.native="search" size="small"
-                          placeholder="请输入名称进行搜索"
+                          placeholder="请输入关键词进行搜索"
                           v-model="keyword"
                           clearable
                           @clear="search">
+                    <el-select slot="prepend" v-model="kw_type" placeholder="请选择" size="small"
+                               style="width:120px;">
+                        <el-option v-for="item in item_type_options"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
@@ -55,7 +63,7 @@
 
                 <el-table-column label="分红金额">
                     <template slot-scope="scope">
-                        <com-ellipsis :line="1">{{scope.row.money}}</com-ellipsis>
+                        <com-ellipsis :line="1">{{scope.row.money}}元</com-ellipsis>
                     </template>
                 </el-table-column>
 
@@ -67,12 +75,12 @@
 
             </el-table>
 
-            <div style="text-align: right;margin: 20px 0;">
+            <div style="text-align: center;margin: 20px 0;">
                 <el-pagination
-                        @current-change="pagination"
-                        background
-                        layout="prev, pager, next"
-                        :page-count="pageCount">
+                    @current-change="pagination"
+                    background
+                    layout="prev, pager, next"
+                    :page-count="pageCount">
                 </el-pagination>
             </div>
         </div>
@@ -85,9 +93,24 @@
             return {
                 list: [],
                 keyword: '',
+                kw_type: 'mobile',
                 listLoading: false,
                 page: 1,
                 pageCount: 0,
+                item_type_options:[
+                    {
+                        value: 'mobile',
+                        label: '手机号'
+                    },
+                    {
+                        value: 'user_id',
+                        label: '用户ID'
+                    },
+                    {
+                        value: 'nickname',
+                        label: '昵称'
+                    },
+                ],
             };
         },
         mounted: function () {
@@ -110,7 +133,8 @@
                     params: {
                         r: 'plugin/boss/mall/examine-prize/index',
                         page: self.page,
-                        keyword: this.keyword
+                        keyword: this.keyword,
+                        kw_type: this.kw_type,
                     },
                     method: 'get',
                 }).then(e => {
@@ -132,7 +156,6 @@
 
     .input-item {
         display: inline-block;
-        width: 250px;
         margin: 0 0 20px;
     }
 

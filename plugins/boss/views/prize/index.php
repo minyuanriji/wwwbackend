@@ -157,7 +157,7 @@
     <el-dialog title="充值" :visible.sync="dialogContent">
         <el-form :model="remarksForm">
             <el-form-item label="金额">
-                <el-input v-model="remarksForm.money" type="number" placeholder="请输入金额" style="width: 220px"></el-input>
+                <el-input v-model="remarksForm.money" type="number" placeholder="请输入金额" min="0" style="width: 220px"></el-input>
                 <el-input style="display: none" :readonly="true" v-model="remarksForm.id"></el-input>
             </el-form-item>
         </el-form>

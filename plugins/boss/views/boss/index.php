@@ -28,13 +28,20 @@ Yii::$app->loadPluginComponentView('boss-level');
         </div>
         <div class="table-body">
             <el-select size="small" v-model="search.level_id" @change='toSearch' class="select">
-                <el-option key="all" label="全部等级" value="0"></el-option>
                 <el-option :key="index" :label="item.name" :value="item.id"
                            v-for="(item, index) in bossLevelList"></el-option>
             </el-select>
             <div class="input-item">
                 <el-input @keyup.enter.native="loadData" size="small" placeholder="请输入搜索内容" v-model="search.keyword"
                           clearable @clear="toSearch">
+                    <el-select slot="prepend" v-model="search.kw_type" placeholder="请选择" size="small"
+                               style="width:120px;">
+                        <el-option v-for="item in item_type_options"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
                     <el-button slot="append" icon="el-icon-search" @click="toSearch"></el-button>
                 </el-input>
             </div>
@@ -180,6 +187,7 @@ Yii::$app->loadPluginComponentView('boss-level');
             nickname: '',
             search: {
                 keyword: '',
+                kw_type: 'mobile',
                 status: -1,
                 page: 1,
                 platform: '',
@@ -218,6 +226,20 @@ Yii::$app->loadPluginComponentView('boss-level');
             },
             bossLevelList: [],
             choose_list: [],
+            item_type_options:[
+                {
+                    value: 'mobile',
+                    label: '手机号'
+                },
+                {
+                    value: 'user_id',
+                    label: '用户ID'
+                },
+                {
+                    value: 'nickname',
+                    label: '昵称'
+                },
+            ],
         },
         mounted() {
             this.loadData();
@@ -449,7 +471,6 @@ Yii::$app->loadPluginComponentView('boss-level');
     }
 
     .input-item {
-        width: 250px;
         margin: 0 0 20px;
         display: inline-block;
     }

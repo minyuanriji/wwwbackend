@@ -43,13 +43,13 @@ Yii::$app->loadComponentView('com-select-cat');
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="团队奖励">
-                            <el-input v-model.number="ruleForm.agent_price" type="number">
+                            <el-input v-model.number="ruleForm.agent_price" type="number" min="0">
                                 <template slot="append" v-if="ruleForm.agent_price_type == 0">%</template>
                                 <template slot="append" v-if="ruleForm.agent_price_type == 1">元</template>
                             </el-input>
                         </el-form-item>
                         <el-form-item label="被越级的奖励">
-                            <el-input v-model.number="ruleForm.over_agent_price" type="number">
+                            <el-input v-model.number="ruleForm.over_agent_price" type="number" min="0">
                                 <template slot="append">%</template>
                             </el-input>
                         </el-form-item>
@@ -61,7 +61,7 @@ Yii::$app->loadComponentView('com-select-cat');
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="平级奖励">
-                            <el-input v-model.number="ruleForm.equal_price" type="number">
+                            <el-input v-model.number="ruleForm.equal_price" type="number" min="0">
                                 <template slot="append" v-if="ruleForm.equal_price_type == 0">%</template>
                                 <template slot="append" v-if="ruleForm.equal_price_type == 1">元</template>
                             </el-input>

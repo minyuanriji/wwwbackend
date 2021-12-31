@@ -75,8 +75,8 @@
                 </el-row>
             </el-form>
         </div>
-        <el-button class="button-item" :loading="btnLoading" type="primary" @click="submitForm('ruleForm')"
-                   size="small">保存
+        <el-button class="button-item" :loading="btnLoading" type="primary" @click="submitForm('ruleForm')" size="small">
+            保存
         </el-button>
     </el-card>
 </div>
@@ -256,13 +256,7 @@
         padding: 20px;
         background-color: #fff;
         margin-bottom: 20px;
-        padding-right: 20%;
         min-width: 900px;
-    }
-
-    .form-body .el-form-item {
-        padding-right: 25%;
-        min-width: 850px;
     }
 
     .form-button {
@@ -275,6 +269,7 @@
 
     .button-item {
         padding: 9px 25px;
+        margin-left: 100px;
     }
 
     .check-group {

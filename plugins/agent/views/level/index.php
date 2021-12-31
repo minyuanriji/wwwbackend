@@ -22,7 +22,7 @@
         <div class="table-body">
             <div class="input-item">
                 <el-input @keyup.enter.native="search" size="small"
-                          placeholder="请输入等级名称或等级进行搜索"
+                          placeholder="请输入等级名称或ID进行搜索"
                           v-model="keyword"
                           clearable
                           @clear="search">

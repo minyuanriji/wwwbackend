@@ -258,6 +258,13 @@ class UserForm extends BaseModel
                     break;
                 default:
             }
+        }elseif($this->keyword){
+            $query->andWhere([
+                "OR",
+                ['u.mobile' => $this->keyword],
+                ['u.id' => $this->keyword],
+                ['like', 'u.nickname', $this->keyword]
+            ]);
         }
 
         if(!empty($this->role_type)){

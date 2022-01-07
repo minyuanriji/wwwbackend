@@ -134,6 +134,7 @@ class OilOrderUseForm extends BaseModel{
                         "bankUserName"    => isset($config['bankUserName']) ? $config['bankUserName'] : "",
                         "bankCardNo"      => isset($config['bankCardNo']) ? $config['bankCardNo'] : "",
                         "bankName"        => isset($config['bankName']) ? $config['bankName'] : "",
+                        "bankNo"          => isset($config['bankNo']) ? $config['bankNo'] : "",
                         "bankAccountType" => 2
                     ]);
                     $transferOrder->save();

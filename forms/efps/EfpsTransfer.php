@@ -34,13 +34,14 @@ class EfpsTransfer extends BaseModel{
                     "bankCardNo"      => $transferData->bankCardNo,
                     "bankName"        => $transferData->bankName,
                     "bankAccountType" => $transferData->bankAccountType,
+                    "bankNo"          => $transferData->bankNo,
                     "created_at"      => time()
                 ]);
             }
 
             if($transferOrder->status == 0){
                 $transferOrder->status = 1;
-                $res = \Yii::$app->efps->withdrawalToCard([
+                $submitOption = [
                     "customerCode"    => \Yii::$app->efps->getCustomerCode(),
                     "outTradeNo"      => $transferOrder->outTradeNo,
                     "notifyUrl"       => $transferOrder->notifyUrl,
@@ -49,7 +50,11 @@ class EfpsTransfer extends BaseModel{
                     "bankCardNo"      => $transferOrder->bankCardNo,
                     "bankName"        => $transferOrder->bankName,
                     "bankAccountType" => $transferOrder->bankAccountType
-                ]);
+                ];
+                if($transferOrder->bankAccountType == 1){
+                    $submitOption['bankNo'] = $transferOrder->bankNo;
+                }
+                $res = \Yii::$app->efps->withdrawalToCard($submitOption);
                 if($res['code'] != Efps::CODE_SUCCESS){
                     $transferOrder->status = 3;
                     $transferOrder->remark = "提交打款处理失败";

@@ -17,7 +17,7 @@ class OilJiayoulaTransferOrder extends BaseActiveRecord{
         return [
             [['mall_id', 'order_sn', 'created_at', 'updated_at', 'amount', 'status', 'bankUserName', 'bankCardNo',
               'bankName', 'bankAccountType', 'originAmount', 'transferRate', 'oil_order_id'], 'required'],
-            [[], 'safe']
+            [['bankNo'], 'safe']
         ];
     }
 }

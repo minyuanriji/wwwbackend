@@ -77,7 +77,8 @@ class JiayoulaTransferAction extends Action{
                 'bankUserName'    => $transferOrder->bankUserName,
                 'bankCardNo'      => $transferOrder->bankCardNo,
                 'bankName'        => $transferOrder->bankName,
-                'bankAccountType' => $transferOrder->bankAccountType
+                'bankAccountType' => $transferOrder->bankAccountType,
+                'bankNo'          => $transferOrder->bankNo
             ]);
 
             $res = EfpsTransfer::commit($transferData);

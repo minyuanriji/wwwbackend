@@ -13,10 +13,12 @@ class EfpsTransferData extends BaseModel{
     public $bankCardNo;
     public $bankName;
     public $bankAccountType;
+    public $bankNo;
 
     public function rules(){
         return [
-            [['outTradeNo', 'source_type', 'amount', 'bankUserName', 'bankCardNo', 'bankName', 'bankAccountType'], 'required']
+            [['outTradeNo', 'source_type', 'amount', 'bankUserName', 'bankCardNo', 'bankName', 'bankAccountType'], 'required'],
+            [['bankNo'], 'safe']
         ];
     }
 

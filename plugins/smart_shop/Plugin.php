@@ -34,6 +34,11 @@ class Plugin extends \app\plugins\Plugin
                 'route' => 'plugin/smart_shop/mall/setting/index',
                 'icon' => 'el-icon-setting'
             ],
+            [
+                'name' => '分账商户',
+                'route' => 'plugin/smart_shop/mall/merchant/index',
+                'icon' => 'el-icon-setting'
+            ],
         ];
     }
 

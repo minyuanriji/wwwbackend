@@ -34,20 +34,29 @@
 
             <el-tabs v-model="activeName">
                 <el-tab-pane label="全局设置" name="first">
-                    <el-form :model="DBSet.ruleForm" :rules="DBSet.rules" ref="ruleDBForm" label-width="200px" size="small">
+                    <el-form :model="DBSet.ruleForm" :rules="DBSet.rules" ref="ruleDBForm" label-width="200px" size="big">
                         <el-form-item label="数据库配置">
                             <el-card class="box-card" style="width:35%" v-if="!DBSet.is_set">
                                 <el-form-item label="IP" prop="db_host" label-width="70px" required>
                                     <el-input v-model="DBSet.ruleForm.db_host" placeholder="请输入数据库的IP地址"></el-input>
                                 </el-form-item>
+                                <el-form-item label="端口" prop="db_port" label-width="70px" required style="margin-top:10px;">
+                                    <el-input v-model="DBSet.ruleForm.db_port" placeholder="请输入数据库的连接端口"></el-input>
+                                </el-form-item>
                                 <el-form-item label="数据库" prop="db_name" label-width="70px" required style="margin-top:10px;">
                                     <el-input v-model="DBSet.ruleForm.db_name" placeholder="请输入数据库名称"></el-input>
+                                </el-form-item>
+                                <el-form-item label="字符集" prop="db_charset" label-width="70px" required style="margin-top:10px;">
+                                    <el-input v-model="DBSet.ruleForm.db_charset" placeholder="请输入数据库字符集"></el-input>
                                 </el-form-item>
                                 <el-form-item label="用户名" prop="db_user" label-width="70px" required style="margin-top:10px;">
                                     <el-input v-model="DBSet.ruleForm.db_user" placeholder="请输入用户名"></el-input>
                                 </el-form-item>
                                 <el-form-item label="密码" prop="db_pass" label-width="70px" required style="margin-top:10px;">
                                     <el-input v-model="DBSet.ruleForm.db_pass" placeholder="请输入密码"></el-input>
+                                </el-form-item>
+                                <el-form-item label="表前缀" prop="db_tb_prefix" label-width="70px"  style="margin-top:10px;">
+                                    <el-input v-model="DBSet.ruleForm.db_tb_prefix" placeholder="请输入数据表前缀"></el-input>
                                 </el-form-item>
                                 <el-form-item label-width="70px" required style="margin-top:10px;">
                                     <el-button :loading="DBSet.btnLoading" @click="saveDBInfo" type="primary" size="big">保存</el-button>
@@ -57,6 +66,14 @@
                                 <el-button @click="DBSet.is_set=false" type="default" size="big">重新设置</el-button>
                             </template>
 
+                        </el-form-item>
+                    </el-form>
+                    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="200px" size="big">
+                        <el-form-item label="项目域名" prop="host_url">
+                            <el-input v-model="ruleForm.host_url" placeholder="请输入数字经营项目域名" style="width:350px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="">
+                            <el-button :loading="btnLoading" @click="globalSave" type="primary" size="big">保存</el-button>
                         </el-form-item>
                     </el-form>
                 </el-tab-pane>
@@ -91,7 +108,6 @@
                     </el-form>
                 </el-tab-pane>
             </el-tabs>
-
         </div>
     </el-card>
 </div>
@@ -101,20 +117,38 @@
         data() {
             return {
                 activeName: "first",
+                ruleForm:{
+                    host_url: ''
+                },
+                rules: {
+                    host_url: [
+                        {required: true, message: '请输入数字经营项目域名', trigger: 'change'},
+                    ],
+                },
+                btnLoading: false,
                 DBSet:{
                     is_set: true,
                     ruleForm:{
                         db_host: '',
+                        db_port: '',
                         db_name: '',
+                        db_charset: '',
                         db_user: '',
-                        db_pass: ''
+                        db_pass: '',
+                        db_tb_prefix: ''
                     },
                     rules: {
                         db_host: [
                             {required: true, message: '请输入数据库IP地址', trigger: 'change'},
                         ],
+                        db_port: [
+                            {required: true, message: '请输入数据库的连接端口', trigger: 'change'},
+                        ],
                         db_name: [
                             {required: true, message: '请输入数据库名称', trigger: 'change'},
+                        ],
+                        db_charset: [
+                            {required: true, message: '请输入数据库字符集', trigger: 'change'},
                         ],
                         db_user: [
                             {required: true, message: '请输入用户名', trigger: 'change'},
@@ -162,6 +196,31 @@
             this.getSetting();
         },
         methods: {
+            globalSave(){
+                let that = this;
+                this.$refs['ruleForm'].validate((valid) => {
+                    if (valid) {
+                        that.btnLoading = true;
+                        request({
+                            params: {
+                                r: 'plugin/smart_shop/mall/setting/save'
+                            },
+                            method: 'post',
+                            data: {form:that.ruleForm}
+                        }).then(e => {
+                            that.btnLoading = false;
+                            if (e.data.code == 0) {
+                                that.$message.success("保存成功");
+                            } else {
+                                that.$message.error(e.data.msg);
+                            }
+                        }).catch(e => {
+                            that.$message.error("请求失败");
+                            that.btnLoading = false;
+                        });
+                    }
+                });
+            },
             saveDBInfo(){
                 let that = this;
                 this.$refs['ruleDBForm'].validate((valid) => {
@@ -169,7 +228,7 @@
                         that.DBSet.btnLoading = true;
                         request({
                             params: {
-                                r: 'plugin/smart_shop/mall/setting/db-save'
+                                r: 'plugin/smart_shop/mall/setting/save'
                             },
                             method: 'post',
                             data: {form:that.DBSet.ruleForm}

@@ -15,7 +15,6 @@
             <el-table v-loading="listLoading" @row-click="chooseRowClick" :data="list" border style="width: 100%">
                 <el-table-column label="选择" width="65" align="center">
                     <template slot-scope="scope">
-                        &nbsp;&nbsp;
                         <el-radio v-model="radio_id" :label="scope.row.id">&nbsp;</el-radio>
                     </template>
                 </el-table-column>

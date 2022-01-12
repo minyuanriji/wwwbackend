@@ -10,25 +10,50 @@
             </div>
         </div>
         <div class="table-body">
-            <div class="input-item">
-                <el-input @keyup.enter.native="search" size="big" placeholder="请输入搜索内容" v-model="search.keyword" clearable @clear="getList">
-                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-                </el-input>
-            </div>
-            <el-table v-loading="loading" :data="list" border style="width: 100%">
+            <el-card class="box-card">
+                <table style="width:100%;" class="search-merchant">
+                    <tr>
+                        <td>
+                            <div style="">
+                                <span style="width:150px;text-align: right;">商户名称：</span>
+                                <el-input v-model="search.name" placeholder="输入商户名称搜索"></el-input>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex;">
+                                <span style="width:150px;text-align: right;">商户ID：</span>
+                                <el-input v-model="search.mch_id" placeholder="输入商户ID搜索"></el-input>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex;">
+                                <span style="width:150px;text-align: right;">手机号：</span>
+                                <el-input v-model="search.mobile"  placeholder="输入手机号搜索"></el-input>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="text-align: center;padding-top:20px;">
+                            <el-button @click="searchReset" type="default" size="big">重置</el-button>
+                            <el-button @click="searchGo" type="danger" size="big">搜索</el-button>
+                        </td>
+                    </tr>
+                </table>
+            </el-card>
+            <el-table v-loading="loading" :data="list" border style="margin-top:20px;width: 100%">
 
-                <el-table-column prop="id" label="ID" width="100" align="center"></el-table-column>
+                <el-table-column prop="bsh_mch_id" label="商户ID" width="100" align="center"></el-table-column>
 
                 <el-table-column :show-overflow-tooltip="true" label="商户信息" width="200">
                     <template slot-scope="scope">
                         <div flex="cross:center">
-                            <com-image width="25" height="25" :src="scope.row.merchant_logo"></com-image>
-                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.merchant_name}}</div>
+                            <com-image width="25" height="25" :src="scope.row.cover_url"></com-image>
+                            <div style="margin-left: 10px;width: 140px;overflow:hidden;text-overflow: ellipsis;">{{scope.row.name}}</div>
                         </div>
                     </template>
                 </el-table-column>
-
-                <el-table-column label="服务费" prop="transfer_rate" width="100"></el-table-column>
+                <el-table-column label="手机" prop="mobile" width="150" align="center"></el-table-column>
+                <el-table-column label="服务费（%）" prop="transfer_rate" width="150" align="center"></el-table-column>
 
                 <el-table-column prop="created_at" width="150" label="添加日期" align="center">
                     <template slot-scope="scope">
@@ -43,6 +68,11 @@
                                 <img src="statics/img/mall/edit.png" alt="">
                             </el-tooltip>
                         </el-button>
+                        <el-button @click="deleteIt(scope.row)" type="text" circle size="mini">
+                            <el-tooltip class="item" effect="dark" content="删除" placement="top">
+                                <img src="statics/img/mall/del.png" alt="">
+                            </el-tooltip>
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -51,12 +81,12 @@
                 <div></div>
                 <div>
                     <el-pagination
-                        v-if="list.length > 0"
-                        style="display: inline-block;float: right;"
-                        background :page-size="pagination.pageSize"
-                        @current-change="pageChange"
-                        layout="prev, pager, next" :current-page="pagination.current_page"
-                        :total="pagination.total_count">
+                            v-if="list.length > 0"
+                            style="display: inline-block;float: right;"
+                            background :page-size="pagination.pageSize"
+                            @current-change="pageChange"
+                            layout="prev, pager, next" :current-page="pagination.current_page"
+                            :total="pagination.total_count">
                     </el-pagination>
                 </div>
             </div>
@@ -74,11 +104,21 @@
                 loading: false,
                 search: {
                     page: 1,
-                    keyword: ''
+                    name: '',
+                    mch_id: '',
+                    mobile: ''
                 }
             };
         },
         methods: {
+            searchReset(){
+                this.search = {page:1, name: '', mch_id: '', mobile: ''};
+                this.getList();
+            },
+            searchGo(){
+                this.page = 1;
+                this.getList();
+            },
             getList() {
                 let self = this;
                 self.loading = true;
@@ -110,6 +150,36 @@
                     r: 'plugin/smart_shop/mall/merchant/edit',
                     id: id,
                 });
+            },
+            deleteIt(row){
+                console.log(row);
+                let self = this;
+                self.$confirm('你确定要删除分账商户吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    self.loading = true;
+                    request({
+                        params: {
+                            r: 'plugin/smart_shop/mall/merchant/delete'
+                        },
+                        method: 'post',
+                        data: {id:row.id}
+                    }).then(e => {
+                        self.loading = false;
+                        if (e.data.code == 0) {
+                            self.getList();
+                        } else {
+                            self.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        self.$message.error("请求失败");
+                        self.loading = false;
+                    });
+                }).catch((e) => {
+
+                });
             }
         },
         mounted: function () {
@@ -119,6 +189,7 @@
 </script>
 
 <style>
+    .search-merchant td > div{display: flex;align-items: center}
     .table-body {
         padding: 20px;
         background-color: #fff;

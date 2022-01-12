@@ -35,4 +35,16 @@ class SettingDetailForm extends BaseModel{
 
     }
 
+    /**
+     * 获取配置
+     * @return mixed
+     */
+    public static function getSetting(){
+        $form = new static();
+        $res = $form->getDetail();
+        if($res['code'] != ApiCode::CODE_SUCCESS){
+            throw new $res['msg'];
+        }
+        return $res['data']['setting'];
+    }
 }

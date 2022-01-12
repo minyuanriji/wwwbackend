@@ -3,6 +3,7 @@
 namespace app\plugins\smart_shop\controllers\mall;
 
 use app\plugins\Controller;
+use app\plugins\smart_shop\forms\mall\MerchantDeleteForm;
 use app\plugins\smart_shop\forms\mall\MerchantDetailForm;
 use app\plugins\smart_shop\forms\mall\MerchantEditForm;
 use app\plugins\smart_shop\forms\mall\MerchantGetSmartshopForm;
@@ -42,6 +43,16 @@ class MerchantController extends Controller{
         } else {
             return $this->render('edit');
         }
+    }
+
+    /**
+     * 删除商户
+     * @return string|\yii\web\Response
+     */
+    public function actionDelete(){
+        $form = new MerchantDeleteForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->delete());
     }
 
     /**

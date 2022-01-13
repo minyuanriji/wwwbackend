@@ -51,14 +51,15 @@ class SmartShop extends Component
     public function getCyorderDetail($record_id){
 
         $selects = ["o.order_no", "o.order_status", "o.total_price", "o.pay_price", "o.is_confirm", "o.apply_refund",
-            "o.cancel_status", "o.is_cancel", "o.pay_type", "u.mobile as u_mobile", "s.title as store_name",
+            "o.cancel_status", "o.is_cancel", "o.pay_type", "o.out_trade_no as transaction_id", "u.mobile as u_mobile", "s.title as store_name",
             "o.address as store_address", "pv.city_name as province",
             "ct.city_name as city", "s_at.filepath as store_logo", "m.id as merchant_id", "m.name as merchant_name",
-            "m.mobile as merchant_mobile"];
+            "m.mobile as merchant_mobile", "me.mno"];
         $sql = "SELECT " .implode(",", $selects) . " FROM {{%cyorder}} o " .
                "INNER JOIN {{%store}} s ON s.id=o.store_id " .
                "INNER JOIN {{%users}} u ON u.id=o.user_id " .
                "INNER JOIN {{%merchant}} m ON s.admin_id=m.admin_id " .
+               "INNER JOIN {{%merchant_entry}} me ON me.merchant_id=m.id " .
                "LEFT JOIN {{%citys}} pv ON pv.cityid=s.province_code ".
                "LEFT JOIN {{%citys}} ct ON ct.cityid=s.city_code " .
                "LEFT JOIN {{%attachment}} s_at ON s_at.id=s.thumb " .
@@ -79,6 +80,24 @@ class SmartShop extends Component
      */
     public function getCzorderDetail($record_id){
         return [];
+    }
+
+    /**
+     * 批量设置智慧门店开启分账功能
+     * @param $storeIds
+     */
+    public function batchSetStoreSplitEnable($storeIds){
+        $sql = "UPDATE {{%store}} SET split_enable=1 WHERE id IN(".implode(",", $storeIds).")";
+        $this->db->createCommand($sql)->execute();
+    }
+
+    /**
+     * 批量设置智慧门店关闭分账功能
+     * @param $storeIds
+     */
+    public function batchSetStoreSplitDisable($storeIds){
+        $sql = "UPDATE {{%store}} SET split_enable=0 WHERE id IN(".implode(",", $storeIds).")";
+        $this->db->createCommand($sql)->execute();
     }
 
     /**

@@ -6,6 +6,11 @@ use app\models\BaseActiveRecord;
 
 class Order extends BaseActiveRecord {
 
+    const STATUS_UNCONFIRMED = 0;
+    const STATUS_PROCESSING  = 1;
+    const STATUS_FINISHED    = 2;
+    const STATUS_CANCELED    = 3;
+
     /**
      * {@inheritdoc}
      */

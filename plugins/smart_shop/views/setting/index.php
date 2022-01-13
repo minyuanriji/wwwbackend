@@ -79,6 +79,24 @@
                 </el-tab-pane>
                 <el-tab-pane label="微信设置" name="second">
                     <el-form :model="WechatSet.ruleForm" :rules="WechatSet.rules" ref="ruleWechatForm" label-width="200px" size="big">
+                        <el-form-item label="服务商应用ID" prop="sp_appid">
+                            <el-input v-model="WechatSet.ruleForm.sp_appid" placeholder="请输入" style="width:350px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="服务商商户号" prop="sp_mchid">
+                            <el-input v-model="WechatSet.ruleForm.sp_mchid" placeholder="请输入" style="width:350px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="API私钥路径" prop="sp_mchid">
+                            <el-input v-model="WechatSet.ruleForm.apiclient_key" placeholder="请输入" style="width:350px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="API证书路径" prop="apiclient_cert">
+                            <el-input v-model="WechatSet.ruleForm.apiclient_cert" placeholder="请输入" style="width:350px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="证书序列号" prop="cert_serial">
+                            <el-input v-model="WechatSet.ruleForm.cert_serial" placeholder="请输入" style="width:350px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="平台证书路径" prop="wechat_cert">
+                            <el-input v-model="WechatSet.ruleForm.wechat_cert" placeholder="请输入" style="width:350px;"></el-input>
+                        </el-form-item>
                         <el-form-item label="分账接收方类型" prop="wechat_fz_type">
                             <el-select v-model="WechatSet.ruleForm.wechat_fz_type" placeholder="请选择" style="width:150px;">
                                 <el-option label="商户号" value="MERCHANT_ID"></el-option>
@@ -86,6 +104,9 @@
                         </el-form-item>
                         <el-form-item label="分账接收方" prop="wechat_fz_account">
                             <el-input v-model="WechatSet.ruleForm.wechat_fz_account" placeholder="请输入内容" style="width:350px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="分账个人接收方姓名" prop="wechat_fz_name">
+                            <el-input v-model="WechatSet.ruleForm.wechat_fz_name" placeholder="请输入内容" style="width:350px;"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button :loading="WechatSet.btnLoading" @click="saveWechatInfo" type="primary" size="big">保存</el-button>
@@ -161,16 +182,44 @@
                 },
                 WechatSet:{
                     ruleForm: {
+                        sp_appid: '',
+                        sp_mchid: '',
+                        apiclient_key: '',
+                        apiclient_cert: '',
+                        cert_serial: '',
+                        wechat_cert: '',
                         wechat_fz_account: '',
-                        wechat_fz_type: 'MERCHANT_ID'
+                        wechat_fz_type: 'MERCHANT_ID',
+                        wechat_fz_name: '',
                     },
                     rules: {
+                        sp_appid: [
+                            {required: true, message: '请输入服务商应用ID', trigger: 'change'},
+                        ],
+                        sp_mchid: [
+                            {required: true, message: '请输入服务商商户号', trigger: 'change'},
+                        ],
+                        apiclient_key: [
+                            {required: true, message: '请输入API私钥路径', trigger: 'change'},
+                        ],
+                        apiclient_cert: [
+                            {required: true, message: '请输入API证书路径', trigger: 'change'},
+                        ],
+                        cert_serial: [
+                            {required: true, message: '请输入证书序列号', trigger: 'change'},
+                        ],
+                        wechat_cert: [
+                            {required: true, message: '请输入平台证书路径', trigger: 'change'},
+                        ],
                         wechat_fz_type: [
                             {required: true, message: '请选择分账接收方类型', trigger: 'change'},
                         ],
                         wechat_fz_account: [
                             {required: true, message: '请输入分账接收方', trigger: 'change'},
                         ],
+                        wechat_fz_name: [
+                            {required: true, message: '请输入分账接收方姓名', trigger: 'change'},
+                        ]
                     },
                     btnLoading: false
                 },
@@ -260,7 +309,7 @@
                                 r: 'plugin/smart_shop/mall/setting/save'
                             },
                             method: 'post',
-                            data: {form:that.WechatSet.ruleForm}
+                            data: {wechat: 1, form:that.WechatSet.ruleForm}
                         }).then(e => {
                             that.WechatSet.btnLoading = false;
                             if (e.data.code == 0) {
@@ -276,8 +325,14 @@
                 });
             },
             setWechatInfo(set){
-                this.WechatSet.ruleForm.wechat_fz_account = set.wechat_fz_account;
-                this.WechatSet.ruleForm.wechat_fz_type = set.wechat_fz_type;
+                let key;
+                for(key in set){
+                    if(typeof this.WechatSet.ruleForm[key] != "undefined"){
+                        this.WechatSet.ruleForm[key] = set[key];
+                    }
+                }
+                //this.WechatSet.ruleForm.wechat_fz_account = set.wechat_fz_account;
+                //this.WechatSet.ruleForm.wechat_fz_type = set.wechat_fz_type;
             },
             saveAliInfo(){
                 let that = this;

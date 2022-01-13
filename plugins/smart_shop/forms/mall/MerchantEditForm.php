@@ -4,6 +4,7 @@ namespace app\plugins\smart_shop\forms\mall;
 
 use app\core\ApiCode;
 use app\plugins\sign_in\forms\BaseModel;
+use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\models\Merchant;
 use app\plugins\smart_shop\models\MerchantFzlist;
 
@@ -24,6 +25,8 @@ class MerchantEditForm extends BaseModel{
         if(!$this->validate()){
             return $this->responseErrorInfo();
         }
+
+        $t = \Yii::$app->db->beginTransaction();
         try {
 
             if(!$this->shop_list){
@@ -44,8 +47,19 @@ class MerchantEditForm extends BaseModel{
                 throw new \Exception($this->responseErrorMsg($merchant));
             }
 
+            $smartShop = new SmartShop();
+
+            $oldStoreIds = MerchantFzlist::find()->where([
+                "bsh_mch_id" => $merchant->bsh_mch_id,
+                "is_delete"  => 0
+            ])->select(["ss_store_id"])->column();
+            if($oldStoreIds){
+                $smartShop->batchSetStoreSplitDisable($oldStoreIds);
+            }
+
             MerchantFzlist::updateAll(["is_delete" => 1], ["bsh_mch_id" => $merchant->bsh_mch_id]);
 
+            $storeIds = [];
             foreach($this->shop_list as $shop){
                 $model = MerchantFzlist::findOne([
                     "bsh_mch_id"  => $merchant->bsh_mch_id,
@@ -68,13 +82,19 @@ class MerchantEditForm extends BaseModel{
                 if(!$model->save()){
                     throw new \Exception($this->responseErrorMsg($model));
                 }
+                $storeIds[] = $shop['ss_store_id'];
             }
 
-            return [
-                'code' => ApiCode::CODE_SUCCESS,
 
+            $smartShop->batchSetStoreSplitEnable($storeIds);
+
+            $t->commit();
+
+            return [
+                'code' => ApiCode::CODE_SUCCESS
             ];
         }catch (\Exception $e){
+            $t->rollBack();
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg'  => $e->getMessage()

@@ -3,12 +3,12 @@
 namespace app\plugins\smart_shop\forms\mall;
 
 use app\core\ApiCode;
+use app\models\Store;
+use app\plugins\mch\models\Mch;
 use app\plugins\sign_in\forms\BaseModel;
 use app\plugins\smart_shop\components\SmartShop;
+use app\plugins\smart_shop\components\WechatPaySdkApi;
 use app\plugins\smart_shop\models\Order;
-use WeChatPay\Builder;
-use WeChatPay\Crypto\Rsa;
-use WeChatPay\Util\PemUtil;
 
 class OrderSplitInfoForm extends BaseModel{
 
@@ -33,17 +33,33 @@ class OrderSplitInfoForm extends BaseModel{
                 throw new \Exception("订单不存在");
             }
 
+            $mch = Mch::findOne($order->bsh_mch_id);
+            if(!$mch || $mch->is_delete || $mch->review_status != Mch::REVIEW_STATUS_CHECKED){
+                throw new \Exception("无法获取到商户信息");
+            }
+
+            $store = Store::findOne(["mch_id" => $mch->id]);
+            if(!$store || $store->is_delete){
+                throw new \Exception("无法获取门店信息");
+            }
+
             $shop = new SmartShop();
             $detail = $shop->getOrderDetail($order->from_table_name, $order->from_table_record_id);
 
+            $info['id']          = $order->id;
             $info['total_price'] = $detail['total_price'];
             $info['pay_price']   = $detail['pay_price'];
             $info['pay_type']    = $detail['pay_type'];
 
             if($info['pay_type'] == 1){
-                $info['unsplit_amount'] = $this->getWechat($order, $shop, $detail);
+                $info['unsplit_amount'] = static::getWechat($order, $shop, $detail);
+                $info['split_account'] = [
+                    ['name' => $detail['merchant_name'], 'amount' => round((1 - $mch->transfer_rate/100) * ($info['unsplit_amount']/100), 6)],
+                    ['name' => '平台', 'amount' => round(($mch->transfer_rate/100) * ($info['unsplit_amount']/100), 6)]
+                ];
             }else{
                 $info['unsplit_amount'] = 0;
+                $info['split_account'] = [];
             }
 
             return [
@@ -61,45 +77,22 @@ class OrderSplitInfoForm extends BaseModel{
     }
 
     /**
-     * 获取微信支付待分账金额
+     * 获取微信支付待分账金额（单位：分）
      * @param Order $order
      * @param SmartShop $shop
      * @param $detail
      * @throws \Exception
      */
-    private function getWechat(Order $order, SmartShop $shop, $detail){
+    public static function getWechat(Order $order, SmartShop $shop, $detail){
 
-// 商户号
-        $merchantId = "1617888245";
-
-// 从本地文件中加载「商户API私钥」，「商户API私钥」会用来生成请求的签名
-        $merchantPrivateKeyFilePath = file_get_contents("C:\\LINO1O\\公司文件\\智慧经营\\WXCertUtil\\cert\\1617888245_20211223_cert\\apiclient_key.pem");
-        $merchantPrivateKeyInstance = Rsa::from($merchantPrivateKeyFilePath, Rsa::KEY_TYPE_PRIVATE);
-
-// 「商户API证书」的「证书序列号」
-        $merchantCertificateSerial = "1B923E4B41FB7387551B0F175E7346ECF688F804";
-
-// 从本地文件中加载「微信支付平台证书」，用来验证微信支付应答的签名
-        $platformCertificateFilePath = file_get_contents("C:\\LINO1O\\公司文件\\智慧经营\\WXCertUtil\\cert\\1617888245_20211223_cert\\wechatpay_32632D72F5DED9D95B8E4B9E1B65BEBCCE03F31C.pem");
-        $platformPublicKeyInstance = Rsa::from($platformCertificateFilePath, Rsa::KEY_TYPE_PUBLIC);
-
-// 从「微信支付平台证书」中获取「证书序列号」
-        $platformCertificateSerial = PemUtil::parseCertificateSerialNo($platformCertificateFilePath);
-
-// 构造一个 APIv3 客户端实例
-        $instance = Builder::factory([
-            'mchid'      => (string)$merchantId,
-            'serial'     => $merchantCertificateSerial,
-            'privateKey' => $merchantPrivateKeyInstance,
-            'certs'      => [
-                $platformCertificateSerial => $platformPublicKeyInstance,
-            ]
+        $wechatPay = new WechatPaySdkApi([
+            "mchid"          => $shop->setting['sp_mchid'],
+            "serial"         => $shop->setting['cert_serial'],
+            "privateKeyPath" => $shop->setting['apiclient_key'],
+            "wechatCertPath" => $shop->setting['wechat_cert']
         ]);
 
-        $resp = $instance->chain('v3/profitsharing/transactions/42000012982022201125214615308/amounts')
-            ->get(['query' => [], 'curl' => [CURLOPT_SSL_VERIFYPEER => false]]);
-
-        $data = @json_decode($resp->getBody(), true);
+        $data = $wechatPay->get('v3/profitsharing/transactions/'.$detail['transaction_id'].'/amounts');
         if(!isset($data['unsplit_amount'])){
             throw new \Exception("待分账金额查询失败");
         }

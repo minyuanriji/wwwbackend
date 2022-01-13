@@ -42,6 +42,9 @@ class OrderListForm extends BaseModel{
                 foreach($list as &$item){
                     $item['detail']     = $shop->getOrderDetail($item['from_table_name'], $item['from_table_record_id']);
                     $item['split_data'] = !empty($item['split_data']) ? (array)@json_decode($item['split_data'], true) : [];
+                    if(!isset($item['split_data']['receivers']) || empty($item['split_data']['receivers'])){
+                        $item['split_data']['receivers'] = [];
+                    }
                 }
             }
 

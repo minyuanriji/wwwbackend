@@ -3,6 +3,7 @@
 namespace app\plugins\smart_shop\controllers\mall;
 
 use app\plugins\Controller;
+use app\plugins\smart_shop\forms\mall\OrderDoSplitForm;
 use app\plugins\smart_shop\forms\mall\OrderListForm;
 use app\plugins\smart_shop\forms\mall\OrderSplitInfoForm;
 
@@ -31,5 +32,15 @@ class OrderController extends Controller{
         $form = new OrderSplitInfoForm();
         $form->attributes = \Yii::$app->request->get();
         return $this->asJson($form->getInfo());
+    }
+
+    /**
+     * @Note:确认分账
+     * @return string|\yii\web\Response
+     */
+    public function actionDoSplit(){
+        $form = new OrderDoSplitForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->split());
     }
 }

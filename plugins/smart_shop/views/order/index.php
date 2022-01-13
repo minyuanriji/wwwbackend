@@ -38,16 +38,16 @@
                 <el-table-column label="分账状态" width="150" align="center">
                     <template slot-scope="scope">
                         <span v-if="scope.row.status == 0" style="color:darkred">待分账</span>
-                        <span v-if="scope.row.status == 1" style="color:darkgreen">已分账</span>
-                        <span v-if="scope.row.status == 2" style="color:gray">已取消</span>
+                        <span v-if="scope.row.status == 1" style="color:steelblue">处理中</span>
+                        <span v-if="scope.row.status == 2" style="color:darkgreen">已分账</span>
+                        <span v-if="scope.row.status == 3" style="color:gray">已取消</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="分账信息" width="500" align="center">
+                <el-table-column label="分账信息" width="300" align="center">
                     <template slot-scope="scope">
-                        <el-table :data="scope.row.split_data" border size="small" style="width: 100%">
-                            <el-table-column label="收益人" width="180"></el-table-column>
-                            <el-table-column label="金额"></el-table-column>
-                            <el-table-column label="日期"></el-table-column>
+                        <el-table :data="scope.row.split_data.receivers" border size="small" style="width: 100%">
+                            <el-table-column prop="account" label="收益人" width="150" align="center"></el-table-column>
+                            <el-table-column prop="amount" label="金额" align="center"></el-table-column>
                         </el-table>
                     </template>
                 </el-table-column>
@@ -103,9 +103,9 @@
 
         </div>
 
-        <el-dialog title="确认分账" :visible.sync="dialogVisible" width="30%" >
+        <el-dialog title="确认分账" :visible.sync="dialogVisible" :close-on-click-modal="false" :close-on-press-escape="false" width="30%" >
             <div v-if="splitLoading" style="text-align: center;margin-top:30px;">加载中</div>
-            <table v-if="!splitLoading" class="grid-i" style="width:100%;">
+            <table v-if="!splitLoading && splitInfo" class="grid-i" style="width:100%;">
                 <tr class="c2">
                     <td class="label">订单金额：</td>
                     <td>{{splitInfo.total_price}}元</td>
@@ -123,11 +123,24 @@
                 </tr>
                 <tr class="c2">
                     <td class="label">可分账金额：</td>
-                    <td>100</td>
+                    <td>
+                        {{splitInfo.unsplit_amount}}
+                    </td>
                 </tr>
                 <tr class="c2">
                     <td class="label">本次分账信息：</td>
-                    <td>100</td>
+                    <td>
+                        <div v-for="account in splitInfo.split_account" style="margin-bottom:1px;display:flex;align-items: center;">
+                            <span style="padding:6px 10px;color:gray;display:inline-block;background:#f7f7f7;width:150px;text-align: right;">{{account.name}}</span>
+                            <span style="margin-left:10px;">{{account.amount}}元</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="c2">
+                    <td class="label"></td>
+                    <td>
+                        <el-button :loading="splitDoing" @click="splitGo" type="danger">确认分账</el-button>
+                    </td>
                 </tr>
             </table>
         </el-dialog>
@@ -142,7 +155,8 @@
             return {
                 dialogVisible: false,
                 splitLoading: false,
-                splitInfo: {},
+                splitDoing: false,
+                splitInfo: '',
                 list: [],
                 pagination: null,
                 loading: false,
@@ -169,6 +183,30 @@
                         this.$message.error(e.data.msg);
                     }
                 }).catch(e => {
+                    this.$message.error("请求失败");
+                });
+            },
+            splitGo(){
+                this.splitDoing = true;
+                request({
+                    params: {
+                        r: 'plugin/smart_shop/mall/order/do-split',
+                    },
+                    method: 'post',
+                    data: {
+                        id: this.splitInfo.id
+                    }
+                }).then(e => {
+                    this.splitDoing = false;
+                    if (e.data.code == 0) {
+                        this.$message.success("分账成功");
+                        this.dialogVisible = false;
+                        this.getList();
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    this.splitDoing = false;
                     this.$message.error("请求失败");
                 });
             },

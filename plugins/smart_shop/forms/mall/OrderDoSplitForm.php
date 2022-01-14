@@ -153,6 +153,11 @@ class OrderDoSplitForm extends BaseModel{
                 if(!isset($data['state']) || !in_array($data['state'], ["PROCESSING", "FINISHED"])){
                     throw new \Exception("分账失败");
                 }
+
+                $splitData['out_order_no'] = $data['out_order_no'];
+                $splitData['order_id']     = $data['order_id'];
+                $order->split_data = json_encode($splitData);
+                $order->save();
             }else{
                 $data = $wechatPay->post("v3/profitsharing/orders/unfreeze", [
                     "sub_mchid"      => (string)$detail['mno'],

@@ -92,6 +92,16 @@ class OrderSplitInfoForm extends BaseModel{
             "wechatCertPath" => $shop->setting['wechat_cert']
         ]);
 
+        //获取订单详情
+        $res = $wechatPay->get("v3/pay/partner/transactions/out-trade-no/" . $detail['order_no'], [
+            "sp_mchid"     => (string)$shop->setting['sp_mchid'],
+            "sub_mchid"    => (string)$detail['mno']
+        ]);
+        if(!isset($res['transaction_id'])){
+            throw new \Exception("无法获取到微信支付订单记录");
+        }
+        $detail['transaction_id'] = $res['transaction_id'];
+
         $data = $wechatPay->get('v3/profitsharing/transactions/'.$detail['transaction_id'].'/amounts');
         if(!isset($data['unsplit_amount'])){
             throw new \Exception("待分账金额查询失败");

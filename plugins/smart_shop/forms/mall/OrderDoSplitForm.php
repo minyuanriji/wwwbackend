@@ -49,6 +49,10 @@ class OrderDoSplitForm extends BaseModel{
                 throw new \Exception("暂未实现支付宝分账");
             }
 
+            $order->status     = Order::STATUS_FINISHED;
+            $order->updated_at = time();
+            $order->save();
+
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
@@ -96,8 +100,6 @@ class OrderDoSplitForm extends BaseModel{
         if(!$unsplitAmount){
             throw new \Exception("无可分账金额");
         }
-
-
 
         $splitData = !empty($order->split_data) ? json_decode($order->split_data, true) : [];
         if(empty($splitData['out_order_no'])){

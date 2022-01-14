@@ -20,9 +20,8 @@ class Order extends BaseActiveRecord {
 
     public function rules(){
         return [
-            [['mall_id', 'bsh_mch_id', 'created_at', 'updated_at', 'from_table_name', 'from_table_record_id', 'ss_mch_id',
-              'ss_store_id', 'status'], 'required'],
-            [['split_data', 'is_delete'], 'safe']
+            [['mall_id', 'bsh_mch_id', 'created_at', 'updated_at', 'from_table_name', 'from_table_record_id', 'ss_mch_id', 'ss_store_id', 'status'], 'required'],
+            [['split_data', 'is_delete', 'pay_user_mobile', 'error_text'], 'safe']
         ];
     }
 

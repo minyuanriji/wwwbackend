@@ -18,7 +18,7 @@ class Merchant extends BaseActiveRecord{
     public function rules(){
         return [
             [['mall_id', 'bsh_mch_id', 'created_at', 'updated_at'], 'required'],
-            [['is_delete'], 'safe']
+            [['start_at', 'is_delete'], 'safe']
         ];
     }
 

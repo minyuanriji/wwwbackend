@@ -12,10 +12,11 @@ class MerchantEditForm extends BaseModel{
 
     public $shop_list;
     public $bsh_mch_id;
+    public $start_at;
 
     public function rules(){
         return [
-            [['bsh_mch_id'], 'required'],
+            [['bsh_mch_id', 'start_at'], 'required'],
             [['bsh_mch_id'], 'integer'],
             [['shop_list'], 'safe']
         ];
@@ -42,6 +43,7 @@ class MerchantEditForm extends BaseModel{
                 ]);
             }
             $merchant->updated_at = time();
+            $merchant->start_at   = strtotime($this->start_at);
             $merchant->is_delete  = 0;
             if(!$merchant->save()){
                 throw new \Exception($this->responseErrorMsg($merchant));
@@ -86,7 +88,7 @@ class MerchantEditForm extends BaseModel{
             }
 
 
-            $smartShop->batchSetStoreSplitEnable($storeIds);
+            $smartShop->batchSetStoreSplitEnable($storeIds, $merchant->start_at);
 
             $t->commit();
 

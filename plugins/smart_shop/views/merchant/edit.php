@@ -53,6 +53,9 @@ echo $this->render("com-add-smartshop");
                         <com-add-smartshop @confirm="chooseSmartshop" style="margin-top:20px;"></com-add-smartshop>
                     </el-card>
                 </el-form-item>
+                <el-form-item label="开始时间" prop="start_at">
+                    <el-date-picker v-model="ruleForm.start_at" type="datetime" placeholder="选择日期" size="big"></el-date-picker>
+                </el-form-item>
                 <el-form-item label="">
                     <el-button :loading="btnLoading" @click="saveIt" type="danger" size="big">确认保存</el-button>
                 </el-form-item>
@@ -70,11 +73,15 @@ echo $this->render("com-add-smartshop");
                 cardLoading: false,
                 activeName: "first",
                 ruleForm: {
-                    bsh_mch_id: ''
+                    bsh_mch_id: '',
+                    start_at: ''
                 },
                 rules: {
                     bsh_mch_id: [
                         {required: true, message: '请选择商户', trigger: 'change'},
+                    ],
+                    start_time: [
+                        {required: true, message: '请设置开始时间', trigger: 'change'},
                     ]
                 },
                 MchSet: {
@@ -103,6 +110,7 @@ echo $this->render("com-add-smartshop");
                         let data = e.data.data;
                         this.shopList = data.shopList;
                         this.ruleForm.bsh_mch_id = data.merchant.bsh_mch_id;
+                        this.ruleForm.start_at = data.merchant.start_at;
                         this.MchSet.name = data.store.name;
                         this.MchSet.logo = data.store.cover_url;
                         this.MchSet.mobile = data.mch.mobile;

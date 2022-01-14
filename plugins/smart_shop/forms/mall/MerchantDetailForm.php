@@ -45,6 +45,8 @@ class MerchantDetailForm extends BaseModel{
                 "is_delete"  => 0
             ])->asArray()->orderBy("id DESC")->all();
 
+            $merchant->start_at = $merchant->start_at ? date("Y-m-d H:i:s", $merchant->start_at) : '';
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [

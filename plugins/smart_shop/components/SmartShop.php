@@ -9,22 +9,32 @@ use yii\db\Connection;
 
 class SmartShop extends Component
 {
-    public $db;
+    public $db = null;
     public $setting = [];
 
     public function init()
     {
         parent::init();
+        $this->initSetting();
+    }
 
+    public function getDB(){
+        if(!$this->db || !$this->db->getIsActive()){
+            $this->db = new Connection([
+                'dsn'         => 'mysql:host=' . $this->setting['db_host'] . ';port=' . $this->setting['db_port'] . ';dbname=' . $this->setting['db_name'],
+                'username'    => $this->setting['db_user'],
+                'password'    => $this->setting['db_pass'],
+                'charset'     => $this->setting['db_charset'],
+                'tablePrefix' => $this->setting['db_tb_prefix']
+            ]);
+            echo "database connected\n";
+
+        }
+        return $this->db;
+    }
+
+    public function initSetting(){
         $this->setting = SettingDetailForm::getSetting();
-
-        $this->db = new Connection([
-            'dsn'         => 'mysql:host=' . $this->setting['db_host'] . ';port=' . $this->setting['db_port'] . ';dbname=' . $this->setting['db_name'],
-            'username'    => $this->setting['db_user'],
-            'password'    => $this->setting['db_pass'],
-            'charset'     => $this->setting['db_charset'],
-            'tablePrefix' => $this->setting['db_tb_prefix']
-        ]);
     }
 
     /**
@@ -41,6 +51,32 @@ class SmartShop extends Component
             $detail = $this->getCzorderDetail($record_id);
         }
         return $detail;
+    }
+
+    public function getCyorders($selects = ["o.*"], $wheres = [], $limit = 10, $orderBy = null){
+        $sql = "SELECT " .implode(",", $selects) . " FROM {{%cyorder}} o " .
+            "INNER JOIN {{%store}} s ON s.id=o.store_id " .
+            "INNER JOIN {{%users}} u ON u.id=o.user_id " .
+            "INNER JOIN {{%merchant}} m ON s.admin_id=m.admin_id " .
+            "INNER JOIN {{%merchant_entry}} me ON me.merchant_id=m.id " .
+            "LEFT JOIN {{%citys}} pv ON pv.cityid=s.province_code ".
+            "LEFT JOIN {{%citys}} ct ON ct.cityid=s.city_code " .
+            "LEFT JOIN {{%attachment}} s_at ON s_at.id=s.thumb " .
+            "WHERE " . (!empty($wheres) ? implode(" AND ", $wheres) : "1") . " " .
+            "ORDER BY " . (!empty($orderBy) ? $orderBy : " o.id DESC") . " " .
+            "LIMIT 0,{$limit}";
+        $rows = $this->getDB()->createCommand($sql)->queryAll();
+        return $rows ? $rows : [];
+    }
+
+    /**
+     * 批量设置订单分账状态
+     * @param $orderIds
+     * @param $status
+     */
+    public function batchSetCyorderSplitStatus($orderIds, $status){
+        $sql = "UPDATE {{%cyorder}} SET split_status='{$status}' WHERE id IN(".implode(",", $orderIds).")";
+        $this->getDB()->createCommand($sql)->execute();
     }
 
     /**
@@ -65,13 +101,14 @@ class SmartShop extends Component
                "LEFT JOIN {{%attachment}} s_at ON s_at.id=s.thumb " .
                "WHERE o.id='{$record_id}'";
 
-        $row = $this->db->createCommand($sql)->queryOne();
+        $row = $this->getDB()->createCommand($sql)->queryOne();
         if($row){
             $row['store_logo'] = rtrim($this->setting['host_url'], "/") . "/" . ltrim(str_replace("\\", "/", $row['store_logo']), "/");
         }
 
         return $row ? $row : [];
     }
+
 
     /**
      * 获取订单详情
@@ -85,10 +122,11 @@ class SmartShop extends Component
     /**
      * 批量设置智慧门店开启分账功能
      * @param $storeIds
+     * @param $startAt
      */
-    public function batchSetStoreSplitEnable($storeIds){
-        $sql = "UPDATE {{%store}} SET split_enable=1 WHERE id IN(".implode(",", $storeIds).")";
-        $this->db->createCommand($sql)->execute();
+    public function batchSetStoreSplitEnable($storeIds, $startAt){
+        $sql = "UPDATE {{%store}} SET split_enable=1,split_start_at='{$startAt}' WHERE id IN(".implode(",", $storeIds).")";
+        $this->getDB()->createCommand($sql)->execute();
     }
 
     /**
@@ -97,7 +135,7 @@ class SmartShop extends Component
      */
     public function batchSetStoreSplitDisable($storeIds){
         $sql = "UPDATE {{%store}} SET split_enable=0 WHERE id IN(".implode(",", $storeIds).")";
-        $this->db->createCommand($sql)->execute();
+        $this->getDB()->createCommand($sql)->execute();
     }
 
     /**
@@ -126,7 +164,7 @@ class SmartShop extends Component
         ];
 
         //获取记录数
-        $row = $this->db->createCommand("SELECT COUNT(*) as count {$fromTable} " . implode(" ", $innerArr) . " {$whereStr}")->queryOne();
+        $row = $this->getDB()->createCommand("SELECT COUNT(*) as count {$fromTable} " . implode(" ", $innerArr) . " {$whereStr}")->queryOne();
         $totalCount = (int)$row['count'];
 
         $pagination = new BasePagination(['totalCount' => $totalCount, 'pageSize' => $limit, 'page' => $page]);
@@ -139,7 +177,7 @@ class SmartShop extends Component
         //获取数据
         $offset = ($page - 1) * $limit;
         $sql = "SELECT {$selects} {$fromTable} " . implode(" ", $innerArr) . " {$whereStr} {$orderStr} limit $offset,{$limit}";
-        $rows = $this->db->createCommand($sql)->queryAll();
+        $rows = $this->getDB()->createCommand($sql)->queryAll();
 
         $pagination = (array)$pagination;
 

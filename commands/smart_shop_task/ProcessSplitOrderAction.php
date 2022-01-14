@@ -65,6 +65,7 @@ class ProcessSplitOrderAction extends Action{
 
             if($detail['pay_type'] == 1){
                 OrderDoSplitForm::wechatSplit($mch, $order, $shop, $detail);
+                $this->controller->commandOut("订单[ID:{$order->id}]分账处理成功");
             }else{
                 throw new \Exception("暂未实现支付宝分账");
             }

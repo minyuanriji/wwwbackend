@@ -71,18 +71,33 @@ class OrderDoSplitForm extends BaseModel{
      */
     public static function wechatSplit(Mch $mch, Order $order, SmartShop $shop, $detail){
 
-        //获取可分账金额
-        $unsplitAmount = OrderSplitInfoForm::getWechat($order, $shop, $detail);
-        if(!$unsplitAmount){
-            throw new \Exception("无可分账金额");
-        }
-
         $wechatPay = new WechatPaySdkApi([
             "mchid"          => $shop->setting['sp_mchid'],
             "serial"         => $shop->setting['cert_serial'],
             "privateKeyPath" => $shop->setting['apiclient_key'],
             "wechatCertPath" => $shop->setting['wechat_cert']
         ]);
+
+        //获取订单详情
+        $res = $wechatPay->get("v3/pay/partner/transactions/out-trade-no/" . $detail['order_no'], [
+            "sp_mchid"     => (string)$shop->setting['sp_mchid'],
+            "sub_mchid"    => (string)$detail['mno']
+        ]);
+        if(!isset($res['transaction_id'])){
+            throw new \Exception("无法获取到微信支付订单记录");
+        }
+        if(!isset($res['trade_state']) || $res['trade_state'] != "SUCCESS"){
+            throw new \Exception("订单未支付成功");
+        }
+        $detail['transaction_id'] = $res['transaction_id'];
+
+        //获取可分账金额
+        $unsplitAmount = OrderSplitInfoForm::getWechat($order, $shop, $detail);
+        if(!$unsplitAmount){
+            throw new \Exception("无可分账金额");
+        }
+
+
 
         $splitData = !empty($order->split_data) ? json_decode($order->split_data, true) : [];
         if(empty($splitData['out_order_no'])){
@@ -136,7 +151,7 @@ class OrderDoSplitForm extends BaseModel{
                 $data = $wechatPay->post("v3/profitsharing/orders/unfreeze", [
                     "sub_mchid"      => (string)$detail['mno'],
                     "transaction_id" => (string)$detail['transaction_id'],
-                    "out_order_no"   => $splitData['out_order_no'],
+                    "out_order_no"   => (string)$splitData['out_order_no'],
                     "description"    => "微信支付"
                 ]);
                 if(!isset($data['state']) || !in_array($data['state'], ["PROCESSING", "FINISHED"])){

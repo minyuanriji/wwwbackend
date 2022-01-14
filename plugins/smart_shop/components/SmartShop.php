@@ -27,8 +27,7 @@ class SmartShop extends Component
                 'charset'     => $this->setting['db_charset'],
                 'tablePrefix' => $this->setting['db_tb_prefix']
             ]);
-            echo "database connected\n";
-
+            //echo "database connected\n";
         }
         return $this->db;
     }

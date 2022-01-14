@@ -129,7 +129,7 @@ class OrderDoSplitForm extends BaseModel{
                 ]);
             }
 
-            $order->status        = $detail['order_status'] == 3 ? Order::STATUS_PROCESSING : Order::STATUS_PROCESSING;
+            $order->status        = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;
             $order->updated_at    = time();
             $order->split_data    = json_encode($splitData);
             $order->split_amount += floatval($amount/100);

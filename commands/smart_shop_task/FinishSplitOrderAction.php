@@ -161,7 +161,7 @@ class FinishSplitOrderAction extends Action{
             ]);
 
             if($order->split_amount > 0){ //请求分账回退
-                $res = $wechatPay->post("v3/profitsharing/return-orders", [
+                /*$res = $wechatPay->post("v3/profitsharing/return-orders", [
                     "sub_mchid"     => (string)$detail['mno'],
                     "out_order_no"  => (string)$splitData['out_order_no'],
                     "out_return_no" => (string)$splitData['out_return_no'],
@@ -171,7 +171,7 @@ class FinishSplitOrderAction extends Action{
                 ]);
                 if(!isset($res['result']) || $res['result'] == "FAILED"){
                     throw new \Exception("请求分账回退失败：" . json_encode(is_array($res) ? $res : []));
-                }
+                }*/
             }
 
             //解冻资金

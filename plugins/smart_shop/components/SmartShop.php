@@ -18,8 +18,8 @@ class SmartShop extends Component
         $this->initSetting();
     }
 
-    public function getDB(){
-        if(!$this->db || !$this->db->getIsActive()){
+    public function getDB($force = false){
+        if($force || !$this->db || !$this->db->getIsActive()){
             $this->db = new Connection([
                 'dsn'         => 'mysql:host=' . $this->setting['db_host'] . ';port=' . $this->setting['db_port'] . ';dbname=' . $this->setting['db_name'],
                 'username'    => $this->setting['db_user'],
@@ -85,7 +85,7 @@ class SmartShop extends Component
      */
     public function getCyorderDetail($record_id){
 
-        $selects = ["o.order_no", "o.order_status", "o.total_price", "o.pay_price", "o.is_confirm", "o.apply_refund",
+        $selects = ["o.order_no", "o.order_status", "o.is_pay", "o.total_price", "o.pay_price", "o.is_confirm", "o.apply_refund",
             "o.cancel_status", "o.is_cancel", "o.pay_type", "o.out_trade_no as transaction_id", "u.mobile as u_mobile", "s.title as store_name",
             "o.address as store_address", "pv.city_name as province",
             "ct.city_name as city", "s_at.filepath as store_logo", "m.id as merchant_id", "m.name as merchant_name",

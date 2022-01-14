@@ -25,6 +25,7 @@ class CommissionController extends BaseCommandController{
             "giftpacks"     => "app\\commands\\commission_action\\GiftpacksAction",
             "region"        => "app\\commands\\commission_action\\RegionAction",//门店二维码收款区域分红
             "regionGoods"   => "app\\commands\\commission_action\\RegionGoodsAction",//商品消费区域分红
+            "smartShop"     => "app\\commands\\commission_action\\SmartShopOrderAction", //智慧门店推荐分佣
         ];
     }
 

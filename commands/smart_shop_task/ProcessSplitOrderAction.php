@@ -15,6 +15,7 @@ class ProcessSplitOrderAction extends Action{
     {
         $this->controller->commandOut(date("Y/m/d H:i:s") . " NewSplitOrderAction start");
         $shop = new SmartShop();
+        $sleep = 3;
         while (true) {
             try {
 
@@ -23,6 +24,8 @@ class ProcessSplitOrderAction extends Action{
                     "is_delete" => 0
                 ])->orderBy("updated_at ASC")->limit(1)->column();
                 if($orderIds){
+                    $sleep = max(1, --$sleep);
+                    $shop->getDB(true);
                     $shop->initSetting(); //刷新下配置
 
                     Order::updateAll(["updated_at" => time()], "id IN(".implode(",", $orderIds).")");
@@ -30,12 +33,14 @@ class ProcessSplitOrderAction extends Action{
                     foreach($orderIds as $orderId){
                         $this->splitOrder($shop, $orderId);
                     }
+                }else{
+                    $sleep = min(30, ++$sleep);
                 }
 
             }catch (\Exception $e){
                 $this->controller->commandOut(implode("\n", [$e->getMessage(), $e->getFile(), $e->getLine()]));
             }
-            $this->controller->sleep(1);
+            $this->controller->sleep($sleep);
         }
 
     }

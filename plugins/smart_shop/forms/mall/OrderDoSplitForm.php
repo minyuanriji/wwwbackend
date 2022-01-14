@@ -108,6 +108,7 @@ class OrderDoSplitForm extends BaseModel{
 
         $amount = (int)(($mch->transfer_rate/100) * $unsplitAmount);
         $splitData['receivers'] = [];
+        $splitData['transaction_id'] = $detail['transaction_id'];
 
         $t = \Yii::$app->db->beginTransaction();
         try {
@@ -128,7 +129,7 @@ class OrderDoSplitForm extends BaseModel{
                 ]);
             }
 
-            $order->status        = Order::STATUS_FINISHED;
+            $order->status        = $detail['order_status'] == 3 ? Order::STATUS_PROCESSING : Order::STATUS_PROCESSING;
             $order->updated_at    = time();
             $order->split_data    = json_encode($splitData);
             $order->split_amount += floatval($amount/100);
@@ -147,7 +148,7 @@ class OrderDoSplitForm extends BaseModel{
                     "transaction_id"   => (string)$detail['transaction_id'],
                     "out_order_no"     => $splitData['out_order_no'],
                     "receivers"        => [$receiver],
-                    "unfreeze_unsplit" => true
+                    "unfreeze_unsplit" => $detail['order_status'] == 3 ? true : false
                 ]);
                 if(!isset($data['state']) || !in_array($data['state'], ["PROCESSING", "FINISHED"])){
                     throw new \Exception("分账失败");

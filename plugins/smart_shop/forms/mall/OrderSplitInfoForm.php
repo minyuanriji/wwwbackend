@@ -106,7 +106,7 @@ class OrderSplitInfoForm extends BaseModel{
         if(!isset($data['unsplit_amount'])){
             throw new \Exception("待分账金额查询失败");
         }
-
+        
         return $data['unsplit_amount'];
     }
 }

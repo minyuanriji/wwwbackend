@@ -111,29 +111,32 @@ class OrderDoSplitForm extends BaseModel{
 
         $t = \Yii::$app->db->beginTransaction();
         try {
+
+            $option = [
+                "sub_mchid"     => (string)$detail['mno'],
+                "appid"         => (string)$shop->setting['sp_appid'],
+                "type"          => (string)$shop->setting['wechat_fz_type'],
+                "name"          => "ENC:" . $shop->setting['wechat_fz_name'],
+                "account"       => (string)$shop->setting['wechat_fz_account'],
+                "relation_type" => "SERVICE_PROVIDER"
+            ];
+
             if($amount > 0){
-
                 $receiver = ["type" => $shop->setting['wechat_fz_type'], "account" => (string)$shop->setting['wechat_fz_account'], "amount" => $amount, "description" => "商户服务费收取"];
-                $option = [
-                    "sub_mchid"     => (string)$detail['mno'],
-                    "appid"         => (string)$shop->setting['sp_appid'],
-                    "type"          => (string)$shop->setting['wechat_fz_type'],
-                    "name"          => "ENC:" . $shop->setting['wechat_fz_name'],
-                    "account"       => (string)$shop->setting['wechat_fz_account'],
-                    "relation_type" => "SERVICE_PROVIDER"
-                ];
-
                 $splitData['receivers'][] = array_merge($receiver, [
                     "option" => $option
                 ]);
+            }
 
-                $order->status        = Order::STATUS_PROCESSING;
-                $order->updated_at    = time();
-                $order->split_data    = json_encode($splitData);
-                $order->split_amount += floatval($amount/100);
-                if(!$order->save()){
-                    throw new \Exception(json_encode($order->getErrors()));
-                }
+            $order->status        = Order::STATUS_PROCESSING;
+            $order->updated_at    = time();
+            $order->split_data    = json_encode($splitData);
+            $order->split_amount += floatval($amount/100);
+            if(!$order->save()){
+                throw new \Exception(json_encode($order->getErrors()));
+            }
+
+            if($amount > 0){
 
                 //绑定分账关系
                 $wechatPay->post("v3/profitsharing/receivers/add", $option);

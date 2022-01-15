@@ -19,7 +19,8 @@ class NewSplitOrderAction extends Action{
                     "o.id as from_table_record_id",
                     "s.id as ss_store_id",
                     "m.id as ss_mch_id",
-                    "u.mobile as pay_user_mobile"
+                    "u.mobile as pay_user_mobile",
+                    "o.pay_price"
                 ];
                 $rows = $shop->getCyorders($selects, [
                     "o.is_split=1 AND o.split_status=0 AND o.create_time > s.split_start_at", //必须是分账订单
@@ -59,6 +60,7 @@ class NewSplitOrderAction extends Action{
                         "ss_mch_id"            => $row['ss_mch_id'],
                         "ss_store_id"          => $row['ss_store_id'],
                         "status"               => Order::STATUS_UNCONFIRMED,
+                        "pay_price"            => $row['pay_price'],
                         "pay_user_mobile"      => $row['pay_user_mobile']
                     ]);
                     if(!$model->save()){

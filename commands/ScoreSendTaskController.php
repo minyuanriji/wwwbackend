@@ -6,7 +6,8 @@ class ScoreSendTaskController extends BaseCommandController {
 
     public function actions(){
         return [
-            'mco' => 'app\commands\score_send_task\MchCheckoutOrderSendAction'
+            'mco' => 'app\commands\score_send_task\MchCheckoutOrderSendAction',
+            'sso' => 'app\commands\score_send_task\SmartshopOrderSendAction'
         ];
     }
 

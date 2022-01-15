@@ -60,6 +60,12 @@ class RevenueRecordCommissionNotification
             case 'addcredit_3r':
                 $keyword2 = '话费消费分佣';
                 break;
+            case 'smart_shop_order':
+                $keyword2 = '门店直推分佣';
+                break;
+            case 'smart_shop_order_3r':
+                $keyword2 = '门店消费分佣';
+                break;
             default:
                 break;
         }

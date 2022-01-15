@@ -45,6 +45,9 @@ class OrderListForm extends BaseModel{
                     if(!isset($item['split_data']['receivers']) || empty($item['split_data']['receivers'])){
                         $item['split_data']['receivers'] = [];
                     }
+                    foreach($item['split_data']['receivers'] as $key => $receiver){
+                        $item['split_data']['receivers'][$key]['amount'] = round($receiver['amount']/100, 6);
+                    }
                 }
             }
 

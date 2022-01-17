@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\Store;
 use app\plugins\mch\models\Mch;
 use app\plugins\sign_in\forms\BaseModel;
+use app\plugins\smart_shop\components\AlipaySdkApi;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\components\WechatPaySdkApi;
 use app\plugins\smart_shop\models\Order;
@@ -45,7 +46,6 @@ class OrderSplitInfoForm extends BaseModel{
 
             $shop = new SmartShop();
             $detail = $shop->getOrderDetail($order->from_table_name, $order->from_table_record_id);
-
             $info['id']          = $order->id;
             $info['total_price'] = $detail['total_price'];
             $info['pay_price']   = $detail['pay_price'];
@@ -58,7 +58,7 @@ class OrderSplitInfoForm extends BaseModel{
                     ['name' => '平台', 'amount' => round(($mch->transfer_rate/100) * ($info['unsplit_amount']/100), 6)]
                 ];
             }else{
-                $info['unsplit_amount'] = 0;
+                $info['unsplit_amount'] = static::getAlipay($order, $shop, $detail);
                 $info['split_account'] = [];
             }
 
@@ -74,6 +74,25 @@ class OrderSplitInfoForm extends BaseModel{
                 'msg'  => $e->getMessage()
             ];
         }
+    }
+
+    /**
+     * 获取支付宝待分账金额（单位：分）
+     * @param Order $order
+     * @param SmartShop $shop
+     * @param $detail
+     * @throws \Exception
+     */
+    public static function getAlipay(Order $order, SmartShop $shop, $detail){
+        $aliPay = new AlipaySdkApi([
+            "appId"                  => $shop->setting['ali_sp_appid'],
+            "rsaPrivateKeyPath"      => $shop->setting['ali_rsaPrivateKeyPath'],
+            "alipayrsaPublicKeyPath" => $shop->setting['ali_alipayrsaPublicKeyPath']
+        ]);
+        //获取订单详情
+        $res = $aliPay->tradeQuery([
+            "out_trade_no" => $detail['order_no']
+        ], $detail['mno_ali']);
     }
 
     /**

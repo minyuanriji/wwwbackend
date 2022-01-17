@@ -115,6 +115,15 @@
                 </el-tab-pane>
                 <el-tab-pane label="支付宝设置" name="third">
                     <el-form :model="AliSet.ruleForm" :rules="AliSet.rules" ref="ruleAliForm" label-width="200px" size="big">
+                        <el-form-item label="AppId" prop="ali_sp_appid">
+                            <el-input v-model="AliSet.ruleForm.ali_sp_appid" placeholder="请输入" style="width:350px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="应用私钥路径" prop="ali_rsaPrivateKeyPath">
+                            <el-input v-model="AliSet.ruleForm.ali_rsaPrivateKeyPath" placeholder="请输入" style="width:350px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="支付宝公钥路径" prop="ali_alipayrsaPublicKeyPath">
+                            <el-input v-model="AliSet.ruleForm.ali_alipayrsaPublicKeyPath" placeholder="请输入" style="width:350px;"></el-input>
+                        </el-form-item>
                         <el-form-item label="分账接收方类型" prop="ali_fz_type">
                             <el-select v-model="AliSet.ruleForm.ali_fz_type" placeholder="请选择" style="width:150px;">
                                 <el-option label="用户号" value="userId"></el-option>
@@ -225,10 +234,22 @@
                 },
                 AliSet:{
                     ruleForm: {
+                        ali_sp_appid: '',
+                        ali_rsaPrivateKeyPath: '',
+                        ali_alipayrsaPublicKeyPath: '',
                         ali_fz_account: '',
                         ali_fz_type: 'userId'
                     },
                     rules: {
+                        ali_sp_appid: [
+                            {required: true, message: '请输入AppId', trigger: 'change'},
+                        ],
+                        ali_rsaPrivateKeyPath: [
+                            {required: true, message: '请输入应用私钥路径', trigger: 'change'},
+                        ],
+                        ali_alipayrsaPublicKeyPath: [
+                            {required: true, message: '请输入支付宝公钥路径', trigger: 'change'},
+                        ],
                         ali_fz_type: [
                             {required: true, message: '请选择分账接收方类型', trigger: 'change'},
                         ],
@@ -360,8 +381,14 @@
                 });
             },
             setAliInfo(set){
-                this.AliSet.ruleForm.ali_fz_account = set.ali_fz_account;
-                this.AliSet.ruleForm.ali_fz_type = set.ali_fz_type;
+                let key;
+                for(key in set){
+                    if(typeof this.AliSet.ruleForm[key] != "undefined"){
+                        this.AliSet.ruleForm[key] = set[key];
+                    }
+                }
+                //this.AliSet.ruleForm.ali_fz_account = set.ali_fz_account;
+                //this.AliSet.ruleForm.ali_fz_type = set.ali_fz_type;
             },
             getSetting(){
                 request({

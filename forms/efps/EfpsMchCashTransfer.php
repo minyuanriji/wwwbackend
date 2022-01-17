@@ -21,7 +21,8 @@ class EfpsMchCashTransfer extends BaseModel{
             'bankUserName'    => !empty($typeData['bankUserName']) ? $typeData['bankUserName'] : "",
             'bankCardNo'      => !empty($typeData['bankCardNo']) ? $typeData['bankCardNo'] : "",
             'bankName'        => !empty($typeData['bankName']) ? $typeData['bankName'] : "",
-            'bankAccountType' => !empty($typeData['bankAccountType']) ? $typeData['bankAccountType'] : ""
+            'bankAccountType' => !empty($typeData['bankAccountType']) ? $typeData['bankAccountType'] : "",
+            "bankNo"          => !empty($typeData['bankNo']) ? $typeData['bankNo'] : ""
         ]);
 
         return EfpsTransfer::commit($transferData);

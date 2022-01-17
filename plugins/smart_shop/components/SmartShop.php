@@ -57,7 +57,8 @@ class SmartShop extends Component
             "INNER JOIN {{%store}} s ON s.id=o.store_id " .
             "INNER JOIN {{%users}} u ON u.id=o.user_id " .
             "INNER JOIN {{%merchant}} m ON s.admin_id=m.admin_id " .
-            "INNER JOIN {{%merchant_entry}} me ON me.merchant_id=m.id " .
+            "LEFT JOIN {{%merchant_entry}} me ON me.merchant_id=m.id AND me.pay_way_id=1 " .
+            "LEFT JOIN {{%merchant_entry}} me_ali ON me_ali.merchant_id=m.id AND me_ali.pay_way_id=2 " .
             "LEFT JOIN {{%citys}} pv ON pv.cityid=s.province_code ".
             "LEFT JOIN {{%citys}} ct ON ct.cityid=s.city_code " .
             "LEFT JOIN {{%attachment}} s_at ON s_at.id=s.thumb " .
@@ -89,12 +90,13 @@ class SmartShop extends Component
             "o.cancel_status", "o.is_cancel", "o.pay_type", "o.out_trade_no as transaction_id", "u.mobile as u_mobile", "s.title as store_name",
             "o.address as store_address", "pv.city_name as province",
             "ct.city_name as city", "s_at.filepath as store_logo", "m.id as merchant_id", "m.name as merchant_name",
-            "m.mobile as merchant_mobile", "me.mno"];
+            "m.mobile as merchant_mobile", "me.mno", "me_ali.mno as mno_ali"];
         $sql = "SELECT " .implode(",", $selects) . " FROM {{%cyorder}} o " .
                "INNER JOIN {{%store}} s ON s.id=o.store_id " .
                "INNER JOIN {{%users}} u ON u.id=o.user_id " .
                "INNER JOIN {{%merchant}} m ON s.admin_id=m.admin_id " .
-               "INNER JOIN {{%merchant_entry}} me ON me.merchant_id=m.id " .
+               "LEFT JOIN {{%merchant_entry}} me ON me.merchant_id=m.id AND me.pay_way_id=1 " .
+               "LEFT JOIN {{%merchant_entry}} me_ali ON me_ali.merchant_id=m.id AND me_ali.pay_way_id=2 " .
                "LEFT JOIN {{%citys}} pv ON pv.cityid=s.province_code ".
                "LEFT JOIN {{%citys}} ct ON ct.cityid=s.city_code " .
                "LEFT JOIN {{%attachment}} s_at ON s_at.id=s.thumb " .

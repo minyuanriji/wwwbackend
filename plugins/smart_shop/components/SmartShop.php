@@ -124,9 +124,10 @@ class SmartShop extends Component
      * 批量设置智慧门店开启分账功能
      * @param $storeIds
      * @param $startAt
+     * @param $setting
      */
-    public function batchSetStoreSplitEnable($storeIds, $startAt){
-        $sql = "UPDATE {{%store}} SET split_enable=1,split_start_at='{$startAt}' WHERE id IN(".implode(",", $storeIds).")";
+    public function batchSetStoreSplitEnable($storeIds, $startAt, $setting = []){
+        $sql = "UPDATE {{%store}} SET split_setting='".json_encode($setting)."',split_enable=1,split_start_at='{$startAt}' WHERE id IN(".implode(",", $storeIds).")";
         $this->getDB()->createCommand($sql)->execute();
     }
 

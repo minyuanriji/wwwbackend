@@ -88,7 +88,12 @@ class MerchantEditForm extends BaseModel{
             }
 
 
-            $smartShop->batchSetStoreSplitEnable($storeIds, $merchant->start_at);
+            $smartShop->batchSetStoreSplitEnable($storeIds, $merchant->start_at, [
+                'wechat_fz_account' => $smartShop->setting['wechat_fz_account'],
+                'wechat_fz_type'    => $smartShop->setting['wechat_fz_type'],
+                'ali_fz_account'    => $smartShop->setting['ali_fz_account'],
+                'ali_fz_type'       => $smartShop->setting['ali_fz_type'],
+            ]);
 
             $t->commit();
 

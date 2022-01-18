@@ -8,13 +8,14 @@ use app\plugins\smart_shop\models\Setting;
 
 class SettingSaveForm extends BaseModel{
 
+    public $alipay;
     public $wechat;
     public $form;
 
     public function rules(){
         return [
             [['form'], 'required'],
-            [['wechat'], 'integer']
+            [['wechat', 'alipay'], 'integer']
         ];
     }
 

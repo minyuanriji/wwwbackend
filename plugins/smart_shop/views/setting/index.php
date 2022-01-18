@@ -365,7 +365,7 @@
                                 r: 'plugin/smart_shop/mall/setting/save'
                             },
                             method: 'post',
-                            data: {form:that.AliSet.ruleForm}
+                            data: {alipay: 1, form:that.AliSet.ruleForm}
                         }).then(e => {
                             that.AliSet.btnLoading = false;
                             if (e.data.code == 0) {

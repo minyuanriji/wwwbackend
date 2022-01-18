@@ -5,6 +5,7 @@ namespace app\plugins\smart_shop\forms\mall;
 use app\core\ApiCode;
 use app\plugins\mch\models\Mch;
 use app\plugins\sign_in\forms\BaseModel;
+use app\plugins\smart_shop\components\AlipaySdkApi;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\components\WechatPaySdkApi;
 use app\plugins\smart_shop\models\Order;
@@ -46,7 +47,7 @@ class OrderDoSplitForm extends BaseModel{
             if($detail['pay_type'] == 1){
                 static::wechatSplit($mch, $order, $shop, $detail);
             }else{
-                throw new \Exception("暂未实现支付宝分账");
+                static::alipaySplit($mch, $order, $shop, $detail);
             }
 
             $order->status     = Order::STATUS_FINISHED;
@@ -64,6 +65,77 @@ class OrderDoSplitForm extends BaseModel{
                 'msg'  => $e->getMessage()
             ];
         }
+    }
+
+    /**
+     * 支付宝分账
+     * @param Order $order
+     * @param SmartShop $shop
+     * @param $detail
+     * @throws \Exception
+     */
+    public static function alipaySplit(Mch $mch, Order $order, SmartShop $shop, $detail){
+        $aliPay = new AlipaySdkApi([
+            "appId"                  => $shop->setting['ali_sp_appid'],
+            "rsaPrivateKeyPath"      => $shop->setting['ali_rsaPrivateKeyPath'],
+            "alipayrsaPublicKeyPath" => $shop->setting['ali_alipayrsaPublicKeyPath']
+        ]);
+
+        //获取订单详情
+        $res = $aliPay->tradeQuery([
+            "out_trade_no" => $detail['transaction_id']
+        ], $detail['mno_ali']);
+        if(!isset($res['trade_status']) || $res['trade_status'] != "TRADE_SUCCESS"){
+            throw new \Exception("无法获取到订单信息");
+        }
+
+        $tradeNo = $res['trade_no']; //支付宝交易号
+
+        //可分账金额（单位分）
+        $unsplitAmount = intval(floatval($res['receipt_amount']) * 100);
+        if(!$unsplitAmount){
+            throw new \Exception("无可分账金额");
+        }
+
+        $amount = round((($mch->transfer_rate/100) * $unsplitAmount)/100, 2);
+        $splitData['receivers'] = isset($splitData['receivers']) && !empty($splitData['receivers']) ? $splitData['receivers'] : [];
+
+        if(empty($splitData['out_request_no'])){
+            $splitData['out_request_no'] = "ali" . date("ymdhis") . rand(0, 10000);
+        }
+
+        $t = \Yii::$app->db->beginTransaction();
+        try {
+
+            if($amount > 0){
+                $receiver = ["trans_in_type" => (string)$shop->setting['ali_fz_type'], "trans_in" => (string)$shop->setting['ali_fz_account'], "amount" => $amount, "description" => "商户服务费收取"];
+            }
+
+            $order->status        = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;
+            $order->updated_at    = time();
+            $order->split_data    = json_encode($splitData);
+            $order->split_amount += $amount;
+            if(!$order->save()){
+                throw new \Exception(json_encode($order->getErrors()));
+            }
+
+            if($amount > 0){
+
+                //绑定分账关系
+                $aliPay->tradeRoyaltyRelationBind($detail['mno_ali'], [
+                    ["type" => (string)$shop->setting['ali_fz_type'], "account" => (string)$shop->setting['ali_fz_account']]
+                ], $splitData['out_request_no']);
+
+                //执行分账请求
+                $aliPay->tradeOrderSettle($detail['mno_ali'], $splitData['out_request_no'], $tradeNo, [$receiver]);
+            }
+
+            $t->commit();
+        }catch (\Exception $e){
+            $t->rollBack();
+            throw $e;
+        }
+
     }
 
     /**
@@ -107,7 +179,7 @@ class OrderDoSplitForm extends BaseModel{
         }
 
         $amount = (int)(($mch->transfer_rate/100) * $unsplitAmount);
-        $splitData['receivers'] = [];
+        $splitData['receivers'] = isset($splitData['receivers']) && !empty($splitData['receivers']) ? $splitData['receivers'] : [];
         $splitData['transaction_id'] = $detail['transaction_id'];
 
         $t = \Yii::$app->db->beginTransaction();

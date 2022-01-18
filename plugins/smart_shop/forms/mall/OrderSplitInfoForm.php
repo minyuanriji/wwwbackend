@@ -53,14 +53,14 @@ class OrderSplitInfoForm extends BaseModel{
 
             if($info['pay_type'] == 1){
                 $info['unsplit_amount'] = static::getWechat($order, $shop, $detail);
-                $info['split_account'] = [
-                    ['name' => $detail['merchant_name'], 'amount' => round((1 - $mch->transfer_rate/100) * ($info['unsplit_amount']/100), 6)],
-                    ['name' => '平台', 'amount' => round(($mch->transfer_rate/100) * ($info['unsplit_amount']/100), 6)]
-                ];
             }else{
                 $info['unsplit_amount'] = static::getAlipay($order, $shop, $detail);
-                $info['split_account'] = [];
             }
+
+            $info['split_account'] = [
+                ['name' => $detail['merchant_name'], 'amount' => round((1 - $mch->transfer_rate/100) * ($info['unsplit_amount']/100), 6)],
+                ['name' => '平台', 'amount' => round(($mch->transfer_rate/100) * ($info['unsplit_amount']/100), 6)]
+            ];
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,
@@ -89,10 +89,13 @@ class OrderSplitInfoForm extends BaseModel{
             "rsaPrivateKeyPath"      => $shop->setting['ali_rsaPrivateKeyPath'],
             "alipayrsaPublicKeyPath" => $shop->setting['ali_alipayrsaPublicKeyPath']
         ]);
+
         //获取订单详情
-        $res = $aliPay->tradeQuery([
-            "out_trade_no" => $detail['order_no']
+        $data = $aliPay->tradeQuery([
+            "out_trade_no" => $detail['transaction_id']
         ], $detail['mno_ali']);
+
+        return isset($data['receipt_amount']) ? intval(floatval($data['receipt_amount']) * 100) : 0;
     }
 
     /**

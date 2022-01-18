@@ -2,6 +2,7 @@
 
 namespace app\plugins\smart_shop\components;
 
+use app\helpers\ArrayHelper;
 use yii\base\Component;
 
 class AlipaySdkApi extends Component{
@@ -37,19 +38,19 @@ class AlipaySdkApi extends Component{
     }
 
     /**
-     * 统一收单线下交易查询
-     * @param $params
+     * 分账关系绑定接口
      * @param $appAuthToken
+     * @param $receiver_list
+     * @throws \Exception
      */
-    public function tradeQuery($params, $appAuthToken = null){
-        require_once __DIR__ . "/alipay_sdk/request/AlipayTradeQueryRequest.php";
+    public function tradeRoyaltyRelationBind($appAuthToken, $receiver_list, $out_request_no){
+        require_once __DIR__ . "/alipay_sdk/request/AlipayTradeRoyaltyRelationBindRequest.php";
 
-        $object = new \stdClass();
-        $object->out_trade_no = $params['out_trade_no'];
-        $json = json_encode($object);
-
-        $request = new \AlipayTradeQueryRequest();
-        $request->setBizContent($json);
+        $request = new \AlipayTradeRoyaltyRelationBindRequest ();
+        $request->setBizContent(json_encode([
+            "receiver_list"  => $receiver_list,
+            "out_request_no" => $out_request_no
+        ]));
         $result = $this->getAop()->execute($request, null, $appAuthToken);
         print_r($result);
         exit;
@@ -61,5 +62,62 @@ class AlipaySdkApi extends Component{
         } else {
             echo "失败";
         }
+    }
+
+    /**
+     * 统一收单交易结算接口
+     * @param $appAuthToken
+     * @param $out_request_no
+     * @param $trade_no
+     * @param $royalty_parameters
+     * @throws \Exception
+     */
+    public function tradeOrderSettle($appAuthToken, $out_request_no, $trade_no, $royalty_parameters){
+        require_once __DIR__ . "/alipay_sdk/request/AlipayTradeOrderSettleRequest.php";
+
+        $option = [
+            "out_request_no"     => $out_request_no,
+            "trade_no"           => $trade_no,
+            "royalty_parameters" => $royalty_parameters
+        ];
+
+        $request = new \AlipayTradeOrderSettleRequest ();
+        $request->setBizContent(json_encode($option));
+        $result = $this->getAop()->execute($request, null, $appAuthToken);
+        print_r($result);
+        exit;
+
+        $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
+        $resultCode = $result->$responseNode->code;
+        if(!empty($resultCode)&&$resultCode == 10000){
+            echo "成功";
+        } else {
+            echo "失败";
+        }
+
+    }
+
+    /**
+     * 统一收单线下交易查询
+     * @param $params
+     * @param $appAuthToken
+     */
+    public function tradeQuery($params, $appAuthToken = null){
+        require_once __DIR__ . "/alipay_sdk/request/AlipayTradeQueryRequest.php";
+        $object = new \stdClass();
+        $object->out_trade_no = $params['out_trade_no'];
+        $json = json_encode($object);
+        $request = new \AlipayTradeQueryRequest();
+        $request->setBizContent($json);
+        $result = $this->getAop()->execute($request, null, $appAuthToken);
+        $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
+        $resultCode = $result->$responseNode->code;
+        $resultData = [];
+        if(!empty($resultCode) && $resultCode == 10000){
+            $resultData =isset($result->$responseNode) ? ArrayHelper::toArray($result->$responseNode) : [];
+        } else {
+            throw new \Exception(isset($responseNode->sub_msg) ? $responseNode->sub_msg : "交易查询查询失败");
+        }
+        return $resultData;
     }
 }

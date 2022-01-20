@@ -56,7 +56,10 @@ class ShoppingVoucherGoodsListForm extends BaseModel implements ICacheForm {
             $form->user_id    = $user ? $user->id : 0;
 
             $query = $form->getQuery();
-            $query->andWhere("s.voucher_price IS NOT NULL");
+            $query->andWhere([
+                "AND",
+                "s.voucher_price IS NOT NULL"
+            ]);
 
             $selects = ["g.id", "g.name", "g.cover_url", "g.price", "g.origin_price", "g.freight_price", "s.voucher_price"];
             $list = $query->asArray()->orderBy("g.id DESC")->select($selects)->page($pagination, $this->limit, $this->page)->all();

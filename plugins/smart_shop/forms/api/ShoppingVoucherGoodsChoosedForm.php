@@ -19,11 +19,13 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
 
     public $token;
     public $ss_store_id;
+    public $cats;
 
     public function rules(){
         return [
             [['ss_store_id', 'token'], 'required'],
-            [['page', 'limit', 'ss_store_id', 'mall_id'], 'integer']
+            [['page', 'limit', 'ss_store_id', 'mall_id'], 'integer'],
+            [['cats'], 'safe']
         ];
     }
 
@@ -42,7 +44,15 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
                 ->innerJoin(["g" => AlibabaDistributionGoodsList::tableName()], "g.id=asvg.alibaba_goods_id")
                 ->leftJoin(["s" => ShoppingVoucherTargetAlibabaDistributionGoods::tableName()], "s.goods_id=g.id AND s.sku_id=0");
 
-            $query->where(["g.is_delete" => 0, "asvg.is_delete" => 0]);
+            $query->where(["g.is_delete" => 0, "asvg.ss_store_id" => $this->ss_store_id, "asvg.is_delete" => 0]);
+
+            if($this->cats){
+                $orStrs = [];
+                foreach($this->cats as $cat){
+                    $orStrs[] = "FIND_IN_SET({$cat}, g.ali_category_id)";
+                }
+                $query->andWhere(implode(" OR ", $orStrs));
+            }
 
             $selects = ["g.id", "g.name", "g.ali_category_id", "g.cover_url", "g.price", "g.origin_price", "g.freight_price", "s.voucher_price"];
 

@@ -114,27 +114,27 @@ class QrCodeCommon extends BaseModel
 
     private function wechat($scene, $width = 430, $page = null,$appForm = '')
     {
-//        $cache = \Yii::$app->getCache();
-//        $cacheKey = "app/forms/common::wechat:getToken";
-//        $cacheData = $cache->get($cacheKey);
-//        if($cacheData && isset($cacheData['token']) && isset($cacheData['expired_at']) && $cacheData['expired_at'] > time()){
-//            $accessTokenArray = $cacheData['token'];
-//        }else{
-//            /** @var Wechat $wechat */
-//            $wechat = \Yii::$app->wechat;
-//            $accessTokenArray = $wechat->miniProgram->access_token->getToken(true);
+         $cache = \Yii::$app->getCache();
+         $cacheKey = "app/forms/common::wechat:getToken";
+         $cacheData = $cache->get($cacheKey);
+         if($cacheData && isset($cacheData['token']) && isset($cacheData['expired_at']) && $cacheData['expired_at'] > time()){
+            $accessTokenArray = $cacheData['token'];
+          }else{
+            /** @var Wechat $wechat */
+            $wechat = \Yii::$app->wechat;
+            $accessTokenArray = $wechat->miniProgram->access_token->getToken(true);
 ////        $this->accessToken = \Yii::$app->wechat->getAccessToken();
-//            if (!isset($accessTokenArray["access_token"])) {
-//                throw new \Exception('微信配置有误');
-//            }
-//            $cacheData['token']      = $accessTokenArray;
-//            $cacheData['expired_at'] = time() + $accessTokenArray['expires_in'] - 1800;
-//            $cache->set($cacheKey, $cacheData);
-//        }
-//        $this->accessToken = $accessTokenArray["access_token"];
+            if (!isset($accessTokenArray["access_token"])) {
+                throw new \Exception('微信配置有误');
+            }
+            $cacheData['token']      = $accessTokenArray;
+            $cacheData['expired_at'] = time() + $accessTokenArray['expires_in'] - 1800;
+            $cache->set($cacheKey, $cacheData);
+         }
+        $this->accessToken = $accessTokenArray["access_token"];
 
-        $token = (new SetToken())->getToken();
-        $this->accessToken = $token;
+        //$token = (new SetToken())->getToken();
+        //$this->accessToken = $token;
 
         $token = \Yii::$app->security->generateRandomString(30);
         $api = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token={$this->accessToken}";

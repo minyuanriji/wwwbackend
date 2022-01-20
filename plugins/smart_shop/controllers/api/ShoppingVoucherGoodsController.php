@@ -8,6 +8,7 @@ use app\helpers\APICacheHelper;
 use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsAddForm;
 use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsCategorysForm;
 use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsChoosedForm;
+use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsDeleteForm;
 use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsListForm;
 
 class ShoppingVoucherGoodsController extends ApiController {
@@ -54,6 +55,16 @@ class ShoppingVoucherGoodsController extends ApiController {
         $form = new ShoppingVoucherGoodsAddForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->save());
+    }
+
+    /**
+     * 智慧门店删除购物券商品
+     * @return string|\yii\web\Response
+     */
+    public function actionDelete(){
+        $form = new ShoppingVoucherGoodsDeleteForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->delete());
     }
 
     /**

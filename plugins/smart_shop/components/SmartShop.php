@@ -37,6 +37,20 @@ class SmartShop extends Component
     }
 
     /**
+     * 验证token
+     * @param $token
+     * @return boolean
+     */
+    public function validateToken($token){
+        $row = null;
+        if(!empty($token)){
+            $sql = "SELECT id FROM {{%admin}} WHERE token='{$token}'";
+            $row = $this->getDB()->createCommand($sql)->queryOne();
+        }
+        return $row && isset($row['id']) ? true : false;
+    }
+
+    /**
      * 获取智慧门店订单详情
      * @param $table
      * @param $record_id

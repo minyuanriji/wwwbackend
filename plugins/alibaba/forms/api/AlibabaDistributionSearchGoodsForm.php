@@ -24,6 +24,20 @@ class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm
         ];
     }
 
+    public function getQuery(){
+        $query = AlibabaDistributionGoodsList::find()->alias("g")->where(["g.is_delete" => 0]);
+        $query->leftJoin(["s" => ShoppingVoucherTargetAlibabaDistributionGoods::tableName()], "s.goods_id=g.id AND s.sku_id=0");
+
+        if($this->ali_cat_id){
+            $query->andWhere("FIND_IN_SET('{$this->ali_cat_id}', g.ali_category_id)");
+        }
+
+        if ($this->recommend) {
+            $query->andWhere(['g.is_recommend' => $this->recommend]);
+        }
+        return $query;
+    }
+
     /**
      * @return APICacheDataForm
      */
@@ -34,16 +48,8 @@ class AlibabaDistributionSearchGoodsForm extends BaseModel implements ICacheForm
         }
 
         try {
-            $query = AlibabaDistributionGoodsList::find()->alias("g")->where(["g.is_delete" => 0]);
-            $query->leftJoin(["s" => ShoppingVoucherTargetAlibabaDistributionGoods::tableName()], "s.goods_id=g.id AND s.sku_id=0");
 
-            if($this->ali_cat_id){
-                $query->andWhere("FIND_IN_SET('{$this->ali_cat_id}', g.ali_category_id)");
-            }
-
-            if ($this->recommend) {
-                $query->andWhere(['g.is_recommend' => $this->recommend]);
-            }
+            $query = $this->getQuery();
 
             $orderBy = "g.id DESC";
             $query->orderBy($orderBy);

@@ -124,7 +124,7 @@
                 <tr class="c2">
                     <td class="label">可分账金额：</td>
                     <td>
-                        {{splitInfo.unsplit_amount}}
+                        {{splitInfo.unsplit_amount}}元
                     </td>
                 </tr>
                 <tr class="c2">

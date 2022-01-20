@@ -62,6 +62,8 @@ class OrderSplitInfoForm extends BaseModel{
                 ['name' => '平台', 'amount' => round(($mch->transfer_rate/100) * ($info['unsplit_amount']/100), 6)]
             ];
 
+            $info['unsplit_amount'] = round($info['unsplit_amount']/100, 2);
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [

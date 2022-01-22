@@ -51,7 +51,7 @@ class SmartShopUserLoginForm extends BaseModel{
                 throw new \Exception("该门店未设置购物券兑换功能");
             }
             $ssStoreLocalUserId = $row['user_id'];
-     
+
             $user = User::findOne(["mobile" => $this->mobile]);
             if(!$user){
                 $user = new User();

@@ -23,9 +23,9 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
 
     public function rules(){
         return [
-            [['ss_store_id', 'token'], 'required'],
+            [['ss_store_id'], 'required'],
             [['page', 'limit', 'ss_store_id', 'mall_id'], 'integer'],
-            [['cats'], 'safe']
+            [['cats', 'token'], 'safe']
         ];
     }
 
@@ -35,10 +35,10 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
         }
         try {
 
-            $smartShop = new SmartShop();
+            /*$smartShop = new SmartShop();
             if(!$smartShop->validateToken($this->token)){
                 throw new \Exception("无权限操作");
-            }
+            }*/
 
             $query = AlibabaShoppingVoucherGoods::find()->alias("asvg")
                 ->innerJoin(["g" => AlibabaDistributionGoodsList::tableName()], "g.id=asvg.alibaba_goods_id")

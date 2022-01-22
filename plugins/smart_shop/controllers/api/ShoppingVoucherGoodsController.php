@@ -6,6 +6,7 @@ use app\controllers\api\ApiController;
 use app\core\ApiCode;
 use app\helpers\APICacheHelper;
 use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsAddForm;
+use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsBatchDeleteForm;
 use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsCategorysForm;
 use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsChoosedForm;
 use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsDeleteForm;
@@ -63,6 +64,16 @@ class ShoppingVoucherGoodsController extends ApiController {
      */
     public function actionDelete(){
         $form = new ShoppingVoucherGoodsDeleteForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->delete());
+    }
+
+    /**
+     * 智慧门店批量删除购物券商品
+     * @return string|\yii\web\Response
+     */
+    public function actionBatchDelete(){
+        $form = new ShoppingVoucherGoodsBatchDeleteForm();
         $form->attributes = $this->requestData;
         return $this->asJson($form->delete());
     }

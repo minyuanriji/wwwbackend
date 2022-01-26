@@ -48,7 +48,8 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
 
             if($this->cats){
                 $orStrs = [];
-                foreach($this->cats as $cat){
+                $cats = is_array($this->cats) ? $this->cats : explode(",", $this->cats);
+                foreach($cats as $cat){
                     $orStrs[] = "FIND_IN_SET({$cat}, g.ali_category_id)";
                 }
                 $query->andWhere(implode(" OR ", $orStrs));

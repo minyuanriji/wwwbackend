@@ -115,7 +115,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
      * @param UserAddress $userAddress
      * @throws \Exception
      */
-    public static function createAliOrder(AlibabaDistributionOrder $order, AlibabaDistributionOrderDetail $orderDetail, UserAddress $userAddress){
+    public static function createAliOrder(AlibabaDistributionOrder $order, AlibabaDistributionOrderDetail $orderDetail, $userAddress){
         static $appList;
         if(!isset($appList[$orderDetail->app_id])){
             $appList[$orderDetail->app_id] = AlibabaApp::findOne($orderDetail->app_id);
@@ -134,16 +134,18 @@ class AlibabaDistributionOrderForm extends BaseModel{
 
         $distribution = new Distribution($app->app_key, $app->secret);
 
+
+
         $postData = [
             "addressParam" => json_encode([
-                "fullName"     => $userAddress->name,
-                "mobile"       => $userAddress->mobile,
-                "phone"        => $userAddress->mobile,
+                "fullName"     => $order->name,
+                "mobile"       => $order->mobile,
+                "phone"        => $order->mobile,
                 "postCode"     => isset($aliAddrInfo['postCode']) ? $aliAddrInfo['postCode'] : "",
-                "cityText"     => $userAddress->city,
-                "provinceText" => $userAddress->province,
-                "areaText"     => $userAddress->district,
-                "address"      => $userAddress->detail,
+                "cityText"     => $userAddress ? $userAddress->city : "",
+                "provinceText" => $userAddress ? $userAddress->province : "",
+                "areaText"     => $userAddress ? $userAddress->district : "",
+                "address"      => $userAddress ? $userAddress->detail : $order->address,
                 "districtCode" => isset($aliAddrInfo['addressCode']) ? $aliAddrInfo['addressCode'] : ""
             ]),
             "cargoParamList" => json_encode([
@@ -153,7 +155,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
             ]),
             "outerOrderInfo" => json_encode([
                 "mediaOrderId" => $orderDetail->id,
-                "phone"        => $userAddress->mobile,
+                "phone"        => $order->mobile,
                 "offers"       => [
                     "id"     => $goods->ali_offerId,
                     "specId" => $orderDetail->ali_spec_id,

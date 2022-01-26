@@ -7,6 +7,7 @@ use app\models\BaseModel;
 use app\models\User;
 use app\models\UserInfo;
 use app\plugins\mch\models\Mch;
+use app\plugins\shopping_voucher\models\ShoppingVoucherUser;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\models\Merchant;
 use app\plugins\smart_shop\models\MerchantFzlist;
@@ -85,9 +86,17 @@ class SmartShopUserLoginForm extends BaseModel{
                 }
             }
 
+            //获取用户剩余的购物券
+            $remainShoppingVoucherNum = 0;
+            $shoppingVoucherUserModel = ShoppingVoucherUser::findOne(["user_id" => $user->id]);
+            if($shoppingVoucherUserModel){
+                $remainShoppingVoucherNum = $shoppingVoucherUserModel->money;
+            }
+
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
+                    "remain_shopping_voucher_num" => $remainShoppingVoucherNum,
                     "token" => $user->access_token
                 ]
             ];

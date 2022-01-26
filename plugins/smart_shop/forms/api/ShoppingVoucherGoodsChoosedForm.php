@@ -59,14 +59,15 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
             $list = $query->orderBy("asvg.id DESC")->asArray()->select($selects)->page($pagination, $this->limit, $this->page)->all();
             $aliCatIds = [];
             if($list){
-                foreach($list as &$item){
+                foreach($list as $key => $item){
                     $item['price']           = $item['price'] + (float)$item['freight_price'] * (1/AlibabaDistributionOrderForm::getShoppingVoucherDecodeExpressRate());
                     $item['price']           = round($item['price'], 2);
                     $item['ali_category_id'] = $item['ali_category_id'] ? explode(",", $item['ali_category_id']) : [];
                     $aliCatIds = array_merge($aliCatIds, $item['ali_category_id']);
+                    $list[$key] = $item;
                 }
                 $categorys = $this->getCategorys($aliCatIds);
-                foreach($list as &$item){
+                foreach($list as $key => $item){
                     $item['cats'] = [];
                     foreach($item['ali_category_id'] as $catId){
                         if(isset($categorys[$catId])){
@@ -74,6 +75,7 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
                         }
                     }
                     $item['cats'] = implode(" / ", $item['cats']);
+                    $list[$key] = $item;
                 }
             }
 
@@ -85,7 +87,11 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
         }catch (\Exception $e){
             return [
                 'code' => ApiCode::CODE_FAIL,
-                'msg'  => $e->getMessage()
+                'msg'  => $e->getMessage(),
+                'error' => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ];
         }
     }

@@ -34,9 +34,9 @@ class SmartShopUserLoginForm extends BaseModel{
 
             $smartShop = new SmartShop();
             $smartAuthUser = $smartShop->findUsersByOpenid($this->openid);
-            if(!$smartAuthUser || $smartAuthUser['mobile'] != $this->mobile){
+            /*if(!$smartAuthUser || $smartAuthUser['mobile'] != $this->mobile){
                 throw new \Exception("用户不存在或未登录");
-            }
+            }*/
 
             //通过智慧门店ID查找关联补商汇商户所绑定的用户ID
             $row = MerchantFzlist::find()->alias("mfl")
@@ -61,9 +61,9 @@ class SmartShopUserLoginForm extends BaseModel{
                 $user->mall_id          = \Yii::$app->mall->id;
                 $user->access_token     = \Yii::$app->security->generateRandomString();
                 $user->auth_key         = \Yii::$app->security->generateRandomString();
-                $user->nickname         = !empty($smartAuthUser['nickname']) ? $smartAuthUser['nickname'] : uniqid();
+                $user->nickname         = $smartAuthUser && !empty($smartAuthUser['nickname']) ? $smartAuthUser['nickname'] : uniqid();
                 $user->password         = \Yii::$app->getSecurity()->generatePasswordHash(uniqid());
-                $user->avatar_url       = !empty($smartAuthUser['avatar']) ? $smartAuthUser['avatar'] : "";
+                $user->avatar_url       = !$smartAuthUser && empty($smartAuthUser['avatar']) ? $smartAuthUser['avatar'] : "";
                 $user->last_login_at    = time();
                 $user->login_ip         = get_client_ip();
                 $user->parent_id        = $ssStoreLocalUserId;

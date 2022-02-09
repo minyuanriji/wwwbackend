@@ -13,18 +13,16 @@
  * @param string $str
  * @return string
  */
-function encrypt($str, $screct_key)
-{
+function encrypt($str,$screct_key){
     //AES, 128 模式加密数据 CBC
     $screct_key = base64_decode($screct_key);
     $str = trim($str);
-    $str = addPKCS7Padding($str);
 
-    //设置全0的IV
-    $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+    // 这里获取对应加密方式的iv长度
+    $iv_size = openssl_cipher_iv_length('AES-128-CBC');
     $iv = str_repeat("\0", $iv_size);
-
-    $encrypt_str = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $screct_key, $str, MCRYPT_MODE_CBC, $iv);
+    // 加密
+    $encrypt_str = openssl_encrypt($str,'AES-128-CBC',$screct_key,OPENSSL_RAW_DATA,$iv);
     return base64_encode($encrypt_str);
 }
 
@@ -33,18 +31,16 @@ function encrypt($str, $screct_key)
  * @param string $str
  * @return string
  */
-function decrypt($str, $screct_key)
-{
+function decrypt($str,$screct_key){
     //AES, 128 模式加密数据 CBC
     $str = base64_decode($str);
     $screct_key = base64_decode($screct_key);
 
-    //设置全0的IV
-    $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+    $iv_size = openssl_cipher_iv_length('AES-128-CBC');
     $iv = str_repeat("\0", $iv_size);
+    $decrypt_str = openssl_decrypt ($str, 'AES-128-CBC', $screct_key, OPENSSL_RAW_DATA,$iv);
 
-    $decrypt_str = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $screct_key, $str, MCRYPT_MODE_CBC, $iv);
-    $decrypt_str = stripPKSC7Padding($decrypt_str);
+
     return $decrypt_str;
 }
 

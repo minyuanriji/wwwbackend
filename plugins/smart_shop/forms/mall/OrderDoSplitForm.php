@@ -103,14 +103,11 @@ class OrderDoSplitForm extends BaseModel{
         if(empty($splitData['out_request_no'])){
             $splitData['out_request_no'] = "ali" . date("ymdhis") . rand(0, 10000);
         }
-
         $t = \Yii::$app->db->beginTransaction();
         try {
-
             if($amount > 0){
                 $receiver = ["trans_in_type" => (string)$shop->setting['ali_fz_type'], "trans_in" => (string)$shop->setting['ali_fz_account'], "amount" => $amount, "description" => "商户服务费收取"];
             }
-
             $order->status        = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;
             $order->updated_at    = time();
             $order->split_data    = json_encode($splitData);

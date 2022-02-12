@@ -52,20 +52,18 @@ class AlipaySdkApi extends Component{
             "out_request_no" => $out_request_no
         ]));
         $result = $this->getAop()->execute($request, null, $appAuthToken);
-        print_r($result);
-        exit;
 
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         if(!empty($resultCode)&&$resultCode == 10000){
-            echo "成功";
+            //关系绑定成功
         } else {
-            echo "失败";
+            throw new \Exception(isset($result->$responseNode) ? $result->$responseNode->sub_msg : "分账关系绑定失败");
         }
     }
 
     /**
-     * 统一收单交易结算接口
+     * 执行分账操作
      * @param $appAuthToken
      * @param $out_request_no
      * @param $trade_no
@@ -84,15 +82,13 @@ class AlipaySdkApi extends Component{
         $request = new \AlipayTradeOrderSettleRequest ();
         $request->setBizContent(json_encode($option));
         $result = $this->getAop()->execute($request, null, $appAuthToken);
-        print_r($result);
-        exit;
 
         $responseNode = str_replace(".", "_", $request->getApiMethodName()) . "_response";
         $resultCode = $result->$responseNode->code;
         if(!empty($resultCode)&&$resultCode == 10000){
-            echo "成功";
+
         } else {
-            echo "失败";
+            throw new \Exception(isset($result->$responseNode) ? $result->$responseNode->sub_msg : "分账失败");
         }
 
     }

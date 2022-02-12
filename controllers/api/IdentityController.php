@@ -11,6 +11,7 @@
 namespace app\controllers\api;
 
 use app\forms\api\identity\ForgetPasswordForm;
+use app\forms\api\identity\IdentityCheckAuthForm;
 use app\forms\api\identity\LoginForm;
 use app\forms\api\identity\RegisterForm;
 use app\forms\api\identity\SmsForm;
@@ -25,6 +26,21 @@ use app\controllers\business\GetAttentionWeChat;
 
 class IdentityController extends ApiController
 {
+    /**
+     * 验证授权TOKEN
+     * @Author: lin
+     * @Date: 2022-02-11
+     * @Time: 11:55
+     * @return yii\web\Response
+     * @throws \Exception
+     */
+    public function actionCheckAuth()
+    {
+        $form = new IdentityCheckAuthForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->check());
+    }
+
     /**
      * 登录
      * @Author: zal

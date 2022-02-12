@@ -55,6 +55,9 @@ class IntegralMallGoodsListForm extends BaseModel implements ICacheForm {
                 ->where(['g.is_delete' => 0,'g.is_recycle' => 0, 'g.status' => 1, 'g.mall_id' => \Yii::$app->mall->id])
                 ->leftJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
 
+            //只显示积分区商品
+            $query->andWhere([">", "g.forehead_score", 0]);
+
             if ($this->keyword) {
                 $query->keyword($this->keyword, [
                     'or',

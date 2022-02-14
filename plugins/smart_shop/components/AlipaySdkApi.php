@@ -26,8 +26,9 @@ class AlipaySdkApi extends Component{
             $aop->gatewayUrl         = 'https://openapi.alipay.com/gateway.do';
             $aop->appId              = $this->appId;
 
-            $aop->rsaPrivateKey      = file_get_contents($this->rsaPrivateKeyPath);
-            $aop->alipayrsaPublicKey = file_get_contents($this->alipayrsaPublicKeyPath);
+            $aop->rsaPrivateKey      = trim(file_get_contents($this->rsaPrivateKeyPath));
+            $aop->alipayrsaPublicKey = trim(file_get_contents($this->alipayrsaPublicKeyPath));
+
             $aop->apiVersion         = '1.0';
             $aop->signType           = 'RSA2';
             $aop->postCharset        = 'UTF-8';

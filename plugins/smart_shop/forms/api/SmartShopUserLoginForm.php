@@ -96,8 +96,9 @@ class SmartShopUserLoginForm extends BaseModel{
             return [
                 'code' => ApiCode::CODE_SUCCESS,
                 'data' => [
+                    "remain_integral_num"         => intval($user->static_score + $user->score),
                     "remain_shopping_voucher_num" => $remainShoppingVoucherNum,
-                    "token" => $user->access_token
+                    "token"                       => $user->access_token
                 ]
             ];
         }catch (\Exception $e){

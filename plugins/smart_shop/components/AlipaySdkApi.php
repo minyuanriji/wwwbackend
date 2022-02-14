@@ -79,7 +79,6 @@ class AlipaySdkApi extends Component{
             "trade_no"           => $trade_no,
             "royalty_parameters" => $royalty_parameters
         ];
-
         $request = new \AlipayTradeOrderSettleRequest ();
         $request->setBizContent(json_encode($option));
         $result = $this->getAop()->execute($request, null, $appAuthToken);

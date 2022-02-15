@@ -190,8 +190,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     columns: [
                         {label:"收益", key:"total_income"},
                         {label:"手机号", key:"mobile"},
-                        {label:"等级", key:"role_type_text"},
-                        {label:"备注", key:"remark"}
+                        {label:"等级", key:"role_type_text"}
                     ],
                     listKey: 'nickname',
                     url: "mall/user/index",
@@ -268,6 +267,10 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     {
                         label:'用户ID',
                         value:'user_id',
+                    },
+                    {
+                        label:'备注',
+                        value:'remark',
                     },
                 ],
                 type_option:[

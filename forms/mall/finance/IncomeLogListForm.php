@@ -64,6 +64,9 @@ class IncomeLogListForm extends BaseModel
                 case "nickname":
                     $query->andWhere(['like', 'u.nickname', $this->keyword]);
                     break;
+                case "remark":
+                    $query->andWhere(['like', 'b.remark', $this->keyword]);
+                    break;
                 default:
             }
         }

@@ -84,6 +84,13 @@ class SmartShopUserLoginForm extends BaseModel{
                 if (!$userInfoModel->save()) {
                     throw new \Exception($this->responseErrorInfo($userInfoModel));
                 }
+            }else{
+                $user->access_token     = \Yii::$app->security->generateRandomString();
+                $user->auth_key         = \Yii::$app->security->generateRandomString();
+            }
+
+            if (!$user->save()) {
+                throw new \Exception($this->responseErrorInfo($user));
             }
 
             //获取用户剩余的购物券

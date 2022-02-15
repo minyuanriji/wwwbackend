@@ -39,11 +39,12 @@ class SmartShop extends Component
     /**
      * 通过OPENID查找用户
      * @param $openid
+     * @param $ali_uid
      */
-    public function findUsersByOpenid($openid){
+    public function findUsersByOpenid($openid, $ali_uid){
         $row = null;
         if(!empty($openid)){
-            $sql = "SELECT id,nickname,avatar,mobile FROM {{%users}} WHERE openid='{$openid}'";
+            $sql = "SELECT id,nickname,avatar,mobile FROM {{%users}} WHERE openid='{$openid}' OR user_id='{$ali_uid}'";
             $row = $this->getDB()->createCommand($sql)->queryOne();
         }
         return $row;

@@ -18,11 +18,12 @@ class SmartShopUserLoginForm extends BaseModel{
     public $openid;
     public $mobile;
     public $ss_store_id;
+    public $ali_uid;
 
     public function rules(){
         return [
-            [['openid', 'mobile', 'ss_store_id'], 'required'],
-            [['mobile', 'openid'], 'trim']
+            [['mobile', 'ss_store_id'], 'required'],
+            [['mobile', 'openid', 'ali_uid'], 'trim']
         ];
     }
 
@@ -33,7 +34,7 @@ class SmartShopUserLoginForm extends BaseModel{
         try {
 
             $smartShop = new SmartShop();
-            $smartAuthUser = $smartShop->findUsersByOpenid($this->openid);
+            $smartAuthUser = $smartShop->findUsersByOpenid($this->openid, $this->ali_uid);
             /*if(!$smartAuthUser || $smartAuthUser['mobile'] != $this->mobile){
                 throw new \Exception("用户不存在或未登录");
             }*/

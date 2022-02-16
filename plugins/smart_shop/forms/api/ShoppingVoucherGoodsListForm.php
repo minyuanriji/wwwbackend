@@ -18,11 +18,12 @@ class ShoppingVoucherGoodsListForm extends BaseModel implements ICacheForm {
     public $user_mobile; //授权用户手机号码
     public $limit = 10;
     public $page;
+    public $keyword;
 
     public function rules(){
         return [
             [['page', 'limit', 'ss_store_id', 'mall_id', 'ali_cat_id'], 'integer'],
-            [['user_mobile'], 'trim']
+            [['user_mobile', 'keyword'], 'trim']
         ];
     }
 
@@ -60,6 +61,10 @@ class ShoppingVoucherGoodsListForm extends BaseModel implements ICacheForm {
                 "AND",
                 "s.voucher_price IS NOT NULL"
             ]);
+
+            if(!empty($this->keyword)){
+                $query->andWhere(["LIKE", "g.name", $this->keyword]);
+            }
 
             $selects = ["g.id", "g.name", "g.cover_url", "g.price", "g.origin_price", "g.freight_price", "s.voucher_price"];
             $list = $query->asArray()->orderBy("g.id DESC")->select($selects)->page($pagination, $this->limit, $this->page)->all();

@@ -21,11 +21,14 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
     public $ss_store_id;
     public $cats;
 
+    public $keyword;
+
     public function rules(){
         return [
             [['ss_store_id'], 'required'],
             [['page', 'limit', 'ss_store_id', 'mall_id'], 'integer'],
-            [['cats', 'token'], 'safe']
+            [['cats', 'token'], 'safe'],
+            [['keyword'], 'trim']
         ];
     }
 
@@ -53,6 +56,10 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
                     $orStrs[] = "FIND_IN_SET({$cat}, g.ali_category_id)";
                 }
                 $query->andWhere(implode(" OR ", $orStrs));
+            }
+
+            if($this->keyword){
+                $query->andWhere(["LIKE", "g.name", $this->keyword]);
             }
 
             $selects = ["g.id", "g.name", "g.ali_category_id", "g.cover_url", "g.price", "g.origin_price", "g.freight_price", "s.voucher_price"];

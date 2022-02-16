@@ -31,7 +31,7 @@ class ShoppingVoucherGoodsListForm extends BaseModel implements ICacheForm {
      * @return array
      */
     public function getCacheKey(){
-        $keys = [$this->mall_id, $this->ss_store_id, $this->user_mobile, $this->limit, $this->page, $this->ali_cat_id];
+        $keys = [$this->mall_id, $this->ss_store_id, $this->user_mobile, $this->limit, $this->page, $this->ali_cat_id, $this->keyword];
         return $keys;
     }
 

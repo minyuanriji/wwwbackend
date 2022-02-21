@@ -108,6 +108,11 @@
                         <el-form-item label="分账个人接收方姓名" prop="wechat_fz_name">
                             <el-input v-model="WechatSet.ruleForm.wechat_fz_name" placeholder="请输入内容" style="width:350px;"></el-input>
                         </el-form-item>
+                        <el-form-item label="费率" prop="wechat_rate">
+                            <el-input v-model="WechatSet.ruleForm.wechat_rate" type="number" min="0" placeholder="请输入收款费率" style="width:350px;">
+                                <template slot="append">%</template>
+                            </el-input>
+                        </el-form-item>
                         <el-form-item>
                             <el-button :loading="WechatSet.btnLoading" @click="saveWechatInfo" type="primary" size="big">保存</el-button>
                         </el-form-item>
@@ -131,6 +136,11 @@
                         </el-form-item>
                         <el-form-item label="分账接收方" prop="ali_fz_account">
                             <el-input v-model="AliSet.ruleForm.ali_fz_account" placeholder="请输入内容" style="width:350px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="费率" prop="ali_rate">
+                            <el-input v-model="AliSet.ruleForm.ali_rate" type="number" min="0" placeholder="请输入收款费率" style="width:350px;">
+                                <template slot="append">%</template>
+                            </el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button :loading="AliSet.btnLoading" @click="saveAliInfo" type="primary" size="big">保存</el-button>
@@ -200,6 +210,7 @@
                         wechat_fz_account: '',
                         wechat_fz_type: 'MERCHANT_ID',
                         wechat_fz_name: '',
+                        wechat_rate: ''
                     },
                     rules: {
                         sp_appid: [
@@ -228,6 +239,9 @@
                         ],
                         wechat_fz_name: [
                             {required: true, message: '请输入分账接收方姓名', trigger: 'change'},
+                        ],
+                        wechat_rate: [
+                            {required: true, message: '请输入微信收款费率', trigger: 'change'},
                         ]
                     },
                     btnLoading: false
@@ -238,7 +252,8 @@
                         ali_rsaPrivateKeyPath: '',
                         ali_alipayrsaPublicKeyPath: '',
                         ali_fz_account: '',
-                        ali_fz_type: 'userId'
+                        ali_fz_type: 'userId',
+                        ali_rate: ''
                     },
                     rules: {
                         ali_sp_appid: [
@@ -256,6 +271,9 @@
                         ali_fz_account: [
                             {required: true, message: '请输入分账接收方', trigger: 'change'},
                         ],
+                        ali_rate: [
+                            {required: true, message: '请输入支付宝收款费率', trigger: 'change'},
+                        ]
                     },
                     btnLoading: false
                 },
@@ -390,6 +408,14 @@
                 //this.AliSet.ruleForm.ali_fz_account = set.ali_fz_account;
                 //this.AliSet.ruleForm.ali_fz_type = set.ali_fz_type;
             },
+            setBaseInfo(set){
+                let key;
+                for(key in set){
+                    if(typeof this.ruleForm[key] != "undefined"){
+                        this.ruleForm[key] = set[key];
+                    }
+                }
+            },
             getSetting(){
                 request({
                     params: {
@@ -398,6 +424,7 @@
                 }).then(e => {
                     if (e.data.code == 0) {
                         this.setDBInfo(e.data.data.setting);
+                        this.setBaseInfo(e.data.data.setting);
                         this.setWechatInfo(e.data.data.setting);
                         this.setAliInfo(e.data.data.setting);
                     }

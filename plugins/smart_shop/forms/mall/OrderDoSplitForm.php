@@ -91,6 +91,10 @@ class OrderDoSplitForm extends BaseModel{
 
         $tradeNo = $res['trade_no']; //支付宝交易号
 
+        //计算出支付公司扣取的费用
+        $rate = isset($shop->setting['ali_rate']) ? max(0, floatval($shop->setting['ali_rate'])) : 0;
+        $deductedAmount = $detail['pay_price'] * ($rate/100);
+
         //可分账金额（单位分）
         $unsplitAmount = intval(floatval($res['receipt_amount']) * 100);
         if(!$unsplitAmount){
@@ -164,6 +168,10 @@ class OrderDoSplitForm extends BaseModel{
         }
         $detail['transaction_id'] = $res['transaction_id'];
 
+        //计算出支付公司扣取的费用
+        $rate = isset($shop->setting['wechat_rate']) ? max(0, floatval($shop->setting['wechat_rate'])) : 0;
+        $deductedAmount = $detail['pay_price'] * ($rate/100);
+
         //获取可分账金额
         $unsplitAmount = OrderSplitInfoForm::getWechat($order, $shop, $detail);
         if(!$unsplitAmount){
@@ -176,6 +184,7 @@ class OrderDoSplitForm extends BaseModel{
         }
 
         $amount = (int)(($mch->transfer_rate/100) * $unsplitAmount);
+
         $splitData['receivers'] = isset($splitData['receivers']) && !empty($splitData['receivers']) ? $splitData['receivers'] : [];
         $splitData['transaction_id'] = $detail['transaction_id'];
 

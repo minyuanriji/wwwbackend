@@ -19,7 +19,7 @@ class ShopController extends ApiController {
         $form->mall_id    = \Yii::$app->mall->id;
         $form->host_info  = \Yii::$app->request->getHostInfo();
 
-        $res = APICacheHelper::get($form);
+        $res = APICacheHelper::get($form, true);
         if($res['code'] == ApiCode::CODE_SUCCESS){
             $res = $res['data'];
         }

@@ -65,6 +65,7 @@ trait SmartShopShopTrait
         //获取数据
         $offset = ($page - 1) * $limit;
         $sql = "SELECT {$selects} {$fromTable} " . implode(" ", $innerArr) . " {$whereStr} {$orderStr} limit $offset,{$limit}";
+        
         $rows = $this->getDB()->createCommand($sql)->queryAll();
 
         $pagination = (array)$pagination;

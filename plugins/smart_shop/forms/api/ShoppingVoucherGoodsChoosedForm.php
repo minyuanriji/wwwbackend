@@ -45,9 +45,16 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
 
             $query = AlibabaShoppingVoucherGoods::find()->alias("asvg")
                 ->innerJoin(["g" => AlibabaDistributionGoodsList::tableName()], "g.id=asvg.alibaba_goods_id")
-                ->leftJoin(["s" => ShoppingVoucherTargetAlibabaDistributionGoods::tableName()], "s.goods_id=g.id AND s.sku_id=0");
-
-            $query->where(["g.is_delete" => 0, "asvg.ss_store_id" => $this->ss_store_id, "asvg.is_delete" => 0]);
+                ->leftJoin(["s" => ShoppingVoucherTargetAlibabaDistributionGoods::tableName()], "s.goods_id=g.id AND s.sku_id=0")
+                ->where(["g.is_delete" => 0, "asvg.is_delete" => 0, "asvg.ss_store_id" => $this->ss_store_id])
+                ->orderBy("asvg.id DESC");
+            $count = $query->count();
+            if(!$count){ //如果一条都没有显示全部
+                $query = AlibabaDistributionGoodsList::find()->alias("g")
+                    ->leftJoin(["s" => ShoppingVoucherTargetAlibabaDistributionGoods::tableName()], "s.goods_id=g.id AND s.sku_id=0")
+                    ->where(["g.is_delete" => 0])
+                    ->orderBy("g.id DESC");
+            }
 
             if($this->cats){
                 $orStrs = [];
@@ -64,7 +71,7 @@ class ShoppingVoucherGoodsChoosedForm extends BaseModel{
 
             $selects = ["g.id", "g.name", "g.ali_category_id", "g.cover_url", "g.price", "g.origin_price", "g.freight_price", "s.voucher_price"];
 
-            $list = $query->orderBy("asvg.id DESC")->asArray()->select($selects)->page($pagination, $this->limit, $this->page)->all();
+            $list = $query->asArray()->select($selects)->page($pagination, $this->limit, $this->page)->all();
             $aliCatIds = [];
             if($list){
                 foreach($list as $key => $item){

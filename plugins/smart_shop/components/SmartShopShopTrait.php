@@ -49,6 +49,7 @@ trait SmartShopShopTrait
             "LEFT JOIN {{%citys}} pv ON pv.cityid=s.province_code",
             "LEFT JOIN {{%citys}} ct ON ct.cityid=s.city_code",
             "LEFT JOIN {{%attachment}} s_at ON s_at.id=s.thumb",
+            "LEFT JOIN {{%storeset}} sst ON sst.store_id=s.id"
         ];
 
         //获取记录数

@@ -57,7 +57,7 @@ trait SmartShopShopTrait
 
         $pagination = new BasePagination(['totalCount' => $totalCount, 'pageSize' => $limit, 'page' => $page]);
 
-        $page = max(1, min($page, $pagination->page_count));
+        $page = max(1, $page);
 
         //显示字段
         $selects = implode(",", $selects);
@@ -65,7 +65,7 @@ trait SmartShopShopTrait
         //获取数据
         $offset = ($page - 1) * $limit;
         $sql = "SELECT {$selects} {$fromTable} " . implode(" ", $innerArr) . " {$whereStr} {$orderStr} limit $offset,{$limit}";
-        
+
         $rows = $this->getDB()->createCommand($sql)->queryAll();
 
         $pagination = (array)$pagination;

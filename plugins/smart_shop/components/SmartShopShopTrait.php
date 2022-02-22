@@ -27,6 +27,26 @@ trait SmartShopShopTrait
     }
 
     /**
+     * 获取智慧门店详情
+     * @param $id
+     * @return array
+     */
+    public function getStoreDetail($id){
+        $whereStr = "WHERE s.id='{$id}'";
+        $fromTable = "FROM {{%store}} s";
+        $innerArr = [
+            "INNER JOIN {{%merchant}} m ON m.admin_id=s.admin_id",
+            "LEFT JOIN {{%storeset}} sst ON sst.store_id=s.id"
+        ];
+        $selects = "s.id as ss_store_id, s.title as store_name";
+
+        //获取记录数
+        $row = $this->getDB()->createCommand("SELECT {$selects} {$fromTable} " . implode(" ", $innerArr) . " {$whereStr}")->queryOne();
+
+        return $row ? $row : null;
+    }
+
+    /**
      * 获取智慧门店数据
      * @param $pagination
      * @param array $selects
@@ -46,6 +66,8 @@ trait SmartShopShopTrait
         $fromTable = "FROM {{%store}} s";
         $innerArr = [
             "INNER JOIN {{%merchant}} m ON m.admin_id=s.admin_id",
+            "LEFT JOIN {{%merchant_entry}} wx_me ON wx_me.merchant_id=m.id AND wx_me.pay_way_id=1",
+            "LEFT JOIN {{%merchant_entry}} ali_me ON ali_me.merchant_id=m.id AND ali_me.pay_way_id=2",
             "LEFT JOIN {{%citys}} pv ON pv.cityid=s.province_code",
             "LEFT JOIN {{%citys}} ct ON ct.cityid=s.city_code",
             "LEFT JOIN {{%attachment}} s_at ON s_at.id=s.thumb",

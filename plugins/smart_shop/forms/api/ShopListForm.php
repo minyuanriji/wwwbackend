@@ -57,7 +57,7 @@ class ShopListForm extends BaseModel implements ICacheForm {
 
             $selects = ["s.id as store_id", "s.title as store_name", "s.address", "pv.city_name as province",
                 "ct.city_name as city", "s_at.filepath as store_logo", "m.id as merchant_id", "m.name as merchant_name",
-                "m.mobile", "sst.coordinates"];
+                "m.mobile", "sst.coordinates", "wx_me.mp_appid as wx_mp_appid", "ali_me.ali_appid as ali_mp_appid"];
 
             $list = $shop->getStoreList($pagination, $selects, $wheres, $this->page, $this->limit);
             $defaultLogo = $this->host_info . "/web/static/header-logo.png";

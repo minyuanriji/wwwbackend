@@ -22,11 +22,12 @@ class ShopListForm extends BaseModel implements ICacheForm {
     public $lng;
     public $lat;
     public $keyword;
+    public $plat;
 
     public function rules() {
         return [
             [['page', 'limit'], 'integer'],
-            [['lat', 'lng', 'keyword'], 'trim']
+            [['lat', 'lng', 'keyword', 'plat'], 'trim']
         ];
     }
 
@@ -50,6 +51,14 @@ class ShopListForm extends BaseModel implements ICacheForm {
             $wheres = [
                 "s.status='1' AND m.copy<>0"
             ];
+
+            if($this->plat == "wechat"){
+                $wheres[] = "wx_me.mp_appid is not null";
+            }
+
+            if($this->plat == "alipay"){
+                $wheres[] = "ali_me.ali_appid is not null";
+            }
 
             if(!empty($this->keyword)){
                 $wheres[] = "s.title LIKE '%".$this->keyword."%'";

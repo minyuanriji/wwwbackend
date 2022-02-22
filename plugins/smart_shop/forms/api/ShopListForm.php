@@ -21,16 +21,17 @@ class ShopListForm extends BaseModel implements ICacheForm {
     public $mall_id;
     public $lng;
     public $lat;
+    public $keyword;
 
     public function rules() {
         return [
             [['page', 'limit'], 'integer'],
-            [['lat', 'lng'], 'trim']
+            [['lat', 'lng', 'keyword'], 'trim']
         ];
     }
 
     public function getCacheKey(){
-        return [(int)$this->page, (int)$this->limit, (int)$this->mall_id];
+        return [(int)$this->page, (int)$this->limit, (int)$this->mall_id, $this->keyword, $this->lng, $this->lat];
     }
 
     /**
@@ -49,6 +50,10 @@ class ShopListForm extends BaseModel implements ICacheForm {
             $wheres = [
                 "s.status='1' AND m.copy<>0"
             ];
+
+            if(!empty($this->keyword)){
+                $wheres[] = "`s.title` LIKE '%".$this->keyword."%'";
+            }
 
             $selects = ["s.id as store_id", "s.title as store_name", "s.address", "pv.city_name as province",
                 "ct.city_name as city", "s_at.filepath as store_logo", "m.id as merchant_id", "m.name as merchant_name",
@@ -128,7 +133,7 @@ class ShopListForm extends BaseModel implements ICacheForm {
             if(isset($rows[$item['store_id']])){
                 $shoppingVoucherGiveValue = $rows[$item['store_id']]['shopping_voucher_give_value'];
                 if($shoppingVoucherGiveValue){
-                    $item['shopping_voucher_remark'] = "付100送".$shoppingVoucherGiveValue."购物券";
+                    $item['shopping_voucher_remark'] = "付100送".$shoppingVoucherGiveValue."红包";
                 }
             }
             $list[$key] = $item;

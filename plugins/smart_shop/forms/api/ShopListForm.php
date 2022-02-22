@@ -53,9 +53,9 @@ class ShopListForm extends BaseModel implements ICacheForm {
             ];
 
             if($this->plat == "wechat"){
-                $wheres[] = "wx_me.mp_appid is not  null";
+                $wheres[] = "wx_me.mp_appid IS NOT NULL AND wx_me.mp_appid <> ''";
             }elseif($this->plat == "alipay"){
-                $wheres[] = "ali_me.ali_appid is not null";
+                $wheres[] = "ali_me.ali_appid IS NOT NULL AND ali_me.ali_appid <> ''";
             }else{
                 throw new \Exception("参数plat错误");
             }

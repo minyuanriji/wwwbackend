@@ -52,14 +52,12 @@ class ShopListForm extends BaseModel implements ICacheForm {
             ];
 
             if(!empty($this->keyword)){
-                $wheres[] = "`s.title` LIKE '%".$this->keyword."%'";
+                $wheres[] = "s.title LIKE '%".$this->keyword."%'";
             }
 
             $selects = ["s.id as store_id", "s.title as store_name", "s.address", "pv.city_name as province",
                 "ct.city_name as city", "s_at.filepath as store_logo", "m.id as merchant_id", "m.name as merchant_name",
                 "m.mobile", "sst.coordinates"];
-
-
 
             $list = $shop->getStoreList($pagination, $selects, $wheres, $this->page, $this->limit);
             $defaultLogo = $this->host_info . "/web/static/header-logo.png";

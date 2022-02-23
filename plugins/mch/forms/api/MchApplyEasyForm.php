@@ -28,6 +28,16 @@ class MchApplyEasyForm extends BaseModel{
         ];
     }
 
+    public function attributeLabels(){
+        return [
+            'name'     => '门店名称',
+            'realname' => '负责人',
+            'province' => '省份',
+            'city'     => '城市',
+
+        ];
+    }
+
     public function save(){
         if(!$this->validate()){
             return $this->responseErrorInfo();

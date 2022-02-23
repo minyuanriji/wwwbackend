@@ -4,6 +4,7 @@ namespace app\plugins\mch\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\controllers\api\filters\LoginFilter;
+use app\plugins\mch\forms\api\MchApplyEasyForm;
 use app\plugins\mch\forms\common\apply\MchApplyBasicForm;
 use app\plugins\mch\forms\common\apply\MchApplyInfoForm;
 use app\plugins\mch\forms\common\apply\MchApplyLicenseForm;
@@ -17,6 +18,16 @@ class ApplyController extends ApiController{
                 'class' => LoginFilter::class,
             ]
         ]);
+    }
+
+    /**
+     * 店铺入驻申请简单处理
+     * @return \yii\web\Response
+     */
+    public function actionEasy(){
+        $form = new MchApplyEasyForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->save());
     }
 
     /**

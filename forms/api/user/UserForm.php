@@ -309,7 +309,7 @@ class UserForm extends BaseModel
         }
         if($mch && $mch->review_status == Mch::REVIEW_STATUS_CHECKED) {
             $userCenter['menus'][] = [
-                "icon_url" => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                "icon_url" => "https://www.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
                 "name" => "商户",
                 "link_url" => "/mch/personalCentre/personalCentre",
                 "open_type" => "navigate"
@@ -321,7 +321,7 @@ class UserForm extends BaseModel
             ])->count();
             if($subAccountCount){
                 $userCenter['menus'][] = [
-                    "icon_url" => "https://dev.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                    "icon_url" => "https://www.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
                     "name" => "商户",
                     "link_url" => "/mch/personalCentre/subAccount/chooseToEnter/chooseToEnter",
                     "open_type" => "navigate"
@@ -331,7 +331,7 @@ class UserForm extends BaseModel
 
         if (!$mch || $mch->review_status != Mch::REVIEW_STATUS_CHECKED) {
             $userCenter['menus'][] = [
-                "icon_url"  => "https://dev.mingyuanriji.cn/web/static/shopSettle.png",
+                "icon_url"  => "https://www.mingyuanriji.cn/web/static/shopSettle.png",
                 "name"      => "商家入驻",
                 "link_url"  => "/pages/enter/enter",
                 "open_type" => "navigate"
@@ -350,7 +350,7 @@ class UserForm extends BaseModel
         ])->andWhere(['or',['role_type' => 'partner'],['role_type' => 'branch_office']])->exists();
         if($isBoss || $isUserRole) {
             $userCenter['menus'][] = [
-                "icon_url"  => "https://dev.mingyuanriji.cn/web/static/bonus.png",
+                "icon_url"  => "https://www.mingyuanriji.cn/web/static/bonus.png",
                 "name"      => "奖金分红",
                 "link_url"  => "/pages/user/bonus/bonus",
                 "open_type" => "navigate"
@@ -362,7 +362,7 @@ class UserForm extends BaseModel
         if ($user_res) {
             if ($user_res->is_examine) {
                 $userCenter['menus'][] = [
-                    "icon_url"  => "https://dev.mingyuanriji.cn/web/static/examine.png",
+                    "icon_url"  => "https://www.mingyuanriji.cn/web/static/examine.png",
                     "name"      => "审核店铺",
                     "link_url"  => "/pages/user/examine/examine",
                     "open_type" => "navigate"

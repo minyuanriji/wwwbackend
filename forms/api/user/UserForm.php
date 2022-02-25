@@ -309,7 +309,7 @@ class UserForm extends BaseModel
         }
         if($mch && $mch->review_status == Mch::REVIEW_STATUS_CHECKED) {
             $userCenter['menus'][] = [
-                "icon_url" => "https://www.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                "icon_url" => "https://www.mingyuanriji.cn/web/static/shop_new_home.png",
                 "name" => "商户",
                 "link_url" => "/mch/personalCentre/personalCentre",
                 "open_type" => "navigate"
@@ -321,7 +321,7 @@ class UserForm extends BaseModel
             ])->count();
             if($subAccountCount){
                 $userCenter['menus'][] = [
-                    "icon_url" => "https://www.mingyuanriji.cn/web/uploads/images/thumbs/20210322/07c58e197c00184ba1aee91909f143f8.png",
+                    "icon_url" => "https://www.mingyuanriji.cn/web/static/shop_new_home.png",
                     "name" => "商户",
                     "link_url" => "/mch/personalCentre/subAccount/chooseToEnter/chooseToEnter",
                     "open_type" => "navigate"

@@ -43,7 +43,7 @@ class OrderListForm extends BaseModel{
             $list = $query->select($selects)->asArray()->page($pagination, 10, $this->page)->all();
             $shop = new SmartShop();
             if($list){
-                foreach($list as &$item){
+                foreach($list as $key1 => $item){
                     $item['detail']     = $shop->getOrderDetail($item['from_table_name'], $item['from_table_record_id']);
                     $item['split_data'] = !empty($item['split_data']) ? (array)@json_decode($item['split_data'], true) : [];
                     if(!isset($item['split_data']['receivers']) || empty($item['split_data']['receivers'])){
@@ -55,7 +55,7 @@ class OrderListForm extends BaseModel{
                     $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
 
                     //获取支付用户信息
-                    $user = User::findOne(["mobile" => $item['pay_user_mobile']]);
+                    $user = !empty($item['pay_user_mobile']) ? User::findOne(["mobile" => $item['pay_user_mobile']]) : null;
                     $item['user'] = $user ? $user->getAttributes() : '';
 
                     //获取支付用户上级信息
@@ -86,6 +86,8 @@ class OrderListForm extends BaseModel{
                         ["is_delete" => 0],
                         ["type" => 1]
                     ])->sum("income")), 2);
+
+                    $list[$key1] = $item;
                 }
             }
 

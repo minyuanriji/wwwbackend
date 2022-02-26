@@ -189,7 +189,7 @@
                     infos.push({name: "分账金额", value: item.split_amount});
                     infos.push({name: "赠送购物券", value: item.shopping_voucher});
                     infos.push({name: "赠送积分", value: item.send_score});
-                    infos.push({name: "分佣", value: item.commision_amount});
+                    infos.push({name: "门店推荐+分佣", value: item.commision_amount});
                     return infos;
                 }
             }

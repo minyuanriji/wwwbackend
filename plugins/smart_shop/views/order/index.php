@@ -12,8 +12,8 @@
 
             </el-card>
             <el-table v-loading="loading" :data="list" border style="margin-top:20px;width: 100%">
-                <el-table-column prop="bsh_mch_id" label="商户ID" width="100" ></el-table-column>
-                <el-table-column label="商户信息" width="200" >
+                <el-table-column prop="bsh_mch_id" label="商户ID" width="90" align="center"></el-table-column>
+                <el-table-column label="商户信息" width="180" >
                     <template slot-scope="scope">
                         <div style="display:flex;align-items: center;">
                             <com-image width="25" height="25" :src="scope.row.cover_url"></com-image>
@@ -23,19 +23,20 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="智慧门店" width="200" >
+                <el-table-column label="折扣" width="90" align="center" prop="zk"></el-table-column>
+                <el-table-column label="智慧门店" width="180" >
                     <template slot-scope="scope">
                         {{scope.row.detail.merchant_name}}
                         <span style="color:gray;">（{{scope.row.detail.store_name}}）</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="支付方式" width="110" align="center">
+                <el-table-column label="支付方式" width="100" align="center">
                     <template slot-scope="scope">
                         {{scope.row.detail.pay_type == 1 ? '微信' : '支付宝'}}
                     </template>
                 </el-table-column>
 
-                <el-table-column label="分账状态" width="150" align="center">
+                <el-table-column label="分账状态" width="140" align="center">
                     <template slot-scope="scope">
                         <span v-if="scope.row.status == 0" style="color:darkred">待分账</span>
                         <span v-if="scope.row.status == 1" style="color:steelblue">处理中</span>

@@ -87,6 +87,9 @@ class OrderListForm extends BaseModel{
                         ["type" => 1]
                     ])->sum("income")), 2);
 
+                    //折扣
+                    $item['zk'] = round(10 - ($item['transfer_rate']/100) * 10, 1);
+
                     $list[$key1] = $item;
                 }
             }

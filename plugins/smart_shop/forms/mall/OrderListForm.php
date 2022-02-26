@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\IncomeLog;
 use app\models\Integral;
 use app\models\Store;
+use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\shopping_voucher\models\ShoppingVoucherLog;
 use app\plugins\sign_in\forms\BaseModel;
@@ -52,6 +53,16 @@ class OrderListForm extends BaseModel{
                         $item['split_data']['receivers'][$key]['amount'] = round($receiver['amount']/100, 6);
                     }
                     $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
+
+                    //获取支付用户信息
+                    $user = User::findOne(["mobile" => $item['pay_user_mobile']]);
+                    $item['user'] = $user ? $user->getAttributes() : '';
+
+                    //获取支付用户上级信息
+                    if($user){
+                        $parent = User::findOne($user->parent_id);
+                        $item['parent'] = $parent ? $parent->getAttributes() : '';
+                    }
 
                     //统计赠送的购物券
                     $item['shopping_voucher'] = round((float)ShoppingVoucherLog::find()->where([

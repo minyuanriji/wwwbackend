@@ -34,13 +34,22 @@
                         {{scope.row.detail.pay_type == 1 ? '微信' : '支付宝'}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="pay_user_mobile" label="支付手机" width="130" align="center"></el-table-column>
+
                 <el-table-column label="分账状态" width="150" align="center">
                     <template slot-scope="scope">
                         <span v-if="scope.row.status == 0" style="color:darkred">待分账</span>
                         <span v-if="scope.row.status == 1" style="color:steelblue">处理中</span>
                         <span v-if="scope.row.status == 2" style="color:darkgreen">已分账</span>
                         <span v-if="scope.row.status == 3" style="color:gray">已取消</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column label="用户信息" width="350" align="center">
+                    <template slot-scope="scope">
+                        <el-table :show-header="false" :data="userInfos(scope.row)" border size="small" style="width: 100%">
+                            <el-table-column prop="name" width="100" align="right"></el-table-column>
+                            <el-table-column prop="value" align="left"></el-table-column>
+                        </el-table>
                     </template>
                 </el-table-column>
                 <!--
@@ -53,7 +62,7 @@
                     </template>
                 </el-table-column>
                 -->
-                <el-table-column label="订单信息" align="center" width="500">
+                <el-table-column label="订单信息" align="center" width="350">
                     <template slot-scope="scope">
                         <el-table :show-header="false" :data="orderInfos(scope.row)" border size="small" style="width: 100%">
                             <el-table-column prop="name" width="130" align="right"></el-table-column>
@@ -61,8 +70,6 @@
                         </el-table>
                     </template>
                 </el-table-column>
-
-
                 <el-table-column label="操作" fixed="right" width="150" align="center">
                     <template slot-scope="scope">
                         <el-button @click="showSplitDialog(scope.row)" type="text" circle size="mini" v-if="scope.row.status == 0">
@@ -158,6 +165,20 @@
             };
         },
         computed: {
+            userInfos(item){
+                return function(item){
+                    let infos = [];
+                    infos.push({name: "用户ID", value: item.user ? item.user.id : '-'});
+                    infos.push({name: "用户昵称", value: item.user ? item.user.nickname : '-'});
+                    infos.push({name: "手机号码", value: item.pay_user_mobile});
+                    infos.push({name: "用户身份", value: item.user ? this.roleText(item.user.role_type) : '-'});
+                    infos.push({name: "上级ID", value: item.parent ? item.parent.id : '-'});
+                    infos.push({name: "上级昵称", value: item.parent ? item.parent.nickname : '-'});
+                    infos.push({name: "上级手机号", value: item.parent ? item.parent.mobile : '-'});
+                    infos.push({name: "上级身份", value: item.parent ? this.roleText(item.parent.role_type) : '-'});
+                    return infos;
+                }
+            },
             orderInfos(item){
                 return function(item){
                     let infos = [];
@@ -174,6 +195,15 @@
             }
         },
         methods: {
+            roleText(type){
+                let values = {
+                    store: 'VIP会员',
+                    partner: '合伙人',
+                    branch_office: '分公司',
+                    user: '普通用户'
+                };
+                return values[type] ? values[type] : '';
+            },
             showSplitDialog(item){
                 this.dialogVisible = true;
                 this.splitLoading = true;

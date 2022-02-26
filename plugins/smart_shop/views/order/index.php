@@ -43,34 +43,26 @@
                         <span v-if="scope.row.status == 3" style="color:gray">已取消</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="分账信息" width="300" align="center">
+                <!--
+                <el-table-column label="分账信息" width="350" align="center">
                     <template slot-scope="scope">
-                        <el-table :data="scope.row.split_data.receivers" border size="small" style="width: 100%">
-                            <el-table-column prop="account" label="收益人" width="150" align="center"></el-table-column>
-                            <el-table-column prop="amount" label="金额" align="center"></el-table-column>
+                        <el-table :show-header="false" :data="scope.row.split_data.receivers" border size="small" style="width: 100%">
+                            <el-table-column prop="account" width="100" align="right"></el-table-column>
+                            <el-table-column prop="amount" align="left"></el-table-column>
                         </el-table>
                     </template>
                 </el-table-column>
-                <el-table-column prop="created_at" width="150" label="日期" align="center">
+                -->
+                <el-table-column label="订单信息" align="center" width="500">
                     <template slot-scope="scope">
-                        {{scope.row.created_at|dateTimeFormat('Y-m-d')}}
+                        <el-table :show-header="false" :data="orderInfos(scope.row)" border size="small" style="width: 100%">
+                            <el-table-column prop="name" width="130" align="right"></el-table-column>
+                            <el-table-column prop="value" align="left"></el-table-column>
+                        </el-table>
                     </template>
                 </el-table-column>
-                <el-table-column label="订单号" width="200" align="center">
-                    <template slot-scope="scope">
-                        {{scope.row.detail.order_no}}
-                    </template>
-                </el-table-column>
-                <el-table-column label="订单金额" width="100" align="center">
-                    <template slot-scope="scope">
-                        {{scope.row.detail.total_price}}
-                    </template>
-                </el-table-column>
-                <el-table-column label="实际支付" width="100" align="center">
-                    <template slot-scope="scope">
-                        {{scope.row.detail.pay_price}}
-                    </template>
-                </el-table-column>
+
+
                 <el-table-column label="操作" fixed="right" width="150" align="center">
                     <template slot-scope="scope">
                         <el-button @click="showSplitDialog(scope.row)" type="text" circle size="mini" v-if="scope.row.status == 0">
@@ -165,6 +157,22 @@
                 }
             };
         },
+        computed: {
+            orderInfos(item){
+                return function(item){
+                    let infos = [];
+                    infos.push({name: "订单号", value: item.detail.order_no});
+                    infos.push({name: "日期", value: item.created_at});
+                    infos.push({name: "订单金额", value: item.detail.total_price});
+                    infos.push({name: "实际支付", value: item.detail.pay_price});
+                    infos.push({name: "分账金额", value: item.split_amount});
+                    infos.push({name: "赠送购物券", value: item.shopping_voucher});
+                    infos.push({name: "赠送积分", value: item.send_score});
+                    infos.push({name: "分佣", value: item.commision_amount});
+                    return infos;
+                }
+            }
+        },
         methods: {
             showSplitDialog(item){
                 this.dialogVisible = true;
@@ -251,6 +259,10 @@
     });
 </script>
 <style>
+
+    .fin-detail{display:flex;align-items: center}
+    .fin-detail > span:first-child{width:100px;text-align: right}
+
     .grid-i th{padding:5px 0px 5px 0px;}
     .grid-i th,.grid-i td{text-align:left;}
     .grid-i td{padding:10px 10px;border:1px solid #ddd;border-bottom:none;}

@@ -3,8 +3,11 @@
 namespace app\plugins\smart_shop\forms\mall;
 
 use app\core\ApiCode;
+use app\models\IncomeLog;
+use app\models\Integral;
 use app\models\Store;
 use app\plugins\mch\models\Mch;
+use app\plugins\shopping_voucher\models\ShoppingVoucherLog;
 use app\plugins\sign_in\forms\BaseModel;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\models\Order;
@@ -48,6 +51,30 @@ class OrderListForm extends BaseModel{
                     foreach($item['split_data']['receivers'] as $key => $receiver){
                         $item['split_data']['receivers'][$key]['amount'] = round($receiver['amount']/100, 6);
                     }
+                    $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
+
+                    //统计赠送的购物券
+                    $item['shopping_voucher'] = round((float)ShoppingVoucherLog::find()->where([
+                        "type"        => 1,
+                        "source_id"   => $item['id'],
+                        "source_type" => "from_smart_shop_order"
+                    ])->sum("money"), 2);
+
+                    //统计赠送的积分
+                    $item['send_score'] = (int)Integral::find()->where([
+                        "source_id"   => $item['id'],
+                        "source_type" => "from_smart_shop_order"
+                    ])->sum("integral_num");
+
+                    //统计分佣
+                    $item['commision_amount'] = round(floatval(IncomeLog::find()->andWhere([
+                        "AND",
+                        ["source_id" => $item['id']],
+                        "source_type LIKE 'smart_shop_order%'",
+                        "flag" => 1,
+                        "is_delete" => 0,
+                        "type" => 1
+                    ])->sum("income")), 2);
                 }
             }
 

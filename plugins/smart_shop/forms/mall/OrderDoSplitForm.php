@@ -116,7 +116,7 @@ class OrderDoSplitForm extends BaseModel{
             $order->status        = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;
             $order->updated_at    = time();
             $order->split_data    = json_encode($splitData);
-            $order->split_amount += $amount;
+            $order->split_amount  = $amount;
             if(!$order->save()){
                 throw new \Exception(json_encode($order->getErrors()));
             }
@@ -209,7 +209,7 @@ class OrderDoSplitForm extends BaseModel{
             $order->status        = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;
             $order->updated_at    = time();
             $order->split_data    = json_encode($splitData);
-            $order->split_amount += floatval($amount/100);
+            $order->split_amount  = floatval($amount/100);
             if(!$order->save()){
                 throw new \Exception(json_encode($order->getErrors()));
             }

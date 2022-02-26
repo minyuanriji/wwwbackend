@@ -111,6 +111,7 @@ class OrderDoSplitForm extends BaseModel{
         try {
             if($amount > 0){
                 $receiver = ["trans_in_type" => (string)$shop->setting['ali_fz_type'], "trans_in" => (string)$shop->setting['ali_fz_account'], "amount" => $amount, "description" => "商户服务费收取"];
+                $splitData['receivers'] = [$receiver];
             }
             $order->status        = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;
             $order->updated_at    = time();
@@ -202,9 +203,7 @@ class OrderDoSplitForm extends BaseModel{
 
             if($amount > 0){
                 $receiver = ["type" => $shop->setting['wechat_fz_type'], "account" => (string)$shop->setting['wechat_fz_account'], "amount" => $amount, "description" => "商户服务费收取"];
-                $splitData['receivers'][] = array_merge($receiver, [
-                    "option" => $option
-                ]);
+                $splitData['receivers'] = [$receiver];
             }
 
             $order->status        = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;

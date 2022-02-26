@@ -82,9 +82,9 @@ class OrderListForm extends BaseModel{
                         "AND",
                         ["source_id" => $item['id']],
                         "source_type LIKE 'smart_shop_order%'",
-                        "flag" => 1,
-                        "is_delete" => 0,
-                        "type" => 1
+                        ["flag" => 1],
+                        ["is_delete" => 0],
+                        ["type" => 1]
                     ])->sum("income")), 2);
                 }
             }

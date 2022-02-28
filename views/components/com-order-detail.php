@@ -578,12 +578,12 @@ Yii::$app->loadComponentView('order/com-city');
                                 <span style="color:darkred">￥-{{scope.row.use_score_price}}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column align="center" label="红包" width="120">
+                        <el-table-column align="center" label="金豆" width="120">
                             <template slot-scope="scope">
                                 <span style="color:darkred">￥-{{scope.row.integral_price}}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column align="center" label="购物券" width="120">
+                        <el-table-column align="center" label="红包" width="120">
                             <template slot-scope="scope">
                                 <span style="color:darkred">￥-{{scope.row.shopping_voucher_decode_price}}</span>
                             </template>
@@ -602,7 +602,7 @@ Yii::$app->loadComponentView('order/com-city');
                         <el-form-item label="积分抵扣" v-if="order.score_deduction_price != 0.00">
                             <span style="color:#ff4544;">-￥{{ order.score_deduction_price }}</span>
                         </el-form-item>
-                        <el-form-item label="红包券抵扣" v-if="order.integral_deduction_price != 0.00">
+                        <el-form-item label="金豆券抵扣" v-if="order.integral_deduction_price != 0.00">
                             <span style="color:#ff4544;">-￥{{ order.integral_deduction_price }}</span>
                         </el-form-item>
                         <el-form-item label="优惠券抵扣" v-if="order.coupon_discount_price != 0.00">
@@ -632,10 +632,10 @@ Yii::$app->loadComponentView('order/com-city');
                         <el-form-item label="积分抵扣">
                             <span style="color:#ff4544;">-￥{{ order.score_deduction_price }}</span>
                         </el-form-item>
-                        <el-form-item label="红包抵扣">
+                        <el-form-item label="金豆抵扣">
                             <span style="color:#ff4544;">-￥{{ order.integral_deduction_price }}</span>
                         </el-form-item>
-                        <el-form-item label="购物券抵扣">
+                        <el-form-item label="红包抵扣">
                             <span style="color:#ff4544;">-￥{{ order.shopping_voucher_decode_price }}</span>
                         </el-form-item>
                         <el-form-item label="实付款">

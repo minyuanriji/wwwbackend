@@ -328,7 +328,7 @@ abstract class BaseOrderForm extends BaseModel
         return $result;
     }
 
-    //获取购物券
+    //获取红包
     private function getShoppingVoucher ($detail_id)
     {
         $log =  ShoppingVoucherLog::find()->andWhere(['source_id' => $detail_id, 'source_type' => 'from_order_detail'])->select('id,money')->asArray()->one();
@@ -348,11 +348,11 @@ abstract class BaseOrderForm extends BaseModel
         return [
             'total_commission' => $this->getTotalCommission($order_id),//总分佣
 
-            'total_shopping_voucher' => $this->getTotalShoppingVoucher($detail_id),//总购物券
+            'total_shopping_voucher' => $this->getTotalShoppingVoucher($detail_id),//总红包
 
             /*'total_score' => $this->getTotalScore($order_id),//总积分
 
-            'total_red_envelopes' => $this->getTotalRedEnvelopes($order_id),//总红包*/
+            'total_red_envelopes' => $this->getTotalRedEnvelopes($order_id),//总金豆*/
         ];
     }
 
@@ -362,7 +362,7 @@ abstract class BaseOrderForm extends BaseModel
         return CommissionGoodsPriceLog::find()->where(['order_id' => $order_id])->sum('price');
     }
 
-    //获取总购物券
+    //获取总红包
     private function getTotalShoppingVoucher ($detail_id)
     {
         return ShoppingVoucherLog::find()->andWhere([
@@ -555,11 +555,11 @@ abstract class BaseOrderForm extends BaseModel
                 ['o.cancel_status' => 0]
             ]);
 
-        $query->keyword($this->pay_type == 0, ['AND', ['>','o.integral_deduction_price','0']])//红包
+        $query->keyword($this->pay_type == 0, ['AND', ['>','o.integral_deduction_price','0']])//金豆
             ->keyword($this->pay_type == 1, ['o.pay_type' => 3])//余额
             ->keyword($this->pay_type == 2, ['o.pay_type' => 1])//现金
             ->keyword($this->pay_type == 3, ['AND', ['>','o.score_deduction_price','0']])//积分
-            ->keyword($this->pay_type == 4, ['AND', ['>','o.shopping_voucher_decode_price','0']]);//购物券
+            ->keyword($this->pay_type == 4, ['AND', ['>','o.shopping_voucher_decode_price','0']]);//红包
 
         if ($this->user_id) {
             $query->andWhere(['o.user_id' => $this->user_id]);
@@ -901,7 +901,7 @@ abstract class BaseOrderForm extends BaseModel
         $TotalItemQuery = clone $query;
         $Array['TotalItem'] = $TotalItemQuery->leftJoin(["od" => OrderDetail::tableName()], "od.order_id = o.id")->sum('od.num');
 
-        //红包抵扣金额
+        //金豆抵扣金额
         $RedAmountQuery = clone $query;
         $Array['RedAmount'] = $RedAmountQuery->sum('integral_deduction_price');
 
@@ -909,7 +909,7 @@ abstract class BaseOrderForm extends BaseModel
         $integralQuery = clone $query;
         $Array['integral'] = $integralQuery->sum('use_score');
 
-        //购物券抵扣金额
+        //红包抵扣金额
         $ShoppingVoucherQuery = clone $query;
         $Array['ShoppingVoucher'] = $ShoppingVoucherQuery->sum('shopping_voucher_use_num');
 

@@ -27,7 +27,7 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
     }
 
     /**
-     * 红包券抵扣
+     * 金豆券抵扣
      * @return boolean
      */
     public function save(){
@@ -42,14 +42,14 @@ class CheckoutOrderDeductIntegralForm extends BaseModel{
                 throw new \Exception("抵扣金额必须大于0");
             }
 
-            //需要抵扣的红包券数
+            //需要抵扣的金豆券数
             $integralDeductionPrice = (float)$this->deduction_price ;
 
             //用户对象
             $user = User::findOne($this->user_id);
             $beforeMoney = $user->static_integral;
 
-            $desc = $this->desc . '（永久红包券抵扣）';
+            $desc = $this->desc . '（永久金豆券抵扣）';
 
             $record = array(
                 'controller_type' => 1,

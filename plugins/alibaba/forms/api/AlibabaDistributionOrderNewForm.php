@@ -22,7 +22,7 @@ class AlibabaDistributionOrderNewForm extends BaseModel{
     }
 
     /**
-     * 使用购物券抵扣运费的比例
+     * 使用红包抵扣运费的比例
      * @return float
      */
     public static function getShoppingVoucherDecodeExpressRate(){
@@ -121,7 +121,7 @@ class AlibabaDistributionOrderNewForm extends BaseModel{
         ];
         $userAddress = !empty($this->address) ? array_merge($userAddressTpl, @json_decode($this->address, true)) : $userAddressTpl;
 
-        //计算对应的购物券兑换价格
+        //计算对应的红包兑换价格
         foreach($orderItem["goods_list"] as $key => $goodsItem){
             $voucherGoods = ShoppingVoucherTargetAlibabaDistributionGoods::findOne([
                 "goods_id"  => $goodsItem['id'],
@@ -129,16 +129,16 @@ class AlibabaDistributionOrderNewForm extends BaseModel{
                 "is_delete" => 0
             ]);
             if(!$voucherGoods){
-                throw new \Exception("[".$goodsItem['id'].":".$goodsItem['sku_id']."]非购物券兑换商品");
+                throw new \Exception("[".$goodsItem['id'].":".$goodsItem['sku_id']."]非红包兑换商品");
             }
 
-            //商品对应购物券价
+            //商品对应红包价
             $ratio = $voucherGoods->voucher_price/$goodsItem['price'];
             $orderItem["goods_list"][$key]['sv_price']       = floatval($goodsItem['total_price']) * $ratio;
             $orderItem["goods_list"][$key]['sv_total_price'] = $orderItem["goods_list"][$key]['sv_price'] * $goodsItem['num'];
             $orderItem["goods_list"][$key]['sv_radio']       = $ratio;
 
-            //运费对应购物券价
+            //运费对应红包价
             $ratio = static::getShoppingVoucherDecodeExpressRate(); //运费抵扣比例
             $orderItem["goods_list"][$key]['sv_freight_price'] = $goodsItem['freight_price'] * (1/$ratio);
         }
@@ -157,7 +157,7 @@ class AlibabaDistributionOrderNewForm extends BaseModel{
         $orderItem['express_origin_price']    = $orderItem['express_price'];
         $orderItem['sv_express_origin_price'] = $orderItem['sv_express_price'];
 
-        //购物券抵扣商品
+        //红包抵扣商品
         $orderItem['shopping_voucher_use_num']              = 0;
         $orderItem['shopping_voucher_decode_price']         = 0;
         $orderItem['shopping_voucher_express_use_num']      = 0;
@@ -195,7 +195,7 @@ class AlibabaDistributionOrderNewForm extends BaseModel{
             $mainData['shopping_voucher']['remaining']      = $remaining;
         }
 
-        //购物券抵扣运费
+        //红包抵扣运费
         if($mainData['shopping_voucher']['remaining'] > $orderItem['sv_express_price']){
             $orderItem['shopping_voucher_express_decode_price'] = $orderItem['express_price'];
             $orderItem['shopping_voucher_express_use_num']      = $orderItem['sv_express_price'];

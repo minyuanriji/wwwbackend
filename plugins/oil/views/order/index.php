@@ -61,7 +61,7 @@
                             <span v-if="scope.row.pay_status == 'paid'">
                                 <div>支付日期：{{scope.row.pay_at}}</div>
                                 <div>使用现金：<span style="color:darkgreen">{{scope.row.pay_price}}元</span></div>
-                                <div>红包抵扣：<span style="color:darkred">{{scope.row.integral_deduction_price}}</span></div>
+                                <div>金豆抵扣：<span style="color:darkred">{{scope.row.integral_deduction_price}}</span></div>
                             </span>
                             <span v-else>-</span>
                         </template>

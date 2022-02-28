@@ -116,14 +116,14 @@ class MchForm extends BaseModel
             $detail['password'] = $detail['mchAdmin']['password'];
             $detail['admin_id'] = $detail['mchAdmin']['id'];
 
-            //编辑购物券赠送所需参数
+            //编辑红包赠送所需参数
             $detail['give_shopping_params'][0]['id'] = $this->id;
             $detail['give_shopping_params'][0]['mall_id'] = \Yii::$app->mall->id;
             $detail['give_shopping_params'][0]['store_id'] = $detail['store']['id'];
             $detail['give_shopping_params'][0]['name'] = $detail['store']['name'];
             $detail['give_shopping_params'][0]['cover_url'] = $detail['store']['cover_url'];
 
-            //获取购物券赠送比列
+            //获取红包赠送比列
             $shoppingVoucherResult = ShoppingVoucherFromStore::findOne([
                 "mall_id" => \Yii::$app->mall->id,
                 "store_id" => $detail['store']['id']

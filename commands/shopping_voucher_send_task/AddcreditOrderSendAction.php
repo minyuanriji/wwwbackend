@@ -46,13 +46,13 @@ class AddcreditOrderSendAction extends Action{
                 }
                 $modifyForm = new ShoppingVoucherLogModifiyForm([
                     "money"       => $sendLog['money'],
-                    "desc"        => "话费充值获得赠送购物券",
+                    "desc"        => "话费充值获得赠送红包",
                     "source_id"   => $sendLog['source_id'],
                     "source_type" => $sendLog['source_type']
                 ]);
                 $modifyForm->add($user, true);
                 $sendLogIds[] = $sendLog['id'];
-                $this->controller->commandOut("购物券发放记录ID:" . $sendLog['id'] . "处理完成");
+                $this->controller->commandOut("红包发放记录ID:" . $sendLog['id'] . "处理完成");
             }catch (\Exception $e){
                 $remark = implode("\n", [$e->getMessage(), "line:" . $e->getLine(), "file:".$e->getFile()]);
                 ShoppingVoucherSendLog::updateAll([
@@ -143,7 +143,7 @@ class AddcreditOrderSendAction extends Action{
 
             $money = $value['pay_price'] * (floatval($ratio)/100);
 
-            //慢充，新用户第一次购物券赠超过100部分按50%赠送
+            //慢充，新用户第一次红包赠超过100部分按50%赠送
             if ($mobile_count <=1 && $money > 100 && $productData[$value['product_id']]['type'] != 'fast') {
                 $money = 100 + ($money - 100) * 0.5;
             }
@@ -161,7 +161,7 @@ class AddcreditOrderSendAction extends Action{
             ]);
 
             if($sendLog->save()){
-                $this->controller->commandOut("购物券发放记录创建成功，ID:" . $sendLog->id);
+                $this->controller->commandOut("红包发放记录创建成功，ID:" . $sendLog->id);
             }else{
                 $this->controller->commandOut(json_encode($sendLog->getErrors()));
             }

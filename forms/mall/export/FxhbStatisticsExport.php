@@ -71,7 +71,7 @@ class FxhbStatisticsExport extends BaseExport
         $this->getFields();
         $dataList = $this->getDataList();
 
-        $fileName = '拆红包统计' . date('YmdHis');
+        $fileName = '拆金豆统计' . date('YmdHis');
         (new CsvExport())->export($dataList, $this->fieldsNameList, $fileName);
     }
 

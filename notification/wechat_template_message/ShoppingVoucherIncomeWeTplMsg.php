@@ -2,7 +2,7 @@
 namespace app\notification\wechat_template_message;
 
 /***
- * 购物券收入微信公众号通知
+ * 红包收入微信公众号通知
  * @package app\notification\wechat_template_message
  * @property string $openid
  * @property string $data

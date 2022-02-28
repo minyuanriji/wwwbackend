@@ -59,7 +59,7 @@
                         <div>购买数量：<b style="color:#cc3311">{{scope.row.num}}</b></div>
                         <div>商品原总价(优惠前)：<b style="color:#cc3311">{{scope.row.total_original_price}}元</b></div>
                         <div>扣除积分：<b style="color:#cc3311">{{scope.row.use_score_price}}</b></div>
-                        <div>扣除红包：<b style="color:#cc3311">{{scope.row.integral_price}}</b></div>
+                        <div>扣除金豆：<b style="color:#cc3311">{{scope.row.integral_price}}</b></div>
                         <div>商品总价(优惠后)：<b style="color:#cc3311">{{scope.row.total_price}}元</b></div>
                         <div>实际支付（含运费）：<b style="color:#cc3311">{{scope.row.total_pay_price}}元</b></div>
                     </template>

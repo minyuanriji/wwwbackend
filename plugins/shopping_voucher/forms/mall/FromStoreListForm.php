@@ -122,7 +122,7 @@ class FromStoreListForm extends BaseModel {
             }
             $selects[] = "IFNULL(({$sql}), 0) as total_income";
 
-            //赠购物券统计
+            //赠红包统计
             $sql = "select sum(money) from jxmall_plugin_shopping_voucher_send_log l inner join jxmall_plugin_mch_checkout_order mco on mco.id=l.source_id where l.source_type='from_mch_checkout_order' and l.`status`='success' and mco.store_id=s.id";
             if($this->send_stat_date){
                 $sql .= " AND l.created_at>='".strtotime($this->send_stat_date[0])."' AND l.created_at<'".strtotime($this->send_stat_date[1])."'";

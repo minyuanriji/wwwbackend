@@ -41,7 +41,7 @@
                     <tr class="c4">
                         <td class="label">现金支付： </td>
                         <td>{{order.pay_price}}元</td>
-                        <td class="label">红包支付： </td>
+                        <td class="label">金豆支付： </td>
                         <td>{{order.integral_deduction_price}}元</td>
                     </tr>
                     <tr class="c2">

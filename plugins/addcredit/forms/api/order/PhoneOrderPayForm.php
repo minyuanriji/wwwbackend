@@ -43,13 +43,13 @@ class PhoneOrderPayForm extends BaseModel
             }
 
             if ($user->static_integral < $this->order_price) {
-                throw new \Exception("红包数量不足");
+                throw new \Exception("金豆数量不足");
             }
 
-            //扣取红包
+            //扣取金豆
             $res = UserIntegralForm::PhoneBillOrderPaySub($addcredit_order, $user, $addcredit_order->integral_deduction_price);
             if ($res['code'] != ApiCode::CODE_SUCCESS) {
-                throw new \Exception("红包扣取失败：" . $res['msg']);
+                throw new \Exception("金豆扣取失败：" . $res['msg']);
             }
 
             //更新订单状态为已支付

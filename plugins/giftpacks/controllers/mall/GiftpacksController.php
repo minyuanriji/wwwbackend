@@ -99,7 +99,7 @@ class GiftpacksController extends Controller{
     }
 
     /**
-     * 购物券设置
+     * 红包设置
      * @return \yii\web\Response
      */
     public function actionShoppingVoucherSetting()

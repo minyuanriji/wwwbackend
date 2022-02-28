@@ -46,7 +46,7 @@ class OrderRefundSuccessNotification
         (new OrderRefundSuccessNotificationWeTplMsg([
             "mall_id"           => $order_refund->mall_id,
             "openid"            => $userInfo->openid,
-            "price"             => $order_refund->reality_refund_price . '+红包（' . $order->integral_deduction_price . '）',
+            "price"             => $order_refund->reality_refund_price . '+金豆（' . $order->integral_deduction_price . '）',
             "goods_name"        => $goods->goodsWarehouse->name,
             "order_no"          => $order_refund->order_no,
             "remark"            => ($order_refund->type == 1 || $order_refund->type == 2)

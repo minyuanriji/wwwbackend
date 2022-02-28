@@ -98,7 +98,7 @@ class OrderSubmitForm extends BaseModel
     protected $enableScore = true;
 
     /**
-     * 是否开启红包券
+     * 是否开启金豆券
      * @var bool
      */
     protected $enableIntegral = true;
@@ -325,10 +325,10 @@ class OrderSubmitForm extends BaseModel
                 $order->use_score = $orderItem['score']['use'] ? $orderItem['score']['use_num'] : 0;
                 //积分抵扣
                 $order->score_deduction_price = $orderItem['score']['use'] ? $orderItem['score']['deduction_price'] : 0;
-                //红包券抵扣
+                //金豆券抵扣
                 $order->integral_deduction_price = $orderItem['integral']['use'] ? $orderItem['integral']['integral_deduction_price'] : 0;
 
-                //购物券抵扣
+                //红包抵扣
                 $order->shopping_voucher_use_num = $orderItem['shopping_voucher_use_num'];
                 $order->shopping_voucher_decode_price = $orderItem['shopping_voucher_decode_price'];
 
@@ -437,11 +437,11 @@ class OrderSubmitForm extends BaseModel
                 }
 
 
-                //扣除购物券
+                //扣除红包
                 if ($order->shopping_voucher_use_num > 0) {
                     $modifyForm = new ShoppingVoucherLogModifiyForm([
                         "money" => $order->shopping_voucher_use_num,
-                        "desc" => "订单(" . $order->id . ")创建扣除购物券：" . $order->shopping_voucher_use_num,
+                        "desc" => "订单(" . $order->id . ")创建扣除红包：" . $order->shopping_voucher_use_num,
                         "source_id" => $order->id,
                         "source_type" => "target_order"
                     ]);
@@ -457,11 +457,11 @@ class OrderSubmitForm extends BaseModel
                 }
 
 
-                // 扣除红包券
+                // 扣除金豆券
                 if ($order->integral_deduction_price) {
                     $res = IntegralDeduct::buyGooodsDeduct($order, 1);
                     if ($res === false) {
-                        return $this->returnApiResultData(ApiCode::CODE_FAIL, '红包券扣除失败。');
+                        return $this->returnApiResultData(ApiCode::CODE_FAIL, '金豆券扣除失败。');
                     }
                 }
                 //开放额外的订单处理接口
@@ -700,7 +700,7 @@ class OrderSubmitForm extends BaseModel
             } else {
                 $use_score = false;
             }
-            //是否使用红包券
+            //是否使用金豆券
             if (isset($this->form_data['use_integral']) && $this->form_data['use_integral'] == 1) {
                 $use_integral = true;
             } else {
@@ -712,7 +712,7 @@ class OrderSubmitForm extends BaseModel
             $item = $ScoreService->countScore();
 
 
-            //计算红包券总额
+            //计算金豆券总额
             $user_integral = isset($IntegralService) ? $IntegralService->getRemainingIntegral() : User::getCanUseIntegral(\Yii::$app->user->id);
             $IntegralService = new IntegralService($item, $user_integral, $type, $use_integral, $this->enableIntegral);
             $item = $IntegralService->countIntegral();
@@ -744,7 +744,7 @@ class OrderSubmitForm extends BaseModel
 
         }
 
-        //使用购物券
+        //使用红包
         $userRemainingShoppingVoucher = (float)ShoppingVoucherUser::find()->where([
             "user_id" => \Yii::$app->user->id
         ])->select("money")->scalar();
@@ -760,7 +760,7 @@ class OrderSubmitForm extends BaseModel
                 $goodsItem['use_shopping_voucher'] = 0;
                 $goodsItem['use_shopping_voucher_decode_price'] = 0;
                 $goodsItem['use_shopping_voucher_num'] = 0;
-                //如果用户选择使用购物券按支付
+                //如果用户选择使用红包按支付
                 if ($goodsItem['total_price'] > 0 && $shoppingVoucherUseData['use']) {
                     $voucherGoods = ShoppingVoucherTargetGoods::findOne([
                         "goods_id" => $goodsItem['id'],
@@ -771,7 +771,7 @@ class OrderSubmitForm extends BaseModel
 
                     $goodsItem['use_shopping_voucher'] = 1;
 
-                    //计算购物券价与商品价格比例
+                    //计算红包价与商品价格比例
                     $ratio = $voucherGoods->voucher_price / $goodsItem['goods_attr']['price'];
                     if (($userRemainingShoppingVoucher / $ratio) > $goodsItem['total_price']) {
                         $needNum = floatval($goodsItem['total_price']) * $ratio;
@@ -909,7 +909,7 @@ class OrderSubmitForm extends BaseModel
         } else {
             $score_enable = false;
         }
-        //红包券开关
+        //金豆券开关
         if ($this->enableIntegral) {
             $integral_enable = isset($optionCache->integral_status) ? $optionCache->integral_status : false;
         } else {
@@ -930,10 +930,10 @@ class OrderSubmitForm extends BaseModel
             }
         }
 
-        //购物券使用开关
+        //红包使用开关
         $shoppingVoucherUseData['enable'] = true;
 
-        //确认收货可获得购物券数量
+        //确认收货可获得红包数量
         $gotShoppingVoucherNum = $this->gotShoppingVoucherNum($listData);
 
         return [
@@ -951,7 +951,7 @@ class OrderSubmitForm extends BaseModel
             'all_self_mention' => $allSelfMention,
             'hasCity' => $hasCity,
             'score_enable' => $score_enable,
-            'integral_enable' => $integral_enable, //红包券
+            'integral_enable' => $integral_enable, //金豆券
             'shopping_voucher' => $shoppingVoucherUseData,
             'form_data' => [
                 'sign' => isset($this->form_data['sign']) ? $this->form_data['sign'] : null,
@@ -962,14 +962,14 @@ class OrderSubmitForm extends BaseModel
     }
 
     /**
-     * 计算可获得的购物券
+     * 计算可获得的红包
      * @param $listData
      * @return float
      */
     public function gotShoppingVoucherNum($listData){
         $gotShoppingVoucherNum = 0;
 
-        //支付商品费用可获得购物券
+        //支付商品费用可获得红包
         $goodsIdPrices = [];
         foreach ($listData as &$item) {
             foreach ($item['goods_list'] as $goods) {
@@ -996,11 +996,11 @@ class OrderSubmitForm extends BaseModel
             }
         }
 
-        //支付运费可获得购物券数量
+        //支付运费可获得红包数量
         foreach ($listData as &$item) {
             $item['enable_express_got_shopping_voucher'] = 0;
             if(!$item['express_price'] > 0) continue;
-            //只要有满足一个商品支持运费送购物券
+            //只要有满足一个商品支持运费送红包
             foreach($item['goods_list'] as $goodsItem){
                 if(in_array($goodsItem['id'], $enableExpressfromGoodsIds)){
                     $item['enable_express_got_shopping_voucher'] = 1;
@@ -2679,11 +2679,11 @@ class OrderSubmitForm extends BaseModel
         $orderDetail->use_score = $goodsItem['use_score'];
         $orderDetail->score_price = $goodsItem['score_price'];
 
-        //红包券抵扣
+        //金豆券抵扣
         $orderDetail->integral_price = $goodsItem['integral_price'];
         $orderDetail->integral_fee_rate = $goodsItem['integral_fee_rate'];
 
-        //购物券抵扣
+        //红包抵扣
         $orderDetail->shopping_voucher_decode_price = $goodsItem['use_shopping_voucher_decode_price'];
         $orderDetail->shopping_voucher_num = $goodsItem['use_shopping_voucher_num'];
 

@@ -8,7 +8,7 @@ echo $this->render("../com/com-tab-target");
         <com-tab-target :current="activeName"></com-tab-target>
 
         <div class="table-body">
-            <el-alert title="说明：用户在商城下单，可使用购物券进行抵扣支付" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
+            <el-alert title="说明：用户在商城下单，可使用红包进行抵扣支付" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
 
             <div class="input-item">
                 <el-input @keyup.enter.native="search" placeholder="请输入关键词搜索" v-model="searchData.keyword" clearable @clear="search">
@@ -39,7 +39,7 @@ echo $this->render("../com/com-tab-target");
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="voucher_price" width="200" label="购物券价"></el-table-column>
+                <el-table-column prop="voucher_price" width="200" label="红包价"></el-table-column>
                 <el-table-column prop="scope" width="150" label="添加时间">
                     <template slot-scope="scope">
                         {{scope.row.created_at|dateTimeFormat('Y-m-d')}}

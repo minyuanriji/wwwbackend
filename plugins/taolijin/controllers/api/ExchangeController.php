@@ -28,7 +28,7 @@ class ExchangeController extends ApiController {
     }
 
     /**
-     * 使用红包生成礼金
+     * 使用金豆生成礼金
      * @return \yii\web\Response
      */
     public function actionIntegralToLj(){

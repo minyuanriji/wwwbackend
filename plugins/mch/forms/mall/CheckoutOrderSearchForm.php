@@ -119,7 +119,7 @@ class CheckoutOrderSearchForm extends BaseModel
                 foreach ($list as $key => $row) {
                     $list[$key]['format_pay_time'] = date("Y-m-d H:i:s", $row['pay_at']);
 
-                    //获取赠送购物券
+                    //获取赠送红包
                     $shoppingVoucherSend = ShoppingVoucherSendLog::find()->where([
                         'mall_id' => \Yii::$app->mall->id,
                         'user_id' => $row['pay_user_id'],

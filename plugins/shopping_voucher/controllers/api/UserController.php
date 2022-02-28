@@ -18,7 +18,7 @@ class UserController extends ApiController{
     }
 
     /**
-     * 用户购物券记录
+     * 用户红包记录
      * @return \yii\web\Response
      */
     public function actionLog(){

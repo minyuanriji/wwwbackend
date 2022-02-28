@@ -55,7 +55,7 @@ class VoucherConsumptionNotification
                 'first'     => '恭喜您！购买的商品已支付成功，请留意物流信息哦！么么哒！~~',
                 'keyword1'  => $order->order_no,
                 'keyword2'  => $goodWare->name,
-                'keyword3'  => $orderDetail->shopping_voucher_num . '购物券',
+                'keyword3'  => $orderDetail->shopping_voucher_num . '红包',
                 'keyword4'  => '已支付',
                 'keyword5'  => date('Y-m-d H:i:s', $order->pay_at),
                 'remark'    => '欢迎您的到来！'

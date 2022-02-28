@@ -77,7 +77,7 @@ Yii::$app->loadComponentView('statistics/com-search');
                     </div>
                 </div>
                 <div class="num-info-item">
-                    <div class="info-item-name">红包</div>
+                    <div class="info-item-name">金豆</div>
                     <div id="assets" style="margin-top: 17px">{{countUser.static_integral}}</div>
                 </div>
                 <div class="num-info-item">
@@ -94,7 +94,7 @@ Yii::$app->loadComponentView('statistics/com-search');
                     </div>
                 </div>
                 <div class="num-info-item">
-                    <div class="info-item-name">购物券</div>
+                    <div class="info-item-name">红包</div>
                     <div id="assets" style="margin-top: 17px">{{countUser.money ?? 0}}</div>
                 </div>
             </div>
@@ -155,7 +155,7 @@ Yii::$app->loadComponentView('statistics/com-search');
                         </div>
                     </div>
                     <div class="num-info-item">
-                        <div class="info-item-name">红包</div>
+                        <div class="info-item-name">金豆</div>
                         <div style="display: flex;justify-content: space-evenly">
                             <div>
                                 <div>收入</div>
@@ -198,7 +198,7 @@ Yii::$app->loadComponentView('statistics/com-search');
                         </div>
                     </div>
                     <div class="num-info-item">
-                        <div class="info-item-name">购物券</div>
+                        <div class="info-item-name">红包</div>
                         <div style="display: flex;justify-content: space-evenly">
                             <div>
                                 <div>收入</div>
@@ -216,9 +216,9 @@ Yii::$app->loadComponentView('statistics/com-search');
 
             <el-tabs v-model="search.type" @tab-click="tab_assets">
                 <el-tab-pane label="收益" name="income"></el-tab-pane>
-                <el-tab-pane label="红包" name="RedPacket"></el-tab-pane>
+                <el-tab-pane label="金豆" name="RedPacket"></el-tab-pane>
                 <el-tab-pane label="积分" name="Integral"></el-tab-pane>
-                <el-tab-pane label="购物券" name="ShoppingVoucher"></el-tab-pane>
+                <el-tab-pane label="红包" name="ShoppingVoucher"></el-tab-pane>
                 <el-tab-pane label="余额" name="balance"></el-tab-pane>
             </el-tabs>
 
@@ -820,7 +820,7 @@ Yii::$app->loadComponentView('statistics/com-search');
                 this.getList();
             },
 
-            <!-- --------------------红包分页------------------ -->
+            <!-- --------------------金豆分页------------------ -->
             RedPacket_incomePagination_pageChange(currentPage) {
                 this.RedPacket_incomePagination_page = currentPage;
                 this.getList();
@@ -848,7 +848,7 @@ Yii::$app->loadComponentView('statistics/com-search');
                 this.getList();
             },
 
-            <!-- --------------------购物券分页------------------ -->
+            <!-- --------------------红包分页------------------ -->
             ShoppingVoucher_incomePagination_pageChange(currentPage) {
                 this.ShoppingVoucher_incomePagination_page = currentPage;
                 this.getList();

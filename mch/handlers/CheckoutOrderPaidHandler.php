@@ -55,7 +55,7 @@ class CheckoutOrderPaidHandler {
                 //获取商户信息
                 $mch = Mch::findOne($store_name->mch_id);
 
-                //红包券抵扣
+                //金豆券抵扣
                 if($checkoutOrder->integral_deduction_price > 0){
                     $deductIntegralForm = new CheckoutOrderDeductIntegralForm([
                         "user_id"           => $checkoutOrder->pay_user_id,

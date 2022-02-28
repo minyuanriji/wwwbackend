@@ -59,7 +59,7 @@
                 <el-table-column prop="controller_type" label="类型">
                   <template slot-scope="scope">
                     <span v-if="scope.row.controller_type == 0" style="color: green">积分券</span>
-                    <span v-if="scope.row.controller_type == 1" style="color: red">购物券</span>
+                    <span v-if="scope.row.controller_type == 1" style="color: red">红包</span>
                   </template>
                 </el-table-column>
 

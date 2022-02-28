@@ -4,8 +4,8 @@
             <span>异常警告</span>
         </div>
         <el-tabs v-model="activeName" type="card">
-            <el-tab-pane label="全部" name="all">赠送红包异常</el-tab-pane>
-            <el-tab-pane label="赠送红包" name="integral">赠送红包异常</el-tab-pane>
+            <el-tab-pane label="全部" name="all">赠送金豆异常</el-tab-pane>
+            <el-tab-pane label="赠送金豆" name="integral">赠送金豆异常</el-tab-pane>
             <el-tab-pane label="用户提现" name="user_cash">用户提现</el-tab-pane>
             <el-tab-pane label="用户收益" name="user_income">用户收益异常</el-tab-pane>
             <el-tab-pane label="商户提现" name="mch_cash">商户提现异常</el-tab-pane>

@@ -19,7 +19,7 @@ class Plugin extends \app\plugins\Plugin
     {
         return [
             'key' => $this->getName(),
-            'name' => '购物券',
+            'name' => '红包',
             'route' => $this->getIndexRoute(),
             'children' => $this->getMenus(),
             'icon' => 'statics/img/mall/nav/finance.png',
@@ -37,7 +37,7 @@ class Plugin extends \app\plugins\Plugin
                 'action' => []
             ],
             [
-                'name' => '购物券记录',
+                'name' => '红包记录',
                 'route' => 'plugin/shopping_voucher/mall/shopping-voucher-log/list',
                 'icon' => 'el-icon-setting',
                 'action' => []
@@ -80,7 +80,7 @@ class Plugin extends \app\plugins\Plugin
      */
     public function getDisplayName()
     {
-        return '购物券';
+        return '红包';
     }
 
 

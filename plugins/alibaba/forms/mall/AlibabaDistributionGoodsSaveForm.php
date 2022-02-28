@@ -94,7 +94,7 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                         throw new \Exception($this->responseErrorMsg($sku));
                     }
 
-                    //加入购物券消费场景
+                    //加入红包消费场景
                     $shoppingVoucheGoods = ShoppingVoucherTargetAlibabaDistributionGoods::findOne([
                         "goods_id" => $goods->id,
                         "sku_id"   => $sku->id,
@@ -119,7 +119,7 @@ class AlibabaDistributionGoodsSaveForm extends BaseModel{
                 }
             }
 
-            //加入购物券消费场景（针对默认规格）
+            //加入红包消费场景（针对默认规格）
             $shoppingVoucheGoods = ShoppingVoucherTargetAlibabaDistributionGoods::findOne([
                 "goods_id" => $goods->id,
                 "sku_id"   => 0,

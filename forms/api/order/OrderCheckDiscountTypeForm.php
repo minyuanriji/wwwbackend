@@ -75,12 +75,12 @@ class OrderCheckDiscountTypeForm extends BaseModel
                 $returnDate['use_score'] = 1;
             }
 
-            //判断红包是否可以使用
+            //判断金豆是否可以使用
             if (($user->static_integral > 0 || $user->dynamic_integral > 0) && $max_red_envelopes > 0) {
                 $returnDate['use_red_envelopes'] = 1;
             }
 
-            //判断购物券是否可以使用
+            //判断红包是否可以使用
             if ($user_voucher && $user_voucher->money > 0 && $targetGoods) {
                 $returnDate['use_shopping_voucher'] = 1;
             }

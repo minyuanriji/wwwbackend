@@ -94,7 +94,7 @@ class UserIntegralForm extends BaseModel{
     public static function hotelOrderRefundAdd(HotelRefundApplyOrder $refundApplyOrder, User $user){
         $t = \Yii::$app->db->beginTransaction();
         try {
-            $desc = "酒店预订单[".$refundApplyOrder->order_id."]取消，返还红包";
+            $desc = "酒店预订单[".$refundApplyOrder->order_id."]取消，返还金豆";
 
             static::change($user, $refundApplyOrder->refund_price, self::TYPE_ADD, "hotel_order_refund", $refundApplyOrder->id, $desc);
 
@@ -151,7 +151,7 @@ class UserIntegralForm extends BaseModel{
         $t = \Yii::$app->db->beginTransaction();
         try {
             if($record->controller_type != 1){
-                throw new \Exception("非红包记录类型无法操作");
+                throw new \Exception("非金豆记录类型无法操作");
             }
 
             $type  = $record->money >= 0 ? self::TYPE_ADD : self::TYPE_SUB;
@@ -186,7 +186,7 @@ class UserIntegralForm extends BaseModel{
     public static function orderRefundAdd(User $user, $price, $source_id){
         $t = \Yii::$app->db->beginTransaction();
         try {
-            $desc = "订单[Detail Id:".$source_id."]退款退还红包券";
+            $desc = "订单[Detail Id:".$source_id."]退款退还金豆券";
 
             static::change($user, $price, self::TYPE_ADD, "order_refund", $source_id, $desc);
 
@@ -207,7 +207,7 @@ class UserIntegralForm extends BaseModel{
     }
 
     /**
-     * 结帐单红包抵扣
+     * 结帐单金豆抵扣
      * @param User $user
      * @param $price
      * @param $source_id
@@ -217,7 +217,7 @@ class UserIntegralForm extends BaseModel{
         $t = \Yii::$app->db->beginTransaction();
         try {
             if(empty($desc)){
-                $desc = "红包券抵扣";
+                $desc = "金豆券抵扣";
             }
 
             static::change($user, $price, self::TYPE_SUB, "checkout", $source_id, $desc);
@@ -371,7 +371,7 @@ class UserIntegralForm extends BaseModel{
     public static function PhoneBillOrderRefundAdd(User $user, $price, $source_id){
         $t = \Yii::$app->db->beginTransaction();
         try {
-            $desc = "话费订单[Detail Id:".$source_id."]退款退还红包券";
+            $desc = "话费订单[Detail Id:".$source_id."]退款退还金豆券";
 
             static::change($user, $price, self::TYPE_ADD, "addcredit_refund", $source_id, $desc);
 

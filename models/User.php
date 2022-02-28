@@ -39,7 +39,7 @@ use Yii;
  * @property float $total_income 总收益
  * @property float $income 已收益
  * @property float $income_frozen 冻结收益
- * @property float $static_integral 静态红包
+ * @property float $static_integral 静态金豆
  * @property int $junior_at 成为下级时间
  * @property int $is_delete 是否删除
  * @property int $is_blacklist 是否黑名单
@@ -553,7 +553,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
 
 
     /**
-     * 获取用户可用红包券总额
+     * 获取用户可用金豆券总额
      * @Author bing
      * @DateTime 2020-10-08 17:10:02
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -566,7 +566,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
     }
 
     /**
-     * 获取用户可用红包券总额
+     * 获取用户可用金豆券总额
      * @Author bing
      * @DateTime 2020-10-08 17:10:02
      * @copyright: Copyright (c) 2020 广东七件事集团

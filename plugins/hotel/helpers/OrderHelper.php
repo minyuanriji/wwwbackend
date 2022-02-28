@@ -262,7 +262,7 @@ class OrderHelper{
     }
 
     /**
-     * 计算如果使用红包抵扣需要的数量
+     * 计算如果使用金豆抵扣需要的数量
      * @param float $price
      * @return float
      */

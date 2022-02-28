@@ -105,7 +105,7 @@ class SeckillGoodsSaveForm extends BaseModel
 
                     if ($item['shopping_voucher_deduction_price'] > 0) {
                         if ($item['seckill_price'] > 0 || $item['score_deduction_price'] > 0)
-                            throw new \Exception('选择购物券抵扣时不能选择秒杀价和积分抵扣');
+                            throw new \Exception('选择红包抵扣时不能选择秒杀价和积分抵扣');
 
                     }
 

@@ -18,10 +18,10 @@ class PriceDisplayService
     private $mall_id;
 
     const SETTING_KEY = "price_display"; //商品配置,自定义商品价格显示key
-    const INTEGRAL_PRICE_SETTING_KEY = "integral_price_display"; //商品配置,红包券会员价显示key
+    const INTEGRAL_PRICE_SETTING_KEY = "integral_price_display"; //商品配置,金豆券会员价显示key
 
     private $is_price_display = 1; //自定义商品价格显示前端是否显示
-    private $is_integral_price_display = 0; //红包券会员价前端是否显示
+    private $is_integral_price_display = 0; //金豆券会员价前端是否显示
 
     public function __construct($mall_id)
     {

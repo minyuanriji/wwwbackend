@@ -11,7 +11,7 @@ use app\models\User;
 class UserIntegralModifyForm extends BaseModel{
 
     public $type; //类型：1=收入，2=支出
-    public $integral; //变动红包
+    public $integral; //变动金豆
     public $desc; //变动说明
     public $source_id;
     public $source_type;
@@ -34,7 +34,7 @@ class UserIntegralModifyForm extends BaseModel{
             $user->static_integral = $currentIntegral + floatval($this->integral);
         }else{ //减少
             if($currentIntegral < floatval($this->integral)){
-                throw new \Exception("红包不足");
+                throw new \Exception("金豆不足");
             }
             $user->static_integral = max(0, $currentIntegral - floatval($this->integral));
         }

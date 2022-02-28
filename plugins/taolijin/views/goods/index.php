@@ -46,7 +46,7 @@ echo $this->render("com-edit");
                         </el-table-column>
                         <el-table-column prop="price" width="110" label="一口价"></el-table-column>
                         <el-table-column prop="ali_rate" width="110" label="佣金比（%）"></el-table-column>
-                        <el-table-column prop="deduct_integral" width="110" label="抵扣红包"></el-table-column>
+                        <el-table-column prop="deduct_integral" width="110" label="抵扣金豆"></el-table-column>
                         <el-table-column width="110" label="状态（上下架）">
                             <template slot-scope="scope">
                                 <el-switch v-model="scope.row.status" active-value="1" inactive-value="0"></el-switch>

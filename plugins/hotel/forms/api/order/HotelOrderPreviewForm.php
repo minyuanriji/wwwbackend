@@ -54,7 +54,7 @@ class HotelOrderPreviewForm extends BaseModel{
             //计算订单价格
             $orderPrice = $this->days * $this->num * $bookingItem['product_price'];
 
-            //如果使用红包抵扣
+            //如果使用金豆抵扣
             $integralDeductionPrice = 0;
             if($this->use_integral){
                 $integralDeductionPrice = $user->static_integral > $orderPrice ? $orderPrice : $user->static_integral;

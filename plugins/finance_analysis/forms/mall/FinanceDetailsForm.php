@@ -75,7 +75,7 @@ class FinanceDetailsForm extends BaseModel
         //获取收益
         $incomeQuery->leftJoin(['i' => IncomeLog::tableName()], "i.user_id=u.id");
 
-        //红包
+        //金豆
         $redPacketQuery->leftJoin(['it' => IntegralLog::tableName()], "it.user_id=u.id");
 
         //永久积分
@@ -87,7 +87,7 @@ class FinanceDetailsForm extends BaseModel
         //动态积分(支出)
         $dynamicDisIntegralQuery->leftJoin(['id' => IntegralDeduct::tableName()], "id.user_id=u.id");
 
-        //购物券
+        //红包
         $ShoppingVoucherQuery->leftJoin(['svl' => ShoppingVoucherLog::tableName()], "svl.user_id=u.id");
 
         $startTime = strtotime($this->start_time);
@@ -154,11 +154,11 @@ class FinanceDetailsForm extends BaseModel
         $balance = $this->getBalance($balanceQuery, $balanceType);
         /*-------------------------------收益---------------------------------------*/
         $income = $this->getIncome($incomeQuery, $incomeType);
-        /*-------------------------------红包---------------------------------------*/
+        /*-------------------------------金豆---------------------------------------*/
         $RedPacket = $this->getRedPacket($redPacketQuery, $redPacketType);
         /*-------------------------------积分---------------------------------------*/
         $Integral = $this->getIntegral($permanentIntegralQuery, $dynamicIntegralQuery, $dynamicDisIntegralQuery, $IntegralType);
-        /*-------------------------------购物券---------------------------------------*/
+        /*-------------------------------红包---------------------------------------*/
         $ShoppingVoucher = $this->getShoppingVoucher($ShoppingVoucherQuery, $ShoppingVoucherType);
 
         return $this->returnApiResultData(
@@ -270,11 +270,11 @@ class FinanceDetailsForm extends BaseModel
     protected function getRedPacket ($redPacketQuery, $type)
     {
         $incomePagination = $expenditurePagination = null;
-        //获取某个时间段收入红包
+        //获取某个时间段收入金豆
         $incomeQuery = clone $redPacketQuery;
         $incomeRedPacket = $incomeQuery->andWhere(['it.type' => 1])->sum('it.integral');
 
-        //获取某个时间段支出红包
+        //获取某个时间段支出金豆
         $expenditureQuery = clone $redPacketQuery;
         $expenditureRedPacket = $expenditureQuery->andWhere(['it.type' => 2])->sum('it.integral');
 
@@ -349,11 +349,11 @@ class FinanceDetailsForm extends BaseModel
     protected function getShoppingVoucher ($ShoppingVoucherQuery, $type)
     {
         $incomePagination = $expenditurePagination = null;
-        //获取某个时间段收入购物券
+        //获取某个时间段收入红包
         $incomeQuery = clone $ShoppingVoucherQuery;
         $incomeShoppingVoucher = $incomeQuery->andWhere(['svl.type' => 1])->sum('svl.money');
 
-        //获取某个时间段支出购物券
+        //获取某个时间段支出红包
         $expenditureQuery = clone $ShoppingVoucherQuery;
         $expenditureShoppingVoucher = $expenditureQuery->andWhere(['svl.type' => 2])->sum('svl.money');
         if ($type) {

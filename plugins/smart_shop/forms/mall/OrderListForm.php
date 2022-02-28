@@ -64,7 +64,7 @@ class OrderListForm extends BaseModel{
                         $item['parent'] = $parent ? $parent->getAttributes() : '';
                     }
 
-                    //统计赠送的购物券
+                    //统计赠送的红包
                     $item['shopping_voucher'] = round((float)ShoppingVoucherLog::find()->where([
                         "type"        => 1,
                         "source_id"   => $item['id'],

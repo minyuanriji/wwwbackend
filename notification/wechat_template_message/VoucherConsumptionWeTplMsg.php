@@ -2,7 +2,7 @@
 namespace app\notification\wechat_template_message;
 
 /***
- * 购物券消费微信公众号通知
+ * 红包消费微信公众号通知
  * Class MchApplyWeTplMsg
  * @package app\notification\wechat_template_message
  * @property string $openid

@@ -47,7 +47,7 @@ class UserCenterOrderRefundApplyForm extends BaseModel {
             }
 
 
-            //开始退款+退还红包、余额
+            //开始退款+退还金豆、余额
             /*$refundForm = new HotelOrderRefundActionForm([
                 "order_id" => $hotelOrder->id,
                 "mall_id"  => \Yii::$app->mall->id,

@@ -14,7 +14,7 @@
 	<!-- <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
 	    <div slot="header">
 	        <div>
-                <el-button :type="pageName=='plan' ? 'primary' : '' "  @click="$navigate('mall/finance/integral-plan')">红包券发放计划</el-button>
+                <el-button :type="pageName=='plan' ? 'primary' : '' "  @click="$navigate('mall/finance/integral-plan')">金豆券发放计划</el-button>
 	        </div>
 	    </div>
 	</el-card> -->

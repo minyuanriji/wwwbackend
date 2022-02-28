@@ -364,7 +364,7 @@ class CommonPageTwo extends BaseModel
         $this->isLog && $this->setLog($this->model['id']);
         return $data;
     }
-    //首页裂变拆红包
+    //首页裂变拆金豆
     protected function HFxhb(bool $is_show, array $arr)
     {
         if ($is_show) {

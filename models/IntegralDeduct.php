@@ -191,7 +191,7 @@ class IntegralDeduct extends BaseActiveRecord{
     }
 
     /**
-     * 购物红包券、积分券抵扣
+     * 购物金豆券、积分券抵扣
      * @Author bing
      * @DateTime 2020-10-08 14:14:26
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -201,9 +201,9 @@ class IntegralDeduct extends BaseActiveRecord{
         try{
             $user_id = $order->user_id;
             $wallet = User::getUserWallet($user_id,$order->mall_id);
-            //查询用户可用红包券,并且按过期时间升序排列
+            //查询用户可用金豆券,并且按过期时间升序排列
             $can_use_integrals = IntegralRecord::getIntegralAscExpireTime($user_id,$ctype);
-            $integral_deduction_price = $ctype==1?$order->integral_deduction_price:$order->score_deduction_price; // 订单抵扣红包券或积分
+            $integral_deduction_price = $ctype==1?$order->integral_deduction_price:$order->score_deduction_price; // 订单抵扣金豆券或积分
             if($integral_deduction_price > 0){
                 if($ctype==1){
                     self::_deductStaticIntegral($wallet, $integral_deduction_price, $order, $ctype);
@@ -284,7 +284,7 @@ class IntegralDeduct extends BaseActiveRecord{
     }
 
     /**
-     * 使用永久红包券抵扣
+     * 使用永久金豆券抵扣
      * @Author bing
      * @DateTime 2020-10-09 15:50:03
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -294,15 +294,15 @@ class IntegralDeduct extends BaseActiveRecord{
      */
     private static function _deductStaticIntegral($wallet,$integral_deduction_price,$order,$ctype){
 
-        // 使用永久红包券抵扣
+        // 使用永久金豆券抵扣
         $diff_integral = $wallet['static_integral'] - $integral_deduction_price;
-        if($diff_integral < 0) throw new Exception('永久红包券不足');
+        if($diff_integral < 0) throw new Exception('永久金豆券不足');
         $record = array(
             'controller_type'=> $ctype,
             'mall_id'=> $order['mall_id'],
             'user_id'=> $order['user_id'],
             'money'=> $integral_deduction_price * -1,
-            'desc'=> '订单('.$order->id.')创建,扣除红包券'.$integral_deduction_price,
+            'desc'=> '订单('.$order->id.')创建,扣除金豆券'.$integral_deduction_price,
             'before_money'=> $wallet['static_integral'],
             'type'=> Integral::TYPE_ALWAYS,
             'source_id'=>	$order->id,

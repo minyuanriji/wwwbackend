@@ -62,14 +62,14 @@ class ExchangeIntegralToLjForm extends BaseModel{
                     throw new \Exception($this->responseErrorMsg($exchangeLog));
                 }
 
-                //扣取红包
+                //扣取金豆
                 if($user->static_integral < $goods->deduct_integral){
-                    throw new \Exception("红包不足");
+                    throw new \Exception("金豆不足");
                 }
                 $modifyForm = new UserIntegralModifyForm([
                     "type"        => 2,
                     "integral"    => $goods->deduct_integral,
-                    "desc"        => "礼金商品兑换，扣除红包",
+                    "desc"        => "礼金商品兑换，扣除金豆",
                     "source_id"   => $exchangeLog->id,
                     "source_type" => "tlj_exchange",
                     "is_manual"   => 0
@@ -88,7 +88,7 @@ class ExchangeIntegralToLjForm extends BaseModel{
                         "per_face"                 => $goods->gift_price,
                         "security_switch"          => "true",
                         "user_total_win_num_limit" => "1",
-                        "name"                     => "补商会红包抵扣",
+                        "name"                     => "补商会金豆抵扣",
                         "total_num"                => "1",
                         "item_id"                  => $goods->ali_unique_id
                     ]);

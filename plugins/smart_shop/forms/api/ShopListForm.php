@@ -82,7 +82,7 @@ class ShopListForm extends BaseModel implements ICacheForm {
                 $list[$key] = $item;
             }
 
-            //设置购物券
+            //设置红包
             $this->setShoppingVoucher($list);
 
             $sourceData = $this->returnApiResultData(ApiCode::CODE_SUCCESS, '', [
@@ -105,7 +105,7 @@ class ShopListForm extends BaseModel implements ICacheForm {
     }
 
     /**
-     * 设置赠送购物券信息
+     * 设置赠送红包信息
      * @param $list
      */
     private function setShoppingVoucher(&$list){
@@ -140,7 +140,7 @@ class ShopListForm extends BaseModel implements ICacheForm {
             if(isset($rows[$item['store_id']])){
                 $shoppingVoucherGiveValue = $rows[$item['store_id']]['shopping_voucher_give_value'];
                 if($shoppingVoucherGiveValue){
-                    $item['shopping_voucher_remark'] = "付100送".$shoppingVoucherGiveValue."红包";
+                    $item['shopping_voucher_remark'] = "付100送".$shoppingVoucherGiveValue."金豆";
                 }
             }
             $list[$key] = $item;

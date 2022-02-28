@@ -23,7 +23,7 @@ class IntegralController extends ApiController
     }
 
     /**
-     * 红包券管理中心页面
+     * 金豆券管理中心页面
      * @Author bing
      * @DateTime 2020-10-13 09:58:24
      * @return
@@ -38,7 +38,7 @@ class IntegralController extends ApiController
         }
         $controller_type = $reques_data['controller_type'] ?? 0;
         $user_id = Yii::$app->user->id ?? 0;
-        //查询用户的红包券、积分券余额
+        //查询用户的金豆券、积分券余额
         $wallet = User::getUserWallet($user_id);
         $where = array(
             ['=', 'controller_type', $controller_type],
@@ -68,7 +68,7 @@ class IntegralController extends ApiController
     }
 
     /**
-     * 红包券、积分券发放计划
+     * 金豆券、积分券发放计划
      * @Author bing
      * @DateTime 2020-10-13 14:45:49
      * @return void
@@ -98,7 +98,7 @@ class IntegralController extends ApiController
     }
 
     /**
-     * 动态红包券、积分券变动明细
+     * 动态金豆券、积分券变动明细
      * @Author bing
      * @DateTime 2020-10-13 14:45:49
      * @return void
@@ -129,7 +129,7 @@ class IntegralController extends ApiController
     }
 
     /**
-     * @Note:红包记录  2021-08-19 最新
+     * @Note:金豆记录  2021-08-19 最新
      * @return array
      */
     public function actionIntegralList()

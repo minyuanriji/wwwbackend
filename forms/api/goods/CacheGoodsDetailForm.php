@@ -94,7 +94,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
 
             $info['max_deduct_integral'] = $goods->max_deduct_integral;
 
-            //可抵红包券大于0才显示红包券会员价
+            //可抵金豆券大于0才显示金豆券会员价
             $PriceDisplayService=new PriceDisplayService($this->mall_id);
             if ($goods->max_deduct_integral > 0) {
                 $info['price_display'] = $PriceDisplayService->getGoodsPriceDisplay($goods->price_display);
@@ -205,7 +205,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
                 }
             }
 
-            //判断是否是购物券商品
+            //判断是否是红包商品
             $info['shopping_voucher'] = [
                 "is_shopping_voucher_goods" => 0,
                 'user_shopping_voucher'     => 0,

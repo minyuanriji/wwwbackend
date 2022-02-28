@@ -10,7 +10,7 @@ use app\plugins\shopping_voucher\forms\mall\ShoppingVoucherRechargeForm;
 class ShoppingVoucherLogController extends Controller{
 
     /**
-     * 购物券记录
+     * 红包记录
      * @return bool|string|\yii\web\Response
      */
     public function actionList(){
@@ -24,7 +24,7 @@ class ShoppingVoucherLogController extends Controller{
     }
 
     /**
-     * 购物券记录统计
+     * 红包记录统计
      * @return bool|string|\yii\web\Response
      */
     public function actionStatistics(){
@@ -34,7 +34,7 @@ class ShoppingVoucherLogController extends Controller{
     }
 
     /**
-     * 购物券充值
+     * 红包充值
      * @return bool|string|\yii\web\Response
      */
     public function actionRecharge(){

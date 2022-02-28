@@ -109,7 +109,7 @@ class GoodsForm extends BaseModel
 
             $info['max_deduct_integral'] = $goods->max_deduct_integral;
 
-            //可抵红包券大于0才显示红包券会员价
+            //可抵金豆券大于0才显示金豆券会员价
             $PriceDisplayService=new PriceDisplayService(\Yii::$app->mall->id);
             if ($goods->max_deduct_integral > 0) {
                 $info['price_display'] = $PriceDisplayService->getGoodsPriceDisplay($goods->price_display);

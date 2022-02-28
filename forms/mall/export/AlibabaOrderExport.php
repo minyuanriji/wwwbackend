@@ -52,7 +52,7 @@ class AlibabaOrderExport extends BaseExport
             ],
             [
                 'key' => 'shopping_voucher',
-                'value' => '消费购物券',
+                'value' => '消费红包',
             ],
             [
                 'key' => 'freight',

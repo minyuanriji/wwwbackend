@@ -46,7 +46,7 @@ class HotelPayVoucherNotification
                 'keyword2'  => $hotelOrderResult->order_no,
                 'keyword3'  => $hotelOrderResult->order_price . '元',
                 'keyword4'  => '酒店下单:' . $hotelOrderResult->order_price . '元',
-                'remark'    => '赠送’'. $voucher_log['money'] .'‘购物券，欢迎您再次光临！'
+                'remark'    => '赠送’'. $voucher_log['money'] .'‘红包，欢迎您再次光临！'
             ]
         ]))->send();
     }

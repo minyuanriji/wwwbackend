@@ -548,7 +548,7 @@ class CommonPage extends BaseModel
                         $nav['template']['data'] = [];
                     }
 
-                    // 是设置首页的diy页面才添加裂变红包广告
+                    // 是设置首页的diy页面才添加裂变金豆广告
                     if ($page['is_home_page'] == 1 && $index == 0) {
                         $modal = (new DiyModalForm())->getModal();
                         if (count($modal) > 0) {
@@ -564,7 +564,7 @@ class CommonPage extends BaseModel
                     }
                 }
                 unset($nav);
-                // 是设置首页的diy页面才添加裂变红包广告
+                // 是设置首页的diy页面才添加裂变金豆广告
 //                if ($page['is_home_page'] == 1) {
 //                    $modal = (new DiyModalForm())->getModal();
 //                    $page['navs'][0]['template']['data'][] = [
@@ -756,7 +756,7 @@ class CommonPage extends BaseModel
                 } else {
                     $nav['template']['data'] = [];
                 }
-                // 是设置首页的diy页面才添加裂变红包广告
+                // 是设置首页的diy页面才添加裂变金豆广告
                 if ($page['is_home_page'] == 1 && $index == 0) {
                     $modal = (new DiyModalForm())->getModal();
                     if (count($modal) > 0) {

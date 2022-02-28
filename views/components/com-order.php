@@ -388,9 +388,9 @@ Yii::$app->loadComponentView('order/com-city');
                 <el-table-column prop="TotalAmount" label="总金额"></el-table-column>
                 <el-table-column prop="ActualPayment" label="实际支付金额"></el-table-column>
                 <el-table-column prop="TotalItem" label="总件数"></el-table-column>
-                <el-table-column prop="RedAmount" label="红包抵扣金额"></el-table-column>
+                <el-table-column prop="RedAmount" label="金豆抵扣金额"></el-table-column>
                 <el-table-column prop="integral" label="积分抵扣金额"></el-table-column>
-                <el-table-column prop="ShoppingVoucher" label="购物券抵扣金额"></el-table-column>
+                <el-table-column prop="ShoppingVoucher" label="红包抵扣金额"></el-table-column>
             </el-table>
         </el-card>
         <div class="table-body">
@@ -711,10 +711,10 @@ Yii::$app->loadComponentView('order/com-city');
                                     (<span style="color: green">积分抵扣</span><span style="color: #909399">￥{{item.score_deduction_price}})</span>
                                 </div>
                                 <div>
-                                    (<span style="color: red">红包抵扣</span><span style="color: #909399">￥{{item.integral_deduction_price}})</span>
+                                    (<span style="color: red">金豆抵扣</span><span style="color: #909399">￥{{item.integral_deduction_price}})</span>
                                 </div>
                                 <div>
-                                    (<span style="color: red">购物券抵扣</span><span style="color: #909399">￥{{item.shopping_voucher_decode_price}})</span>
+                                    (<span style="color: red">红包抵扣</span><span style="color: #909399">￥{{item.shopping_voucher_decode_price}})</span>
                                 </div>
                                 <div class="express-price">
                                     <span>
@@ -748,13 +748,13 @@ Yii::$app->loadComponentView('order/com-city');
                                     <span>总分佣：{{item.gift_statistics.total_commission > 0 ? item.gift_statistics.total_commission : 0}}</span>
                                 </div>
                                 <!--<div class="gift-statistics">
-                                    <span>总红包：00000</span>
+                                    <span>总金豆：00000</span>
                                 </div>
                                 <div class="gift-statistics">
                                     <span>总积分：00000</span>
                                 </div>-->
                                 <div class="gift-statistics">
-                                    <span>总购物券：{{item.gift_statistics.total_shopping_voucher > 0 ? item.gift_statistics.total_shopping_voucher : 0}}</span>
+                                    <span>总红包：{{item.gift_statistics.total_shopping_voucher > 0 ? item.gift_statistics.total_shopping_voucher : 0}}</span>
                                 </div>
                             </div>
                             <div style="width: 30%;float: right;height: 100%;line-height: 100%;display: flex;justify-content:center;align-items:Center;">
@@ -1001,7 +1001,7 @@ Yii::$app->loadComponentView('order/com-city');
                                 </td>
                             </tr>
                             <tr class="c4">
-                                <td class="label">赠送购物券：</td>
+                                <td class="label">赠送红包：</td>
                                 <td>
                                     {{ item.shoppingVoucher.money }}
                                     <span v-if="item.shoppingVoucher.status == 'invalid'" style="color: red">(无效)</span>
@@ -1009,7 +1009,7 @@ Yii::$app->loadComponentView('order/com-city');
                                     <span v-else-if="item.shoppingVoucher.status == 'waiting'" style="color: red">(待发送)</span>
                                     <span v-else style="color: red" >不赠送</span>
                                 </td>
-                                <td class="label">赠送红包：</td>
+                                <td class="label">赠送金豆：</td>
                                 <td>
                                     开发中...
                                     <!--<span v-if="infoDialog.score_status == 'invalid' || infoDialog.score_status == ''"

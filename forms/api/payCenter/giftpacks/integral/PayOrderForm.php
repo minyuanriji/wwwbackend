@@ -14,7 +14,7 @@ class PayOrderForm extends IntegralBasePayForm {
     /**
      * 支付后操作
      * @param User $user
-     * @param Closure $callback 回掉方法传入红包记录来源ID、类型、描述
+     * @param Closure $callback 回掉方法传入金豆记录来源ID、类型、描述
      * @return array
      */
     protected function paidAction(User $user, \Closure $callback){
@@ -22,9 +22,9 @@ class PayOrderForm extends IntegralBasePayForm {
         $order = $this->getGiftpacksOrder();
         $giftpacks = $this->getGiftpacks();
 
-        //检查是否支持红包支付
+        //检查是否支持金豆支付
         if($giftpacks->allow_currency != "integral"){
-            throw new \Exception("不允许使用红包支付");
+            throw new \Exception("不允许使用金豆支付");
         }
 
         $processClass = $order->process_class;
@@ -50,7 +50,7 @@ class PayOrderForm extends IntegralBasePayForm {
     }
 
     /**
-     * 获取要支付的红包数
+     * 获取要支付的金豆数
      * @param User $user
      * @return float
      */

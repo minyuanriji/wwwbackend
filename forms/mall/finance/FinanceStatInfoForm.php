@@ -50,7 +50,7 @@ class FinanceStatInfoForm extends BaseModel{
             //商品消费总额
             $data['total_goods_paid'] = (float)$query()->sum("total_goods_original_price");
 
-            //商品消费红包抵扣总额
+            //商品消费金豆抵扣总额
             $data['total_goods_integral_paid'] = (float)$query()->sum("integral_deduction_price");
 
             $query = function(){
@@ -67,16 +67,16 @@ class FinanceStatInfoForm extends BaseModel{
             //店铺消费总额
             $data['total_checkout_paid'] = (float)$query()->sum("order_price");
 
-            //店铺红包抵扣总额
+            //店铺金豆抵扣总额
             $data['total_checkout_integral_paid'] = (float)$query()->sum("integral_deduction_price");
 
             //消费总额
             $data['total_paid'] =  $data['total_goods_paid'] + $data['total_checkout_paid'];
 
-            //红包抵扣总额
+            //金豆抵扣总额
             $data['total_integral_paid'] = $data['total_goods_integral_paid'] + $data['total_checkout_integral_paid'];
 
-            //红包获得总数
+            //金豆获得总数
             $query = Integral::find()->where(["controller_type" => 1]);
             if($this->user_id){
                 $query->andWhere(["user_id" => $this->user_id]);

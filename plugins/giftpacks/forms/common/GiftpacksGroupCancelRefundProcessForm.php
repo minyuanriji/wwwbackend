@@ -28,15 +28,15 @@ class GiftpacksGroupCancelRefundProcessForm extends BaseModel{
             "group_id"   => $group->id
         ])->all();
         if($payOrders){
-            foreach($payOrders as $payOrder){ //退红包
+            foreach($payOrders as $payOrder){ //退金豆
                 $user = User::findOne($payOrder->user_id);
                 if(!$user) continue;
-                if($payOrder->pay_type == "integral") { //红包支付的
+                if($payOrder->pay_type == "integral") { //金豆支付的
                     static::integralRefund($payOrder, $user);
                 }elseif($payOrder->pay_type == "balance"){ //余额支付
                     static::balanceRefund($payOrder, $user);
                 }else{
-                    $payOrder->remark = "未实现除红包外的退款";
+                    $payOrder->remark = "未实现除金豆外的退款";
                 }
                 if(!$payOrder->save()){
                     throw new \Exception(json_encode($payOrder->getErrors()));
@@ -52,7 +52,7 @@ class GiftpacksGroupCancelRefundProcessForm extends BaseModel{
     }
 
     /**
-     * 返还红包
+     * 返还金豆
      * @param GiftpacksGroupPayOrder $payOrder
      * @param User $user
      */
@@ -71,7 +71,7 @@ class GiftpacksGroupCancelRefundProcessForm extends BaseModel{
      * @param User $user
      */
     protected static function balanceRefund(GiftpacksGroupPayOrder $payOrder, User $user){
-        $desc = "大礼包拼单取消，支付单[ID:".$payOrder->id."]退款，返还红包";
+        $desc = "大礼包拼单取消，支付单[ID:".$payOrder->id."]退款，返还金豆";
         $balanceModifyForm = new UserBalanceModifyForm([
             "type"        => BalanceLog::TYPE_ADD,
             "money"       => $payOrder->pay_price,

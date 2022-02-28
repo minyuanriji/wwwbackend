@@ -78,7 +78,7 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
             throw new \Exception($this->responseErrorMsg($order));
         }
 
-        //赠送红包
+        //赠送金豆
         static::giveIntegral($giftpacks, $order);
 
         //赠送积分
@@ -127,7 +127,7 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
     }
 
     /**
-     * 赠送红包
+     * 赠送金豆
      * @param Giftpacks $giftpacks
      * @param GiftpacksOrder $order
      * @throws \Exception
@@ -138,7 +138,7 @@ class GiftpacksOrderPaidProcessForm extends BaseModel{
                 "type"        => 1,
                 "integral"    => min($order->order_price, $giftpacks->integral_give_num),
                 "is_manual"   => 0,
-                "desc"        => "购买大礼包“".$giftpacks->title."”赠送红包",
+                "desc"        => "购买大礼包“".$giftpacks->title."”赠送金豆",
                 "source_id"   => $order->id,
                 "source_type" => "giftpacks_order"
             ]);

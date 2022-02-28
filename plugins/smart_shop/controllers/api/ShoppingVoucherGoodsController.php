@@ -15,7 +15,7 @@ use app\plugins\smart_shop\forms\api\ShoppingVoucherGoodsListForm;
 class ShoppingVoucherGoodsController extends ApiController {
 
     /**
-     * 购物券商品列表
+     * 红包商品列表
      * @return string|\yii\web\Response
      */
     public function actionList(){
@@ -49,7 +49,7 @@ class ShoppingVoucherGoodsController extends ApiController {
     }
 
     /**
-     * 智慧门店添加购物券商品
+     * 智慧门店添加红包商品
      * @return string|\yii\web\Response
      */
     public function actionAdd(){
@@ -59,7 +59,7 @@ class ShoppingVoucherGoodsController extends ApiController {
     }
 
     /**
-     * 智慧门店删除购物券商品
+     * 智慧门店删除红包商品
      * @return string|\yii\web\Response
      */
     public function actionDelete(){
@@ -69,7 +69,7 @@ class ShoppingVoucherGoodsController extends ApiController {
     }
 
     /**
-     * 智慧门店批量删除购物券商品
+     * 智慧门店批量删除红包商品
      * @return string|\yii\web\Response
      */
     public function actionBatchDelete(){
@@ -79,7 +79,7 @@ class ShoppingVoucherGoodsController extends ApiController {
     }
 
     /**
-     * 已选择的购物券商品
+     * 已选择的红包商品
      * @return string|\yii\web\Response
      */
     public function actionChoosed(){

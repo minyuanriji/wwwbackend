@@ -832,11 +832,11 @@ class Menus
                         'route' => 'mall/finance/score-log',
                     ],
                     [
-                        'name' => '红包记录',
+                        'name' => '金豆记录',
                         'route' => 'mall/finance/integral-log',
                     ],
                     [
-                        'name' => '购物券记录',
+                        'name' => '红包记录',
                         'route' => 'plugin/shopping_voucher/mall/shopping-voucher-log/list',
                     ],
                     [

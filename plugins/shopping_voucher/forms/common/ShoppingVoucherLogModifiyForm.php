@@ -24,7 +24,7 @@ class ShoppingVoucherLogModifiyForm extends BaseModel{
     }
 
     /**
-     * 增加购物券
+     * 增加红包
      * @param ShoppingVoucherUser|User $user
      * @param false $is_trans 是否开启事务
      * @throws \Exception
@@ -36,7 +36,7 @@ class ShoppingVoucherLogModifiyForm extends BaseModel{
     }
 
     /**
-     * 扣减购物券
+     * 扣减红包
      * @param ShoppingVoucherUser|User $user
      * @param false $is_trans 是否开启事务
      * @throws \Exception
@@ -48,7 +48,7 @@ class ShoppingVoucherLogModifiyForm extends BaseModel{
     }
 
     /**
-     * 修改购物券
+     * 修改红包
      * @param ShoppingVoucherUser $user
      * @param false $is_trans 是否开启事务
      * @throws \Exception

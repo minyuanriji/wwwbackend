@@ -49,7 +49,7 @@ class OilPayVoucherNotification
                 'keyword2'  => $oilOrdersResult->order_no,
                 'keyword3'  => $oilOrdersResult->order_price . '元',
                 'keyword4'  => '加油订单',
-                'remark'    => '赠送’'. $voucher_log['money'] .'‘购物券，欢迎您再次光临！'
+                'remark'    => '赠送’'. $voucher_log['money'] .'‘红包，欢迎您再次光临！'
             ]
         ]))->send();
     }

@@ -88,7 +88,7 @@ echo $this->render("com-detail");
                     <el-table-column label="抵扣" width="180">
                         <template slot-scope="scope"  v-if="scope.row.pay_status != 'unpaid'">
                             <div>余额抵扣：<b style="color:#077a00">{{scope.row.pay_price}}元</b></div>
-                            <div>红包抵扣：<b style="color:#cc3311">{{scope.row.integral_deduction_price}}元</b></div>
+                            <div>金豆抵扣：<b style="color:#cc3311">{{scope.row.integral_deduction_price}}元</b></div>
                         </template>
                     </el-table-column>
 

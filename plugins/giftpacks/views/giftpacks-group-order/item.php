@@ -39,7 +39,7 @@
            </el-table-column>
            <el-table-column label="实付金额" width="130">
                <template slot-scope="scope">
-                   <div>红包：{{scope.row.integral_deduction_price ?? 0}}</div>
+                   <div>金豆：{{scope.row.integral_deduction_price ?? 0}}</div>
                    <div>余额：{{scope.row.pay_price ?? 0}}</div>
                </template>
            </el-table-column>

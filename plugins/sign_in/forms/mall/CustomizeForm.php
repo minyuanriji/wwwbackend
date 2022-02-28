@@ -75,7 +75,7 @@ class CustomizeForm extends BaseModel
             'not_signed_icon' => '未签到图标',
             'signed_icon' => '已签到图标',
             'head_bg' => '头部背景图',
-            'balance_icon' => '红包图标',
+            'balance_icon' => '金豆图标',
             'integral_icon' => '积分图标',
             'calendar_icon' => '日历签到图标',
             'end_gradient_bg' => '渐变颜色',

@@ -232,7 +232,7 @@ class FinanceController extends MallController
     }
 
     /**
-     * 红包券发放计划
+     * 金豆券发放计划
      * @Author bing
      * @DateTime 2020-10-13 14:45:49
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -271,7 +271,7 @@ class FinanceController extends MallController
     }
     
     /**
-     * 红包券管理中心页面
+     * 金豆券管理中心页面
      * @Author bing
      * @DateTime 2020-10-13 09:58:24
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -303,7 +303,7 @@ class FinanceController extends MallController
     }
 
     /**
-     * 动态红包券变动明细
+     * 动态金豆券变动明细
      * @Author bing
      * @DateTime 2020-10-13 14:45:49
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -403,7 +403,7 @@ class FinanceController extends MallController
     }
 
     /**
-     * 动态红包券变动明细
+     * 动态金豆券变动明细
      * @Author bing
      * @DateTime 2020-10-13 14:45:49
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -441,7 +441,7 @@ class FinanceController extends MallController
     }
 
     /**
-     * 红包记录
+     * 金豆记录
      * @return string|\yii\web\Response
      */
     public function actionIntegralLog()
@@ -465,7 +465,7 @@ class FinanceController extends MallController
     }
 
     /**
-     * 充值红包
+     * 充值金豆
      */
     public function actionIntegralModified(){
         $form = new IntegralModifiedForm();

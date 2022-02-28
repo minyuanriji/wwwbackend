@@ -8,7 +8,7 @@
 class AlipayMarketingCouponTemplateCreateRequest
 {
 	/** 
-	 * 创建红包模板
+	 * 创建金豆模板
 	 **/
 	private $bizContent;
 

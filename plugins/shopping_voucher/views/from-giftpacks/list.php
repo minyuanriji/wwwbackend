@@ -8,7 +8,7 @@ echo $this->render("../com/com-tab-from");
         <com-tab-from :current="activeName"></com-tab-from>
 
         <div class="table-body">
-            <el-alert title="说明：用户通过现金支付大礼包订单，成功后可获得赠送购物券" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
+            <el-alert title="说明：用户通过现金支付大礼包订单，成功后可获得赠送红包" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
 
             <el-tabs v-model="activeName2" type="border-card">
                 <el-tab-pane label="通用配置" name="first">

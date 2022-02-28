@@ -24,7 +24,7 @@
                     <el-col :span="12"><span style="color:green">{{stat_info.total_goods_paid}}元</span></el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">
-                    <el-col :span="12" class="l-label">商品红包抵扣总额</el-col>
+                    <el-col :span="12" class="l-label">商品金豆抵扣总额</el-col>
                     <el-col :span="12"><span style="color:#cc3311">{{stat_info.total_goods_integral_paid}}元</span></el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">
@@ -32,7 +32,7 @@
                     <el-col :span="12"><span style="color:green">{{stat_info.total_checkout_paid}}元</span></el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">
-                    <el-col :span="12" class="l-label">店铺红包抵扣总额</el-col>
+                    <el-col :span="12" class="l-label">店铺金豆抵扣总额</el-col>
                     <el-col :span="12"><span style="color:#cc3311">{{stat_info.total_checkout_integral_paid}}元</span></el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">
@@ -40,11 +40,11 @@
                     <el-col :span="12"><b style="color:green">{{stat_info.total_paid}}元</b></el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">
-                    <el-col :span="12" class="l-label">红包抵扣总额</el-col>
+                    <el-col :span="12" class="l-label">金豆抵扣总额</el-col>
                     <el-col :span="12"><b style="color:#cc3311">{{stat_info.total_integral_paid}}元</b></el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">
-                    <el-col :span="12" class="l-label">获得红包总数</el-col>
+                    <el-col :span="12" class="l-label">获得金豆总数</el-col>
                     <el-col :span="12"><b style="color:#cc3311">{{stat_info.total_integral_got}}元</b></el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">
@@ -81,11 +81,11 @@
                 stat_info: {
                     total_goods_paid: 0.00, //商品消费总额
                     total_checkout_paid: 0.00, //店铺消费总额
-                    total_goods_integral_paid: 0.00, //商品订单红包抵扣总额
-                    total_checkout_integral_paid:0.00, //店铺红包抵扣总额
+                    total_goods_integral_paid: 0.00, //商品订单金豆抵扣总额
+                    total_checkout_integral_paid:0.00, //店铺金豆抵扣总额
                     total_paid: 0.00, //消费总额
-                    total_integral_paid: 0.00, //红包抵扣总额
-                    total_integral_got: 0.00, //红包获得总数
+                    total_integral_paid: 0.00, //金豆抵扣总额
+                    total_integral_got: 0.00, //金豆获得总数
                     total_income: 0.00, //总收益
                     total_cash_count: 0, //提现总笔数
                     total_cash: 0.00 //提现总额

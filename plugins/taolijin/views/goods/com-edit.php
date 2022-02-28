@@ -96,7 +96,7 @@ Yii::$app->loadComponentView('com-rich-text');
                             <el-link class="box-grow-0" type="primary" style="font-size:12px" v-if='formData.video_url' :underline="false" target="_blank" :href="formData.video_url">视频链接
                             </el-link>
                         </el-form-item>
-                        <el-form-item label="红包最大抵扣" prop="deduct_integral">
+                        <el-form-item label="金豆最大抵扣" prop="deduct_integral">
                             <el-input v-model="formData.deduct_integral" style="width:60%;">
                                 <template slot="append">元</template>
                             </el-input>
@@ -169,7 +169,7 @@ Yii::$app->loadComponentView('com-rich-text');
                         {required: true, message: '商品名称不能为空', trigger: 'change'},
                     ],
                     deduct_integral: [
-                        {required: true, message: '抵扣红包不能为空', trigger: 'change'},
+                        {required: true, message: '抵扣金豆不能为空', trigger: 'change'},
                     ],
                     gift_price: [
                         {required: true, message: '礼金面额不能为空', trigger: 'change'},

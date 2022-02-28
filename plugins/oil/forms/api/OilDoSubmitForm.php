@@ -46,12 +46,12 @@ class OilDoSubmitForm extends OilBaseSubmitForm {
                 throw new \Exception($this->responseErrorMsg($order));
             }
 
-            //如果使用红包支付，扣除红包
+            //如果使用金豆支付，扣除金豆
             if($order['integral_deduction_price'] > 0){
                 $modifyForm = new UserIntegralModifyForm([
                     "type"        => 2,
                     "integral"    => $order['integral_deduction_price'],
-                    "desc"        => "加油券订单红包抵扣",
+                    "desc"        => "加油券订单金豆抵扣",
                     "source_id"   => $order->id,
                     "source_type" => "oil_order",
                     "is_manual"   => 0

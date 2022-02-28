@@ -200,7 +200,7 @@ defined('YII_ENV') or exit('Access Denied');
                                                :src="form.balance_icon ? form.balance_icon : defaultIntegral"></com-image>
                                     <div style="margin-left: 15px" flex="dir:top">
                                         <div>连续签到6天</div>
-                                        <div>赠送2.0余额红包</div>
+                                        <div>赠送2.0余额金豆</div>
                                     </div>
                                     <div class="btn-lq" :style="{
                                             background: form.not_btn_bg ? form.not_btn_bg : '#5997fc',
@@ -311,7 +311,7 @@ defined('YII_ENV') or exit('Access Denied');
                                 <com-image v-if="form.head_bg" mode="aspectFill" width='80px' height='80px'
                                            :src="form.head_bg"></com-image>
                             </el-form-item>
-                            <el-form-item label="红包图标" prop="balance_icon">
+                            <el-form-item label="金豆图标" prop="balance_icon">
                                 <com-attachment :multiple="false" :max="1" @selected="balancePhoto">
                                     <el-tooltip class="item" effect="dark" content="建议尺寸:72*72" placement="top">
                                         <el-button size="mini">选择文件</el-button>

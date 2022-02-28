@@ -37,11 +37,11 @@
                             </el-input>
                             <div style="color: red;font-size: 12px">请输入服务费0-100</div>
                         </el-form-item>
-                        <el-form-item label="红包收费比例" prop="ratio">
+                        <el-form-item label="金豆收费比例" prop="ratio">
                             <el-input type="number" v-model="ruleForm.ratio" style="width: 500px;">
                                 <template slot="append">%</template>
                             </el-input>
-                            <div style="color: red;font-size: 12px">例如：10   充值100元 红包扣取110</div>
+                            <div style="color: red;font-size: 12px">例如：10   充值100元 金豆扣取110</div>
                         </el-form-item>
                         <el-form-item label="推荐人" prop="parent_id">
                             <el-autocomplete v-model="ruleForm.parent_name"
@@ -270,7 +270,7 @@
                         {required: true, message: '请输入服务费0-100', trigger: 'change'},
                     ],
                     ratio: [
-                        {required: true, message: '红包收费比例', trigger: 'change'},
+                        {required: true, message: '金豆收费比例', trigger: 'change'},
                     ],
                     /*parent_id: [
                         {required: true, message: '请选择推荐人', trigger: 'change'},

@@ -37,13 +37,13 @@ abstract class IntegralBasePayForm extends BaseModel {
                 throw new \Exception('交易密码错误');
             }
 
-            //待支付红包数
+            //待支付金豆数
             $payIntegral = $this->payIntegray($user);
             if($user->static_integral < $payIntegral){
-                throw new \Exception('红包不足');
+                throw new \Exception('金豆不足');
             }
 
-            //红包扣取
+            //金豆扣取
             $currentIntegral = floatval($user->static_integral);
             $user->static_integral = max(0, $currentIntegral - floatval($payIntegral));
             if(!$user->save()){
@@ -58,7 +58,7 @@ abstract class IntegralBasePayForm extends BaseModel {
                 $logData['desc']        = $desc;
             });
 
-            //生成红包记录
+            //生成金豆记录
             $integralLog = new IntegralLog(array_merge($logData, [
                 "mall_id"          => $user->mall_id,
                 "user_id"          => $user->id,
@@ -92,7 +92,7 @@ abstract class IntegralBasePayForm extends BaseModel {
     }
 
     /**
-     * 获取要支付的红包数
+     * 获取要支付的金豆数
      * @param User $user
      * @return float
      */
@@ -102,7 +102,7 @@ abstract class IntegralBasePayForm extends BaseModel {
     /**
      * 支付后操作
      * @param User $user
-     * @param Closure $callback 回掉方法传入红包记录来源ID、类型、描述
+     * @param Closure $callback 回掉方法传入金豆记录来源ID、类型、描述
      * @return array
      */
     abstract protected function paidAction(User $user, \Closure $callback);

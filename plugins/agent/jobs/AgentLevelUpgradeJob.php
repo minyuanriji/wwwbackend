@@ -418,7 +418,7 @@ class AgentLevelUpgradeJob extends Component implements JobInterface
                     
                     \Yii::warning("用户：{$this->user_id}，经销商升级成功！");
 
-                    //经销商升级赠送红包券
+                    //经销商升级赠送金豆券
                     $level_info = AgentLevel::find()->where(array('level'=>$agent->level))->asArray()->one();
                     IntegralLogic::levelupSendIntegral($level_info,$agent,1);
                     

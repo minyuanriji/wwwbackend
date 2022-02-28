@@ -70,7 +70,7 @@ class GoodsListForm extends BaseModel{
                 $editableScore['is_permanent']  = $scoreSetting['expire'] == -1 ? "1" : "0";
                 $editableScore = array_merge($editableScore, $scoreSetting);
 
-                //赠送购物券设置
+                //赠送红包设置
                 $integralSetting                 = !empty($row['integral_setting']) ? @json_decode($row['integral_setting'], true) : [];
                 $integralSetting['expire']       = -1;
                 $integralSetting['integral_num'] = isset($integralSetting['integral_num']) ? (int)$integralSetting['integral_num'] : 0;

@@ -40,7 +40,7 @@ class Plugin extends \app\plugins\Plugin
     {
         return [
             [
-                'name' => '红包券充值卡',
+                'name' => '金豆券充值卡',
                 'route' => 'plugin/recharge_card/admin/card/index',
                 'icon' => 'el-icon-setting',
             ]

@@ -97,8 +97,8 @@ abstract class BaseOrderSalesHandler extends BaseOrderHandler
         // 发放积分券
         // echo '完成后发放积分券'.PHP_EOL;
         // IntegralLogic::shopSendScore($this->order);
-        // 发放红包券
-        // echo '完成后发放红包券'.PHP_EOL;
+        // 发放金豆券
+        // echo '完成后发放金豆券'.PHP_EOL;
         // IntegralLogic::shopSendIntegral($this->order);
         // 消费升级会员等级
         //echo '消费升级会员等级'.PHP_EOL;

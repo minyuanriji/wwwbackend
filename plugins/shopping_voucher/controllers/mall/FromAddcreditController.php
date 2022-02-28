@@ -9,7 +9,7 @@ use app\plugins\Controller;
 class FromAddcreditController extends Controller
 {
     /**
-     * @Note:话费赠送购物券设置
+     * @Note:话费赠送红包设置
      * @return string|\yii\web\Response
      */
     public function actionEdit()

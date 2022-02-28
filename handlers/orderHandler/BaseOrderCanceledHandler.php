@@ -66,7 +66,7 @@ abstract class BaseOrderCanceledHandler extends BaseOrderHandler
         $order = $this->event->order;
         $mall = Mall::findOne(['id' => $order->mall_id]);
         Yii::$app->mall = $mall;
-        //退还用户红包券、积分券、购物券
+        //退还用户金豆券、积分券、红包
         $integralLogic = new IntegralLogic();
         $integralLogic->refundShoppingVoucher($order);
         $integralLogic->refundIntegral($order,0);

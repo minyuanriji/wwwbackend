@@ -211,7 +211,7 @@ class CommonGoods extends BaseModel
         $PriceDisplayService     = new PriceDisplayService(\Yii::$app->mall->id);
         $detail['price_display'] = $PriceDisplayService->getGoodsPriceDisplay($detail['price_display']);
 
-        //红包券赠送规则
+        //金豆券赠送规则
         if(!empty($detail['integral_setting'])){
             $detail['integral_setting']=json_decode($detail['integral_setting'],true);
         }

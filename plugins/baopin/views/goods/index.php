@@ -93,11 +93,11 @@
                             </el-popover>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="scope" width="100" label="红包赠送">
+                    <el-table-column prop="scope" width="100" label="金豆赠送">
                         <template slot-scope="scope">
                             <el-popover placement="right" trigger="click" width="300">
                                 <el-form size="mini" :label-position="label_position_top" :model="scope.row.editable_integral" label-width="80px">
-                                    <el-form-item label="赠送红包">
+                                    <el-form-item label="赠送金豆">
                                         <el-switch v-model="scope.row.editable_integral.enable_integral" :active-value="1" :inactive-value="0" active-text="开启" inactive-text="关闭"></el-switch>
                                     </el-form-item>
                                     <template v-if="scope.row.editable_integral.enable_integral == 1">
@@ -108,7 +108,7 @@
                                         </el-form-item>
                                         <el-form-item label="赠送">
                                             <el-input type="number" :min="0" placeholder="" v-model="scope.row.editable_integral.integral_num">
-                                                <template slot="append">红包券</template>
+                                                <template slot="append">金豆券</template>
                                             </el-input>
                                         </el-form-item>
                                         <el-form-item label="按月">
@@ -435,7 +435,7 @@
                 });
             },
 
-            //保存购物券赠送设置
+            //保存红包赠送设置
             save_integral_setting(goods_id, form){
                 let self = this;
                 self.edit_integral_loading = true;

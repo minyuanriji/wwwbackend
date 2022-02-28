@@ -69,16 +69,16 @@ class OilBaseSubmitForm extends BaseModel{
         $orderData['poi_type']        = "tx"; //腾讯坐标
         $orderData['address']         = $region['poi']['addr'];
         $orderData['product_id']      = $product->id;
-        $orderData['user_integral']   = intval($user->static_integral);  //用户红包总数
-        $orderData['remain_integral'] = intval($user->static_integral); //用户剩余红包总数
+        $orderData['user_integral']   = intval($user->static_integral);  //用户金豆总数
+        $orderData['remain_integral'] = intval($user->static_integral); //用户剩余金豆总数
         $orderData['order_price']     = (float)$product->price; //订单金额
         $orderData['total_price']     = (float)$product->price; //待支付总金额
 
-        //如果使用红包计算需要扣取的红包
+        //如果使用金豆计算需要扣取的金豆
         $orderData['integral_deduction_price'] = 0;
         $orderData['integral_fee_rate'] = 0;
         if($this->use_integral){
-            $needIntegralTotalNum = $orderData['total_price']; //需要的红包总数
+            $needIntegralTotalNum = $orderData['total_price']; //需要的金豆总数
             if($orderData['remain_integral'] > $needIntegralTotalNum){
                 $orderData['integral_deduction_price'] = $needIntegralTotalNum;
                 $orderData['remain_integral'] -= $needIntegralTotalNum;
@@ -86,7 +86,7 @@ class OilBaseSubmitForm extends BaseModel{
                 $orderData['integral_deduction_price'] = $orderData['remain_integral'];
                 $orderData['remain_integral'] = 0;
             }
-            $integralDeductionPrice = $orderData['integral_deduction_price']; //使用红包抵扣的金额
+            $integralDeductionPrice = $orderData['integral_deduction_price']; //使用金豆抵扣的金额
             $orderData['total_price'] -= $integralDeductionPrice;
         }
 

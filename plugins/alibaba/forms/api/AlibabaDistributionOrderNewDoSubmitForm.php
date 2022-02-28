@@ -53,7 +53,7 @@ class AlibabaDistributionOrderNewDoSubmitForm extends AlibabaDistributionOrderNe
                 $order->express_price = $orderItem['express_price'];
                 $order->total_goods_original_price = $orderItem['total_goods_original_price'];
 
-                //购物券抵扣
+                //红包抵扣
                 $order->shopping_voucher_use_num = $orderItem['shopping_voucher_use_num'];
                 $order->shopping_voucher_decode_price = $orderItem['shopping_voucher_decode_price'];
                 $order->shopping_voucher_express_use_num = $orderItem['shopping_voucher_express_use_num'];
@@ -79,12 +79,12 @@ class AlibabaDistributionOrderNewDoSubmitForm extends AlibabaDistributionOrderNe
                     $this->extraOrderDetail($order, $goodsItem);
                 }
 
-                //扣除购物券
+                //扣除红包
                 $shoppingVoucherUseNum = $order->shopping_voucher_express_use_num + $order->shopping_voucher_use_num;
                 if ($shoppingVoucherUseNum > 0) {
                     $modifyForm = new ShoppingVoucherLogModifiyForm([
                         "money" => $shoppingVoucherUseNum,
-                        "desc" => "订单(" . $order->id . ")创建扣除购物券：" . $shoppingVoucherUseNum,
+                        "desc" => "订单(" . $order->id . ")创建扣除红包：" . $shoppingVoucherUseNum,
                         "source_id" => $order->id,
                         "source_type" => "target_alibaba_distribution_order"
                     ]);
@@ -155,7 +155,7 @@ class AlibabaDistributionOrderNewDoSubmitForm extends AlibabaDistributionOrderNe
         $orderDetail->total_original_price  = $goodsItem['total_original_price'];
         $orderDetail->total_price           = $goodsItem['total_price'];
 
-        //购物券抵扣
+        //红包抵扣
         if(isset($goodsItem['use_shopping_voucher_decode_price'])){
             $orderDetail->shopping_voucher_decode_price = $goodsItem['use_shopping_voucher_decode_price'];
         }

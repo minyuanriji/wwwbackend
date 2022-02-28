@@ -68,10 +68,10 @@
                         <el-table-column label="打款类型" width="150">
                             <template slot-scope="scope">
                                 <span v-if="scope.row.refund_type == 'score'">积分</span>
-                                <span v-if="scope.row.refund_type == 'integral'">红包</span>
+                                <span v-if="scope.row.refund_type == 'integral'">金豆</span>
                                 <span v-if="scope.row.refund_type == 'money'">现金</span>
                                 <span v-if="scope.row.refund_type == 'balance'">余额</span>
-                                <span v-if="scope.row.refund_type == 'shopping_voucher'">购物券</span>
+                                <span v-if="scope.row.refund_type == 'shopping_voucher'">红包</span>
                             </template>
                         </el-table-column>
                         <el-table-column label="金额/数量" width="200">

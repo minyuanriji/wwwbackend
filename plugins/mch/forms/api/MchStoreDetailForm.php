@@ -91,7 +91,7 @@ class MchStoreDetailForm extends BaseModel implements ICacheForm {
             $detail['city']          = isset($cityData['city']['name']) ? $cityData['city']['name'] : "";
             $detail['district']      = isset($cityData['district']['name']) ? $cityData['district']['name'] : "";
             $detail['region_name']   = $detail['district'] ? $detail['district'] : ($detail['city'] ? $detail['city'] : $detail['province']);
-            $detail['remark']        = "付100送100购物券";
+            $detail['remark']        = "付100送100红包";
 
             return new APICacheDataForm([
                 "sourceData" => [

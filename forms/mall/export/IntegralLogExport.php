@@ -23,11 +23,11 @@ class IntegralLogExport extends BaseExport
             ],
             [
                 'key' => 'change_integral',
-                'value' => '变动红包',
+                'value' => '变动金豆',
             ],
             [
                 'key' => 'current_integral',
-                'value' => '当前红包',
+                'value' => '当前金豆',
             ],
             [
                 'key' => 'desc',
@@ -48,7 +48,7 @@ class IntegralLogExport extends BaseExport
         $this->getFields();
         $dataList = $this->getDataList();
 
-        $fileName = '用户红包记录' . date('YmdHis');
+        $fileName = '用户金豆记录' . date('YmdHis');
         (new CsvExport())->export($dataList, $this->fieldsNameList, $fileName);
     }
 

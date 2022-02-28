@@ -87,7 +87,7 @@ class MchStoreListForm extends BaseModel implements ICacheForm {
 
                     $item['remark'] = "";
                     if($item['shopping_voucher_give_value']){
-                        $item['remark'] = "付100送".$item['shopping_voucher_give_value']."购物券";
+                        $item['remark'] = "付100送".$item['shopping_voucher_give_value']."红包";
                     }
 
                 }

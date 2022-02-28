@@ -36,7 +36,7 @@ class UserLinkPosterNewForm extends GrafikaOption implements BasePoster{
                 'bg_url' => \Yii::$app->basePath . '/web/statics/bg/redpack.png',//背景图片路径
                 'text' => [
                     [
-                        'text' => '',//扫码领红包
+                        'text' => '',//扫码领金豆
                         'left' => 116,
                         'top' => 280,
                         'width' => 300,

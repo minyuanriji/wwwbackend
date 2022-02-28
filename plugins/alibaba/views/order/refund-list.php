@@ -36,8 +36,8 @@ echo $this->render("com-refund-agree");
                         <template slot-scope="scope">
                             <div>订单日期：{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s') }}</div>
                             <div>订单编号：{{scope.row.order_no}}</div>
-                            <div>支付商品：￥{{scope.row.total_price}} + {{scope.row.shopping_voucher_num}}购物券</div>
-                            <div>支付运费：￥{{scope.row.express_price}} + {{scope.row.shopping_voucher_express_use_num}}购物券</div>
+                            <div>支付商品：￥{{scope.row.total_price}} + {{scope.row.shopping_voucher_num}}红包</div>
+                            <div>支付运费：￥{{scope.row.express_price}} + {{scope.row.shopping_voucher_express_use_num}}红包</div>
                             <div>支付用户：{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
                             <div>支付日期：{{ scope.row.pay_at|dateTimeFormat('Y-m-d H:i:s') }}</div>
                         </template>
@@ -125,11 +125,11 @@ echo $this->render("com-refund-agree");
                 </tr>
                 <tr class="c2">
                     <td class="label">支付商品：</td>
-                    <td colspan="3">￥{{agreeItem.total_price}} + {{agreeItem.shopping_voucher_num}}购物券</td>
+                    <td colspan="3">￥{{agreeItem.total_price}} + {{agreeItem.shopping_voucher_num}}红包</td>
                 </tr>
                 <tr class="c2">
                     <td class="label">支付运费：</td>
-                    <td colspan="3">￥{{agreeItem.express_price}} + {{agreeItem.shopping_voucher_express_use_num}}购物券</td>
+                    <td colspan="3">￥{{agreeItem.express_price}} + {{agreeItem.shopping_voucher_express_use_num}}红包</td>
                 </tr>
                 <tr class="c4">
                     <td class="label">支付用户：</td>
@@ -161,7 +161,7 @@ echo $this->render("com-refund-agree");
                     <td>
                         <span style="color:darkred">￥{{agreeRefundPrice}}</span>
                         +
-                        <span style="color:darkgreen">{{agreeRefundShoppingVoucher}}购物券</span>
+                        <span style="color:darkgreen">{{agreeRefundShoppingVoucher}}红包</span>
                     </td>
                     <td class="label">退运费（运营费）：</td>
                     <td>

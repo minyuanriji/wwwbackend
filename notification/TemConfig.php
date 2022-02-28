@@ -337,7 +337,7 @@ class TemConfig
      * */
     const STORE_PAY = 'zkMsjE9-pjgANoP5JsKAAFPpx2zi37q-0bLYy348wN4';
 
-    /*  @todo 订单支付成功通知(赠送购物券使用)
+    /*  @todo 订单支付成功通知(赠送红包使用)
 
         您的订单已支付成功。 &gt;&gt;查看订单详情
         用户名：123456789@qingpinji.com
@@ -355,7 +355,7 @@ class TemConfig
      * */
     const GIVE_SHOPPING_VOUCHER = 'BCCFMTDa0PNln8cDkShFjLQnH4hClMPayfkBPUWZChY';
 
-    /*  @todo 消费成功通知(赠送购物券使用)
+    /*  @todo 消费成功通知(赠送红包使用)
 
         您的好友消费啦
         顾客：小明

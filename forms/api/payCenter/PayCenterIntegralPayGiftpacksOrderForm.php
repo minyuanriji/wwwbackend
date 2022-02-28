@@ -63,13 +63,13 @@ class PayCenterIntegralPayGiftpacksOrderForm extends BaseModel{
                 throw new \Exception('交易密码错误');
             }
 
-            //验证红包够不够
+            //验证金豆够不够
             $order->integral_deduction_price = GiftpacksDetailForm::integralDeductionPrice($giftpacks, $user);
             if($user->static_integral < $order->integral_deduction_price){
-                throw new \Exception('红包不足');
+                throw new \Exception('金豆不足');
             }
 
-            //红包扣取
+            //金豆扣取
             $res = UserIntegralForm::giftpacksOrderPaySub($order, $user, false);
             if($res['code'] != ApiCode::CODE_SUCCESS){
                 throw new \Exception($res['msg']);

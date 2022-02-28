@@ -33,7 +33,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
     }
 
     /**
-     * 使用购物券抵扣运费的比例
+     * 使用红包抵扣运费的比例
      * @return float
      */
     public static function getShoppingVoucherDecodeExpressRate(){
@@ -241,7 +241,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
         $mainData['user_address_enable'] = true;
         $mainData['user_address'] = $userAddress;
 
-        //使用购物券
+        //使用红包
         $userRemainingShoppingVoucher = (float)ShoppingVoucherUser::find()->where([
             "user_id" => \Yii::$app->user->id
         ])->select("money")->scalar();
@@ -268,7 +268,7 @@ class AlibabaDistributionOrderForm extends BaseModel{
                     ]);
                     if(!$voucherGoods) continue;
                     $goodsItem['use_shopping_voucher'] = 1;
-                    //计算购物券价与商品价格比例
+                    //计算红包价与商品价格比例
                     $ratio = $voucherGoods->voucher_price/$goodsItem['price'];
                     $goodsItem['if_shopping_voucher_need_total_num'] = floatval($goodsItem['total_price']) * $ratio;
                     if(($userRemainingShoppingVoucher/$ratio) > $goodsItem['total_price']){

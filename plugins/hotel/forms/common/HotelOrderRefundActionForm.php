@@ -202,11 +202,11 @@ class HotelOrderRefundActionForm extends BaseModel {
         $applyOrder->status = "paid";
         $hotelOrder->pay_status = "refund"; //设置订单为已退款
 
-        if($hotelOrder->integral_deduction_price > 0){ //退红包
+        if($hotelOrder->integral_deduction_price > 0){ //退金豆
             $modifyForm = new UserIntegralModifyForm([
                 "type"        => 1,
                 "integral"    => $hotelOrder->integral_deduction_price,
-                "desc"        => "酒店预订单退款，返还红包",
+                "desc"        => "酒店预订单退款，返还金豆",
                 "source_id"   => $applyOrder->id,
                 "source_type" => "hotel_order_refund"
             ]);

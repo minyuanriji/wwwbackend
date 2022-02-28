@@ -74,7 +74,7 @@ class GoodsController extends Controller{
     }
 
     /**
-     * 保存购物券赠送设置
+     * 保存红包赠送设置
      * @return string|yii\web\Response
      */
     public function actionUpdateIntegraSetting(){

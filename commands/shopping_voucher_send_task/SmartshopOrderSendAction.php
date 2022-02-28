@@ -86,7 +86,7 @@ class SmartshopOrderSendAction extends Action{
             ]);
 
             if($sendLog->save()){
-                $this->controller->commandOut("购物券发放记录创建成功，ID:" . $sendLog->id);
+                $this->controller->commandOut("红包发放记录创建成功，ID:" . $sendLog->id);
             }else{
                 $this->controller->commandOut(json_encode($sendLog->getErrors()));
             }
@@ -113,13 +113,13 @@ class SmartshopOrderSendAction extends Action{
                 }
                 $modifyForm = new ShoppingVoucherLogModifiyForm([
                     "money"       => $sendLog['money'],
-                    "desc"        => "门店消费获得赠送购物券",
+                    "desc"        => "门店消费获得赠送红包",
                     "source_id"   => $sendLog['source_id'],
                     "source_type" => $sendLog['source_type']
                 ]);
                 $modifyForm->add($user, true);
                 $sendLogIds[] = $sendLog['id'];
-                $this->controller->commandOut("购物券发放记录ID:" . $sendLog['id'] . "处理完成");
+                $this->controller->commandOut("红包发放记录ID:" . $sendLog['id'] . "处理完成");
             }catch (\Exception $e){
                 $remark = implode("\n", [$e->getMessage(), "line:" . $e->getLine(), "file:".$e->getFile()]);
                 ShoppingVoucherSendLog::updateAll([

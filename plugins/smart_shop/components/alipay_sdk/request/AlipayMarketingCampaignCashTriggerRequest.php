@@ -8,7 +8,7 @@
 class AlipayMarketingCampaignCashTriggerRequest
 {
 	/** 
-	 * 触发现金红包活动
+	 * 触发现金金豆活动
 	 **/
 	private $bizContent;
 

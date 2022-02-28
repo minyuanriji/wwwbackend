@@ -54,7 +54,7 @@
                 <template slot-scope="scope">
                     <div v-if="scope.row.pay_status != 'unpaid'">
                         <div>支付日期：{{scope.row.pay_at}}</div>
-                        <div>使用红包：{{scope.row.integral_deduction_price ?? 0}}</div>
+                        <div>使用金豆：{{scope.row.integral_deduction_price ?? 0}}</div>
                         <div>使用现金：{{scope.row.pay_price ?? 0}}</div>
                     </div>
                     <div v-else>-</div>
@@ -64,7 +64,7 @@
             <el-table-column label="赠送" >
                 <template slot-scope="scope">
                     <div>红 包：{{scope.row.integral_give_num}}</div>
-                    <div>购物券：{{scope.row.got_shopping_voucher_num}}</div>
+                    <div>红包：{{scope.row.got_shopping_voucher_num}}</div>
                     <div v-if="scope.row.score_enable == 1 && scope.row.pay_status == 'paid'">
                         <span v-if="scope.row.score_give_settings.is_permanent == 1">永久积分：{{scope.row.score_give_settings.integral_num}}</span>
                         <span v-else>

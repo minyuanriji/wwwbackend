@@ -124,14 +124,14 @@
                         </el-col>
                     </el-row>
                 </el-tab-pane>
-                <el-tab-pane label="红包券设置" name="integral">
+                <el-tab-pane label="金豆券设置" name="integral">
                     <el-row>
                         <el-col :span="24">
                             <div class="title">
-                                <span>红包券设置</span>
+                                <span>金豆券设置</span>
                             </div>
                             <div class="form-body">
-                                <el-form-item label="启用红包券抵扣功能" prop="integral_status">
+                                <el-form-item label="启用金豆券抵扣功能" prop="integral_status">
                                     <el-switch v-model="ruleForm.integral_status" active-value="1"
                                                inactive-value="0"></el-switch>
                                 </el-form-item>

@@ -46,13 +46,13 @@ class OilOrderSendAction extends Action{
                 }
                 $modifyForm = new ShoppingVoucherLogModifiyForm([
                     "money"       => $sendLog['money'],
-                    "desc"        => "支付加油券获得赠送购物券",
+                    "desc"        => "支付加油券获得赠送红包",
                     "source_id"   => $sendLog['source_id'],
                     "source_type" => $sendLog['source_type']
                 ]);
                 $modifyForm->add($user, true);
                 $sendLogIds[] = $sendLog['id'];
-                $this->controller->commandOut("购物券发放记录ID:" . $sendLog['id'] . "处理完成");
+                $this->controller->commandOut("红包发放记录ID:" . $sendLog['id'] . "处理完成");
             }catch (\Exception $e){
                 $remark = implode("\n", [$e->getMessage(), "line:" . $e->getLine(), "file:".$e->getFile()]);
                 ShoppingVoucherSendLog::updateAll([
@@ -117,7 +117,7 @@ class OilOrderSendAction extends Action{
 
         foreach($oilOrders as $oilOrder){
 
-            //通过查询历史赠送记录，判断用户是否首次赠送购物券
+            //通过查询历史赠送记录，判断用户是否首次赠送红包
             $sendLog = ShoppingVoucherLog::find()->where([
                 "user_id"     => $oilOrder['user_id'],
                 "type"        => 1,
@@ -157,7 +157,7 @@ class OilOrderSendAction extends Action{
             ]);
 
             if($sendLog->save()){
-                $this->controller->commandOut("购物券发放记录创建成功，ID:" . $sendLog->id);
+                $this->controller->commandOut("红包发放记录创建成功，ID:" . $sendLog->id);
             }else{
                 $this->controller->commandOut(json_encode($sendLog->getErrors()));
             }

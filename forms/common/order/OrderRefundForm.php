@@ -255,7 +255,7 @@ class OrderRefundForm extends BaseModel
             (new OrderCommon()) -> returnIntegral($orderRefund->detail,$orderRefund -> order_no);
             $this->returnScore($orderRefund->detail);
 
-            //退购物券
+            //退红包
             $this->returnShoppingVoucher($orderRefund);
 
             $transaction->commit();
@@ -289,7 +289,7 @@ class OrderRefundForm extends BaseModel
     }
 
     /**
-     * 退回购物券
+     * 退回红包
      * @param OrderRefund $refund
      */
     public function returnShoppingVoucher(OrderRefund $refund)
@@ -299,7 +299,7 @@ class OrderRefundForm extends BaseModel
             $user = User::findOne($refund->user_id);
             $modifyForm = new ShoppingVoucherLogModifiyForm([
                 "money"       => $orderDetail->shopping_voucher_num,
-                "desc"        => "订单退款，购物券返还",
+                "desc"        => "订单退款，红包返还",
                 "source_id"   => $refund->id,
                 "source_type" => "from_order_refund"
             ]);

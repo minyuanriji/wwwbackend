@@ -19,7 +19,7 @@ Yii::$app->loadComponentView('goods/com-dialog-select');
                         <el-button type="primary" size="small">指定商品</el-button>
                     </com-dialog-select>
                 </el-form-item>
-                <el-form-item label="购物券价" prop="voucher_price">
+                <el-form-item label="红包价" prop="voucher_price">
                     <el-input v-model="formData.voucher_price" style="width:35%;">
                         <template slot="append">元</template>
                     </el-input>
@@ -66,7 +66,7 @@ Yii::$app->loadComponentView('goods/com-dialog-select');
                         {required: true, message: '请设置商品', trigger: 'change'},
                     ],
                     voucher_price: [
-                        {required: true, message: '请设置购物券价格', trigger: 'change'},
+                        {required: true, message: '请设置红包价格', trigger: 'change'},
                     ]
                 },
                 btnLoading: false

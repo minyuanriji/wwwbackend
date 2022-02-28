@@ -19,7 +19,7 @@ class UserIntegralGiftpacksForm extends UserIntegralForm{
     public static function groupCancelRefundAdd(GiftpacksGroupPayOrder $payOrder, User $user, $trans = false){
         $trans && ($t = \Yii::$app->db->beginTransaction());
         try {
-            $desc = "大礼包拼单取消，支付单[ID:".$payOrder->id."]退款，返还红包";
+            $desc = "大礼包拼单取消，支付单[ID:".$payOrder->id."]退款，返还金豆";
 
             static::change($user, $payOrder->integral_deduction_price, self::TYPE_ADD, "giftpacks_group_pay_order_refund", $payOrder->id, $desc);
 

@@ -124,14 +124,14 @@
                             <div v-if="scope.row.source_type == 'giftpacks_order_item'">
                                 <div><span style="color:darkgreen">¥{{scope.row.order_item_info.giftpackOrder.pay_price}}</span>
                                 </div>
-                                <div><span style="color:darkred">{{scope.row.order_item_info.giftpackOrder.integral_deduction_price}}红包 </span>
+                                <div><span style="color:darkred">{{scope.row.order_item_info.giftpackOrder.integral_deduction_price}}金豆 </span>
                                 </div>
                             </div>
                             <div v-if="scope.row.source_type == 'order_detail'">
                                 <div><span style="color:darkgreen">¥{{scope.row.order.total_price}}</span></div>
-                                <div><span style="color:darkred">{{scope.row.order.integral_deduction_price}}红包</span>
+                                <div><span style="color:darkred">{{scope.row.order.integral_deduction_price}}金豆</span>
                                 </div>
-                                <div>{{scope.row.order.shopping_voucher_decode_price}}购物券</div>
+                                <div>{{scope.row.order.shopping_voucher_decode_price}}红包</div>
                                 <div>{{scope.row.order.score_deduction_price}}积分</div>
                             </div>
                         </template>
@@ -222,11 +222,11 @@
                         <span v-else>
                             <span
                                   v-if="details.allow_currency == 'integral'">
-                                红包
+                                金豆
                             </span>
                         </span>
                     </td>
-                    <td class="label"><span v-if="details.integral_enable == 0" style="color: red">(未开启)</span>返红包：</td>
+                    <td class="label"><span v-if="details.integral_enable == 0" style="color: red">(未开启)</span>返金豆：</td>
                     <td>{{ details.integral_give_num }}</td>
                 </tr>
                 <tr class="c2" >

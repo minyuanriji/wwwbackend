@@ -32,7 +32,7 @@ class CacheMallConfigForm extends BaseModel implements ICacheForm{
         $mall_setting['setting']["name"] = $mall_setting["name"];
         $setting['setting'] = $mall_setting['setting'];
 
-        //获取红包券开启状态
+        //获取金豆券开启状态
         $optionCache = OptionLogic::get(
             Option::NAME_PAYMENT,
             \Yii::$app->mall->id,

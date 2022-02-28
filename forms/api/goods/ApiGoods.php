@@ -79,7 +79,7 @@ class ApiGoods extends BaseModel
         }
 
         $PriceDisplayService=new PriceDisplayService(\Yii::$app->mall->id);
-        //可抵红包券大于0才显示红包券会员价  2
+        //可抵金豆券大于0才显示金豆券会员价  2
         if ($this->goods->max_deduct_integral > 0) {
             $price_display = $PriceDisplayService->getGoodsPriceDisplay($this->goods->price_display);
         } else {

@@ -66,7 +66,7 @@ Yii::$app->loadComponentView('statistics/com-header');
 <div id="app" v-cloak>
     <el-card v-loading="loading" shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
-            <com-header :url="url" :new-search="JSON.stringify(search)">裂变拆红包</com-header>
+            <com-header :url="url" :new-search="JSON.stringify(search)">裂变拆金豆</com-header>
         </div>
         <div class="table-body">
             <com-search

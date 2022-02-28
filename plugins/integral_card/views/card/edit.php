@@ -41,7 +41,7 @@
                     <el-input :disabled="isLook" size="small" v-model="form.name" placeholder="请输入卡密名称" autocomplete="off"></el-input>
                 </el-form-item>
 				
-				<!-- 领卡送红包券 -->
+				<!-- 领卡送金豆券 -->
 				<el-form-item label="领卡送积分" prop="status">
 					<div>
 						<el-switch

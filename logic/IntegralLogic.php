@@ -19,7 +19,7 @@ class IntegralLogic
 {
 
     /**
-     * 订单取消返还购物券
+     * 订单取消返还红包
      * @param $order
      * @return void
      */
@@ -31,7 +31,7 @@ class IntegralLogic
                 $user = User::findOne($order->user_id);
                 $modifyForm = new ShoppingVoucherLogModifiyForm([
                     "money"       => $order->shopping_voucher_use_num,
-                    "desc"        => '订单(' . $order->id . ')取消，返还购物券' . $order->shopping_voucher_use_num,
+                    "desc"        => '订单(' . $order->id . ')取消，返还红包' . $order->shopping_voucher_use_num,
                     "source_id"   => $order->id,
                     "source_type" => "from_order_cancel"
                 ]);
@@ -39,14 +39,14 @@ class IntegralLogic
             }
             $trans->commit();
         }catch (\Exception $e){
-            Yii::error('取消订单返还购物券失败' . PHP_EOL . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL . "message:" . $e->getMessage());
+            Yii::error('取消订单返还红包失败' . PHP_EOL . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL . "message:" . $e->getMessage());
             $trans->rollBack();
             throw $e;
         }
     }
 
     /**
-     * 订单取消返还红包券/积分券
+     * 订单取消返还金豆券/积分券
      * @Author bing
      * @DateTime 2020-10-09 15:39:38
      * @param [type] $order
@@ -59,9 +59,9 @@ class IntegralLogic
         try {
             if (!empty($order)) {
                 if ($ctype == 1) {
-                    //订单取消返还红包券
+                    //订单取消返还金豆券
                     if ($order->integral_deduction_price > 0) {
-                        //查询所有抵扣掉的永久红包券
+                        //查询所有抵扣掉的永久金豆券
                         $static_deduct_record = IntegralRecord::getDeductRecordByOrder($order, $ctype);
                         $user_id = $order->user_id;
                         // $agent = ProfitAgent::getAgentByUserId($user_id,$order->mall_id);
@@ -72,7 +72,7 @@ class IntegralLogic
                                 'mall_id' => $static_deduct_record['mall_id'],
                                 'user_id' => $static_deduct_record['user_id'],
                                 'money' => $static_deduct_record['money'] * -1,
-                                'desc' => '订单(' . $order->id . ')取消,返还红包券' . ($static_deduct_record['money'] * -1),
+                                'desc' => '订单(' . $order->id . ')取消,返还金豆券' . ($static_deduct_record['money'] * -1),
                                 'before_money' => $wallet['static_integral'],
                                 'type' => Integral::TYPE_ALWAYS,
                                 'source_id' => $order->id,
@@ -99,7 +99,7 @@ class IntegralLogic
                                         'record_id' => $deduct['record_id'],
                                         'before_money' => $before_money,
                                         'money' => $deduct['money'] * -1,
-                                        'desc' => '订单(' . $order->id . ')取消,返还动态红包券(' . $deduct['record_id'] . ')面额：' . ($deduct['money'] * -1)
+                                        'desc' => '订单(' . $order->id . ')取消,返还动态金豆券(' . $deduct['record_id'] . ')面额：' . ($deduct['money'] * -1)
                                     );
                                     // 写入日志
                                     $res = IntegralDeduct::deduct($refund);
@@ -130,7 +130,7 @@ class IntegralLogic
                                 'mall_id' => $static_deduct_record['mall_id'],
                                 'user_id' => $static_deduct_record['user_id'],
                                 'money' => $static_deduct_record['money'] * -1,
-                                'desc' => '订单(' . $order->id . ')取消,返还红包券' . ($static_deduct_record['money'] * -1),
+                                'desc' => '订单(' . $order->id . ')取消,返还金豆券' . ($static_deduct_record['money'] * -1),
                                 'before_money' => $wallet['static_score'],
                                 'type' => Integral::TYPE_ALWAYS,
                                 'source_id' => $order->id,
@@ -158,7 +158,7 @@ class IntegralLogic
                                         'record_id' => $deduct['record_id'],
                                         'before_money' => $before_money,
                                         'money' => $deduct['money'] * -1,
-                                        'desc' => '订单(' . $order->id . ')取消,返还动态红包券(' . $deduct['record_id'] . ')面额：' . ($deduct['money'] * -1)
+                                        'desc' => '订单(' . $order->id . ')取消,返还动态金豆券(' . $deduct['record_id'] . ')面额：' . ($deduct['money'] * -1)
                                     );
                                     // 写入日志
                                     $res = IntegralDeduct::deduct($refund);
@@ -179,7 +179,7 @@ class IntegralLogic
             }
             $trans->commit();
         } catch (Exception $e) {
-            Yii::error('取消订单返还红包券失败' . PHP_EOL . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL . "message:" . $e->getMessage());
+            Yii::error('取消订单返还金豆券失败' . PHP_EOL . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL . "message:" . $e->getMessage());
             $trans->rollBack();
             throw $e;
         }
@@ -187,7 +187,7 @@ class IntegralLogic
 
 
     /**
-     * 升级发放积分券，红包券
+     * 升级发放积分券，金豆券
      * @Author bing
      * @DateTime 2020-10-09 17:39:26
      * @param [type] $level_info
@@ -199,7 +199,7 @@ class IntegralLogic
     {
         $title = '积分券';
         if ($ctype == 1) {
-            $title = '红包券';
+            $title = '金豆券';
         }
         try {
             echo '经销商升级赠送' . $title . PHP_EOL;
@@ -217,7 +217,7 @@ class IntegralLogic
 
 
     /**
-     * 购物发放红包券
+     * 购物发放金豆券
      * @Author bing
      * @DateTime 2020-10-09 17:44:13
      * @return
@@ -246,7 +246,7 @@ class IntegralLogic
                     if ($setting['integral_setting']) {
                         $integral_setting = json_decode($setting['integral_setting'], true);
                     }
-                    //计算需要赠送的红包
+                    //计算需要赠送的金豆
                     $totalIntegralNum = intval($order_detail['num']) * intval($integral_setting['integral_num']);
 
                     if ($setting['first_buy_setting']) {
@@ -286,7 +286,7 @@ class IntegralLogic
                     $integral_setting['source_type'] = "goods_order";
                     $integral_setting['source_id'] = $order_detail->id;
 
-                    $desc = '购买商品[ID:' . $goods_id . ']赠送红包券，支付金额：' . $order_detail->total_original_price;
+                    $desc = '购买商品[ID:' . $goods_id . ']赠送金豆券，支付金额：' . $order_detail->total_original_price;
                     if ($type == 'paid' && $is_order_paid && $order_paid['is_integral_card']) {  //商品订单设置支付状态下执行
                         Integral::addIntegralPlan($user_id, $integral_setting, $desc, '1');
                     } elseif (!$is_order_paid) { //商品订单不设置支付状态下执行
@@ -298,7 +298,7 @@ class IntegralLogic
             return true;
         } catch (Exception $e) {
             $trans->rollBack();
-            Yii::error('用户购物发放红包券失败' . PHP_EOL . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL . "message:" . $e->getMessage());
+            Yii::error('用户购物发放金豆券失败' . PHP_EOL . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL . "message:" . $e->getMessage());
             return false;
         }
     }
@@ -319,7 +319,7 @@ class IntegralLogic
                     if (empty($integral_setting))
                         continue;
 
-                    //计算需要赠送的红包
+                    //计算需要赠送的金豆
                     $totalIntegralNum = intval($order_detail['num']) * intval($integral_setting['integral_num']);
 
                     //不能大于支付金额
@@ -331,7 +331,7 @@ class IntegralLogic
                     $integral_setting['source_type'] = "goods_order";
                     $integral_setting['source_id'] = $order_detail->id;
 
-                    $desc = '购买商品[ID:' . $goods_id . ']赠送红包券，支付金额：' . $order_detail->total_original_price;
+                    $desc = '购买商品[ID:' . $goods_id . ']赠送金豆券，支付金额：' . $order_detail->total_original_price;
                     if ($type == 'paid' && $is_order_paid && $order_paid['is_integral_card']) {  //商品订单设置支付状态下执行
                         Integral::addIntegralPlan($user_id, $integral_setting, $desc, '1');
                     } elseif (!$is_order_paid) { //商品订单不设置支付状态下执行
@@ -343,7 +343,7 @@ class IntegralLogic
             return true;
         } catch (Exception $e) {
             $trans->rollBack();
-            Yii::error('用户购物发放红包券失败' . PHP_EOL . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL . "message:" . $e->getMessage());
+            Yii::error('用户购物发放金豆券失败' . PHP_EOL . $e->getFile() . '(' . $e->getLine() . ')' . PHP_EOL . "message:" . $e->getMessage());
             return false;
         }
     }
@@ -414,7 +414,7 @@ class IntegralLogic
     {
         $title = '积分券';
         if ($ctype == 1) {
-            $title = '红包券';
+            $title = '金豆券';
         }
         try {
             $setting = json_decode($integral_setting, true);

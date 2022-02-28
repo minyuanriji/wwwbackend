@@ -106,7 +106,7 @@ class SameGoodsService
 
             $this->same_goods_list[$goods_id]['coupon_list'] = [];
 
-            //红包券
+            //金豆券
             $this->same_goods_list[$goods_id]['max_deduct_integral'] = $goodsItem['max_deduct_integral'];
             $this->same_goods_list[$goods_id]['integral_fee_rate'] = $goodsItem['integral_fee_rate'];
         }

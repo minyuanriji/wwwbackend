@@ -27,7 +27,7 @@ class ShoppingVoucherGoodsDeleteForm extends BaseModel{
 
             $voucherGoods = ShoppingVoucherTargetGoods::findOne($this->id);
             if(!$voucherGoods){
-                throw new \Exception("购物券商品不存在");
+                throw new \Exception("红包商品不存在");
             }
 
             $voucherGoods->is_delete = 1;

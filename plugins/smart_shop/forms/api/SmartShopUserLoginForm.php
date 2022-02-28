@@ -50,7 +50,7 @@ class SmartShopUserLoginForm extends BaseModel{
                     "mf.is_delete"    => 0
                 ])->asArray()->one();
             if(!$row){
-                throw new \Exception("该门店未设置购物券兑换功能");
+                throw new \Exception("该门店未设置红包兑换功能");
             }
             $ssStoreLocalUserId = $row['user_id'];
 
@@ -94,7 +94,7 @@ class SmartShopUserLoginForm extends BaseModel{
                 throw new \Exception($this->responseErrorInfo($user));
             }
 
-            //获取用户剩余的购物券
+            //获取用户剩余的红包
             $remainShoppingVoucherNum = 0;
             $shoppingVoucherUserModel = ShoppingVoucherUser::findOne(["user_id" => $user->id]);
             if($shoppingVoucherUserModel){

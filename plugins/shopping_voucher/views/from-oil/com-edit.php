@@ -52,7 +52,7 @@
         },
         data() {
             return {
-                dialogTitle: "设置加油券购物券赠送",
+                dialogTitle: "设置加油券红包赠送",
                 activeName: "first",
                 dialogVisible: false,
                 formDialogVisible: false,

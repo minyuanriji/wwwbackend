@@ -182,7 +182,7 @@
                 <el-table-column label="资金明细" width="160">
                     <template slot-scope="scope">
                         <div>支付现金：{{scope.row.pay_price}}</div>
-                        <div>支付红包：{{scope.row.integral_deduction_price}}</div>
+                        <div>支付金豆：{{scope.row.integral_deduction_price}}</div>
                         <div>总支付：{{scope.row.order_price}}</div>
                     </template>
                 </el-table-column>
@@ -190,7 +190,7 @@
                 <el-table-column label="赠送明细" width="180">
                     <template slot-scope="scope">
                         <div>
-                            赠送购物券：{{scope.row.send_money}}
+                            赠送红包：{{scope.row.send_money}}
                             <span v-if="scope.row.send_status == 'invalid' || scope.row.send_status == ''"
                                   style="color: red">(无效)</span>
                             <span v-if="scope.row.send_status == 'success'" style="color: green">(已发送)</span>
@@ -340,7 +340,7 @@
                     <tr class="c4">
                         <td class="label">支付现金：</td>
                         <td>{{ infoDialog.pay_price }}</td>
-                        <td class="label">支付红包：</td>
+                        <td class="label">支付金豆：</td>
                         <td>{{ infoDialog.integral_deduction_price }}</td>
                     </tr>
                     <tr class="c4">
@@ -361,7 +361,7 @@
                 </div>
                 <table class="grid-i" style="width:100%;">
                     <tr class="c4">
-                        <td class="label">赠送购物券：</td>
+                        <td class="label">赠送红包：</td>
                         <td>
                             {{ infoDialog.send_money }}
                             <span v-if="infoDialog.send_status == 'invalid' || infoDialog.send_status == ''"
@@ -541,7 +541,7 @@
                 ],
                 pay_mode: [
                     {label: "全部", value: ""},
-                    {label: "红包", value: "red_packet"},
+                    {label: "金豆", value: "red_packet"},
                     {label: "余额", value: "balance"}
                 ],
                 dialogVisible: false,

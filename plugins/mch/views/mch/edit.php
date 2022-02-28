@@ -107,8 +107,8 @@
                                 实际到手<span style="color: #F56C6C;font-size: 12px">90</span>元
                             </div>
                         </el-form-item>
-                        <el-form-item label="红包券额外扣取比例" prop="transfer_rate">
-                            <label slot="label">红包券扣取比例
+                        <el-form-item label="金豆券额外扣取比例" prop="transfer_rate">
+                            <label slot="label">金豆券扣取比例
                                 <el-tooltip class="item" effect="dark"
                                             content="0表示不设置"
                                             placement="top">
@@ -119,11 +119,11 @@
                                 <template slot="append">%</template>
                             </el-input>
                             <div>
-                                <span class="text-danger">使用红包券支付需额外支付的红包券数额</span><br>
+                                <span class="text-danger">使用金豆券支付需额外支付的金豆券数额</span><br>
                                 例如：设置<span style="color: #F56C6C;font-size: 12px">10%</span><br>
-                                使用红包券抵扣<span style="color: #F56C6C;font-size: 12px">100</span>元时，需要额外收取<span
-                                        style="color: #F56C6C;font-size: 12px">10</span>的红包券，
-                                最终需要<span style="color: #F56C6C;font-size: 12px">110</span>的红包券
+                                使用金豆券抵扣<span style="color: #F56C6C;font-size: 12px">100</span>元时，需要额外收取<span
+                                        style="color: #F56C6C;font-size: 12px">10</span>的金豆券，
+                                最终需要<span style="color: #F56C6C;font-size: 12px">110</span>的金豆券
                             </div>
                         </el-form-item>
                         <el-form-item label="排序" prop="sort">
@@ -251,10 +251,10 @@
                             <el-input v-model="ruleForm.settle_num"></el-input>
                         </el-form-item>
                     </el-tab-pane>
-                    <el-tab-pane label="购物券赠送" name="give_shopping_voucher">
+                    <el-tab-pane label="红包赠送" name="give_shopping_voucher">
                         <el-alert title="说明：编辑完成请点击确定。" type="info" :closable="false" style="margin-bottom: 20px;color: red;"></el-alert>
                         <el-form ref="formData" :rules="formRule" :model="formData" size="small">
-                            <el-form-item label="返购物券" prop="enable">
+                            <el-form-item label="返红包" prop="enable">
                                 <el-switch
                                         v-model="formData.enable"
                                         active-text="启用"

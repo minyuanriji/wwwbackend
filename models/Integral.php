@@ -129,7 +129,7 @@ class Integral extends BaseActiveRecord
     }
 
     /**
-     * 派发积分/红包券
+     * 派发积分/金豆券
      * @Author bing
      * @DateTime 2020-10-07 18:44:27
      * @copyright: Copyright (c) 2020 广东七件事集团

@@ -247,7 +247,7 @@ class AppConfigLogic
                     $v['scene'] = $aliappConfig->cs_scene;
                 }
             }
-            if ($v['open_type'] == 'navigate' && $v['name'] == '购物券订单') {
+            if ($v['open_type'] == 'navigate' && $v['name'] == '红包订单') {
                 $v['link_url'] = "/ali/alibaba/orderList/orderList";
             }
             $menu[] = $v;

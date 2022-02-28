@@ -59,7 +59,7 @@ class GoodsPayVoucherNotification
                 'keyword2'  => $orderResult->order_no,
                 'keyword3'  => $orderDetailResult->total_price . '元',
                 'keyword4'  => $goodsWarehouseResult->name,
-                'remark'    => '赠送’'. $voucher_log['money'] .'‘购物券，欢迎您再次光临！'
+                'remark'    => '赠送’'. $voucher_log['money'] .'‘红包，欢迎您再次光临！'
             ]
         ]))->send();
     }

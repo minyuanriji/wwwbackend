@@ -170,7 +170,7 @@
             },
             finishOrder(){
                 let self = this;
-                self.$confirm('确定要结束订单？一旦结束，若有购物券、积分、红包或分佣等奖励信息，将立即发放！', '提示', {
+                self.$confirm('确定要结束订单？一旦结束，若有红包、积分、金豆或分佣等奖励信息，将立即发放！', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'

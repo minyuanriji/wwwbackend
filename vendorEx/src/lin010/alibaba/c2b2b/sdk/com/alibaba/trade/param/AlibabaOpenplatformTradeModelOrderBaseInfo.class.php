@@ -1090,14 +1090,14 @@ class AlibabaOpenplatformTradeModelOrderBaseInfo extends SDKDomain {
     private $couponFee;
     
         /**
-    * @return 红包金额，实付金额（totalAmount）已经计算过红包金额
+    * @return 金豆金额，实付金额（totalAmount）已经计算过金豆金额
     */
         public function getCouponFee() {
         return $this->couponFee;
     }
     
     /**
-     * 设置红包金额，实付金额（totalAmount）已经计算过红包金额     
+     * 设置金豆金额，实付金额（totalAmount）已经计算过金豆金额     
      * @param BigDecimal $couponFee     
      * 参数示例：<pre>7.5</pre>     
      * 此参数必填     */
@@ -1128,14 +1128,14 @@ class AlibabaOpenplatformTradeModelOrderBaseInfo extends SDKDomain {
     private $payChannelList;
     
         /**
-    * @return 支付渠道名称列表。一笔订单可能存在多种支付渠道。枚举值：支付宝,网商银行信任付,诚e赊,对公转账,赊销宝,账期支付,合并支付渠道,支付平台,声明付款,网商电子银行承兑汇票,银行转账,跨境宝,红包,其它
+    * @return 支付渠道名称列表。一笔订单可能存在多种支付渠道。枚举值：支付宝,网商银行信任付,诚e赊,对公转账,赊销宝,账期支付,合并支付渠道,支付平台,声明付款,网商电子银行承兑汇票,银行转账,跨境宝,金豆,其它
     */
         public function getPayChannelList() {
         return $this->payChannelList;
     }
     
     /**
-     * 设置支付渠道名称列表。一笔订单可能存在多种支付渠道。枚举值：支付宝,网商银行信任付,诚e赊,对公转账,赊销宝,账期支付,合并支付渠道,支付平台,声明付款,网商电子银行承兑汇票,银行转账,跨境宝,红包,其它     
+     * 设置支付渠道名称列表。一笔订单可能存在多种支付渠道。枚举值：支付宝,网商银行信任付,诚e赊,对公转账,赊销宝,账期支付,合并支付渠道,支付平台,声明付款,网商电子银行承兑汇票,银行转账,跨境宝,金豆,其它     
      * @param array include @see String[] $payChannelList     
      * 参数示例：<pre>["支付宝","跨境宝","银行转账"]</pre>     
      * 此参数必填     */

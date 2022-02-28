@@ -16,7 +16,7 @@ class IntegralPayController extends ApiController{
     }
 
     /**
-     * 红包支付大礼包订单
+     * 金豆支付大礼包订单
      * @return \yii\web\Response
      */
     public function actionGiftpacks(){
@@ -26,7 +26,7 @@ class IntegralPayController extends ApiController{
     }
 
     /**
-     * 红包支付大礼包拼单
+     * 金豆支付大礼包拼单
      * @return \yii\web\Response
      */
     public function actionGiftpacksGroup(){

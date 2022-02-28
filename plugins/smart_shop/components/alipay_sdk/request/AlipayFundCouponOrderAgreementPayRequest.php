@@ -8,7 +8,7 @@
 class AlipayFundCouponOrderAgreementPayRequest
 {
 	/** 
-	 * 红包协议支付接口
+	 * 金豆协议支付接口
 	 **/
 	private $bizContent;
 

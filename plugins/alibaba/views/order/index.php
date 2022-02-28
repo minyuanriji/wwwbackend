@@ -79,7 +79,7 @@
                             <div v-if="scope.row.is_pay==1">
                                 <div v-if="scope.row.pay_type==1">现金：{{scope.row.total_price ?? 0}}</div>
                                 <div v-if="scope.row.pay_type==2">货到付款</div>
-                                <div v-if="scope.row.pay_type==3">购物券：
+                                <div v-if="scope.row.pay_type==3">红包：
                                     {{scope.row.shopping_voucher_decode_price ?? 0}}
                                 </div>
                                 <div>运费：{{ scope.row.shopping_voucher_express_use_num }}</div>

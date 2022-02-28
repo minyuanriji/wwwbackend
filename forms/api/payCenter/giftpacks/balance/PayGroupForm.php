@@ -25,7 +25,7 @@ class PayGroupForm extends BalanceBasePayForm {
     /**
      * 支付后操作
      * @param User $user
-     * @param Closure $callback 回掉方法传入红包记录来源ID、类型、描述
+     * @param Closure $callback 回掉方法传入金豆记录来源ID、类型、描述
      * @return array
      */
     protected function paidAction(User $user, \Closure $callback){

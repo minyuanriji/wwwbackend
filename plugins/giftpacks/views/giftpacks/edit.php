@@ -98,9 +98,9 @@ Yii::$app->loadComponentView('com-rich-text');
 
                     <el-form-item label="支付模式" prop="allow_currency">
                         <el-radio v-model="formData.allow_currency" label="money">现金</el-radio>
-                        <el-radio v-model="formData.allow_currency" label="integral">红包</el-radio>
+                        <el-radio v-model="formData.allow_currency" label="integral">金豆</el-radio>
                         <el-card shadow="never" v-if="formData.allow_currency == 'money'">
-                            <el-form-item label="返红包" prop="integral_enable">
+                            <el-form-item label="返金豆" prop="integral_enable">
                                 <el-switch
                                         v-model="formData.integral_enable"
                                         active-text="启用"
@@ -109,7 +109,7 @@ Yii::$app->loadComponentView('com-rich-text');
                             </el-form-item>
                             <el-form-item label="数量" prop="integral_give_num" v-if="formData.integral_enable">
                                 <el-input type="number" style="width:250px" v-model="formData.integral_give_num">
-                                    <template slot="append">红包券</template>
+                                    <template slot="append">金豆券</template>
                                 </el-input>
                             </el-form-item>
                             <el-form-item label="返积分" prop="score_enable">
@@ -184,11 +184,11 @@ Yii::$app->loadComponentView('com-rich-text');
                 </div>
             </el-tab-pane>
 
-            <el-tab-pane label="购物券设置" name="shopping_setting" v-if="shoppingFormData.gift_id > 0">
+            <el-tab-pane label="红包设置" name="shopping_setting" v-if="shoppingFormData.gift_id > 0">
                 <el-form ref="shoppingFormData" :rules="shoppingFormRule" label-width="15%" :model="shoppingFormData"
                          size="small">
                     <div style="margin-left: 36px;margin-bottom: 20px">
-                        赠送购物券设置
+                        赠送红包设置
                         <el-switch
                                 v-model="shoppingSwitchOpen"
                                 active-text="开启"

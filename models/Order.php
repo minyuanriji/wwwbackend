@@ -333,7 +333,7 @@ class Order extends BaseActiveRecord
             'city_info' => '配送信息',
             'address_id'=>'地址id',
             'full_relief_price' =>'满减金额',
-            'integral_deduction_price' =>'红包券抵扣金额',
+            'integral_deduction_price' =>'金豆券抵扣金额',
             'expand_num' =>'延长收货次数',
         ];
     }

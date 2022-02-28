@@ -19,7 +19,7 @@ class ShoppingVoucherSendTaskController extends BaseCommandController {
     }
 
     /**
-     * 购物券发送任务
+     * 红包发送任务
      */
     public function actionStart(){
         $pm = new \Swoole\Process\ProcessManager();

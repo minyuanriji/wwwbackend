@@ -1,4 +1,4 @@
-<!-- '红包券充值卡列表' -->
+<!-- '金豆券充值卡列表' -->
 <?php
 Yii::$app->loadPluginComponentView('card-batch');
 ?>
@@ -9,7 +9,7 @@ Yii::$app->loadPluginComponentView('card-batch');
         
             <div slot="header">
                 <div>
-                    <span>红包券充值卡列表</span>
+                    <span>金豆券充值卡列表</span>
                     <!-- <com-export-dialog style="float: right;margin-top: -5px" :field_list='exportList' :params="searchData"
                         @selected="exportConfirm">
                     </com-export-dialog> -->
@@ -59,7 +59,7 @@ Yii::$app->loadPluginComponentView('card-batch');
                                 <div size="small">{{scope.row.picker.nickname}}</div>
                             </template> -->
                         </el-table-column>
-                        <el-table-column label="红包券类型" prop="integral_setting" width="100">
+                        <el-table-column label="金豆券类型" prop="integral_setting" width="100">
                             <template slot-scope="scope">
                                 <div size="small">{{scope.row.integral_setting.expire==-1?'永久有效':'限时有效'}}</div>
                             </template>

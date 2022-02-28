@@ -142,7 +142,7 @@ class MchApplyPassForm extends BaseModel{
             $giveValue = 0;
         }
 
-        //设置购物券赠送
+        //设置红包赠送
         if($giveValue > 0){
             $model = ShoppingVoucherFromStore::findOne([
                 "mall_id"  => $mch->mall_id,

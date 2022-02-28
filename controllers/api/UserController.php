@@ -298,7 +298,7 @@ class UserController extends ApiController
     }
 
     /**
-     * 分享领取海报领取红包（新版）
+     * 分享领取海报领取金豆（新版）
      * @return array
      */
     public function actionLinkPosterNew(){
@@ -307,7 +307,7 @@ class UserController extends ApiController
     }
 
     /**
-     * 分享领取海报领取红包
+     * 分享领取海报领取金豆
      * @return array
      */
     public function actionLinkPoster($flag = ''){
@@ -355,7 +355,7 @@ class UserController extends ApiController
 //                    'angle' => -50,
 //                ),
                 array(
-                    'text' => '',//扫码领红包
+                    'text' => '',//扫码领金豆
                     'left' => 116,
                     'top' => 280,
                     'width' => 300,
@@ -442,7 +442,7 @@ class UserController extends ApiController
     }
 
     /**
-     * 新人获取红包福利
+     * 新人获取金豆福利
      */
     public function actionGetIntegral(){
         $form = new GiveScoreForm();

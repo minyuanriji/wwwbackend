@@ -59,7 +59,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
 
             <el-tabs v-model="search.type" type="card" @tab-click="handleClick">
                 <el-tab-pane label="总收益" name="TotalRevenue"></el-tab-pane>
-                <el-tab-pane label="红包" name="RedEnvelopes"></el-tab-pane>
+                <el-tab-pane label="金豆" name="RedEnvelopes"></el-tab-pane>
                 <el-tab-pane label="商户" name="Merchant"></el-tab-pane>
                 <el-tab-pane label="管理员充值" name="adminRecharge"></el-tab-pane>
             </el-tabs>
@@ -116,27 +116,27 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                     <div style="display: flex;justify-content: space-evenly">
                         <div class="one_class">
                             <div class="two_class">总送出</div>
-                            <div id="assets" >{{list.total_red_envelope}}红包</div>
+                            <div id="assets" >{{list.total_red_envelope}}金豆</div>
                         </div>
                         <div class="one_class">
                             <div class="two_class">已使用</div>
-                            <div id="assets">{{list.count_envelope}}红包</div>
+                            <div id="assets">{{list.count_envelope}}金豆</div>
                         </div>
                         <div class="one_class">
                             <div class="two_class">商品</div>
-                            <div id="assets">{{list.order_envelope}}红包</div>
+                            <div id="assets">{{list.order_envelope}}金豆</div>
                         </div>
                         <div class="one_class">
                             <div class="two_class">商家</div>
-                            <div id="assets">{{list.mch_envelope}}红包</div>
+                            <div id="assets">{{list.mch_envelope}}金豆</div>
                         </div>
                         <div class="one_class">
                             <div class="two_class">酒店</div>
-                            <div id="assets">{{list.hotel_envelope}}红包</div>
+                            <div id="assets">{{list.hotel_envelope}}金豆</div>
                         </div>
                         <div class="one_class">
                             <div class="two_class">大礼包</div>
-                            <div id="assets">{{list.big_gift_envelope}}红包</div>
+                            <div id="assets">{{list.big_gift_envelope}}金豆</div>
                         </div>
                     </div>
                 </div>
@@ -160,7 +160,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                     </el-table-column>
                                     <el-table-column prop="total_goods_original_price" label="订单总原价"  width="200"></el-table-column>
                                     <el-table-column prop="total_pay_price" label="实际支付总费用(含运费）"  width="200"></el-table-column>
-                                    <el-table-column prop="integral_deduction_price" label="红包抵扣价"  width="180"></el-table-column>
+                                    <el-table-column prop="integral_deduction_price" label="金豆抵扣价"  width="180"></el-table-column>
                                     <el-table-column prop="created_at" label="时间"  width="180">
                                         <template slot-scope="scope">
                                             <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
@@ -182,7 +182,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                     <el-table-column prop="order_no" label="订单号" width="240"></el-table-column>
                                     <el-table-column prop="order_price" label="订单金额"  width="150"></el-table-column>
                                     <el-table-column prop="pay_price" label="实际支付总费用"  width="200"></el-table-column>
-                                    <el-table-column prop="integral_deduction_price" label="红包抵扣价"  width="180"></el-table-column>
+                                    <el-table-column prop="integral_deduction_price" label="金豆抵扣价"  width="180"></el-table-column>
                                     <el-table-column prop="created_at" label="时间"  width="180">
                                         <template slot-scope="scope">
                                             <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
@@ -205,7 +205,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                     <el-table-column prop="order_no" label="订单号" width="240"></el-table-column>
                                     <el-table-column prop="order_price" label="订单金额"  width="150"></el-table-column>
                                     <el-table-column prop="pay_price" label="实际支付总费用"  width="150"></el-table-column>
-                                    <el-table-column prop="integral_deduction_price" label="红包抵扣价"  width="180"></el-table-column>
+                                    <el-table-column prop="integral_deduction_price" label="金豆抵扣价"  width="180"></el-table-column>
                                     <el-table-column prop="created_at" label="时间"  width="180">
                                         <template slot-scope="scope">
                                             <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
@@ -227,7 +227,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                     <el-table-column prop="order_sn" label="订单号" width="240"></el-table-column>
                                     <el-table-column prop="order_price" label="订单金额"  width="200"></el-table-column>
                                     <el-table-column prop="pay_price" label="实际支付总费用"  width="200"></el-table-column>
-                                    <el-table-column prop="integral_deduction_price" label="红包抵扣价"  width="180"></el-table-column>
+                                    <el-table-column prop="integral_deduction_price" label="金豆抵扣价"  width="180"></el-table-column>
                                     <el-table-column prop="created_at" label="时间"  width="180">
                                         <template slot-scope="scope">
                                             <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
@@ -275,7 +275,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                     <el-table-column prop="order_price" label="订单金额" width="150"></el-table-column>
                                     <el-table-column prop="pay_price" label="实际支付金额" width="180"></el-table-column>
                                     <el-table-column prop="score_deduction_price" label="积分抵扣金额"  width="180"></el-table-column>
-                                    <el-table-column prop="integral_deduction_price" label="红包抵扣价"  width="130"></el-table-column>
+                                    <el-table-column prop="integral_deduction_price" label="金豆抵扣价"  width="130"></el-table-column>
                                     <el-table-column prop="created_at" label="时间" width="180">
                                         <template slot-scope="scope">
                                             <div>{{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}</div>
@@ -326,23 +326,23 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 <div class="num-info-item" style="width: 100%;margin-bottom: 25px">
                     <div style="display: flex;justify-content: space-evenly">
                         <div class="one_class">
-                            <div class="two_class">红包</div>
-                            <div id="assets">{{list.integral}}红包</div>
+                            <div class="two_class">金豆</div>
+                            <div id="assets">{{list.integral}}金豆</div>
                         </div>
                         <div class="one_class">
                             <div class="two_class">收益</div>
                             <div id="assets">{{list.Income}}元</div>
                         </div>
                         <div class="one_class">
-                            <div class="two_class">购物券</div>
-                            <div id="assets">{{list.ShoppingVoucher}}购物券</div>
+                            <div class="two_class">红包</div>
+                            <div id="assets">{{list.ShoppingVoucher}}红包</div>
                         </div>
                     </div>
                 </div>
                 <div style="width: 100%">
                     <div style="float: left">
                         <el-tabs :tab-position="tabPosition"  @tab-click="TabClick" v-model="search.second_type">
-                            <el-tab-pane label="红包" name="envelopes">
+                            <el-tab-pane label="金豆" name="envelopes">
                                 <el-table :data="list.oper_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="180"></el-table-column>
                                     <el-table-column prop="id" label="用户信息" width="380">
@@ -352,8 +352,8 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                             </com-user-finance-stat>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="integral" label="变动红包" width="180"></el-table-column>
-                                    <el-table-column prop="current_integral" label="当前红包"  width="180"></el-table-column>
+                                    <el-table-column prop="integral" label="变动金豆" width="180"></el-table-column>
+                                    <el-table-column prop="current_integral" label="当前金豆"  width="180"></el-table-column>
                                     <el-table-column prop="desc" label="说明"  width="380"></el-table-column>
                                     <el-table-column prop="created_at" label="时间" width="180">
                                         <template slot-scope="scope">
@@ -382,7 +382,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                     </el-table-column>
                                 </el-table>
                             </el-tab-pane>
-                            <el-tab-pane label="购物券" name="ShoppingVoucher">
+                            <el-tab-pane label="红包" name="ShoppingVoucher">
                                 <el-table :data="list.oper_list" border style="width: 100%">
                                     <el-table-column prop="id" label="ID" width="180"></el-table-column>
                                     <el-table-column prop="id" label="用户信息" width="380">
@@ -392,8 +392,8 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                                             </com-user-finance-stat>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column prop="money" label="充值购物券" width="180"></el-table-column>
-                                    <el-table-column prop="current_money" label="充值前购物券" width="180"></el-table-column>
+                                    <el-table-column prop="money" label="充值红包" width="180"></el-table-column>
+                                    <el-table-column prop="current_money" label="充值前红包" width="180"></el-table-column>
                                     <el-table-column prop="desc" label="说明"  width="380"></el-table-column>
                                     <el-table-column prop="created_at" label="时间" width="180">
                                         <template slot-scope="scope">

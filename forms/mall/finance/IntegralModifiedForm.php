@@ -42,7 +42,7 @@ class IntegralModifiedForm extends BaseModel{
                 $res = UserIntegralForm::adminAdd($user, $this->price, $adminId, $this->remark);
             }else{ //扣减
                 if ($this->price > $user->static_integral) {
-                    throw new \Exception("最多扣除红包" . $user->static_integral);
+                    throw new \Exception("最多扣除金豆" . $user->static_integral);
                 }
                 $res = UserIntegralForm::adminSub($user, $this->price, $adminId, $this->remark);
             }

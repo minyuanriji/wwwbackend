@@ -13,12 +13,12 @@ class PayGroupForm extends IntegralBasePayForm {
     use CommonPayGroup;
 
     /**
-     * 获取要支付的红包数
+     * 获取要支付的金豆数
      * @param User $user
      * @return float
      */
     protected function payIntegray(User $user){
-        //注意返回的是拼团对应的红包价
+        //注意返回的是拼团对应的金豆价
         return GiftpacksDetailForm::groupIntegralDeductionPrice($this->getGiftpacks(), $user);
     }
 
@@ -34,9 +34,9 @@ class PayGroupForm extends IntegralBasePayForm {
 
         $giftpacks = $this->getGiftpacks();
 
-        //检查是否支持红包支付
+        //检查是否支持金豆支付
         if($giftpacks->allow_currency != "integral"){
-            throw new \Exception("不允许使用红包支付");
+            throw new \Exception("不允许使用金豆支付");
         }
 
         $processClass = $group->process_class;

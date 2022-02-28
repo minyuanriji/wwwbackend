@@ -221,12 +221,12 @@ class GiftpacksDetailForm extends BaseModel{
         return ($orderNum + $groupNum);
     }
 
-    //红包抵扣价
+    //金豆抵扣价
     public static function integralDeductionPrice(Giftpacks $giftpacks, User $user){
         return (float)$giftpacks->price;
     }
 
-    //拼单红包抵扣价
+    //拼单金豆抵扣价
     public static function groupIntegralDeductionPrice(Giftpacks $giftpacks, User $user){
         return (float)$giftpacks->group_price;
     }

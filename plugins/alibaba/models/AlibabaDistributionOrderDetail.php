@@ -205,7 +205,7 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
                     }
                 }
 
-                //退购物券
+                //退红包
                 if($order->shopping_voucher_express_use_num > 0){
                     if(!AlibabaDistributionOrderRefund::findOne([
                         "mall_id"         => $this->mall_id,
@@ -247,7 +247,7 @@ class AlibabaDistributionOrderDetail extends BaseActiveRecord{
                 $moneyRefund = $refund;
             }
 
-            //退购物券
+            //退红包
             if($this->shopping_voucher_num > 0){
                 $refund = new AlibabaDistributionOrderRefund(array_merge($commonRefundData, [
                     "refund_type"   => "shopping_voucher",

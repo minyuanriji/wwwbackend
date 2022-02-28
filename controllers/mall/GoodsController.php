@@ -129,7 +129,7 @@ class GoodsController extends MallController
         }
     }
 
-    //赠送购物券设置
+    //赠送红包设置
     public function actionShoppingSave ()
     {
         if (\Yii::$app->request->isPost) {
@@ -142,7 +142,7 @@ class GoodsController extends MallController
         }
     }
 
-    //购物券兑换价设置
+    //红包兑换价设置
     public function actionShoppingExchangeSave ()
     {
         if (\Yii::$app->request->isPost) {

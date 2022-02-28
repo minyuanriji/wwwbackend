@@ -20,7 +20,7 @@
                             <div>下单用户：{{scope.row.nickname}}[ID:{{scope.row.user_id}}]</div>
                             <template v-if="scope.row.pay_status != 'unpaid'">
                                 <div>支付金额：<b style="color:#077a00">{{scope.row.pay_price}}元</b></div>
-                                <div>红包抵扣：<b style="color:#cc3311">{{scope.row.integral_deduction_price}}元</b></div>
+                                <div>金豆抵扣：<b style="color:#cc3311">{{scope.row.integral_deduction_price}}元</b></div>
                             </template>
                             <template v-if="scope.row.refund_status == 'paid'">
                                 <div>退款金额：<b style="color:#cc3311">{{scope.row.refund_price}}元</b></div>

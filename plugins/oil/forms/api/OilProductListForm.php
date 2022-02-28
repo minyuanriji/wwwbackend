@@ -25,7 +25,7 @@ class OilProductListForm extends BaseModel{
                 throw new Exception("暂无加油产品");
             }
 
-            //送购物券-指定产品
+            //送红包-指定产品
             $fromOil = ShoppingVoucherFromOil::findOne([
                 "plat_id"   => $platModel->id,
                 "is_delete" => 0
@@ -47,19 +47,19 @@ class OilProductListForm extends BaseModel{
             if($list){
                 foreach($list as &$item){
 
-                    //计算送购物券的数量
+                    //计算送红包的数量
                     if($fromOil->first_give_type == 1){ //按比例
                         $number = floatval($item['price']) * (floatval($fromOil->first_give_value)/100);
                     }else{ //固定值
                         $number = floatval($fromOil->first_give_value);
                     }
 
-                    //上线100购物券，超过部分按50%送
+                    //上线100红包，超过部分按50%送
                     if($number > 100){
                         $number = 100 + ($number - 100)/2;
                     }
 
-                    $item['info'] = "送".round($number, 2)."购物券";
+                    $item['info'] = "送".round($number, 2)."红包";
                 }
             }
 

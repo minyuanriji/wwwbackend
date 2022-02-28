@@ -46,12 +46,12 @@ class UserCenterCancelOrderForm extends BaseModel {
 
             $user = User::findOne($hotelOrder->user_id);
 
-            //返还红包
+            //返还金豆
             if(floatval($hotelOrder->integral_deduction_price) > 0){
                 $modifyForm = new UserIntegralModifyForm([
                     "type"        => 1,
                     "integral"    => $hotelOrder->integral_deduction_price,
-                    "desc"        => "订单取消退还红包",
+                    "desc"        => "订单取消退还金豆",
                     "source_id"   => $hotelOrder->id,
                     "source_type" => "hotel_order_cancel"
                 ]);

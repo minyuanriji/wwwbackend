@@ -7,7 +7,7 @@ echo $this->render("../com/com-tab-from");
         <com-tab-from :current="activeName"></com-tab-from>
 
         <div class="table-body">
-            <el-alert title="说明：话费充值，成功后可获得赠送购物券" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
+            <el-alert title="说明：话费充值，成功后可获得赠送红包" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
 
             <el-tabs v-model="search.type" @tab-click="tab_assets">
                 <el-tab-pane label="快充呗" name="kcb"></el-tab-pane>

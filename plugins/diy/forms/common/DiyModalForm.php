@@ -16,7 +16,7 @@ class DiyModalForm extends BaseModel
     public function getModal()
     {
         try {
-            // 暂时只有裂变红包
+            // 暂时只有裂变金豆
             return \Yii::$app->plugin->getPlugin('fxhb')->getHomePage('api');
         } catch (\Exception $exception) {
             return [];

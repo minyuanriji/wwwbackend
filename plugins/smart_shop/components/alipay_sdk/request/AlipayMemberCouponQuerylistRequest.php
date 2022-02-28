@@ -8,7 +8,7 @@
 class AlipayMemberCouponQuerylistRequest
 {
 	/** 
-	 * 红包发放者商户信息，json格式。商户可以传自己的PID，平台商可以传其它商户的PID用于查询指定商户的信息
+	 * 金豆发放者商户信息，json格式。商户可以传自己的PID，平台商可以传其它商户的PID用于查询指定商户的信息
 目前仅支持如下key：
   unique：商户唯一标识
   unique_type：支持以下1种取值。

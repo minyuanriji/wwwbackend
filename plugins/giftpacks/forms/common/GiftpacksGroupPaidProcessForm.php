@@ -161,7 +161,7 @@ class GiftpacksGroupPaidProcessForm extends BaseModel{
                     throw new \Exception($this->responseErrorMsg($order));
                 }
 
-                //赠送红包
+                //赠送金豆
                 GiftpacksOrderPaidProcessForm::giveIntegral($giftpacks, $order);
 
                 //赠送积分

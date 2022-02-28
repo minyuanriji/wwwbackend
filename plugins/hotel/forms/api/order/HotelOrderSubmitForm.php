@@ -58,7 +58,7 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
             //计算订单价格
             $orderNeedPay = $orderPrice = $this->days * $this->num * $bookingItem['product_price'];
 
-            //如果使用红包抵扣
+            //如果使用金豆抵扣
             $integralDeductionPrice = 0;
             if($this->use_integral){
                 $integralDeductionPrice = $user->static_integral > $orderPrice ? $orderPrice : $user->static_integral;
@@ -99,12 +99,12 @@ class HotelOrderSubmitForm extends HotelOrderPreviewForm {
                 throw new \Exception($this->responseErrorMsg($order));
             }
 
-            //扣除用户红包
+            //扣除用户金豆
             if($integralDeductionPrice > 0){
                 $modifyForm = new UserIntegralModifyForm([
                     "type"        => 2,
                     "integral"    => $integralDeductionPrice,
-                    "desc"        => "酒店订单红包抵扣",
+                    "desc"        => "酒店订单金豆抵扣",
                     "source_id"   => $order->id,
                     "source_type" => "hotel_order"
                 ]);

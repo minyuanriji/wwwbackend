@@ -101,7 +101,7 @@ class AgentLevel extends BaseActiveRecord
             'over_agent_price'=>'被越级的奖励',
             'levelup_give_setting'=>'升级名额赠送设置',
             'invited_give_setting'=>'推广名额赠送设置',
-            'levelup_integral_setting'=>'升级赠送红包券设置',
+            'levelup_integral_setting'=>'升级赠送金豆券设置',
         ];
 
     }

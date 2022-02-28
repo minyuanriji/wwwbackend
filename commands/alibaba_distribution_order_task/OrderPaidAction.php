@@ -131,7 +131,7 @@ class OrderPaidAction extends Action{
 
             $user = User::findOne($orderDetail1688->user_id);
 
-            //如果有余额、购物券的退款，执行自动退款操作
+            //如果有余额、红包的退款，执行自动退款操作
             $refunds = AlibabaDistributionOrderRefund::find()->where([
                 "status"          => "waitting",
                 "order_id"        => $orderDetail1688->order_id,
@@ -157,10 +157,10 @@ class OrderPaidAction extends Action{
                         $modifyForm->modify($user);
                     }
 
-                    if($refund->refund_type == "shopping_voucher") { //退还购物券
+                    if($refund->refund_type == "shopping_voucher") { //退还红包
                         $modifyForm = new ShoppingVoucherLogModifiyForm([
                             "money"       => $refund->real_amount,
-                            "desc"        => "交易失败，退还购物券",
+                            "desc"        => "交易失败，退还红包",
                             "source_id"   => $orderDetail->id,
                             "source_type" => "1688_distribution_order_detail_refund"
                         ]);

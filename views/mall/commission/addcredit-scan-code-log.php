@@ -53,7 +53,7 @@
                         <div>支付用户昵称：<b>{{scope.row.pay_user_name}}</b></div>
                         <div>订单编号：<b style="font-size: 14px">{{scope.row.order_no}}</b></div>
                         <div>订单金额：<b style="color:#cc3311">{{scope.row.order_price}}元</b></div>
-                        <div>扣除红包：<b style="color:#cc3311">{{scope.row.integral_deduction_price}}</b></div>
+                        <div>扣除金豆：<b style="color:#cc3311">{{scope.row.integral_deduction_price}}</b></div>
                         <div>实际支付费用：<b style="color:#cc3311">{{scope.row.pay_price}}元</b></div>
                     </template>
                 </el-table-column>

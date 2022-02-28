@@ -31,7 +31,7 @@ class CardController extends ApiBaseController
     }
 
     /**
-     * 红包券充值
+     * 金豆券充值
      * @Author bing
      * @DateTime 2020-10-10 19:48:51
      * @copyright: Copyright (c) 2020 广东七件事集团
@@ -50,7 +50,7 @@ class CardController extends ApiBaseController
     }
 
     /**
-     * 红包券充值列表
+     * 金豆券充值列表
      * @Author bing
      * @DateTime 2020-10-10 19:48:51
      * @copyright: Copyright (c) 2020 广东七件事集团

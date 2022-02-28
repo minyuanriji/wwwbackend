@@ -76,7 +76,7 @@
                 <el-form-item label="类型">
                     <el-radio-group v-model="form.controller_type">
                         <el-radio :label="0">积分券</el-radio>
-<!--                        <el-radio :label="1">购物券</el-radio>-->
+<!--                        <el-radio :label="1">红包</el-radio>-->
                     </el-radio-group>
                 </el-form-item>
 

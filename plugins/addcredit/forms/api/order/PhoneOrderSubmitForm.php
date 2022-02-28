@@ -74,14 +74,14 @@ class PhoneOrderSubmitForm extends BaseModel
                 "recharge_type" => $product['type']
             ]);
 
-            //红包
+            //金豆
             if ($this->pay_type == 2) {
                 $user = User::findOne(['id' => \Yii::$app->user->id, 'is_delete' => 0]);
                 if (!$user) {
                     throw new \Exception('账户不存在！');
                 }
                 if ($this->order_price > $user->static_integral) {
-                    throw new \Exception('账户红包不足！');
+                    throw new \Exception('账户金豆不足！');
                 }
                 $order->integral_deduction_price = floatval($product['price']) + floatval($product['price']) * ($plate->ratio / 100);
             } elseif ($this->pay_type == 1) {

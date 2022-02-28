@@ -45,7 +45,7 @@ class HotelRefundSuccessfulNotification
                 'keyword1'  => $hotel_order_res->pay_price,
                 'keyword2'  => '原路退回',
                 'keyword3'  => '具体到账时间以收到时间为准',
-                'remark'    => '抵扣红包'. $hotel_order_res->integral_deduction_price .'退还到账户，若有疑问请拨打020-31923526',
+                'remark'    => '抵扣金豆'. $hotel_order_res->integral_deduction_price .'退还到账户，若有疑问请拨打020-31923526',
             ]
         ]))->send();
     }

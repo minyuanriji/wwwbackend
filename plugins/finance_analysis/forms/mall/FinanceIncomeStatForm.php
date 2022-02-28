@@ -73,9 +73,9 @@ class FinanceIncomeStatForm extends BaseModel
                         $list['income_list'] = $CashQuery->page($Pagination, $this->limit)->orderBy('i.id DESC')->asArray()->all();
                     }
                     break;
-                //红包
+                //金豆
                 case 'RedEnvelopes':
-                    //总共送出去的红包
+                    //总共送出去的金豆
                     $totalSendQuery = IntegralLog::find()->alias('i')
                         ->innerJoin(['u' => User::tableName()], 'u.id=i.user_id')
                         ->andWhere(['and', ['<>', 'u.mobile', ''], ['IS NOT', 'u.mobile', null], ['u.is_delete' => 0], ['i.type' => 1], ['i.mall_id' => \Yii::$app->mall->id]]);
@@ -89,7 +89,7 @@ class FinanceIncomeStatForm extends BaseModel
                         $totalSendQuery->andWhere([">", "i.created_at", $timeStart]);
                     }
                     $list['total_red_envelope'] = $totalSendQuery->sum('i.integral') ?: 0;
-                    //已经使用的红包--商品
+                    //已经使用的金豆--商品
                     $orderQuery = \app\models\Order::find()->alias('o')
                                 ->innerJoin(['u' => User::tableName()], 'u.id=o.user_id')
                                 ->andWhere([
@@ -106,7 +106,7 @@ class FinanceIncomeStatForm extends BaseModel
                                 ->select(['o.*', 'u.nickname']);
                     $this->mergeWhere($orderQuery, $dayStartTime, $dayEndTime, $timeStart, 'o');
                     $list['order_envelope'] = $orderQuery->sum('o.integral_deduction_price') ?: 0;
-                    //已经使用的红包--商家
+                    //已经使用的金豆--商家
                     $MchQuery = MchCheckoutOrder::find()->alias('mco')
                         ->innerJoin(['u' => User::tableName()], 'u.id=mco.pay_user_id')
                         ->where(['mco.mall_id' => \Yii::$app->mall->id, 'mco.is_pay' => 1])
@@ -116,7 +116,7 @@ class FinanceIncomeStatForm extends BaseModel
                     $this->mergeWhere($MchQuery, $dayStartTime, $dayEndTime, $timeStart, 'mco');
                     $list['mch_envelope'] = $MchQuery->sum('mco.integral_deduction_price') ?: 0;
 
-                    //已经使用的红包--酒店
+                    //已经使用的金豆--酒店
                     $HotelQuery = HotelOrder::find()->alias('h')
                         ->innerJoin(['u' => User::tableName()], 'u.id=h.user_id')
                         ->andWhere([
@@ -133,7 +133,7 @@ class FinanceIncomeStatForm extends BaseModel
                     $this->mergeWhere($HotelQuery, $dayStartTime, $dayEndTime, $timeStart, 'h');
                     $list['hotel_envelope'] = $HotelQuery->sum('h.integral_deduction_price') ?: 0;
 
-                    //已经使用的红包--大礼包
+                    //已经使用的金豆--大礼包
                     $GiftQuery = GiftpacksOrder::find()->alias('go')
                         ->innerJoin(['u' => User::tableName()], 'u.id=go.user_id')
                         ->where(['go.mall_id' => \Yii::$app->mall->id, 'go.pay_status' => 'paid', 'go.pay_type' => 'integral'])
@@ -213,7 +213,7 @@ class FinanceIncomeStatForm extends BaseModel
                     break;
                 //管理员充值
                 case 'adminRecharge':
-                    //管理员操作  --- 红包
+                    //管理员操作  --- 金豆
                     $IntAdminQuery = IntegralLog::find()->alias('i')
                         ->innerJoin(['u' => User::tableName()], 'u.id=i.user_id')
                         ->andWhere([
@@ -255,7 +255,7 @@ class FinanceIncomeStatForm extends BaseModel
                     $this->mergeWhere($IncomeQuery, $dayStartTime, $dayEndTime, $timeStart, 'i');
                     $list['Income'] = $IncomeQuery->sum('i.income') ?: 0;
 
-                    //购物券
+                    //红包
                     $shopQuery = ShoppingVoucherLog::find()->alias('s')
                         ->innerJoin(['u' => User::tableName()], 'u.id=s.user_id')
                         ->andWhere([
@@ -270,11 +270,11 @@ class FinanceIncomeStatForm extends BaseModel
                     $this->mergeWhere($shopQuery, $dayStartTime, $dayEndTime, $timeStart, 's');
                     $list['ShoppingVoucher'] = $shopQuery->sum('s.money') ?: 0;
 
-                    if ($this->second_type == 'envelopes') { //--- 红包
+                    if ($this->second_type == 'envelopes') { //--- 金豆
                         $list['oper_list'] = $IntAdminQuery->page($Pagination, $this->limit)->orderBy('i.id DESC')->asArray()->all();
                     } elseif($this->second_type == 'NoCashWithdrawal') { //收益
                         $list['oper_list'] = $IncomeQuery->page($Pagination, $this->limit)->orderBy('i.id DESC')->asArray()->all();
-                    } elseif ($this->second_type == 'ShoppingVoucher') { //购物券
+                    } elseif ($this->second_type == 'ShoppingVoucher') { //红包
                         $list['oper_list'] = $shopQuery->page($Pagination, $this->limit)->orderBy('s.id DESC')->asArray()->all();
                     }
                     break;
@@ -346,7 +346,7 @@ class FinanceIncomeStatForm extends BaseModel
 
     public function getSendEnvelope ($dayStartTime, $dayEndTime, $timeStart)
     {
-         //获取红包已送出
+         //获取金豆已送出
           $orderDetQuery = OrderDetail::find()->alias('od')->where(['o.mall_id' => \Yii::$app->mall->id])
                         ->innerJoin(['o' => \app\models\Order::tableName()], 'od.order_id=o.id')
                         ->innerJoin(['u' => User::tableName()], 'u.id=o.user_id')

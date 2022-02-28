@@ -25,7 +25,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
     }
 
     /**
-     * 获取购物券抵扣价格
+     * 获取红包抵扣价格
      * @param AlibabaDistributionGoodsList $goods
      * @param integer $skuId 规格ID
      * @param float $price 价格
@@ -45,10 +45,10 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
             }
         }
 
-        $number = 0; //需要的购物券数量
+        $number = 0; //需要的红包数量
         if($price > 0 && isset($voucherGoodsList[$goods->id . ":" . $skuId])){
             $voucherPrice = $voucherGoodsList[$goods->id . ":" . $skuId];
-            $ratio = $voucherPrice/$price; //购物券价与商品价格比例
+            $ratio = $voucherPrice/$price; //红包价与商品价格比例
             $number = floatval($price) * $ratio * $num;
         }
 
@@ -151,7 +151,7 @@ class AlibabaDistributionGoodsDetailForm extends BaseModel implements ICacheForm
                 $detail['sku_list'] = static::getDefaultSkuList($goods);
             }
 
-            //计算各个规格使用购物券兑换的价格
+            //计算各个规格使用红包兑换的价格
             foreach($detail['sku_list'] as &$skuItem){
                 $skuItem['freight_price'] = round($skuItem['freight_price'] * (1/$expressRate), 2);
                 $detail['freight_price']  = max($detail['freight_price'] , $skuItem['freight_price']);

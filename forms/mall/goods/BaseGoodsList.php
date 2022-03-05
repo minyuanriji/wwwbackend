@@ -69,6 +69,10 @@ abstract class BaseGoodsList extends BaseModel
                 ['g.goods_warehouse_id' => $goodsIds]
             ]);
         }
+        //商品ID数组搜索
+        if(isset($search['goods_id_list']) && !empty($search['goods_id_list'])){
+            $query->andWhere(["IN", "g.id", $search['goods_id_list']]);
+        }
         // 商品排序
         if (isset($search['sort_prop']) && $search['sort_prop'] && isset($search['sort_type'])) {
             $sortType = $search['sort_type'] ? SORT_ASC : SORT_DESC;

@@ -117,6 +117,9 @@ class GoodsEditForm extends BaseGoodsEdit
 //            exit();
             return [
                 'code' => ApiCode::CODE_SUCCESS,
+                'data' => [
+                    'goods_id' => $this->goods->id
+                ],
                 'msg' => '保存成功',
             ];
         } catch (\Exception $e) {

@@ -2171,7 +2171,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                     url = 'r=mall/goods/index';
                                 }
                                 console.log(url);
-                                window.location.href = _baseUrl + '/index.php?' + url;
+                                //window.location.href = _baseUrl + '/index.php?' + url;
                             } else {
                                 self.$message.error(e.data.msg);
                             }

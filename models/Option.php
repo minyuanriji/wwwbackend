@@ -26,6 +26,7 @@ use Yii;
  */
 class Option extends BaseActiveRecord
 {
+    const GROUP_TAOBAO = 'taobao'; //淘宝联盟
     const GROUP_ADMIN = 'admin';
     const GROUP_APP = 'app';
     const NAME_PAYMENT = 'payment';//微信支付配置

@@ -67,6 +67,7 @@ class TaobaoSettingEditForm extends BaseModel{
                 ]);
             }
             $account->updated_at  = time();
+			$account->app_key     = $this->data['app_key'];
             $account->app_secret  = $this->data['app_secret'];
             $account->adzone_id   = $this->data['adzone_id'];
             $account->special_id  = $this->data['special_id'];

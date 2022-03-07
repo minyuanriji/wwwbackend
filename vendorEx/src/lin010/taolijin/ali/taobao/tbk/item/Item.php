@@ -5,10 +5,22 @@ namespace lin010\taolijin\ali\taobao\tbk\item;
 use lin010\taolijin\ali\taobao\tbk\abstracts\TbkBaseHandle;
 use lin010\taolijin\ali\taobao\tbk\item\convert\TbkItemConvertRequest;
 use lin010\taolijin\ali\taobao\tbk\item\convert\TbkItemConvertResponse;
+use lin010\taolijin\ali\taobao\tbk\item\coupon\TbkItemCouponGetRequest;
+use lin010\taolijin\ali\taobao\tbk\item\coupon\TbkItemCouponGetResponse;
 use lin010\taolijin\ali\taobao\tbk\item\info\TbkItemInfoGetRequest;
 use lin010\taolijin\ali\taobao\tbk\item\info\TbkItemInfoGetResponse;
 
 class Item extends TbkBaseHandle {
+
+    /**
+     * 淘宝客-公用-阿里妈妈推广券详情查询
+     * @param array $params
+     * @return TbkBaseResponse
+     * @throws \Exception
+     */
+    public function couponGet($params = []){
+        return parent::client(TbkItemCouponGetRequest::class, $params)->execute(TbkItemCouponGetResponse::class);
+    }
 
     /**
      * 淘宝客-公用-淘宝客商品详情查询(简版)

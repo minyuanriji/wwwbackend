@@ -76,7 +76,9 @@ class TaobaoGoodsRemoteImportForm extends BaseModel {
                     "adzone_id"   => $account->adzone_id,
                     "special_id"  => $account->special_id,
                     "invite_code" => $account->invite_code,
-                    "url"         => $importData['url']
+                    "url"         => $importData['url'],
+                    "num_iid"     => $importData['num_iid'],
+                    "coupon_id"   => $importData['coupon_id']
                 ]);
                 if(!$taobaoGoodsModel->save()){
                     throw new \Exception($this->responseErrorMsg($taobaoGoodsModel));

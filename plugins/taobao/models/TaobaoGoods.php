@@ -18,7 +18,7 @@ class TaobaoGoods extends BaseActiveRecord
     {
         return [
             [['mall_id', 'account_id', 'app_key', 'adzone_id', 'special_id', 'invite_code', 'goods_id', 'updated_at', 'created_at'], 'required'],
-            [['url'], 'safe']
+            [['url', 'num_iid', 'check_time', 'coupon_id'], 'safe']
         ];
     }
 

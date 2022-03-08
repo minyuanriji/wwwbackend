@@ -12,7 +12,7 @@
                         <el-table-column prop="special_id" label="ID"></el-table-column>
                         <el-table-column prop="root_pid" label="推广位"></el-table-column>
                     </el-table>
-                    
+
                 </el-tab-pane>
             </el-tabs>
         </div>

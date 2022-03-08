@@ -2,6 +2,7 @@
 
 namespace lin010\taolijin\ali\taobao\tbk\publisher;
 
+use app\helpers\ArrayHelper;
 use lin010\taolijin\ali\taobao\tbk\abstracts\TbkBaseResponse;
 
 class TbkScPublisherInfoGetResponse extends TbkBaseResponse {
@@ -10,6 +11,10 @@ class TbkScPublisherInfoGetResponse extends TbkBaseResponse {
         $data = isset($this->result->data) ? $this->result->data : null;
         $inviterList = $data && isset($data->inviter_list) ? (array)$data->inviter_list : null;
         $inviterList = $inviterList && isset($inviterList['map_data']) ? $inviterList['map_data'] : null;
+        if($inviterList){
+            $inviterList = !is_array($inviterList) ? [(array)$inviterList] : $inviterList;
+        }
+
         $totalCount = $data && isset($data->total_count) ? (array)$data->total_count : null;
 
         $list = [];

@@ -39,6 +39,11 @@ class Plugin extends \app\plugins\Plugin
                 'route' => 'plugin/taobao/mall/setting/index',
                 'icon' => 'el-icon-setting'
             ],
+            [
+                'name' => '会员管理',
+                'route' => 'plugin/taobao/mall/publisher/index',
+                'icon' => 'el-icon-setting'
+            ],
             /*
             [
                 'name' => '分类管理',

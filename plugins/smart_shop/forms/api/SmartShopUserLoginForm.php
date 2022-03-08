@@ -64,7 +64,7 @@ class SmartShopUserLoginForm extends BaseModel{
                 $user->auth_key         = \Yii::$app->security->generateRandomString();
                 $user->nickname         = $smartAuthUser && !empty($smartAuthUser['nickname']) ? $smartAuthUser['nickname'] : uniqid();
                 $user->password         = \Yii::$app->getSecurity()->generatePasswordHash(uniqid());
-                $user->avatar_url       = !$smartAuthUser && empty($smartAuthUser['avatar']) ? $smartAuthUser['avatar'] : "";
+                $user->avatar_url       = $smartAuthUser && !empty($smartAuthUser['avatar']) ? $smartAuthUser['avatar'] : "/";
                 $user->last_login_at    = time();
                 $user->login_ip         = get_client_ip();
                 $user->parent_id        = $ssStoreLocalUserId;

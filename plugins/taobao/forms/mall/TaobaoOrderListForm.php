@@ -46,12 +46,20 @@ class TaobaoOrderListForm extends BaseModel {
 
             $query->orderBy("od.id DESC");
 
-            $selects = ["tbg.id", "tbg.goods_id", "tbg.created_at", "gw.name", "gw.cover_pic",
+            $selects = ["tbg.goods_id", "gw.name", "gw.cover_pic",
                 "od.num", "od.total_price", "od.is_refund", "od.refund_status",
-                "o.id as order_id", "o.order_no", "u.id as user_id", "u.nickname", "tbg.url"
+                "od.shopping_voucher_num", "od.shopping_voucher_decode_price",
+                "o.id as order_id", "o.order_no", "u.id as user_id", "u.nickname", "tbg.url",
+                "o.name", "o.mobile", "o.address", "o.created_at", "o.status as order_status"
             ];
 
-            $list = $query->select($selects)->asArray()->page($pagination)->all();
+            $list = $query->select($selects)->asArray()->page($pagination, $this->limit, $this->page)->all();
+            if($list){
+                foreach($list as $key => $item){
+                    $item['created_at'] = date("Y-m-d H:i:s", $item['created_at']);
+                    $list[$key] = $item;
+                }
+            }
 
             return [
                 'code' => ApiCode::CODE_SUCCESS,

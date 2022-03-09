@@ -8,7 +8,7 @@
                 <el-tab-pane label="订单管理" name="first">
 
                     <el-table :data="list" border v-loading="loading" size="small" style="margin: 15px 0;">
-                        <el-table-column prop="goods_id" width="90" label="商品ID"></el-table-column>
+                        <el-table-column prop="goods_id" width="90" label="商品ID" align="center"></el-table-column>
                         <el-table-column label="商品名称" width="320">
                             <template slot-scope="scope">
                                 <div flex="box:first">
@@ -28,16 +28,27 @@
                                 </div>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="num" width="70" label="数量"></el-table-column>
-                        <el-table-column prop="total_price" width="110" label="实付款"></el-table-column>
-                        <el-table-column label="订单信息" width="320">
+                        <el-table-column width="120" label="退款状态" align="center">
+                            <template slot-scope="scope">
+                                {{refundStatus(scope.row)}}
+                            </template>
+                        </el-table-column>
+                        <el-table-column width="120" label="订单状态" align="center">
+                            <template slot-scope="scope">
+                                {{orderStatus(scope.row)}}
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="订单信息" width="350">
                             <template slot-scope="scope">
                                 <el-table size="small" :show-header="false" :data="orderInfos(scope.row)"  border style="width: 100%">
-                                    <el-table-column prop="label" width="100" align="right"></el-table-column>
+                                    <el-table-column prop="label" width="120" align="right"></el-table-column>
                                     <el-table-column prop="content"></el-table-column>
                                 </el-table>
                             </template>
                         </el-table-column>
+                        <el-table-column prop="num" width="70" label="数量" align="center"></el-table-column>
+                        <el-table-column prop="total_price" width="110" label="实付款" align="center"></el-table-column>
+
                         <el-table-column label="操作">
                             <template slot-scope="scope">
                                 <el-button @click="edit(scope.row)" type="text" circle size="mini">
@@ -88,11 +99,71 @@
             this.loadData();
         },
         computed: {
+            orderStatus(row){
+                return function(row){
+                    let str = '';
+                    switch(row.order_status){
+                        case "0":
+                            str = '未支付';
+                            break;
+                        case "1":
+                            str = '待发货';
+                            break;
+                        case "2":
+                            str = '待收货';
+                            break;
+                        case "3":
+                            str = '待评价';
+                            break;
+                        case "4":
+                            str = '取消待处理';
+                            break;
+                        case "5":
+                            str = '已取消/已关闭';
+                            break;
+                        case "6":
+                            str = '售后申请中';
+                            break;
+                        case "7":
+                            str = '售后完成';
+                            break;
+                        case "8":
+                            str = '已完成';
+                            break;
+                    }
+                    return str;
+                }
+            },
+            refundStatus(row){
+                return function(row){
+                    let str = '无';
+                    if(row.is_refund == 1){
+                        str = '已退款';
+                    }else if(row.refund_status == 10){
+                        str = '售后中,待处理';
+                    }else if(row.refund_status == 11){
+                        str = '售后中,仅退款,已同意';
+                    }else if(row.refund_status == 12){
+                        str = '售后中,退款退货,已同意';
+                    }else if(row.refund_status == 20){
+                        str = '完成售后,已退款';
+                    }else if(row.refund_status == 21){
+                        str = '完成售后,已拒绝';
+                    }
+                    return str;
+                }
+            },
             orderInfos(row){
                 return function (row){
                     let infos = [];
+                    infos.push({label: "日期", content: row.created_at});
                     infos.push({label: "订单号", content: row.order_no});
                     infos.push({label: "用户昵称", content: row.nickname + "("+row.user_id+")"});
+                    infos.push({label: "购物券抵扣金额", content: row.shopping_voucher_decode_price});
+                    infos.push({label: "购物券使用数量", content: row.shopping_voucher_num});
+                    infos.push({label: "收件人", content: row.name});
+                    infos.push({label: "联系手机", content: row.mobile});
+                    infos.push({label: "收件地址", content: row.address});
                     return infos;
                 }
             }

@@ -12,7 +12,7 @@
                 </el-row>
                 <el-row class="user-finance-stat-row">
                     <el-col :span="12" class="l-label">用户ID</el-col>
-                    <el-col :span="12"><span style="color:green">{{stat_info.user_id}}</span></el-col>
+                    <el-col :span="12"><span style="color:green">{{userId}}</span></el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">
                     <el-col :span="12" class="l-label">用户等级</el-col>

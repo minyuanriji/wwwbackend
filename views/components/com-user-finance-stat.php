@@ -11,6 +11,10 @@
                     <el-col :span="24" style="margin-bottom:5px;text-align: center">”{{nickname}}“财务概况</el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">
+                    <el-col :span="12" class="l-label">用户ID</el-col>
+                    <el-col :span="12"><span style="color:green">{{stat_info.user_id}}</span></el-col>
+                </el-row>
+                <el-row class="user-finance-stat-row">
                     <el-col :span="12" class="l-label">用户等级</el-col>
                     <el-col :span="12">
                         <span v-if="role_type == 'branch_office'">分公司</span>

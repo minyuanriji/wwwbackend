@@ -29,7 +29,7 @@ class CommissionController extends BaseCommandController{
             "smartShop3r"     => "app\\commands\\commission_action\\SmartShopOrder3rAction",
         ];
     }
-
+/*
     public function actionMaintantJob(){
 
         $this->mutiKill();
@@ -49,7 +49,7 @@ class CommissionController extends BaseCommandController{
             });
         }
         $pm->start();
-    }
+    }*/
 
 
     /**

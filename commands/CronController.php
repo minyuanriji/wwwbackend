@@ -7,22 +7,23 @@ use Yii;
 class CronController extends BaseCommandController{
 
     public static $handlers = [
-        ShoppingVoucherSendTaskController::class
+        "shopping-voucher-send-task" => ShoppingVoucherSendTaskController::class
     ];
 
     public function actionStart(){
         $pm = new \Swoole\Process\ProcessManager();
-        foreach(static::$handlers as $className){
-            $controller = Yii::createObject($className, []);
-            foreach($controller->actions() as $actionID => $value){
-                $taskName = $className . "::" . $actionID;
-                $pm->add(function (\Swoole\Process\Pool $pool, int $workerId) use($taskName, $actionID, $controller){
+        $controllers = [];
+        foreach(static::$handlers as $id => $className){
+            $controllers[$className] = Yii::createObject($className, [$id, $this]);
+            foreach($controllers[$className]->actions() as $actionID => $value){
+                $pm->add(function (\Swoole\Process\Pool $pool, int $workerId) use($className, $actionID, $controllers){
+                    $taskName = $className . "::" . $actionID;
                     try {
                         require_once(__DIR__ . '/../vendor/autoload.php');
                         require_once __DIR__ . '/../config/const.php';
                         new \app\core\ConsoleApplication();
                         $this->commandOut("启动任务{$taskName}");
-                        $controller->runAction($actionID);
+                        $controllers[$className]->runAction($actionID);
                     }catch (\Exception $e){
                         $this->commandOut("任务{$taskName} message:" . $e->getMessage() . " file:" . $e->getFile() . " line:" . $e->getLine());
                     }

@@ -7,7 +7,8 @@ use Yii;
 class CronController extends BaseCommandController{
 
     public static $handlers = [
-        "shopping-voucher-send-task" => ShoppingVoucherSendTaskController::class
+        "commission" => CommissionController::class, //分佣任务
+        "shopping-voucher-send-task" => ShoppingVoucherSendTaskController::class //红包（购物券）发放任务
     ];
 
     public function actionStart(){

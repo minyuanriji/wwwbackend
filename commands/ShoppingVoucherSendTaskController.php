@@ -20,8 +20,9 @@ class ShoppingVoucherSendTaskController extends BaseCommandController {
 
     /**
      * 红包发送任务
+     * @deprecated
      */
-    public function actionStart(){
+    /*public function actionStart(){
         $pm = new \Swoole\Process\ProcessManager();
         foreach($this->actions() as $id => $class){
             $pm->add(function (\Swoole\Process\Pool $pool, int $workerId) use($id){
@@ -35,6 +36,6 @@ class ShoppingVoucherSendTaskController extends BaseCommandController {
             });
         }
         $pm->start();
-    }
+    }*/
 
 }

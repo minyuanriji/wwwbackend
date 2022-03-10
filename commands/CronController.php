@@ -19,9 +19,11 @@ class CronController extends BaseCommandController{
                 $pm->add(function (\Swoole\Process\Pool $pool, int $workerId) use($className, $actionID, $controllers){
                     $taskName = $className . "::" . $actionID;
                     try {
-                        require_once(__DIR__ . '/../vendor/autoload.php');
-                        require_once __DIR__ . '/../config/const.php';
-                        new \app\core\ConsoleApplication();
+                        if(!defined("Yii")){
+                            require_once(__DIR__ . '/../vendor/autoload.php');
+                            require_once __DIR__ . '/../config/const.php';
+                            new \app\core\ConsoleApplication();
+                        }
                         $this->commandOut("启动任务{$taskName}");
                         $controllers[$className]->runAction($actionID);
                     }catch (\Exception $e){

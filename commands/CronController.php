@@ -2,6 +2,8 @@
 
 namespace app\commands;
 
+use Yii;
+
 class CronController extends BaseCommandController{
 
     public static $handlers = [
@@ -11,7 +13,7 @@ class CronController extends BaseCommandController{
     public function actionStart(){
         $pm = new \Swoole\Process\ProcessManager();
         foreach(static::$handlers as $className){
-            $controller = new $className();
+            $controller = Yii::createObject($className, []);
             foreach($controller->actions() as $actionID => $value){
                 $taskName = $className . "::" . $actionID;
                 $pm->add(function (\Swoole\Process\Pool $pool, int $workerId) use($taskName, $actionID, $controller){

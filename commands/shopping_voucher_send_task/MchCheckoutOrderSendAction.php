@@ -7,6 +7,7 @@ use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
+use app\plugins\shopping_voucher\helpers\ShoppingVoucherHelper;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 
@@ -87,10 +88,10 @@ class MchCheckoutOrderSendAction extends BaseAction {
         ]);
         $query->orderBy("mco.updated_at ASC");
 
-        $selects = ["mco.id", "mco.mall_id", "mco.pay_user_id", "mco.pay_price", "mco.mch_id", "mco.store_id", "svfs.give_type", "svfs.give_value"];
+        $selects = ["mco.id", "mco.mall_id", "mco.pay_user_id", "mco.pay_price", "mco.mch_id", "mco.store_id",
+            "svfs.give_type", "svfs.give_value", "m.transfer_rate"];
 
         $checkOrders = $query->select($selects)->asArray()->limit(10)->all();
-
         if(!$checkOrders){
             $this->negativeTime();
             return false;
@@ -106,7 +107,10 @@ class MchCheckoutOrderSendAction extends BaseAction {
 
         foreach($checkOrders as $checkOrder){
 
-            $money = $checkOrder['pay_price'] * (floatval($checkOrder['give_value'])/100);
+
+            $giveValue = ShoppingVoucherHelper::calculateMchRateByTransferRate($checkOrder['transfer_rate']);
+            $checkOrder['give_value'] = $giveValue;
+            $money = $checkOrder['pay_price'] * (floatval($giveValue)/100);
 
             $sendLog = new ShoppingVoucherSendLog([
                 "mall_id"     => $checkOrder['mall_id'],

@@ -7,6 +7,7 @@ use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
+use app\plugins\shopping_voucher\helpers\ShoppingVoucherHelper;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 use app\plugins\smart_shop\models\Order;
@@ -49,8 +50,8 @@ class SmartshopOrderSendAction extends BaseAction {
         ]);
         $query->orderBy("o.updated_at ASC");
 
-        $selects = ["o.id", "o.mall_id", "o.pay_price", "u.id as user_id", "s.mch_id", "s.id as store_id", "svfs.give_type", "svfs.give_value"];
-
+        $selects = ["o.id", "o.mall_id", "o.pay_price", "u.id as user_id", "s.mch_id", "s.id as store_id",
+            "svfs.give_type", "svfs.give_value", "m.transfer_rate"];
         $orders = $query->select($selects)->asArray()->limit(10)->all();
 
         if(!$orders) {
@@ -68,7 +69,9 @@ class SmartshopOrderSendAction extends BaseAction {
 
         foreach($orders as $order){
 
-            $money = $order['pay_price'] * (floatval($order['give_value'])/100);
+            $giveValue = ShoppingVoucherHelper::calculateMchRateByTransferRate($order['transfer_rate']);
+            $order['give_value'] = $giveValue;
+            $money = $order['pay_price'] * (floatval($giveValue)/100);
 
             $sendLog = new ShoppingVoucherSendLog([
                 "mall_id"     => $order['mall_id'],

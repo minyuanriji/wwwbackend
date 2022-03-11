@@ -2,27 +2,26 @@
 
 namespace app\commands\shopping_voucher_send_task;
 
+use app\commands\BaseAction;
 use app\models\User;
 use app\plugins\mch\models\Mch;
 use app\plugins\mch\models\MchCheckoutOrder;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
-use yii\base\Action;
 
-class MchCheckoutOrderSendAction extends Action{
+class MchCheckoutOrderSendAction extends BaseAction {
 
     public function run(){
-        $this->controller->commandOut(date("Y/m/d H:i:s") . " MchCheckoutOrderSendAction start");
         while (true){
+            sleep($this->sleepTime);
             try {
                 if(!$this->newAction()){
                     $this->sendAction();
                 }
             }catch (\Exception $e){
-                $this->controller->commandOut(implode("\n", [$e->getMessage(), $e->getFile(), $e->getLine()]));
+                throw $e;
             }
-            $this->controller->sleep(1);
         }
     }
 
@@ -62,6 +61,9 @@ class MchCheckoutOrderSendAction extends Action{
         }
         if($sendLogIds){
             ShoppingVoucherSendLog::updateAll(["status" => "success"], "id IN (".implode(",", $sendLogIds).")");
+            $this->activeTime();
+        }else{
+            $this->negativeTime();
         }
     }
 
@@ -89,8 +91,12 @@ class MchCheckoutOrderSendAction extends Action{
 
         $checkOrders = $query->select($selects)->asArray()->limit(10)->all();
 
-        if(!$checkOrders)
+        if(!$checkOrders){
+            $this->negativeTime();
             return false;
+        }
+
+        $this->activeTime();
 
         $checkOrderIds = [];
         foreach($checkOrders as $checkOrder){

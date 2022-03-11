@@ -2,6 +2,7 @@
 
 namespace app\commands\shopping_voucher_send_task;
 
+use app\commands\BaseAction;
 use app\models\Store;
 use app\models\User;
 use app\plugins\mch\models\Mch;
@@ -9,23 +10,19 @@ use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 use app\plugins\smart_shop\models\Order;
-use yii\base\Action;
 
-class SmartshopOrderSendAction extends Action{
-
-    private $sleep = 1;
+class SmartshopOrderSendAction extends BaseAction {
 
     public function run(){
-        $this->controller->commandOut(date("Y/m/d H:i:s") . " SmartshopOrderSendAction start");
         while (true){
+            sleep($this->sleepTime);
             try {
                 if(!$this->newAction()){
                     $this->sendAction();
                 }
             }catch (\Exception $e){
-                $this->controller->commandOut(implode("\n", [$e->getMessage(), $e->getFile(), $e->getLine()]));
+                throw $e;
             }
-            $this->controller->sleep(min(max($this->sleep, 1), 30));
         }
     }
 
@@ -57,11 +54,11 @@ class SmartshopOrderSendAction extends Action{
         $orders = $query->select($selects)->asArray()->limit(10)->all();
 
         if(!$orders) {
-            $this->sleep = min(30, $this->sleep + 1);
+            $this->negativeTime();
             return false;
         }
 
-        $this->sleep = max(1, $this->sleep - 1);
+        $this->activeTime();
 
         $orderIds = [];
         foreach($orders as $order){
@@ -131,9 +128,9 @@ class SmartshopOrderSendAction extends Action{
         }
         if($sendLogIds){
             ShoppingVoucherSendLog::updateAll(["status" => "success"], "id IN (".implode(",", $sendLogIds).")");
-            $this->sleep = max(1, $this->sleep - 1);
+            $this->activeTime();
         }else{
-            $this->sleep = min(30, $this->sleep + 1);
+            $this->negativeTime();
         }
     }
 }

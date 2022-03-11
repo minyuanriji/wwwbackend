@@ -19,7 +19,7 @@ class IntegralMallController extends ApiController {
         $form->attributes = $this->requestData;
         $form->mall_id    = \Yii::$app->mall->id;
 
-        $res = APICacheHelper::get($form);
+        $res = APICacheHelper::get($form, true);
         if($res['code'] == ApiCode::CODE_SUCCESS){
             $res = $res['data'];
         }

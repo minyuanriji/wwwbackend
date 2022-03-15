@@ -23,6 +23,20 @@ class ShoppingVoucheTargetGoodsListForm extends BaseModel implements ICacheForm 
         ];
     }
 
+    public function getQuery(){
+        $query = Goods::find()->alias('g');
+        $query->innerJoin(["svtg" => ShoppingVoucherTargetGoods::tableName()], "svtg.goods_id=g.id");
+        $query->innerJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
+
+        $query->where([
+            "g.is_delete"    => 0,
+            "g.status"       => Goods::STATUS_ON,
+            "svtg.is_delete" => 0
+        ]);
+
+        return $query;
+    }
+
     /**
      * @return APICacheDataForm
      */
@@ -33,18 +47,13 @@ class ShoppingVoucheTargetGoodsListForm extends BaseModel implements ICacheForm 
 
         try {
 
-            $query = Goods::find()->alias('g');
-            $query->innerJoin(["svtg" => ShoppingVoucherTargetGoods::tableName()], "svtg.goods_id=g.id");
-            $query->innerJoin(['gw' => GoodsWarehouse::tableName()], 'gw.id=g.goods_warehouse_id');
-
-            $query->where([
-                "g.is_delete"    => 0,
-                "g.status"       => Goods::STATUS_ON,
-                "svtg.is_delete" => 0
-            ]);
+            $query = $this->getQuery();
+            $query->orderBy("g.sort DESC, g.id DESC");
 
             $selects = ["g.id", "gw.name", "gw.cover_pic", "g.price", "gw.original_price",  "svtg.voucher_price"];
-            $list = $query->asArray()->orderBy("g.id DESC")->select($selects)->page($pagination, $this->limit, $this->page)->all();
+            $list = $query->asArray()
+                ->select($selects)
+                ->page($pagination, $this->limit, $this->page)->all();
             if($list){
                 foreach($list as &$item){
 

@@ -34,6 +34,10 @@ class ShoppingVoucheTargetGoodsListForm extends BaseModel implements ICacheForm 
             "svtg.is_delete" => 0
         ]);
 
+        if($this->keyword){
+            $query->andWhere(["LIKE", "gw.name", $this->keyword]);
+        }
+
         return $query;
     }
 

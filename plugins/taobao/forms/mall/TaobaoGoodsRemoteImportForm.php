@@ -52,7 +52,7 @@ class TaobaoGoodsRemoteImportForm extends BaseModel {
                 $goodsData['pic_url']        = [];
                 $smallImages = !empty($importData['small_images']) ? $importData['small_images']['string'] : [];
                 if($smallImages){
-                    if(isset($smallImages['string'])){
+                    if(!is_array($smallImages)){
                         $goodsData['pic_url'][] = ['id' => 0, 'pic_url' => $smallImages['string']];
                     }else{
                         foreach($smallImages as $imageUrl){

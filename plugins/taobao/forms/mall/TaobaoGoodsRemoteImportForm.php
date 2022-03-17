@@ -59,6 +59,8 @@ class TaobaoGoodsRemoteImportForm extends BaseModel {
                             $goodsData['pic_url'][] = ['id' => 0, 'pic_url' => $imageUrl];
                         }
                     }
+                }else{
+                    $goodsData['pic_url'][] = ['id' => 0, 'pic_url' => $importData['pict_url']];
                 }
 
                 $form = new GoodsEditForm();

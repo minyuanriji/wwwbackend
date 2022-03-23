@@ -35,7 +35,7 @@ class MerchantGetSmartshopForm extends BaseModel{
             $shop = new SmartShop();
 
             $wheres = [
-                "s.status='1' AND m.copy<>0"
+                "s.status='1'"
             ];
 
             if($this->store_id){

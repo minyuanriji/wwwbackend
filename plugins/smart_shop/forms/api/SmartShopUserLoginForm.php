@@ -110,6 +110,7 @@ class SmartShopUserLoginForm extends BaseModel{
                 ]
             ];
         }catch (\Exception $e){
+            \Yii::error($e->getMessage(), "app\plugins\smart_shop");
             return [
                 'code' => ApiCode::CODE_FAIL,
                 'msg'  => $e->getMessage()

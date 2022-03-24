@@ -14,7 +14,6 @@ class OrderController extends Controller{
      * @return string|\yii\web\Response
      */
     public function actionIndex() {
-
         if (\Yii::$app->request->isAjax) {
             $form = new OrderListForm();
             $form->attributes = \Yii::$app->request->get();

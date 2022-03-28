@@ -49,6 +49,7 @@ use app\models\User;
 use app\models\UserAddress;
 use app\models\UserCoupon;
 use app\plugins\mch\models\Mch;
+use app\plugins\mpwx\models\MpwxConfig;
 use app\plugins\seckill\models\SeckillGoods;
 use app\plugins\shopping_voucher\forms\common\ShoppingVoucherLogModifiyForm;
 use app\plugins\shopping_voucher\models\ShoppingVoucherFromGoods;
@@ -497,10 +498,17 @@ class OrderSubmitForm extends BaseModel
                 \Yii::$app->trigger(Order::EVENT_CREATED, $event);
             }
 
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, "", [
-                'token' => $token,
+            $resultData = [
+                'token'    => $token,
                 'queue_id' => $queueId ?? 0,
-            ]);
+            ];
+
+            if(isset($this->form_data['mode']) && $this->form_data['mode'] == "external"){
+                $info = MpwxConfig::findOne(['mall_id' => $this->mall_id, 'is_delete' => 0]);
+                $resultData['mp_appid'] = $info->app_id;
+            }
+
+            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, "", $resultData);
         } catch (\Exception $e) {
             $t->rollBack();
             \Yii::$app->redis->set('var1', $e->getMessage());

@@ -46,6 +46,7 @@ class FinishSplitOrderAction extends Action{
      * @param $orderId
      */
     private function finishOrder(SmartShop $shop, $orderId){
+        $this->controller->commandOut("FinishSplitOrderAction::finishOrder");
         try {
             $this->controller->commandOut("FinishSplitOrderAction::finishOrder::获取订单");
             $order = Order::findOne($orderId);
@@ -91,6 +92,7 @@ class FinishSplitOrderAction extends Action{
      * @throws \yii\db\Exception
      */
     private function finishDone(Order $order, SmartShop $shop, $detail){
+        $this->controller->commandOut("FinishSplitOrderAction::finishDone");
         $t = \Yii::$app->db->beginTransaction();
         try {
             $this->controller->commandOut("FinishSplitOrderAction::finishDone::更新订单状态->已完成");

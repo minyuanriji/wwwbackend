@@ -62,10 +62,15 @@ class FinishSplitOrderAction extends Action{
 
             $detail = $shop->getOrderDetail($order->from_table_name, $order->from_table_record_id);
             if($detail['pay_type'] == 1){
-                if(!$this->cancelOrder($order, $shop, $detail) && $detail['order_status'] == 3){
+                if(!$this->cancelOrder($order, $shop, $detail)){
+                    if($detail['order_status'] != 3){
+                        //如果超过3天未确认收货
+                        if((time() - $detail['create_time']) > 3600 * 24 * 7){
+                            throw new \Exception("超过3天未发货、或未确认收货");
+                        }
+                    }
                     $this->finishDone($order, $shop, $detail); //订单已完成
                 }
-
                 $this->controller->commandOut("订单[ID:{$order->id}]分账处理成功");
             }else{
                 throw new \Exception("暂未实现支付宝分账");

@@ -47,6 +47,7 @@ class FinishSplitOrderAction extends Action{
      */
     private function finishOrder(SmartShop $shop, $orderId){
         try {
+            $this->controller->commandOut("FinishSplitOrderAction::finishOrder::获取订单");
             $order = Order::findOne($orderId);
             if(!$order || $order->is_delete){
                 throw new \Exception("订单不存在");
@@ -56,9 +57,10 @@ class FinishSplitOrderAction extends Action{
                 throw new \Exception("订单状态异常");
             }
 
+            $this->controller->commandOut("FinishSplitOrderAction::finishOrder::获取订单详情");
+
             $detail = $shop->getOrderDetail($order->from_table_name, $order->from_table_record_id);
             if($detail['pay_type'] == 1){
-
                 if(!$this->cancelOrder($order, $shop, $detail) && $detail['order_status'] == 3){
                     $this->finishDone($order, $shop, $detail); //订单已完成
                 }
@@ -91,6 +93,7 @@ class FinishSplitOrderAction extends Action{
     private function finishDone(Order $order, SmartShop $shop, $detail){
         $t = \Yii::$app->db->beginTransaction();
         try {
+            $this->controller->commandOut("FinishSplitOrderAction::finishDone::更新订单状态->已完成");
             $order->status     = Order::STATUS_FINISHED;
             $order->updated_at = time();
             if(!$order->save()){
@@ -107,6 +110,7 @@ class FinishSplitOrderAction extends Action{
             $splitData = !empty($order->split_data) ? json_decode($order->split_data, true) : [];
 
             //解冻资金
+            $this->controller->commandOut("FinishSplitOrderAction::finishDone::解冻资金");
             $data = $wechatPay->post("v3/profitsharing/orders/unfreeze", [
                 "sub_mchid"      => (string)$detail['mno'],
                 "transaction_id" => (string)$splitData['transaction_id'],
@@ -118,6 +122,7 @@ class FinishSplitOrderAction extends Action{
             }
 
             $t->commit();
+            $this->controller->commandOut("FinishSplitOrderAction::finishDone::完成");
         }catch (\Exception $e){
             $t->rollBack();
             throw $e;
@@ -134,12 +139,16 @@ class FinishSplitOrderAction extends Action{
      */
     private function cancelOrder(Order $order, SmartShop $shop, $detail){
 
+        $this->controller->commandOut("FinishSplitOrderAction::cancelOrder::检查订单状态");
+
         if(in_array($detail['order_status'], [1, 2, 3]) && in_array($detail['cancel_status'], [0, 3]) && $detail['is_pay'] == 1){
             return false;
         }
 
         $t = \Yii::$app->db->beginTransaction();
         try {
+
+            $this->controller->commandOut("FinishSplitOrderAction::cancelOrder::更新订单状态->已取消");
 
             $splitData = !empty($order->split_data) ? json_decode($order->split_data, true) : [];
             if(empty($splitData['out_return_no'])){
@@ -173,6 +182,8 @@ class FinishSplitOrderAction extends Action{
                     throw new \Exception("请求分账回退失败：" . json_encode(is_array($res) ? $res : []));
                 }*/
             }
+
+            $this->controller->commandOut("FinishSplitOrderAction::cancelOrder::解冻资金");
 
             //解冻资金
             $res = $wechatPay->post("v3/profitsharing/orders/unfreeze", [

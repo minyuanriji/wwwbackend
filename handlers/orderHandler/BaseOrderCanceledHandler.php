@@ -57,7 +57,7 @@ abstract class BaseOrderCanceledHandler extends BaseOrderHandler
 
     protected function action()
     {
-        $this->ScoreResume()->couponResume()->refund()->cardResume()->sendTemplate()->updateGoodsInfo()->goodsAddStock($this->event->order);
+        $this->couponResume()->refund()->cardResume()->sendTemplate()->updateGoodsInfo()->goodsAddStock($this->event->order);
 
         if ('group_buy' != $this->event->order->sign) {
             $this->sendWechatTemp();
@@ -70,7 +70,6 @@ abstract class BaseOrderCanceledHandler extends BaseOrderHandler
         $integralLogic = new IntegralLogic();
         $integralLogic->refundShoppingVoucher($order);
         $integralLogic->refundIntegral($order,0);
-        $integralLogic->refundIntegral($order,1);
 
     }
 

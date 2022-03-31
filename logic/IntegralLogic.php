@@ -59,63 +59,9 @@ class IntegralLogic
         try {
             if (!empty($order)) {
                 if ($ctype == 1) {
-                    //订单取消返还金豆券
-                    if ($order->integral_deduction_price > 0) {
-                        //查询所有抵扣掉的永久金豆券
-                        $static_deduct_record = IntegralRecord::getDeductRecordByOrder($order, $ctype);
-                        $user_id = $order->user_id;
-                        // $agent = ProfitAgent::getAgentByUserId($user_id,$order->mall_id);
-                        $wallet = User::getUserWallet($user_id, $order->mall_id);
-                        if ($static_deduct_record) {
-                            $record = array(
-                                'controller_type' => $ctype,
-                                'mall_id' => $static_deduct_record['mall_id'],
-                                'user_id' => $static_deduct_record['user_id'],
-                                'money' => $static_deduct_record['money'] * -1,
-                                'desc' => '订单(' . $order->id . ')取消,返还金豆券' . ($static_deduct_record['money'] * -1),
-                                'before_money' => $wallet['static_integral'],
-                                'type' => Integral::TYPE_ALWAYS,
-                                'source_id' => $order->id,
-                                'source_table' => 'order',
-                            );
-                            // 写入日志
-                            $res = IntegralRecord::record($record);
-                            if ($res === false) throw new Exception(IntegralRecord::getError());
-                        }
 
-                        //查询抵扣掉的动态积分
-                        $dynamic_deduct_records = IntegralDeduct::getDeductByOrder($order);
-
-                        $before_money = $wallet['dynamic_integral'];
-                        if (!empty($dynamic_deduct_records)) {
-                            foreach ($dynamic_deduct_records as $deduct) {
-                                //如果当前的动态积分不是过期状态那么则返还
-                                if ($deduct['record']['status'] != 2) {
-                                    $refund = array(
-                                        'mall_id' => $deduct['mall_id'],
-                                        'user_id' => $deduct['user_id'],
-                                        'source_id' => $deduct['source_id'],
-                                        'source_table' => 'order',
-                                        'record_id' => $deduct['record_id'],
-                                        'before_money' => $before_money,
-                                        'money' => $deduct['money'] * -1,
-                                        'desc' => '订单(' . $order->id . ')取消,返还动态金豆券(' . $deduct['record_id'] . ')面额：' . ($deduct['money'] * -1)
-                                    );
-                                    // 写入日志
-                                    $res = IntegralDeduct::deduct($refund);
-                                    if ($res === false) throw new Exception(IntegralDeduct::getError());
-                                    if ($deduct['record']['status'] == 3) {
-                                        $deduct['record']->status = 1;
-                                        $deduct['record']->save();
-                                        $res = $deduct['record']->save();
-                                        if ($res === false) throw new Exception($deduct['record']->getErrorMessage());
-                                    }
-                                }
-
-                            }
-                        }
-                    }
                 } else {
+
                     //订单取消返还积分券
                     if ($order->score_deduction_price > 0) {
 
@@ -130,7 +76,7 @@ class IntegralLogic
                                 'mall_id' => $static_deduct_record['mall_id'],
                                 'user_id' => $static_deduct_record['user_id'],
                                 'money' => $static_deduct_record['money'] * -1,
-                                'desc' => '订单(' . $order->id . ')取消,返还金豆券' . ($static_deduct_record['money'] * -1),
+                                'desc' => '订单(' . $order->id . ')取消,返还积分' . ($static_deduct_record['money'] * -1),
                                 'before_money' => $wallet['static_score'],
                                 'type' => Integral::TYPE_ALWAYS,
                                 'source_id' => $order->id,
@@ -144,8 +90,7 @@ class IntegralLogic
 
                         //查询抵扣掉的动态积分
                         $dynamic_deduct_records = IntegralDeduct::getDeductByOrder($order);
-
-                        $before_money = $wallet['dynamic_integral'];
+                        $before_money = $wallet['dynamic_score'];
                         if (!empty($dynamic_deduct_records)) {
                             foreach ($dynamic_deduct_records as $deduct) {
                                 //如果当前的动态积分不是过期状态那么则返还
@@ -158,7 +103,7 @@ class IntegralLogic
                                         'record_id' => $deduct['record_id'],
                                         'before_money' => $before_money,
                                         'money' => $deduct['money'] * -1,
-                                        'desc' => '订单(' . $order->id . ')取消,返还动态金豆券(' . $deduct['record_id'] . ')面额：' . ($deduct['money'] * -1)
+                                        'desc' => '订单(' . $order->id . ')取消,返还动态积分券(' . $deduct['record_id'] . ')面额：' . ($deduct['money'] * -1)
                                     );
                                     // 写入日志
                                     $res = IntegralDeduct::deduct($refund);

@@ -99,7 +99,7 @@ class IntegralRecord extends BaseActiveRecord{
                         $wallet->score += $log['money'];
                         break;
                 }
-                $wallet->dynamic_score = $wallet->score;
+                //$wallet->dynamic_score = $wallet->score;
                 $wallet->total_score   = $wallet->static_score + $wallet->score;
 
                 //绑定积分券所属上级

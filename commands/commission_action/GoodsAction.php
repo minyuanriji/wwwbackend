@@ -91,7 +91,7 @@ class GoodsAction extends Action{
          */
         $newPriceLogFunc = function($userId, $isLianc, $price, $totalIncome, $ruleData, $orderDetailData){
 
-            $price = min($price, $orderDetailData['profit_price']);
+            $price = min($price, $orderDetailData['profit_price'] * $orderDetailData['num']);
 
             $uniqueData = [
                 "mall_id"         => $orderDetailData['mall_id'],

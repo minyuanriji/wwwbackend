@@ -101,7 +101,9 @@ class OrderDoSplitForm extends BaseModel{
             throw new \Exception("无可分账金额");
         }
 
-        $amount = round((($mch->transfer_rate/100) * $unsplitAmount)/100, 2);
+        //如果支付用户手机号为空，就不分帐
+        $amount = !empty($order->pay_user_mobile) ? round((($mch->transfer_rate/100) * $unsplitAmount)/100, 2) : 0;
+
         $splitData['receivers'] = isset($splitData['receivers']) && !empty($splitData['receivers']) ? $splitData['receivers'] : [];
 
         if(empty($splitData['out_request_no'])){
@@ -184,7 +186,8 @@ class OrderDoSplitForm extends BaseModel{
             $splitData['out_order_no'] = "wx" . md5(uniqid() . rand(0, 10000));
         }
 
-        $amount = (int)(($mch->transfer_rate/100) * $unsplitAmount);
+        //如果支付用户手机号为空，就不分帐
+        $amount = !empty($order->pay_user_mobile) ? (int)(($mch->transfer_rate/100) * $unsplitAmount) : 0;
 
         $splitData['receivers'] = isset($splitData['receivers']) && !empty($splitData['receivers']) ? $splitData['receivers'] : [];
         $splitData['transaction_id'] = $detail['transaction_id'];

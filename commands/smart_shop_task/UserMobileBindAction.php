@@ -24,7 +24,7 @@ class UserMobileBindAction extends BaseAction {
                         "AND",
                         "o.pay_user_mobile <> '' AND o.pay_user_mobile IS NOT NULL AND o.is_delete=0",
                         "u.id IS NULL"
-                    ])->asArray()->select(["o.id", "o.pay_user_mobile"])->limit(1)->all();
+                    ])->asArray()->select(["o.id", "o.mall_id", "o.pay_user_mobile"])->limit(1)->all();
                 if(!$rows){
                     $this->negativeTime();
                     continue;
@@ -43,7 +43,7 @@ class UserMobileBindAction extends BaseAction {
                     $user = new User();
                     $user->username         = $nickname;
                     $user->mobile           = $row['pay_user_mobile'];
-                    $user->mall_id          = \Yii::$app->mall->id;
+                    $user->mall_id          = $row['mall_id'];
                     $user->access_token     = \Yii::$app->security->generateRandomString();
                     $user->auth_key         = \Yii::$app->security->generateRandomString();
                     $user->nickname         = $nickname;
@@ -60,7 +60,7 @@ class UserMobileBindAction extends BaseAction {
                     }
 
                     $userInfoModel = new UserInfo();
-                    $userInfoModel->mall_id       = \Yii::$app->mall->id;
+                    $userInfoModel->mall_id       = $row['mall_id'];
                     $userInfoModel->mch_id        = 0;
                     $userInfoModel->user_id       = $user->id;
                     $userInfoModel->unionid       = "";

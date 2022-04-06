@@ -507,7 +507,11 @@ class OrderSubmitForm extends BaseModel
                 $info = MpwxConfig::findOne(['mall_id' => $this->mall_id, 'is_delete' => 0]);
                 $resultData['mp_appid'] = $info->app_id;
             }
-
+            return [
+                'code'     => ApiCode::CODE_SUCCESS,
+                'mp_appid' => $resultData['mp_appid'],
+                'data'     => $resultData
+            ];
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, "", $resultData);
         } catch (\Exception $e) {
             $t->rollBack();

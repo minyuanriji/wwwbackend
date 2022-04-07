@@ -47,7 +47,7 @@ class AlibabaDistributionOrderListForm extends BaseModel{
             ]);
             $selects = ["id", "order_no", "total_price", "total_pay_price", "express_original_price", "express_price", "total_goods_price",
                 "total_goods_original_price", "is_pay", "shopping_voucher_use_num", "shopping_voucher_decode_price",
-                "shopping_voucher_express_use_num", "shopping_voucher_express_decode_price"
+                "shopping_voucher_express_use_num", "shopping_voucher_express_decode_price", "created_at"
             ];
 
             if ($this->keywords) {
@@ -59,7 +59,7 @@ class AlibabaDistributionOrderListForm extends BaseModel{
             $orderDatas = $query->select($selects)->asArray()->orderBy("id DESC")->page($pagination, 20, $this->page)->all();
             if($orderDatas){
                 $orderIds = $tmpOrderDatas = [];
-                foreach($orderDatas as &$orderData){
+                foreach($orderDatas as $orderData){
                     $orderIds[] = $orderData['id'];
                     $tmpOrderDatas[$orderData['id']] = $orderData;
                 }
@@ -91,6 +91,10 @@ class AlibabaDistributionOrderListForm extends BaseModel{
                     }
                 }
                 unset($tmpOrderDatas);
+            }
+
+            foreach($orderDatas as $key => $orderData){
+                $orderDatas[$key]['created_at'] = date("Y-m-d H:i:s", $orderData['created_at']);
             }
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'', [

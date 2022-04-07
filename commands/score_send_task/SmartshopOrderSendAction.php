@@ -2,6 +2,7 @@
 
 namespace app\commands\score_send_task;
 
+use app\commands\BaseAction;
 use app\models\Integral;
 use app\models\Mall;
 use app\models\Store;
@@ -10,21 +11,18 @@ use app\plugins\integral_card\models\ScoreFromStore;
 use app\plugins\integral_card\models\ScoreSendLog;
 use app\plugins\mch\models\Mch;
 use app\plugins\smart_shop\models\Order;
-use yii\base\Action;
 
-class SmartshopOrderSendAction extends Action{
-
-    private $sleep = 1;
+class SmartshopOrderSendAction extends BaseAction {
 
     public function run(){
-        $this->controller->commandOut(date("Y/m/d H:i:s") . " SmartshopOrderSendAction start");
+        $this->controller->commandOut("SmartshopOrderSendAction start");
         while (true){
+            sleep($this->sleepTime);
             try {
                 $this->newAction();
             }catch (\Exception $e){
-                $this->controller->commandOut(implode("\n", [$e->getMessage(), $e->getFile(), $e->getLine()]));
+                throw $e;
             }
-            $this->controller->sleep(min(max($this->sleep, 1), 30));
         }
     }
 
@@ -58,11 +56,11 @@ class SmartshopOrderSendAction extends Action{
         $orders = $query->select($selects)->asArray()->limit(10)->all();
 
         if(!$orders){
-            $this->sleep = min(30, $this->sleep + 1);
+            $this->negativeTime();
             return false;
         }
 
-        $this->sleep = max(1, $this->sleep - 1);
+        $this->activeTime();
 
         $orderIds = [];
         foreach($orders as $order){

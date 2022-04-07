@@ -14,7 +14,7 @@ class ScoreSendTaskController extends BaseCommandController {
     /**
      * 积分发送任务
      */
-    public function actionStart(){
+    /*public function actionStart(){
         $pm = new \Swoole\Process\ProcessManager();
         foreach($this->actions() as $id => $class){
             $pm->add(function (\Swoole\Process\Pool $pool, int $workerId) use($id){
@@ -28,6 +28,6 @@ class ScoreSendTaskController extends BaseCommandController {
             });
         }
         $pm->start();
-    }
+    }*/
 
 }

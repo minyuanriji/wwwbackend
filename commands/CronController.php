@@ -9,7 +9,8 @@ class CronController extends BaseCommandController{
     public static $handlers = [
         "smart-shop-task" => SmartShopTaskController::class, //智慧门店
         "commission" => CommissionController::class, //分佣任务
-        "shopping-voucher-send-task" => ShoppingVoucherSendTaskController::class //红包（购物券）发放任务
+        "shopping-voucher-send-task" => ShoppingVoucherSendTaskController::class, //红包（购物券）发放任务
+        "score-send-task" => ScoreSendTaskController::class //积分发放任务
     ];
 
     public function actionStart(){

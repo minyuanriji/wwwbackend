@@ -211,7 +211,7 @@ class OrderListCommon extends BaseModel
 
     protected function setStatus()
     {
-        switch ($this->order_status) {
+        /*switch ($this->order_status) {
             case 0:
                 break;
             // 待付款
@@ -250,7 +250,7 @@ class OrderListCommon extends BaseModel
                 $this->query->andWhere(['is_sale' => 1,]);
             default:
                 break;
-        }
+        }*/
         return $this->query->andWhere(["o.status" => $this->status]);
     }
 

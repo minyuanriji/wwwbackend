@@ -362,19 +362,19 @@ class Order extends BaseActiveRecord
         }
 
         try {
-//            if ($order->is_pay == 0 && $order->pay_type != 2) {
-//                return '待付款';
-//            } elseif ($order->is_send == 0) {
-//                return $order->send_type == 1 ? '待核销' : '待发货';
-//            } elseif ($order->is_send == 1 && $order->is_confirm == 0) {
-//                return $order->send_type == 1 ? '待核销' : '待收货';
-//            } elseif ($order->is_confirm == 1 && $order->is_sale == 0) {
-//                return $order->send_type == 1 ? '已核销' : '已收货';
-//            } elseif ($order->is_sale == 1) {
-//                return '已完成';
-//            } else {
-//                return '未知状态';
-//            }
+            if ($order->is_pay == 0 && $order->pay_type != 2) {
+                return '待付款';
+            } elseif ($order->is_send == 0) {
+                return $order->send_type == 1 ? '待核销' : '待发货';
+            } elseif ($order->is_send == 1 && $order->is_confirm == 0) {
+                return $order->send_type == 1 ? '待核销' : '待收货';
+            } elseif ($order->is_confirm == 1 && $order->is_sale == 0) {
+                return $order->send_type == 1 ? '已核销' : '已收货';
+            } elseif ($order->is_sale == 1) {
+                return '已完成';
+            } else {
+                return '未知状态';
+            }
             return $this->status_array[$order->status];
         } catch (\Exception $exception) {
             return '未知状态';

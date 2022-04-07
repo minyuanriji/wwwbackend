@@ -211,16 +211,14 @@ class OrderListCommon extends BaseModel
 
     protected function setStatus()
     {
-        /*switch ($this->order_status) {
-            case 0:
-                break;
+        switch ($this->status) {
             // 待付款
-            case 1:
+            case 0:
                 // TODO 货到付款订单除外
                 $this->query->andWhere(['o.is_pay' => 0])->andWhere(['!=', 'o.pay_type', 2]);
                 break;
             // 待发货
-            case 2:
+            case 1:
                 $this->query->andWhere(['o.is_send' => 0])->andWhere([
                     'or',
                     ['o.pay_type' => 2],
@@ -228,30 +226,17 @@ class OrderListCommon extends BaseModel
                 ]);
                 break;
             // 待收货
-            case 3:
+            case 2:
                 $this->query->andWhere(['o.is_send' => 1, 'o.is_confirm' => 0]);
                 break;
             // 待评价
-            case 4:
+            case 3:
                 $this->query->joinWith(['comments c' => function ($query) {
                     $this->query->andWhere('ISNULL(c.id)');
-                }])
-                    ->andWhere(['o.is_confirm' => 1, 'is_sale' => 0, 'sale_status' => 0]);
+                }])->andWhere(['o.is_confirm' => 1, 'is_sale' => 0, 'sale_status' => 0]);
                 break;
-            // 已取消
-            case 6:
-                $this->query->andWhere(['o.cancel_status' => 1]);
-                break;
-            // 取消待处理
-            case 7:
-                $this->query->andWhere(['o.cancel_status' => 2]);
-                break;
-            case 8:
-                $this->query->andWhere(['is_sale' => 1,]);
-            default:
-                break;
-        }*/
-        return $this->query->andWhere(["o.status" => $this->status]);
+        }
+        //return $this->query->andWhere(["o.status" => $this->status]);
     }
 
     protected function setSaleStatus(){

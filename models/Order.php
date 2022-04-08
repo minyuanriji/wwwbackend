@@ -362,7 +362,11 @@ class Order extends BaseActiveRecord
         }
 
         try {
-            if ($order->is_pay == 0 && $order->pay_type != 2) {
+            if($order->sale_status  == self::SALE_STATUS_YES){
+                return '申请售后';
+            }elseif($order->sale_status  == self::SALE_STATUS_FINISHED){
+                return '已完成售后';
+            }elseif ($order->is_pay == 0 && $order->pay_type != 2) {
                 return '待付款';
             } elseif ($order->is_send == 0) {
                 return $order->send_type == 1 ? '待核销' : '待发货';

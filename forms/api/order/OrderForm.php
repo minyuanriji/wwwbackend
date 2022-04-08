@@ -115,10 +115,10 @@ class OrderForm extends BaseModel
                 $newItem['detail'][$key]['diy_refund_status'] = $orderRefundStatus;
                 CommonLogic::unsetArrayKey($newItem['detail'][$key],["created_at","updated_at","is_delete","deleted_at"]);
             }
-            $newItem["sale_status"] = Order::IS_SALE_NO;
+            /*$newItem["sale_status"] = Order::IS_SALE_NO;
             if($orderGoodsTotal == $refundOrderGoodsTotal){
                 $newItem["sale_status"] = Order::IS_SALE_YES;
-            }
+            }*/
 
             $newItem["created_at"] = date("Y-m-d H:i:s",$item["created_at"]);
             // 兼容发货方式

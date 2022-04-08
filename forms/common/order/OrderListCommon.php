@@ -219,6 +219,7 @@ class OrderListCommon extends BaseModel
                     "AND",
                     ['o.cancel_status' => 0],
                     ['o.is_pay' => 0],
+                    ['o.status' => 0],
                     ['!=', 'o.pay_type', 2]
                 ]);
                 break;

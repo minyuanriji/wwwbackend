@@ -215,7 +215,12 @@ class OrderListCommon extends BaseModel
             // 待付款
             case 0:
                 // TODO 货到付款订单除外
-                $this->query->andWhere(['o.is_pay' => 0])->andWhere(['!=', 'o.pay_type', 2]);
+                $this->query->andWhere([
+                    "AND",
+                    ['o.cancel_status' => 0],
+                    ['o.is_pay' => 0],
+                    ['!=', 'o.pay_type', 2]
+                ]);
                 break;
             // 待发货
             case 1:

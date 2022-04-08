@@ -124,7 +124,10 @@ class OrderRefundSubmitForm extends BaseModel
             $orderRefund->reason = $this->reason;
             $orderRefund->refund_price = $this->refund_total_price;
             $orderRefund->remark = $this->remark;
-            $orderRefund->pic_list = $this->pic_list;
+
+            $picList = @json_decode($this->pic_list, true);
+            $orderRefund->pic_list = is_string($picList) ? json_encode(explode(",", $picList)) : json_encode($picList);
+
             $orderRefund->is_refund = OrderRefund::NO;
             $res = $orderRefund->save();
             if (!$res) {

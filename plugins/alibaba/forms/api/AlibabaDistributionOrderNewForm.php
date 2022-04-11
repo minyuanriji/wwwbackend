@@ -193,6 +193,9 @@ class AlibabaDistributionOrderNewForm extends BaseModel{
             $mainData['shopping_voucher']['use_num']       += $useNum;
             $mainData['shopping_voucher']['decode_price']  += $decodePrice;
             $mainData['shopping_voucher']['remaining']      = $remaining;
+
+            $orderItem['goods_list'][$key]['use_shopping_voucher_num'] = $useNum;
+            $orderItem['goods_list'][$key]['use_shopping_voucher_decode_price'] = $decodePrice;
         }
 
         //红包抵扣运费

@@ -56,7 +56,7 @@ class AlibabaDistributionOrderDetailsForm extends BaseModel{
             $query->innerJoin(["g" => AlibabaDistributionGoodsList::tableName()], "g.id=od.goods_id");
             $query->andWhere(["od.order_id" => $order->id]);
             $selects = ["od.id", "od.order_id", "od.num", "od.unit_price", "od.total_original_price", "od.total_price", "od.is_refund", "od.refund_status", "od.shopping_voucher_decode_price",
-                "od.shopping_voucher_num", "od.sku_labels", "od1688.app_id", "od1688.ali_order_id",  "g.cover_url", "g.name", "od1688.id as od1688_id"
+                "od.shopping_voucher_num", "od.sku_labels", "od1688.app_id", "od1688.ali_order_id",  "g.cover_url", "g.name", "g.id as goods_id", "od1688.id as od1688_id"
             ];
             $orderDetails = $query->select($selects)->asArray()->all();
             if(!$orderDetails){

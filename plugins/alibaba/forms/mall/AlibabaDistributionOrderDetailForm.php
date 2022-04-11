@@ -70,7 +70,7 @@ class AlibabaDistributionOrderDetailForm extends BaseModel{
                 "OR",
                 ["order_detail_id" => $orderDetail->id],
                 ["order_detail_id" => 0]
-            ])->all();
+            ])->andWhere(["order_id" => $order->id])->all();
             if($refundDatas){
                 foreach($refundDatas as &$refundData){
                     $refundData['order_detail_id'] = (int)$refundData['order_detail_id'];

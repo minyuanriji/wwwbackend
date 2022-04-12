@@ -68,14 +68,14 @@ class ProcessSplitOrderAction extends Action{
             }
             $detail = $shop->getOrderDetail($order->from_table_name, $order->from_table_record_id);
 
-            if($detail['pay_type'] == 1){
-                OrderDoSplitForm::wechatSplit($mch, $order, $shop, $detail);
-            }else{
-                OrderDoSplitForm::alipaySplit($mch, $order, $shop, $detail);
+            if($detail['order_status'] == 3){ //订单状态为已完成，才进行分账操作
+                if($detail['pay_type'] == 1){
+                    OrderDoSplitForm::wechatSplit($mch, $order, $shop, $detail);
+                }else{
+                    OrderDoSplitForm::alipaySplit($mch, $order, $shop, $detail);
+                }
+                $this->controller->commandOut("订单[ID:{$order->id}]分账处理成功");
             }
-
-            $this->controller->commandOut("订单[ID:{$order->id}]分账处理成功");
-
         }catch (\Exception $e){
             $this->controller->commandOut($e->getMessage());
             Order::updateAll([

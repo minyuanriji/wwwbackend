@@ -8,7 +8,6 @@ class SmartShopTaskController extends SwooleProcessController {
         return [
             'user-mobile-bind'    => 'app\commands\smart_shop_task\UserMobileBindAction',
             'new-split-order'     => 'app\commands\smart_shop_task\NewSplitOrderAction',
-            'free-split-order'     => 'app\commands\smart_shop_task\FreeSplitOrderAction',
             'process-split-order' => 'app\commands\smart_shop_task\ProcessSplitOrderAction',
             'finish-split-order'  => 'app\commands\smart_shop_task\FinishSplitOrderAction',
         ];

@@ -112,7 +112,7 @@ class RegisterForm extends BaseModel
                 'mall_id' => \Yii::$app->mall->id
             ]);
 
-            if($user->parent_id){
+            if($user->parent_id && $user->parent_id != GLOBAL_PARENT_ID){
                 return $this->returnApiResultData(ApiCode::CODE_FAIL,'已经存在推荐人');
             }
 

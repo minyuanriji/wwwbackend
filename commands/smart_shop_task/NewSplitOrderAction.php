@@ -25,6 +25,7 @@ class NewSplitOrderAction extends Action{
                     "o.is_split=1 AND o.split_status=0 AND o.create_time > s.split_start_at", //必须是分账订单
                     "o.order_status IN(1, 2, 3, 7) AND o.is_pay=1", //订单状态满足
                     "o.cancel_status IN(0, 3) AND o.is_cancel=0", //订单未取消未退款
+                    "o.pay_type IN(1, 2)", //微信支付或者支付宝
                     "o.pay_time < '".(time() - 10)."'"
                 ], 1);
 

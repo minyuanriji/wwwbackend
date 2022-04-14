@@ -1,9 +1,6 @@
 <?php
 echo $this->render("com-edit");
-echo $this->render("com-update");
-
 echo $this->render("../com/com-tab-from");
-
 ?>
 <div id="app" v-cloak>
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
@@ -11,7 +8,6 @@ echo $this->render("../com/com-tab-from");
         <com-tab-from :current="activeName"></com-tab-from>
 
         <div class="table-body">
-            <el-alert title="说明：用户通过扫商户二维码进行付款，成功后可获得赠送积分" type="info" :closable="false" style="margin-bottom: 20px;"></el-alert>
 
             <div class="input-item">
                 <el-input @keyup.enter.native="search" placeholder="请输入关键词搜索" v-model="searchData.keyword" clearable @clear="search">
@@ -19,47 +15,34 @@ echo $this->render("../com/com-tab-from");
                 </el-input>
             </div>
             <div style="float: right">
-                <el-button type="primary" style="padding: 9px 15px !important;"  @click="newStore">添加商户</el-button>
+                <el-button type="primary" style="padding: 9px 15px !important;"  @click="newFree">添加领取活动</el-button>
             </div>
             <el-table :data="list" border style="width: 100%" v-loading="loading">
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                <el-table-column sortable="custom" label="商户名称" width="350">
-                    <template slot-scope="scope">
-                        <div flex="box:first">
-                            <div style="padding-right: 10px;">
-                                <com-image mode="aspectFill" :src="scope.row.cover_url"></com-image>
-                            </div>
-                            <div >
-                                <div>
-                                    <el-tooltip class="item" effect="dark" placement="top">
-                                        <template slot="content">
-                                            <div style="width: 320px;">{{scope.row.name}}</div>
-                                        </template>
-                                        <com-ellipsis :line="2">{{scope.row.name}}</com-ellipsis>
-                                    </el-tooltip>
-                                </div>
-                                <div>ID：{{scope.row.mch_id}}</div>
-                            </div>
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="give_value" label="赠送配置" width="300">
+                <el-table-column prop="name" label="名称" width="200"></el-table-column>
+                <el-table-column label="赠送配置">
                     <template slot-scope="scope">
                         <span v-if="scope.row.enable_score != 1">已关闭</span>
                         <span v-else>
                             <span v-if="scope.row.score_give_settings.is_permanent == 1">
-                                永久，赠送比例{{scope.row.rate}}%
+                                永久积分，赠送数量{{scope.row.number}}
                             </span>
                             <span v-else>
-                                限时，赠送比例{{scope.row.rate}}%，
-                                送{{scope.row.score_give_settings.period}}个月
+                                限时积分，赠送数量{{scope.row.number}}，
+                                送{{scope.row.score_give_settings.period}}个月，
+                                有效期{{scope.row.score_give_settings.expire}}天
                             </span>
                         </span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="scope" width="200" label="启动时间">
+                <el-table-column prop="scope" width="150" label="开始时间">
                     <template slot-scope="scope">
                         {{scope.row.start_at}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="scope" width="150" label="结束时间">
+                    <template slot-scope="scope">
+                        {{scope.row.end_at}}
                     </template>
                 </el-table-column>
                 <el-table-column prop="scope" width="150" label="添加时间">
@@ -74,7 +57,7 @@ echo $this->render("../com/com-tab-from");
                 </el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
-                        <el-button @click="editStore(scope.row)" type="text" circle size="mini">
+                        <el-button @click="editFree(scope.row)" type="text" circle size="mini">
                             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                                 <img src="statics/img/mall/edit.png" alt="">
                             </el-tooltip>
@@ -108,20 +91,14 @@ echo $this->render("../com/com-tab-from");
               @close="close"
               @update="update"></com-edit>
 
-    <com-update :visible="updateDialogVisible"
-              :edit-data="editData"
-              @up_close="up_close"
-              @up_update="up_update"></com-update>
-
 </div>
 <script>
     const app = new Vue({
         el: '#app',
         data() {
             return {
-                activeName: 'store',
+                activeName: 'free',
                 editDialogVisible: false,
-                updateDialogVisible: false,
                 editData: {},
                 searchData: {
                     keyword: ''
@@ -129,18 +106,17 @@ echo $this->render("../com/com-tab-from");
                 date: '',
                 list: [],
                 pagination: null,
-                loading: false,
-
+                loading: false
             };
         },
         methods: {
-            newStore(){
+            newFree(){
                 this.editData = {};
                 this.editDialogVisible = true;
             },
-            editStore(row){
+            editFree(row){
                 this.editData = row;
-                this.updateDialogVisible = true;
+                this.editDialogVisible = true;
             },
             deleteOn(row){
                 let self = this;
@@ -152,7 +128,7 @@ echo $this->render("../com/com-tab-from");
                     self.loading = true;
                     request({
                         params: {
-                            r: 'plugin/integral_card/admin/from-store/delete'
+                            r: 'plugin/integral_card/admin/from-free/delete'
                         },
                         method: 'post',
                         data: {
@@ -183,7 +159,7 @@ echo $this->render("../com/com-tab-from");
             },
             getList() {
                 let params = {
-                    r: 'plugin/integral_card/admin/from-store/list',
+                    r: 'plugin/integral_card/admin/from-free/list',
                     page: this.page,
                     keyword: this.searchData.keyword,
                 };
@@ -208,13 +184,6 @@ echo $this->render("../com/com-tab-from");
             },
             close(){
                 this.editDialogVisible = false;
-            },
-            up_update(){
-                this.getList();
-                this.up_close();
-            },
-            up_close(){
-                this.updateDialogVisible = false;
             }
         },
         mounted: function() {

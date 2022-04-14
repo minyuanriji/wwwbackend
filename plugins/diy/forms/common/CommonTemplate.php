@@ -325,7 +325,12 @@ class CommonTemplate extends BaseModel
                         'id' => 'module',
                         'name' => '自定义模块',
                         'icon' => $pluginUrl . '/images/new-tpl/form_custom_icon.png',
-                    ]
+                    ],
+                    [
+                        'id' => 'take-score',
+                        'name' => '领取积分',
+                        'icon' => $pluginUrl . '/images/new-tpl/form_integral_icon.png',
+                    ],
                 ]
             ]
         ];

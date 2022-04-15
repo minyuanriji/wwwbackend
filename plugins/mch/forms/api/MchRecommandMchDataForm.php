@@ -3,13 +3,15 @@
 namespace app\plugins\mch\forms\api;
 
 use app\core\ApiCode;
+use app\forms\api\APICacheDataForm;
+use app\forms\api\ICacheForm;
 use app\models\BaseModel;
 use app\models\Goods;
 use app\models\GoodsWarehouse;
 use app\models\Store;
 use app\plugins\mch\models\Mch;
 
-class MchRecommandMchDataForm extends BaseModel{
+class MchRecommandMchDataForm extends BaseModel implements ICacheForm {
 
     public $mch_ids;
 
@@ -19,7 +21,17 @@ class MchRecommandMchDataForm extends BaseModel{
         ];
     }
 
-    public function get(){
+    /**
+     * @return array
+     */
+    public function getCacheKey() {
+        $mchIds = $this->mch_ids ? $this->mch_ids : [];
+        sort($mchIds);
+        $keys[] = md5("mch:" . implode($mchIds));
+        return $keys;
+    }
+
+    public function getSourceDataForm(){
         if(!$this->validate()){
             return $this->responseErrorInfo();
         }
@@ -67,12 +79,18 @@ class MchRecommandMchDataForm extends BaseModel{
                 }
             }
 
-            return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, [
-                "list" => $list ? $list : []
+            return new APICacheDataForm([
+                "sourceData" => [
+                    'code' => ApiCode::CODE_SUCCESS,
+                    'data' => [
+                        "list" => $list ? $list : []
+                    ]
+                ]
             ]);
         }catch (\Exception $e){
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
     }
+
 
 }

@@ -68,7 +68,7 @@
                             <div>{{mch.name}}</div>
                         </div>
                         <template v-if="data.showGoods">
-                            <div flex="box:first" v-if="!mch.staticGoods">
+                            <!--<div flex="box:first" v-if="!mch.staticGoods">
                                 <div style="width: 95px;">商品显示数量</div>
                                 <div>
                                     <el-input size="small" v-model.number="mch.showGoodsNum" type="number"
@@ -76,12 +76,14 @@
                                               placeholder="最多10个" @change="goodsNumChange(mchIndex)"></el-input>
                                 </div>
                             </div>
+
                             <div flex="box:first">
                                 <div style="width: 95px;">自定义商品</div>
                                 <div>
                                     <el-switch v-model="mch.staticGoods"></el-switch>
                                 </div>
                             </div>
+                            -->
                             <div v-if="mch.staticGoods">
                                 <div>商品列表</div>
                                 <div class="goods-list" flex>

@@ -71,6 +71,7 @@
                     },
                     startDateTime: '',
                     endDateTime: '',
+                    bottomBg: _currentPluginBaseUrl + '/images/timer-bottom-bg.png',
                 }
             };
         },

@@ -68,8 +68,8 @@ class ProcessSplitOrderAction extends Action{
             }
             $detail = $shop->getOrderDetail($order->from_table_name, $order->from_table_record_id);
 
-            //订单状态为已完成或距下单时间超过12小时，才进行分账操作
-            if($detail['order_status'] == 3 || (time() - $order->created_at) > 1800 * 12){
+            //订单状态为已完成或距下单时间超过1天，才进行分账操作
+            if($detail['order_status'] == 3 || (time() - $order->created_at) > 1800 * 24){
                 if($detail['pay_type'] == 1){
                     OrderDoSplitForm::wechatSplit($mch, $order, $shop, $detail);
                 }else{

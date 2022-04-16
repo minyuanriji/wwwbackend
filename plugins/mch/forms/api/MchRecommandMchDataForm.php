@@ -69,7 +69,7 @@ class MchRecommandMchDataForm extends BaseModel implements ICacheForm {
                             'g.is_recycle' => 0,
                             'g.status'     => 1,
                             'g.mall_id'    => $item['mall_id'],
-                            //'g.mch_id'     => $item['mch_id']
+                            'g.mch_id'     => $item['mch_id']
                         ])->select(["g.id", "gw.cover_pic", "g.price"])
                         ->orderBy(['g.sort' => SORT_ASC, 'g.id' => SORT_DESC])
                         ->groupBy('g.goods_warehouse_id')->limit(3)

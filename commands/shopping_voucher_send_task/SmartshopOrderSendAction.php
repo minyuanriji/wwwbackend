@@ -36,15 +36,15 @@ class SmartshopOrderSendAction extends BaseAction {
             ->innerJoin(["m" => Mch::tableName()], "m.id=o.bsh_mch_id AND m.is_delete=0 AND m.review_status=1")
             ->innerJoin(["s" => Store::tableName()], "s.mch_id=o.bsh_mch_id")
             ->innerJoin(["svfs" => ShoppingVoucherFromStore::tableName()], "svfs.store_id=s.id AND svfs.is_delete=0")
-            ->innerJoin(["u" => User::tableName()], "u.mobile=o.pay_user_mobile")
-            ->leftJoin(["svsl" => ShoppingVoucherSendLog::tableName()], "svsl.source_id=o.id AND svsl.source_type='from_smart_shop_order'");
+            ->innerJoin(["u" => User::tableName()], "u.mobile=o.pay_user_mobile");
 
         $query->andWhere([
             "AND",
-            "svsl.id IS NULL",
             "o.created_at > svfs.start_at",
             "o.pay_price > 0",
-            "u.mobile IS NOT NULL AND u.mobile <> ''",
+            "u.mobile IS NOT NULL",
+            "u.mobile <> ''",
+            ["o.shopping_voucher_status" => 0],
             ["o.status" => Order::STATUS_FINISHED],
             ["o.is_delete" => 0]
         ]);
@@ -52,7 +52,7 @@ class SmartshopOrderSendAction extends BaseAction {
 
         $selects = ["o.id", "o.mall_id", "o.pay_price", "u.id as user_id", "s.mch_id", "s.id as store_id",
             "svfs.give_type", "svfs.give_value", "m.transfer_rate"];
-        $orders = $query->select($selects)->asArray()->limit(10)->all();
+        $orders = $query->select($selects)->asArray()->limit(1)->all();
 
         if(!$orders) {
             $this->negativeTime();
@@ -68,7 +68,18 @@ class SmartshopOrderSendAction extends BaseAction {
         Order::updateAll(["updated_at" => time()], "id IN (".implode(",", $orderIds).")");
 
         foreach($orders as $order){
+            $this->processOrder($order);
+        }
 
+        return true;
+    }
+
+    /**
+     * 处理新增发送记录
+     * @param $order
+     */
+    private function processOrder($order){
+        try {
             $giveValue = ShoppingVoucherHelper::calculateMchRateByTransferRate($order['transfer_rate']);
             $order['give_value'] = $giveValue;
             $money = $order['pay_price'] * (floatval($giveValue)/100);
@@ -85,14 +96,15 @@ class SmartshopOrderSendAction extends BaseAction {
                 "data_json"   => json_encode($order)
             ]);
 
-            if($sendLog->save()){
-                $this->controller->commandOut("红包发放记录创建成功，ID:" . $sendLog->id);
-            }else{
-                $this->controller->commandOut(json_encode($sendLog->getErrors()));
+            if(!$sendLog->save()){
+                throw new \Exception(json_encode($sendLog->getErrors()));
             }
-        }
 
-        return true;
+            $this->controller->commandOut("红包发放记录创建成功，ID:" . $sendLog->id);
+        }catch (\Exception $e){
+            $this->controller->commandOut($e->getMessage());
+        }
+        Order::updateAll(["shopping_voucher_status" => 1], ["id" => $order['id']]);
     }
 
     /**

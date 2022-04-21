@@ -15,6 +15,9 @@ use app\plugins\smart_shop\models\Order;
 class SmartshopOrderSendAction extends BaseAction {
 
     public function run(){
+        if(!\Yii::$app->getMallId()){
+            \Yii::$app->setMall(Mall::findOne(5));
+        }
         $this->controller->commandOut("SmartshopOrderSendAction start");
         while (true){
             sleep($this->sleepTime);
@@ -36,15 +39,15 @@ class SmartshopOrderSendAction extends BaseAction {
             ->innerJoin(["m" => Mch::tableName()], "m.id=o.bsh_mch_id AND m.is_delete=0 AND m.review_status=1")
             ->innerJoin(["s" => Store::tableName()], "s.mch_id=o.bsh_mch_id")
             ->innerJoin(["u" => User::tableName()], "u.mobile=o.pay_user_mobile")
-            ->innerJoin(["sfs" => ScoreFromStore::tableName()], "sfs.store_id=s.id AND sfs.is_delete=0")
-            ->leftJoin(["ssl" => ScoreSendLog::tableName()], "ssl.source_id=o.id AND ssl.source_type='from_smart_shop_order'");
+            ->innerJoin(["sfs" => ScoreFromStore::tableName()], "sfs.store_id=s.id AND sfs.is_delete=0");
 
         $query->andWhere([
             "AND",
-            "ssl.id IS NULL",
             "o.created_at > sfs.start_at",
             "o.pay_price > 0",
-            "u.mobile IS NOT NULL AND u.mobile <> ''",
+            "u.mobile IS NOT NULL",
+            "u.mobile <> ''",
+            ["o.score_status" => 0],
             ["o.status" => Order::STATUS_FINISHED],
             ["o.is_delete" => 0],
             ["sfs.enable_score" => 1]
@@ -53,7 +56,7 @@ class SmartshopOrderSendAction extends BaseAction {
 
         $selects = ["o.id", "o.mall_id", "u.id as pay_user_id", "o.pay_price", "m.id as mch_id", "s.id as store_id", "sfs.rate", "sfs.score_setting"];
 
-        $orders = $query->select($selects)->asArray()->limit(10)->all();
+        $orders = $query->select($selects)->asArray()->limit(1)->all();
 
         if(!$orders){
             $this->negativeTime();
@@ -69,8 +72,20 @@ class SmartshopOrderSendAction extends BaseAction {
 
         Order::updateAll(["updated_at" => time()], "id IN (".implode(",", $orderIds).")");
 
-        foreach($orders as $order){
 
+        foreach($orders as $order){
+            $this->processOrder($order);
+        }
+
+        return true;
+    }
+
+    /**
+     * 处理订单的积分发放
+     * @param $order
+     */
+    private function processOrder($order){
+        try {
             $sendLog = new ScoreSendLog([
                 "mall_id"     => $order['mall_id'],
                 "user_id"     => $order['pay_user_id'],
@@ -82,19 +97,23 @@ class SmartshopOrderSendAction extends BaseAction {
                 "data_json"   => json_encode($order)
             ]);
 
-            if($sendLog->save()){
-                \Yii::$app->mall = Mall::findOne($order['mall_id']);
-                $scoreSetting = @json_decode($order['score_setting'], true);
-                $scoreSetting['integral_num'] = floatval($order['pay_price'] * ($order['rate']/100));
-                $scoreSetting['source_type']  = 'from_smart_shop_order';
-                $scoreSetting['source_id']    = $order['id'];
-                $res = Integral::addIntegralPlan($order['pay_user_id'], $scoreSetting, '智慧门店消费赠送积分券', '0');
-                $this->controller->commandOut("积分发放记录创建成功，ID:" . $sendLog->id);
-            }else{
-                $this->controller->commandOut(json_encode($sendLog->getErrors()));
+            if(!$sendLog->save()){
+                throw new \Exception(json_encode($sendLog->getErrors()));
             }
+
+            $scoreSetting = @json_decode($order['score_setting'], true);
+            $scoreSetting['integral_num'] = floatval($order['pay_price']);
+            $scoreSetting['source_type']  = 'from_smart_shop_order';
+            $scoreSetting['source_id']    = $order['id'];
+            $res = Integral::addIntegralPlan($order['pay_user_id'], $scoreSetting, '智慧门店消费赠送积分券', '0');
+            if(!$res){
+                throw new \Exception(Integral::getError());
+            }
+            $this->controller->commandOut("积分发放记录创建成功，ID:" . $sendLog->id);
+        }catch (\Exception $e){
+            $this->controller->commandOut($e->getMessage());
         }
 
-        return true;
+        Order::updateAll(["score_status" => 1], ["id" => $order['id']]);
     }
 }

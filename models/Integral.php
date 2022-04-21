@@ -106,7 +106,7 @@ class Integral extends BaseActiveRecord
             $model->parent_id         = $parentid;
             $model->integral_num      = $integral_setting['integral_num'];
             $model->period            = $integral_setting['period'];
-            $model->period_unit       = $integral_setting['period_unit'];
+            $model->period_unit       = !empty($integral_setting['period_unit']) ? $integral_setting['period_unit'] : "month";
             $model->effective_days    = $integral_setting['expire'] == -1 ? 0 : $integral_setting['expire'];
             $model->next_publish_time = time();
             $model->desc              = $desc;

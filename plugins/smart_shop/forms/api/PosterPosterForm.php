@@ -91,7 +91,7 @@ class PosterPosterForm extends GrafikaOption implements BasePoster{
                 $editor = $this->getPoster($option);
                 $picUrl = $editor->qrcode_url;
 
-                \Yii::$app->cache->set($this->cacheKey, $picUrl, 24 * 3600);
+                \Yii::$app->cache->set($this->cacheKey, $picUrl, 1800);
             }
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '请求成功', [

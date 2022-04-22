@@ -58,7 +58,7 @@ class SharePosterForm extends GrafikaOption implements BasePoster
         }
 
         $editor = $this->getPoster($option);
-        return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功',['pic_url' => $editor->qrcode_url . '?v=' . time()]);
+        return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功', ['pic_url' => $editor->qrcode_url . '?v=' . time()]);
     }
 
     protected function h5Path(){

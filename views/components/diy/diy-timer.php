@@ -6,6 +6,8 @@
  * Date: 2020-04-23
  * Time: 10:30
  */
+$_currentPluginBaseUrl = \app\helpers\PluginHelper::getPluginBaseAssetsUrl('diy');
+
 ?>
 
 <template id="diy-timer">
@@ -55,6 +57,7 @@
     </div>
 </template>
 <script>
+    const _currentPluginBaseUrl = '<?=$_currentPluginBaseUrl?>';
     Vue.component('diy-timer', {
         template: '#diy-timer',
         props: {

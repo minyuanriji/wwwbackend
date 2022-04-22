@@ -33,6 +33,10 @@ class CacheIndexForm extends BaseModel implements ICacheForm{
 
         $component_list = SerializeHelper::decode($homePgae->page_data);
         foreach ($component_list as $i => $component) {
+            if(!$component || !isset($component['id'])){
+                unset($component_list[$i]);
+                continue;
+            }
             if ($component['id'] == 'label-bar') {
                 $label_list = $component['data']['label_list'];
                 foreach ($label_list as &$label) {

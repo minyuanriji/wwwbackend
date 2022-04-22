@@ -149,6 +149,17 @@ class DiyForm extends BaseModel
                 'groupName' => '其他组件',
                 'list' => [
                     [
+                        'id' => 'timer',
+                        'name' => '倒计时',
+                        'icon' => \app\helpers\PluginHelper::getPluginBaseAssetsUrl('diy') . '/images/new-tpl/form_time_icon.png',
+                    ],
+                    [
+                        'id' => 'mch',
+                        'name' => '好店推荐',
+                        'icon' => \app\helpers\PluginHelper::getPluginBaseAssetsUrl('diy') . '/images/new-tpl/form_shop_icon.png',
+                        'key' => 'mch'
+                    ],
+                    [
                         'id' => 'modal',
                         'name' => '弹窗广告',
                         'icon' => $diyIconUrl . '/modal.png',

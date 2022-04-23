@@ -96,7 +96,9 @@ class PosterPosterForm extends GrafikaOption implements BasePoster{
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '请求成功', [
                 'is_cache' => $isCache ? 1 : 0,
-                'pic_url'  => $picUrl . '?v=' . time()
+                'pic_url'  => $picUrl . '?v=' . time(),
+                'pic_width' => 321,
+                'pic_height' => 564
             ]);
         }catch (\Exception $e){
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage(), [

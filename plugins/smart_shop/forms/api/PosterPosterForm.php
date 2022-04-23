@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\forms\api\poster\BasePoster;
 use app\forms\common\grafika\CustomizeFunction;
 use app\forms\common\grafika\GrafikaOption;
+use app\helpers\CloudStorageHelper;
 use app\logic\AppConfigLogic;
 use GuzzleHttp\Client;
 
@@ -81,8 +82,8 @@ class PosterPosterForm extends GrafikaOption implements BasePoster{
                 $option['nickname']['left'] = ($option['pic']['width'] - ($nicknameSize[2] - $nicknameSize[0]))/2;
 
                 //远程文件临时存储到本地
-                $this->saveLocalTempFile($data['store_logo']);
-                $this->saveLocalTempFile($data['goods_thumb']);
+                //$this->saveLocalTempFile($data['store_logo']);
+                //$this->saveLocalTempFile($data['goods_thumb']);
                 $this->saveLocalTempFile($this->qrcode);
 
                 isset($option['qr_code']) && $option['qr_code']['file_path'] = $this->qrcode;
@@ -96,7 +97,7 @@ class PosterPosterForm extends GrafikaOption implements BasePoster{
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, '请求成功', [
                 'is_cache' => $isCache ? 1 : 0,
-                'pic_url'  => $picUrl . '?v=' . time(),
+                'pic_url'  => CloudStorageHelper::url($picUrl) . '?v=' . time(),
                 'pic_width' => 321,
                 'pic_height' => 564
             ]);

@@ -14,4 +14,9 @@ class SmartShopKPI extends Component{
      */
     public function bindInviter(User $inviter, User $user){}
 
+    /**
+     * 分享链接访问统计
+     * @param $data
+     */
+    public function linkGoodsDetail($data){}
 }

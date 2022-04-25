@@ -18,23 +18,32 @@ class SmartShopKPI extends Component{
      */
     public function register(User $inviterUser, User $user){
 
-        $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
-        if(!$relatLink){
-            throw new \Exception("邀请用户关系链异常");
-        }
+        //已有上级或者上级是自己的不进行处理
+        if(($user->parent_id && $user->parent_id != GLOBAL_PARENT_ID) || $user->id == $inviterUser->id)
+            return;
 
-        $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
-        sort($parentIds);
+        try {
 
-        $kpiRegister = new KpiRegister([
-            "mall_id"      => $inviterUser->mall_id,
-            "user_id_list" => implode(",", $parentIds),
-            "created_at"   => time(),
-            "mobile"       => !empty($user->mobile) ? $user->mobile : "none"
-        ]);
+            $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
+            if(!$relatLink){
+                throw new \Exception("邀请用户关系链异常");
+            }
 
-        if(!$kpiRegister->save()){
-            throw new \Exception(json_encode($kpiRegister->getErrors()));
+            $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
+            sort($parentIds);
+
+            $kpiRegister = new KpiRegister([
+                "mall_id"      => $inviterUser->mall_id,
+                "user_id_list" => implode(",", $parentIds),
+                "created_at"   => time(),
+                "mobile"       => !empty($user->mobile) ? $user->mobile : "none"
+            ]);
+
+            if(!$kpiRegister->save()){
+                throw new \Exception(json_encode($kpiRegister->getErrors()));
+            }
+        }catch (\Exception $e){
+
         }
     }
 

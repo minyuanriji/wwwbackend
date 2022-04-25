@@ -3,7 +3,6 @@
 namespace app\commands\smart_shop_task;
 
 use app\commands\BaseAction;
-use app\core\ApiCode;
 use app\plugins\mch\models\Mch;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\forms\mall\OrderDoSplitForm;

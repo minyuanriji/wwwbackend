@@ -10,6 +10,12 @@ use yii\base\Component;
 
 class SmartShopKPI extends Component{
 
+    private $error;
+
+    public function getError(){
+        return $this->error;
+    }
+
     /**
      * 成为会员
      * @param User $inviter 邀请者用户信息
@@ -20,7 +26,7 @@ class SmartShopKPI extends Component{
 
         //已有上级或者上级是自己的不进行处理
         if(($user->parent_id && $user->parent_id != GLOBAL_PARENT_ID) || $user->id == $inviterUser->id)
-            return;
+            return true;
 
         try {
 
@@ -42,9 +48,13 @@ class SmartShopKPI extends Component{
             if(!$kpiRegister->save()){
                 throw new \Exception(json_encode($kpiRegister->getErrors()));
             }
-        }catch (\Exception $e){
 
+            return true;
+        }catch (\Exception $e){
+            $this->error = $e->getMessage();
         }
+
+        return false;
     }
 
     /**
@@ -68,32 +78,39 @@ class SmartShopKPI extends Component{
      */
     public function newOrder($order_type, $order_id, $mobile, $inviter_mobile){
 
-        //获取邀请者本地用户
-        $inviterUser = User::findOne(["mobile" => $inviter_mobile]);
-        if(!$inviterUser){
-            throw new \Exception("邀请者用户信息不存在");
+        try {
+            //获取邀请者本地用户
+            $inviterUser = User::findOne(["mobile" => $inviter_mobile]);
+            if(!$inviterUser){
+                throw new \Exception("邀请者用户信息不存在");
+            }
+
+            $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
+            if(!$relatLink){
+                throw new \Exception("邀请用户关系链异常");
+            }
+
+            $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
+            sort($parentIds);
+
+            $kpiNewOrder = new KpiNewOrder([
+                "mall_id"      => $inviterUser->mall_id,
+                "user_id_list" => implode(",", $parentIds),
+                "created_at"   => time(),
+                "mobile"       => !empty($mobile) ? $mobile : "none",
+                "source_table" => $order_type,
+                "source_id"    => $order_id
+            ]);
+
+            if(!$kpiNewOrder->save()){
+                throw new \Exception(json_encode($kpiNewOrder->getErrors()));
+            }
+
+            return true;
+        }catch (\Exception $e){
+            $this->error = $e->getMessage();
         }
 
-        $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
-        if(!$relatLink){
-            throw new \Exception("邀请用户关系链异常");
-        }
-
-        $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
-        sort($parentIds);
-
-        $kpiNewOrder = new KpiNewOrder([
-            "mall_id"      => $inviterUser->mall_id,
-            "user_id_list" => implode(",", $parentIds),
-            "created_at"   => time(),
-            "mobile"       => !empty($mobile) ? $mobile : "none",
-            "source_table" => $order_type,
-            "source_id"    => $order_id
-        ]);
-
-        if(!$kpiNewOrder->save()){
-            throw new \Exception(json_encode($kpiNewOrder->getErrors()));
-        }
-
+        return false;
     }
 }

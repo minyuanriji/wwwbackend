@@ -36,7 +36,10 @@ class KpiCyorderNewAction extends BaseAction{
 
                 $kpi = new SmartShopKPI();
                 foreach($rows as $row){
-                    $kpi->newOrder("cyorder", $row['id'], $row['mobile'], $row['kpi_inviter_mobile']);
+                    $res = $kpi->newOrder("cyorder", $row['id'], $row['mobile'], $row['kpi_inviter_mobile']);
+                    if(!$res){
+                        $this->controller->commandOut($kpi->getError());
+                    }
                 }
 
                 $this->controller->commandOut("KPI用户新订单统计完成（cyorder）");

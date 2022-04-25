@@ -89,7 +89,7 @@
                                 <img src="statics/img/mall/del.png" alt="">
                             </el-tooltip>
                         </el-button>
-                        <el-button @click="unfreeze(scope.row)"  type="text" circle size="mini">
+                        <el-button v-if="scope.row.status != 0" @click="unfreeze(scope.row)"  type="text" circle size="mini">
                             <el-tooltip class="item" effect="dark" content="解冻资金" placement="top">
                                 <img src="statics/img/mall/balance.png" alt="">
                             </el-tooltip>

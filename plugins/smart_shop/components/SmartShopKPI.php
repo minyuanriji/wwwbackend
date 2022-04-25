@@ -25,7 +25,7 @@ class SmartShopKPI extends Component{
     public function register(User $inviterUser, User $user){
 
         //已有上级或者上级是自己的不进行处理
-        if(($user->parent_id && $user->parent_id != GLOBAL_PARENT_ID) || $user->id == $inviterUser->id)
+        if(($user->parent_id && $user->parent_id != GLOBAL_PARENT_ID) || $user->id == $inviterUser->id || $user->mobile == $inviterUser->mobile)
             return true;
 
         try {

@@ -76,9 +76,16 @@ class SmartShopUserLoginForm extends BaseModel{
                 $user->avatar_url       = $smartAuthUser && !empty($smartAuthUser['avatar']) ? $smartAuthUser['avatar'] : "/";
                 $user->last_login_at    = time();
                 $user->login_ip         = get_client_ip();
-                $user->parent_id        = $inviterUser ? $inviterUser->id : ($ssStoreLocalUserId ? $ssStoreLocalUserId : GLOBAL_PARENT_ID);
+                $user->parent_id        = $ssStoreLocalUserId ? $ssStoreLocalUserId : GLOBAL_PARENT_ID;
                 $user->second_parent_id = 0;
                 $user->third_parent_id  = 0;
+
+                if($inviterUser){
+                    if($kpi->register($inviterUser, $user)){
+                        $user->parent_id = $inviterUser->id;
+                    }
+                }
+
                 if (!$user->save()) {
                     throw new \Exception($this->responseErrorInfo($user));
                 }
@@ -94,15 +101,14 @@ class SmartShopUserLoginForm extends BaseModel{
                 if (!$userInfoModel->save()) {
                     throw new \Exception($this->responseErrorInfo($userInfoModel));
                 }
-
-                if($inviterUser){
-                    $kpi->register($inviterUser, $user);
-                }
             }else{
                 if(!$user->parent_id || $user->parent_id == GLOBAL_PARENT_ID){
-                    $user->parent_id = $inviterUser ? $inviterUser->id : ($ssStoreLocalUserId ? $ssStoreLocalUserId : GLOBAL_PARENT_ID);
                     if($inviterUser){
-                        $res = $kpi->register($inviterUser, $user);
+                        if($kpi->register($inviterUser, $user)){
+                            $user->parent_id = $inviterUser->id;
+                        }
+                    }else{
+                        $user->parent_id = $ssStoreLocalUserId ? $ssStoreLocalUserId : GLOBAL_PARENT_ID;
                     }
                 }
                 $user->access_token = \Yii::$app->security->generateRandomString();

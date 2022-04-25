@@ -2,31 +2,34 @@
 
 namespace app\commands\smart_shop_task;
 
+use app\commands\BaseAction;
 use app\core\ApiCode;
 use app\plugins\mch\models\Mch;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\forms\mall\OrderDoSplitForm;
 use app\plugins\smart_shop\models\Order;
-use yii\base\Action;
 
-class ProcessSplitOrderAction extends Action{
+class ProcessSplitOrderAction extends BaseAction {
 
     public function run()
     {
-        $this->controller->commandOut(date("Y/m/d H:i:s") . " NewSplitOrderAction start");
+        $this->controller->commandOut(date("Y/m/d H:i:s") . " ProcessSplitOrderAction start");
+
         $shop = new SmartShop();
-        $sleep = 3;
+
         while (true) {
+            sleep($this->sleepTime);
             try {
+
+                $shop->initSetting(); //刷新下配置
 
                 $orderIds = Order::find()->select(["id"])->where([
                     "status"    => Order::STATUS_UNCONFIRMED,
                     "is_delete" => 0
                 ])->orderBy("updated_at ASC")->limit(1)->column();
                 if($orderIds){
-                    $sleep = max(1, --$sleep);
-                    $shop->getDB(true);
-                    $shop->initSetting(); //刷新下配置
+
+                    $this->activeTime();
 
                     Order::updateAll(["updated_at" => time()], "id IN(".implode(",", $orderIds).")");
 
@@ -34,13 +37,12 @@ class ProcessSplitOrderAction extends Action{
                         $this->splitOrder($shop, $orderId);
                     }
                 }else{
-                    $sleep = min(30, ++$sleep);
+                    $this->negativeTime();
                 }
 
             }catch (\Exception $e){
                 $this->controller->commandOut(implode("\n", [$e->getMessage(), $e->getFile(), $e->getLine()]));
             }
-            $this->controller->sleep($sleep);
         }
 
     }

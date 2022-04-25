@@ -228,7 +228,7 @@ class OrderDoSplitForm extends BaseModel{
                     "transaction_id"   => (string)$detail['transaction_id'],
                     "out_order_no"     => $splitData['out_order_no'],
                     "receivers"        => [$receiver],
-                    "unfreeze_unsplit" => $detail['order_status'] == 3 ? true : false
+                    "unfreeze_unsplit" => true
                 ]);
                 if(!isset($data['state']) || !in_array($data['state'], ["PROCESSING", "FINISHED"])){
                     throw new \Exception("分账失败");

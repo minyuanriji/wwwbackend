@@ -14,23 +14,20 @@ class ProcessSplitOrderAction extends BaseAction {
     {
         $this->controller->commandOut(date("Y/m/d H:i:s") . " ProcessSplitOrderAction start");
 
-        $shop = new SmartShop();
-
         while (true) {
             sleep($this->sleepTime);
             try {
-
-                $shop->initSetting(); //刷新下配置
 
                 $orderIds = Order::find()->select(["id"])->where([
                     "status"    => Order::STATUS_UNCONFIRMED,
                     "is_delete" => 0
                 ])->orderBy("updated_at ASC")->limit(1)->column();
                 if($orderIds){
-
                     $this->activeTime();
-
                     Order::updateAll(["updated_at" => time()], "id IN(".implode(",", $orderIds).")");
+
+                    $shop = new SmartShop();
+                    $shop->initSetting(); //刷新下配置
 
                     foreach($orderIds as $orderId){
                         $this->splitOrder($shop, $orderId);

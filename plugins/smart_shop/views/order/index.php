@@ -236,7 +236,7 @@
                     }).then(e => {
                         this.loading = false;
                         if (e.data.code === 0) {
-                            this.$message.success(e.data.msg);
+                            this.$message.success("操作成功");
                         } else {
                             this.$message.error(e.data.msg);
                         }

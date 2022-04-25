@@ -4,6 +4,7 @@ namespace app\plugins\smart_shop\components;
 
 use app\models\User;
 use app\models\UserRelationshipLink;
+use app\plugins\smart_shop\models\KpiLinkGoods;
 use app\plugins\smart_shop\models\KpiNewOrder;
 use app\plugins\smart_shop\models\KpiRegister;
 use yii\base\Component;
@@ -21,6 +22,7 @@ class SmartShopKPI extends Component{
      * @param User $inviter 邀请者用户信息
      * @param User $user 被邀请用户信息
      * @throws \Exception
+     * @return boolean
      */
     public function register(User $inviterUser, User $user){
 
@@ -49,12 +51,12 @@ class SmartShopKPI extends Component{
                 throw new \Exception(json_encode($kpiRegister->getErrors()));
             }
 
-            return true;
         }catch (\Exception $e){
             $this->error = $e->getMessage();
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -65,8 +67,55 @@ class SmartShopKPI extends Component{
      *    'mobile'         => '访问者手机号',
      *    'goods_id'       => '商品ID'
      *  ]
+     * @return boolean
      */
-    public function linkGoodsDetail($data){}
+    public function linkGoodsDetail($data){
+
+        $exists = KpiLinkGoods::findOne([
+            "mobile"   => !empty($data['mobile']) ? $data['mobile'] : "none",
+            "goods_id" => $data['goods_id'],
+            "date"     => date("Ymd")
+        ]);
+        if($exists){
+            return true;
+        }
+
+        try {
+
+            //获取邀请者本地用户
+            $inviterUser = User::findOne(["mobile" => $data['inviter_mobile']]);
+            if(!$inviterUser){
+                throw new \Exception("邀请者用户信息不存在");
+            }
+
+            $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
+            if(!$relatLink){
+                throw new \Exception("邀请用户关系链异常");
+            }
+
+            $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
+            sort($parentIds);
+
+            $kpiLinkGoods = new KpiLinkGoods([
+                "mall_id"      => $inviterUser->mall_id,
+                "user_id_list" => implode(",", $parentIds),
+                "created_at"   => time(),
+                "mobile"       => !empty($data['mobile']) ? $data['mobile'] : "none",
+                "goods_id"     => $data['goods_id'],
+                "date"         => date("Ymd")
+            ]);
+
+            if(!$kpiLinkGoods->save()){
+                throw new \Exception(json_encode($kpiLinkGoods->getErrors()));
+            }
+
+        }catch (\Exception $e){
+            $this->error = $e->getMessage();
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * 新订单统计
@@ -75,6 +124,7 @@ class SmartShopKPI extends Component{
      * @param $mobile 支付手机号
      * @param $inviter_mobile 邀请人手机号
      * @throws \Exception
+     * @return boolean
      */
     public function newOrder($order_type, $order_id, $mobile, $inviter_mobile){
 
@@ -106,11 +156,11 @@ class SmartShopKPI extends Component{
                 throw new \Exception(json_encode($kpiNewOrder->getErrors()));
             }
 
-            return true;
         }catch (\Exception $e){
             $this->error = $e->getMessage();
+            return false;
         }
 
-        return false;
+        return true;
     }
 }

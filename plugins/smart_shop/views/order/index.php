@@ -9,7 +9,13 @@
         </div>
         <div class="table-body">
             <el-card class="box-card">
-
+                <div style="display:flex;align-items: center">
+                    <el-select v-model="search.kw_type" placeholder="请选择" style="width:150px;">
+                        <el-option key="bsh_mch_id" value="bsh_mch_id" label="补商汇-商户ID"></el-option>
+                    </el-select>
+                    <el-input v-model="search.keyword" placeholder="请输入"  style="margin-left:10px;width:350px;"></el-input>
+                    <el-button @click="searchGo" type="primary" style="margin-left:10px;">查询</el-button>
+                </div>
             </el-card>
             <el-table v-loading="loading" :data="list" border style="margin-top:20px;width: 100%">
                 <el-table-column prop="bsh_mch_id" label="商户ID" width="90" align="center"></el-table-column>
@@ -81,6 +87,11 @@
                         <el-button type="text" circle size="mini" v-if="scope.row.status == 0">
                             <el-tooltip class="item" effect="dark" content="取消分账" placement="top">
                                 <img src="statics/img/mall/del.png" alt="">
+                            </el-tooltip>
+                        </el-button>
+                        <el-button @click="unfreeze(scope.row)"  type="text" circle size="mini">
+                            <el-tooltip class="item" effect="dark" content="解冻资金" placement="top">
+                                <img src="statics/img/mall/balance.png" alt="">
                             </el-tooltip>
                         </el-button>
                     </template>
@@ -161,7 +172,9 @@
                 pagination: null,
                 loading: false,
                 search: {
-                    page: 1
+                    page: 1,
+                    kw_type: 'bsh_mch_id',
+                    keyword: ''
                 }
             };
         },
@@ -204,6 +217,34 @@
                     user: '普通用户'
                 };
                 return values[type] ? values[type] : '';
+            },
+            unfreeze(item){
+                this.$confirm('确定操作吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.loading = true;
+                    request({
+                        params: {
+                            r: 'plugin/smart_shop/mall/order/unfreeze',
+                        },
+                        method: 'post',
+                        data: {
+                            id: item.id
+                        }
+                    }).then(e => {
+                        this.loading = false;
+                        if (e.data.code === 0) {
+                            this.$message.success(e.data.msg);
+                        } else {
+                            this.$message.error(e.data.msg);
+                        }
+                    }).catch(e => {
+                        this.$message.error("网络异常");
+                        this.loading = false;
+                    });
+                }).catch(() => {});
             },
             showSplitDialog(item){
                 this.dialogVisible = true;

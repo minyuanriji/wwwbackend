@@ -17,10 +17,13 @@ class OrderListForm extends BaseModel{
 
     public $page;
     public $mch_id;
+    public $kw_type;
+    public $keyword;
 
     public function rules(){
         return [
-            [['page', 'mch_id'], 'integer']
+            [['page', 'mch_id'], 'integer'],
+            [['kw_type', 'keyword'], 'trim']
         ];
     }
 
@@ -37,6 +40,12 @@ class OrderListForm extends BaseModel{
             $query->andWhere(["o.is_delete" => 0]);
 
             $query->orderBy("o.id DESC");
+
+            if(!empty($this->kw_type) && !empty($this->keyword)){
+                if($this->kw_type == "bsh_mch_id"){
+                    $query->andWhere(["m.id" => (int)$this->keyword]);
+                }
+            }
 
             $selects = ["o.*", "m.mobile", "s.name", "s.cover_url", "m.transfer_rate"];
 

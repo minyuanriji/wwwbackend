@@ -6,6 +6,7 @@ use app\plugins\Controller;
 use app\plugins\smart_shop\forms\mall\OrderDoSplitForm;
 use app\plugins\smart_shop\forms\mall\OrderListForm;
 use app\plugins\smart_shop\forms\mall\OrderSplitInfoForm;
+use app\plugins\smart_shop\forms\mall\OrderUnfreezeForm;
 
 class OrderController extends Controller{
 
@@ -41,5 +42,15 @@ class OrderController extends Controller{
         $form = new OrderDoSplitForm();
         $form->attributes = \Yii::$app->request->post();
         return $this->asJson($form->split());
+    }
+
+    /**
+     * @Note:解冻资金
+     * @return string|\yii\web\Response
+     */
+    public function actionUnfreeze(){
+        $form = new OrderUnfreezeForm();
+        $form->attributes = \Yii::$app->request->post();
+        return $this->asJson($form->unfreeze());
     }
 }

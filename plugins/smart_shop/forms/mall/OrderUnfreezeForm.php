@@ -60,32 +60,45 @@ class OrderUnfreezeForm extends BaseModel {
      */
     private static function wechatUnfreeze(Order $order, $shop, $detail){
 
-        $splitData = !empty($order->split_data) ? json_decode($order->split_data, true) : [];
-        if(empty($splitData['out_order_no'])){
-            $splitData['out_order_no'] = "wx" . md5(uniqid() . rand(0, 10000));
-        }
+        $unsplitAmount = OrderSplitInfoForm::getWechat($order, $shop, $detail);
 
-        $order->updated_at = time();
-        $order->split_data = json_encode($splitData);
-        if(!$order->save()){
-            throw new \Exception(json_encode($order->getErrors()));
-        }
+        if($unsplitAmount > 0){
 
-        $wechatPay = new WechatPaySdkApi([
-            "mchid"          => $shop->setting['sp_mchid'],
-            "serial"         => $shop->setting['cert_serial'],
-            "privateKeyPath" => $shop->setting['apiclient_key'],
-            "wechatCertPath" => $shop->setting['wechat_cert']
-        ]);
+            $wechatPay = new WechatPaySdkApi([
+                "mchid"          => $shop->setting['sp_mchid'],
+                "serial"         => $shop->setting['cert_serial'],
+                "privateKeyPath" => $shop->setting['apiclient_key'],
+                "wechatCertPath" => $shop->setting['wechat_cert']
+            ]);
 
-        $data = $wechatPay->post("v3/profitsharing/orders/unfreeze", [
-            "sub_mchid"      => (string)$detail['mno'],
-            "transaction_id" => (string)$detail['transaction_id'],
-            "out_order_no"   => (string)$splitData['out_order_no'],
-            "description"    => "微信支付"
-        ]);
-        if(!isset($data['state']) || !in_array($data['state'], ["PROCESSING", "FINISHED"])){
-            throw new \Exception("解除冻结资金失败：" . json_encode($data, JSON_UNESCAPED_UNICODE));
+            $splitData = !empty($order->split_data) ? json_decode($order->split_data, true) : [];
+            if(empty($splitData['out_order_no'])){
+                $splitData['out_order_no'] = "wx" . md5(uniqid() . rand(0, 10000));
+            }
+
+            $outOrderNo = isset($splitData['order_id']) && !empty($splitData['order_id']) ? $splitData['order_id'] : $splitData['out_order_no'];
+
+            $data = $wechatPay->post("v3/profitsharing/orders/unfreeze", [
+                "sub_mchid"      => (string)$detail['mno'],
+                "transaction_id" => (string)$detail['transaction_id'],
+                "out_order_no"   => (string)$outOrderNo,
+                "description"    => "微信支付"
+            ]);
+            if(!isset($data['state']) || !in_array($data['state'], ["PROCESSING", "FINISHED"])){
+                throw new \Exception("解除冻结资金失败：" . json_encode($data, JSON_UNESCAPED_UNICODE));
+            }
+
+            if(isset($data['order_id'])){
+                $splitData['order_id'] = $data['order_id'];
+            }
+
+            $order->updated_at     = time();
+            $order->split_data     = json_encode($splitData);
+            if(!$order->save()){
+                throw new \Exception(json_encode($order->getErrors()));
+            }
+        }else{
+            throw new \Exception("无可操作金额");
         }
     }
 

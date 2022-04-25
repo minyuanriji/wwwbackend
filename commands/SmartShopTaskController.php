@@ -10,6 +10,8 @@ class SmartShopTaskController extends SwooleProcessController {
             'new-split-order'     => 'app\commands\smart_shop_task\NewSplitOrderAction',
             'process-split-order' => 'app\commands\smart_shop_task\ProcessSplitOrderAction',
             'finish-split-order'  => 'app\commands\smart_shop_task\FinishSplitOrderAction',
+            'kpi-cyorder-new'     => 'app\commands\smart_shop_task\KpiCyorderNewAction',
+            'kpi-czorder-new'     => 'app\commands\smart_shop_task\KpiCzorderNewAction',
         ];
     }
 

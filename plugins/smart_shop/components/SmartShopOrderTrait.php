@@ -37,6 +37,23 @@ trait SmartShopOrderTrait
         return $rows ? $rows : [];
     }
 
+    public function getCzorders($selects = ["o.*"], $wheres = [], $limit = 10, $orderBy = null){
+        $sql = "SELECT " .implode(",", $selects) . " FROM {{%czorder}} o " .
+            "INNER JOIN {{%store}} s ON s.id=o.store_id " .
+            "INNER JOIN {{%users}} u ON u.id=o.user_id " .
+            "INNER JOIN {{%merchant}} m ON s.admin_id=m.admin_id " .
+            "LEFT JOIN {{%merchant_entry}} me ON me.merchant_id=m.id AND me.pay_way_id=1 " .
+            "LEFT JOIN {{%merchant_entry}} me_ali ON me_ali.merchant_id=m.id AND me_ali.pay_way_id=2 " .
+            "LEFT JOIN {{%citys}} pv ON pv.cityid=s.province_code ".
+            "LEFT JOIN {{%citys}} ct ON ct.cityid=s.city_code " .
+            "LEFT JOIN {{%attachment}} s_at ON s_at.id=s.thumb " .
+            "WHERE " . (!empty($wheres) ? implode(" AND ", $wheres) : "1") . " " .
+            "ORDER BY " . (!empty($orderBy) ? $orderBy : " o.id DESC") . " " .
+            "LIMIT 0,{$limit}";
+        $rows = $this->getDB()->createCommand($sql)->queryAll();
+        return $rows ? $rows : [];
+    }
+
     /**
      * 批量设置订单分账状态
      * @param $orderIds
@@ -44,6 +61,16 @@ trait SmartShopOrderTrait
      */
     public function batchSetCyorderSplitStatus($orderIds, $status){
         $sql = "UPDATE {{%cyorder}} SET split_status='{$status}' WHERE id IN(".implode(",", $orderIds).")";
+        $this->getDB()->createCommand($sql)->execute();
+    }
+
+    /**
+     * 批量设置KPI新订单状态
+     * @param $orderIds
+     * @param $status
+     */
+    public function batchSetCyorderKpiNewStatus($orderIds, $status){
+        $sql = "UPDATE {{%cyorder}} SET `kpi_new_status`='{$status}' WHERE `id` IN(".implode(",", $orderIds).")";
         $this->getDB()->createCommand($sql)->execute();
     }
 
@@ -78,6 +105,15 @@ trait SmartShopOrderTrait
         return $row ? $row : [];
     }
 
+    /**
+     * 批量设置KPI新订单状态
+     * @param $orderIds
+     * @param $status
+     */
+    public function batchSetCzorderKpiNewStatus($orderIds, $status){
+        $sql = "UPDATE {{%czorder}} SET `kpi_new_status`='{$status}' WHERE `id` IN(".implode(",", $orderIds).")";
+        $this->getDB()->createCommand($sql)->execute();
+    }
 
     /**
      * 获取订单详情

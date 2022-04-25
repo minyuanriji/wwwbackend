@@ -96,13 +96,13 @@ class SmartShopUserLoginForm extends BaseModel{
                 }
 
                 if($inviterUser){
-                    $kpi->bindInviter($inviterUser, $user);
+                    $kpi->register($inviterUser, $user);
                 }
             }else{
                 if(!$user->parent_id || $user->parent_id == GLOBAL_PARENT_ID){
                     $user->parent_id = $inviterUser ? $inviterUser->id : ($ssStoreLocalUserId ? $ssStoreLocalUserId : GLOBAL_PARENT_ID);
                     if($inviterUser){
-                        $kpi->bindInviter($inviterUser, $user);
+                        $kpi->register($inviterUser, $user);
                     }
                 }
                 $user->access_token = \Yii::$app->security->generateRandomString();

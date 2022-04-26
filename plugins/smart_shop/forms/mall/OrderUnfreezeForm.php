@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\components\WechatPaySdkApi;
+use app\plugins\smart_shop\exception\WxNoOperateMoneyException;
 use app\plugins\smart_shop\models\Order;
 
 class OrderUnfreezeForm extends BaseModel {
@@ -58,7 +59,7 @@ class OrderUnfreezeForm extends BaseModel {
      * @param $detail
      * @throws \Exception
      */
-    private static function wechatUnfreeze(Order $order, $shop, $detail){
+    public static function wechatUnfreeze(Order $order, $shop, $detail){
 
         $unsplitAmount = OrderSplitInfoForm::getWechat($order, $shop, $detail);
 
@@ -98,9 +99,9 @@ class OrderUnfreezeForm extends BaseModel {
                 throw new \Exception(json_encode($order->getErrors()));
             }
         }else{
-            throw new \Exception("无可操作金额");
+            throw new WxNoOperateMoneyException("无可操作金额");
         }
     }
 
-    private static function alipayUnfreeze($order, $shop, $detail){}
+    public static function alipayUnfreeze($order, $shop, $detail){}
 }

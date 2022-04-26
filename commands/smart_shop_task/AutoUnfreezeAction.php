@@ -57,7 +57,7 @@ class AutoUnfreezeAction extends BaseAction{
 
             $detail = $shop->getOrderDetail($order->from_table_name, $order->from_table_record_id);
             if(!$detail){
-                throw new \Exception("[AutoUnfreezeAction::unfreezeOrder]获取订单详情信息失败");
+                throw new \Exception("[AutoUnfreezeAction::unfreezeOrder]获取订单[ID:{$orderId}]详情信息失败");
             }
 
             if ($detail['pay_type'] == 1) {

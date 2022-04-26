@@ -11,7 +11,7 @@ use app\plugins\smart_shop\models\Order;
 class AutoUnfreezeAction extends BaseAction{
 
     public function run() {
-        $shop = new SmartShop();
+
         while (true) {
             sleep($this->sleepTime);
             try {
@@ -27,6 +27,7 @@ class AutoUnfreezeAction extends BaseAction{
                     continue;
                 }
 
+                $shop = new SmartShop();
                 $shop->initSetting();
                 $this->activeTime();
 

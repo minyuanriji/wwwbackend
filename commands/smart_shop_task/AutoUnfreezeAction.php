@@ -18,7 +18,7 @@ class AutoUnfreezeAction extends BaseAction{
 
                 $orderIds = Order::find()->andWhere([
                     "AND",
-                    ["status" => Order::STATUS_FINISHED],
+                    "status<>0",
                     ["auto_freeze_time" => 0],
                     ["is_delete" => 0]
                 ])->select(["id"])->orderBy("updated_at ASC")->limit(1)->column();

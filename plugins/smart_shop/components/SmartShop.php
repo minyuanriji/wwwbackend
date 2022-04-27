@@ -22,13 +22,17 @@ class SmartShop extends Component
     }
 
     public function getDB($force = false){
-        $this->db = new Connection([
-            'dsn'         => 'mysql:host=' . $this->setting['db_host'] . ';port=' . $this->setting['db_port'] . ';dbname=' . $this->setting['db_name'],
-            'username'    => $this->setting['db_user'],
-            'password'    => $this->setting['db_pass'],
-            'charset'     => $this->setting['db_charset'],
-            'tablePrefix' => $this->setting['db_tb_prefix']
-        ]);
+        if(!$this->db){
+            $this->db = new Connection([
+                'dsn'          => 'mysql:host=' . $this->setting['db_host'] . ';port=' . $this->setting['db_port'] . ';dbname=' . $this->setting['db_name'],
+                'username'     => $this->setting['db_user'],
+                'password'     => $this->setting['db_pass'],
+                'charset'      => $this->setting['db_charset'],
+                'tablePrefix'  => $this->setting['db_tb_prefix'],
+                'commandClass' => 'app\component\lib\Command'
+            ]);
+        }
+        $this->db->open();
         return $this->db;
     }
 

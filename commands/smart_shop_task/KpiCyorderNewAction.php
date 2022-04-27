@@ -15,7 +15,7 @@ class KpiCyorderNewAction extends BaseAction{
             try {
                 $shop->initSetting();
 
-                $selects = ["o.id", "o.kpi_inviter_mobile", "u.mobile"];
+                $selects = ["o.id", "o.store_id", "m.id AS merchant_id", "o.kpi_inviter_mobile", "u.mobile"];
                 $rows = $shop->getCyorders($selects, [
                     "o.kpi_new_status=0 AND o.kpi_inviter_mobile is not null AND  o.kpi_inviter_mobile <> ''",
                     "o.is_pay=1", //必须是已支付
@@ -36,7 +36,7 @@ class KpiCyorderNewAction extends BaseAction{
 
                 $kpi = new SmartShopKPI();
                 foreach($rows as $row){
-                    $res = $kpi->newOrder("cyorder", $row['id'], $row['mobile'], $row['kpi_inviter_mobile']);
+                    $res = $kpi->newOrder("cyorder", $row['store_id'], $row['merchant_id'], $row['id'], $row['mobile'], $row['kpi_inviter_mobile']);
                     if(!$res){
                         $this->controller->commandOut($kpi->getError());
                     }

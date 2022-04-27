@@ -38,7 +38,7 @@ trait SmartShopShopTrait
             "INNER JOIN {{%merchant}} m ON m.admin_id=s.admin_id",
             "LEFT JOIN {{%storeset}} sst ON sst.store_id=s.id"
         ];
-        $selects = "s.id as ss_store_id, s.title as store_name";
+        $selects = "s.id as ss_store_id, s.title as store_name, m.id as merchant_id";
 
         //获取记录数
         $row = $this->getDB()->createCommand("SELECT {$selects} {$fromTable} " . implode(" ", $innerArr) . " {$whereStr}")->queryOne();

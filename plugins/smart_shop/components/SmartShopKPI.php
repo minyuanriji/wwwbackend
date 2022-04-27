@@ -21,10 +21,12 @@ class SmartShopKPI extends Component{
      * 成为会员
      * @param User $inviter 邀请者用户信息
      * @param User $user 被邀请用户信息
+     * @param $store_id 门店ID
+     * @param $merchant_id 小程序商户ID
      * @throws \Exception
      * @return boolean
      */
-    public function register(User $inviterUser, User $user){
+    public function register(User $inviterUser, User $user, $store_id, $merchant_id){
 
         //已有上级或者上级是自己的不进行处理
         if(($user->parent_id && $user->parent_id != GLOBAL_PARENT_ID) || $user->id == $inviterUser->id || $user->mobile == $inviterUser->mobile)
@@ -44,7 +46,9 @@ class SmartShopKPI extends Component{
                 "mall_id"      => $inviterUser->mall_id,
                 "user_id_list" => implode(",", $parentIds),
                 "created_at"   => time(),
-                "mobile"       => !empty($user->mobile) ? $user->mobile : "none"
+                "mobile"       => !empty($user->mobile) ? $user->mobile : "none",
+                'store_id'     => $store_id,
+                'merchant_id'  => $merchant_id
             ]);
 
             if(!$kpiRegister->save()){
@@ -63,6 +67,7 @@ class SmartShopKPI extends Component{
      * 分享链接访问统计
      * @param $data
      *  [
+     *    'store_id'       => '门店ID',
      *    'inviter_mobile' => '邀请人手机号',
      *    'mobile'         => '访问者手机号',
      *    'goods_id'       => '商品ID'
@@ -71,10 +76,19 @@ class SmartShopKPI extends Component{
      */
     public function linkGoodsDetail($data){
 
+        $smartShop = new SmartShop();
+        $shopData = $smartShop->getStoreDetail($data['store_id']);
+        if(!$shopData){
+            $this->error = "无法获取门店信息";
+            return false;
+        }
+
         $exists = KpiLinkGoods::findOne([
-            "mobile"   => !empty($data['mobile']) ? $data['mobile'] : "none",
-            "goods_id" => $data['goods_id'],
-            "date"     => date("Ymd")
+            "mobile"      => !empty($data['mobile']) ? $data['mobile'] : "none",
+            "goods_id"    => $data['goods_id'],
+            "date"        => date("Ymd"),
+            'store_id'    => $shopData['ss_store_id'],
+            'merchant_id' => $shopData['merchant_id'],
         ]);
         if($exists){
             return true;
@@ -102,7 +116,9 @@ class SmartShopKPI extends Component{
                 "created_at"   => time(),
                 "mobile"       => !empty($data['mobile']) ? $data['mobile'] : "none",
                 "goods_id"     => $data['goods_id'],
-                "date"         => date("Ymd")
+                "date"         => date("Ymd"),
+                'store_id'     => $shopData['ss_store_id'],
+                'merchant_id'  => $shopData['merchant_id'],
             ]);
 
             if(!$kpiLinkGoods->save()){
@@ -119,6 +135,8 @@ class SmartShopKPI extends Component{
 
     /**
      * 新订单统计
+     * @param $store_id 门店ID
+     * @param $merchant_id 小程序商户ID
      * @param $order_type 订单类型（cyorder|czorder）
      * @param $order_id 订单ID
      * @param $mobile 支付手机号
@@ -126,7 +144,7 @@ class SmartShopKPI extends Component{
      * @throws \Exception
      * @return boolean
      */
-    public function newOrder($order_type, $order_id, $mobile, $inviter_mobile){
+    public function newOrder($order_type, $store_id, $merchant_id,  $order_id, $mobile, $inviter_mobile){
 
         try {
             //获取邀请者本地用户
@@ -148,6 +166,8 @@ class SmartShopKPI extends Component{
                 "user_id_list" => implode(",", $parentIds),
                 "created_at"   => time(),
                 "mobile"       => !empty($mobile) ? $mobile : "none",
+                "store_id"     => $store_id,
+                "merchant_id"  => $merchant_id,
                 "source_table" => $order_type,
                 "source_id"    => $order_id
             ]);

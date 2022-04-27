@@ -43,6 +43,11 @@ class SmartShopUserLoginForm extends BaseModel{
             }
 
             $smartShop = new SmartShop();
+            $shopData = $smartShop->getStoreDetail($this->ss_store_id);
+            if(!$shopData){
+                throw new \Exception("无法获取门店信息");
+            }
+
             $smartAuthUser = $smartShop->findUsersByOpenid($this->openid, $this->ali_uid);
             /*if(!$smartAuthUser || $smartAuthUser['mobile'] != $this->mobile){
                 throw new \Exception("用户不存在或未登录");
@@ -81,7 +86,7 @@ class SmartShopUserLoginForm extends BaseModel{
                 $user->third_parent_id  = 0;
 
                 if($inviterUser){
-                    if($kpi->register($inviterUser, $user)){
+                    if($kpi->register($inviterUser, $user, $this->ss_store_id, $shopData['merchant_id'])){
                         $user->parent_id = $inviterUser->id;
                     }
                 }
@@ -104,7 +109,7 @@ class SmartShopUserLoginForm extends BaseModel{
             }else{
                 if(!$user->parent_id || $user->parent_id == GLOBAL_PARENT_ID){
                     if($inviterUser){
-                        if($kpi->register($inviterUser, $user)){
+                        if($kpi->register($inviterUser, $user, $this->ss_store_id, $shopData['merchant_id'])){
                             $user->parent_id = $inviterUser->id;
                         }
                     }else{

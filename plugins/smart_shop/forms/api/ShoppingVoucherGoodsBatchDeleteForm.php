@@ -28,7 +28,7 @@ class ShoppingVoucherGoodsBatchDeleteForm extends BaseModel{
         try {
 
             $smartShop = new SmartShop();
-            if(!$smartShop->validateToken($this->token)){
+            if(!$smartShop->validateToken($this->token, $admin, $merchant, $store)){
                 throw new \Exception("无权限操作");
             }
 

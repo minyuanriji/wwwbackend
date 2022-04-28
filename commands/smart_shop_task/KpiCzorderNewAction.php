@@ -15,7 +15,7 @@ class KpiCzorderNewAction extends BaseAction{
             try {
                 $shop->initSetting();
 
-                $selects = ["o.id", "o.kpi_inviter_mobile", "u.mobile"];
+                $selects = ["o.id", "o.store_id", "m.id as merchant_id", "o.kpi_inviter_mobile", "u.mobile"];
                 $rows = $shop->getCzorders($selects, [
                     "o.kpi_new_status=0 AND o.kpi_inviter_mobile is not null AND  o.kpi_inviter_mobile <> ''",
                     "o.state=2", //必须是已支付
@@ -36,7 +36,7 @@ class KpiCzorderNewAction extends BaseAction{
 
                 $kpi = new SmartShopKPI();
                 foreach($rows as $row){
-                    $kpi->newOrder("czorder", $row['id'], $row['mobile'], $row['kpi_inviter_mobile']);
+                    $kpi->newOrder("czorder", $row['store_id'], $row['merchant_id'], $row['id'], $row['mobile'], $row['kpi_inviter_mobile']);
                 }
 
                 $this->controller->commandOut("KPI用户新订单统计完成（czorder）");

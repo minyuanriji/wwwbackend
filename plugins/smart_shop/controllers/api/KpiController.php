@@ -14,7 +14,9 @@ class KpiController extends ApiController {
     public function actionLinkGoodsDetail(){
         try {
             $kpi = new SmartShopKPI();
-            $kpi->linkGoodsDetail($this->requestData);
+            if(!$kpi->linkGoodsDetail($this->requestData)){
+                throw new \Exception($kpi->getError());
+            }
             return $this->success();
         }catch (\Exception $e){
             return $this->error($e->getMessage());

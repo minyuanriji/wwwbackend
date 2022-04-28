@@ -43,12 +43,13 @@ class SmartShopKPI extends Component{
             sort($parentIds);
 
             $kpiRegister = new KpiRegister([
-                "mall_id"      => $inviterUser->mall_id,
-                "user_id_list" => implode(",", $parentIds),
-                "created_at"   => time(),
-                "mobile"       => !empty($user->mobile) ? $user->mobile : "none",
-                'store_id'     => $store_id,
-                'merchant_id'  => $merchant_id
+                "mall_id"         => $inviterUser->mall_id,
+                "inviter_user_id" => $inviterUser->id,
+                "user_id_list"    => implode(",", $parentIds),
+                "created_at"      => time(),
+                "mobile"          => !empty($user->mobile) ? $user->mobile : "none",
+                'store_id'        => $store_id,
+                'merchant_id'     => $merchant_id
             ]);
 
             if(!$kpiRegister->save()){
@@ -68,6 +69,7 @@ class SmartShopKPI extends Component{
      * @param $data
      *  [
      *    'store_id'       => '门店ID',
+     *    'merchant_id'    => '商户ID',
      *    'inviter_mobile' => '邀请人手机号',
      *    'mobile'         => '访问者手机号',
      *    'goods_id'       => '商品ID'
@@ -84,11 +86,11 @@ class SmartShopKPI extends Component{
         }
 
         $exists = KpiLinkGoods::findOne([
-            "mobile"      => !empty($data['mobile']) ? $data['mobile'] : "none",
-            "goods_id"    => $data['goods_id'],
-            "date"        => date("Ymd"),
-            'store_id'    => $shopData['ss_store_id'],
-            'merchant_id' => $shopData['merchant_id'],
+            "mobile"          => !empty($data['mobile']) ? $data['mobile'] : "none",
+            "goods_id"        => $data['goods_id'],
+            "date"            => date("Ymd"),
+            'store_id'        => $shopData['ss_store_id'],
+            'merchant_id'     => $shopData['merchant_id'],
         ]);
         if($exists){
             return true;
@@ -111,14 +113,15 @@ class SmartShopKPI extends Component{
             sort($parentIds);
 
             $kpiLinkGoods = new KpiLinkGoods([
-                "mall_id"      => $inviterUser->mall_id,
-                "user_id_list" => implode(",", $parentIds),
-                "created_at"   => time(),
-                "mobile"       => !empty($data['mobile']) ? $data['mobile'] : "none",
-                "goods_id"     => $data['goods_id'],
-                "date"         => date("Ymd"),
-                'store_id'     => $shopData['ss_store_id'],
-                'merchant_id'  => $shopData['merchant_id'],
+                "mall_id"         => $inviterUser->mall_id,
+                "inviter_user_id" => $inviterUser->id,
+                "user_id_list"    => implode(",", $parentIds),
+                "created_at"      => time(),
+                "mobile"          => !empty($data['mobile']) ? $data['mobile'] : "none",
+                "goods_id"        => $data['goods_id'],
+                "date"            => date("Ymd"),
+                'store_id'        => $shopData['ss_store_id'],
+                'merchant_id'     => $shopData['merchant_id'],
             ]);
 
             if(!$kpiLinkGoods->save()){
@@ -162,14 +165,15 @@ class SmartShopKPI extends Component{
             sort($parentIds);
 
             $kpiNewOrder = new KpiNewOrder([
-                "mall_id"      => $inviterUser->mall_id,
-                "user_id_list" => implode(",", $parentIds),
-                "created_at"   => time(),
-                "mobile"       => !empty($mobile) ? $mobile : "none",
-                "store_id"     => $store_id,
-                "merchant_id"  => $merchant_id,
-                "source_table" => $order_type,
-                "source_id"    => $order_id
+                "mall_id"         => $inviterUser->mall_id,
+                "inviter_user_id" => $inviterUser->id,
+                "user_id_list"    => implode(",", $parentIds),
+                "created_at"      => time(),
+                "mobile"          => !empty($mobile) ? $mobile : "none",
+                "store_id"        => $store_id,
+                "merchant_id"     => $merchant_id,
+                "source_table"    => $order_type,
+                "source_id"       => $order_id
             ]);
 
             if(!$kpiNewOrder->save()){

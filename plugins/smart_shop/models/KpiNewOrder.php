@@ -15,7 +15,7 @@ class KpiNewOrder extends BaseActiveRecord{
 
     public function rules(){
         return [
-            [['mall_id', 'user_id_list', 'created_at', 'mobile', 'store_id', 'merchant_id', 'source_table', 'source_id'], 'required'],
+            [['mall_id', 'inviter_user_id', 'user_id_list', 'created_at', 'mobile', 'store_id', 'merchant_id', 'source_table', 'source_id'], 'required'],
         ];
     }
 }

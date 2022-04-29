@@ -4,6 +4,7 @@ namespace app\plugins\smart_shop\components;
 
 use app\models\User;
 use app\models\UserRelationshipLink;
+use app\plugins\smart_shop\models\KpiLinkCoupon;
 use app\plugins\smart_shop\models\KpiLinkGoods;
 use app\plugins\smart_shop\models\KpiNewOrder;
 use app\plugins\smart_shop\models\KpiRegister;
@@ -65,7 +66,7 @@ class SmartShopKPI extends Component{
     }
 
     /**
-     * 分享链接访问统计
+     * 分享商品链接访问统计
      * @param $data
      *  [
      *    'store_id'       => '门店ID',
@@ -126,6 +127,75 @@ class SmartShopKPI extends Component{
 
             if(!$kpiLinkGoods->save()){
                 throw new \Exception(json_encode($kpiLinkGoods->getErrors()));
+            }
+
+        }catch (\Exception $e){
+            $this->error = $e->getMessage();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 分享优惠券链接访问统计
+     * @param $data
+     *  [
+     *    'store_id'       => '门店ID',
+     *    'merchant_id'    => '商户ID',
+     *    'inviter_mobile' => '邀请人手机号',
+     *    'mobile'         => '访问者手机号',
+     *  ]
+     * @return boolean
+     */
+    public function linkCouponList($data){
+
+        $smartShop = new SmartShop();
+        $shopData = $smartShop->getStoreDetail($data['store_id']);
+        if(!$shopData){
+            $this->error = "无法获取门店信息";
+            return false;
+        }
+
+        $exists = KpiLinkCoupon::findOne([
+            "mobile"          => !empty($data['mobile']) ? $data['mobile'] : "none",
+            "date"            => date("Ymd"),
+            'store_id'        => $shopData['ss_store_id'],
+            'merchant_id'     => $shopData['merchant_id'],
+        ]);
+        if($exists){
+            return true;
+        }
+
+        try {
+
+            //获取邀请者本地用户
+            $inviterUser = User::findOne(["mobile" => $data['inviter_mobile']]);
+            if(!$inviterUser){
+                throw new \Exception("邀请者用户信息不存在");
+            }
+
+            $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
+            if(!$relatLink){
+                throw new \Exception("邀请用户关系链异常");
+            }
+
+            $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
+            sort($parentIds);
+
+            $kpiLinkCoupon = new KpiLinkCoupon([
+                "mall_id"         => $inviterUser->mall_id,
+                "inviter_user_id" => $inviterUser->id,
+                "user_id_list"    => implode(",", $parentIds),
+                "created_at"      => time(),
+                "mobile"          => !empty($data['mobile']) ? $data['mobile'] : "none",
+                "date"            => date("Ymd"),
+                'store_id'        => $shopData['ss_store_id'],
+                'merchant_id'     => $shopData['merchant_id'],
+            ]);
+
+            if(!$kpiLinkCoupon->save()){
+                throw new \Exception(json_encode($kpiLinkCoupon->getErrors()));
             }
 
         }catch (\Exception $e){

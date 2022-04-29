@@ -14,6 +14,7 @@ class SettingController extends AdminAuthController {
     public function actionSave(){
         $form = new KpiAdminSettingSaveForm();
         $form->attributes = $this->requestData;
+        $form->merchant_id = $this->merchant ? $this->merchant['id'] : 0;
         return $this->asJson($form->save());
     }
 
@@ -24,6 +25,7 @@ class SettingController extends AdminAuthController {
     public function actionDetail(){
         $form = new KpiAdminSettingDetailForm();
         $form->attributes = $this->requestData;
+        $form->merchant_id = $this->merchant ? $this->merchant['id'] : 0;
         return $this->asJson($form->getDetail());
     }
 

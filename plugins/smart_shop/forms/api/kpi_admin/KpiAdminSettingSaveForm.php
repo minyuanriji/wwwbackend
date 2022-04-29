@@ -9,9 +9,11 @@ use app\plugins\smart_shop\models\Setting;
 class KpiAdminSettingSaveForm extends BaseModel{
 
     public $form;
+    public $merchant_id;
 
     public function rules(){
         return [
+            [['merchant_id'], 'required'],
             [['form'], 'string']
         ];
     }
@@ -27,12 +29,12 @@ class KpiAdminSettingSaveForm extends BaseModel{
 
             $setting = Setting::findOne([
                 "mall_id" => \Yii::$app->mall->id,
-                "key"     => "kpi_setting"
+                "key"     => "kpi_setting_" . $this->merchant_id
             ]);
             if(!$setting){
                 $setting = new Setting([
                     "mall_id"   => \Yii::$app->mall->id,
-                    "key"       => "kpi_setting",
+                    "key"       => "kpi_setting_" . $this->merchant_id,
                     "is_delete" => 0
                 ]);
             }

@@ -8,6 +8,7 @@ use app\plugins\smart_shop\models\KpiLinkCoupon;
 use app\plugins\smart_shop\models\KpiLinkGoods;
 use app\plugins\smart_shop\models\KpiNewOrder;
 use app\plugins\smart_shop\models\KpiRegister;
+use app\plugins\smart_shop\models\Setting;
 use yii\base\Component;
 
 class SmartShopKPI extends Component{
@@ -112,6 +113,12 @@ class SmartShopKPI extends Component{
 
             $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
             sort($parentIds);
+
+            //获取奖励配置
+            $setting = $this->getKPISetting();
+            print_r($setting);
+            exit;
+
 
             $kpiLinkGoods = new KpiLinkGoods([
                 "mall_id"         => $inviterUser->mall_id,
@@ -256,5 +263,21 @@ class SmartShopKPI extends Component{
         }
 
         return true;
+    }
+
+    /**
+     * 获取奖励设置
+     * @return array|mixed
+     */
+    private function getKPISetting(){
+        $setting = Setting::findOne([
+            "key"     => "kpi_setting",
+            "mall_id" => \Yii::$app->mall->id
+        ]);
+        $data = [];
+        if($setting){
+            $data = !empty($setting->value) ? json_decode($setting->value, true) : [];
+        }
+        return $data;
     }
 }

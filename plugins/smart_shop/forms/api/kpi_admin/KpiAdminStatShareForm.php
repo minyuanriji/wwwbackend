@@ -5,12 +5,14 @@ namespace app\plugins\smart_shop\forms\api\kpi_admin;
 use app\core\ApiCode;
 use app\models\BaseModel;
 use app\models\User;
+use app\plugins\smart_shop\models\KpiLinkCoupon;
 use app\plugins\smart_shop\models\KpiLinkGoods;
 
 class KpiAdminStatShareForm extends BaseModel{
 
     public $merchant_id;
     public $store_id;
+    public $type;
 
     public $mobile;
     public $start_time;
@@ -21,7 +23,7 @@ class KpiAdminStatShareForm extends BaseModel{
     public function rules(){
         return [
             [['merchant_id'], 'required'],
-            [['mobile', 'start_time', 'end_time'], 'trim'],
+            [['mobile', 'start_time', 'end_time', 'type'], 'trim'],
             [['page', 'limit', 'store_id'], 'integer']
         ];
     }
@@ -34,13 +36,20 @@ class KpiAdminStatShareForm extends BaseModel{
 
         try {
 
-            $query = KpiLinkGoods::find()->alias("klg")
-                ->innerJoin(["u" => User::tableName()], "u.id=klg.inviter_user_id")
-                ->groupBy("klg.inviter_user_id");
+            if($this->type == "coupon"){
+                $query = KpiLinkCoupon::find()->alias("kls")
+                    ->innerJoin(["u" => User::tableName()], "u.id=kls.inviter_user_id")
+                    ->groupBy("kls.inviter_user_id");
+            }else{
+                $query = KpiLinkGoods::find()->alias("kls")
+                    ->innerJoin(["u" => User::tableName()], "u.id=kls.inviter_user_id")
+                    ->groupBy("kls.inviter_user_id");
+            }
 
-            $query->where(["klg.merchant_id" => $this->merchant_id]);
+
+            $query->where(["kls.merchant_id" => $this->merchant_id]);
             if($this->store_id){
-                $query->where(["klg.store_id" => $this->store_id]);
+                $query->where(["kls.store_id" => $this->store_id]);
             }
 
             if(!$this->start_time || !$this->end_time){
@@ -51,16 +60,16 @@ class KpiAdminStatShareForm extends BaseModel{
                 $this->end_time = strtotime($this->end_time);
             }
 
-            $query->andWhere([">", "klg.created_at", $this->start_time]);
-            $query->andWhere(["<", "klg.created_at", $this->end_time]);
+            $query->andWhere([">", "kls.created_at", $this->start_time]);
+            $query->andWhere(["<", "kls.created_at", $this->end_time]);
 
             if($this->mobile){
                 $query->andWhere(["u.mobile" => $this->mobile]);
             }
 
             $selects = ["u.id as user_id", "u.mobile", "u.nickname", "u.avatar_url"];
-            $selects[] = "count(klg.inviter_user_id) as num";
-            $selects[] = "sum(klg.point) as total_point";
+            $selects[] = "count(kls.inviter_user_id) as num";
+            $selects[] = "sum(kls.point) as total_point";
 
             $list = $query->select($selects)->orderBy("num DESC")->asArray()
                 ->page($pagination, $this->limit, $this->page)->all();

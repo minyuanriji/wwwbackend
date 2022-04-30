@@ -44,6 +44,31 @@ class SmartShopKPI extends Component{
             $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
             sort($parentIds);
 
+            //KPI奖励
+            $awardPoint = 0;
+            $startTime = strtotime(date("Y-m-d") . " 00:00:00");
+            $setting = $this->getKPISetting($merchant_id);
+            $query = KpiRegister::find()->andWhere([
+                "AND",
+                ["mall_id" => $inviterUser->mall_id],
+                "inviter_user_id" => $inviterUser->id,
+                'store_id' => $store_id,
+                'merchant_id' => $merchant_id,
+                [">", "created_at", $startTime],
+                ["<", "created_at", ($startTime + 3600 * 24 - 1)]
+            ]);
+            $totalPoint = (int)$query->sum("point");
+            $userNum = (int)$query->count() + 1;
+            if(isset($setting['new_user_rules']) && !empty($setting['new_user_rules'])){
+                $rule = $this->matchRule($setting['new_user_rules'], "user_num", $userNum);
+                if($rule){
+                    $awardPoint = $rule['award_point'];
+                }
+            }
+            if(isset($setting['new_user_day_limit']) && $setting['new_user_day_limit']){
+                $awardPoint = min($awardPoint, max(0, $setting['new_user_day_limit_point'] - $totalPoint));
+            }
+
             $kpiRegister = new KpiRegister([
                 "mall_id"         => $inviterUser->mall_id,
                 "inviter_user_id" => $inviterUser->id,
@@ -51,7 +76,8 @@ class SmartShopKPI extends Component{
                 "created_at"      => time(),
                 "mobile"          => !empty($user->mobile) ? $user->mobile : "none",
                 'store_id'        => $store_id,
-                'merchant_id'     => $merchant_id
+                'merchant_id'     => $merchant_id,
+                "point"           => $awardPoint
             ]);
 
             if(!$kpiRegister->save()){
@@ -114,11 +140,30 @@ class SmartShopKPI extends Component{
             $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
             sort($parentIds);
 
-            //获取奖励配置
-            $setting = $this->getKPISetting();
-            print_r($setting);
-            exit;
-
+            //KPI奖励
+            $awardPoint = 0;
+            $startTime = strtotime(date("Y-m-d") . " 00:00:00");
+            $setting = $this->getKPISetting($shopData['merchant_id']);
+            $query = KpiLinkGoods::find()->andWhere([
+                "AND",
+                ["mall_id" => $inviterUser->mall_id],
+                "inviter_user_id" => $inviterUser->id,
+                'store_id' => $shopData['ss_store_id'],
+                'merchant_id' => $shopData['merchant_id'],
+                [">", "created_at", $startTime],
+                ["<", "created_at", ($startTime + 3600 * 24 - 1)]
+            ]);
+            $totalPoint = (int)$query->sum("point");
+            $shareNum = (int)$query->count() + 1;
+            if(isset($setting['share_rules']) && !empty($setting['share_rules'])){
+                $rule = $this->matchRule($setting['share_rules'], "share_num", $shareNum);
+                if($rule){
+                    $awardPoint = $rule['award_point'];
+                }
+            }
+            if(isset($setting['share_day_limit']) && $setting['share_day_limit']){
+                $awardPoint = min($awardPoint, max(0, $setting['share_day_limit_point'] - $totalPoint));
+            }
 
             $kpiLinkGoods = new KpiLinkGoods([
                 "mall_id"         => $inviterUser->mall_id,
@@ -130,6 +175,7 @@ class SmartShopKPI extends Component{
                 "date"            => date("Ymd"),
                 'store_id'        => $shopData['ss_store_id'],
                 'merchant_id'     => $shopData['merchant_id'],
+                "point"           => $awardPoint
             ]);
 
             if(!$kpiLinkGoods->save()){
@@ -190,6 +236,31 @@ class SmartShopKPI extends Component{
             $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
             sort($parentIds);
 
+            //KPI奖励
+            $awardPoint = 0;
+            $startTime = strtotime(date("Y-m-d") . " 00:00:00");
+            $setting = $this->getKPISetting($shopData['merchant_id']);
+            $query = KpiLinkCoupon::find()->andWhere([
+                "AND",
+                ["mall_id" => $inviterUser->mall_id],
+                "inviter_user_id" => $inviterUser->id,
+                'store_id' => $shopData['ss_store_id'],
+                'merchant_id' => $shopData['merchant_id'],
+                [">", "created_at", $startTime],
+                ["<", "created_at", ($startTime + 3600 * 24 - 1)]
+            ]);
+            $totalPoint = (int)$query->sum("point");
+            $shareNum = (int)$query->count() + 1;
+            if(isset($setting['share_rules']) && !empty($setting['share_rules'])){
+                $rule = $this->matchRule($setting['share_rules'], "share_num", $shareNum);
+                if($rule){
+                    $awardPoint = $rule['award_point'];
+                }
+            }
+            if(isset($setting['share_day_limit']) && $setting['share_day_limit']){
+                $awardPoint = min($awardPoint, max(0, $setting['share_day_limit_point'] - $totalPoint));
+            }
+
             $kpiLinkCoupon = new KpiLinkCoupon([
                 "mall_id"         => $inviterUser->mall_id,
                 "inviter_user_id" => $inviterUser->id,
@@ -199,6 +270,7 @@ class SmartShopKPI extends Component{
                 "date"            => date("Ymd"),
                 'store_id'        => $shopData['ss_store_id'],
                 'merchant_id'     => $shopData['merchant_id'],
+                "point"           => $awardPoint
             ]);
 
             if(!$kpiLinkCoupon->save()){
@@ -241,6 +313,31 @@ class SmartShopKPI extends Component{
             $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
             sort($parentIds);
 
+            //KPI奖励
+            $awardPoint = 0;
+            $startTime = strtotime(date("Y-m-d") . " 00:00:00");
+            $setting = $this->getKPISetting($merchant_id);
+            $query = KpiNewOrder::find()->andWhere([
+                "AND",
+                ["mall_id" => $inviterUser->mall_id],
+                "inviter_user_id" => $inviterUser->id,
+                'store_id' => $store_id,
+                'merchant_id' => $merchant_id,
+                [">", "created_at", $startTime],
+                ["<", "created_at", ($startTime + 3600 * 24 - 1)]
+            ]);
+            $totalPoint = (int)$query->sum("point");
+            $orderNum = (int)$query->count() + 1;
+            if(isset($setting['new_order_rules']) && !empty($setting['new_order_rules'])){
+                $rule = $this->matchRule($setting['new_order_rules'], "order_num", $orderNum);
+                if($rule){
+                    $awardPoint = $rule['award_point'];
+                }
+            }
+            if(isset($setting['new_order_day_limit']) && $setting['new_order_day_limit']){
+                $awardPoint = min($awardPoint, max(0, $setting['new_order_day_limit_point'] - $totalPoint));
+            }
+
             $kpiNewOrder = new KpiNewOrder([
                 "mall_id"         => $inviterUser->mall_id,
                 "inviter_user_id" => $inviterUser->id,
@@ -250,7 +347,8 @@ class SmartShopKPI extends Component{
                 "store_id"        => $store_id,
                 "merchant_id"     => $merchant_id,
                 "source_table"    => $order_type,
-                "source_id"       => $order_id
+                "source_id"       => $order_id,
+                "point"           => $awardPoint
             ]);
 
             if(!$kpiNewOrder->save()){
@@ -269,9 +367,9 @@ class SmartShopKPI extends Component{
      * 获取奖励设置
      * @return array|mixed
      */
-    private function getKPISetting(){
+    private function getKPISetting($merchant_id){
         $setting = Setting::findOne([
-            "key"     => "kpi_setting",
+            "key"     => "kpi_setting_" . $merchant_id,
             "mall_id" => \Yii::$app->mall->id
         ]);
         $data = [];
@@ -279,5 +377,44 @@ class SmartShopKPI extends Component{
             $data = !empty($setting->value) ? json_decode($setting->value, true) : [];
         }
         return $data;
+    }
+
+    /**
+     * 匹配规则
+     * @param $rules
+     * @param $key
+     * @param $num
+     * @return array
+     */
+    private function matchRule($rules, $key, $num){
+        $this->sortRules($rules, $key);
+        $rules = array_reverse($rules);
+        $match = null;
+        foreach($rules as $rule){
+            if($num >= $rule[$key]){
+                $match = $rule;
+                break;
+            }
+        }
+        if(!$match){
+            $match = !empty($rules) ? array_pop($rules) : null;
+        }
+        return $match;
+    }
+
+    /**
+     * 规则排序
+     * @param $rules
+     */
+    private function sortRules(&$rules, $key){
+        $temps = [];
+        foreach($rules as $rule){
+            $temps[$rule[$key]] = $rule;
+        }
+        $rules = [];
+        ksort($temps);
+        foreach($temps as $rule){
+            $rules[] = $rule;
+        }
     }
 }

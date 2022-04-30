@@ -58,6 +58,7 @@ class GoodsAction extends Action{
             "(lianc_u.income+lianc_u.income_frozen) as lianc_total_income",
             "lianc_u_url.left as lianc_left", "lianc_u_url.right as lianc_right"
         ]);
+
         $orderDetailData = $query->asArray()->one();
         if(!$orderDetailData){
             return false;
@@ -188,7 +189,10 @@ class GoodsAction extends Action{
                 $ruleData = $parentData['rule_data'];
 
                 //无分佣规则 跳过
-                if(!$ruleData) continue;
+                if(!$ruleData){
+                    $this->controller->commandOut("无分佣规则");
+                    continue;
+                }
 
                 //计算分佣金额
                 $ruleData['profit_price'] = $orderDetailData['profit_price'];
@@ -196,6 +200,7 @@ class GoodsAction extends Action{
 
                 //判断该商品是否设置首次利润
                 if ($orderDetailData['first_buy_setting']) {
+                    $this->controller->commandOut("首次利润");
                     $first_buy_setting = json_decode($orderDetailData['first_buy_setting'], true);
                     if (isset($first_buy_setting['buy_num']) && $first_buy_setting['buy_num'] > 0) {
                         //查询该商品该用户购买过几次
@@ -240,12 +245,15 @@ class GoodsAction extends Action{
                         }
                     }
                 }
-
+                $this->controller->commandOut("金额:{$price}");
                 //生成分佣记录
                 if($price > 0){
                     $newPriceLogFunc($parentData['id'], 0, $price, $parentData['total_income'], $ruleData, $orderDetailData);
+                }else{
+                    $this->controller->commandOut("分佣金额为0");
                 }
             }
+            $this->controller->commandOut("生成分佣记录完成");
         }catch (\Exception $e){
             $this->controller->commandOut($e->getMessage());
         }

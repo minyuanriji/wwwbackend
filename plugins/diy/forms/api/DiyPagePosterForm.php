@@ -34,9 +34,18 @@ class DiyPagePosterForm extends GrafikaOption implements BasePoster{
         $options = AppConfigLogic::getPosterConfig();
         $option = $options["share"];
         $option = $this->optionDiff($option, $default);
+        $option['head'] = [
+            'is_show' => '1',
+            'size' => 60,
+            'top' => 10,
+            'left' => 10,
+            'file_type' => 'image',
+        ];
+
         if(empty($option['name']['text'])){
             isset($option['name']) && $option['name']['text'] = \Yii::$app->user->identity->nickname;
         }
+
         if($this->pic_url){
             $option['bg_pic']['url'] = $this->pic_url;
         }
@@ -61,19 +70,16 @@ class DiyPagePosterForm extends GrafikaOption implements BasePoster{
             isset($option['head']) && $option['head']['file_path'] = self::head($this, "share/");
         }
 
-        if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
-            $option['qr_code']['left'] = (750 - $option['qr_code']['size']) / 2;
-        }else{
-            $option['qr_code']['left'] = (750 - $option['qr_code']['size']) / 2;
-        }
-
+        $option['qr_code']['top'] = 832;
+        $option['qr_code']['left'] = (750 - $option['qr_code']['size']) / 2;
 
         $pos = imagettfbbox(14,0, $this->font_path, trim($option['name']['text']));
         $str_width = $pos[2] - $pos[0];
         $option['head']['left'] = (750 - ($option['head']['size'] + $str_width)) / 2 - 30;
         $option['name']['left'] = $option['head']['left'] + $option['head']['size'] + 10;
-        $option['head']['top'] = $option['qr_code']['size'] + $option['qr_code']['top'];
-        $option['name']['top'] = $option['qr_code']['size'] + $option['qr_code']['top'];
+
+        $option['head']['top'] = $option['qr_code']['top'] + $option['qr_code']['size'] + 20;
+        $option['name']['top'] = $option['qr_code']['top'] + $option['qr_code']['size'] + 40;
 
         $editor = $this->getPoster($option);
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功', ['pic_url' => $editor->qrcode_url . '?v=' . time()]);

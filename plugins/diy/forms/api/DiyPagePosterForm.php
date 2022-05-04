@@ -48,7 +48,7 @@ class DiyPagePosterForm extends GrafikaOption implements BasePoster{
         if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
             $file = $this->qrcode($option, [
                 ['pid' => \Yii::$app->user->id, 'mall_id'=>\Yii::$app->mall->id, 'page_id' => $this->page_id],
-                280,
+                120,
                 "pages/diy/diy"
             ], $this);
             isset($option['qr_code']) && $option['qr_code']['file_path'] = $file;

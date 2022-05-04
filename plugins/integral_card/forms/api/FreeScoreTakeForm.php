@@ -39,29 +39,27 @@ class FreeScoreTakeForm extends BaseModel{
                 "source_id"   => $fromFree->id,
                 "source_type" => "from_free"
             ]);
-            if($sendLog){
-                throw new \Exception("您已经领取过了");
-            }
+            if(!$sendLog){
+                $sendLog = new ScoreSendLog([
+                    "mall_id"     => $fromFree->mall_id,
+                    "user_id"     => \Yii::$app->user->id,
+                    "source_id"   => $fromFree->id,
+                    "source_type" => "from_free",
+                    "status"      => "success",
+                    "created_at"  => time(),
+                    "updated_at"  => time(),
+                    "data_json"   => json_encode($fromFree->getAttributes())
+                ]);
 
-            $sendLog = new ScoreSendLog([
-                "mall_id"     => $fromFree->mall_id,
-                "user_id"     => \Yii::$app->user->id,
-                "source_id"   => $fromFree->id,
-                "source_type" => "from_free",
-                "status"      => "success",
-                "created_at"  => time(),
-                "updated_at"  => time(),
-                "data_json"   => json_encode($fromFree->getAttributes())
-            ]);
-
-            if($sendLog->save()){
-                $scoreSetting = @json_decode($fromFree->score_setting, true);
-                $scoreSetting['integral_num'] = floatval($fromFree->number);
-                $scoreSetting['source_type']  = 'from_free';
-                $scoreSetting['source_id']    = $fromFree->id;
-                $res = Integral::addIntegralPlan(\Yii::$app->user->id, $scoreSetting, '免费领积分', '0');
-            }else{
-                throw new \Exception($this->responseErrorMsg($sendLog));
+                if($sendLog->save()){
+                    $scoreSetting = @json_decode($fromFree->score_setting, true);
+                    $scoreSetting['integral_num'] = floatval($fromFree->number);
+                    $scoreSetting['source_type']  = 'from_free';
+                    $scoreSetting['source_id']    = $fromFree->id;
+                    $res = Integral::addIntegralPlan(\Yii::$app->user->id, $scoreSetting, '免费领积分', '0');
+                }else{
+                    throw new \Exception($this->responseErrorMsg($sendLog));
+                }
             }
 
             return [

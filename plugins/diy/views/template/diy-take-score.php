@@ -148,6 +148,7 @@
                     img_width: 0,
                     img_height: 0,
                     isButton: true,
+                    isShare: false,
                     button_x:0,
                     button_y:0,
                     button_w: 200,

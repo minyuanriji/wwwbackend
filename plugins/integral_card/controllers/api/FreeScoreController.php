@@ -4,6 +4,7 @@ namespace app\plugins\integral_card\controllers\api;
 
 use app\controllers\api\filters\LoginFilter;
 use app\plugins\integral_card\controllers\ApiBaseController;
+use app\plugins\integral_card\forms\api\FreeScorePosterForm;
 use app\plugins\integral_card\forms\api\FreeScoreTakeForm;
 
 class FreeScoreController extends ApiBaseController

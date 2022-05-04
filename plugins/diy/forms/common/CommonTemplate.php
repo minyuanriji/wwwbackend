@@ -186,7 +186,7 @@ class CommonTemplate extends BaseModel
                         'id' => 'image-text',
                         'name' => '图文详情',
                         'icon' => $pluginUrl . '/images/new-tpl/form_imgtext_icon(1).png',
-                    ],
+                    ]
                 ]
             ],
             [

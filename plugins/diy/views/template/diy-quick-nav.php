@@ -66,6 +66,25 @@
                         <com-image-upload width="100" height="100" v-model="data.openedPicUrl"></com-image-upload>
                     </el-form-item>
                     <div class="edit-item">
+                        <div style="margin-bottom: 10px;">分享</div>
+                        <el-form-item label="是否开启">
+                            <el-switch v-model="data.share.opened"></el-switch>
+                        </el-form-item>
+                        <el-form-item v-if="data.share.opened" label="分享图片">
+                            <com-image-upload width="100" height="100" v-model="data.share.pic_url"></com-image-upload>
+                        </el-form-item>
+                        <!--
+                        <el-form-item v-if="data.share.opened" label="分享链接">
+                            <el-input :disabled="true" size="small"
+                                      v-model="data.share.link_url" autocomplete="off">
+                                <com-pick-link slot="append" @selected="selectShareLink">
+                                    <el-button size="mini">选择链接</el-button>
+                                </com-pick-link>
+                            </el-input>
+                        </el-form-item>
+                        -->
+                    </div>
+                    <div class="edit-item">
                         <div style="margin-bottom: 10px;">返回首页</div>
                         <el-form-item label="是否开启">
                             <el-switch v-model="data.home.opened"></el-switch>
@@ -177,6 +196,14 @@
                     navStyle: 1,
                     closedPicUrl: '',
                     openedPicUrl: '',
+                    share: {
+                        opened: false,
+                        pic_url: '',
+                        link_url: '',
+                        open_type: '',
+                        params: '',
+                        key: ''
+                    },
                     home: {
                         opened: false,
                         picUrl: '',
@@ -225,6 +252,12 @@
                 this.data = Object.assign({}, this.data, this.value);
                 //this.data = JSON.parse(JSON.stringify(this.value));
             }
+            if(!this.data.share){
+                this.data['share'] = {
+                    opened: false,
+                    pic_url: '',
+                };
+            }
         },
         computed: {},
         watch: {
@@ -248,6 +281,14 @@
                         Object.assign(this.value, data);
                     }
                     this.$message.success(response.data.msg);
+                });
+            },
+            selectShareLink(e) {
+                e.map(item => {
+                    this.data.share.link_url = item.new_link_url;
+                    this.data.share.open_type = item.open_type;
+                    this.data.share.params = item.params;
+                    this.data.share.key = item.key ? item.key : '';
                 });
             },
             selectQuickCustomize(e) {

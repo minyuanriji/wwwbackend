@@ -15,6 +15,7 @@ use app\core\ApiCode;
 use app\helpers\APICacheHelper;
 use app\helpers\SerializeHelper;
 use app\plugins\diy\forms\api\DivPageDetailForm;
+use app\plugins\diy\forms\api\DiyPagePosterForm;
 use app\plugins\diy\models\DiyPage;
 use app\plugins\diy\forms\api\InfoForm;
 use app\models\Goods;
@@ -27,7 +28,7 @@ class PageController extends ApiController
         return array_merge(parent::behaviors(), [
             'loginFilter' => [
                 'class' => \app\controllers\behavior\LoginFilter::class,
-                'safeActions' => ['detail']
+                'safeActions' => ['detail', 'poster']
             ]
         ]);
     }
@@ -54,5 +55,16 @@ class PageController extends ApiController
         $form = new InfoForm();
         $form->form_data = json_decode(\Yii::$app->request->post('form_data'), true);
         return $this->asJson($form->save());
+    }
+
+    /**
+     * 生成海报
+     * @return \yii\web\Response
+     */
+    public function actionPoster()
+    {
+        $form = new DiyPagePosterForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->get());
     }
 }

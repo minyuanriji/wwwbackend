@@ -61,15 +61,19 @@ class DiyPagePosterForm extends GrafikaOption implements BasePoster{
             isset($option['head']) && $option['head']['file_path'] = self::head($this, "share/");
         }
 
-        $option['qr_code']['top'] -= $option['qr_code']['size'];
-        $option['qr_code']['left'] = (750 - $option['qr_code']['size']) / 2;
+        if(\Yii::$app->appPlatform == User::PLATFORM_MP_WX){
+            $option['qr_code']['left'] = (750 - $option['qr_code']['size']) / 2;
+        }else{
+            $option['qr_code']['left'] = (750 - $option['qr_code']['size']) / 2;
+        }
+
 
         $pos = imagettfbbox(14,0, $this->font_path, trim($option['name']['text']));
         $str_width = $pos[2] - $pos[0];
         $option['head']['left'] = (750 - ($option['head']['size'] + $str_width)) / 2 - 30;
         $option['name']['left'] = $option['head']['left'] + $option['head']['size'] + 10;
-        $option['head']['top'] += 70;
-        $option['name']['top'] += 60;
+        $option['head']['top'] += $option['qr_code']['size'] + $option['qr_code']['top'];
+        $option['name']['top'] += $option['qr_code']['size'] + $option['qr_code']['top'];
 
         $editor = $this->getPoster($option);
         return $this->returnApiResultData(ApiCode::CODE_SUCCESS,'请求成功', ['pic_url' => $editor->qrcode_url . '?v=' . time()]);

@@ -63,7 +63,7 @@ class DiyPagePosterForm extends GrafikaOption implements BasePoster{
             isset($option['qr_code']) && $option['qr_code']['file_path'] = $file;
             isset($option['head']) && $option['head']['file_path'] = self::head($this);
         }else{
-            $path = "/h5/#/pages/diy/diy?mall_id=" . \Yii::$app->mall->id . "&pid=".\Yii::$app->user->id."&source=".User::SOURCE_SHARE_POSTER;
+            $path = "/h5/#/pages/diy/diy?page_id=".$this->page_id."&mall_id=" . \Yii::$app->mall->id . "&pid=".\Yii::$app->user->id."&source=".User::SOURCE_SHARE_POSTER;
             $dir = 'share/' . \Yii::$app->user->id . '/diy_page_' . $this->page_id . '.jpg';
             $file = CommonLogic::createQrcode($option, $this, $path, $dir);
             isset($option['qr_code']) && $option['qr_code']['file_path'] = $file;

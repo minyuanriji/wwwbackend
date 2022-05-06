@@ -25,8 +25,8 @@
                 </el-form-item>
                 <template v-if="!data.useMallConfig && data.navSwitch == 1">
                     <el-form-item label="导航样式">
-                        <el-radio v-model="data.navStyle" :label="1">样式1(点击收起)</el-radio>
-                        <el-radio v-model="data.navStyle" :label="2">样式2(全部展示)</el-radio>
+                        <el-radio v-model="data.navStyle" :label="1">浮动</el-radio>
+                        <el-radio v-model="data.navStyle" :label="2">固定底部</el-radio>
                     </el-form-item>
                     <el-form-item label="收起图标">
                         <com-image-upload width="100" height="100" v-model="data.closedPicUrl"></com-image-upload>

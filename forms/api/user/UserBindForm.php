@@ -124,6 +124,12 @@ class UserBindForm extends BaseModel
                 }
 
                 $userResult->access_token = \Yii::$app->security->generateRandomString();
+
+                //如果没有绑定上级
+                if($parent_id && (!$userResult->parent_id || $userResult->parent_id == GLOBAL_PARENT_ID)){
+                    $userResult->parent_id = $parent_id;
+                }
+
                 if (!$userResult->save()) {
                     \Yii::error("UpdateUserAccessToken ".var_export($userResult->getErrors(),true));
                     throw new Exception("更新用户access_token失败");

@@ -56,8 +56,8 @@
                         <el-button size="small" @click="getMallNav">获取</el-button>
                     </el-form-item>
                     <el-form-item label="导航样式">
-                        <com-radio v-model="data.navStyle" :label="1">样式1(点击收起)</com-radio>
-                        <com-radio v-model="data.navStyle" :label="2">样式2(全部展示)</com-radio>
+                        <com-radio v-model="data.navStyle" :label="1">浮动</com-radio>
+                        <com-radio v-model="data.navStyle" :label="2">固定底部</com-radio>
                     </el-form-item>
                     <el-form-item label="收起图标">
                         <com-image-upload width="100" height="100" v-model="data.closedPicUrl"></com-image-upload>

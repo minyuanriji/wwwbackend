@@ -218,6 +218,7 @@ class OrderDoSplitForm extends BaseModel{
 
             $order->status        = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;
             $order->updated_at    = time();
+            $order->wx_got_amount = $wxGotAmount;
             $order->split_data    = json_encode($splitData);
             $order->split_amount  = floatval($amount/100);
             if(!$order->save()){

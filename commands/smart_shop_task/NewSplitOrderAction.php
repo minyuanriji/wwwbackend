@@ -10,6 +10,7 @@ use yii\base\Action;
 class NewSplitOrderAction extends Action{
 
     public function run(){
+        $this->controller->commandOut("NewSplitOrderAction start");
         $shop = new SmartShop();
         while (true){
             try {

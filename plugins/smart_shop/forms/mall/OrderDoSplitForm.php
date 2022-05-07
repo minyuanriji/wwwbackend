@@ -171,9 +171,12 @@ class OrderDoSplitForm extends BaseModel{
         }
         $detail['transaction_id'] = $res['transaction_id'];
 
-        //计算出支付公司扣取的费用
+        //实际支付金额（分）
+        $realAmount = (float)$res['amount']['total'];
+
+        //计算出微信扣取的费用（分）
         $rate = isset($shop->setting['wechat_rate']) ? max(0, floatval($shop->setting['wechat_rate'])) : 0;
-        $deductedAmount = $detail['pay_price'] * ($rate/100);
+        $wxGotAmount = $realAmount * ($rate/100);
 
         //获取可分账金额
         $unsplitAmount = OrderSplitInfoForm::getWechat($order, $shop, $detail);
@@ -186,9 +189,13 @@ class OrderDoSplitForm extends BaseModel{
             $splitData['out_order_no'] = "wx" . md5(uniqid() . rand(0, 10000));
         }
 
+        //计算手续费（分）
         //如果支付用户手机号为空，就不分帐
+        //手续费还要减去微信扣取的费用
         $amount = !empty($order->pay_user_mobile) ? (int)(($mch->transfer_rate/100) * $unsplitAmount) : 0;
+        $amount = (int)max(0, $amount - $wxGotAmount);
 
+        $splitData['transfer_rate'] = $mch->transfer_rate;
         $splitData['receivers'] = isset($splitData['receivers']) && !empty($splitData['receivers']) ? $splitData['receivers'] : [];
         $splitData['transaction_id'] = $detail['transaction_id'];
 
@@ -233,11 +240,6 @@ class OrderDoSplitForm extends BaseModel{
                 if(!isset($data['state']) || !in_array($data['state'], ["PROCESSING", "FINISHED"])){
                     throw new \Exception("分账失败");
                 }
-
-                $splitData['out_order_no'] = $data['out_order_no'];
-                $splitData['order_id']     = $data['order_id'];
-                $order->split_data = json_encode($splitData);
-                $order->save();
             }else{
                 $data = $wechatPay->post("v3/profitsharing/orders/unfreeze", [
                     "sub_mchid"      => (string)$detail['mno'],
@@ -249,6 +251,13 @@ class OrderDoSplitForm extends BaseModel{
                     throw new \Exception("分账失败");
                 }
             }
+
+            //保存微信接口请求返回订单号信息
+            $splitData['out_order_no'] = $data['out_order_no'];
+            $splitData['order_id']     = $data['order_id'];
+            $order->split_data = json_encode($splitData);
+            $order->save();
+
             $t->commit();
         }catch (\Exception $e){
             $t->rollBack();

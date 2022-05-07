@@ -12,6 +12,10 @@ class AutoUnfreezeAction extends BaseAction{
 
     public function run() {
 
+        $this->controller->commandOut("AutoUnfreezeAction start");
+
+        $shop = new SmartShop();
+
         while (true) {
             sleep($this->sleepTime);
             try {
@@ -27,7 +31,6 @@ class AutoUnfreezeAction extends BaseAction{
                     continue;
                 }
 
-                $shop = new SmartShop();
                 $shop->initSetting();
                 $this->activeTime();
 

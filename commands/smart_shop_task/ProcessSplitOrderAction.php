@@ -10,14 +10,14 @@ use app\plugins\smart_shop\models\Order;
 
 class ProcessSplitOrderAction extends BaseAction {
 
-    public function run()
-    {
-        $this->controller->commandOut(date("Y/m/d H:i:s") . " ProcessSplitOrderAction start");
+    public function run(){
+        $this->controller->commandOut("ProcessSplitOrderAction start");
+
+        $shop = new SmartShop();
 
         while (true) {
             sleep($this->sleepTime);
             try {
-
                 $orderIds = Order::find()->select(["id"])->where([
                     "status"    => Order::STATUS_UNCONFIRMED,
                     "is_delete" => 0
@@ -26,7 +26,6 @@ class ProcessSplitOrderAction extends BaseAction {
                     $this->activeTime();
                     Order::updateAll(["updated_at" => time()], "id IN(".implode(",", $orderIds).")");
 
-                    $shop = new SmartShop();
                     $shop->initSetting(); //刷新下配置
 
                     foreach($orderIds as $orderId){

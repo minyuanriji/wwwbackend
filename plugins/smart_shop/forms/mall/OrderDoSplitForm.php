@@ -91,9 +91,12 @@ class OrderDoSplitForm extends BaseModel{
 
         $tradeNo = $res['trade_no']; //支付宝交易号
 
-        //计算出支付公司扣取的费用
+        //实际支付金额（元）
+        $realAmount = (float)$res['receipt_amount'];
+
+        //支付宝手续费（元）
         $rate = isset($shop->setting['ali_rate']) ? max(0, floatval($shop->setting['ali_rate'])) : 0;
-        $deductedAmount = $detail['pay_price'] * ($rate/100);
+        $aliGotAmount = $realAmount * ($rate/100);
 
         //可分账金额（单位分）
         $unsplitAmount = intval(floatval($res['receipt_amount']) * 100);
@@ -101,9 +104,13 @@ class OrderDoSplitForm extends BaseModel{
             throw new \Exception("无可分账金额");
         }
 
+        //计算手续费（元）
         //如果支付用户手机号为空，就不分帐
+        //手续费还要减去支付宝手续费
         $amount = !empty($order->pay_user_mobile) ? round((($mch->transfer_rate/100) * $unsplitAmount)/100, 2) : 0;
+        $amount = (float)max(0, $amount - $aliGotAmount);
 
+        $splitData['transfer_rate'] = $mch->transfer_rate;
         $splitData['receivers'] = isset($splitData['receivers']) && !empty($splitData['receivers']) ? $splitData['receivers'] : [];
 
         if(empty($splitData['out_request_no'])){
@@ -115,10 +122,11 @@ class OrderDoSplitForm extends BaseModel{
                 $receiver = ["trans_in_type" => (string)$shop->setting['ali_fz_type'], "trans_in" => (string)$shop->setting['ali_fz_account'], "amount" => $amount, "description" => "商户服务费收取"];
                 $splitData['receivers'] = [$receiver];
             }
-            $order->status        = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;
-            $order->updated_at    = time();
-            $order->split_data    = json_encode($splitData);
-            $order->split_amount  = $amount;
+            $order->status         = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;
+            $order->updated_at     = time();
+            $order->split_data     = json_encode($splitData);
+            $order->ali_got_amount = $aliGotAmount;
+            $order->split_amount   = $amount;
             if(!$order->save()){
                 throw new \Exception(json_encode($order->getErrors()));
             }

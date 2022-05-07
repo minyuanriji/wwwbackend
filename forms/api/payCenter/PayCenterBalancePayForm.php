@@ -147,7 +147,12 @@ class PayCenterBalancePayForm extends BaseModel{
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }catch (\Exception $e){
             $t->rollBack();
-            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage(), [
+                "error" => [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
+            ]);
         }
     }
 

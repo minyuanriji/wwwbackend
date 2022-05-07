@@ -68,6 +68,8 @@ class AlibabaDistributionOrderNotifiyProcess extends PaymentNotify{
                     AlibabaDistributionOrderForm::createAliOrder($order, $orderDetail, $userAddress);
                 }
             }
+        }catch (AlibabaOrderException $e){ //1688订单异常
+            throw $e;
         }catch (\Exception $e){
             $ex = new AlibabaOrderException($e->getMessage(), $e->getCode(), $e->getPrevious());
             $ex->mall_id  = $order->mall_id;

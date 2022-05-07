@@ -11,7 +11,9 @@ use app\models\BaseModel;
 use app\models\Order;
 use app\models\PaymentOrderUnion;
 use app\plugins\addcredit\models\AddcreditOrder;
+use app\plugins\alibaba\exception\AlibabaOrderException;
 use app\plugins\alibaba\models\AlibabaDistributionOrder;
+use app\plugins\alibaba\models\AlibabaDistributionOrderException;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\mch\models\MchCheckoutOrder;
 use app\plugins\oil\models\OilOrders;
@@ -48,7 +50,7 @@ class PayCenterBalancePayForm extends BaseModel{
                 throw new \Exception('待支付订单不存在。');
             }
 
-            if($paymentOrderUnion->is_pay){
+            if ($paymentOrderUnion->is_pay) {
                 throw new \Exception('请勿重复支付');
             }
 
@@ -61,11 +63,11 @@ class PayCenterBalancePayForm extends BaseModel{
 
             $paymentConfigs = AppConfigLogic::getPaymentConfig();
             $pay_password_status = isset($paymentConfigs["pay_password_status"]) ? $paymentConfigs["pay_password_status"] : 0;
-            if($pay_password_status == 1){
-                if(empty($user->transaction_password)){
+            if ($pay_password_status == 1) {
+                if (empty($user->transaction_password)) {
                     throw new \Exception('您未设置支付密码');
                 }
-                if(empty($transaction_password)){
+                if (empty($transaction_password)) {
                     throw new \Exception('请输入交易密码');
                 }
                 if (!\Yii::$app->getSecurity()->validatePassword(trim($transaction_password), $user->transaction_password)) {
@@ -84,14 +86,14 @@ class PayCenterBalancePayForm extends BaseModel{
             if ($balanceAmount < $totalAmount) {
                 throw new \Exception('账户余额不足。');
             }
-            $paymentOrderUnion->is_pay   = 1;
+            $paymentOrderUnion->is_pay = 1;
             $paymentOrderUnion->pay_type = 3;
             if (!$paymentOrderUnion->save()) {
                 throw new \Exception($paymentOrderUnion->getFirstErrors());
             }
 
             foreach ($paymentOrders as $paymentOrder) {
-                $paymentOrder->is_pay   = 1;
+                $paymentOrder->is_pay = 1;
                 $paymentOrder->pay_type = 3;
                 if (!$paymentOrder->save()) {
                     throw new \Exception($paymentOrder->getFirstErrors());
@@ -102,20 +104,20 @@ class PayCenterBalancePayForm extends BaseModel{
                 $NotifyClass = $paymentOrder->notify_class;
                 $notifyObject = new $NotifyClass();
                 $po = new PaymentOrder([
-                    'orderNo'     => $paymentOrder->order_no,
-                    'amount'      => (float)$paymentOrder->amount,
-                    'title'       => $paymentOrder->title,
+                    'orderNo' => $paymentOrder->order_no,
+                    'amount' => (float)$paymentOrder->amount,
+                    'title' => $paymentOrder->title,
                     'notifyClass' => $paymentOrder->notify_class,
-                    'payType'     => "balance",
+                    'payType' => "balance",
                 ]);
                 if ($po->amount > 0) {
                     $modifyForm = new UserBalanceModifyForm([
-                        "type"        => BalanceLog::TYPE_SUB,
-                        "money"       => (float)$paymentOrder->amount,
+                        "type" => BalanceLog::TYPE_SUB,
+                        "money" => (float)$paymentOrder->amount,
                         "custom_desc" => '',
-                        "source_id"   => $source_id,
+                        "source_id" => $source_id,
                         "source_type" => $source_type,
-                        "desc"        => $desc
+                        "desc" => $desc
                     ]);
                     $modifyForm->modify($user);
                 }
@@ -128,9 +130,21 @@ class PayCenterBalancePayForm extends BaseModel{
             $t->commit();
 
             return [
-                'code'  => ApiCode::CODE_SUCCESS,
-                'msg'   => '支付成功'
+                'code' => ApiCode::CODE_SUCCESS,
+                'msg' => '支付成功'
             ];
+        }catch (AlibabaOrderException $e){ //1688订单异常
+            $t->rollBack();
+            $exLog = new AlibabaDistributionOrderException([
+                "mall_id" => $e->mall_id,
+                "order_id" => $e->order_id,
+                "created_at" => time(),
+                "order_detail_id" => $e->order_detail_id,
+                "order_detail_1688_id" => $e->order_detail_1688_id,
+                "content" => json_encode(["message" => $e->getMessage(), "file" => $e->getFile(), "line" => $e->getLine()], JSON_UNESCAPED_UNICODE)
+            ]);
+            $exLog->save();
+            return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }catch (\Exception $e){
             $t->rollBack();
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());

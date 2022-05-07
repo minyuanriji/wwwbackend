@@ -4,6 +4,7 @@ namespace app\plugins\alibaba\forms\api;
 
 use app\models\BaseModel;
 use app\models\UserAddress;
+use app\plugins\alibaba\exception\AlibabaOrderException;
 use app\plugins\alibaba\models\AlibabaApp;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsList;
 use app\plugins\alibaba\models\AlibabaDistributionGoodsSku;
@@ -117,79 +118,87 @@ class AlibabaDistributionOrderForm extends BaseModel{
      */
     public static function createAliOrder(AlibabaDistributionOrder $order, AlibabaDistributionOrderDetail $orderDetail, $userAddress){
         static $appList;
-        if(!isset($appList[$orderDetail->app_id])){
-            $appList[$orderDetail->app_id] = AlibabaApp::findOne($orderDetail->app_id);
-            if(!$appList[$orderDetail->app_id] || $appList[$orderDetail->app_id]->is_delete){
-                throw new \Exception("应用信息[ID:{$orderDetail->app_id}]不存在");
+        try {
+            if(!isset($appList[$orderDetail->app_id])){
+                $appList[$orderDetail->app_id] = AlibabaApp::findOne($orderDetail->app_id);
+                if(!$appList[$orderDetail->app_id] || $appList[$orderDetail->app_id]->is_delete){
+                    throw new \Exception("应用信息[ID:{$orderDetail->app_id}]不存在");
+                }
             }
-        }
-        $app = $appList[$orderDetail->app_id];
+            $app = $appList[$orderDetail->app_id];
 
-        $goods = AlibabaDistributionGoodsList::findOne($orderDetail->goods_id);
-        if(!$goods || $goods->is_delete){
-            throw new \Exception("商品[ID:{$orderDetail->goods_id}]不存在");
-        }
+            $goods = AlibabaDistributionGoodsList::findOne($orderDetail->goods_id);
+            if(!$goods || $goods->is_delete){
+                throw new \Exception("商品[ID:{$orderDetail->goods_id}]不存在");
+            }
 
-        $aliAddrInfo = (array)@json_decode($order->ali_address_info, true);
+            $aliAddrInfo = (array)@json_decode($order->ali_address_info, true);
 
-        $distribution = new Distribution($app->app_key, $app->secret);
-
+            $distribution = new Distribution($app->app_key, $app->secret);
 
 
-        $postData = [
-            "addressParam" => json_encode([
-                "fullName"     => $order->name,
-                "mobile"       => $order->mobile,
-                "phone"        => $order->mobile,
-                "postCode"     => isset($aliAddrInfo['postCode']) ? $aliAddrInfo['postCode'] : "",
-                "cityText"     => $userAddress ? $userAddress->city : "",
-                "provinceText" => $userAddress ? $userAddress->province : "",
-                "areaText"     => $userAddress ? $userAddress->district : "",
-                "address"      => $userAddress ? $userAddress->detail : $order->address,
-                "districtCode" => isset($aliAddrInfo['addressCode']) ? $aliAddrInfo['addressCode'] : ""
-            ]),
-            "cargoParamList" => json_encode([
-                'offerId'   => $goods->ali_offerId,
-                'specId'    => $orderDetail->ali_spec_id,
-                'quantity'  => $orderDetail->ali_num
-            ]),
-            "outerOrderInfo" => json_encode([
-                "mediaOrderId" => $orderDetail->id,
-                "phone"        => $order->mobile,
-                "offers"       => [
-                    "id"     => $goods->ali_offerId,
-                    "specId" => $orderDetail->ali_spec_id,
-                    "price"  => $orderDetail->unit_price * 100,
-                    "num"    => $orderDetail->ali_num
-                ]
-            ]),
-            "message" => "发货不要放任何收据清单、产品价格，因为我们是分销商，不要直接联系客户，有任何问题请与我们联系，不要直接打客户电话，打这个电话13536992449/020-31923526"
-        ];
-        $res = $distribution->requestWithToken(new OrderCreate($postData), $app->access_token);
-        if(!empty($res->error)){
-            throw new \Exception($res->error);
-        }
-        if(!$res instanceof OrderCreateResponse){
-            throw new \Exception("返回结果异常");
-        }
-        $orderDetail1688 = new AlibabaDistributionOrderDetail1688([
-            "mall_id"          => $order->mall_id,
-            "app_id"           => $app->id,
-            "order_id"         => $order->id,
-            "order_detail_id"  => $orderDetail->id,
-            "goods_id"         => $goods->id,
-            "user_id"          => $order->user_id,
-            "ali_total_amount" => $res->totalSuccessAmount,
-            "ali_order_id"     => $res->orderId,
-            "ali_post_fee"     => $res->postFee,
-            "ali_postdata"     => json_encode($postData),
-            "created_at"       => time(),
-            "updated_at"       => time(),
-            "app_key"          => $app->app_key,
-            "status"           => "unpaid"
-        ]);
-        if(!$orderDetail1688->save()){
-            throw new \Exception(json_encode($orderDetail1688->getErrors()));
+
+            $postData = [
+                "addressParam" => json_encode([
+                    "fullName"     => $order->name,
+                    "mobile"       => $order->mobile,
+                    "phone"        => $order->mobile,
+                    "postCode"     => isset($aliAddrInfo['postCode']) ? $aliAddrInfo['postCode'] : "",
+                    "cityText"     => $userAddress ? $userAddress->city : "",
+                    "provinceText" => $userAddress ? $userAddress->province : "",
+                    "areaText"     => $userAddress ? $userAddress->district : "",
+                    "address"      => $userAddress ? $userAddress->detail : $order->address,
+                    "districtCode" => isset($aliAddrInfo['addressCode']) ? $aliAddrInfo['addressCode'] : ""
+                ]),
+                "cargoParamList" => json_encode([
+                    'offerId'   => $goods->ali_offerId,
+                    'specId'    => $orderDetail->ali_spec_id,
+                    'quantity'  => $orderDetail->ali_num
+                ]),
+                "outerOrderInfo" => json_encode([
+                    "mediaOrderId" => $orderDetail->id,
+                    "phone"        => $order->mobile,
+                    "offers"       => [
+                        "id"     => $goods->ali_offerId,
+                        "specId" => $orderDetail->ali_spec_id,
+                        "price"  => $orderDetail->unit_price * 100,
+                        "num"    => $orderDetail->ali_num
+                    ]
+                ]),
+                "message" => "发货不要放任何收据清单、产品价格，因为我们是分销商，不要直接联系客户，有任何问题请与我们联系，不要直接打客户电话，打这个电话13536992449/020-31923526"
+            ];
+            $res = $distribution->requestWithToken(new OrderCreate($postData), $app->access_token);
+            if(!empty($res->error)){
+                throw new \Exception($res->error);
+            }
+            if(!$res instanceof OrderCreateResponse){
+                throw new \Exception("返回结果异常");
+            }
+            $orderDetail1688 = new AlibabaDistributionOrderDetail1688([
+                "mall_id"          => $order->mall_id,
+                "app_id"           => $app->id,
+                "order_id"         => $order->id,
+                "order_detail_id"  => $orderDetail->id,
+                "goods_id"         => $goods->id,
+                "user_id"          => $order->user_id,
+                "ali_total_amount" => $res->totalSuccessAmount,
+                "ali_order_id"     => $res->orderId,
+                "ali_post_fee"     => $res->postFee,
+                "ali_postdata"     => json_encode($postData),
+                "created_at"       => time(),
+                "updated_at"       => time(),
+                "app_key"          => $app->app_key,
+                "status"           => "unpaid"
+            ]);
+            if(!$orderDetail1688->save()){
+                throw new \Exception(json_encode($orderDetail1688->getErrors()));
+            }
+        }catch (\Exception $e){
+            $ex = new AlibabaOrderException($e->getMessage(), $e->getCode(), $e->getPrevious());
+            $ex->mall_id         = $order->mall_id;
+            $ex->order_id        = $order->id;
+            $ex->order_detail_id = $orderDetail->id;
+            throw $ex;
         }
     }
 

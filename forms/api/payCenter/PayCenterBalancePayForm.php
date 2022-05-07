@@ -121,12 +121,11 @@ class PayCenterBalancePayForm extends BaseModel{
                     ]);
                     $modifyForm->modify($user);
                 }
-                try {
-                    $notifyObject->notify($po);
-                } catch (\Exception $e) {
-                    return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
-                }
+
+                $notifyObject->notify($po);
+
             }
+
             $t->commit();
 
             return [

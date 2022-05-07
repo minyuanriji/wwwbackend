@@ -88,7 +88,7 @@ class AlipaySdkApi extends Component{
         if(!empty($resultCode)&&$resultCode == 10000){
 
         } else {
-            throw new \Exception(isset($result->$responseNode) ? $result->$responseNode->sub_msg : "分账失败");
+            throw new \Exception(isset($result->$responseNode) ? "tradeOrderSettle::alipay:" . $result->$responseNode->sub_msg : "tradeOrderSettle::分账失败");
         }
 
     }

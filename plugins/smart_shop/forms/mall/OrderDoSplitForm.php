@@ -118,10 +118,9 @@ class OrderDoSplitForm extends BaseModel{
         }
         $t = \Yii::$app->db->beginTransaction();
         try {
-            if($amount > 0){
-                $receiver = ["trans_in_type" => (string)$shop->setting['ali_fz_type'], "trans_in" => (string)$shop->setting['ali_fz_account'], "amount" => $amount, "description" => "商户服务费收取"];
-                $splitData['receivers'] = [$receiver];
-            }
+            $receiver = ["trans_in_type" => (string)$shop->setting['ali_fz_type'], "trans_in" => (string)$shop->setting['ali_fz_account'], "amount" => $amount, "description" => "商户服务费收取"];
+            $splitData['receivers'] = [$receiver];
+
             $order->status         = $detail['order_status'] == 3 ? Order::STATUS_FINISHED : Order::STATUS_PROCESSING;
             $order->updated_at     = time();
             $order->split_data     = json_encode($splitData);
@@ -139,7 +138,7 @@ class OrderDoSplitForm extends BaseModel{
                 ], $splitData['out_request_no']);
 
                 //执行分账请求
-                $aliPay->tradeOrderSettle($detail['mno_ali'], $splitData['out_request_no'], $tradeNo, [$receiver]);
+                $aliPay->tradeOrderSettle($detail['mno_ali'], $splitData['out_request_no'], $tradeNo, $receiver ? [$receiver] : []);
             }
 
             $t->commit();

@@ -33,7 +33,7 @@ class SmartShopOrderAction extends Action{
                     ["o.commission_status" => 0]
                 ]);
                 $query->select(["o.id", "o.mall_id", "o.from_table_name", "o.from_table_record_id", "o.bsh_mch_id", "s.id as bsh_store_id", "o.ss_mch_id", "o.ss_store_id",
-                    "o.split_amount", "s.name as store_name", "m.transfer_rate", "m.integral_fee_rate", "m.user_id as mch_user_id", "p.id as parent_id"]);
+                    "o.split_amount", "o.wx_got_amount", "o.ali_got_amount", "s.name as store_name", "m.transfer_rate", "m.integral_fee_rate", "m.user_id as mch_user_id", "p.id as parent_id"]);
                 $orders = $query->asArray()->orderBy("o.updated_at ASC")->limit(1)->all();
                 if($orders){
                     $sleep = max(1, --$sleep);
@@ -94,7 +94,7 @@ class SmartShopOrderAction extends Action{
             $commissionRule['role_type']       = $parent->role_type;
             $commissionRule['ver']             = "2021/10/25";
             $commissionRule['commisson_value'] = min(0.02, (float)($commissionRule['commisson_value']/100));
-            $commissionRule['profit_price']    = $order['split_amount'];
+            $commissionRule['profit_price']    = max(0, $order['split_amount'] - ($order['wx_got_amount'] + $order['ali_got_amount']));
             $price = $commissionRule['commisson_value'] * $commissionRule['profit_price'];
 
             if($price <= 0){

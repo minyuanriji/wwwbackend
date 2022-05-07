@@ -50,7 +50,7 @@ class SmartshopOrderSendAction extends BaseAction {
         ]);
         $query->orderBy("o.updated_at ASC");
 
-        $selects = ["o.id", "o.mall_id", "o.pay_price", "o.split_amount", "o.ali_got_amount", "u.id as user_id", "s.mch_id", "s.id as store_id",
+        $selects = ["o.id", "o.mall_id", "o.pay_price", "o.split_amount", "o.wx_got_amount", "o.ali_got_amount", "u.id as user_id", "s.mch_id", "s.id as store_id",
             "svfs.give_type", "svfs.give_value", "m.transfer_rate"];
         $orders = $query->select($selects)->asArray()->limit(1)->all();
 

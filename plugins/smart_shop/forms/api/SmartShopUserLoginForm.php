@@ -107,7 +107,7 @@ class SmartShopUserLoginForm extends BaseModel{
                     throw new \Exception($this->responseErrorInfo($userInfoModel));
                 }
             }else{
-                if(!$user->parent_id || $user->parent_id == GLOBAL_PARENT_ID){
+                if((!$user->parent_id || $user->parent_id == GLOBAL_PARENT_ID) && !$user->lock_parent){
                     if($inviterUser){
                         if($kpi->register($inviterUser, $user, $this->ss_store_id, $shopData['merchant_id'])){
                             $user->parent_id = $inviterUser->id;

@@ -14,6 +14,14 @@
         </div>
         <div class="diy-component-edit">
             <el-form label-width="100px" @submit.native.prevent>
+                <el-form-item label="背景颜色">
+                    <div style="display: flex;align-items: center">
+                        <el-color-picker @change="(row) => {row == null ? data.background = '#FFFFFF' : ''}"
+                                         size="small" v-model="data.background"></el-color-picker>
+                        <el-input size="small" style="width: 80px;margin-left: 5px;"
+                                  v-model="data.background"></el-input>
+                    </div>
+                </el-form-item>
                 <el-form-item label="背景图片">
                     <com-attachment v-model="data.pic_url" :multiple="false" :max="1">
                         <el-tooltip class="item" effect="dark" content="建议尺寸:750 * 287" placement="top">
@@ -142,6 +150,7 @@
             return {
                 chooseData: '',
                 data: {
+                    background: '',
                     send_data: '',
                     isPadding: false,
                     pic_url: '',

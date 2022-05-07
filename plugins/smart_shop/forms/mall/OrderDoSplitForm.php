@@ -108,7 +108,7 @@ class OrderDoSplitForm extends BaseModel{
         //如果支付用户手机号为空，就不分帐
         //手续费还要减去支付宝手续费
         $amount = !empty($order->pay_user_mobile) ? round((($mch->transfer_rate/100) * $unsplitAmount)/100, 2) : 0;
-        $amount = (float)max(0, $amount - $aliGotAmount);
+        $amount = round((float)max(0, $amount - $aliGotAmount), 2);
 
         $splitData['transfer_rate'] = $mch->transfer_rate;
         $splitData['receivers'] = isset($splitData['receivers']) && !empty($splitData['receivers']) ? $splitData['receivers'] : [];

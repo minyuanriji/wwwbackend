@@ -198,7 +198,7 @@
                     let infos = [], zk = parseInt(item.transfer_rate) > 0 ? (10 - (parseInt(item.transfer_rate)/100) * 10) : '-';
                     infos.push({name: "订单号", value: item.detail.order_no});
                     infos.push({name: "日期", value: item.created_at});
-                    infos.push({name: "折扣", value: zk.toFixed(1)});
+                    infos.push({name: "折扣", value: !isNaN(zk) ? zk.toFixed(1) : zk});
                     infos.push({name: "订单金额", value: item.detail.total_price});
                     infos.push({name: "实际支付", value: item.detail.pay_price});
                     infos.push({name: "分账金额", value: item.split_amount});

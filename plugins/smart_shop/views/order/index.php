@@ -195,7 +195,7 @@
             },
             orderInfos(item){
                 return function(item){
-                    let infos = [], zk = 10 - (parseInt(item.transfer_rate)/100) * 10;
+                    let infos = [], zk = parseInt(item.transfer_rate) > 0 ? (10 - (parseInt(item.transfer_rate)/100) * 10) : '-';
                     infos.push({name: "订单号", value: item.detail.order_no});
                     infos.push({name: "日期", value: item.created_at});
                     infos.push({name: "折扣", value: zk.toFixed(1)});

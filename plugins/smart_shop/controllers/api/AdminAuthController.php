@@ -1,6 +1,6 @@
 <?php
 
-namespace app\plugins\smart_shop\controllers\api\kpi_admin;
+namespace app\plugins\smart_shop\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\plugins\smart_shop\components\SmartShop;

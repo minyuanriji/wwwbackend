@@ -22,9 +22,9 @@ class MchApplyEasyForm extends BaseModel{
 
     public function rules(){
         return [
-            [['name', 'realname', 'mobile', 'province', 'city', 'province_id', 'city_id'], 'required'],
+            [['name', 'realname', 'mobile'], 'required'],
             [['name', 'realname', 'mobile', 'district', 'address'], 'trim'],
-            [['district_id', 'zk'], 'safe'],
+            [['district_id', 'zk', 'province', 'city', 'province_id', 'city_id'], 'safe'],
         ];
     }
 

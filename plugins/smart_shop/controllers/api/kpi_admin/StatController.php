@@ -2,6 +2,7 @@
 
 namespace app\plugins\smart_shop\controllers\api\kpi_admin;
 
+use app\plugins\smart_shop\controllers\api\AdminAuthController;
 use app\plugins\smart_shop\forms\api\kpi_admin\KpiAdminStatNewOrderForm;
 use app\plugins\smart_shop\forms\api\kpi_admin\KpiAdminStatRegisterForm;
 use app\plugins\smart_shop\forms\api\kpi_admin\KpiAdminStatShareForm;

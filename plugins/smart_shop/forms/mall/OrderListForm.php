@@ -47,7 +47,7 @@ class OrderListForm extends BaseModel{
                 }
             }
 
-            $selects = ["o.*", "m.mobile", "s.name", "s.cover_url", "m.transfer_rate"];
+            $selects = ["o.*", "m.mobile", "s.name", "s.cover_url", "m.transfer_rate as mch_transfer_rate"];
 
             $list = $query->select($selects)->asArray()->page($pagination, 10, $this->page)->all();
             $shop = new SmartShop();
@@ -97,7 +97,7 @@ class OrderListForm extends BaseModel{
                     ])->sum("income")), 2);
 
                     //折扣
-                    $item['zk'] = round(10 - ($item['transfer_rate']/100) * 10, 1);
+                    $item['zk'] = round(10 - ($item['mch_transfer_rate']/100) * 10, 1);
 
                     $list[$key1] = $item;
                 }

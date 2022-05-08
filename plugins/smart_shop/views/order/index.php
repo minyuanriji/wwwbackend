@@ -29,7 +29,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="折扣" width="90" align="center" prop="zk"></el-table-column>
+                <el-table-column label="折扣(补商汇)" width="90" align="center" prop="zk"></el-table-column>
                 <el-table-column label="智慧门店" width="180" >
                     <template slot-scope="scope">
                         {{scope.row.detail.merchant_name}}
@@ -195,9 +195,10 @@
             },
             orderInfos(item){
                 return function(item){
-                    let infos = [];
+                    let infos = [], zk = 10 - (parseInt(item.transfer_rate)/100) * 10;
                     infos.push({name: "订单号", value: item.detail.order_no});
                     infos.push({name: "日期", value: item.created_at});
+                    infos.push({name: "折扣", value: zk.toFixed(1)});
                     infos.push({name: "订单金额", value: item.detail.total_price});
                     infos.push({name: "实际支付", value: item.detail.pay_price});
                     infos.push({name: "分账金额", value: item.split_amount});

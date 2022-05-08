@@ -51,7 +51,7 @@ class SmartshopOrderSendAction extends BaseAction {
         $query->orderBy("o.updated_at ASC");
 
         $selects = ["o.id", "o.mall_id", "o.pay_price", "o.split_amount", "o.wx_got_amount", "o.ali_got_amount", "u.id as user_id", "s.mch_id", "s.id as store_id",
-            "svfs.give_type", "svfs.give_value", "m.transfer_rate"];
+            "svfs.give_type", "svfs.give_value", "m.transfer_rate", "o.transfer_rate as transfer_rate2"];
         $orders = $query->select($selects)->asArray()->limit(1)->all();
 
         if(!$orders) {
@@ -86,7 +86,9 @@ class SmartshopOrderSendAction extends BaseAction {
                 throw new \Exception("支付公司扣取手续费大于分账金额 ID:" . $order['id']);
             }
 
-            $giveValue = ShoppingVoucherHelper::calculateMchRateByTransferRate($order['transfer_rate']);
+            $transferRate = $order['transfer_rate2'] ? $order['transfer_rate2'] : $order['transfer_rate'];
+            $giveValue = ShoppingVoucherHelper::calculateMchRateByTransferRate($transferRate);
+
             $order['give_value'] = $giveValue;
             $money = $order['pay_price'] * (floatval($giveValue)/100);
 

@@ -9,6 +9,7 @@ use app\plugins\smart_shop\components\AlipaySdkApi;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\components\WechatPaySdkApi;
 use app\plugins\smart_shop\models\Order;
+use app\plugins\smart_shop\models\StoreSet;
 
 class OrderDoSplitForm extends BaseModel{
 
@@ -68,6 +69,26 @@ class OrderDoSplitForm extends BaseModel{
     }
 
     /**
+     * 获取服务费
+     * @param Mch $mch
+     * @param $ss_mch_id
+     * @param $ss_store_id
+     * @return float
+     */
+    public static function getTransferRate(Mch $mch, $ss_mch_id, $ss_store_id){
+        $set = StoreSet::findOne([
+            "bsh_mch_id"  => $mch->id,
+            "ss_mch_id"   => $ss_mch_id,
+            "ss_store_id" => $ss_store_id
+        ]);
+        $transferRate = $mch->transfer_rate;
+        if($set){
+            $transferRate = $set->transfer_rate;
+        }
+        return max(3, (float)$transferRate);
+    }
+
+    /**
      * 支付宝分账
      * @param Order $order
      * @param SmartShop $shop
@@ -107,10 +128,11 @@ class OrderDoSplitForm extends BaseModel{
         //计算手续费（元）
         //如果支付用户手机号为空，就不分帐
         //手续费还要减去支付宝手续费
-        $amount = !empty($order->pay_user_mobile) ? round((($mch->transfer_rate/100) * $unsplitAmount)/100, 2) : 0;
+        $transferRate = static::getTransferRate($mch, $detail['merchant_id'],  $detail['store_id']);
+        $amount = !empty($order->pay_user_mobile) ? round((($transferRate/100) * $unsplitAmount)/100, 2) : 0;
         $amount = round((float)max(0, $amount - $aliGotAmount), 2);
 
-        $splitData['transfer_rate'] = $mch->transfer_rate;
+        $splitData['transfer_rate'] = $transferRate;
         $splitData['receivers'] = isset($splitData['receivers']) && !empty($splitData['receivers']) ? $splitData['receivers'] : [];
 
         if(empty($splitData['out_request_no'])){
@@ -126,6 +148,7 @@ class OrderDoSplitForm extends BaseModel{
             $order->split_data     = json_encode($splitData);
             $order->ali_got_amount = $aliGotAmount;
             $order->split_amount   = $amount;
+            $order->transfer_rate  = $transferRate;
             if(!$order->save()){
                 throw new \Exception(json_encode($order->getErrors()));
             }
@@ -199,10 +222,12 @@ class OrderDoSplitForm extends BaseModel{
         //计算手续费（分）
         //如果支付用户手机号为空，就不分帐
         //手续费还要减去微信扣取的费用
-        $amount = !empty($order->pay_user_mobile) ? (int)(($mch->transfer_rate/100) * $unsplitAmount) : 0;
+        $transferRate = static::getTransferRate($mch, $detail['merchant_id'],  $detail['store_id']);
+
+        $amount = !empty($order->pay_user_mobile) ? (int)(($transferRate/100) * $unsplitAmount) : 0;
         $amount = (int)max(0, $amount - $wxGotAmount);
 
-        $splitData['transfer_rate'] = $mch->transfer_rate;
+        $splitData['transfer_rate'] = $transferRate;
         $splitData['receivers'] = isset($splitData['receivers']) && !empty($splitData['receivers']) ? $splitData['receivers'] : [];
         $splitData['transaction_id'] = $detail['transaction_id'];
 
@@ -228,6 +253,7 @@ class OrderDoSplitForm extends BaseModel{
             $order->wx_got_amount = $wxGotAmount/100;
             $order->split_data    = json_encode($splitData);
             $order->split_amount  = floatval($amount/100);
+            $order->transfer_rate = $transferRate;
             if(!$order->save()){
                 throw new \Exception(json_encode($order->getErrors()));
             }

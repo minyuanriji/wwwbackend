@@ -10,7 +10,29 @@ class ShoppingVoucherHelper{
      * @return float
      */
     public static function calculateMchRateByTransferRate($transferRate){
-        $value = (100 - $transferRate)/10;
+        $zk = (100 - $transferRate)/10;
+        $arr = [
+            "8.7" => 100,
+            "8.8" => 90,
+            "8.9" => 80,
+            "9"   => 70,
+            "9.1" => 60,
+            "9.2" => 50,
+            "9.3" => 40,
+            "9.4" => 30,
+            "9.5" => 20,
+            "9.6" => 10
+        ];
+        $giveValue = 0;
+        foreach($arr as $key => $value){
+            if($zk <= floatval($key)){
+                $giveValue = $value;
+                break;
+            }
+        }
+        return $giveValue;
+
+        /*$value = (100 - $transferRate)/10;
         if($value <= 8){ //8折以下都是100%
             $giveValue = 100;
         }elseif($value > 8 && $value <= 8.5){ //8折-8.5折，70%
@@ -26,7 +48,7 @@ class ShoppingVoucherHelper{
             $x = (0.3/0.5) * ($value - 9.5);
             $giveValue = intval((0.3 - $x) * 100);
         }
-        return $giveValue;
+        return $giveValue;*/
     }
 
 }

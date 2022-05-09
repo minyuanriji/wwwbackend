@@ -57,7 +57,8 @@ class StoreSetDetailForm extends BaseModel{
             }
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, [
-                "setting" => $set
+                "setting" => $set,
+                "mch_rate_list" => static::getMchRateList()
             ]);
         }catch (\Exception $e){
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
@@ -65,4 +66,18 @@ class StoreSetDetailForm extends BaseModel{
 
     }
 
+    public static function getMchRateList(){
+        return [
+            ['label' => '送10%红包', 'value' => '4'],
+            ['label' => '送20%红包', 'value' => '5'],
+            ['label' => '送30%红包', 'value' => '6'],
+            ['label' => '送40%红包', 'value' => '7'],
+            ['label' => '送50%红包', 'value' => '8'],
+            ['label' => '送60%红包', 'value' => '9'],
+            ['label' => '送70%红包', 'value' => '10'],
+            ['label' => '送80%红包', 'value' => '11'],
+            ['label' => '送90%红包', 'value' => '12'],
+            ['label' => '送100%红包', 'value' => '13']
+        ];
+    }
 }

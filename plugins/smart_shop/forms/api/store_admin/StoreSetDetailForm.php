@@ -68,16 +68,17 @@ class StoreSetDetailForm extends BaseModel{
 
     public static function getMchRateList(){
         return [
-            ['label' => '送10%红包', 'value' => '4'],
-            ['label' => '送20%红包', 'value' => '5'],
-            ['label' => '送30%红包', 'value' => '6'],
-            ['label' => '送40%红包', 'value' => '7'],
-            ['label' => '送50%红包', 'value' => '8'],
-            ['label' => '送60%红包', 'value' => '9'],
-            ['label' => '送70%红包', 'value' => '10'],
-            ['label' => '送80%红包', 'value' => '11'],
-            ['label' => '送90%红包', 'value' => '12'],
-            ['label' => '送100%红包', 'value' => '13']
+            ['label' => '不送红包，送100%积分', 'value' => '3'],
+            ['label' => '送10%红包，100%积分', 'value' => '4'],
+            ['label' => '送20%红包，100%积分', 'value' => '5'],
+            ['label' => '送30%红包，100%积分', 'value' => '6'],
+            ['label' => '送40%红包，100%积分', 'value' => '7'],
+            ['label' => '送50%红包，100%积分', 'value' => '8'],
+            ['label' => '送60%红包，100%积分', 'value' => '9'],
+            ['label' => '送70%红包，100%积分', 'value' => '10'],
+            ['label' => '送80%红包，100%积分', 'value' => '11'],
+            ['label' => '送90%红包，100%积分', 'value' => '12'],
+            ['label' => '送100%红包，100%积分', 'value' => '13']
         ];
     }
 }

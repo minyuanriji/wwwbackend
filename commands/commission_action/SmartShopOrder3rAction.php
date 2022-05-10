@@ -43,7 +43,7 @@ class SmartShopOrder3rAction extends Action{
                     $sleep = min(30, ++$sleep);
                 }
             } catch (\Exception $e) {
-                $this->controller->commandOut($e->getMessage());
+                $this->controller->commandOut("SmartShopOrder3rAction::run>>" . $e->getMessage());
             }
             $this->controller->sleep($sleep);
         }
@@ -58,12 +58,12 @@ class SmartShopOrder3rAction extends Action{
         $t = \Yii::$app->db->beginTransaction();
         try {
             if(empty($order['pay_user_mobile'])){
-                throw new \Exception("支付用户手机为空");
+                throw new \Exception("智慧门店小程序订单消费分佣>>订单[ID:".$order['id']."]>>支付用户手机为空");
             }
 
             $payUser = User::findOne(["mobile" => $order['pay_user_mobile']]);
             if(!$payUser){
-                throw new \Exception("无法获取到支付用户");
+                throw new \Exception("智慧门店小程序订单消费分佣>>订单[ID:".$order['id']."]>>无法获取到支付用户");
             }
 
             $parentDatas = $this->controller->getCommissionParents($payUser->id);
@@ -114,10 +114,10 @@ class SmartShopOrder3rAction extends Action{
                     "line" => $e->getLine()
                 ])
             ], ["id" => $order['id']]);
-            $this->controller->commandOut($e->getMessage());
+            $this->controller->commandOut("SmartShopOrder3rAction::processNew>>" . $e->getMessage());
         }
 
-        $this->controller->commandOut("智慧门店订单[ID:".$order['id']."]上下级分佣记录处理完毕");
+        $this->controller->commandOut("智慧门店小程序订单消费分佣>>订单[ID:".$order['id']."]>>上下级分佣记录处理完毕");
 
     }
 
@@ -142,7 +142,7 @@ class SmartShopOrder3rAction extends Action{
                 "rule_data_json"    => json_encode($ruleData)
             ]);
             if(!$priceLog->save()){
-                throw new \Exception(json_encode($priceLog->getErrors()));
+                throw new \Exception("智慧门店小程序订单消费分佣>>订单[ID:".$order['id']."]>>" . json_encode($priceLog->getErrors()));
             }
 
             $user = User::findOne($parentData['id']);
@@ -195,7 +195,7 @@ class SmartShopOrder3rAction extends Action{
         }
 
         if(!$rule){
-            throw new \Exception("无法获取分佣规则");
+            throw new \Exception("智慧门店小程序订单消费分佣>>订单[ID:".$order['id']."]>>无法获取分佣规则");
         }
 
         $chains = CommissionRuleChain::find()->where([

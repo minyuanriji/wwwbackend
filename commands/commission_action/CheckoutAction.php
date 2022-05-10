@@ -104,7 +104,7 @@ class CheckoutAction extends Action{
                                 if(!$priceLog->save()){
                                     throw new \Exception(json_encode($priceLog->getErrors()));
                                 }
-                                $this->controller->commandOut("[CheckoutAction]生成分佣记录 [ID:".$priceLog->id."]");
+                                $this->controller->commandOut("收款消费分佣>>ID:".$checkoutOrder['id'].">>生成分佣记录 [ID:".$priceLog->id."]");
 
                                 //收入记录
                                 $incomeLog = new IncomeLog([
@@ -121,7 +121,7 @@ class CheckoutAction extends Action{
                                     'updated_at'  => $checkoutOrder['updated_at']
                                 ]);
                                 if(!$incomeLog->save()){
-                                    throw new \Exception(json_encode($incomeLog->getErrors()));
+                                    throw new \Exception("收款消费分佣>>ID:".$checkoutOrder['id'].">>" .  json_encode($incomeLog->getErrors()));
                                 }
 
                                 User::updateAllCounters([
@@ -132,13 +132,13 @@ class CheckoutAction extends Action{
                                 $trans->commit();
                             }catch (\Exception $e){
                                 $trans->rollBack();
-                                $this->controller->commandOut($e->getMessage());
+                                $this->controller->commandOut("CheckoutAction::doNew>>" . $e->getMessage());
                             }
                         }
                     }
                 }
             }catch (\Exception $e){
-                $this->controller->commandOut($e->getMessage());
+                $this->controller->commandOut("CheckoutAction::doNew>>" . $e->getMessage());
             }
 
             MchCheckoutOrder::updateAll([
@@ -182,7 +182,7 @@ class CheckoutAction extends Action{
         }
 
         if(!$rule){
-            throw new \Exception("无法获取分佣规则");
+            throw new \Exception("收款消费分佣>>ID:".$checkoutOrder['id'].">>无法获取分佣规则");
         }
 
         $chains = CommissionRuleChain::find()->where([

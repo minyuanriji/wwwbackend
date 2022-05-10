@@ -50,14 +50,14 @@ class StoreAction extends Action{
                 //获取店铺用户信息及上级用户
                 $user = User::findOne($checkoutOrder['user_id']);
                 if (!$user)
-                    throw new \Exception("商铺用户[ID:".($user ? $user->id : 0)."]不存在");
+                    throw new \Exception("收款推荐分佣>>ID:".$checkoutOrder['id'].">>商铺用户[ID:".($user ? $user->id : 0)."]不存在");
 
                 $parent_user = User::findOne($user->parent_id);
                 if (!$parent_user)
-                    throw new \Exception("商铺上级用户[ID:".($parent_user ? $parent_user->id : 0)."]不存在");
+                    throw new \Exception("收款推荐分佣>>ID:".$checkoutOrder['id'].">>商铺上级用户[ID:".($parent_user ? $parent_user->id : 0)."]不存在");
 
                 if ($parent_user->role_type == 'user')
-                    throw new \Exception("普通用户不分佣");
+                    throw new \Exception("收款推荐分佣>>ID:".$checkoutOrder['id'].">>普通用户不分佣");
 
                 //获取当前店铺分佣规则
                 $query = CommissionRules::find()->alias("cr");
@@ -82,7 +82,7 @@ class StoreAction extends Action{
                     ])->select(["cr.commission_type", "crc.level", "crc.commisson_value"])->asArray()->one();
 
                     if (!$commission_res) {
-                        $this->controller->commandOut('没有分佣规则');
+                        $this->controller->commandOut("收款推荐分佣>>ID:".$checkoutOrder['id'].">>没有分佣规则");
                         continue;
                     }
                 }
@@ -128,9 +128,9 @@ class StoreAction extends Action{
                                 "rule_data_json"    => json_encode($commission_res)
                             ]);
                             if(!$priceLog->save()){
-                                throw new \Exception(json_encode($priceLog->getErrors()));
+                                throw new \Exception("收款推荐分佣>>ID:".$checkoutOrder['id'].">>" . json_encode($priceLog->getErrors()));
                             }
-                            $this->controller->commandOut("[StoreAction]生成分佣记录 [ID:".$priceLog->id."]");
+                            $this->controller->commandOut("收款推荐分佣>>ID:".$checkoutOrder['id'].">>[StoreAction]生成分佣记录 [ID:".$priceLog->id."]");
 
                             //收入记录
                             $incomeLog = new IncomeLog([
@@ -158,15 +158,15 @@ class StoreAction extends Action{
                             $trans->commit();
                         }catch (\Exception $e){
                             $trans->rollBack();
-                            $this->controller->commandOut($e->getMessage());
-                            $this->controller->commandOut("line:" . $e->getLine());
+                            $this->controller->commandOut("StoreAction::doNew>>" . $checkoutOrder['id'].">>" . $e->getMessage());
+                            $this->controller->commandOut("StoreAction::doNew>>line:" . $e->getLine());
                         }
                     }
                 }
 
             }catch (\Exception $e){
-                $this->controller->commandOut($e->getMessage());
-                $this->controller->commandOut("line:" . $e->getLine());
+                $this->controller->commandOut("StoreAction::doNew>>" . $e->getMessage());
+                $this->controller->commandOut("StoreAction::doNew>>line:" . $e->getLine());
             }
 
             MchCheckoutOrder::updateAll([

@@ -44,7 +44,7 @@ class SmartShopOrderAction extends Action{
                     $sleep = min(30, ++$sleep);
                 }
             }catch (\Exception $e){
-                $this->controller->commandOut($e->getMessage());
+                $this->controller->commandOut("SmartShopOrderAction::run>>" . $e->getMessage());
             }
             $this->controller->sleep($sleep);
         }
@@ -60,10 +60,10 @@ class SmartShopOrderAction extends Action{
         try {
             $parent = User::findOne($order['parent_id']);
             if (!$parent || $parent->is_delete){
-                throw new \Exception("推荐人[ID:".$order['parent_id']."]不存在");
+                throw new \Exception("智慧门店小程序订单推荐分佣>>订单[ID:".$order['id']."]>>推荐人[ID:".$order['parent_id']."]不存在");
             }
             if ($parent->role_type == 'user'){
-                throw new \Exception("普通用户不分佣");
+                throw new \Exception("智慧门店小程序订单推荐分佣>>订单[ID:".$order['id']."]>>普通用户不分佣");
             }
 
             //获取当前店铺分佣规则
@@ -86,7 +86,7 @@ class SmartShopOrderAction extends Action{
                     ['cr.is_delete'         => 0],
                 ])->select(["cr.commission_type", "crc.level", "crc.commisson_value"])->asArray()->one();
                 if (!$commissionRule) {
-                    throw new \Exception("没有分佣规则");
+                    throw new \Exception("智慧门店小程序订单推荐分佣>>订单[ID:".$order['id']."]>>没有分佣规则");
                 }
             }
 
@@ -98,7 +98,7 @@ class SmartShopOrderAction extends Action{
             $price = $commissionRule['commisson_value'] * $commissionRule['profit_price'];
 
             if($price <= 0){
-                throw new \Exception("分佣金额小于0");
+                throw new \Exception("智慧门店小程序订单推荐分佣>>订单[ID:".$order['id']."]>>分佣金额小于0");
             }
 
             $priceLog = CommissionSmartshopPriceLog::findOne([
@@ -127,10 +127,10 @@ class SmartShopOrderAction extends Action{
                     "line" => $e->getLine()
                 ])
             ], ["id" => $order['id']]);
-            $this->controller->commandOut($e->getMessage());
+            $this->controller->commandOut("SmartShopOrderAction::processNew>>" . $e->getMessage());
         }
 
-        $this->controller->commandOut("智慧门店订单[ID:".$order['id']."]直推分佣记录处理完毕");
+        $this->controller->commandOut("智慧门店小程序订单推荐分佣>>订单[ID:".$order['id']."]>>直推分佣记录处理完毕");
     }
 
     /**
@@ -153,7 +153,7 @@ class SmartShopOrderAction extends Action{
                 "rule_data_json"    => json_encode($commissionRule)
             ]);
             if(!$priceLog->save()){
-                throw new \Exception(json_encode($priceLog->getErrors()));
+                throw new \Exception("智慧门店小程序订单推荐分佣>>订单[ID:".$order['id']."]>>".json_encode($priceLog->getErrors()));
             }
 
             $user = User::findOne($order['parent_id']);

@@ -206,7 +206,7 @@ class AlibabaDistributionOrderNewForm extends BaseModel{
             $mainData['shopping_voucher']['remaining']         -= $orderItem['sv_express_price'];
         }else{
             $remaining = $mainData['shopping_voucher']['remaining'];
-            $decodePrice = ($remaining/static::getShoppingVoucherDecodeExpressRate());
+            $decodePrice = $remaining * static::getShoppingVoucherDecodeExpressRate();
             $orderItem['shopping_voucher_express_decode_price'] = $decodePrice;
             $orderItem['shopping_voucher_express_use_num']      = $remaining;
             $orderItem['sv_express_price']                     -= $remaining;

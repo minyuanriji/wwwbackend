@@ -38,6 +38,11 @@ class MchReviewDoForm extends BaseModel{
                 throw new \Exception("申请记录不存在");
             }
 
+            if(floatval($this->settle_discount) < 7 || floatval($this->settle_discount) > 9.7){
+                throw new \Exception("折扣只能在7至9.7范围之间");
+            }
+
+
             $applyData = !empty($applyModel->json_apply_data) ? json_decode($applyModel->json_apply_data, true) : [];
             $applyData['bind_mobile'] = $this->bind_mobile;
             $applyData['store_mch_common_cat_id'] = $this->store_mch_common_cat_id;

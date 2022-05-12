@@ -14,6 +14,7 @@ class FromFreeEditForm extends BaseModel{
     public $end_at;
     public $score_enable;
     public $score_give_settings;
+    public $parent_award_enable;
     public $number;
 
     public function rules(){
@@ -22,7 +23,7 @@ class FromFreeEditForm extends BaseModel{
             [['id'], 'integer'],
             [['number'], 'number'],
             [['start_at', 'end_at'], 'string'],
-            [['score_give_settings', 'score_enable', 'number'], 'safe']
+            [['score_give_settings', 'score_enable', 'parent_award_enable', 'number'], 'safe']
         ];
     }
 
@@ -56,6 +57,7 @@ class FromFreeEditForm extends BaseModel{
             $fromFree->start_at      = strtotime($this->start_at);
             $fromFree->end_at        = strtotime($this->end_at);
             $fromFree->enable_score  = $this->score_enable == "true" ? 1 : 0;
+            $fromFree->enable_parent_award  = $this->parent_award_enable == "true" ? 1 : 0;
             $fromFree->score_setting = is_array($this->score_give_settings) ? json_encode($this->score_give_settings) : '';
             $fromFree->number        = (int)$this->number;
 

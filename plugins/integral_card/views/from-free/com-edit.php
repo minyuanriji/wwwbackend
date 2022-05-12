@@ -1,7 +1,7 @@
 <template id="com-edit">
     <div class="com-edit">
         <el-dialog width="30%" title="设置积分赠送" :visible.sync="dialogVisible" :close-on-click-modal="false" @close="close">
-            <el-form v-if="formData" ref="formData" :rules="formRule" label-width="15%" :model="formData" size="small">
+            <el-form v-if="formData" ref="formData" :rules="formRule" label-width="20%" :model="formData" size="small">
 
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="formData.name" placeholder=""></el-input>
@@ -39,6 +39,14 @@
                 <el-form-item label="状态">
                     <el-switch
                             v-model="formData.score_enable"
+                            active-text="启用"
+                            inactive-text="关闭">
+                    </el-switch>
+                </el-form-item>
+
+                <el-form-item label="上级同步奖励">
+                    <el-switch
+                            v-model="formData.parent_award_enable"
                             active-text="启用"
                             inactive-text="关闭">
                     </el-switch>
@@ -94,6 +102,7 @@
                         number:0,
                         score_enable: false,
                         enable_score: 0,
+                        enable_parent_award: 0,
                         start_at: '',
                         end_at: '',
                         score_give_settings: {
@@ -105,6 +114,7 @@
                         }
                     }
                     formData['score_enable'] = formData.enable_score == 1 ? true : false;
+                    formData['parent_award_enable'] = formData.enable_parent_award == 1 ? true : false;
                     this.formData = JSON.parse(JSON.stringify(formData));
                 },
                 deep:true // 必须加这个属性

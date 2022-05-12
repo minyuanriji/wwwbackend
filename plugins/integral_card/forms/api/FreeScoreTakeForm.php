@@ -57,6 +57,11 @@ class FreeScoreTakeForm extends BaseModel{
                     $scoreSetting['source_type']  = 'from_free';
                     $scoreSetting['source_id']    = $fromFree->id;
                     $res = Integral::addIntegralPlan(\Yii::$app->user->id, $scoreSetting, '免费领积分', '0');
+
+                    if($fromFree->enable_parent_award){ //上级奖励
+                        $res = Integral::addIntegralPlan(\Yii::$app->user->identity->parent_id, $scoreSetting, '免费领积分', '0');
+                    }
+
                 }else{
                     throw new \Exception($this->responseErrorMsg($sendLog));
                 }

@@ -76,13 +76,14 @@ class IntegralRecord extends BaseActiveRecord{
             $model->loadDefaultValues();
             $model->attributes = $log;
 
+            $res = $model->save();
+            if($res === false){
+                throw new Exception($model->getErrorMessage());
+            }
+
             $wallet = User::findOne($log['user_id']);
 
             if($log['controller_type'] == 1){
-                $res = $model->save();
-                if($res === false){
-                    throw new Exception($model->getErrorMessage());
-                }
                 $res = UserIntegralForm::record($wallet, $model);
                 if($res['code'] != ApiCode::CODE_SUCCESS){
                     throw new \Exception($res['msg']);
@@ -99,11 +100,6 @@ class IntegralRecord extends BaseActiveRecord{
                     ]);
                     $modifyForm->modify($wallet);
                 }else{
-
-                    $res = $model->save();
-                    if($res === false){
-                        throw new Exception($model->getErrorMessage());
-                    }
 
                     $wallet->score       += $log['money'];
                     $wallet->total_score = $wallet->static_score + $wallet->score;

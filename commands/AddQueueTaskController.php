@@ -18,8 +18,7 @@ class AddQueueTaskController extends Controller {
                 //赠送积分任务
                 \Yii::$app->queue->delay(1)->push(new SendIntegralJob());
                 //echo "{$date} SendIntegralJob:queue added success\n";
-
-                sleep(5);
+                sleep(6);
 
             }catch(Exception $e){
                 echo $e->getMessage() . "\n";

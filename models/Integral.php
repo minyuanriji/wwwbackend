@@ -137,22 +137,22 @@ class Integral extends BaseActiveRecord
      */
     public static function sendIntegral(){
 
-        $transaction = Yii::$app->db->beginTransaction();
-        try{
-            //获取计划执行时间小于当前时间，状态未结束的计划
-            $now = time();
+        //获取计划执行时间小于当前时间，状态未结束的计划
+        $now = time();
 
-            $whereStr = "(period > finish_period)"; //周期数未达到
-            $whereStr.= " AND status IN (0, 1)"; //状态为未发放，发放中
-            $whereStr.= " AND next_publish_time<'".time()."'";
-            $query = static::find()->where($whereStr)->limit(10);
-            $planList = $query->orderBy([
-                'finish_period'     => 'ASC',
-                'next_publish_time' => 'ASC',
-                'updated_at'        => 'ASC'
-            ])->all();
+        $whereStr = "(period > finish_period)"; //周期数未达到
+        $whereStr.= " AND `status` IN (0, 1)"; //状态为未发放，发放中
+        $whereStr.= " AND next_publish_time<'".time()."'";
+        $query = static::find()->where($whereStr)->limit(5);
+        $planList = $query->orderBy([
+            'finish_period'     => 'ASC',
+            'next_publish_time' => 'ASC',
+            'updated_at'        => 'ASC'
+        ])->all();
 
-            if(!empty($planList)){
+        if(!empty($planList)){
+            $transaction = Yii::$app->db->beginTransaction();
+            try{
                 foreach($planList as $plan){
                     if($plan['controller_type'] == 0 && $plan['period_unit'] == 'month'){
                         if($now < $plan['next_publish_time']){
@@ -169,15 +169,15 @@ class Integral extends BaseActiveRecord
                         $before_money = $plan['type'] == self::TYPE_ALWAYS ? $wallet['static_score'] : $wallet['dynamic_score'];
                     }
                     // 按充值日期过期
-    //                $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
+//                $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01')));
 
                     // 按每个月的1号 凌晨12点失效
                     if($plan['effective_days'] >= 30){
                         $date = date('Y-m-d',time());
                         $day = date("t",strtotime($date));
                         $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'. $day .'days',strtotime(date('Y-m-01'))) - 1;
-    //                    \Yii::$app->redis -> set('key1',date('m'));
-    //                    $expire_time = $expire_time - 10;
+//                    \Yii::$app->redis -> set('key1',date('m'));
+//                    $expire_time = $expire_time - 10;
                     }else{
                         $expire_time = $plan['type'] == self::TYPE_ALWAYS ? 0 : strtotime('+'.$plan['effective_days'].'days',strtotime(date('Y-m-01'))) - 1;
                     }
@@ -198,12 +198,12 @@ class Integral extends BaseActiveRecord
                                 break;
                             case 'month':
                                 //获取每次充卡开始时间 到 满一个月发放时间
-    //                           $plan->next_publish_time = strtotime('+ 1 month',$now);
+//                           $plan->next_publish_time = strtotime('+ 1 month',$now);
 
                                 //每个月1号开始发送积分
                                 $plan->next_publish_time = strtotime(date('Y-m-01',strtotime('+ 1 month')));
                                 //测试
-    //                             $plan->next_publish_time = strtotime('+ 2 minutes',$now);
+//                             $plan->next_publish_time = strtotime('+ 2 minutes',$now);
                                 break;
                         }
                     }
@@ -229,20 +229,23 @@ class Integral extends BaseActiveRecord
                     // 写入日志
                     $flag = User::getOneUserFlag($plan['user_id']);
                     if(!empty($flag)){
-                        if(!IntegralRecord::record($record,$plan['parent_id'])){
+                        if(!IntegralRecord::record($record,$plan['parent_id'], false)){
                             throw new Exception(IntegralRecord::getError());
                         }
                     }
-
-                    $transaction->commit();
                 }
+
+
+                $transaction->commit();
+
+            }catch(\Exception $e){
+                $transaction->rollBack();
+                \Yii::$app->redis -> set('show1',$e->getMessage());
+                self::$error = $e->getMessage();
+                return false;
             }
-        }catch(\Exception $e){
-            $transaction->rollBack();
-            \Yii::$app->redis -> set('show1',$e->getMessage());
-            self::$error = $e->getMessage();
-            return false;
         }
+
         return true;
     }
 

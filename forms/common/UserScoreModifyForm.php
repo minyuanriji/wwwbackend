@@ -34,6 +34,7 @@ class UserScoreModifyForm extends BaseModel{
         }else{ //减少
             $user->static_score = max(0, $currentScore - floatval($this->score));
         }
+        $user->total_score = $user->static_score + $user->score;
         if(!$user->save()){
             throw new \Exception(json_encode($user->getErrors()));
         }

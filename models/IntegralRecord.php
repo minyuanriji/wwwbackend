@@ -1,13 +1,9 @@
 <?php
 namespace app\models;
 
-use app\component\jobs\ParentChangeJob;
 use app\core\ApiCode;
 use app\forms\common\UserIntegralForm;
-use app\models\Mall;
-use app\models\User;
-use app\models\RelationSetting;
-use app\logic\RelationLogic;
+use app\forms\common\UserScoreModifyForm;
 use Exception;
 use Yii;
 
@@ -73,62 +69,70 @@ class IntegralRecord extends BaseActiveRecord{
      * @param array $log
      * @return void
      */
-    public static function record(array $log, $parentid=0){
-        $transaction = Yii::$app->db->beginTransaction();
+    public static function record(array $log, $parentid=0, $trans = true){
+        $trans && ($transaction = Yii::$app->db->beginTransaction());
         try{
             $model = new self();
             $model->loadDefaultValues();
             $model->attributes = $log;
-            $res = $model->save();
-            if($res === false){
-                throw new Exception($model->getErrorMessage());
-            }
+
             $wallet = User::findOne($log['user_id']);
 
             if($log['controller_type'] == 1){
+                $res = $model->save();
+                if($res === false){
+                    throw new Exception($model->getErrorMessage());
+                }
                 $res = UserIntegralForm::record($wallet, $model);
                 if($res['code'] != ApiCode::CODE_SUCCESS){
                     throw new \Exception($res['msg']);
                 }
             }else{
-                switch($log['type']){
-                    case Integral::TYPE_ALWAYS:
-                        $wallet->static_score += $log['money'];
-                        break;
-                    case Integral::TYPE_DYNAMIC:
-                        $wallet->score += $log['money'];
-                        break;
-                }
-                //$wallet->dynamic_score = $wallet->score;
-                $wallet->total_score   = $wallet->static_score + $wallet->score;
+                //永久积分处理
+                if(Integral::TYPE_ALWAYS == $log['type']){
+                    $modifyForm = new UserScoreModifyForm([
+                        "type"        => 1,
+                        "score"       => $log['money'],
+                        "desc"        => $log['desc'],
+                        "custom_desc" => $log['desc'],
+                        "source_type" => $log['source_table']
+                    ]);
+                    $modifyForm->modify($wallet);
+                }else{
 
-                //绑定积分券所属上级
-                $beforeParentId = $wallet['parent_id'];
-                if(!$wallet['parent_id'] && $parentid > 0){
-                    $resx = self::checkBindParent($wallet,$parentid);
-                    if($resx){
-                        $wallet->parent_id        = $parentid;
-                        $wallet->second_parent_id = $resx['parent_id'];
-                        $wallet->third_parent_id  = $resx['second_parent_id'];
-                        $wallet->junior_at        = time();
+                    $res = $model->save();
+                    if($res === false){
+                        throw new Exception($model->getErrorMessage());
+                    }
+
+                    $wallet->score       += $log['money'];
+                    $wallet->total_score = $wallet->static_score + $wallet->score;
+
+                    //绑定积分券所属上级
+                    $beforeParentId = $wallet['parent_id'];
+                    if(!$wallet['parent_id'] && $parentid > 0){
+                        $resx = self::checkBindParent($wallet,$parentid);
+                        if($resx){
+                            $wallet->parent_id        = $parentid;
+                            $wallet->second_parent_id = $resx['parent_id'];
+                            $wallet->third_parent_id  = $resx['second_parent_id'];
+                            $wallet->junior_at        = time();
+                        }
+                    }
+
+                    //修改经销商的余额、积分(还有等级)
+                    $resxx = $wallet->save(false);
+                    if($resxx === false) {
+                        throw new Exception($wallet->getErrorMessage());
                     }
                 }
-
-                //修改经销商的余额、积分(还有等级)
-                $resxx = $wallet->save(false);
-                if($resxx === false) {
-                    throw new Exception($wallet->getErrorMessage());
-                }/*else{
-                    if($beforeParentId == 0 && $parentid > 0){ //变更上下级归属
-                        $wallet->bindParent($beforeParentId);
-                    }
-                }*/
             }
 
-            $transaction->commit();
+            $trans && $transaction->commit();
+
             return true;
         }catch(\Exception $e){
-            $transaction->rollBack();
+            $trans && $transaction->rollBack();
             self::$error = $e->getMessage();
             return false;
         }

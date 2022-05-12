@@ -47,6 +47,7 @@ class GoodsBase extends BaseModel
     public $goods_price_update_type;
     public $cat_id;
     public $MallMemberLevel = [];
+
     /**
      * @var GoodsCommon
      */

@@ -124,6 +124,8 @@ class CommonGoods extends BaseModel
         }
         $detail = array_merge($detail, $this->transGoodsFromAttr($goods));
 
+        $detail['order_prompt'] = (int)$detail['order_prompt'];
+
         //xuyaoxiang,2020/08/27修改过
         $detail['goods_warehouse'] = [
             'goods_id' => $goods->id,
@@ -269,6 +271,7 @@ class CommonGoods extends BaseModel
                 'return_red_envelopes' => 0,
                 'return_commission' => 0,
             ];
+
 
         //联创合伙人
         $detail['lianc_user_info'] = [];

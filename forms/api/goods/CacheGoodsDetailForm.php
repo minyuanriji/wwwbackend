@@ -92,6 +92,9 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
             $info['use_attr'] = $goods->use_attr;
             $info['goods_stock'] = $goods->goods_stock;
 
+            $info['order_prompt'] = $goods->order_prompt;
+            $info['order_prompt_content'] = $goods->order_prompt_content;
+
             $info['max_deduct_integral'] = $goods->max_deduct_integral;
 
             //可抵金豆券大于0才显示金豆券会员价

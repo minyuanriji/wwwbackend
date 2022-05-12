@@ -88,6 +88,8 @@ abstract class BaseGoodsEdit extends BaseModel
     public $goods_supplier;
     public $enable_upgrade_user_role;
     public $upgrade_user_role_type;
+    public $order_prompt;
+    public $order_prompt_content;
 
     //联创
     public $lianc_user_id;
@@ -135,7 +137,7 @@ abstract class BaseGoodsEdit extends BaseModel
                 'confine_count', 'give_score', 'give_score_type', 'forehead_score_type',
                 'accumulative', 'freight_id', 'pieces', 'is_level_alone', 'is_default_services', 'goods_warehouse_id',
                 'mch_id', 'form_id', 'is_area_limit', 'confine_order_count',
-                'is_vip_card_goods', 'use_virtual_sales', 'is_show_sales'], 'integer'],
+                'is_vip_card_goods', 'use_virtual_sales', 'is_show_sales', 'order_prompt'], 'integer'],
             [['goods_no', 'rebate', 'app_share_title', 'app_share_pic', 'attr_default_name'], 'string'],
             [['forehead', 'id','fulfil_price','full_relief_price','max_deduct_integral','enable_integral','enable_score','is_order_paid', 'is_order_sales'], 'number'],
             [['cats', 'mchCats', 'services', 'cards', 'attr', 'attrGroups', 'member_price',
@@ -146,7 +148,7 @@ abstract class BaseGoodsEdit extends BaseModel
                 'attr_setting_type', 'goods_weight', 'is_area_limit', 'form_id'], 'default', 'value' => 0],
             [['app_share_title', 'app_share_pic', 'attr_default_name'], 'default', 'value' => ''],
             [['sort'], 'default', 'value' => 100],
-            [['area_limit','goods_brand','goods_supplier'], 'trim'],
+            [['area_limit','goods_brand','goods_supplier', 'order_prompt_content'], 'trim'],
             [['confine_count', 'confine_order_count'], 'default', 'value' => -1],
             [['forehead_score_type', 'give_score_type', 'is_level',
                 'is_default_services'], 'default', 'value' => 1],
@@ -432,6 +434,8 @@ abstract class BaseGoodsEdit extends BaseModel
         $goods->is_order_paid = $this->is_order_paid;
         $goods->is_order_sales = $this->is_order_sales;
         $goods->profit_price = (float)$this->profit_price;
+        $goods->order_prompt = (int)$this->order_prompt;
+        $goods->order_prompt_content = $this->order_prompt_content;
 
         $goods->lianc_user_id = $this->lianc_user_id;
         $goods->lianc_commission_type = $this->lianc_commission_type;

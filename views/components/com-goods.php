@@ -195,6 +195,25 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             </el-row>
                         </el-card>
 
+                        <!-- 下单前提示 -->
+                        <el-card shadow="never" class="mt-24">
+                            <div slot="header">
+                                <span>下单提示</span>
+                            </div>
+                            <el-row>
+                                <el-col :xl="12" :lg="16">
+                                    <el-form-item label=" ">
+                                        <el-switch active-text="开启"
+                                                   inactive-text="关闭" :active-value="1" :inactive-value="0" v-model="ruleForm.order_prompt"></el-switch>
+                                    </el-form-item>
+                                    <el-form-item label="提示内容">
+                                        <el-input v-model="ruleForm.order_prompt_content" type="textarea" :rows="3" placeholder="请输入内容" v-model="textarea"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+
+                        </el-card>
+
                         <!-- 联创合伙人 -->
                         <el-card shadow="never" class="mt-24">
                             <div slot="header">
@@ -1373,6 +1392,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
         },
         data() {
             let ruleForm = {
+                order_prompt:0, //下单提示
+                order_prompt_content: '',
                 labels: [],
                 attr: [],
                 cats: [],

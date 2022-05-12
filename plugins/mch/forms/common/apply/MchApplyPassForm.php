@@ -235,7 +235,7 @@ class MchApplyPassForm extends BaseModel{
         $mch->realname            = $applyModel->realname;
         $mch->mobile              = $this->bind_mobile;
         $mch->updated_at          = time();
-        $mch->transfer_rate       = strval((10 - $settleDiscount) * 10);
+        $mch->transfer_rate       = max(3, strval((10 - $settleDiscount) * 10));
         $mch->integral_fee_rate   = $mch->transfer_rate <= 10 ? 10 : 0;
         $mch->is_special          = $isSpecialDiscount;
         $mch->special_rate        = $mch->transfer_rate;

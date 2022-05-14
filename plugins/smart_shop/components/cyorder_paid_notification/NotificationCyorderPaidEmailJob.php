@@ -1,6 +1,6 @@
 <?php
 
-namespace app\plugins\smart_shop\components\jobs;
+namespace app\plugins\smart_shop\components\cyorder_paid_notification;
 
 use yii\base\Component;
 use yii\queue\JobInterface;

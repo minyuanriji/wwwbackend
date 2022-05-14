@@ -1,6 +1,11 @@
 <?php
+/*
+ * @link:http://www.@copyright: Copyright (c) @Author: Mr.Lin
+ * @Email: 746027209@qq.com
+ * @Date: 2021-07-06 14:13
+ */
 
-namespace app\plugins\smart_shop\components\wechat_msg_template;
+namespace app\plugins\smart_shop\components\cyorder_paid_notification;
 
 use app\notification\wechat_template_message\WechatTemplateMessageNew;
 

@@ -1,9 +1,10 @@
 <?php
 namespace app\canal\smart_shop\table;
 
-use app\plugins\smart_shop\components\jobs\NotificationCyorderPaidEmailJob;
-use app\plugins\smart_shop\components\jobs\NotificationCyorderPaidMobileJob;
-use app\plugins\smart_shop\components\jobs\NotificationCyorderPaidWechatJob;
+
+use app\plugins\smart_shop\components\cyorder_paid_notification\NotificationCyorderPaidEmailJob;
+use app\plugins\smart_shop\components\cyorder_paid_notification\NotificationCyorderPaidMobileJob;
+use app\plugins\smart_shop\components\cyorder_paid_notification\NotificationCyorderPaidWechatJob;
 
 class Cyorder{
 

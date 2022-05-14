@@ -8,13 +8,17 @@
 namespace app\commands;
 
 
-use app\plugins\smart_shop\components\jobs\NotificationCyorderPaidWechatJob;
+
+use app\models\Mall;
+use app\plugins\smart_shop\components\cyorder_paid_notification\NotificationCyorderPaidMobileJob;
 
 class DebugController extends BaseCommandController{
 
     public function actionIndex(){
 
-        (new NotificationCyorderPaidWechatJob([
+        \Yii::$app->setMall(Mall::findOne(5));
+
+        (new NotificationCyorderPaidMobileJob([
             "mall_id"  => 5,
             "order_id" => 4448
         ]))->execute(null);

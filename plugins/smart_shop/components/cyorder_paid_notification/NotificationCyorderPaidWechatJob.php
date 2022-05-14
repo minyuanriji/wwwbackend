@@ -1,9 +1,8 @@
 <?php
 
-namespace app\plugins\smart_shop\components\jobs;
+namespace app\plugins\smart_shop\components\cyorder_paid_notification;
 
 use app\plugins\smart_shop\components\SmartShop;
-use app\plugins\smart_shop\components\wechat_msg_template\CyorderPaidMsgTemplate;
 use app\plugins\smart_shop\helpers\NotificationHelper;
 use yii\base\Component;
 use yii\queue\JobInterface;
@@ -50,7 +49,6 @@ class NotificationCyorderPaidWechatJob extends Component implements JobInterface
                     "remark"     => "请及时处理！"
                 ]))->send($setting['data']['openid']);
             }
-
         }catch (\Exception $e){
             echo "NotificationCyorderPaidWechatJob::execute\n";
             echo "error:" . $e->getMessage() . "\n";

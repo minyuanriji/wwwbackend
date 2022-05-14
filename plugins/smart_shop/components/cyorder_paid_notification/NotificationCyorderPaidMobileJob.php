@@ -2,6 +2,7 @@
 
 namespace app\plugins\smart_shop\components\cyorder_paid_notification;
 
+use app\helpers\sms\NewOrderMessage;
 use app\logic\AppConfigLogic;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\helpers\NotificationHelper;
@@ -13,6 +14,8 @@ class NotificationCyorderPaidMobileJob extends Component implements JobInterface
 
     public $mall_id;
     public $order_id;
+
+    private $smsConfig;
 
     public function execute($queue){
         try {
@@ -39,7 +42,8 @@ class NotificationCyorderPaidMobileJob extends Component implements JobInterface
 
             $setting = NotificationHelper::getMobile($this->mall_id, $store['merchant_id'], $store['ss_store_id']);
             if($setting && $setting['status'] && $setting['enable']){
-                $this->getSms()->send($setting['data']['mobile'], sprintf("您有一条新的订单，订单号:%s", $detail['order_no']));
+                $message = new NewOrderMessage($detail['order_no'], $this->smsConfig['order']);
+                $res = $this->getSms()->send($setting['data']['mobile'], $message);
             }
 
         }catch (\Exception $e){
@@ -84,6 +88,8 @@ class NotificationCyorderPaidMobileJob extends Component implements JobInterface
                 'sign_name'         => $smsConfig['template_name'],
             ];
         }
+
+        $this->smsConfig = $smsConfig;
 
         return new EasySms($config);
     }

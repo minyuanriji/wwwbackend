@@ -4,6 +4,12 @@ namespace app\notification\wechat_template_message;
 use app\models\Wechat;
 use yii\base\Component;
 
+/***
+ * 微信公众号模板消息
+ * Class CashNotificationWeTplMsg
+ * @package app\notification\wechat_template_message
+ * @deprecated 后续用app\notification\wechat_template_message\WechatTemplateMessageNew
+ */
 abstract class WechatTemplateMessage extends Component{
 
     public $mall_id;

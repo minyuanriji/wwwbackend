@@ -1,6 +1,6 @@
 <?php
 
-namespace app\canal\table;
+namespace app\canal\myrj\table;
 
 use app\notification\ReservationSuccessNotification;
 use app\plugins\hotel\models\HotelOrder;

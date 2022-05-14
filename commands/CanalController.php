@@ -1,29 +1,25 @@
 <?php
 namespace app\commands;
 
-use app\models\Store;
-use app\models\User;
-use app\models\UserInfo;
-use app\models\Wechat;
-use app\plugins\mch\models\Mch;
+use app\models\Mall;
 use Com\Alibaba\Otter\Canal\Protocol\EventType;
 use Com\Alibaba\Otter\Canal\Protocol\RowChange;
 use xingwenge\canal_php\CanalClient;
 use xingwenge\canal_php\CanalConnectorFactory;
-use xingwenge\canal_php\Fmt;
-use yii\console\Controller;
-use Com\Alibaba\Otter\Canal\Protocol\Entry;
 
-class CanalController extends Controller
+class CanalController extends BaseCommandController
 {
 
     public function actionIndex()
     {
-        echo date("Y-m-d H:i:s") . " Canal守候程序启动...完成\n";
+        $this->commandOut("CanalController start");
+
+        \Yii::$app->setMall(Mall::findOne(5));
 
         try {
-            $client = CanalConnectorFactory::createClient(CanalClient::TYPE_SOCKET_CLUE);
+            $client = CanalConnectorFactory::createClient(CanalClient::TYPE_SOCKET);
             # $client = CanalConnectorFactory::createClient(CanalClient::TYPE_SWOOLE);
+
             $canalConf = \Yii::$app->params['canal'];
             $client->connect($canalConf['host'], $canalConf['port']);
             $client->checkValid();
@@ -32,7 +28,7 @@ class CanalController extends Controller
 
             # $client->subscribe("1001", "example", "db_name.tb_name"); # 设置过滤
 
-            $allowSchemas = $canalConf['allows'];
+            $allowSchemas = array_keys($canalConf['allows']);
 
             while (true) {
                 $message = $client->get(100);
@@ -47,11 +43,16 @@ class CanalController extends Controller
                             continue;
                         }
 
+                        $schema = $header->getSchemaName();
                         $tableName = $header->getTableName();
                         $tablePrefix = \Yii::$app->getDb()->tablePrefix;
 
                         if(empty($tableName))
                             continue;
+
+                        if($canalConf['allows'][$schema] == "smart_shop"){
+                            $tablePrefix = "tplay_";
+                        }
 
                         $parts = explode("_", str_replace("-", "_", str_replace($tablePrefix, "", $tableName)));
                         $className = "";
@@ -59,7 +60,9 @@ class CanalController extends Controller
                             $className .= ucfirst($part);
                         }
 
-                        $tableClassName = "\\app\\canal\\table\\{$className}";
+
+                        $tableClassName = "\\app\\canal\\".$canalConf['allows'][$schema]."\\table\\{$className}";
+
                         if(!class_exists($tableClassName))
                             continue;
 

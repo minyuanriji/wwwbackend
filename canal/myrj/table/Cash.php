@@ -1,5 +1,5 @@
 <?php
-namespace app\canal\table;
+namespace app\canal\myrj\table;
 
 use app\notification\CashAgreeNotification;
 use app\notification\CashPaidNotification;

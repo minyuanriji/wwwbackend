@@ -7,23 +7,17 @@
 
 namespace app\commands;
 
-use app\component\efps\Efps;
-use app\forms\common\UserIntegralModifyForm;
-use app\forms\mall\finance\IntegralModifiedForm;
-use app\models\EfpsPaymentOrder;
-use app\models\IncomeLog;
-use app\models\IntegralLog;
-use app\models\Order;
-use app\models\PaymentOrder;
-use app\models\PaymentOrderUnion;
-use app\models\User;
-use app\plugins\commission\models\CommissionGoodsPriceLog;
+
+use app\plugins\smart_shop\components\jobs\NotificationCyorderPaidWechatJob;
 
 class DebugController extends BaseCommandController{
 
     public function actionIndex(){
 
-
+        (new NotificationCyorderPaidWechatJob([
+            "mall_id"  => 5,
+            "order_id" => 4448
+        ]))->execute(null);
 
        /* $sql = 'select * from jxmall_plugin_commission_goods_price_log where order_id IN(
                     select o.id from jxmall_order o 

@@ -81,9 +81,9 @@ trait SmartShopOrderTrait
      */
     public function getCyorderDetail($record_id){
 
-        $selects = ["o.order_no", "o.order_status", "o.is_pay", "o.total_price", "o.pay_price", "o.is_confirm", "o.apply_refund",
+        $selects = ["o.order_no", "o.order_status", "o.state", "o.type", "o.is_pay", "o.total_price", "o.pay_price", "o.is_confirm", "o.apply_refund",
             "o.cancel_status", "o.is_cancel", "o.pay_type", "o.out_trade_no as transaction_id", "u.mobile as u_mobile", "s.title as store_name",
-            "o.address as store_address", "pv.city_name as province", "o.create_time", "o.store_id",
+            "o.address as store_address", "pv.city_name as province", "o.create_time", "o.store_id", "u.nickname",
             "ct.city_name as city", "s_at.filepath as store_logo", "m.id as merchant_id", "m.name as merchant_name",
             "m.mobile as merchant_mobile", "me.mno", "me_ali.mno as mno_ali"];
         $sql = "SELECT " .implode(",", $selects) . " FROM {{%cyorder}} o " .

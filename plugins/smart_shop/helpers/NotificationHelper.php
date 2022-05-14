@@ -45,7 +45,7 @@ class NotificationHelper{
      * @return array
      */
     public static function getNotification($mall_id, $merchant_id, $store_id, $type){
-        $data = ["type" => $type, "status" => 0, "enable" => 0, "data" => []];
+        $data = ["id" => 0, "type" => $type, "status" => 0, "enable" => 0, "data" => []];
         $notification = Notifications::findOne([
             "mall_id"     => $mall_id,
             "ss_mch_id"   => $merchant_id,
@@ -54,8 +54,9 @@ class NotificationHelper{
         ]);
         if($notification){
             $params = !empty($notification->data_json) ? @json_decode($notification->data_json, true) : [];
+            $data['id']     = $notification->id;
             $data['data']   = $params;
-            $data['enable'] = (int)$notification->enable;
+            $data['enable'] = $notification->enable;
         }
         return $data;
     }

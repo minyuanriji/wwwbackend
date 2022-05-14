@@ -3,7 +3,7 @@
 /* 废弃 2021/07/29
  *
  * */
-namespace app\canal\table;
+namespace app\canal\myrj\table;
 
 use app\notification\MchApplyAdoptNotification;
 use app\notification\MchApplyNoPassNotification;

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\canal\table;
+namespace app\canal\myrj\table;
 
 use app\notification\MchCheckoutOrderPaySuccessNotification;
 use app\plugins\mch\models\MchCheckoutOrder;

@@ -51,6 +51,9 @@ class CyorderPaidMsgTemplate extends WechatTemplateMessageNew {
      * @return string
      */
     protected function miniprogram(){
-        return 'wx25a6c376389beca2';
+        return [
+            "appid"    => "wx25a6c376389beca2",
+            "pagepath" => "/"
+        ];
     }
 }

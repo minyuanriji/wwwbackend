@@ -7,6 +7,7 @@ use yii\queue\JobInterface;
 
 class NotificationCyorderPaidEmailJob extends Component implements JobInterface{
 
+    public $mall_id;
     public $order_id;
 
     public function execute($queue){

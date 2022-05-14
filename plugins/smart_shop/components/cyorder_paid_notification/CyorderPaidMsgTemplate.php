@@ -45,4 +45,12 @@ class CyorderPaidMsgTemplate extends WechatTemplateMessageNew {
     protected function templateId(){
         return "zRzF4qdG4AkeaBTL8bp2WAq2atw2838obKzsmTXIwKw";
     }
+
+    /**
+     * 跳转小程序
+     * @return string
+     */
+    protected function miniprogram(){
+        return 'wx25a6c376389beca2';
+    }
 }

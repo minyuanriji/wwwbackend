@@ -39,11 +39,16 @@ abstract class WechatTemplateMessageNew extends Component{
      * @return void
      */
     public function send($openid){
-        $res = \Yii::$app->wechat->app->template_message->send([
+        $miniprogram = $this->miniprogram();
+        $option = [
             'touser'        => $openid,
             'template_id'   => $this->templateId(),
             'data'          => $this->data(),
-        ]);
+        ];
+        if(!empty($miniprogram)){
+            $option['miniprogram'] = $miniprogram;
+        }
+        $res = \Yii::$app->wechat->app->template_message->send($option);
     }
 
 
@@ -59,5 +64,11 @@ abstract class WechatTemplateMessageNew extends Component{
      */
     abstract protected function templateId();
 
-
+    /**
+     * 跳转小程序
+     * @return string
+     */
+    protected function miniprogram(){
+        return '';
+    }
 }

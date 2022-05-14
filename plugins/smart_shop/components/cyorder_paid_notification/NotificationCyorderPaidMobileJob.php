@@ -3,6 +3,7 @@
 namespace app\plugins\smart_shop\components\cyorder_paid_notification;
 
 use app\helpers\sms\Sms;
+use app\models\Mall;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\helpers\NotificationHelper;
 use yii\base\Component;
@@ -15,6 +16,9 @@ class NotificationCyorderPaidMobileJob extends Component implements JobInterface
 
     public function execute($queue){
         try {
+
+            \Yii::$app->setMall(Mall::findOne($this->mall_id));
+
             $smartShop = new SmartShop();
             $detail = $smartShop->getCyorderDetail($this->order_id);
             if(!$detail['is_pay']){

@@ -16,4 +16,14 @@ class CommonHelper{
         }
         return preg_match($pattern, $mobile) ? true : false;
     }
+
+    /**
+     * 判断邮箱格式
+     * @param $email
+     * @return bool
+     */
+    public static function isEmail($email){
+        $pattern = '#^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$#';
+        return preg_match($pattern, $email) ? true : false;
+    }
 }

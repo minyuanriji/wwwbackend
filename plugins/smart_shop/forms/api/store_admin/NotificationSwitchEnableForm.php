@@ -31,8 +31,7 @@ class NotificationSwitchEnableForm  extends BaseModel{
             $notification = Notifications::findOne([
                 "id"          => $this->id,
                 "ss_mch_id"   => $this->merchant_id,
-                "ss_store_id" => $this->store_id,
-                "type"        => "wechat_template"
+                "ss_store_id" => $this->store_id
             ]);
             if(!$notification){
                 throw new \Exception("设置信息不存在");

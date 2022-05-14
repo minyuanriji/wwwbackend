@@ -4,6 +4,8 @@ namespace app\plugins\smart_shop\controllers\api\store_admin;
 
 use app\plugins\smart_shop\controllers\api\AdminAuthController;
 use app\plugins\smart_shop\forms\api\store_admin\NotificationDetailForm;
+use app\plugins\smart_shop\forms\api\store_admin\NotificationSetEmailForm;
+use app\plugins\smart_shop\forms\api\store_admin\NotificationSetMobileForm;
 use app\plugins\smart_shop\forms\api\store_admin\NotificationSetWechatTemplateForm;
 use app\plugins\smart_shop\forms\api\store_admin\NotificationSwitchEnableForm;
 
@@ -19,6 +21,30 @@ class NotificationController extends AdminAuthController {
         $form->merchant_id = $this->merchant ? $this->merchant['id'] : 0;
         $form->store_id    = $this->store ? $this->store['id'] : '';
         return $this->asJson($form->get());
+    }
+
+    /**
+     * 设置短信通知
+     * @return \yii\web\Response
+     */
+    public function actionSetMobile(){
+        $form = new NotificationSetMobileForm();
+        $form->attributes  = $this->requestData;
+        $form->merchant_id = $this->merchant ? $this->merchant['id'] : 0;
+        $form->store_id    = $this->store ? $this->store['id'] : '';
+        return $this->asJson($form->set());
+    }
+
+    /**
+     * 设置邮件通知
+     * @return \yii\web\Response
+     */
+    public function actionSetEmail(){
+        $form = new NotificationSetEmailForm();
+        $form->attributes  = $this->requestData;
+        $form->merchant_id = $this->merchant ? $this->merchant['id'] : 0;
+        $form->store_id    = $this->store ? $this->store['id'] : '';
+        return $this->asJson($form->set());
     }
 
     /**

@@ -2,11 +2,9 @@
 
 namespace app\plugins\smart_shop\components\cyorder_paid_notification;
 
-use app\helpers\sms\NewOrderMessage;
-use app\logic\AppConfigLogic;
+use app\helpers\sms\Sms;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\helpers\NotificationHelper;
-use Overtrue\EasySms\EasySms;
 use yii\base\Component;
 use yii\queue\JobInterface;
 
@@ -14,8 +12,6 @@ class NotificationCyorderPaidMobileJob extends Component implements JobInterface
 
     public $mall_id;
     public $order_id;
-
-    private $smsConfig;
 
     public function execute($queue){
         try {
@@ -42,8 +38,8 @@ class NotificationCyorderPaidMobileJob extends Component implements JobInterface
 
             $setting = NotificationHelper::getMobile($this->mall_id, $store['merchant_id'], $store['ss_store_id']);
             if($setting && $setting['status'] && $setting['enable']){
-                $message = new NewOrderMessage($detail['order_no'], $this->smsConfig['order']);
-                $res = $this->getSms()->send($setting['data']['mobile'], $message);
+                $sms = new Sms();
+                $res = $sms->sendOrderMessage([$setting['data']['mobile']], $detail['order_no']);
             }
 
         }catch (\Exception $e){
@@ -52,45 +48,5 @@ class NotificationCyorderPaidMobileJob extends Component implements JobInterface
             echo "file:" . $e->getFile() . "\n";
             echo "line:" . $e->getLine();
         }
-    }
-
-    private function getSms(){
-        $config = [
-            // HTTP 请求的超时时间（秒）
-            'timeout' => 5.0,
-
-            // 默认发送配置
-            'default' => [
-                // 网关调用策略，默认：顺序调用
-                'strategy' => \Overtrue\EasySms\Strategies\OrderStrategy::class,
-
-                // 默认可用的发送网关
-                'gateways' => [
-                    'aliyun',
-                ],
-            ],
-            // 可用的网关配置
-            'gateways' => [
-                'errorlog' => [
-                    'file' => '/runtime/easy-sms.log',
-                ],
-                //...
-            ],
-        ];
-
-        $smsConfig = AppConfigLogic::getSmsConfig();
-
-        // 阿里云短信配置
-        if ($smsConfig['platform'] == 'aliyun') {
-            $config['gateways']['aliyun'] = [
-                'access_key_id'     => $smsConfig['access_key_id'],
-                'access_key_secret' => $smsConfig['access_key_secret'],
-                'sign_name'         => $smsConfig['template_name'],
-            ];
-        }
-
-        $this->smsConfig = $smsConfig;
-
-        return new EasySms($config);
     }
 }

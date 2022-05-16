@@ -3,9 +3,9 @@ namespace app\canal\smart_shop\table;
 
 
 
-use app\plugins\smart_shop\components\cyorder_paid_notification\NotificationCyorderPaidEmailJob;
-use app\plugins\smart_shop\components\cyorder_paid_notification\NotificationCyorderPaidMobileJob;
-use app\plugins\smart_shop\components\cyorder_paid_notification\NotificationCyorderPaidWechatJob;
+use app\plugins\smart_shop\components\czorder_paid_notification\NotificationCzorderPaidEmailJob;
+use app\plugins\smart_shop\components\czorder_paid_notification\NotificationCzorderPaidMobileJob;
+use app\plugins\smart_shop\components\czorder_paid_notification\NotificationCzorderPaidWechatJob;
 
 class Czorder{
 
@@ -20,15 +20,15 @@ class Czorder{
 
             //订单付款，通知商户
             if(isset($updates['state']) && $updates['state'] == 2){
-                \Yii::$app->queue->delay(1)->push(new NotificationCyorderPaidWechatJob([
+                \Yii::$app->queue->delay(1)->push(new NotificationCzorderPaidWechatJob([
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
                 ]));
-                \Yii::$app->queue->delay(2)->push(new NotificationCyorderPaidMobileJob([
+                \Yii::$app->queue->delay(2)->push(new NotificationCzorderPaidMobileJob([
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
                 ]));
-                \Yii::$app->queue->delay(3)->push(new NotificationCyorderPaidEmailJob([
+                \Yii::$app->queue->delay(3)->push(new NotificationCzorderPaidEmailJob([
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
                 ]));

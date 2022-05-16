@@ -24,11 +24,11 @@ class Cyorder{
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
                 ]));
-                \Yii::$app->queue->delay(1)->push(new NotificationCyorderPaidMobileJob([
+                \Yii::$app->queue->delay(2)->push(new NotificationCyorderPaidMobileJob([
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
                 ]));
-                \Yii::$app->queue->delay(1)->push(new NotificationCyorderPaidEmailJob([
+                \Yii::$app->queue->delay(3)->push(new NotificationCyorderPaidEmailJob([
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
                 ]));
@@ -41,11 +41,11 @@ class Cyorder{
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
                 ]));
-                \Yii::$app->queue->delay(1)->push(new NotificationCyorderRefundMobileJob([
+                \Yii::$app->queue->delay(2)->push(new NotificationCyorderRefundMobileJob([
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
                 ]));
-                \Yii::$app->queue->delay(1)->push(new NotificationCyorderRefundEmailJob([
+                \Yii::$app->queue->delay(3)->push(new NotificationCyorderRefundEmailJob([
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
                 ]));

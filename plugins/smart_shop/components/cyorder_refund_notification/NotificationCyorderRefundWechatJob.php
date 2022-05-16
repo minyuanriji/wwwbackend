@@ -2,7 +2,6 @@
 
 namespace app\plugins\smart_shop\components\cyorder_refund_notification;
 
-use app\models\Mall;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\helpers\NotificationHelper;
 use yii\base\Component;
@@ -15,8 +14,6 @@ class NotificationCyorderRefundWechatJob extends Component implements JobInterfa
 
     public function execute($queue){
         try {
-
-            \Yii::$app->setMall(Mall::findOne(5));
 
             $smartShop = new SmartShop();
             $detail = $smartShop->getCyorderDetail($this->order_id);

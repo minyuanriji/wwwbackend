@@ -49,6 +49,7 @@ abstract class WechatTemplateMessageNew extends Component{
             $option['miniprogram'] = $miniprogram;
         }
         $res = \Yii::$app->wechat->app->template_message->send($option);
+        echo json_encode($res) . "\n";
     }
 
 

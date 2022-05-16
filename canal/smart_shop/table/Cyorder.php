@@ -18,14 +18,10 @@ class Cyorder{
 
             //订单付款，通知商户
             if(isset($updates['is_pay']) && $updates['is_pay'] == 1){
-                (new NotificationCyorderPaidWechatJob([
+                \Yii::$app->queue->delay(1)->push(new NotificationCyorderPaidWechatJob([
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
-                ]))->execute(null);
-                /*\Yii::$app->queue->delay(1)->push(new NotificationCyorderPaidWechatJob([
-                    "mall_id"  => \Yii::$app->mall->id,
-                    "order_id" => $condition['id']
-                ]));*/
+                ]));
                 \Yii::$app->queue->delay(1)->push(new NotificationCyorderPaidMobileJob([
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
@@ -39,14 +35,10 @@ class Cyorder{
             //取消订单，申请退款
             if(isset($updates['apply_refund']) && isset($updates['cancel_status'])
                 && $updates['apply_refund'] == 1 && $updates['cancel_status'] == 1){
-                (new NotificationCyorderRefundWechatJob([
+                \Yii::$app->queue->delay(1)->push(new NotificationCyorderRefundWechatJob([
                     "mall_id"  => \Yii::$app->mall->id,
                     "order_id" => $condition['id']
-                ]))->execute(null);
-                /*\Yii::$app->queue->delay(1)->push(new NotificationCyorderRefundWechatJob([
-                    "mall_id"  => \Yii::$app->mall->id,
-                    "order_id" => $condition['id']
-                ]));*/
+                ]));
             }
 
         }

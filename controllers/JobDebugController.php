@@ -7,6 +7,7 @@ use app\models\Mall;
 use app\models\Order;
 use app\models\Wechat;
 use app\plugins\smart_shop\components\AlipaySdkApi;
+use app\plugins\smart_shop\components\cyorder_refund_notification\NotificationCyorderRefundWechatJob;
 use app\plugins\smart_shop\components\jobs\NotificationCyorderPaidWechatJob;
 use app\plugins\smart_shop\components\SmartShop;
 
@@ -14,7 +15,10 @@ class JobDebugController extends BaseController {
 
     public function actionIndex(){
 
-
+        \Yii::$app->queue->delay(1)->push(new NotificationCyorderRefundWechatJob([
+            "mall_id"  => 5,
+            "order_id" => 5033
+        ]));
 
         /*\Yii::$app->mall = Mall::findOne(5);
 

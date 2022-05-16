@@ -33,7 +33,7 @@ class NotificationCyorderRefundWechatJob extends Component implements JobInterfa
                     "date"          => date("Y-m-d H:i:s", $detail['apply_time']),
                     "nickname"      => !empty($detail['nickname']) ? $detail['nickname'] : "普通用户",
                     "mobile"        => $detail['u_mobile'],
-                    "refund_money"  => $detail['refund_price'],
+                    "refund_money"  => $detail['total_price'],
                     "refund_reason" => $detail['refund_reason'],
                     "remark"        => "请登陆后台查看详情"
                 ]))->send($setting['data']['openid']);

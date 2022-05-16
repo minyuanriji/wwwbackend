@@ -1,6 +1,6 @@
 <?php
 
-namespace app\plugins\smart_shop\components\cyorder_paid_notification;
+namespace app\plugins\smart_shop\components\cyorder_refund_notification;
 
 use app\helpers\sms\Sms;
 use app\models\Mall;
@@ -9,7 +9,7 @@ use app\plugins\smart_shop\helpers\NotificationHelper;
 use yii\base\Component;
 use yii\queue\JobInterface;
 
-class NotificationCyorderPaidMobileJob extends Component implements JobInterface{
+class NotificationCyorderRefundMobileJob extends Component implements JobInterface{
 
     public $mall_id;
     public $order_id;
@@ -33,14 +33,15 @@ class NotificationCyorderPaidMobileJob extends Component implements JobInterface
             $setting = NotificationHelper::getMobile($this->mall_id, $store['merchant_id'], $store['ss_store_id']);
             if($setting && $setting['status'] && $setting['enable']){
                 $sms = new Sms();
-                $res = $sms->sendOrderMessage([$setting['data']['mobile']], $detail['order_no']);
+                $res = $sms->sendOrderRefundMessage([$setting['data']['mobile']], $detail['order_no']);
             }
 
         }catch (\Exception $e){
-            echo "NotificationCyorderPaidMobileJob::execute\n";
+            echo "NotificationCyorderRefundMobileJob::execute\n";
             echo "error:" . $e->getMessage() . "\n";
             echo "file:" . $e->getFile() . "\n";
             echo "line:" . $e->getLine();
         }
     }
+
 }

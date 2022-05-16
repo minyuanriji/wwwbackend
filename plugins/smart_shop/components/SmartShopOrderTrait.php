@@ -121,6 +121,24 @@ trait SmartShopOrderTrait
      * @return array
      */
     public function getCzorderDetail($record_id){
-        return [];
+        $selects = ["o.state", "o.code as order_no", "o.pay_price", "o.send_price", "u.mobile as u_mobile", "u.nickname",
+            "s.title as store_name", "o.create_time", "u.balance"];
+        $sql = "SELECT " .implode(",", $selects) . " FROM {{%czorder}} o " .
+            "INNER JOIN {{%store}} s ON s.id=o.store_id " .
+            "INNER JOIN {{%users}} u ON u.id=o.user_id " .
+            "INNER JOIN {{%merchant}} m ON s.admin_id=m.admin_id " .
+            "LEFT JOIN {{%merchant_entry}} me ON me.merchant_id=m.id AND me.pay_way_id=1 " .
+            "LEFT JOIN {{%merchant_entry}} me_ali ON me_ali.merchant_id=m.id AND me_ali.pay_way_id=2 " .
+            "LEFT JOIN {{%citys}} pv ON pv.cityid=s.province_code ".
+            "LEFT JOIN {{%citys}} ct ON ct.cityid=s.city_code " .
+            "LEFT JOIN {{%attachment}} s_at ON s_at.id=s.thumb " .
+            "WHERE o.id='{$record_id}'";
+
+        $row = $this->getDB()->createCommand($sql)->queryOne();
+        if($row){
+
+        }
+
+        return $row ? $row : [];
     }
 }

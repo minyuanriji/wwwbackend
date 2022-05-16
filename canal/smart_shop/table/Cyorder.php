@@ -18,6 +18,8 @@ class Cyorder{
             $condition = $mixData['condition'];
             $updates = $mixData['update'];
 
+            echo json_encode($mixData) . "\n";
+
             //订单付款，通知商户
             if(isset($updates['is_pay']) && $updates['is_pay'] == 1){
                 \Yii::$app->queue->delay(1)->push(new NotificationCyorderPaidWechatJob([

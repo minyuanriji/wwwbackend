@@ -121,7 +121,7 @@ trait SmartShopOrderTrait
      * @return array
      */
     public function getCzorderDetail($record_id){
-        $selects = ["o.state", "o.code as order_no", "o.pay_price", "o.send_price", "u.mobile as u_mobile", "u.nickname",
+        $selects = ["o.state", "o.code as order_no", "o.store_id", "o.pay_price", "o.send_price", "u.mobile as u_mobile", "u.nickname",
             "s.title as store_name", "o.create_time", "u.balance"];
         $sql = "SELECT " .implode(",", $selects) . " FROM {{%czorder}} o " .
             "INNER JOIN {{%store}} s ON s.id=o.store_id " .

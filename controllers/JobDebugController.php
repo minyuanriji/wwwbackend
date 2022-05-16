@@ -19,6 +19,8 @@ class JobDebugController extends BaseController {
             "mall_id"  => 5,
             "order_id" => 5033
         ]));
+        echo "success";
+        exit;
 
         /*\Yii::$app->mall = Mall::findOne(5);
 

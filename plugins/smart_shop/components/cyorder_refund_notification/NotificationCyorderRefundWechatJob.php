@@ -29,6 +29,7 @@ class NotificationCyorderRefundWechatJob extends Component implements JobInterfa
             $setting = NotificationHelper::getWechatTemplate($this->mall_id, $store['merchant_id'], $store['ss_store_id']);
             if($setting && $setting['status'] && $setting['enable']){
                 $res = (new CyorderRefundMsgTemplate([
+                    "mall_id"       => $this->mall_id,
                     "title"         => "你有一条新的退款消息",
                     "date"          => date("Y-m-d H:i:s", $detail['apply_time']),
                     "nickname"      => !empty($detail['nickname']) ? $detail['nickname'] : "普通用户",

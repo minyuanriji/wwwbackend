@@ -14,11 +14,13 @@ class StoreSetSaveForm extends BaseModel{
     public $merchant_id;
     public $store_id;
     public $transfer_rate;
+    public $enable_shopping_voucher;
 
     public function rules()
     {
         return [
-            [['merchant_id', 'store_id', 'transfer_rate'], 'required'],
+            [['merchant_id', 'store_id'], 'required'],
+            [['enable_shopping_voucher'], 'integer'],
             [['transfer_rate'], 'number']
         ];
     }
@@ -43,7 +45,7 @@ class StoreSetSaveForm extends BaseModel{
                 ])->asArray()->select(["m.mall_id", "mf.bsh_mch_id"])->one();
 
             if(!$row){
-                throw new \Exception("请先入驻补商汇平台");
+                throw new \Exception("您还未入驻补商汇平台");
             }
 
             $set = StoreSet::findOne([
@@ -60,8 +62,9 @@ class StoreSetSaveForm extends BaseModel{
                     "created_at"  => time()
                 ]);
             }
-            $set->transfer_rate = $this->transfer_rate;
-            $set->updated_at    = time();
+            $set->updated_at              = time();
+            $set->transfer_rate           = $this->transfer_rate;
+            $set->enable_shopping_voucher = $this->enable_shopping_voucher;
             if(!$set->save()){
                 throw new \Exception($this->responseErrorMsg($set));
             }

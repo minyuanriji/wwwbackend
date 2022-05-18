@@ -13,6 +13,16 @@ use app\models\User;
 
 abstract class BasePrepareForm extends BaseModel {
 
+    public $token;
+    public $order_id;
+
+    public function rules(){
+        return [
+            [['token'], 'trim'],
+            [['order_id'], 'safe']
+        ];
+    }
+
     /**
      * 创建前检查操作
      * @param User $user
@@ -119,6 +129,9 @@ abstract class BasePrepareForm extends BaseModel {
             $data["union_id"]            = $paymentOrderUnion->id;
             $data["is_send"]             = 1;
 
+            //支付成功后的页面跳转
+            $data['to_path'] = $this->getPagePath();
+
             $t->commit();
 
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS,"", $data);
@@ -126,5 +139,13 @@ abstract class BasePrepareForm extends BaseModel {
             $t->rollBack();
             return $this->returnApiResultData(ApiCode::CODE_FAIL,$e->getMessage());
         }
+    }
+
+    /**
+     * 支付成功后的页面跳转
+     * @return string
+     */
+    protected function getPagePath(){
+        return "";
     }
 }

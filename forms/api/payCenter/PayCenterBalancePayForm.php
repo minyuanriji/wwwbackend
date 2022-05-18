@@ -17,6 +17,7 @@ use app\plugins\alibaba\models\AlibabaDistributionOrderException;
 use app\plugins\hotel\models\HotelOrder;
 use app\plugins\mch\models\MchCheckoutOrder;
 use app\plugins\oil\models\OilOrders;
+use app\plugins\smart_shop\models\StorePayOrder;
 
 class PayCenterBalancePayForm extends BaseModel{
 
@@ -109,6 +110,7 @@ class PayCenterBalancePayForm extends BaseModel{
                     'title' => $paymentOrder->title,
                     'notifyClass' => $paymentOrder->notify_class,
                     'payType' => "balance",
+                    'user_id' => $paymentOrderUnion->user_id
                 ]);
                 if ($po->amount > 0) {
                     $modifyForm = new UserBalanceModifyForm([
@@ -193,14 +195,22 @@ class PayCenterBalancePayForm extends BaseModel{
             $desc       = "支付话费订单";
             $sourceType = "addcredit_order";
             $sourceId   = $order->id;
-        }elseif(substr($paymentOrder->order_no, 0, 3) == "OIL"){
+        }elseif(substr($paymentOrder->order_no, 0, 3) == "OIL") {
             $order = OilOrders::findOne(["order_no" => $paymentOrder->order_no]);
-            if (!$order){
+            if (!$order) {
                 throw new \Exception("[OilOrders]订单“{$paymentOrder->order_no}”记录不存在");
             }
-            $desc       = "支付加油券订单";
+            $desc = "支付加油券订单";
             $sourceType = "oil_order";
-            $sourceId   = $order->id;
+            $sourceId = $order->id;
+        }elseif(substr($paymentOrder->order_no, 0, 4) == "SSPO"){
+            $payOrder = StorePayOrder::findOne(["order_no" => $paymentOrder->order_no]);
+            if(!$payOrder){
+                throw new \Exception("[StorePayOrder]订单“{$paymentOrder->order_no}”记录不存在");
+            }
+            $desc       = "智慧经营-门店充值支付订单";
+            $sourceType = "store_pay_order";
+            $sourceId   = $payOrder->id;
         }else {
             $order = Order::findOne(["order_no" => $paymentOrder->order_no]);
             if(!$order){

@@ -126,7 +126,8 @@ class PayNotifyController extends BaseController
                                 'amount' => (float)$paymentOrder->amount,
                                 'title' => $paymentOrder->title,
                                 'notifyClass' => $paymentOrder->notify_class,
-                                'payType' => \app\core\payment\PaymentOrder::PAY_TYPE_WECHAT
+                                'payType' => \app\core\payment\PaymentOrder::PAY_TYPE_WECHAT,
+                                'user_id' => $paymentOrderUnion->user_id
                             ]);
                             $notify->notify($po);
                         } catch (\Exception $e) {

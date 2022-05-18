@@ -28,6 +28,7 @@ class PaymentOrder extends BaseModel
     public $notifyClass;
     public $supportPayTypes;
     public $payType;
+    public $user_id;
 
     public function rules()
     {
@@ -43,7 +44,7 @@ class PaymentOrder extends BaseModel
             }],
             [['amount'], 'number', 'min' => 0, 'max' => 100000000],
             [['payType'], 'safe'],
-            [['supportPayTypes'], 'safe'],
+            [['supportPayTypes', 'user_id'], 'safe'],
         ];
     }
 

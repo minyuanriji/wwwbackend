@@ -35,6 +35,11 @@ class Plugin extends \app\plugins\Plugin
                 'icon' => 'el-icon-setting'
             ],
             [
+                'name' => '门店支付单',
+                'route' => 'plugin/smart_shop/mall/store-pay-order/index',
+                'icon' => 'el-icon-setting'
+            ],
+            [
                 'name' => '分账商户',
                 'route' => 'plugin/smart_shop/mall/merchant/index',
                 'icon' => 'el-icon-setting'

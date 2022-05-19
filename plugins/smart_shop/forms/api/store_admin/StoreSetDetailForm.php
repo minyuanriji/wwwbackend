@@ -7,6 +7,7 @@ use app\models\BaseModel;
 use app\plugins\mch\models\Mch;
 use app\plugins\smart_shop\models\Merchant;
 use app\plugins\smart_shop\models\MerchantFzlist;
+use app\plugins\smart_shop\models\StoreAccount;
 use app\plugins\smart_shop\models\StoreSet;
 
 class StoreSetDetailForm extends BaseModel{
@@ -44,6 +45,7 @@ class StoreSetDetailForm extends BaseModel{
             }
 
             $set = StoreSet::findOne([
+                "mall_id"     => \Yii::$app->mall->id,
                 "bsh_mch_id"  => $row['bsh_mch_id'],
                 "ss_mch_id"   => $this->merchant_id,
                 "ss_store_id" => $this->store_id
@@ -56,8 +58,16 @@ class StoreSetDetailForm extends BaseModel{
                 $set = $set->getAttributes();
             }
 
+            //门店账户
+            $account = StoreAccount::findOne([
+                "mall_id"     => \Yii::$app->mall->id,
+                "ss_mch_id"   => $this->merchant_id,
+                "ss_store_id" => $this->store_id
+            ]);
+
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, null, [
                 "setting" => $set,
+                "balance" => $account ? $account->balance : 0,
                 "mch_rate_list" => static::getMchRateList()
             ]);
         }catch (\Exception $e){

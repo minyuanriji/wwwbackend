@@ -6,6 +6,7 @@ use app\core\ApiCode;
 use app\logic\CommonLogic;
 use app\models\BaseModel;
 use app\models\PaymentPrepare;
+use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\models\StorePayOrder;
 
 class AccountRechargeSubmitForm extends BaseModel{
@@ -32,6 +33,10 @@ class AccountRechargeSubmitForm extends BaseModel{
                 throw new \Exception("充值金额不能小于0");
             }
 
+            $smartShop = new SmartShop();
+            $store = $smartShop->getStoreDetail($this->store_id);
+            $storeName = isset($store['store_name']) ? $store['store_name'] : "";
+
             $payOrder = new StorePayOrder([
                 "mall_id"        => \Yii::$app->mall->id,
                 "ss_mch_id"      => $this->merchant_id,
@@ -46,7 +51,8 @@ class AccountRechargeSubmitForm extends BaseModel{
                 "pay_type"       => "wechat",
                 "pay_price"      => 0,
                 "pay_time"       => 0,
-                "pay_uid"        => 0
+                "pay_uid"        => 0,
+                "store_name"     => $storeName
             ]);
             if(!$payOrder->save()){
                 throw new \Exception($this->responseErrorMsg($payOrder));

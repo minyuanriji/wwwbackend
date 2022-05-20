@@ -3,10 +3,9 @@
 namespace app\commands\smart_shop_task;
 
 use app\commands\BaseAction;
-use app\models\Mall;
 use app\models\User;
 use app\models\UserInfo;
-use app\plugins\smart_shop\models\Order;
+use app\plugins\smart_shop\models\Cyorder;
 
 class UserMobileBindAction extends BaseAction {
 
@@ -17,12 +16,12 @@ class UserMobileBindAction extends BaseAction {
             try {
 
                 //获取有手机号但是没注册绑定本地用户的记录
-                $rows = Order::find()->alias("o")
+                $rows = Cyorder::find()->alias("o")
                     ->leftJoin(["u" => User::tableName()], "u.mobile=o.pay_user_mobile")
                     ->orderBy("o.updated_at ASC")
                     ->andWhere([
                         "AND",
-                        "o.pay_user_mobile <> '' AND o.pay_user_mobile IS NOT NULL AND o.is_delete=0",
+                        "o.pay_user_mobile <> '' AND o.pay_user_mobile IS NOT NULL",
                         "u.id IS NULL"
                     ])->asArray()->select(["o.id", "o.mall_id", "o.pay_user_mobile"])->limit(1)->all();
                 if(!$rows){
@@ -34,7 +33,7 @@ class UserMobileBindAction extends BaseAction {
                 foreach($rows as $row){
                     $orderIds[] = $row['id'];
                 }
-                Order::updateAll(["updated_at" => time()], "id IN (".implode(",", $orderIds).")");
+                Cyorder::updateAll(["updated_at" => time()], "id IN (".implode(",", $orderIds).")");
 
                 $this->activeTime();
 

@@ -11,6 +11,9 @@ use app\plugins\mch\models\Mch;
 use app\plugins\smart_shop\models\Order;
 use yii\base\Action;
 
+/**
+ * @deprecated
+ */
 class SmartShopOrderAction extends Action{
 
     public function run(){

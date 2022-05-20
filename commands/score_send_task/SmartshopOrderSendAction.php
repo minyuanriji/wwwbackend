@@ -12,6 +12,9 @@ use app\plugins\integral_card\models\ScoreSendLog;
 use app\plugins\mch\models\Mch;
 use app\plugins\smart_shop\models\Order;
 
+/**
+ * @deprecated
+ */
 class SmartshopOrderSendAction extends BaseAction {
 
     public function run(){

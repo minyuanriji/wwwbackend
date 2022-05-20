@@ -44,11 +44,12 @@ class Plugin extends \app\plugins\Plugin
                 'route' => 'plugin/smart_shop/mall/merchant/index',
                 'icon' => 'el-icon-setting'
             ],
+            /*
             [
                 'name' => '小程序管理',
                 'route' => 'plugin/smart_shop/mall/mp/wechat',
                 'icon' => 'el-icon-setting'
-            ],
+            ],*/
             [
                 'name' => '分账订单',
                 'route' => 'plugin/smart_shop/mall/order/index',

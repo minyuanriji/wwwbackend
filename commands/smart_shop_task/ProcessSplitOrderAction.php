@@ -8,6 +8,9 @@ use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\forms\mall\OrderDoSplitForm;
 use app\plugins\smart_shop\models\Order;
 
+/**
+ * @deprecated
+ */
 class ProcessSplitOrderAction extends BaseAction {
 
     public function run(){

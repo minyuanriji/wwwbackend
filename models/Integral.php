@@ -95,14 +95,14 @@ class Integral extends BaseActiveRecord
      * @param string $period_unit
      * @return void
      */
-    public static function addIntegralPlan($user_id,$integral_setting,$desc='',$ctype=0,$parentid=0){
+    public static function addIntegralPlan($user_id,$integral_setting,$desc='',$ctype=0,$parentid=0, $mall_id = 0){
 
         try{
             $model = new self();
             $model->loadDefaultValues();
             $model->controller_type   = $ctype;
             $model->user_id           = $user_id;
-            $model->mall_id           = Yii::$app->mall->id;
+            $model->mall_id           = $mall_id ? $mall_id : Yii::$app->mall->id;
             $model->parent_id         = $parentid;
             $model->integral_num      = $integral_setting['integral_num'];
             $model->period            = $integral_setting['period'];

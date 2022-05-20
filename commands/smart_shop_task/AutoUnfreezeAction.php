@@ -8,6 +8,9 @@ use app\plugins\smart_shop\exception\WxNoOperateMoneyException;
 use app\plugins\smart_shop\forms\mall\OrderUnfreezeForm;
 use app\plugins\smart_shop\models\Order;
 
+/**
+ * @deprecated
+ */
 class AutoUnfreezeAction extends BaseAction{
 
     public function run() {

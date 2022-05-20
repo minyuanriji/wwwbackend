@@ -15,18 +15,20 @@ class CommissionController extends BaseCommandController{
 
     public function actions(){
         return [
-            "goods"         => "app\\commands\\commission_action\\GoodsAction",
-            "checkout"      => "app\\commands\\commission_action\\CheckoutAction",
-            "store"         => "app\\commands\\commission_action\\StoreAction",
-            "hotel"         => "app\\commands\\commission_action\\HotelAction",
-            "hotel3r"       => "app\\commands\\commission_action\\Hotel3rAction",
-            "addcredit"     => "app\\commands\\commission_action\\AddcreditAction",
-            "addcredit3r"   => "app\\commands\\commission_action\\Addcredit3rAction",
-            "giftpacks"     => "app\\commands\\commission_action\\GiftpacksAction",
-            "region"        => "app\\commands\\commission_action\\RegionAction",//门店二维码收款区域分红
-            "regionGoods"   => "app\\commands\\commission_action\\RegionGoodsAction",//商品消费区域分红
-            "smartShop"     => "app\\commands\\commission_action\\SmartShopOrderAction", //智慧门店推荐分佣
-            "smartShop3r"     => "app\\commands\\commission_action\\SmartShopOrder3rAction",
+            "goods"              => "app\\commands\\commission_action\\GoodsAction",
+            "checkout"           => "app\\commands\\commission_action\\CheckoutAction",
+            "store"              => "app\\commands\\commission_action\\StoreAction",
+            "hotel"              => "app\\commands\\commission_action\\HotelAction",
+            "hotel3r"            => "app\\commands\\commission_action\\Hotel3rAction",
+            "addcredit"          => "app\\commands\\commission_action\\AddcreditAction",
+            "addcredit3r"        => "app\\commands\\commission_action\\Addcredit3rAction",
+            "giftpacks"          => "app\\commands\\commission_action\\GiftpacksAction",
+            "region"             => "app\\commands\\commission_action\\RegionAction",//门店二维码收款区域分红
+            "regionGoods"        => "app\\commands\\commission_action\\RegionGoodsAction",//商品消费区域分红
+            "smartShop"          => "app\\commands\\commission_action\\SmartShopOrderAction", //智慧门店推荐分佣
+            "smartShop3r"        => "app\\commands\\commission_action\\SmartShopOrder3rAction",
+            "smartShopCyorder"   => "app\\commands\\commission_action\\SmartShopCyorderAction", //智慧门店小程序订单推荐分佣
+            "smartShopCyorder3r" => "app\\commands\\commission_action\\SmartShopCyorder3rAction",
         ];
     }
 /*

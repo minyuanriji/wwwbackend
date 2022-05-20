@@ -12,6 +12,9 @@ use app\plugins\shopping_voucher\models\ShoppingVoucherFromStore;
 use app\plugins\shopping_voucher\models\ShoppingVoucherSendLog;
 use app\plugins\smart_shop\models\Order;
 
+/**
+ * @deprecated
+ */
 class SmartshopOrderSendAction extends BaseAction {
 
     public function run(){

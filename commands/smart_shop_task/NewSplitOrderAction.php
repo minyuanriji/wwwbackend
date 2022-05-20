@@ -7,6 +7,9 @@ use app\plugins\smart_shop\models\MerchantFzlist;
 use app\plugins\smart_shop\models\Order;
 use yii\base\Action;
 
+/**
+ * @deprecated
+ */
 class NewSplitOrderAction extends Action{
 
     public function run(){

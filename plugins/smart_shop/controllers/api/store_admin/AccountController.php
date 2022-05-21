@@ -4,6 +4,7 @@ namespace app\plugins\smart_shop\controllers\api\store_admin;
 
 use app\plugins\smart_shop\controllers\api\AdminAuthController;
 use app\plugins\smart_shop\forms\api\store_admin\AccountAccountDetailForm;
+use app\plugins\smart_shop\forms\api\store_admin\AccountAccountLogForm;
 use app\plugins\smart_shop\forms\api\store_admin\AccountRechargeLogForm;
 use app\plugins\smart_shop\forms\api\store_admin\AccountRechargeSubmitForm;
 
@@ -39,6 +40,18 @@ class AccountController extends AdminAuthController {
      */
     public function actionRechargeLog(){
         $form = new AccountRechargeLogForm();
+        $form->attributes  = $this->requestData;
+        $form->merchant_id = $this->merchant ? $this->merchant['id'] : 0;
+        $form->store_id    = $this->store ? $this->store['id'] : 0;
+        return $this->asJson($form->getList());
+    }
+
+    /**
+     * 充值记录
+     * @return \yii\web\Response
+     */
+    public function actionAccountLog(){
+        $form = new AccountAccountLogForm();
         $form->attributes  = $this->requestData;
         $form->merchant_id = $this->merchant ? $this->merchant['id'] : 0;
         $form->store_id    = $this->store ? $this->store['id'] : 0;

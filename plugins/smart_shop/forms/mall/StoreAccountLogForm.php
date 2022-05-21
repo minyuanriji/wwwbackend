@@ -86,6 +86,7 @@ class StoreAccountLogForm extends BaseModel{
                             $row['source_info']['commission_3r'] = CommissionSmartshopCyorder3rPriceLog::find()->alias("c")
                                 ->leftJoin(["u" => User::tableName()], "u.id=c.user_id")
                                 ->where(["c.cyorder_id" => $cyorder->id])
+                                ->asArray()
                                 ->select(["u.nickname", "u.role_type", "c.price", "c.status"])
                                 ->all();
                         }else{

@@ -70,7 +70,7 @@ class AccountRechargeSubmitForm extends BaseModel{
                 throw new \Exception($this->responseErrorMsg($paymentPrepare));
             }
 
-            $dir = 'smartshop/pay/store_pay_' . $this->store_id . '.jpg';
+            $dir = 'smartshop/pay/store_pay_' . $this->store_id .  '_' . $payOrder->id . '.jpg';
 
             $path = "/h5/#/pay/pay?source_table=store_pay_order&orderId=" . $payOrder->id;
             $file = CommonLogic::createQrcode(null, $this, $path, $dir);

@@ -102,7 +102,8 @@ class EfpsPayQueryJob extends Component implements JobInterface{
                                 'notifyClass' => $paymentOrder->notify_class,
                                 'payType'     => $paymentOrder->pay_type == 1 ?
                                                     \app\core\payment\PaymentOrder::PAY_TYPE_WECHAT :
-                                                    \app\core\payment\PaymentOrder::PAY_TYPE_ALIPAY
+                                                    \app\core\payment\PaymentOrder::PAY_TYPE_ALIPAY,
+                                'user_id'     => $paymentOrderUnion->user_id
                             ]);
                             $notify->notify($po);
                         } catch (\Exception $e) {

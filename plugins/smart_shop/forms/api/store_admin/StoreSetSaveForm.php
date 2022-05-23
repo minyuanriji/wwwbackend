@@ -15,13 +15,14 @@ class StoreSetSaveForm extends BaseModel{
     public $store_id;
     public $transfer_rate;
     public $enable_shopping_voucher;
+    public $shopping_voucher_rate;
     public $enable_score;
 
     public function rules()
     {
         return [
             [['merchant_id', 'store_id'], 'required'],
-            [['enable_shopping_voucher', 'enable_score'], 'integer'],
+            [['enable_shopping_voucher', 'enable_score', 'shopping_voucher_rate'], 'integer'],
             [['transfer_rate'], 'number']
         ];
     }
@@ -66,6 +67,7 @@ class StoreSetSaveForm extends BaseModel{
             $set->updated_at              = time();
             $set->transfer_rate           = $this->transfer_rate;
             $set->enable_shopping_voucher = $this->enable_shopping_voucher;
+            $set->shopping_voucher_rate   = $this->shopping_voucher_rate;
             $set->enable_score            = $this->enable_score;
             if(!$set->save()){
                 throw new \Exception($this->responseErrorMsg($set));

@@ -15,7 +15,8 @@ class StoreSet extends BaseActiveRecord{
 
     public function rules(){
         return [
-            [['mall_id', 'bsh_mch_id', 'ss_mch_id', 'ss_store_id', 'transfer_rate', 'created_at', 'updated_at'], 'required']
+            [['mall_id', 'bsh_mch_id', 'ss_mch_id', 'ss_store_id', 'created_at', 'updated_at'], 'required'],
+            [['transfer_rate', 'shopping_voucher_rate'], 'integer']
         ];
     }
 

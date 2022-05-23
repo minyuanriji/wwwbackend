@@ -70,7 +70,12 @@ class SmartShopCyorder3rAction extends BaseAction{
             $this->setCommissoinValues($localCyorder, $parentDatas, $mch);
 
             //红包赠送信息
-            $shoppingVoucherInfo = json_decode($localCyorder->shopping_voucher_info, true);
+            $shoppingVoucherInfo = !empty($localCyorder->shopping_voucher_info) ? @json_decode($localCyorder->shopping_voucher_info, true) : [];
+            $scoreInfo = !empty($localCyorder->score_info) ? @json_decode($localCyorder->score_info, true) : [];
+            $profitPrice = isset($shoppingVoucherInfo['price']) ? (float)$shoppingVoucherInfo['price'] : 0;
+            if(isset($scoreInfo['price'])){
+                $profitPrice += (float)$scoreInfo['price'];
+            }
 
             //通过相关规则键获取分佣规则进行分佣
             foreach($parentDatas as $parentData) {
@@ -82,7 +87,7 @@ class SmartShopCyorder3rAction extends BaseAction{
                 //新公式
                 $ruleData['role_type']    = $parentData['role_type'];
                 $ruleData['ver']          = "2021/12/10";
-                $ruleData['profit_price'] = $shoppingVoucherInfo['price'];
+                $ruleData['profit_price'] = $profitPrice;
 
                 $price = $ruleData['profit_price'] * $ruleData['commisson_value'];
 

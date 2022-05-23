@@ -82,68 +82,62 @@ class SmartshopCyorderSendAction extends BaseAction {
                 throw new \Exception("智慧经营>>门店红包赠送业务>>ID:".$localCyorder->id.">>门店账户不存在");
             }
 
-            $balance = $account->balance;
-
-            //赠送红包
+            //计算出红包+积分赠送需要的金额
             $shoppingVoucherNum = (float)$localCyorder->pay_price; //要赠送的红包数量
-            if($storeSet->enable_shopping_voucher && $shoppingVoucherNum > 0 && !$localCyorder->shopping_voucher_status){
-                $price = $shoppingVoucherNum * 0.1; //按10%比例计算出门店账户扣减余额
-                if($price > 0 && $balance >= $price){
-                    $modifyForm = new StoreAccountBalanceModifyForm([
-                        "source_type" => "cyorder",
-                        "source_id"   => $localCyorder->id,
-                        "balance"     => $price,
-                        "desc"        => "红包赠送业务储值扣减"
-                    ]);
-                    $modifyForm->sub($account);
+            $scoreNum = intval($localCyorder->pay_price); //要赠送的积分
+            $shoppingVoucherPrice = $storeSet->enable_shopping_voucher ? floatval($shoppingVoucherNum * 0.1) : 0; //红包按10%比例
+            $scorePrice = $storeSet->enable_score ? floatval($scoreNum * 0.03) : 0; //积分按3%比例
+            $totalPrice = $shoppingVoucherPrice + $scorePrice;
 
-                    //赠送用户红包
-                    $modifyForm = new ShoppingVoucherLogModifiyForm([
-                        "money"       => $shoppingVoucherNum,
-                        "desc"        => "门店消费获得赠送红包",
-                        "source_id"   => $localCyorder->id,
-                        "source_type" => "from_smart_shop_cyorder"
-                    ]);
-                    $modifyForm->add($user, false);
-                    $localCyorder->shopping_voucher_status = 1;
-                    $localCyorder->shopping_voucher_info = json_encode([
-                        "shopping_voucher_num" => $shoppingVoucherNum,
-                        "price" => $price,
-                        "rate"  => 0.1
-                    ], JSON_UNESCAPED_UNICODE);
-                }
+            //账户余额扣减
+            if($account->balance < $totalPrice){
+                throw new \Exception("智慧经营>>门店红包赠送业务>>ID:".$localCyorder->id.">>余额不足");
+            }
+            if($totalPrice > 0){
+                $modifyForm = new StoreAccountBalanceModifyForm([
+                    "source_type" => "cyorder",
+                    "source_id"   => $localCyorder->id,
+                    "balance"     => $totalPrice,
+                    "desc"        => "红包+积分赠送业务储值扣减"
+                ]);
+                $modifyForm->sub($account);
+            }
+
+            //赠送用户红包
+            if($storeSet->enable_shopping_voucher && $shoppingVoucherNum > 0 && !$localCyorder->shopping_voucher_status){
+                $modifyForm = new ShoppingVoucherLogModifiyForm([
+                    "money"       => $shoppingVoucherNum,
+                    "desc"        => "门店消费获得赠送红包",
+                    "source_id"   => $localCyorder->id,
+                    "source_type" => "from_smart_shop_cyorder"
+                ]);
+                $modifyForm->add($user, false);
+                $localCyorder->shopping_voucher_status = 1;
+                $localCyorder->shopping_voucher_info = json_encode([
+                    "shopping_voucher_num" => $shoppingVoucherNum,
+                    "balance" => $account->balance,
+                    "price" => $shoppingVoucherPrice,
+                    "rate"  => 0.1
+                ], JSON_UNESCAPED_UNICODE);
             }
 
             //赠送用户积分
-            $scoreNum = intval($localCyorder->pay_price);
             if($storeSet->enable_score && !$localCyorder->score_status && $scoreNum > 0){
-
-                //重新获取账户
-                $account = StoreAccount::findOne([
-                    "mall_id"     => $localCyorder->mall_id,
-                    "ss_mch_id"   => $localCyorder->ss_mch_id,
-                    "ss_store_id" => $localCyorder->ss_store_id
-                ]);
-                $balance = $account->balance;
-
-                $price = floatval($scoreNum * 0.03); //按3%比例计算出门店账户扣减余额
-                if($price > 0 && $balance >= $price){
-
-                    $scoreSetting = [
-                        "integral_num" => $scoreNum,
-                        "period" => 1,
-                        "period_unit" => "month",
-                        "expire" => -1,
-                        "source_type" => "from_smart_shop_cyorder",
-                        "source_id" => $localCyorder->id,
-                        "price" => $price,
-                        "rate"  => 0.03
-                    ];
-                    $localCyorder->score_status = 1;
-                    $localCyorder->score_info = json_encode($scoreSetting);
-                    Integral::addIntegralPlan($user->id, $scoreSetting, '门店消费获得赠送积分', 0, 0, $localCyorder->mall_id);
-                }
-
+                $scoreSetting = [
+                    "integral_num" => $scoreNum,
+                    "period" => 1,
+                    "period_unit" => "month",
+                    "expire" => -1,
+                    "source_type" => "from_smart_shop_cyorder",
+                    "source_id" => $localCyorder->id
+                ];
+                $localCyorder->score_status = 1;
+                $localCyorder->score_info = json_encode(array_merge($scoreSetting, [
+                    "balance" => $account->balance,
+                    "price" => $scorePrice,
+                    "rate"  => 0.03
+                ]));
+                Integral::addIntegralPlan($user->id, $scoreSetting, '门店消费获得赠送积分', 0, 0, $localCyorder->mall_id);
             }
 
             //更新订单信息

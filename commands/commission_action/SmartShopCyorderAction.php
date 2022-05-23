@@ -95,13 +95,18 @@ class SmartShopCyorderAction extends BaseAction{
                 }
             }
 
-            $shoppingVoucherInfo = json_decode($localCyorder->shopping_voucher_info, true);
+            $shoppingVoucherInfo = !empty($localCyorder->shopping_voucher_info) ? @json_decode($localCyorder->shopping_voucher_info, true) : [];
+            $scoreInfo = !empty($localCyorder->score_info) ? @json_decode($localCyorder->score_info, true) : [];
+            $profitPrice = isset($shoppingVoucherInfo['price']) ? (float)$shoppingVoucherInfo['price'] : 0;
+            if(isset($scoreInfo['price'])){
+                $profitPrice += (float)$scoreInfo['price'];
+            }
 
             //新公式
             $commissionRule['role_type']       = $parent->role_type;
             $commissionRule['ver']             = "2021/10/25";
             $commissionRule['commisson_value'] = min(0.02, (float)($commissionRule['commisson_value']/100));
-            $commissionRule['profit_price']    = $shoppingVoucherInfo['price'];
+            $commissionRule['profit_price']    = $profitPrice;
             $price = (float)$commissionRule['commisson_value'] * $commissionRule['profit_price'];
             if($price <= 0){
                 throw new \Exception("智慧经营>>门店小程序订单推荐分佣>>ID:".$localCyorder->id.">>分佣金额小于0");

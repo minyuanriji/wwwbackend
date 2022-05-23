@@ -83,8 +83,9 @@ class SmartshopCyorderSendAction extends BaseAction {
             }
 
             //计算出红包+积分赠送需要的金额
-            $shoppingVoucherNum = (float)$localCyorder->pay_price; //要赠送的红包数量
             $scoreNum = intval($localCyorder->pay_price); //要赠送的积分
+            $shoppingVoucherRate = min(100, max(10, (int)$storeSet->shopping_voucher_rate));
+            $shoppingVoucherNum = (float)($localCyorder->pay_price * ($shoppingVoucherRate/100)); //要赠送的红包数量
             $shoppingVoucherPrice = $storeSet->enable_shopping_voucher ? floatval($shoppingVoucherNum * 0.1) : 0; //红包按10%比例
             $scorePrice = $storeSet->enable_score ? floatval($scoreNum * 0.03) : 0; //积分按3%比例
             $totalPrice = $shoppingVoucherPrice + $scorePrice;
@@ -115,6 +116,7 @@ class SmartshopCyorderSendAction extends BaseAction {
                 $localCyorder->shopping_voucher_status = 1;
                 $localCyorder->shopping_voucher_info = json_encode([
                     "shopping_voucher_num" => $shoppingVoucherNum,
+                    "shopping_voucher_rate" => $shoppingVoucherRate,
                     "balance" => $account->balance,
                     "price" => $shoppingVoucherPrice,
                     "rate"  => 0.1

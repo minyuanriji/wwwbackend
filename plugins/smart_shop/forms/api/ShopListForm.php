@@ -62,7 +62,7 @@ class ShopListForm extends BaseModel implements ICacheForm {
             $defaultLogo = $this->host_info . "/web/static/header-logo.png";
             foreach($list as $key => $item){
                 $item['sales']       = 0;
-                $item['distance_mi'] = (int)$item['distance_mi'];
+                $item['distance']    = (int)$item['distance_mi'];
                 $item['store_logo']  = !empty($item['store_logo']) ? rtrim($shop->setting['host_url'], "/") . str_replace("\\", "/", $item['store_logo']) : $defaultLogo;
 
                 $list[$key] = $item;

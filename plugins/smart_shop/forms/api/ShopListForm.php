@@ -46,38 +46,24 @@ class ShopListForm extends BaseModel implements ICacheForm {
 
         try {
 
-            $shop = new SmartShop();
-
             $wheres = [
                 "s.status='1' AND m.copy<>0"
             ];
-
-            if($this->plat == "wechat"){
-                $wheres[] = "wx_me.mp_appid IS NOT NULL AND wx_me.mp_appid <> ''";
-            }elseif($this->plat == "alipay"){
-                $wheres[] = "ali_me.ali_appid IS NOT NULL AND ali_me.ali_appid <> ''";
-            }else{
-                throw new \Exception("参数plat错误");
-            }
 
             if(!empty($this->keyword)){
                 $wheres[] = "s.title LIKE '%".$this->keyword."%'";
             }
 
-            $selects = ["s.id as store_id", "s.title as store_name", "s.address", "pv.city_name as province",
-                "ct.city_name as city", "s_at.filepath as store_logo", "m.id as merchant_id", "m.name as merchant_name",
-                "m.mobile", "sst.coordinates", "wx_me.mp_appid as wx_mp_appid", "ali_me.ali_appid as ali_mp_appid"];
-
-            $list = $shop->getStoreList($pagination, $selects, $wheres, $this->page, $this->limit);
+            $selects = ["s.id as store_id", "s.title as store_name", "s.address",  "s_at.filepath as store_logo",
+                "m.id as merchant_id", "m.name as merchant_name", "m.mobile", "sst.coordinates", "me.mp_appid as wx_mp_appid",
+                "me.ali_appid as ali_mp_appid"];
+            $shop = new SmartShop();
+            $list = $shop->getStoreNearby($this->plat, $this->lng, $this->lat, $pagination, $selects, $wheres, $this->page, $this->limit);
             $defaultLogo = $this->host_info . "/web/static/header-logo.png";
             foreach($list as $key => $item){
-                $item['sales']      = 0;
-                $item['distance']   = -1;
-                if(!empty($this->lat) && !empty($this->lng) && $item['coordinates']){
-                    $coord = explode(",", $item['coordinates']);
-                    $item['distance'] = (int)PoiHelper::getDistance($this->lng, $this->lat, $coord[1], $coord[0]);
-                }
-                $item['store_logo'] = !empty($item['store_logo']) ? rtrim($shop->setting['host_url'], "/") . str_replace("\\", "/", $item['store_logo']) : $defaultLogo;
+                $item['sales']       = 0;
+                $item['distance_mi'] = (int)$item['distance_mi'];
+                $item['store_logo']  = !empty($item['store_logo']) ? rtrim($shop->setting['host_url'], "/") . str_replace("\\", "/", $item['store_logo']) : $defaultLogo;
 
                 $list[$key] = $item;
             }

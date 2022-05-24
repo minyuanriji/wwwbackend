@@ -47,6 +47,61 @@ trait SmartShopShopTrait
     }
 
     /**
+     * 获取附近好店
+     * @param string $plat
+     * @param string $lng
+     * @param string $lat
+     * @param array $pagination
+     * @param array $selects
+     * @param array $where
+     * @param int $page
+     * @param int $limit
+     * @return array
+     */
+    public function getStoreNearby($plat, $lng, $lat, &$pagination, $selects = [], $where = [], $page = 1, $limit = 10){
+
+        $payWayId = $plat == "wechat" ? 1 : 0;
+        $fromTable = "FROM {{%store}} s";
+        $innerArr = [
+            "INNER JOIN {{%merchant}} m ON m.admin_id=s.admin_id",
+            "INNER JOIN {{%merchant_entry}} me ON me.merchant_id=m.id AND me.pay_way_id='{$payWayId}'",
+            "LEFT JOIN {{%attachment}} s_at ON s_at.id=s.thumb",
+            "LEFT JOIN {{%storeset}} sst ON sst.store_id=s.id"
+        ];
+
+        //条件
+        $whereStr = "WHERE " . implode(" AND ", $where);
+
+
+        //获取记录数
+        $row = $this->getDB()->createCommand("SELECT COUNT(*) as count {$fromTable} " . implode(" ", $innerArr) . " {$whereStr}")->queryOne();
+        $totalCount = (int)$row['count'];
+
+        $pagination = new BasePagination(['totalCount' => $totalCount, 'pageSize' => $limit, 'page' => $page]);
+
+        $page = max(1, $page);
+
+        //显示字段
+        $selects = implode(",", $selects);
+        $selects .= ",ST_Distance_sphere(
+            point(SUBSTRING_INDEX(sst.coordinates, ',', -1), SUBSTRING_INDEX(sst.coordinates, ',', 1)),
+            point({$lng}, {$lat})
+        ) as distance_mi";
+
+        //排序
+        $orderStr = "ORDER BY distance_mi ASC";
+
+        //获取数据
+        $offset = ($page - 1) * $limit;
+        $sql = "SELECT {$selects} {$fromTable} " . implode(" ", $innerArr) . " {$whereStr} {$orderStr} limit $offset,{$limit}";
+        $rows = $this->getDB()->createCommand($sql)->queryAll();
+
+        $pagination = (array)$pagination;
+
+        return $rows ? $rows : [];
+    }
+
+    /**
      * 获取智慧门店数据
      * @param $pagination
      * @param array $selects

@@ -24,7 +24,8 @@ class PerformDistributionGoods extends BaseActiveRecord
     {
         return [
             [['mall_id', 'created_at', 'updated_at'], 'required'],
-            [['goods_id', 'is_delete'], 'integer']
+            [['goods_id', 'is_delete', 'award_type'], 'integer'],
+            [['award_rules'], 'trim']
         ];
     }
 

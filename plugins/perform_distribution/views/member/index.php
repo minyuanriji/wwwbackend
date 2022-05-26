@@ -1,54 +1,47 @@
 <?php
-Yii::$app->loadPluginComponentView('com-goods-edit');
-Yii::$app->loadComponentView('goods/com-select-goods');
+Yii::$app->loadPluginComponentView('com-user-edit');
+Yii::$app->loadComponentView('com-dialog-select');
 ?>
 <div id="app" v-cloak>
     <el-card shadow="never" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
             <div>
-                <span>商品设置</span>
+                <span>人员设置</span>
                 <div style="float: right; margin: -5px 0">
-                    <com-select-goods :multiple="false" @selected="goodsSelect" title="商品选择">
-                        <el-button type="primary" size="small">添加商品</el-button>
-                    </com-select-goods>
+                    <com-dialog-select @close="editDialogVisible = false" :visible="editDialogVisible"
+                            url="mall/user/index" :list-key="'nickname'"
+                            :columns="[{key: 'mobile', label: '手机号'}]"
+                            :multiple="false" @selected="userSelect" title="用户选择">
+                        <el-button @click="editDialogVisible = true" type="primary" size="small">添加人员</el-button>
+                    </com-dialog-select>
                 </div>
             </div>
         </div>
         <div class="table-body">
             <div class="input-item">
-                <el-input @keyup.enter.native="search" size="small"  placeholder="请输入商品名称搜索" v-model="keyword" clearable @clear="search">
+                <el-input @keyup.enter.native="search" size="small"  placeholder="请输入关键词搜索" v-model="keyword" clearable @clear="search">
                     <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                 </el-input>
             </div>
             <el-table v-loading="listLoading" :data="list" border style="width: 100%">
                 <el-table-column prop="id" label="ID" width="80"></el-table-column>
-                <el-table-column prop="level" label="商品名称" width="350">
+                <el-table-column prop="level" label="用户名" width="260">
                     <template slot-scope="scope">
-                        <div style="display: flex;">
-                            <com-image :src="scope.row.cover_pic" style="flex-shrink: 0"></com-image>
-                            <div style="margin-left:10px;">{{scope.row.name}}</div>
+                        <div style="display: flex;align-items: center">
+                            <com-image :src="scope.row.avatar_url" style="flex-shrink: 0"></com-image>
+                            <div style="margin-left:10px;display: flex;flex-direction: column;justify-content: space-between">
+                                <span>{{scope.row.nickname}}</span>
+                                <span>ID：{{scope.row.user_id}}</span>
+                            </div>
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="售价" width="120">
+                <el-table-column prop="mobile" label="手机" width="120" align="center"></el-table-column>
+                <el-table-column prop="level_name" label="等级" width="120" align="center"></el-table-column>
+                <el-table-column  label="上级" align="center">
                     <template slot-scope="scope">
-                        <com-ellipsis :line="1" >{{scope.row.goods.price}}</com-ellipsis>
-                    </template>
-                </el-table-column>
-                <el-table-column label="利润" width="120">
-                    <template slot-scope="scope">
-                        <com-ellipsis :line="1" >{{scope.row.goods.profit_price}}</com-ellipsis>
-                    </template>
-                </el-table-column>
-                <el-table-column label="奖励类型" width="100" align="center">
-                    <template slot-scope="scope">
-                        {{scope.row.award_type == 0 ? '百分比' : '固定值'}}
-                    </template>
-                </el-table-column>
-                <el-table-column label="奖励规则" align="center">
-                    <template slot-scope="scope">
-                        <el-table :show-header="false" :data="cAwardRules(scope.row)" border size="small">
-                            <el-table-column prop="name" width="100" align="right"></el-table-column>
+                        <el-table :show-header="false" :data="cParentInfo(scope.row)" border size="small">
+                            <el-table-column prop="label" width="100" align="right"></el-table-column>
                             <el-table-column prop="value"></el-table-column>
                         </el-table>
                     </template>
@@ -58,14 +51,14 @@ Yii::$app->loadComponentView('goods/com-select-goods');
                         {{scope.row.created_at|dateTimeFormat('Y-m-d H:i:s')}}
                     </template>
                 </el-table-column>
-                <el-table-column label="操作"  width="300">
+                <el-table-column label="操作" width="200">
                     <template slot-scope="scope">
                         <el-button circle size="mini" type="text" @click="edit(scope.row)">
                             <el-tooltip class="item" effect="dark" content="编辑" placement="top">
                                 <img src="statics/img/mall/edit.png" alt="">
                             </el-tooltip>
                         </el-button>
-                        <el-button circle size="mini" type="text" @click="goodsDelete(scope.row, scope.$index)">
+                        <el-button circle size="mini" type="text" @click="userDelete(scope.row, scope.$index)">
                             <el-tooltip class="item" effect="dark" content="删除" placement="top">
                                 <img src="statics/img/mall/del.png" alt="">
                             </el-tooltip>
@@ -84,20 +77,20 @@ Yii::$app->loadComponentView('goods/com-select-goods');
             </div>
         </div>
     </el-card>
-    <com-goods-edit v-model="isEdit" @on-save="getList" :data="editForm"></com-goods-edit>
+    <com-user-edit v-model="isEdit" @on-save="getList" :data="editForm"></com-user-edit>
 </div>
 <script>
     const app = new Vue({
         el: '#app',
         data() {
             return {
+                editDialogVisible: false,
                 isEdit: false,
                 editForm: {
                     id: 0,
-                    goods_id: 0,
-                    award_type: '0',
-                    award_rules: '',
-                    goods: {name: '', price: '', profit_price: '', cover_pic: ''}
+                    user_id: 0,
+                    level_id: '',
+                    user: {nickname: '', mobile: '', avatar_url: ''}
                 },
                 list: [],
                 keyword: '',
@@ -107,13 +100,16 @@ Yii::$app->loadComponentView('goods/com-select-goods');
             };
         },
         computed:{
-            cAwardRules(item){
+            cParentInfo(item){
                 return function(item){
-                    let i, rules = item.award_rules ? JSON.parse(item.award_rules) : [];
-                    for(i=0; i < rules.length; i++){
-                        rules[i].value = rules[i].value + (item.award_type == 0 ? '%' : '元');
+                    let infos = [];
+                    if(item.parent){
+                        infos.push({label: '编号', value: item.parent.id});
+                        infos.push({label: '昵称', value: item.parent.nickname});
+                        infos.push({label: '手机号', value: item.parent.mobile});
+                        infos.push({label: '等级', value: item.parent.level_name ? item.parent.level_name : '-'});
                     }
-                    return rules;
+                    return infos;
                 }
             }
         },
@@ -135,7 +131,7 @@ Yii::$app->loadComponentView('goods/com-select-goods');
                 self.listLoading = true;
                 request({
                     params: {
-                        r: 'plugin/perform_distribution/mall/goods/index',
+                        r: 'plugin/perform_distribution/mall/member/index',
                         page: self.page,
                         keyword: this.keyword
                     },
@@ -148,28 +144,22 @@ Yii::$app->loadComponentView('goods/com-select-goods');
                     console.log(e);
                 });
             },
-            goodsSelect(e){
+            userSelect(e){
                 let item = {
                     id: 0,
-                    goods_id: e.id,
-                    award_type: '0',
-                    award_rules: '',
-                    goods: {
-                        name: e.name,
-                        price: e.price,
-                        profit_price: e.profit_price,
-                        cover_pic: e.goodsWarehouse.cover_pic,
-                        original_price: e.goodsWarehouse.original_price
-                    }
+                    user_id: e.id,
+                    level_id:'',
+                    user: {nickname: e.nickname, mobile: e.mobile, avatar_url: e.avatar_url}
                 };
+                this.editDialogVisible = false;
                 this.edit(item);
             },
             edit(item){
-                item.award_type = item.award_type + '';
+                item.level_id = item.level_id + '';
                 this.editForm = item;
                 this.isEdit = true;
             },
-            goodsDelete(row, index) {
+            userDelete(row, index) {
                 let self = this;
                 self.$confirm('删除该商品, 是否继续?', '提示', {
                     confirmButtonText: '确定',
@@ -179,7 +169,7 @@ Yii::$app->loadComponentView('goods/com-select-goods');
                     self.listLoading = true;
                     request({
                         params: {
-                            r: 'plugin/perform_distribution/mall/goods/delete',
+                            r: 'plugin/perform_distribution/mall/member/delete',
                         },
                         method: 'post',
                         data: {

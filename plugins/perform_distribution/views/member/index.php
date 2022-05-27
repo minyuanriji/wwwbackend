@@ -3,27 +3,39 @@ Yii::$app->loadPluginComponentView('com-user-edit');
 Yii::$app->loadComponentView('com-dialog-select');
 ?>
 <div id="app" v-cloak>
-    <el-card shadow="never" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
+    <el-card v-loading="cardLoading" shadow="never" body-style="background-color: #f3f3f3;padding: 10px 0 0;">
         <div slot="header">
-            <div>
-                <span>人员设置</span>
-                <div style="float: right; margin: -5px 0">
-                    <com-dialog-select @close="editDialogVisible = false" :visible="editDialogVisible"
-                            url="mall/user/index" :list-key="'nickname'"
-                            :columns="[{key: 'mobile', label: '手机号'}]"
-                            :multiple="false" @selected="userSelect" title="用户选择">
-                        <el-button @click="editDialogVisible = true" type="primary" size="small">添加人员</el-button>
-                    </com-dialog-select>
-                </div>
-            </div>
+            <el-breadcrumb separator="/">
+                <el-breadcrumb-item>
+                    <span style="color: #409EFF;cursor: pointer"
+                          @click="$navigate({r:'plugin/perform_distribution/mall/region/index'})">
+                        区域设置
+                    </span>
+                </el-breadcrumb-item>
+                <el-breadcrumb-item v-if="regionInfo">
+                    <span style="color: #409EFF;cursor: pointer"
+                          @click="$navigate({r:'plugin/perform_distribution/mall/region/edit', id:regionInfo.id})">
+                        {{regionInfo.name}}
+                    </span>
+                </el-breadcrumb-item>
+                <el-breadcrumb-item>人员设置</el-breadcrumb-item>
+            </el-breadcrumb>
         </div>
         <div class="table-body">
-            <div class="input-item">
-                <el-input @keyup.enter.native="search" size="small"  placeholder="请输入关键词搜索" v-model="keyword" clearable @clear="search">
-                    <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
-                </el-input>
+            <div style="display: flex;align-items: center">
+                <div class="input-item" style="flex-grow: 1">
+                    <el-input style="width:260px;" @keyup.enter.native="search" size="small"  placeholder="请输入关键词搜索" v-model="keyword" clearable @clear="search">
+                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
+                    </el-input>
+                </div>
+                <com-dialog-select @close="editDialogVisible = false" :visible="editDialogVisible"
+                                   url="mall/user/index" :list-key="'nickname'"
+                                   :columns="[{key: 'mobile', label: '手机号'}]"
+                                   :multiple="false" @selected="userSelect" title="用户选择">
+                    <el-button @click="editDialogVisible = true" type="primary" size="small">添加人员</el-button>
+                </com-dialog-select>
             </div>
-            <el-table v-loading="listLoading" :data="list" border style="width: 100%">
+            <el-table v-loading="listLoading" :data="list" border style="margin-top:20px;width: 100%">
                 <el-table-column prop="id" label="ID" width="80"></el-table-column>
                 <el-table-column prop="level" label="用户名" width="260">
                     <template slot-scope="scope">
@@ -37,6 +49,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                     </template>
                 </el-table-column>
                 <el-table-column prop="mobile" label="手机" width="120" align="center"></el-table-column>
+                <el-table-column prop="total_income" label="总收益" width="120" align="center"></el-table-column>
                 <el-table-column prop="level_name" label="等级" width="120" align="center"></el-table-column>
                 <el-table-column  label="上级" align="center">
                     <template slot-scope="scope">
@@ -84,11 +97,13 @@ Yii::$app->loadComponentView('com-dialog-select');
         el: '#app',
         data() {
             return {
+                cardLoading: false,
                 editDialogVisible: false,
                 isEdit: false,
                 editForm: {
                     id: 0,
                     user_id: 0,
+                    region_id: 0,
                     level_id: '',
                     user: {nickname: '', mobile: '', avatar_url: ''}
                 },
@@ -96,7 +111,8 @@ Yii::$app->loadComponentView('com-dialog-select');
                 keyword: '',
                 listLoading: false,
                 page: 1,
-                pageCount: 0
+                pageCount: 0,
+                regionInfo: ''
             };
         },
         computed:{
@@ -114,7 +130,7 @@ Yii::$app->loadComponentView('com-dialog-select');
             }
         },
         mounted: function () {
-            this.getList();
+            this.getRegionInfo();
         },
         methods: {
             search() {
@@ -133,7 +149,8 @@ Yii::$app->loadComponentView('com-dialog-select');
                     params: {
                         r: 'plugin/perform_distribution/mall/member/index',
                         page: self.page,
-                        keyword: this.keyword
+                        region_id: self.regionInfo ? self.regionInfo.id : 0,
+                        keyword: self.keyword
                     },
                     method: 'get',
                 }).then(e => {
@@ -148,6 +165,7 @@ Yii::$app->loadComponentView('com-dialog-select');
                 let item = {
                     id: 0,
                     user_id: e.id,
+                    region_id: getQuery('region_id'),
                     level_id:'',
                     user: {nickname: e.nickname, mobile: e.mobile, avatar_url: e.avatar_url}
                 };
@@ -190,6 +208,28 @@ Yii::$app->loadComponentView('com-dialog-select');
                     self.$message.info('已取消删除')
                 });
             },
+            getRegionInfo() {
+                this.cardLoading = true;
+                request({
+                    params: {
+                        r: 'plugin/perform_distribution/mall/region/edit',
+                        id: getQuery('region_id'),
+                    },
+                    method: 'get'
+                }).then(e => {
+                    this.cardLoading = false;
+                    if (e.data.code == 0) {
+                        if (e.data.data) {
+                            this.regionInfo = e.data.data.detail;
+                            this.getList();
+                        }
+                    } else {
+                        this.$message.error(e.data.msg);
+                    }
+                }).catch(e => {
+                    console.log(e);
+                });
+            }
         }
     });
 </script>
@@ -203,7 +243,6 @@ Yii::$app->loadComponentView('com-dialog-select');
     .input-item {
         display: inline-block;
         width: 250px;
-        margin: 0 0 20px;
     }
 
     .input-item .el-input__inner {
@@ -229,17 +268,4 @@ Yii::$app->loadComponentView('com-dialog-select');
         padding: 0;
     }
 
-    .input-item .el-input-group__append .el-button {
-        padding: 0;
-    }
-
-    .input-item .el-input-group__append .el-button {
-        margin: 0;
-    }
-
-    .table-body .el-button {
-        padding: 0 !important;
-        border: 0;
-        margin: 0 5px;
-    }
 </style>

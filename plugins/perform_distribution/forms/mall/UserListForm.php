@@ -10,15 +10,17 @@ use app\plugins\perform_distribution\models\PerformDistributionUser;
 
 class UserListForm extends BaseModel{
 
+    public $region_id;
     public $keyword;
     public $limit = 10;
     public $page = 1;
 
     public function rules(){
         return [
+            [['region_id'], 'required'],
             [['keyword'], 'trim'],
             [['keyword'], 'string'],
-            [['limit', 'page'], 'integer']
+            [['limit', 'page', 'region_id'], 'integer']
         ];
     }
 
@@ -30,9 +32,12 @@ class UserListForm extends BaseModel{
         try {
 
             $query = PerformDistributionUser::find()->alias("pdu")
-                ->where(['pdu.is_delete' => 0, 'pdu.mall_id' => \Yii::$app->mall->id])
-                ->leftJoin(["l" => Level::tableName()], "l.id=pdu.level_id")
-                ->leftJoin(["u" => User::tableName()], "u.id=pdu.user_id");
+                ->where([
+                    'pdu.region_id' => $this->region_id,
+                    'pdu.is_delete' => 0,
+                    'pdu.mall_id'   => \Yii::$app->mall->id
+                ])->leftJoin(["l" => Level::tableName()], "l.id=pdu.level_id")
+                  ->leftJoin(["u" => User::tableName()], "u.id=pdu.user_id");
 
             if ($this->keyword) {
                 $query->andWhere([
@@ -46,6 +51,12 @@ class UserListForm extends BaseModel{
             $list = $query->select('u.nickname,u.parent_id,u.mobile,u.avatar_url,pdu.*,l.name as level_name')
                 ->page($pagination, $this->limit, $this->page)
                 ->orderBy("pdu.id DESC")->asArray()->all();
+            if($list){
+                foreach($list as $key => $row){
+                    $row['total_income'] = 0;
+                    $list[$key] = $row;
+                }
+            }
 
             foreach ($list as $key => $item) {
                 $user = User::findOne($item['user_id']);

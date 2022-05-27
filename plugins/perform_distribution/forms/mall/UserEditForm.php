@@ -10,12 +10,13 @@ use app\plugins\perform_distribution\models\PerformDistributionUser;
 class UserEditForm extends BaseModel{
 
     public $id;
+    public $region_id;
     public $user_id;
     public $level_id;
 
     public function rules(){
         return [
-            [['user_id', 'level_id'], 'required'],
+            [['user_id', 'level_id', 'region_id'], 'required'],
             [['user_id', 'id', 'level_id'], 'integer']
         ];
     }
@@ -39,6 +40,7 @@ class UserEditForm extends BaseModel{
                     "created_at" => time()
                 ]);
             }
+            $performDistributionUser->region_id  = $this->region_id;
             $performDistributionUser->level_id   = $this->level_id;
             $performDistributionUser->updated_at = time();
             $performDistributionUser->is_delete  = 0;

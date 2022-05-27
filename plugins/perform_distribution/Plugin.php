@@ -40,18 +40,13 @@ class Plugin extends \app\plugins\Plugin
                 'icon' => 'el-icon-setting'
             ],
             [
-                'name' => '人员设置',
-                'route' => 'plugin/perform_distribution/mall/member/index',
-                'icon' => 'el-icon-setting'
-            ],
-            [
                 'name' => '区域设置',
                 'route' => 'plugin/perform_distribution/mall/region/index',
                 'icon' => 'el-icon-setting'
             ],
             [
                 'name' => '奖励明细',
-                'route' => 'plugin/perform_distribution/mall/award/log',
+                'route' => 'plugin/perform_distribution/mall/award/order',
                 'icon' => 'el-icon-setting'
             ]
         ];

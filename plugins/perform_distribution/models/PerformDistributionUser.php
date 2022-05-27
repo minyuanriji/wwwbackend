@@ -22,7 +22,7 @@ class PerformDistributionUser extends BaseActiveRecord
     public function rules()
     {
         return [
-            [['mall_id', 'level_id', 'user_id',  'created_at', 'updated_at'], 'required'],
+            [['mall_id', 'level_id', 'user_id',  'created_at', 'updated_at', 'region_id'], 'required'],
             [['is_delete'], 'integer']
         ];
     }

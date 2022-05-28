@@ -7,6 +7,7 @@ use Yii;
 class CronController extends BaseCommandController{
 
     public static $handlers = [
+        "perform-distributiont-task" => PerformDistributiontTaskController::class, //业绩分配奖励
         "smart-shop-task" => SmartShopTaskController::class, //智慧门店
         "commission" => CommissionController::class, //分佣任务
         "shopping-voucher-send-task" => ShoppingVoucherSendTaskController::class, //红包（购物券）发放任务

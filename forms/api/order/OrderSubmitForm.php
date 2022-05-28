@@ -509,7 +509,7 @@ class OrderSubmitForm extends BaseModel
             }
             return [
                 'code'     => ApiCode::CODE_SUCCESS,
-                'mp_appid' => $resultData['mp_appid'],
+                'mp_appid' => isset($resultData['mp_appid']) ? $resultData['mp_appid'] : "",
                 'data'     => $resultData
             ];
             return $this->returnApiResultData(ApiCode::CODE_SUCCESS, "", $resultData);

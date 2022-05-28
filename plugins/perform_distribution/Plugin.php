@@ -3,7 +3,7 @@ namespace app\plugins\perform_distribution;
 
 
 use app\handlers\BaseHandler;
-use app\plugins\stock\handlers\HandlerRegister;
+use app\plugins\perform_distribution\handlers\HandlerRegister;
 
 class Plugin extends \app\plugins\Plugin
 {

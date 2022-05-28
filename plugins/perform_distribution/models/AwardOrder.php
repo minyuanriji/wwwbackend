@@ -8,6 +8,9 @@ use app\models\BaseActiveRecord;
 class AwardOrder extends BaseActiveRecord
 {
 
+    const STATUS_SUCCESS  = 1;
+    const STATUS_INVALID  = 2;
+
     /**
      * {@inheritdoc}
      */

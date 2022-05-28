@@ -304,7 +304,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
 
     public function getParent()
     {
-        return $this->hasOne(User::className(), ['id' => 'parent_id']);
+        return $this->hasOne(User::class, ['id' => 'parent_id']);
     }
 
     public function getSecondParent()

@@ -11,13 +11,14 @@ use app\plugins\perform_distribution\models\PerformDistributionUser;
 class UserListForm extends BaseModel{
 
     public $region_id;
+    public $level_id;
     public $keyword;
     public $limit = 10;
     public $page = 1;
 
     public function rules(){
         return [
-            [['region_id'], 'required'],
+            [['region_id', 'level_id'], 'required'],
             [['keyword'], 'trim'],
             [['keyword'], 'string'],
             [['limit', 'page', 'region_id'], 'integer']
@@ -33,6 +34,7 @@ class UserListForm extends BaseModel{
 
             $query = PerformDistributionUser::find()->alias("pdu")
                 ->where([
+                    'pdu.level_id'  => $this->level_id,
                     'pdu.region_id' => $this->region_id,
                     'pdu.is_delete' => 0,
                     'pdu.mall_id'   => \Yii::$app->mall->id

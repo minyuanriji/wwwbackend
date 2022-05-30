@@ -73,6 +73,7 @@
                 handler(newVal){
                     this.ruleForm = newVal;
                     this.ruleForm.level_id = this.ruleForm.level_id ? parseInt(this.ruleForm.level_id) : '';
+
                 },
                 deep: true
             }

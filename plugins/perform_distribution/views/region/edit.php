@@ -109,12 +109,12 @@
                             self.btnLoading = false;
                             if (e.data.code == 0) {
                                 self.$message.success(e.data.msg);
+                                navigateTo({
+                                    r: 'plugin/perform_distribution/mall/region/index'
+                                })
                             } else {
                                 self.$message.error(e.data.msg);
                             }
-                            navigateTo({
-                                r: 'plugin/perform_distribution/mall/region/index'
-                            })
                         }).catch(e => {
                             self.$message.error(e.data.msg);
                             self.btnLoading = false;

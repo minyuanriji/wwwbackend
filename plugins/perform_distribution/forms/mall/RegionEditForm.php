@@ -10,7 +10,6 @@ class RegionEditForm extends BaseModel{
 
     public $id;
     public $name;
-    public $region_id;
     public $province_id;
     public $city_id;
     public $district_id;
@@ -18,7 +17,7 @@ class RegionEditForm extends BaseModel{
 
     public function rules(){
         return [
-            [['name', 'region_id'], 'required'],
+            [['name'], 'required'],
             [['province_id', 'city_id', 'district_id', 'id'], 'integer'],
             [['address', 'name'], 'trim']
         ];
@@ -41,7 +40,6 @@ class RegionEditForm extends BaseModel{
                     "created_at" => time()
                 ]);
             }
-            $region->region_id   = $this->region_id;
             $region->updated_at  = time();
             $region->name        = $this->name;
             $region->is_delete   = 0;

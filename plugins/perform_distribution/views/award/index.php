@@ -39,7 +39,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="状态" width="120" >
+                <el-table-column label="状态" width="120" align="center">
                     <template slot-scope="scope">
                         <el-tag v-if="scope.row.status == 0">待结算</el-tag>
                         <el-tag v-if="scope.row.status == 1" type="success">已结算</el-tag>

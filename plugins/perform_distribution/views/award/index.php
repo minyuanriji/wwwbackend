@@ -39,6 +39,13 @@
                         </div>
                     </template>
                 </el-table-column>
+                <el-table-column label="状态" width="120" >
+                    <template slot-scope="scope">
+                        <el-tag v-if="scope.row.status == 0">待结算</el-tag>
+                        <el-tag v-if="scope.row.status == 1" type="success">已结算</el-tag>
+                        <el-tag v-if="scope.row.status == 2" type="danger">无效</el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="price" label="获得收益" width="120" align="center"></el-table-column>
                 <el-table-column prop="total_income" label="累计收益" width="120" align="center"></el-table-column>
                 <el-table-column label="商品信息" width="350" >

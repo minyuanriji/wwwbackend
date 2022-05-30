@@ -23,6 +23,7 @@ use app\logic\IntegralLogic;
 
 use app\models\CommonOrder;
 use app\models\CouponAutoSend;
+use app\models\Order;
 use app\models\OrderPayResult;
 use app\models\OrderDetail;
 use app\models\OrderRefund;
@@ -31,6 +32,7 @@ use app\models\User;
 use app\models\UserCard;
 use app\forms\efps\distribute\EfpsDistributeForm;
 use app\plugins\mch\forms\common\price_log\PriceLogNewOrderForm;
+use app\plugins\perform_distribution\events\AwardOrderEvent;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
 
 /**
@@ -108,6 +110,13 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
         if($this->order->mch_id){
             PriceLogNewOrderForm::create($this->order);
         }
+
+        //业绩奖励
+        \Yii::$app->trigger(AwardOrderEvent::SHOP_ORDER_PAID,
+            new AwardOrderEvent([
+                'order' => $this->order
+            ])
+        );
 
         //多商户订单结算
         //GoodsOrderAutoSettleForm::settle($this->order);

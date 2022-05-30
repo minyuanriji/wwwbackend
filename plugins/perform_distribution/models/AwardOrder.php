@@ -27,7 +27,7 @@ class AwardOrder extends BaseActiveRecord
         return [
             [['mall_id', 'user_id', 'created_at', 'updated_at', 'order_id', 'order_detail_id'], 'required'],
             [['price'], 'number'],
-            [['status', 'is_delete'], 'integer'],
+            [['status', 'is_delete', 'level_id'], 'integer'],
             [['award_info'], 'safe']
         ];
     }

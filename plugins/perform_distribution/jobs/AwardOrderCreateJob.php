@@ -58,6 +58,7 @@ class AwardOrderCreateJob extends Component implements JobInterface{
                         "user_id"         => $awardUser['user_id'],
                         "order_id"        => $this->order->id,
                         "order_detail_id" => $detail->id,
+                        "level_id"        => $awardUser['level_id'],
                         "created_at"      => time()
                     ]);
                     $awardOrder->updated_at = time();

@@ -44,11 +44,13 @@ class CardController extends ApiBaseController
         $serialize_no = $params['serialize_no'] ?? '';
         $use_code = $params['use_code'] ?? '';
         $user_id = Yii::$app->user->id;
-        $card = CardDetail::recharge($serialize_no,$use_code,$user_id);
+        $card = CardDetail::recharge($serialize_no,$use_code,$user_id, $link_url);
         if($card === false)  return $this->error(CardDetail::getError());
         $unit_list = Integral::$unit_list;
         $integral_setting= json_decode($card->integral_setting,true);
-        return $this->success('充值成功',compact('integral_setting','unit_list'));
+        return $this->success('充值成功',array_merge(compact('integral_setting','unit_list'), [
+            'link_url' => $link_url
+        ]));
     }
 
     /**

@@ -99,7 +99,15 @@
 						</el-input>
 					</div>
 				</el-form-item> -->
-				
+
+                <el-form-item label="跳转页面" prop="status">
+                    <div style="display:flex;align-items: center;">
+                        <el-input v-model="form.link_url.name" size="small"  placeholder="" :disabled="true" style="width:200px;margin-right:10px;"></el-input>
+                        <com-pick-link @selected="selectLink">
+                            <el-button size="small">选择链接</el-button>
+                        </com-pick-link>
+                    </div>
+                </el-form-item>
             </el-form>
         </div>
         <el-button v-if="!isLook" class="button-item" type="primary" :loading="btnLoading" @click="onSubmit">保存</el-button>
@@ -127,6 +135,7 @@ const app = new Vue({
 				"expire_time": "",
 				// "fee": "",
 				"nickname":'',	//发请求时要删除
+                "link_url": {name: ''}
             },
             keyword: '',
             listLoading: false,
@@ -154,7 +163,10 @@ const app = new Vue({
         };
     },
     methods: {
-		
+        selectLink(e) {
+            this.form.link_url = e[0];
+        },
+
 		//0.1 模糊搜索代理商
 		querySearchAsync(queryString, cb) {
 		    this.keyword = queryString;
@@ -209,7 +221,7 @@ const app = new Vue({
                 if (valid) {
                     this.btnLoading = true;
                     // let para = Object.assign(this.form);
-					let formData = this.form;
+					let formData = JSON.parse(JSON.stringify(this.form));
 					delete formData.nickname
 					formData.id==-1?delete formData.id:'';	//新增的时候删掉id
                     request({
@@ -255,6 +267,9 @@ const app = new Vue({
 						console.log('this.form.expire_time:'+this.form.expire_time);
 						// this.form.fee = info.fee;
 						this.form.nickname = info.user.nickname;
+						if(info.link_url){
+                            this.form.link_url = JSON.parse(info.link_url);
+                        }
                         // console.log(this.form, 123);
                     }
                 }

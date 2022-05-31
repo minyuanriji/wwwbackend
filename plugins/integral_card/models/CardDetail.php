@@ -75,7 +75,7 @@ class CardDetail extends BaseActiveRecord{
      * @param int $user_id
      * @return boolean|object
      */
-    public static function recharge($serialize_no,$use_code,$user_id){
+    public static function recharge($serialize_no,$use_code,$user_id, &$link_url = null){
         try{
             $model = self::find()
             ->where(array(
@@ -112,6 +112,9 @@ class CardDetail extends BaseActiveRecord{
             if($level['role_type'] == 'user'){
                 (new UserModel()) -> updateUsers(['role_type' => 'store'],$user_id);
             }
+
+            $link_url = $card->link_url ? json_decode($card->link_url, true) : [];
+
             return $model;
         }catch(Exception $e){
             self::$error = $e->getMessage();

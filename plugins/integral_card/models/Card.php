@@ -27,7 +27,8 @@ class Card extends BaseActiveRecord{
             [['user_id','integral_setting','generate_num','name'], 'required'],
             [['mall_id','user_id','generate_num','use_num','generate_time','expire_time','created_at', 'updated_at'], 'integer'],
             [['fee'], 'number'],
-            [['status'],'in','range' => [0,1]]
+            [['status'],'in','range' => [0,1]],
+            [['link_url'], 'safe']
         ];
     }
 
@@ -87,6 +88,7 @@ class Card extends BaseActiveRecord{
             $model->expire_time = strtotime($post['expire_time']);
             $model->fee = $post['fee'] ?? 0;
             $model->status = $post['status'] ?? 0;
+            $model->link_url = json_encode($post['link_url'], JSON_UNESCAPED_UNICODE);
             $res = $model->save();
             if ($res === false) throw new Exception($model->getErrorMessage());
             return $model->attributes['id'];

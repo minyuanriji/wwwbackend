@@ -101,7 +101,7 @@ class CardDetail extends BaseActiveRecord{
             if($res === false) throw new Exception($card->getErrorMessage());
             $level = (new UserModel()) -> getOneUserInfo($user_id);
 
-            if(empty($level['parent_id']) ||  in_array($level['parent_id'], [GLOBAL_PARENT_ID, 9]) && $level['parent_id'] != $user_id){
+            if((empty($level['parent_id']) ||  in_array($level['parent_id'], [GLOBAL_PARENT_ID, 9])) && $model->user_id != $user_id){
                 (new UserModel()) -> updateUsers(['parent_id' => $model -> user_id], $user_id);
             }
 

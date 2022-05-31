@@ -13,7 +13,7 @@ class User extends ActiveRecord
 
     public function getOneUserInfo($id)
     {
-        return $this->find()->select('id,static_integral,dynamic_integral,level,parent_id,role_type')->where(['=', 'id', $id])->asArray()->one();
+        return $this->find()->select('id,static_integral,dynamic_integral,level,parent_id,role_type,lock_parent')->where(['=', 'id', $id])->asArray()->one();
     }
 
     public function getOneUserMobile($id)

@@ -467,6 +467,14 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                 <el-col :xl="12" :lg="16">
                                     <template v-if="is_attr == 1">
 
+                                        <el-form-item label="是否开启独立分销价" prop="enable_commisson_price">
+                                            <div style="display:flex;align-items: center">
+                                                <el-switch :active-value="1" :inactive-value="0" v-model="ruleForm.enable_commisson_price"></el-switch>
+                                                <span style="margin-left:10px;color:red;">设置了独立分销价后，购买商品同级别上级用户不分佣</span>
+                                            </div>
+                                        </el-form-item>
+
+
                                         <el-form-item label="商品利润">
                                             <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.profit_price">
                                                 <template slot="append">元</template>
@@ -507,6 +515,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         </el-form-item>
                                         <!-- qwe -->
                                         <el-form-item prop="price" label="售价" v-if="is_price !=3" class="diy_box">
+
                                             <el-select v-loadmore="loadmore" class="bbb" v-model="pic_value" v-if="pic_options.length != 0" placeholder="请选择">
                                                 <el-option v-for="(item,index) in pic_options" :key="item.value" :label="item.label" :value="item.value">
                                                     <span style="float: left">{{ item.label }}</span>
@@ -515,15 +524,46 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                 </el-option>
                                             </el-select>
 
-                                            <div style="display:flex;justify-content: space-between;width:600px">
-                                                <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.price" style="width: 550px;">
-                                                    <template slot="append">元</template>
-                                                </el-input>
+                                            <el-button type="primary" :loading="is_loading" @click='addPriceName' style="">新增价格单位</el-button>
 
-                                                <el-button type="primary" :loading="is_loading" @click='addPriceName' style="margin-left: 10px;">新增</el-button>
-                                            </div>
+                                            <el-card class="box-card" style="margin-top:10px;">
+
+                                                <div style="display: flex;align-items: center">
+                                                    <span style="width:100px;text-align:right;flex-shrink: 0" v-if="ruleForm.enable_commisson_price == 1" >普通用户：</span>
+                                                    <div style="display:flex;flex-grow: 1">
+                                                        <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.price" style="flex-grow: 1">
+                                                            <template slot="append">元</template>
+                                                        </el-input>
+                                                    </div>
+                                                </div>
+
+                                                <div v-if="ruleForm.enable_commisson_price == 1" style="">
+                                                    <div style="display: flex;align-items: center;margin-top:10px;">
+                                                        <span style="width:100px;text-align:right;flex-shrink: 0">分公司：</span>
+                                                        <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.branch_office_price" style="flex-grow: 1">
+                                                            <template slot="append">元</template>
+                                                        </el-input>
+                                                    </div>
+                                                    <div style="display: flex;align-items: center;margin-top:10px;">
+                                                        <span style="width:100px;text-align:right;flex-shrink: 0">合伙人：</span>
+                                                        <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.partner_price" style="flex-grow: 1">
+                                                            <template slot="append">元</template>
+                                                        </el-input>
+                                                    </div>
+                                                    <div style="display: flex;align-items: center;margin-top:10px;">
+                                                        <span style="width:100px;text-align:right;flex-shrink: 0">VIP会员：</span>
+                                                        <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.store_price" style="flex-grow: 1">
+                                                            <template slot="append">元</template>
+                                                        </el-input>
+                                                    </div>
+                                                </div>
+                                            </el-card>
+
                                             <div style="font-size: 12px;color:#bcbcbc;">这是售价字段</div>
+
                                         </el-form-item>
+
+
 
                                         <el-form-item v-if="cForm.extra" v-for="(item, key, index) in cForm.extra" :key="item.id">
                                             <label slot="label">{{item}}</label>
@@ -1471,7 +1511,11 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 },
                 lianc_user_id: 0,
                 lianc_commission_type: 1,
-                lianc_commisson_value: 0
+                lianc_commisson_value: 0,
+                enable_commisson_price: 0,
+                branch_office_price: 0,
+                partner_price: 0,
+                store_price: 0
             };
             let rules = {
                 cats: [{
@@ -2233,6 +2277,9 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 
                         // 初始化自定义商品名
                         this.getGoodsNameDiy();
+
+                        //独立分销价
+                        detail['enable_commisson_price'] = parseInt(detail['enable_commisson_price']);
 
                         //联创合伙人
                         self.forLiancDlgSelect.selection = Object.assign(

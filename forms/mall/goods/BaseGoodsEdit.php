@@ -128,6 +128,13 @@ abstract class BaseGoodsEdit extends BaseModel
     public $use_virtual_sales;
     public $labels;
 
+    //独立分销价
+    public $enable_commisson_price;
+    public $branch_office_price;
+    public $partner_price;
+    public $store_price;
+
+
     public function rules()
     {
         return [
@@ -137,7 +144,7 @@ abstract class BaseGoodsEdit extends BaseModel
                 'confine_count', 'give_score', 'give_score_type', 'forehead_score_type',
                 'accumulative', 'freight_id', 'pieces', 'is_level_alone', 'is_default_services', 'goods_warehouse_id',
                 'mch_id', 'form_id', 'is_area_limit', 'confine_order_count',
-                'is_vip_card_goods', 'use_virtual_sales', 'is_show_sales', 'order_prompt'], 'integer'],
+                'is_vip_card_goods', 'use_virtual_sales', 'is_show_sales', 'order_prompt', 'enable_commisson_price'], 'integer'],
             [['goods_no', 'rebate', 'app_share_title', 'app_share_pic', 'attr_default_name'], 'string'],
             [['forehead', 'id','fulfil_price','full_relief_price','max_deduct_integral','enable_integral','enable_score','is_order_paid', 'is_order_sales'], 'number'],
             [['cats', 'mchCats', 'services', 'cards', 'attr', 'attrGroups', 'member_price',
@@ -154,7 +161,8 @@ abstract class BaseGoodsEdit extends BaseModel
                 'is_default_services'], 'default', 'value' => 1],
             [['price', 'forehead_score', 'profit_price'], 'number', 'min' => 0],
             [['price', 'profit_price'], 'number', 'max' => 9999999],
-            [['is_on_site_consumption', 'enable_upgrade_user_role', 'lianc_user_id'], 'number'],
+            [['is_on_site_consumption', 'enable_upgrade_user_role', 'lianc_user_id',
+              'branch_office_price', 'partner_price', 'store_price'], 'number'],
             [['fulfil_price','full_relief_price'],'default','value'=>0],
             [['integral_fee_rate'], 'integer', 'min' => 0, 'max' => 100],
             [['virtual_sales'], 'safe']
@@ -470,6 +478,12 @@ abstract class BaseGoodsEdit extends BaseModel
         if(!empty($this->upgrade_user_role_type)){
             $goods->upgrade_user_role_type = $this->upgrade_user_role_type;
         }
+
+        //独立分销价
+        $goods->enable_commisson_price = (int)$this->enable_commisson_price;
+        $goods->branch_office_price    = (float)$this->branch_office_price;
+        $goods->partner_price          = (float)$this->partner_price;
+        $goods->store_price            = (float)$this->store_price;
 
         $res = $goods->save();
         if (!$res) {

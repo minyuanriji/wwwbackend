@@ -119,7 +119,9 @@ class Goods extends BaseActiveRecord
                 'forehead_score_type', 'accumulative', 'individual_share', 'attr_setting_type', 'is_level',
                 'is_level_alone', 'share_type', 'is_default_services', 'sort', 'is_delete', 'payment_people',
                 'payment_num', 'payment_order', 'is_area_limit', 'form_id'], 'integer'],
-            [['price', 'profit_price', 'forehead', 'payment_amount', 'forehead_score', 'confine_order_count', 'full_relief_price', 'fulfil_price', 'max_deduct_integral', 'enable_integral', 'enable_score', 'is_order_paid', 'is_order_sales'], 'number'],
+            [['price', 'profit_price', 'forehead', 'payment_amount', 'forehead_score', 'confine_order_count', 'full_relief_price',
+              'fulfil_price', 'max_deduct_integral', 'enable_integral', 'enable_score', 'is_order_paid', 'is_order_sales',
+              'branch_office_price', 'partner_price', 'store_price'], 'number'],
             [['attr_groups', 'area_limit'], 'string'],
             [['area_limit'], 'default', 'value' => ''],
             [['created_at', 'updated_at', 'deleted_at', 'labels', 'price_display', 'integral_setting', 'score_setting', 'order_paid', 'order_sales', 'cannotrefund', 'is_on_site_consumption', 'purchase_permission', 'first_buy_setting'], 'safe'],
@@ -127,7 +129,7 @@ class Goods extends BaseActiveRecord
             [['app_share_title'], 'string', 'max' => 65],
             [['full_relief_price', 'fulfil_price'], 'default', 'value' => 0],
             [['integral_setting', 'score_setting', 'order_paid', 'order_sales'], 'default', 'value' => ''],
-            [['integral_fee_rate', 'enable_upgrade_user_role'], 'integer'],
+            [['integral_fee_rate', 'enable_upgrade_user_role', 'enable_commisson_price'], 'integer'],
             [['upgrade_user_role_type', 'lianc_user_id', 'lianc_commission_type', 'lianc_commisson_value'], 'safe']
         ];
     }

@@ -37,7 +37,7 @@ class GoodsAttr extends BaseActiveRecord
         return [
             [['goods_id'], 'required'],
             [['goods_id', 'stock', 'weight', 'is_delete'], 'integer'],
-            [['price'], 'number'],
+            [['price', 'branch_office_price', 'partner_price', 'store_price'], 'number'],
             [['sign_id', 'no', 'pic_url'], 'string', 'max' => 255],
         ];
     }

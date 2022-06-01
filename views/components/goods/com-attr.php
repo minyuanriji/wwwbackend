@@ -50,7 +50,7 @@
 
         <el-table ref="multipleTable" :data="cData" border stripe style="width: 100%"
                   @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55"></el-table-column>
+            <el-table-column type="selection" width="55" align="center"></el-table-column>
             <el-table-column
                     v-for="(item, index) in attrGroups"
                     :key="item.id"
@@ -61,7 +61,7 @@
                              v-for="(item, key, index) in cList"
                              :key="item.id"
                              :property="key"
-                             :label="item + (append ? '(' + append + ')' : '')">
+                             :label="item + (append ? '(' + append + ')' : '')" width="110">
                 <template slot="header" v-if="key===`price` || key=== `stock`">
                     <div class="header-require">{{item}}</div>
                 </template>
@@ -99,6 +99,7 @@
     Vue.component('com-attr', {
         template: '#com-attr',
         props: {
+            commissonPrice: Number, //是否开启独立分销价
             value: Array, // 商品规格信息
             attrGroups: Array, // 商品规格组
             extra: Object, // 额外的数据信息
@@ -126,7 +127,7 @@
                 },
                 selectData: '',
                 batch: 0,
-                selectList: [],
+                selectList: []
             };
         },
         created() {
@@ -161,39 +162,57 @@
         },
         computed: {
             cList() {
+                let obj = {};
+
                 // TODO 分销数据暂时
                 if (this.share) {
                     let share = JSON.parse(JSON.stringify(this.share));
-                    let obj = {};
                     for (let i = 0; i < share.length; i++) {
                         obj[share[i].value] = share[i].label;
                     }
-                    return obj;
                 }
                 // TODO 会员数据暂时
                 if (this.isLevel) {
                     let members = JSON.parse(JSON.stringify(this.members));
-                    let obj = {};
                     for (let i = 0; i < members.length; i++) {
                         obj['level' + members[i].level] = members[i].name
                     }
-                    return obj;
                 } else {
                     if (this.extra) {
-                        return Object.assign(this.data, JSON.parse(JSON.stringify(this.extra)));
+                        obj = Object.assign(this.data, JSON.parse(JSON.stringify(this.extra)));
                     } else if (this.list) {
-                        return JSON.parse(JSON.stringify(this.list))
+                        obj = JSON.parse(JSON.stringify(this.list))
                     } else {
-                        return this.data;
+                        obj = this.data;
                     }
                 }
+
+                //让价格排在一起
+                let key, newObj = {};
+                for(key in obj){
+                    if(key == "price"){
+                        newObj['price'] = '价格';
+                        if(this.commissonPrice == 1){
+                            newObj['branch_office_price'] = '分公司';
+                            newObj['partner_price'] = '合伙人';
+                            newObj['store_price'] = 'VIP';
+                        }
+                    }else{
+                        newObj[key] = obj[key];
+                    }
+                }
+
+                return newObj;
             },
             cData() {
+                let data = [];
                 if (this.attrGroups && this.attrGroups.length > 0 && this.attrGroups[0].attr_list.length === 0) {
-                    return [];
+                    data = [];
                 } else {
-                    return this.value;
+                    data = this.value;
                 }
+                console.log("data", data);
+                return data;
             }
         },
         methods: {

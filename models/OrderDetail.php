@@ -79,12 +79,12 @@ class OrderDetail extends BaseActiveRecord
     {
         return [
             [['order_id', 'goods_id', 'num', 'unit_price', 'total_original_price', 'total_price', 'member_discount_price', 'goods_info', 'created_at', 'updated_at', 'deleted_at'], 'required'],
-            [['order_id', 'goods_id', 'num', 'is_delete', 'is_refund', 'refund_status', 'form_id', 'use_user_coupon_id', 'integral_fee_rate', 'is_score_send'], 'integer'],
+            [['order_id', 'goods_id', 'num', 'is_delete', 'is_refund', 'refund_status', 'form_id', 'use_user_coupon_id', 'integral_fee_rate', 'is_score_send', 'is_commisson_price'], 'integer'],
             [['unit_price', 'total_original_price', 'total_price', 'member_discount_price', 'back_price',
               'coupon_discount_price', 'use_score_price', 'use_score', 'score_price', 'full_relief_price', 'integral_price',
               'shopping_voucher_decode_price', 'shopping_voucher_num'
             ], 'number'],
-            [['goods_info', 'goods_no', 'form_data'], 'string'],
+            [['goods_info', 'goods_no', 'form_data', 'user_role_type'], 'string'],
             [['created_at', 'updated_at', 'deleted_at', 'commission_status'], 'safe'],
             [['sign'], 'string', 'max' => 255],
         ];

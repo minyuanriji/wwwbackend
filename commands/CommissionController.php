@@ -175,7 +175,7 @@ class CommissionController extends BaseCommandController{
      * @return array
      * @throws \Exception
      */
-    public function getCommissionParentRuleDatas($user_id, $item_id, $item_type, $lianc_user_id = null){
+    public function getCommissionParentRuleDatas($user_id, $item_id, $item_type, $lianc_user_id = null, $is_commisson_price = null, $user_role_type = null){
 
         $newParentDatas = $this->getCommissionParents($user_id, $lianc_user_id);
 
@@ -245,6 +245,17 @@ class CommissionController extends BaseCommandController{
             $parentDatas[$key]['rule_data'] = $ruleData ? $ruleData : null;
 
             $currentLevel--;
+        }
+
+        //如果是独立分销价，同级别上级不进行分佣
+        if($item_type == "goods" && $is_commisson_price){
+            $newParentDatas = [];
+            foreach($parentDatas as $parentData){
+                if($parentData['role_type'] != $user_role_type){
+                    $newParentDatas[] = $parentData;
+                }
+            }
+            $parentDatas = $newParentDatas;
         }
 
         return $parentDatas;

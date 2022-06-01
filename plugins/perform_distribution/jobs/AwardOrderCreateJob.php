@@ -76,7 +76,7 @@ class AwardOrderCreateJob extends Component implements JobInterface{
                         "flag"        => 0,
                         "source_id"   => $awardOrder->id,
                         "source_type" => "perform_distribution_award_order",
-                        "desc"        => "业绩分配奖励收益",
+                        "desc"        => "来自“".$awardInfo['region_name']."”商品“".$awardInfo['goods_name']."”的业绩分配奖励",
                         "is_manual"   => 0
                     ]);
                     $incomeModifyForm->modify(User::findOne($awardUser['user_id']), false);

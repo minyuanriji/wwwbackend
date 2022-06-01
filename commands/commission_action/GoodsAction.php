@@ -52,7 +52,8 @@ class GoodsAction extends Action{
         ]);
         $query->select([
             "od.id as order_detail_id", "od.num", "od.is_refund", "od.refund_status", "od.created_at",
-            "od.updated_at", "o.mall_id", "o.user_id", "url.left", "url.right", "od.order_id", "od.goods_id", "od.total_original_price",
+            "od.updated_at", "o.mall_id", "o.user_id", "url.left", "url.right", "od.order_id", "od.goods_id",
+            "od.is_commisson_price", "od.user_role_type", "od.total_original_price",
             "od.total_price", "g.profit_price", "gw.name","g.first_buy_setting",
             "lianc_u.id as lianc_user_id", "g.lianc_commission_type", "g.lianc_commisson_value",
             "(lianc_u.income+lianc_u.income_frozen) as lianc_total_income",
@@ -181,7 +182,7 @@ class GoodsAction extends Action{
                 }
             }
 
-            $parentDatas = $this->controller->getCommissionParentRuleDatas($orderDetailData['user_id'], $orderDetailData['goods_id'], 'goods', $liancUserId);
+            $parentDatas = $this->controller->getCommissionParentRuleDatas($orderDetailData['user_id'], $orderDetailData['goods_id'], 'goods', $liancUserId, $orderDetailData['is_commisson_price'], $orderDetailData['user_role_type']);
 
             //通过相关规则键获取分佣规则进行分佣
             foreach($parentDatas as $parentData){

@@ -72,6 +72,10 @@ class OrderGoodsAttr extends BaseModel
     public $goods_distribution_level;
     public $attr_setting_type;
 
+    //独立分销价
+    public $is_commisson_price;
+    public $user_role_type;
+
     protected $goods;
     protected $goodsAttr;
 
@@ -117,6 +121,25 @@ class OrderGoodsAttr extends BaseModel
         $this->original_price = $this->price;
         $this->discount = [];
         $this->extra = $this->getAttrExtra();
+    }
+
+    /**
+     * 设置商品独立分销价（分公司、合伙人、VIP）
+     * @throws \Exception
+     */
+    public function setCommissionPrice(){
+        $user = \Yii::$app->user->getIdentity();
+        if($this->goods->enable_commisson_price){
+            $this->is_commisson_price = 1;
+            $this->user_role_type = $user->role_type;
+            if($user->role_type == "branch_office"){
+                $this->price = $this->goodsAttr->branch_office_price;
+            }elseif($user->role_type == "partner"){
+                $this->price = $this->goodsAttr->partner_price;
+            }elseif($user->role_type == "store"){
+                $this->price = $this->goodsAttr->store_price;
+            }
+        }
     }
 
     public function getGoodsAttr()

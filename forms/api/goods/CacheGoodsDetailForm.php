@@ -328,6 +328,22 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
             $newItem['attr_list'] = $attrList[$item['sign_id']];
             $newAttr[] = $newItem;
         }
+
+        //设置独立分销价
+        if($goods->enable_commisson_price && !\Yii::$app->user->isGuest){
+            $identity = \Yii::$app->user->getIdentity();
+            foreach($newAttr as $key => $attr){
+                if($identity->role_type == "branch_office"){ //分公司
+                    $attr['price'] = $item['branch_office_price'];
+                }elseif($identity->role_type == "partner"){
+                    $attr['price'] = $item['partner_price'];
+                }elseif($identity->role_type == "store"){
+                    $attr['price'] = $item['store_price'];
+                }
+                $newAttr[$key] = $attr;
+            }
+        }
+
         $this->attr = $newAttr;
     }
 
@@ -440,7 +456,20 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
         $attr = $this->attr;
         $price = $goods->price;
         foreach ($attr as $index => $item) {
-            $price = max($price, $item['price']);
+            if($goods->enable_commisson_price && !\Yii::$app->user->isGuest){
+                $identity = \Yii::$app->user->getIdentity();
+                if($identity->role_type == "branch_office"){ //分公司
+                    $price = max($price, $item['branch_office_price']);
+                }elseif($identity->role_type == "partner"){
+                    $price = max($price, $item['partner_price']);
+                }elseif($identity->role_type == "store"){
+                    $price = max($price, $item['store_price']);
+                }else{
+                    $price = max($price, $item['price']);
+                }
+            }else{
+                $price = max($price, $item['price']);
+            }
         }
         return price_format($price, 'float', 2);
     }
@@ -455,7 +484,20 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
         $attr = $this->attr;
         $price = $goods->price;
         foreach ($attr as $index => $item) {
-            $price = min($price, $item['price']);
+            if($goods->enable_commisson_price && !\Yii::$app->user->isGuest){
+                $identity = \Yii::$app->user->getIdentity();
+                if($identity->role_type == "branch_office"){ //分公司
+                    $price = min($price, $item['branch_office_price']);
+                }elseif($identity->role_type == "partner"){
+                    $price = min($price, $item['partner_price']);
+                }elseif($identity->role_type == "store"){
+                    $price = min($price, $item['store_price']);
+                }else{
+                    $price = min($price, $item['price']);
+                }
+            }else{
+                $price = min($price, $item['price']);
+            }
         }
         return price_format($price, 'float', 2);
     }

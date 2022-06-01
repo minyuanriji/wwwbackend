@@ -467,7 +467,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                 <el-col :xl="12" :lg="16">
                                     <template v-if="is_attr == 1">
 
-                                        <el-form-item label="是否开启独立分销价" prop="enable_commisson_price">
+                                        <el-form-item label="是否开启独立分销价" >
                                             <div style="display:flex;align-items: center">
                                                 <el-switch :active-value="1" :inactive-value="0" v-model="ruleForm.enable_commisson_price"></el-switch>
                                                 <span style="margin-left:10px;color:red;">设置了独立分销价后，购买商品同级别上级用户不分佣</span>
@@ -500,7 +500,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                 <com-attr-group @select="makeAttrGroup" v-model="attrGroups"></com-attr-group>
                                             </div>
                                             <div v-if="ruleForm.use_attr" style="width:130%;margin-top: 24px;">
-                                                <com-attr v-model="ruleForm.attr" :attr-groups="attrGroups" :extra="cForm.extra ? cForm.extra : {}"></com-attr>
+                                                <com-attr v-model="ruleForm.attr" :commisson-price="ruleForm.enable_commisson_price" :attr-groups="attrGroups" :extra="cForm.extra ? cForm.extra : {}"></com-attr>
                                             </div>
                                         </el-form-item>
                                         <el-form-item prop="sort">
@@ -2509,6 +2509,9 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         attr_list: options,
                         stock: 0,
                         price: 0,
+                        branch_office_price: 0,
+                        partner_price: 0,
+                        store_price: 0,
                         no: '',
                         weight: 0,
                         pic_url: '',
@@ -2541,6 +2544,9 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                             }
                             if (oldOptions.toString() === newOptions.toString()) {
                                 row['price'] = self.ruleForm.attr[j].price;
+                                row['branch_office_price'] = self.ruleForm.attr[j].branch_office_price ? self.ruleForm.attr[j].branch_office_price : 0;
+                                row['partner_price'] = self.ruleForm.attr[j].partner_price ? self.ruleForm.attr[j].partner_price : 0;
+                                row['store_price'] = self.ruleForm.attr[j].store_price ? self.ruleForm.attr[j].store_price : 0;
                                 row['stock'] = self.ruleForm.attr[j].stock;
                                 row['no'] = self.ruleForm.attr[j].no;
                                 row['weight'] = self.ruleForm.attr[j].weight;

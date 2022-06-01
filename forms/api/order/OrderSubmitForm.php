@@ -1172,7 +1172,11 @@ class OrderSubmitForm extends BaseModel
             // 规格自定义货币 例如：步数宝的步数币
             //'custom_currency' => $this->getCustomCurrency($goods, $goodsAttr),
             'is_on_site_consumption' => $goods->is_on_site_consumption, //到店消费类型
-            'integral_fee_rate' => $goods->integral_fee_rate
+            'integral_fee_rate' => $goods->integral_fee_rate,
+
+            //独立分销价
+            'is_commisson_price' => $goodsAttr->is_commisson_price,
+            'user_role_type' => $goodsAttr->user_role_type
         ];
         return $itemData;
     }
@@ -2623,6 +2627,9 @@ class OrderSubmitForm extends BaseModel
         $newGoodsAttr->setGoods($goods);
         $newGoodsAttr->setGoodsAttrById($goodsAttrId);
 
+        //设置商品独立分销价（分公司、合伙人、VIP）
+        $newGoodsAttr->setCommissionPrice();
+
         return $newGoodsAttr;
     }
 
@@ -2701,6 +2708,10 @@ class OrderSubmitForm extends BaseModel
 
         //满减金额
         $orderDetail->full_relief_price = $goodsItem['actual_full_relief_price'];
+
+        //独立分销价
+        $orderDetail->is_commisson_price = $goodsItem['is_commisson_price'];
+        $orderDetail->user_role_type = $goodsItem['user_role_type'];
 
         $orderDetailId = $orderDetail->save();
         if (!$orderDetailId) {

@@ -558,6 +558,9 @@ abstract class BaseGoodsEdit extends BaseModel
             $goodsAttr->price = $newAttr['price'];
             $goodsAttr->no = $newAttr['no'];
             $goodsAttr->weight = $newAttr['weight'] ?: 0;
+            $goodsAttr->branch_office_price = isset($newAttr['branch_office_price']) ? $newAttr['branch_office_price'] : 0;
+            $goodsAttr->partner_price = isset($newAttr['partner_price']) ? $newAttr['partner_price'] : 0;
+            $goodsAttr->store_price = isset($newAttr['store_price']) ? $newAttr['store_price'] : 0;
             //$goodsAttr->pic_url = $newAttr['pic_url'];
             $key = strstr($signIds, ':', true) ?: $signIds;
             $goodsAttr->pic_url = $attrPicList[$key] ?? '';

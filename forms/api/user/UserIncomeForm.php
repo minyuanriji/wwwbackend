@@ -38,12 +38,15 @@ class UserIncomeForm extends BaseModel
 
     public $updated_at;
 
+    public $keyword;
+
     public function rules()
     {
         return [
             [['page', 'limit', 'flag'], 'integer'],
             [['sign', 'source_type','updated_at'], 'string'],
             [['status'], 'integer'],
+            [['keyword'], 'trim'],
             ['page', 'default', 'value' => 1],
             ['limit', 'default', 'value' => 20],
         ];
@@ -156,6 +159,11 @@ class UserIncomeForm extends BaseModel
         if ($this->source_type) {
             $query->andWhere(['source_type' => $this->source_type]);
         }
+
+        if($this->keyword){
+            $query->andWhere(['LIKE', 'desc', $this->keyword]);
+        }
+
         $incomeQuery = clone $query;
         $income = $incomeQuery->andWhere(['type' => 1])->sum('income');
 

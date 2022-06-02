@@ -133,6 +133,9 @@ abstract class BaseGoodsEdit extends BaseModel
     public $branch_office_price;
     public $partner_price;
     public $store_price;
+    public $branch_office_freight_id;
+    public $partner_freight_id;
+    public $store_freight_id;
 
 
     public function rules()
@@ -144,7 +147,8 @@ abstract class BaseGoodsEdit extends BaseModel
                 'confine_count', 'give_score', 'give_score_type', 'forehead_score_type',
                 'accumulative', 'freight_id', 'pieces', 'is_level_alone', 'is_default_services', 'goods_warehouse_id',
                 'mch_id', 'form_id', 'is_area_limit', 'confine_order_count',
-                'is_vip_card_goods', 'use_virtual_sales', 'is_show_sales', 'order_prompt', 'enable_commisson_price'], 'integer'],
+                'is_vip_card_goods', 'use_virtual_sales', 'is_show_sales', 'order_prompt', 'enable_commisson_price',
+                'partner_freight_id', 'branch_office_freight_id', 'store_freight_id'], 'integer'],
             [['goods_no', 'rebate', 'app_share_title', 'app_share_pic', 'attr_default_name'], 'string'],
             [['forehead', 'id','fulfil_price','full_relief_price','max_deduct_integral','enable_integral','enable_score','is_order_paid', 'is_order_sales'], 'number'],
             [['cats', 'mchCats', 'services', 'cards', 'attr', 'attrGroups', 'member_price',
@@ -480,10 +484,13 @@ abstract class BaseGoodsEdit extends BaseModel
         }
 
         //独立分销价
-        $goods->enable_commisson_price = (int)$this->enable_commisson_price;
-        $goods->branch_office_price    = (float)$this->branch_office_price;
-        $goods->partner_price          = (float)$this->partner_price;
-        $goods->store_price            = (float)$this->store_price;
+        $goods->enable_commisson_price   = (int)$this->enable_commisson_price;
+        $goods->branch_office_price      = (float)$this->branch_office_price;
+        $goods->partner_price            = (float)$this->partner_price;
+        $goods->store_price              = (float)$this->store_price;
+        $goods->branch_office_freight_id = (int)$this->branch_office_freight_id;
+        $goods->partner_freight_id       = (int)$this->partner_freight_id;
+        $goods->store_freight_id         = (int)$this->store_freight_id;
 
         $res = $goods->save();
         if (!$res) {

@@ -170,12 +170,26 @@ class CommonGoods extends BaseModel
 
 
         // 运费可能被删除、再查询一次
-
         $postageRule = null;
         $postageRule = PostageRules::findOne(['is_delete' => 0, 'id' => $detail['freight_id']]);
-
         $detail['freight_id'] = $postageRule ? $postageRule->id : 0;
         $detail['freight'] = $postageRule ? $postageRule : ['id' => 0, 'name' => '默认运费'];
+
+        //分公司
+        $postageRule = PostageRules::findOne(['is_delete' => 0, 'id' => $detail['branch_office_freight_id']]);
+        $detail['branch_office_freight_id'] = $postageRule ? $postageRule->id : 0;
+        $detail['branch_office_freight'] = $postageRule ? $postageRule : ['id' => 0, 'name' => '默认运费'];
+
+        //合伙人
+        $postageRule = PostageRules::findOne(['is_delete' => 0, 'id' => $detail['partner_freight_id']]);
+        $detail['partner_freight_id'] = $postageRule ? $postageRule->id : 0;
+        $detail['partner_freight'] = $postageRule ? $postageRule : ['id' => 0, 'name' => '默认运费'];
+
+        //VIP
+        $postageRule = PostageRules::findOne(['is_delete' => 0, 'id' => $detail['store_freight_id']]);
+        $detail['store_freight_id'] = $postageRule ? $postageRule->id : 0;
+        $detail['store_freight'] = $postageRule ? $postageRule : ['id' => 0, 'name' => '默认运费'];
+
 
         if ($detail['form_id'] > 0) {
             $detail['form'] = Form::find()->where([

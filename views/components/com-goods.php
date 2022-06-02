@@ -161,7 +161,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 </style>
 <template id="com-goods">
     <el-card shadow="never" style="border:0" body-style="background-color: #f3f3f3;padding: 10px 0 0;" class="com-goods" v-loading="cardLoading">
-        <div class='form-body'>
+        <el-card class='form-body'>
             <el-form :model="cForm" :rules="cRule" ref="ruleForm" label-width="180px" size="small" class="demo-ruleForm">
                 <el-tabs v-model="activeName" @tab-click="handleClick">
                     <el-tab-pane label="基础设置" name="first" v-if="is_basic == 1">
@@ -719,11 +719,53 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                 <i class="el-icon-info"></i>
                                             </el-tooltip>
                                         </template>
-                                        <el-tag @close="freightDelete()" v-if="ruleForm.freight" :key="ruleForm.freight.name" :disable-transitions="true" style="margin-right: 10px;" closable>
-                                            {{ruleForm.freight.name}}
-                                        </el-tag>
-                                        <el-button type="button" size="mini" @click="freightOpen">选择运费
-                                        </el-button>
+
+                                        <el-card class="box-card" >
+                                            <div style="padding:10px 10px;border:1px solid #eee;display:flex;align-items: center">
+                                                <span style="width:90px;text-align:right;flex-shrink: 0;">普通用户：</span>
+                                                <el-tag @close="freightDelete()" v-if="ruleForm.freight" :key="ruleForm.freight.name" :disable-transitions="true" style="margin-right: 10px;" closable>
+                                                    {{ruleForm.freight.name}}
+                                                </el-tag>
+                                                <el-button type="button" size="mini" @click="freightOpen">选择运费</el-button>
+                                            </div>
+
+                                            <template v-if="ruleForm.enable_commisson_price == 1">
+
+                                                <!-- 分公司运费模板 start-->
+                                                <div style="padding:10px 10px;border:1px solid #eee;display:flex;align-items: center">
+                                                    <span style="width:90px;text-align:right;flex-shrink: 0">分公司：</span>
+                                                    <el-tag @close="freightDelete('branch_office')" v-if="ruleForm.branch_office_freight" :key="ruleForm.branch_office_freight.name" :disable-transitions="true" style="margin-right: 10px;" closable>
+                                                        {{ruleForm.branch_office_freight.name}}
+                                                    </el-tag>
+                                                    <el-button type="button" size="mini" @click="freightOpen('branch_office')">选择运费</el-button>
+                                                </div>
+                                                <!-- 分公司运费模板 end-->
+
+                                                <!-- 合伙人运费模板 start-->
+                                                <div style="padding:10px 10px;border:1px solid #eee;display:flex;align-items: center">
+                                                    <span style="width:90px;text-align:right;flex-shrink: 0">合伙人：</span>
+                                                    <el-tag @close="freightDelete('partner')" v-if="ruleForm.partner_freight" :key="ruleForm.partner_freight.name" :disable-transitions="true" style="margin-right: 10px;" closable>
+                                                        {{ruleForm.partner_freight.name}}
+                                                    </el-tag>
+                                                    <el-button type="button" size="mini" @click="freightOpen('partner')">选择运费</el-button>
+                                                </div>
+                                                <!-- 合伙人运费模板 end-->
+
+                                                <!-- VIP运费模板 start-->
+                                                <div style="padding:10px 10px;border:1px solid #eee;display:flex;align-items: center">
+                                                    <span style="width:90px;text-align:right;flex-shrink: 0">VIP：</span>
+                                                    <el-tag @close="freightDelete('store')" v-if="ruleForm.store_freight" :key="ruleForm.store_freight.name" :disable-transitions="true" style="margin-right: 10px;" closable>
+                                                        {{ruleForm.store_freight.name}}
+                                                    </el-tag>
+                                                    <el-button type="button" size="mini" @click="freightOpen('store')">选择运费</el-button>
+                                                </div>
+                                                <!-- VIP运费模板 end-->
+
+                                            </template>
+
+                                        </el-card>
+
+
                                         <el-dialog title="选择运费" :visible.sync="freight.dialog" width="30%">
                                             <el-card shadow="never" flex="dir:left" style="flex-wrap: wrap" v-loading="freight.loading">
                                                 <el-radio-group v-model="freight.checked">
@@ -737,6 +779,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                 <el-button type="primary" @click="freightConfirm">确 定</el-button>
                                             </div>
                                         </el-dialog>
+
                                     </el-form-item>
 
                                     <el-drawer
@@ -1515,7 +1558,13 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 enable_commisson_price: 0,
                 branch_office_price: 0,
                 partner_price: 0,
-                store_price: 0
+                store_price: 0,
+                branch_office_freight_id: 0,
+                branch_office_freight: null,
+                partner_freight_id: 0,
+                partner_freight: null,
+                store_freight_id: 0,
+                store_freight: null,
             };
             let rules = {
                 cats: [{
@@ -1667,6 +1716,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     loading: false
                 },
                 freight: {
+                    type: '',
                     dialog: false,
                     list: [],
                     checked: {},
@@ -2703,7 +2753,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 this.ruleForm.services.splice(index, 1);
             },
             /*---运费----*/
-            freightOpen() {
+            freightOpen(t) {
+                this.freight.type = t ? t : '';
                 this.freight.dialog = true;
                 this.getFreight();
             },
@@ -2712,8 +2763,20 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 this.freight.dialog = false;
             },
             freightConfirm() {
-                this.ruleForm.freight = JSON.parse(JSON.stringify(this.freight.checked));
-                this.ruleForm.freight_id = this.ruleForm.freight.id;
+                if(this.freight.type == 'branch_office') { //分公司
+                    this.ruleForm.branch_office_freight = JSON.parse(JSON.stringify(this.freight.checked));
+                    this.ruleForm.branch_office_freight_id = this.ruleForm.branch_office_freight.id;
+                }else if(this.freight.type == 'partner'){ //合伙人
+                    this.ruleForm.partner_freight = JSON.parse(JSON.stringify(this.freight.checked));
+                    this.ruleForm.partner_freight_id = this.ruleForm.partner_freight.id;
+                }else if(this.freight.type == 'store'){ //VIP
+                    this.ruleForm.store_freight = JSON.parse(JSON.stringify(this.freight.checked));
+                    this.ruleForm.store_freight_id = this.ruleForm.store_freight.id;
+                }else{
+                    this.ruleForm.freight = JSON.parse(JSON.stringify(this.freight.checked));
+                    this.ruleForm.freight_id = this.ruleForm.freight.id;
+                }
+
                 this.ExpressFlag = false;
                 this.ExpressForm.forEach((el,i) => {
                     var value = this.ExpressName[i] + ',' + (el ? el : 0);
@@ -2722,9 +2785,20 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 console.log(this.ExpressName);
                 this.freightCancel();
             },
-            freightDelete() {
-                this.ruleForm.freight = null;
-                this.ruleForm.freight_id = 0;
+            freightDelete(t) {
+                if(t == "branch_office") { //分公司
+                    this.ruleForm.branch_office_freight = null;
+                    this.ruleForm.branch_office_freight_id = 0;
+                }else if(t == "partner"){ //合伙人
+                    this.ruleForm.partner_freight = null;
+                    this.ruleForm.partner_freight_id = 0;
+                }else if(t == "store"){ //VIP
+                    this.ruleForm.store_freight = null;
+                    this.ruleForm.store_freight_id = 0;
+                }else{
+                    this.ruleForm.freight = null;
+                    this.ruleForm.freight_id = 0;
+                }
             },
             cardDelete(index) {
                 this.ruleForm.cards.splice(index, 1);

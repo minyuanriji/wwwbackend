@@ -1124,6 +1124,18 @@ class OrderSubmitForm extends BaseModel
             throw new OrderException('商品不存在或已下架。');
         }
 
+        //独立分销价
+        if($goods->enable_commisson_price && !\Yii::$app->user->isGuest){
+            $identity = \Yii::$app->user->getIdentity();
+            if($identity->role_type == "branch_office"){
+                $goods->freight_id = $goods->branch_office_freight_id;
+            }elseif($identity->role_type == "partner"){
+                $goods->freight_id = $goods->partner_freight_id;
+            }elseif($identity->role_type == "store"){
+                $goods->freight_id = $goods->store_freight_id;
+            }
+        }
+
         // 其他商品特有判断
         $this->checkGoods($goods, $goodsItem);
         try {

@@ -128,7 +128,7 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
             [['username', 'password'], 'required'],
             [['mall_id', 'mch_id', 'parent_id', 'second_parent_id', 'third_parent_id', 'is_delete', 'is_blacklist',
                  'created_at', 'last_login_at', 'junior_at', 'level', 'birthday', 'is_inviter', 'inviter_at','source','upgrade_status', 'is_examine'], 'integer'],
-            [['password', 'auth_key', 'access_token', 'avatar_url', 'platform', 'login_ip', 'transaction_password', 'role_type'], 'string'],
+            [['password', 'auth_key', 'access_token', 'avatar_url', 'platform', 'login_ip', 'transaction_password', 'role_type', 'role_type_label'], 'string'],
             [['balance', 'total_balance', 'total_income', 'income','income_frozen','total_score','score'], 'number'],
             [['username'], 'string', 'max' => 64],
             [['mobile', 'auth_expire_dt', 'is_lianc', 'lock_parent'], 'safe']

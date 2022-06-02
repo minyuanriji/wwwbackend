@@ -56,6 +56,10 @@
                     </el-select>
                 </el-form-item>
 
+                <el-form-item label="自定义类型显示">
+                    <el-input size="small" v-model="form.role_type_label" autocomplete="off" style="width:215px;"></el-input>
+                </el-form-item>
+
                 <el-form-item label="上级推荐人" prop="parent_id">
                     <el-autocomplete size="small" v-model="form.parent_name" value-key="nickname"
                                      :fetch-suggestions="querySearchAsync" placeholder="请输入搜索内容"
@@ -120,6 +124,7 @@
                 form: {
                     share: {},
                     role_type: 'user',
+                    role_type_label: '',
                     is_lianc: 0
                 },
                 mall_members: [],

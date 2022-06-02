@@ -48,7 +48,7 @@
                     </el-select>
                 </el-form-item>-->
                 <el-form-item label="会员类型" prop="role_type">
-                    <el-select size="small" v-model="form.role_type" placeholder="请选择会员类型">
+                    <el-select @change="roleTypeChange" size="small" v-model="form.role_type" placeholder="请选择会员类型">
                         <el-option key="user" label="普通用户" value="user"></el-option>
                         <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
                         <el-option key="partner" label="合伙人" value="partner"></el-option>
@@ -141,6 +141,17 @@
             };
         },
         methods: {
+            roleTypeChange(e){
+                if(e == "branch_office"){
+                    this.form.role_type_label = "分公司";
+                }else if(e == "partner"){
+                    this.form.role_type_label = "合伙人";
+                }else if(e == "store"){
+                    this.form.role_type_label = "VIP会员";
+                }else{
+                    this.form.role_type_label = "普通用户";
+                }
+            },
             //搜索
             querySearchAsync(queryString, cb) {
                 this.keyword = queryString;

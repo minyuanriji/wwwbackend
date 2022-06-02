@@ -650,11 +650,13 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
             ],
         ];
 
+        $roleTypeLabel = trim(\Yii::$app->user->getIdentity()->role_type_label);
+
         $userLevel = isset($levelList[$this->role_type]) ? $levelList[$this->role_type] : null;
 
         return [
             'level' => $this->role_type,
-            'name'  => $userLevel != null ? $userLevel['name'] : "",
+            'name'  => !empty($roleTypeLabel) ? $roleTypeLabel : ($userLevel != null ? $userLevel['name'] : ""),
             'icon'  => $userLevel != null ? $userLevel['icon'] : ""
         ];
     }
@@ -689,6 +691,11 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
                 $text = '普通用户';
                 break;
             default:
+        }
+
+        $roleTypeLabel = trim(\Yii::$app->user->getIdentity()->role_type_label);
+        if(!empty($roleTypeLabel)){
+            $text = $roleTypeLabel;
         }
 
         return $text;

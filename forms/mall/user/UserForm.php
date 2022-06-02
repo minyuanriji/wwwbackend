@@ -425,6 +425,7 @@ class UserForm extends BaseModel
             'username' => $user->username,
             'nickname' => $user->nickname,
             'role_type' => $user->role_type,
+            'role_type_label' => $user->role_type_label,
             'mobile' => $user->mobile,
             'avatar' => $user->avatar_url,
             'is_inviter'=>$user->is_inviter,

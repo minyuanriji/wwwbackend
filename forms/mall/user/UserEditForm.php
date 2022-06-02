@@ -26,6 +26,7 @@ class UserEditForm extends BaseModel
     public $id;
     public $member_level;
     public $role_type;
+    public $role_type_label;
     public $money;
 
     public $is_blacklist;
@@ -43,7 +44,7 @@ class UserEditForm extends BaseModel
             [['parent_id', 'is_blacklist', 'id', 'member_level', 'is_inviter', 'is_examine', 'is_lianc', 'lock_parent'], 'integer'],
             [['money'], 'number'],
             [['contact_way', 'remark'], 'string', 'max' => 255],
-            [['role_type'], 'string']
+            [['role_type', 'role_type_label'], 'string']
         ];
     }
 
@@ -117,6 +118,7 @@ class UserEditForm extends BaseModel
         $form->parent_id = $this->parent_id;
         $form->junior_at = time();
         $form->level = $this->member_level;
+        $form->role_type_label = $this->role_type_label;
 
         //用户角色类型修改
         if($form->role_type != $this->role_type){

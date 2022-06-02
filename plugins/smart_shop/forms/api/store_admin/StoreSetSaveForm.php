@@ -23,7 +23,7 @@ class StoreSetSaveForm extends BaseModel{
         return [
             [['merchant_id', 'store_id'], 'required'],
             [['enable_shopping_voucher', 'enable_score', 'shopping_voucher_rate'], 'integer'],
-            [['transfer_rate'], 'number']
+            [['transfer_rate'], 'safe']
         ];
     }
 

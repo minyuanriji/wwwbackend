@@ -55,7 +55,7 @@ class IncomeLog extends BaseActiveRecord
             [['user_id', 'mall_id', 'type','flag','deleted_at','is_delete','is_manual'], 'integer'],
             [['money','income', 'source_id'], 'number'],
             [['desc', 'source_type'], 'string'],
-            [['created_at','updated_at'], 'safe'],
+            [['created_at','updated_at', 'order_detail_id', 'from', 'from_id'], 'safe'],
         ];
     }
 

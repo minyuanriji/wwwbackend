@@ -12,6 +12,7 @@ namespace app\plugins\area\jobs;
 
 use app\helpers\SerializeHelper;
 use app\models\CommonOrderDetail;
+use app\models\IncomeLog;
 use app\models\Mall;
 use app\models\Order;
 use app\models\PriceLog;
@@ -180,8 +181,7 @@ class AreaLogJob extends Component implements JobInterface
                     }
                     if ($log->save()) { //加钱
                         $user = User::findOne($log->user_id);
-                        \Yii::$app->currency->setUser($user)->income
-                            ->add(floatval($log->price), "区域代理商提成记录ID：{$log->id} 的冻结佣金", 0);
+                        $this->newIncomeLog($user, $price);
                         $area->frozen_price += $price;
                         $order_count = PriceLog::find()->where(['user_id' => $log->user_id, 'is_delete' => 0, 'sign' => $sign])->groupBy('order_id')->count();
                         $area->total_order = $order_count;
@@ -240,8 +240,7 @@ class AreaLogJob extends Component implements JobInterface
                     }
                     if ($log->save()) { //加钱
                         $user = User::findOne($log->user_id);
-                        \Yii::$app->currency->setUser($user)->income
-                            ->add(floatval($log->price), "区域代理商提成记录ID：{$log->id} 的冻结佣金", 0);
+                        $this->newIncomeLog($user, $price);
                         $area->frozen_price += $price;
                         $order_count = PriceLog::find()->where(['user_id' => $log->user_id, 'is_delete' => 0, 'sign' => $sign])->groupBy('order_id')->count();
                         $area->total_order = $order_count;
@@ -302,8 +301,7 @@ class AreaLogJob extends Component implements JobInterface
                     }
                     if ($log->save()) { //加钱
                         $user = User::findOne($log->user_id);
-                        \Yii::$app->currency->setUser($user)->income
-                            ->add(floatval($log->price), "区域代理商提成记录ID：{$log->id} 的冻结佣金", 0);
+                        $this->newIncomeLog($user, $price);
                         $area->frozen_price += $price;
                         $order_count = PriceLog::find()->where(['user_id' => $log->user_id, 'is_delete' => 0, 'sign' => $sign])->groupBy('order_id')->count();
                         $area->total_order = $order_count;
@@ -367,8 +365,7 @@ class AreaLogJob extends Component implements JobInterface
                     if ($log->save()) { //加钱
                         \Yii::warning('区域佣金保存成功之后，执行保存冻结佣金');
                         $user = User::findOne($log->user_id);
-                        \Yii::$app->currency->setUser($user)->income
-                            ->add(floatval($log->price), "区域代理商提成记录ID：{$log->id} 的冻结佣金", 0);
+                        $this->newIncomeLog($user, $price);
                         $area->frozen_price += $price;
                         $order_count = PriceLog::find()->where(['user_id' => $log->user_id, 'is_delete' => 0, 'sign' => $sign])->groupBy('order_id')->count();
                         $area->total_order = $order_count;
@@ -393,8 +390,9 @@ class AreaLogJob extends Component implements JobInterface
                     $log->status = 1;
                     //开始佣金到账
                     $user = User::findOne($log->user_id);
-                    \Yii::$app->currency->setUser($user)->income
-                        ->add(floatval($log->price), "区域代理商提成记录ID：{$log->id} 的佣金发放", 0, 1);
+
+                    $this->editIncomeLog($user);
+
                     $log->is_price = 1;
                     if (!$log->save()) {
                         \Yii::warning('佣金记录发放保存失败：' . SerializeHelper::encode($log->getErrors()));
@@ -428,8 +426,9 @@ class AreaLogJob extends Component implements JobInterface
                     } else {
                         //保存成功之后要减掉冻结的钱
                         $user = User::findOne($log->user_id);
-                        \Yii::$app->currency->setUser($user)->income
-                            ->refund(floatval($log->price), "分佣记录ID：{$log->id} 的冻结佣金扣除", 0, 0);
+
+                        $this->invalidIncomeLog($user);
+
                         $area = AreaAgent::findOne(['user_id' => $log->user_id, 'is_delete' => 0]);
                         if ($area) {
                             $area->frozen_price -= floatval($log->price);
@@ -454,8 +453,9 @@ class AreaLogJob extends Component implements JobInterface
                     $log->status = 1;
                     //开始佣金到账
                     $user = User::findOne($log->user_id);
-                    \Yii::$app->currency->setUser($user)->income
-                        ->add(floatval($log->price), "区域代理商提成记录ID：{$log->id} 的佣金发放", 0, 1);
+
+                    $this->editIncomeLog($user);
+
                     $log->is_price = 1;
                     if (!$log->save()) {
                         \Yii::warning('佣金记录发放保存失败：' . SerializeHelper::encode($log->getErrors()));
@@ -482,5 +482,91 @@ class AreaLogJob extends Component implements JobInterface
             }
         }
 
+    }
+
+    /**
+     * 取消冻结收益
+     * @param User $user
+     */
+    private function invalidIncomeLog(User $user){
+        //取消收入记录的冻结状态
+        $incomeLog = IncomeLog::findOne([
+            "source_id"   => $this->common_order_detail_id,
+            "source_type" => "area",
+            "flag"        => 0
+        ]);
+        if($incomeLog){
+            $incomeLog->desc = "区域代理商冻结佣金扣除";
+            $incomeLog->flag = -1;
+            $incomeLog->updated_at = time();
+            if(!$incomeLog->save()){
+                throw new \Exception(json_encode($incomeLog->getErrors()));
+            }else{
+                //更新用户收入信息
+                User::updateAllCounters([
+                    "total_income"  => -1 * abs($incomeLog->income),
+                    "income_frozen" => -1 * abs($incomeLog->income)
+                ], ["id" => $user->id]);
+            }
+        }
+
+    }
+
+    /**
+     * 佣金到账
+     * @param User $user
+     * @throws \Exception
+     */
+    private function editIncomeLog(User $user){
+        //取消收入记录的冻结状态
+        $incomeLog = IncomeLog::findOne([
+            "source_id"   => $this->common_order_detail_id,
+            "source_type" => "area",
+            "flag"        => 0
+        ]);
+        if($incomeLog){
+            $incomeLog->desc = "区域代理商佣金";
+            $incomeLog->flag = 1;
+            $incomeLog->updated_at = time();
+            if(!$incomeLog->save()){
+                throw new \Exception(json_encode($incomeLog->getErrors()));
+            }else{
+                //更新用户收入信息
+                User::updateAllCounters([
+                    "income"        => $incomeLog->income,
+                    "income_frozen" => -1 * abs($incomeLog->income)
+                ], ["id" => $user->id]);
+            }
+        }
+    }
+
+    /**
+     * 新增收益
+     * @param User $user
+     * @param $price
+     * @throws \Exception
+     */
+    private function newIncomeLog(User $user, $price){
+        $incomeLog = new IncomeLog([
+            'mall_id'     => $user->mall_id,
+            'user_id'     => $user->id,
+            'type'        => 1,
+            'money'       => $user->total_income,
+            'income'      => $price,
+            'desc'        => "区域代理商冻结佣金",
+            'flag'        => 0, //冻结
+            'source_id'   => $this->common_order_detail_id,
+            'source_type' => 'area',
+            'created_at'  => time(),
+            'updated_at'  => time()
+        ]);
+        if(!$incomeLog->save()){
+            throw new \Exception(json_encode($incomeLog->getErrors()));
+        }else{
+            User::updateAllCounters([
+                "total_income"  => $price,
+                "income_frozen" => $price
+            ], ["id" => $user->id]);
+        }
     }
 }

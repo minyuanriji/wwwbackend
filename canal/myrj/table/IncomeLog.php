@@ -6,7 +6,7 @@ use app\notification\RevenueRecordCommissionNotification;
 
 class IncomeLog
 {
-    const source_type_value = ['boss','hotel_commission','hotel_3r_commission','goods'];
+    const source_type_value = ['boss','hotel_commission','hotel_3r_commission','goods','area'];
     const add_source_type_key = [3,4,10,11,12,15,16];
 
     public function insert($rows)

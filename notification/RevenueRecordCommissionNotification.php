@@ -61,10 +61,18 @@ class RevenueRecordCommissionNotification
                 $keyword2 = '话费消费分佣';
                 break;
             case 'smart_shop_order':
+            case 'smart_shop_cyorder':
                 $keyword2 = '门店直推分佣';
                 break;
             case 'smart_shop_order_3r':
+            case 'smart_shop_cyorder_3r':
                 $keyword2 = '门店消费分佣';
+                break;
+            case 'perform_distribution_award_order':
+                $keyword2 = '业绩分配奖励';
+                break;
+            case 'area':
+                $keyword2 = '区域代理';
                 break;
             default:
                 break;

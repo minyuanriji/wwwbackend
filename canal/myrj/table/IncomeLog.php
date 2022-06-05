@@ -28,7 +28,6 @@ class IncomeLog
                 $income_log = \app\models\IncomeLog::find()->where($condition)->asArray()->one();
                 if ($income_log) {
                     RevenueRecordCommissionNotification::send($income_log);
-                    \Yii::error('IncomeLogNotice:' . json_encode($mixData) . '---time:' . date("Y-m-d H:i:s", time()));
                 }
             }
         }

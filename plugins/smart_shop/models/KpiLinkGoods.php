@@ -15,7 +15,7 @@ class KpiLinkGoods extends BaseActiveRecord{
 
     public function rules(){
         return [
-            [['mall_id', 'inviter_user_id', 'user_id_list', 'created_at', 'mobile', 'goods_id', 'date', 'store_id', 'merchant_id'], 'required'],
+            [['mall_id', 'inviter_user_id', 'user_id_list', 'created_at', 'mobile', 'goods_id', 'goods_type', 'date', 'store_id', 'merchant_id'], 'required'],
             [['point'], 'integer']
         ];
     }

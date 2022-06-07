@@ -24,13 +24,13 @@ class KpiController extends ApiController {
     }
 
     /**
-     * 分享优惠券链接访问统计
+     * 领取优惠券统计
      * @return \yii\web\Response
      */
-    public function actionLinkCouponDetail(){
+    public function actionTakeCoupon(){
         try {
             $kpi = new SmartShopKPI();
-            if(!$kpi->linkGoodsDetail($this->requestData)){
+            if(!$kpi->takeCoupon($this->requestData)){
                 throw new \Exception($kpi->getError());
             }
             return $this->success();

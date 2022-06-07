@@ -100,11 +100,14 @@ class SmartShopKPI extends Component{
      *    'merchant_id'    => '商户ID',
      *    'inviter_mobile' => '邀请人手机号',
      *    'mobile'         => '访问者手机号',
-     *    'goods_id'       => '商品ID'
+     *    'goods_id'       => '商品ID',
+     *    'goods_type'     => '类型'
      *  ]
      * @return boolean
      */
     public function linkGoodsDetail($data){
+
+        $data['goods_type'] = isset($data['goods_type']) ? $data['goods_type'] : "goods";
 
         $smartShop = new SmartShop();
         $shopData = $smartShop->getStoreDetail($data['store_id']);
@@ -116,6 +119,7 @@ class SmartShopKPI extends Component{
         $exists = KpiLinkGoods::findOne([
             "mobile"          => !empty($data['mobile']) ? $data['mobile'] : "none",
             "goods_id"        => $data['goods_id'],
+            "goods_type"      => $data['goods_type'],
             "date"            => date("Ymd"),
             'store_id'        => $shopData['ss_store_id'],
             'merchant_id'     => $shopData['merchant_id'],
@@ -172,6 +176,7 @@ class SmartShopKPI extends Component{
                 "created_at"      => time(),
                 "mobile"          => !empty($data['mobile']) ? $data['mobile'] : "none",
                 "goods_id"        => $data['goods_id'],
+                "goods_type"      => $data['goods_type'],
                 "date"            => date("Ymd"),
                 'store_id'        => $shopData['ss_store_id'],
                 'merchant_id'     => $shopData['merchant_id'],
@@ -191,6 +196,7 @@ class SmartShopKPI extends Component{
     }
 
     /**
+     * @deprecated
      * 分享优惠券链接访问统计
      * @param $data
      *  [
@@ -286,17 +292,47 @@ class SmartShopKPI extends Component{
     }
 
     /**
+     * 领取优惠券统计
+     * @param $data
+     *  [
+     *    'store_id'       => '门店ID',
+     *    'inviter_mobile' => '邀请人手机号',
+     *    'mobile'         => '访问者手机号',
+     *    'coupon_id'      => '优惠券ID'
+     *  ]
+     * @return boolean
+     */
+    public function takeCoupon($data){
+
+        $smartShop = new SmartShop();
+        $shopData = $smartShop->getStoreDetail($data['store_id']);
+        if(!$shopData){
+            $this->error = "无法获取门店信息";
+            return false;
+        }
+
+        try {
+            $this->newOrder("store_usercoupons", $shopData['ss_store_id'], $shopData['merchant_id'], $data['coupon_id'], $data['mobile'], $data['inviter_mobile']);
+        }catch (\Exception $e){
+            $this->error = $e->getMessage();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * 新订单统计
      * @param $store_id 门店ID
      * @param $merchant_id 小程序商户ID
-     * @param $order_type 订单类型（cyorder|czorder）
+     * @param $order_type 订单类型（cyorder|czorder|store_usercoupons）
      * @param $order_id 订单ID
      * @param $mobile 支付手机号
      * @param $inviter_mobile 邀请人手机号
      * @throws \Exception
      * @return boolean
      */
-    public function newOrder($order_type, $store_id, $merchant_id,  $order_id, $mobile, $inviter_mobile){
+    public function newOrder($order_type, $store_id, $merchant_id, $order_id, $mobile, $inviter_mobile){
 
         try {
             //获取邀请者本地用户
@@ -305,56 +341,64 @@ class SmartShopKPI extends Component{
                 throw new \Exception("邀请者用户信息不存在");
             }
 
-            $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
-            if(!$relatLink){
-                throw new \Exception("邀请用户关系链异常");
-            }
+            $exists = KpiNewOrder::find()->where([
+                "mall_id"      => $inviterUser->mall_id,
+                "store_id"     => $store_id,
+                "merchant_id"  => $merchant_id,
+                "source_table" => $order_type,
+                "source_id"    => $order_id,
+            ])->exists();
+            if(!$exists){
+                $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
+                if(!$relatLink){
+                    throw new \Exception("邀请用户关系链异常");
+                }
 
-            $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
-            sort($parentIds);
+                $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
+                sort($parentIds);
 
-            //KPI奖励
-            $awardPoint = 0;
-            $startTime = strtotime(date("Y-m-d") . " 00:00:00");
-            $setting = $this->getKPISetting($merchant_id);
-            $query = KpiNewOrder::find()->andWhere([
-                "AND",
-                ["mall_id" => $inviterUser->mall_id],
-                "inviter_user_id" => $inviterUser->id,
-                'store_id' => $store_id,
-                'merchant_id' => $merchant_id,
-                [">", "created_at", $startTime],
-                ["<", "created_at", ($startTime + 3600 * 24 - 1)]
-            ]);
-            $totalPoint = (int)$query->sum("point");
-            $orderNum = (int)$query->count() + 1;
-            if(isset($setting['new_order_rules']) && !empty($setting['new_order_rules'])){
-                $rule = $this->matchRule($setting['new_order_rules'], "order_num", $orderNum);
-                if($rule){
-                    $awardPoint = $rule['award_point'];
+                //KPI奖励
+                $awardPoint = 0;
+                $startTime = strtotime(date("Y-m-d") . " 00:00:00");
+                $setting = $this->getKPISetting($merchant_id);
+                $query = KpiNewOrder::find()->andWhere([
+                    "AND",
+                    ["mall_id" => $inviterUser->mall_id],
+                    "inviter_user_id" => $inviterUser->id,
+                    'store_id' => $store_id,
+                    'merchant_id' => $merchant_id,
+                    [">", "created_at", $startTime],
+                    ["<", "created_at", ($startTime + 3600 * 24 - 1)]
+                ]);
+                $totalPoint = (int)$query->sum("point");
+                $orderNum = (int)$query->count() + 1;
+                if(isset($setting['new_order_rules']) && !empty($setting['new_order_rules'])){
+                    $rule = $this->matchRule($setting['new_order_rules'], "order_num", $orderNum);
+                    if($rule){
+                        $awardPoint = $rule['award_point'];
+                    }
+                }
+                if(isset($setting['new_order_day_limit']) && $setting['new_order_day_limit']){
+                    $awardPoint = min($awardPoint, max(0, $setting['new_order_day_limit_point'] - $totalPoint));
+                }
+
+                $kpiNewOrder = new KpiNewOrder([
+                    "mall_id"         => $inviterUser->mall_id,
+                    "inviter_user_id" => $inviterUser->id,
+                    "user_id_list"    => implode(",", $parentIds),
+                    "created_at"      => time(),
+                    "mobile"          => !empty($mobile) ? $mobile : "none",
+                    "store_id"        => $store_id,
+                    "merchant_id"     => $merchant_id,
+                    "source_table"    => $order_type,
+                    "source_id"       => $order_id,
+                    "point"           => $awardPoint
+                ]);
+
+                if(!$kpiNewOrder->save()){
+                    throw new \Exception(json_encode($kpiNewOrder->getErrors()));
                 }
             }
-            if(isset($setting['new_order_day_limit']) && $setting['new_order_day_limit']){
-                $awardPoint = min($awardPoint, max(0, $setting['new_order_day_limit_point'] - $totalPoint));
-            }
-
-            $kpiNewOrder = new KpiNewOrder([
-                "mall_id"         => $inviterUser->mall_id,
-                "inviter_user_id" => $inviterUser->id,
-                "user_id_list"    => implode(",", $parentIds),
-                "created_at"      => time(),
-                "mobile"          => !empty($mobile) ? $mobile : "none",
-                "store_id"        => $store_id,
-                "merchant_id"     => $merchant_id,
-                "source_table"    => $order_type,
-                "source_id"       => $order_id,
-                "point"           => $awardPoint
-            ]);
-
-            if(!$kpiNewOrder->save()){
-                throw new \Exception(json_encode($kpiNewOrder->getErrors()));
-            }
-
         }catch (\Exception $e){
             $this->error = $e->getMessage();
             return false;

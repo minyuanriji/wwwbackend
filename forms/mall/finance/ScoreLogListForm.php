@@ -103,7 +103,7 @@ class ScoreLogListForm extends BaseModel
         if ($list) {
             foreach ($list as &$v) {
                 if ($v['source_type'] != 'giftpacks_order') {
-                    $v['info_desc'] = $v['custom_desc'] ? SerializeHelper::decode($v['custom_desc']) : [];
+                    $v['info_desc'] = $v['custom_desc'] ? (array)@SerializeHelper::decode($v['custom_desc']) : [];
                 }
             }
             unset($v);

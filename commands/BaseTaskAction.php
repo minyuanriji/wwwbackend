@@ -28,6 +28,7 @@ abstract class BaseTaskAction extends Action{
      * 运行代码
      */
     public function run() {
+        $this->beforeWhile();
         while (true) {
             sleep($this->sleepTime);
             try {
@@ -37,6 +38,12 @@ abstract class BaseTaskAction extends Action{
             }
         }
     }
+
+    /**
+     * 执行前的一些业务处理
+     * @return void
+     */
+    public function beforeWhile(){}
 
     /**
      * 运行业务逻辑

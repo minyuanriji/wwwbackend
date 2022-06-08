@@ -12,6 +12,7 @@ class SmartShop extends Component
     public $setting = [];
 
     use SmartShopOrderTrait;
+    use SmartShopGiftpackOrderTrait;
     use SmartShopShopTrait;
     use SmartShopIdentityTrait;
 

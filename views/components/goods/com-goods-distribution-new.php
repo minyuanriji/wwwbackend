@@ -9,7 +9,7 @@ echo $this->render('@app/plugins/commission/views/components/com-commission-rule
             </el-switch>
         </el-form-item>
         <el-form-item label="" v-if="form.is_alone == 1">
-            <com-commission-rule-edit @update="updateCommissionRule" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-rule-edit>
+            <com-commission-rule-edit @update="updateCommissionRule" :commisson-price="commisson_price" :ctype="commissionType" :chains="commissionRuleChains"></com-commission-rule-edit>
         </el-form-item>
         <el-form-item v-if="form.is_alone == 1">
             <el-button type="primary" style="margin-top: 10px;margin-bottom:30px;" size="small" @click="saveGoodsCommission">保存分销设置</el-button>
@@ -24,6 +24,7 @@ echo $this->render('@app/plugins/commission/views/components/com-commission-rule
             goods: Number,
             goods_id: String,
             goods_type: String,
+            commisson_price: Boolean
         },
         data() {
             return {

@@ -1242,7 +1242,11 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                     </el-tab-pane>
 
                     <el-tab-pane label="分销设置" name="third" v-if="is_show_distribution">
-                        <com-goods-distribution-new v-model="ruleForm" :is_mch="is_mch" :goods_type="goods_type" :goods_id="goods_id" v-if="activeName == 'third'">
+                        <com-goods-distribution-new  v-model="ruleForm" :is_mch="is_mch"
+                            :goods_type="goods_type"
+                            :goods_id="goods_id"
+                            :commisson_price="ruleForm.enable_commisson_price"
+                            v-if="activeName == 'third'">
                         </com-goods-distribution-new>
                     </el-tab-pane>
 

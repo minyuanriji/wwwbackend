@@ -175,9 +175,31 @@ class CommissionController extends BaseCommandController{
      * @return array
      * @throws \Exception
      */
-    public function getCommissionParentRuleDatas($user_id, $item_id, $item_type, $lianc_user_id = null, $is_commisson_price = null, $user_role_type = null){
+    public function getCommissionParentRuleDatas($user_id, $item_id, $item_type, $lianc_user_id = null,
+            $is_commisson_price = null, $user_role_type = null, $enable_commisson_price = false){
 
         $newParentDatas = $this->getCommissionParents($user_id, $lianc_user_id);
+
+        //如果是独立分销价，比消费用户级别低或同级别的都不分佣
+        if($item_type == "goods" && $is_commisson_price){
+            $newNewParentDatas = [];
+            foreach($newParentDatas as $newParentData){
+                if($user_role_type == "branch_office" && in_array($newParentData['role_type'], ["branch_office", "partner", "store", "user"])){
+                    continue;
+                }
+                if($user_role_type == "partner" && in_array($newParentData['role_type'], ["partner", "store", "user"])){
+                    continue;
+                }
+                if($user_role_type == "store" && in_array($newParentData['role_type'], ["store", "user"])){
+                    continue;
+                }
+                if($user_role_type == "user" && in_array($newParentData['role_type'], ["user"])){
+                    continue;
+                }
+                $newNewParentDatas[] = $newParentData;
+            }
+            $newParentDatas = $newNewParentDatas;
+        }
 
         //生成相关规则键
         $parentDatas = [];
@@ -189,6 +211,24 @@ class CommissionController extends BaseCommandController{
             $parentData = array_shift($newParentDatas);
             $parentData['rel_keys'] = $relKeys;
             $parentDatas[] = $parentData;
+        }
+
+        //如果开启了独立分销价规则设置
+        if($enable_commisson_price && $parentDatas){
+            $row = User::find()->where(["id" => $user_id])->select(["role_type"])->one();
+            $suffix = $row && $row['role_type'] != "user" ? $row['role_type'] : "all";
+            $parentData = $parentDatas[count($parentDatas) - 1];
+            $relKey = $parentData['role_type'] . "#{$suffix}";
+            $parentData['rel_keys'] = [$relKey];
+            $parentDatas[count($parentDatas) - 1] = $parentData;
+        }
+
+        //处理合伙人平级插入
+        foreach($parentDatas as $key => $parentData){
+            if(isset($parentData['pingji']) && $parentData['pingji']){
+                $parentDatas[$key]['rel_keys'] = ["partner#partner#all"];
+                break;
+            }
         }
 
         $getChainRuleData = function(ActiveQuery $query, $item_id){
@@ -245,17 +285,6 @@ class CommissionController extends BaseCommandController{
             $parentDatas[$key]['rule_data'] = $ruleData ? $ruleData : null;
 
             $currentLevel--;
-        }
-
-        //如果是独立分销价，同级别上级不进行分佣
-        if($item_type == "goods" && $is_commisson_price){
-            $newParentDatas = [];
-            foreach($parentDatas as $parentData){
-                if($parentData['role_type'] != $user_role_type){
-                    $newParentDatas[] = $parentData;
-                }
-            }
-            $parentDatas = $newParentDatas;
         }
 
         return $parentDatas;

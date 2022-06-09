@@ -26,31 +26,19 @@
                     <tr v-for="row in groupData.branch_office">
                         <td colspan="2">
                             <table class="commission-rule"  cellspacing="0" cellpadding="0" width="100%">
-                                <template v-if="row.level == 1">
-                                    <tr v-for="chain in row.chain">
-                                        <td>直推消费者</td>
-                                        <td>
-                                            <el-input @input="changeCommissionChain(row, chain)" type="number" placeholder="请输入内容" v-model="chain.commisson_value">
-                                                <template slot="append">{{commission_type == 1 ? '%' : '元'}}</template>
-                                            </el-input>
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template v-else>
-                                    <tr v-for="chain in row.chain">
-                                        <td v-for="role_type in chain.relationship">
-                                            <span v-if="role_type == 'branch_office'">分公司</span>
-                                            <span v-if="role_type == 'partner'">合伙人</span>
-                                            <span v-if="role_type == 'store'">VIP会员</span>
-                                            <span v-if="role_type == 'all'">消费者</span>
-                                        </td>
-                                        <td>
-                                            <el-input @input="changeCommissionChain(row, chain)" type="number" placeholder="请输入内容" v-model="chain.commisson_value">
-                                                <template slot="append">{{commission_type == 1 ? '%' : '元'}}</template>
-                                            </el-input>
-                                        </td>
-                                    </tr>
-                                </template>
+                                <tr v-for="chain in row.chain">
+                                    <td v-for="role_type in chain.relationship">
+                                        <span v-if="role_type == 'branch_office'">分公司</span>
+                                        <span v-if="role_type == 'partner'">合伙人</span>
+                                        <span v-if="role_type == 'store'">VIP会员</span>
+                                        <span v-if="role_type == 'all'">消费者</span>
+                                    </td>
+                                    <td>
+                                        <el-input @input="changeCommissionChain(row, chain)" type="number" placeholder="请输入内容" v-model="chain.commisson_value">
+                                            <template slot="append">{{commission_type == 1 ? '%' : '元'}}</template>
+                                        </el-input>
+                                    </td>
+                                </tr>
                             </table>
                         </td>
                     </tr>
@@ -71,31 +59,19 @@
                     <tr v-for="row in groupData.partner">
                         <td colspan="2">
                             <table  class="commission-rule"  cellspacing="0" cellpadding="0" width="100%">
-                                <template v-if="row.level == 1">
-                                    <tr v-for="chain in row.chain">
-                                        <td>直推消费者</td>
-                                        <td>
-                                            <el-input @input="changeCommissionChain(row, chain)" type="number" placeholder="请输入内容" v-model="chain.commisson_value">
-                                                <template slot="append">{{commission_type == 1 ? '%' : '元'}}</template>
-                                            </el-input>
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template v-else>
-                                    <tr v-for="chain in row.chain">
-                                        <td v-for="role_type in chain.relationship">
-                                            <span v-if="role_type == 'branch_office'">分公司</span>
-                                            <span v-if="role_type == 'partner'">合伙人</span>
-                                            <span v-if="role_type == 'store'">VIP会员</span>
-                                            <span v-if="role_type == 'all'">消费者</span>
-                                        </td>
-                                        <td>
-                                            <el-input @input="changeCommissionChain(row, chain)" type="number" placeholder="请输入内容" v-model="chain.commisson_value">
-                                                <template slot="append">{{commission_type == 1 ? '%' : '元'}}</template>
-                                            </el-input>
-                                        </td>
-                                    </tr>
-                                </template>
+                                <tr v-for="chain in row.chain">
+                                    <td v-for="role_type in chain.relationship">
+                                        <span v-if="role_type == 'branch_office'">分公司</span>
+                                        <span v-if="role_type == 'partner'">合伙人</span>
+                                        <span v-if="role_type == 'store'">VIP会员</span>
+                                        <span v-if="role_type == 'all'">消费者</span>
+                                    </td>
+                                    <td>
+                                        <el-input @input="changeCommissionChain(row, chain)" type="number" placeholder="请输入内容" v-model="chain.commisson_value">
+                                            <template slot="append">{{commission_type == 1 ? '%' : '元'}}</template>
+                                        </el-input>
+                                    </td>
+                                </tr>
                             </table>
                         </td>
                     </tr>
@@ -115,31 +91,19 @@
                     <tr v-for="row in groupData.store">
                         <td colspan="2">
                             <table  class="commission-rule"  cellspacing="0" cellpadding="0" width="100%">
-                                <template v-if="row.level == 1">
-                                    <tr v-for="chain in row.chain">
-                                        <td>直推消费者</td>
-                                        <td>
-                                            <el-input @input="changeCommissionChain(row, chain)" type="number" placeholder="请输入内容" v-model="chain.commisson_value">
-                                                <template slot="append">{{commission_type == 1 ? '%' : '元'}}</template>
-                                            </el-input>
-                                        </td>
-                                    </tr>
-                                </template>
-                                <template v-else>
-                                    <tr v-for="chain in row.chain">
-                                        <td v-for="role_type in chain.relationship">
-                                            <span v-if="role_type == 'branch_office'">分公司</span>
-                                            <span v-if="role_type == 'partner'">合伙人</span>
-                                            <span v-if="role_type == 'store'">VIP会员</span>
-                                            <span v-if="role_type == 'all'">消费者</span>
-                                        </td>
-                                        <td>
-                                            <el-input @input="changeCommissionChain(row, chain)" type="number" placeholder="请输入内容" v-model="chain.commisson_value">
-                                                <template slot="append">{{commission_type == 1 ? '%' : '元'}}</template>
-                                            </el-input>
-                                        </td>
-                                    </tr>
-                                </template>
+                                <tr v-for="chain in row.chain">
+                                    <td v-for="role_type in chain.relationship">
+                                        <span v-if="role_type == 'branch_office'">分公司</span>
+                                        <span v-if="role_type == 'partner'">合伙人</span>
+                                        <span v-if="role_type == 'store'">VIP会员</span>
+                                        <span v-if="role_type == 'all'">消费者</span>
+                                    </td>
+                                    <td>
+                                        <el-input @input="changeCommissionChain(row, chain)" type="number" placeholder="请输入内容" v-model="chain.commisson_value">
+                                            <template slot="append">{{commission_type == 1 ? '%' : '元'}}</template>
+                                        </el-input>
+                                    </td>
+                                </tr>
                             </table>
                         </td>
                     </tr>
@@ -153,7 +117,7 @@
 <script>
     Vue.component('com-commission-rule-edit', {
         template: '#com-commission-rule-edit',
-        props: ['itemType', 'ctype', 'chains'],
+        props: ['itemType', 'ctype', 'chains', 'commissonPrice'],
         computed: {},
         watch: {
             chains: {
@@ -188,41 +152,48 @@
             }
         },
         data() {
+            let branch_office_level_1_chain = [
+                {commisson_value:0, relationship:['branch_office', 'all'], unique_key:'branch_office#all'}
+            ];
+            let partner_level_1_chain = [
+                {commisson_value:0, relationship:['partner', 'all'], unique_key:'partner#all'},
+            ];
+            if(this.commissonPrice){
+                branch_office_level_1_chain.push({commisson_value:0, relationship:['branch_office', 'partner'], unique_key:'branch_office#partner'});
+                branch_office_level_1_chain.push({commisson_value:0, relationship:['branch_office', 'store'], unique_key:'branch_office#store'});
+                partner_level_1_chain.push({commisson_value:0, relationship:['partner', 'store'], unique_key:'partner#store'});
+            }
             return {
                 commission_type: 1,
                 groupData: {
                     branch_office:[
-                        {role:'branch_office', level:1, chain:[
-                                {commisson_value:0, relationship:['branch_office', 'all'], unique_key:'branch_office#all'}
-                            ]},
+                        {role:'branch_office', level:1, chain: branch_office_level_1_chain},
                         {role:'branch_office', level:2, chain:[
-                                {commisson_value:0, relationship:['branch_office', 'partner', 'all'], unique_key:'branch_office#partner#all'},
-                                {commisson_value:0, relationship:['branch_office', 'store', 'all'], unique_key:'branch_office#store#all'}
-                            ]},
+                            {commisson_value:0, relationship:['branch_office', 'partner', 'all'], unique_key:'branch_office#partner#all'},
+                            {commisson_value:0, relationship:['branch_office', 'store', 'all'], unique_key:'branch_office#store#all'}
+                        ]},
                         {role:'branch_office', level:3, chain:[
-                                {commisson_value:0, relationship:['branch_office', 'partner', 'store', 'all'], unique_key:'branch_office#partner#store#all'},
-                                {commisson_value:0, relationship:['branch_office', 'partner', 'partner', 'all'], unique_key:'branch_office#partner#partner#all'},
-                            ]},
+                            {commisson_value:0, relationship:['branch_office', 'partner', 'store', 'all'], unique_key:'branch_office#partner#store#all'},
+                            {commisson_value:0, relationship:['branch_office', 'partner', 'partner', 'all'], unique_key:'branch_office#partner#partner#all'},
+                        ]},
                         {role:'branch_office', level:4, chain:[
-                                {commisson_value:0, relationship:['branch_office', 'partner', 'partner', 'store', 'all'], unique_key:'branch_office#partner#partner#store#all'},
-                            ]}
+                            {commisson_value:0, relationship:['branch_office', 'partner', 'partner', 'store', 'all'], unique_key:'branch_office#partner#partner#store#all'},
+                        ]}
                     ],
                     partner:[
-                        {role:'partner', level:1, chain:[
-                                {commisson_value:0, relationship:['partner', 'all'], unique_key:'partner#all'}
-                            ]},
+                        {role:'partner', level:1, chain:partner_level_1_chain},
                         {role:'partner', level:2, chain:[
-                                {commisson_value:0, relationship:['partner', 'partner', 'all'], unique_key:'partner#partner#all'},
-                                {commisson_value:0, relationship:['partner', 'store', 'all'], unique_key:'partner#store#all'}
-                            ]},
+                            {commisson_value:0, relationship:['partner', 'partner', 'all'], unique_key:'partner#partner#all'},
+                            {commisson_value:0, relationship:['partner', 'store', 'all'], unique_key:'partner#store#all'}
+                        ]},
                         {role:'partner', level:3, chain:[
-                                {commisson_value:0, relationship:['partner', 'partner', 'store', 'all'], unique_key:'partner#partner#store#all'},
-                            ]}
+                            {commisson_value:0, relationship:['partner', 'partner', 'store', 'all'], unique_key:'partner#partner#store#all'},
+                        ]}
                     ],
                     store:[
                         {role:'store', level:1, chain:[
-                                {commisson_value:0, relationship:['store', 'all'], unique_key:'store#all'}
-                            ]}
+                            {commisson_value:0, relationship:['store', 'all'], unique_key:'store#all'}
+                        ]}
                     ]
                 }
             };

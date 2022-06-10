@@ -36,7 +36,7 @@ class PosterPosterForm extends GrafikaOption implements BasePoster{
             $this->cacheKey = md5($this->qrcode . $this->from . $this->data);
             $picUrl = \Yii::$app->cache->get($this->cacheKey);
             $isCache = true;
-            if(!$picUrl){
+            if(!$picUrl || true){
                 $isCache = false;
                 $data = json_decode($this->data, true);
 
@@ -46,13 +46,28 @@ class PosterPosterForm extends GrafikaOption implements BasePoster{
                 $option = $this->optionDiff($option, $default);
                 $this->setFile($option);
 
-                unset($option['head']);
                 unset($option['desc']);
+
+                //设置头像
+                if(!isset($data['avatar']) || empty($data['avatar'])){
+                    $avatar = ROOT_PATH . "/statics/img/common/default-avatar.png";
+                }else{
+                    $avatar = $data['avatar'];
+                    $this->saveLocalTempFile($avatar);
+                }
+
+                isset($option['head']) && $option['head']['file_path'] = $avatar;
+
+                //设置昵称
+                $nickName = $data['mobile'];
+                if(isset($data['nickname']) && !empty($data['nickname'])){
+                    $nickName = $data['nickname'];
+                }
 
                 isset($option['pic']) && $option['pic']['file_path'] = $data['goods_thumb'];
                 isset($option['desc']) && $option['desc']['text'] = self::autowrap($option['desc']['font'], 0, $this->font_path, $data['store_name'], $option['desc']['width']);
                 isset($option['name']) && $option['name']['text'] = self::autowrap($option['name']['font'], 0, $this->font_path, $data['goods_name'], 750 - (float)$option['name']['left'] - 40, 2);
-                isset($option['nickname']) && $option['nickname']['text'] = $data['mobile'];
+                isset($option['nickname']) && $option['nickname']['text'] = $nickName;
 
                 if (isset($option['price'])) {
                     $option['price']['text'] = '￥' . $data['goods_price'];
@@ -72,14 +87,27 @@ class PosterPosterForm extends GrafikaOption implements BasePoster{
                     }
                 }
 
+                $option['head']['size'] = 55;
+
+                //计算出昵称宽度
+                $nicknameSize = imagettfbbox($option['nickname']['font'], 0, $this->font_path, $option['nickname']['text']);
+                $nicknameWidth = abs($nicknameSize[2] - $nicknameSize[0]);
+                $nicknameHeight = abs($nicknameSize[5] - $nicknameSize[3]);
+
+                //昵称加头像的宽度
+                $nickAvatarSize = $nicknameWidth + $option['head']['size'];
+
                 //调整二维码位置
                 $option['qr_code']['left'] = ($option['pic']['width'] - $option['qr_code']['size'])/2;
                 $option['qr_code']['top'] = $option['price']['top'] + 60;
 
+                //调整头像位置
+                $option['head']['top'] = $option['qr_code']['top'] + $option['qr_code']['size'] + 20;
+                $option['head']['left'] = $option['qr_code']['left'] + ($option['qr_code']['size'] - $nickAvatarSize)/2;
+
                 //调整昵称位置
-                $option['nickname']['top'] = $option['qr_code']['top'] + $option['qr_code']['size'] + 20;
-                $nicknameSize = imagettfbbox($option['nickname']['font'], 0, $this->font_path, $option['nickname']['text']);
-                $option['nickname']['left'] = ($option['pic']['width'] - ($nicknameSize[2] - $nicknameSize[0]))/2;
+                $option['nickname']['top'] = $option['head']['top'] + ($option['head']['size'] - $nicknameHeight)/2;
+                $option['nickname']['left'] = $option['head']['left'] + $option['head']['size'];
 
                 //远程文件临时存储到本地
                 //$this->saveLocalTempFile($data['store_logo']);
@@ -87,7 +115,6 @@ class PosterPosterForm extends GrafikaOption implements BasePoster{
                 $this->saveLocalTempFile($this->qrcode);
 
                 isset($option['qr_code']) && $option['qr_code']['file_path'] = $this->qrcode;
-                isset($option['head']) && $option['head']['file_path'] = $data['store_logo'];
 
                 $editor = $this->getPoster($option);
                 $picUrl = $editor->qrcode_url;

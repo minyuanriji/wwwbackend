@@ -7,6 +7,9 @@ use app\plugins\smart_shop\forms\api\kpi_admin\KpiAdminStatNewOrderForm;
 use app\plugins\smart_shop\forms\api\kpi_admin\KpiAdminStatRegisterForm;
 use app\plugins\smart_shop\forms\api\kpi_admin\KpiAdminStatShareForm;
 
+/**
+ * @deprecated
+ */
 class StatController extends AdminAuthController {
 
     /**

@@ -6,6 +6,9 @@ use app\plugins\smart_shop\controllers\api\AdminAuthController;
 use app\plugins\smart_shop\forms\api\kpi_admin\KpiAdminSettingDetailForm;
 use app\plugins\smart_shop\forms\api\kpi_admin\KpiAdminSettingSaveForm;
 
+/**
+ * @deprecated
+ */
 class SettingController extends AdminAuthController {
 
     /**

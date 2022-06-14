@@ -6,7 +6,7 @@ use app\core\ApiCode;
 use app\models\BaseModel;
 use app\plugins\smart_shop\models\KpiSetting;
 
-class KpiGetRuleDetailForm  extends BaseModel{
+class KpiGetRuleDetailForm extends BaseModel{
 
     public $merchant_id;
     public $store_id;

@@ -4,21 +4,20 @@ namespace app\plugins\smart_shop\forms\api\store_admin;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
-use app\plugins\smart_shop\models\KpiSetting;
+use app\plugins\smart_shop\models\KpiUser;
 
-class KpiGetRuleListForm extends BaseModel{
+class KpiKpiUserListForm extends BaseModel{
 
     public $merchant_id;
     public $store_id;
-    public $type;
-    public $source_table;
     public $page;
+    public $keyword;
 
     public function rules(){
         return [
-            [['merchant_id', 'store_id', 'type', 'source_table'], 'required'],
-            [['source_table', 'type'], 'trim'],
-            [['page'], 'integer']
+            [['merchant_id', 'store_id'], 'required'],
+            [['page'], 'integer'],
+            [['keyword'], 'trim']
         ];
     }
 
@@ -28,21 +27,27 @@ class KpiGetRuleListForm extends BaseModel{
         }
 
         try {
-            $query = KpiSetting::find()->where([
+
+            $query = KpiUser::find()->where([
                 "mall_id"      => \Yii::$app->mall->id,
                 "ss_mch_id"    => $this->merchant_id,
                 "ss_store_id"  => $this->store_id,
-                "type"         => $this->type,
-                "source_table" => $this->source_table,
                 "is_delete"    => 0
             ])->orderBy("id DESC");
+
+            if($this->keyword){
+                $query->andWhere([
+                    "OR",
+                    ["LIKE", "realname", $this->keyword],
+                    ["LIKE", "mobile", $this->keyword]
+                ]);
+            }
 
             $list = $query->asArray()->page($pagination, 10, $this->page)->all();
             if($list){
                 foreach($list as $key => $row){
                     $list[$key]['created_at'] = date("Y-m-d H:i:s", $row['created_at']);
                     $list[$key]['updated_at'] = date("Y-m-d H:i:s", $row['updated_at']);
-                    $list[$key]['value'] = $row['value'] ? @json_decode($row['value'], true) : '';
                 }
             }
 
@@ -57,5 +62,4 @@ class KpiGetRuleListForm extends BaseModel{
             return $this->returnApiResultData(ApiCode::CODE_FAIL, $e->getMessage());
         }
     }
-
 }

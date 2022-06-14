@@ -3,6 +3,7 @@
 namespace app\plugins\smart_shop\controllers\api\store_admin;
 
 use app\plugins\smart_shop\controllers\api\AdminAuthController;
+use app\plugins\smart_shop\forms\api\store_admin\KpiDeleteRuleForm;
 use app\plugins\smart_shop\forms\api\store_admin\KpiGetRuleDetailForm;
 use app\plugins\smart_shop\forms\api\store_admin\KpiGetRuleListForm;
 use app\plugins\smart_shop\forms\api\store_admin\KpiSaveRuleForm;
@@ -43,5 +44,17 @@ class KpiController extends AdminAuthController {
         $form->merchant_id = $this->merchant ? $this->merchant['id'] : 0;
         $form->store_id    = $this->store ? $this->store['id'] : 0;
         return $this->asJson($form->getDetail());
+    }
+
+    /**
+     * 删除规则
+     * @return \yii\web\Response
+     */
+    public function actionDeleteRule(){
+        $form = new KpiDeleteRuleForm();
+        $form->attributes = $this->requestData;
+        $form->merchant_id = $this->merchant ? $this->merchant['id'] : 0;
+        $form->store_id    = $this->store ? $this->store['id'] : 0;
+        return $this->asJson($form->delete());
     }
 }

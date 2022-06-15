@@ -3,6 +3,7 @@
 namespace app\commands\smart_shop_task;
 
 use app\commands\BaseAction;
+use app\models\Mall;
 use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\components\SmartShopKPI;
 
@@ -26,6 +27,8 @@ class KpiCyorderNewAction extends BaseAction{
                 }
 
                 $this->activeTime();
+
+                \Yii::$app->setMall(Mall::findOne(MAIN_MALL_ID));
 
                 //先把状态更新了
                 $orderIds = [];

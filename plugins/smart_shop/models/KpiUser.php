@@ -15,7 +15,7 @@ class KpiUser extends BaseActiveRecord{
 
     public function rules(){
         return [
-            [['mall_id', 'ss_mch_id', 'ss_store_id', 'created_at', 'updated_at', 'realname', 'mobile'], 'required'],
+            [['mall_id', 'user_id', 'ss_mch_id', 'ss_store_id', 'created_at', 'updated_at', 'realname', 'mobile'], 'required'],
             [['is_delete'], 'safe']
         ];
     }

@@ -7,6 +7,9 @@ use app\plugins\smart_shop\components\SmartShop;
 use app\plugins\smart_shop\models\Cyorder;
 use app\plugins\smart_shop\models\StoreSet;
 
+/**
+ * @deprecated
+ */
 class NewCyorderAction extends BaseAction{
 
     public function run() {

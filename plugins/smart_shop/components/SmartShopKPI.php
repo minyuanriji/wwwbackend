@@ -2,12 +2,14 @@
 
 namespace app\plugins\smart_shop\components;
 
+use app\models\Mall;
 use app\models\User;
 use app\models\UserRelationshipLink;
 use app\plugins\smart_shop\models\KpiLinkCoupon;
 use app\plugins\smart_shop\models\KpiLinkGoods;
 use app\plugins\smart_shop\models\KpiNewOrder;
 use app\plugins\smart_shop\models\KpiRegister;
+use app\plugins\smart_shop\models\KpiUser;
 use app\plugins\smart_shop\models\Setting;
 use yii\base\Component;
 
@@ -28,21 +30,26 @@ class SmartShopKPI extends Component{
      * @throws \Exception
      * @return boolean
      */
-    public function register(User $inviterUser, User $user, $store_id, $merchant_id){
+    public function register(User $sourceUser, User $user, $store_id, $merchant_id){
 
         //已有上级或者上级是自己的不进行处理
-        if(($user->parent_id && $user->parent_id != GLOBAL_PARENT_ID) || $user->id == $inviterUser->id || $user->mobile == $inviterUser->mobile)
+        if(($user->parent_id && $user->parent_id != GLOBAL_PARENT_ID) || $user->id == $sourceUser->id || $user->mobile == $sourceUser->mobile)
             return true;
 
         try {
 
-            $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
-            if(!$relatLink){
-                throw new \Exception("邀请用户关系链异常");
+            //获取推广员信息
+            $kpiUsers = static::getKpiUserAllParents($user, $store_id, $merchant_id);
+            if(!$kpiUsers || empty($kpiUsers)){
+                throw new \Exception("推广员信息不存在");
             }
 
-            $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
-            sort($parentIds);
+            $parentIds = [];
+            foreach($kpiUsers as $kpiUser){
+                $parentIds[] = $kpiUser->user_id;
+            }
+
+            $kpiUser = $kpiUsers[0];
 
             //KPI奖励
             $awardPoint = 0;
@@ -50,8 +57,8 @@ class SmartShopKPI extends Component{
             $setting = $this->getKPISetting($merchant_id);
             $query = KpiRegister::find()->andWhere([
                 "AND",
-                ["mall_id" => $inviterUser->mall_id],
-                "inviter_user_id" => $inviterUser->id,
+                ["mall_id" => $kpiUser->mall_id],
+                "inviter_user_id" => $kpiUser->user_id,
                 'store_id' => $store_id,
                 'merchant_id' => $merchant_id,
                 [">", "created_at", $startTime],
@@ -70,8 +77,8 @@ class SmartShopKPI extends Component{
             }
 
             $kpiRegister = new KpiRegister([
-                "mall_id"         => $inviterUser->mall_id,
-                "inviter_user_id" => $inviterUser->id,
+                "mall_id"         => $kpiUser->mall_id,
+                "inviter_user_id" => $kpiUser->user_id,
                 "user_id_list"    => implode(",", $parentIds),
                 "created_at"      => time(),
                 "mobile"          => !empty($user->mobile) ? $user->mobile : "none",
@@ -131,18 +138,23 @@ class SmartShopKPI extends Component{
         try {
 
             //获取邀请者本地用户
-            $inviterUser = User::findOne(["mobile" => $data['inviter_mobile']]);
-            if(!$inviterUser){
+            $sourceUser = User::findOne(["mobile" => $data['inviter_mobile']]);
+            if(!$sourceUser){
                 throw new \Exception("邀请者用户信息不存在");
             }
 
-            $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
-            if(!$relatLink){
-                throw new \Exception("邀请用户关系链异常");
+            //获取推广员信息
+            $kpiUsers = static::getKpiUserAllParents($sourceUser, $shopData['ss_store_id'], $shopData['merchant_id']);
+            if(!$kpiUsers || empty($kpiUsers)){
+                throw new \Exception("推广员信息不存在");
             }
 
-            $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
-            sort($parentIds);
+            $parentIds = [];
+            foreach($kpiUsers as $kpiUser){
+                $parentIds[] = $kpiUser->user_id;
+            }
+
+            $kpiUser = $kpiUsers[0];
 
             //KPI奖励
             $awardPoint = 0;
@@ -150,8 +162,8 @@ class SmartShopKPI extends Component{
             $setting = $this->getKPISetting($shopData['merchant_id']);
             $query = KpiLinkGoods::find()->andWhere([
                 "AND",
-                ["mall_id" => $inviterUser->mall_id],
-                "inviter_user_id" => $inviterUser->id,
+                ["mall_id" => $kpiUser->mall_id],
+                "inviter_user_id" => $kpiUser->user_id,
                 'store_id' => $shopData['ss_store_id'],
                 'merchant_id' => $shopData['merchant_id'],
                 [">", "created_at", $startTime],
@@ -170,8 +182,8 @@ class SmartShopKPI extends Component{
             }
 
             $kpiLinkGoods = new KpiLinkGoods([
-                "mall_id"         => $inviterUser->mall_id,
-                "inviter_user_id" => $inviterUser->id,
+                "mall_id"         => $kpiUser->mall_id,
+                "inviter_user_id" => $kpiUser->user_id,
                 "user_id_list"    => implode(",", $parentIds),
                 "created_at"      => time(),
                 "mobile"          => !empty($data['mobile']) ? $data['mobile'] : "none",
@@ -188,7 +200,7 @@ class SmartShopKPI extends Component{
             }
 
         }catch (\Exception $e){
-            $this->error = $e->getMessage();
+            $this->error = implode("\n", [$e->getMessage(), $e->getFile(), $e->getLine()]);
             return false;
         }
 
@@ -336,35 +348,40 @@ class SmartShopKPI extends Component{
 
         try {
             //获取邀请者本地用户
-            $inviterUser = User::findOne(["mobile" => $inviter_mobile]);
-            if(!$inviterUser){
-                throw new \Exception("邀请者用户信息不存在");
+            $sourceUser = User::findOne(["mobile" => $inviter_mobile]);
+            if(!$sourceUser){
+                throw new \Exception("用户信息不存在");
             }
 
+            //获取推广员信息
+            $kpiUsers = static::getKpiUserAllParents($sourceUser, $store_id, $merchant_id);
+            if(!$kpiUsers || empty($kpiUsers)){
+                throw new \Exception("推广员信息不存在");
+            }
+
+            $parentIds = [];
+            foreach($kpiUsers as $kpiUser){
+                $parentIds[] = $kpiUser->user_id;
+            }
+
+            $kpiUser = $kpiUsers[0];
+
             $exists = KpiNewOrder::find()->where([
-                "mall_id"      => $inviterUser->mall_id,
+                "mall_id"      => $sourceUser->mall_id,
                 "store_id"     => $store_id,
                 "merchant_id"  => $merchant_id,
                 "source_table" => $order_type,
                 "source_id"    => $order_id,
             ])->exists();
             if(!$exists){
-                $relatLink = UserRelationshipLink::findOne(["user_id" => $inviterUser->id]);
-                if(!$relatLink){
-                    throw new \Exception("邀请用户关系链异常");
-                }
-
-                $parentIds = array_merge([$inviterUser->id], $relatLink->getParentIds());
-                sort($parentIds);
-
                 //KPI奖励
                 $awardPoint = 0;
                 $startTime = strtotime(date("Y-m-d") . " 00:00:00");
                 $setting = $this->getKPISetting($merchant_id);
                 $query = KpiNewOrder::find()->andWhere([
                     "AND",
-                    ["mall_id" => $inviterUser->mall_id],
-                    "inviter_user_id" => $inviterUser->id,
+                    ["mall_id" => $kpiUser->mall_id],
+                    "inviter_user_id" => $kpiUser->user_id,
                     'store_id' => $store_id,
                     'merchant_id' => $merchant_id,
                     [">", "created_at", $startTime],
@@ -383,8 +400,8 @@ class SmartShopKPI extends Component{
                 }
 
                 $kpiNewOrder = new KpiNewOrder([
-                    "mall_id"         => $inviterUser->mall_id,
-                    "inviter_user_id" => $inviterUser->id,
+                    "mall_id"         => $kpiUser->mall_id,
+                    "inviter_user_id" => $kpiUser->user_id,
                     "user_id_list"    => implode(",", $parentIds),
                     "created_at"      => time(),
                     "mobile"          => !empty($mobile) ? $mobile : "none",
@@ -400,7 +417,7 @@ class SmartShopKPI extends Component{
                 }
             }
         }catch (\Exception $e){
-            $this->error = $e->getMessage();
+            $this->error = implode("\n", [$e->getMessage(), $e->getFile(), $e->getLine()]);
             return false;
         }
 
@@ -460,5 +477,50 @@ class SmartShopKPI extends Component{
         foreach($temps as $rule){
             $rules[] = $rule;
         }
+    }
+
+    /**
+     * 获取所有上级且包括自己的推广员
+     * @param User $user
+     * @param $store_id
+     * @param $merchant_id
+     * @return array
+     * @throws \Exception
+     */
+    public static function getKpiUserAllParents(User $user, $store_id, $merchant_id){
+        $kpiUsers = [];
+        try {
+            //获取上级推广员
+            $userRelLink = UserRelationshipLink::findOne(["user_id" => $user->id]);
+            if(!$userRelLink){
+                throw new \Exception("用户【ID:".$user->id."】关系链异常");
+            }
+            //通过关系链得到上级用户ID、手机号
+            $rows = UserRelationshipLink::find()->alias("url")
+                ->innerJoin(["u" => User::tableName()], "u.id=url.user_id")
+                ->innerJoin(["ku" => KpiUser::tableName()], "ku.mobile=u.mobile AND ku.is_delete=0 AND ku.ss_mch_id='{$merchant_id}' AND ku.ss_store_id='{$store_id}'")
+                ->andWhere([
+                    "AND",
+                    ['<=', 'url.left', $userRelLink->left],
+                    ['>=', 'url.right', $userRelLink->right],
+                ])->asArray()->select(["url.user_id", "u.mobile"])->orderBy("url.left DESC")->all();
+            if($rows){
+                foreach($rows as $row){
+                    $kpiUser = KpiUser::findOne([
+                        "mall_id"      => $user->mall_id,
+                        "ss_mch_id"    => $merchant_id,
+                        "ss_store_id"  => $store_id,
+                        "mobile"       => $row['mobile'],
+                        "is_delete"    => 0
+                    ]);
+                    if($kpiUser){
+                        $kpiUsers[] = $kpiUser;
+                    }
+                }
+            }
+        }catch (\Exception $e){
+            throw $e;
+        }
+        return $kpiUsers;
     }
 }

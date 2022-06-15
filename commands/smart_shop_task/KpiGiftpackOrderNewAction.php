@@ -37,6 +37,7 @@ class KpiGiftpackOrderNewAction extends BaseTaskAction {
         foreach($rows as $row){
             $orderIds[] = $row['id'];
         }
+
         $this->shop->batchSetGiftpackOrderKpiNewStatus($orderIds, 1);
         $kpi = new SmartShopKPI();
         foreach($rows as $row){

@@ -37,6 +37,28 @@ trait SmartShopOrderTrait
         return $rows ? $rows : [];
     }
 
+    /**
+     * 通过订单ID获取详情列表
+     * @param $orderId
+     * @param string[] $selects
+     * @return array|\yii\db\DataReader
+     * @throws \yii\db\Exception
+     */
+    public function getCyorderDetailByOrderId($orderId, $selects = ["od.*"]){
+        $sql = "SELECT " .implode(",", $selects) . " FROM {{%cyorder_detail}} od WHERE od.order_id='{$orderId}' ORDER BY od.id DESC";
+        $rows = $this->getDB()->createCommand($sql)->queryAll();
+        return $rows ? $rows : [];
+    }
+
+    /**
+     * 获取商品订单
+     * @param string[] $selects
+     * @param array $wheres
+     * @param int $limit
+     * @param null $orderBy
+     * @return array|\yii\db\DataReader
+     * @throws \yii\db\Exception
+     */
     public function getCzorders($selects = ["o.*"], $wheres = [], $limit = 10, $orderBy = null){
         $sql = "SELECT " .implode(",", $selects) . " FROM {{%czorder}} o " .
             "INNER JOIN {{%store}} s ON s.id=o.store_id " .
@@ -102,6 +124,30 @@ trait SmartShopOrderTrait
             $row['store_logo'] = rtrim($this->setting['host_url'], "/") . "/" . ltrim(str_replace("\\", "/", $row['store_logo']), "/");
         }
 
+        return $row ? $row : [];
+    }
+
+    /**
+     * 获取套餐活动订单详情
+     * @param $record_id
+     * @return array
+     */
+    public function getGiftpackOrderDetail($record_id){
+        $selects = ["go.*"];
+        $sql = "SELECT " .implode(",", $selects) . " FROM {{%giftpack_order}} go WHERE go.id='{$record_id}'";
+        $row = $this->getDB()->createCommand($sql)->queryOne();
+        return $row ? $row : [];
+    }
+
+    /**
+     * 获取优惠券领取详情
+     * @param $record_id
+     * @return array
+     */
+    public function getStoreUsercouponsDetail($record_id){
+        $selects = ["suc.*"];
+        $sql = "SELECT " .implode(",", $selects) . " FROM {{%store_usercoupons}} suc WHERE suc.id='{$record_id}'";
+        $row = $this->getDB()->createCommand($sql)->queryOne();
         return $row ? $row : [];
     }
 

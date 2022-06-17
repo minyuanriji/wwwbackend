@@ -32,9 +32,8 @@ class SmartShopKPI extends Component{
      */
     public function register(User $sourceUser, User $user, $store_id, $merchant_id){
 
-        //已有上级或者上级是自己的不进行处理
-        if(($user->parent_id && $user->parent_id != GLOBAL_PARENT_ID) || $user->id == $sourceUser->id || $user->mobile == $sourceUser->mobile)
-            return true;
+        if($user->parent_id != $sourceUser->id)
+            return;
 
         try {
 
@@ -51,24 +50,28 @@ class SmartShopKPI extends Component{
 
             $kpiUser = $kpiUsers[0];
 
-            $kpiRegister = new KpiRegister([
+            $uniqueData = [
                 "mall_id"         => $kpiUser->mall_id,
                 "inviter_user_id" => $kpiUser->user_id,
-                "user_id_list"    => implode(",", $parentIds),
-                "created_at"      => time(),
-                "mobile"          => !empty($user->mobile) ? $user->mobile : "none",
-                'store_id'        => $store_id,
-                'merchant_id'     => $merchant_id,
-                "point"           => 0
-            ]);
+                "mobile"          => !empty($user->mobile) ? $user->mobile : "none"
+            ];
+            $kpiRegister = KpiRegister::findOne($uniqueData);
+            if(!$kpiRegister){
+                $kpiRegister = new KpiRegister(array_merge($uniqueData, [
+                    "user_id_list"    => implode(",", $parentIds),
+                    "created_at"      => time(),
+                    'store_id'        => $store_id,
+                    'merchant_id'     => $merchant_id,
+                    "point"           => 0
+                ]));
 
-            if(!$kpiRegister->save()){
-                throw new \Exception(json_encode($kpiRegister->getErrors()));
+                if(!$kpiRegister->save()){
+                    throw new \Exception(json_encode($kpiRegister->getErrors()));
+                }
+
+                //处理奖励
+                KpiSetting::setRegisterAward($kpiRegister, $kpiUser, time());
             }
-
-            //处理奖励
-            KpiSetting::setRegisterAward($kpiRegister, $kpiUser, time());
-
         }catch (\Exception $e){
             $this->error = $e->getMessage();
             return false;
@@ -109,6 +112,7 @@ class SmartShopKPI extends Component{
             'store_id'        => $shopData['ss_store_id'],
             'merchant_id'     => $shopData['merchant_id'],
         ]);
+
         if($exists){
             return true;
         }

@@ -128,30 +128,6 @@ trait SmartShopOrderTrait
     }
 
     /**
-     * 获取套餐活动订单详情
-     * @param $record_id
-     * @return array
-     */
-    public function getGiftpackOrderDetail($record_id){
-        $selects = ["go.*"];
-        $sql = "SELECT " .implode(",", $selects) . " FROM {{%giftpack_order}} go WHERE go.id='{$record_id}'";
-        $row = $this->getDB()->createCommand($sql)->queryOne();
-        return $row ? $row : [];
-    }
-
-    /**
-     * 获取优惠券领取详情
-     * @param $record_id
-     * @return array
-     */
-    public function getStoreUsercouponsDetail($record_id){
-        $selects = ["suc.*"];
-        $sql = "SELECT " .implode(",", $selects) . " FROM {{%store_usercoupons}} suc WHERE suc.id='{$record_id}'";
-        $row = $this->getDB()->createCommand($sql)->queryOne();
-        return $row ? $row : [];
-    }
-
-    /**
      * 批量设置KPI新订单状态
      * @param $orderIds
      * @param $status

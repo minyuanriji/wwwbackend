@@ -13,6 +13,7 @@ class SmartShop extends Component
 
     use SmartShopOrderTrait;
     use SmartShopGiftpackOrderTrait;
+    use SmartShopCouponOrderTrait;
     use SmartShopShopTrait;
     use SmartShopIdentityTrait;
 

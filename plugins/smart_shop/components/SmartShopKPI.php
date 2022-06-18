@@ -53,6 +53,7 @@ class SmartShopKPI extends Component{
             $uniqueData = [
                 "mall_id"         => $kpiUser->mall_id,
                 "inviter_user_id" => $kpiUser->user_id,
+                "source_user_id"  => $sourceUser->id,
                 "mobile"          => !empty($user->mobile) ? $user->mobile : "none"
             ];
             $kpiRegister = KpiRegister::findOne($uniqueData);
@@ -141,6 +142,7 @@ class SmartShopKPI extends Component{
             $kpiLinkGoods = new KpiLinkGoods([
                 "mall_id"         => $kpiUser->mall_id,
                 "inviter_user_id" => $kpiUser->user_id,
+                "source_user_id"  => $sourceUser->id,
                 "user_id_list"    => implode(",", $parentIds),
                 "created_at"      => time(),
                 "mobile"          => !empty($data['mobile']) ? $data['mobile'] : "none",
@@ -264,8 +266,8 @@ class SmartShopKPI extends Component{
     }
 
     /**
-     * 领取优惠券统计
      * @deprecated
+     * 领取优惠券统计
      * @param $data
      *  [
      *    'store_id'       => '门店ID',
@@ -298,7 +300,7 @@ class SmartShopKPI extends Component{
      * 新订单统计
      * @param $store_id 门店ID
      * @param $merchant_id 小程序商户ID
-     * @param $order_type 订单类型（cyorder|czorder|store_usercoupons）
+     * @param $order_type 订单类型（cyorder|czorder|store_usercoupons|giftpack_order）
      * @param $order_id 订单ID
      * @param $mobile 支付手机号
      * @param $inviter_mobile 邀请人手机号
@@ -336,9 +338,36 @@ class SmartShopKPI extends Component{
             ])->exists();
             if(!$exists){
 
+                //获取商品ID列表
+                $goodsIdList = [];
+                $smartShop = new SmartShop();
+                if($order_type == "cyorder"){
+                    $details = $smartShop->getCyorderDetailByOrderId($order_id, ["od.goods_id"]);
+                    if(!$details){
+                        throw new \Exception("商品信息不存在");
+                    }
+                    $goodsIdList = [];
+                    foreach($details as $detail){
+                        $goodsIdList[] = $detail['goods_id'];
+                    }
+                }elseif($order_type == "store_usercoupons"){
+                    $detail = $smartShop->getStoreUsercouponsDetail($order_id, ["suc.coupon_id"]);
+                    if(!$detail){
+                        throw new \Exception("优惠信息不存在");
+                    }
+                    $goodsIdList[] = $detail['coupon_id'];
+                }elseif($order_type == "giftpack_order"){
+                    $detail = $smartShop->getGiftpackOrderDetail($order_id, ["go.giftpack_id"]);
+                    if(!$detail){
+                        throw new \Exception("套餐活动信息不存在");
+                    }
+                    $goodsIdList[] = $detail['giftpack_id'];
+                }
+
                 $kpiNewOrder = new KpiNewOrder([
                     "mall_id"         => $kpiUser->mall_id,
                     "inviter_user_id" => $kpiUser->user_id,
+                    "source_user_id"  => $sourceUser->id,
                     "user_id_list"    => implode(",", $parentIds),
                     "created_at"      => time(),
                     "mobile"          => !empty($mobile) ? $mobile : "none",
@@ -346,6 +375,7 @@ class SmartShopKPI extends Component{
                     "merchant_id"     => $merchant_id,
                     "source_table"    => $order_type,
                     "source_id"       => $order_id,
+                    "goods_id_list"   => implode(",", $goodsIdList),
                     "point"           => 0
                 ]);
 

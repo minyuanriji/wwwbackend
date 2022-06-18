@@ -24,15 +24,16 @@ class KpiController extends ApiController {
     }
 
     /**
+     * @deprecated
      * 领取优惠券统计
      * @return \yii\web\Response
      */
     public function actionTakeCoupon(){
         try {
-            $kpi = new SmartShopKPI();
+            /*$kpi = new SmartShopKPI();
             if(!$kpi->takeCoupon($this->requestData)){
                 throw new \Exception($kpi->getError());
-            }
+            }*/
             return $this->success();
         }catch (\Exception $e){
             return $this->error($e->getMessage());

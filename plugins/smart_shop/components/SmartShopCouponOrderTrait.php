@@ -2,8 +2,8 @@
 
 namespace app\plugins\smart_shop\components;
 
-trait SmartShopGiftpackOrderTrait{
-
+trait SmartShopCouponOrderTrait
+{
     /**
      * 获取订单列表
      * @param string[] $selects
@@ -13,8 +13,8 @@ trait SmartShopGiftpackOrderTrait{
      * @return array|\yii\db\DataReader
      * @throws \yii\db\Exception
      */
-    public function getGiftpackOrders($selects = ["o.*"], $wheres = [], $limit = 10, $orderBy = null){
-        $sql = "SELECT " .implode(",", $selects) . " FROM {{%giftpack_order}} o " .
+    public function getCouponOrders($selects = ["o.*"], $wheres = [], $limit = 10, $orderBy = null){
+        $sql = "SELECT " .implode(",", $selects) . " FROM {{%store_usercoupons}} o " .
             "INNER JOIN {{%store}} s ON s.id=o.store_id " .
             "INNER JOIN {{%merchant}} m ON s.admin_id=m.admin_id " .
             "WHERE " . (!empty($wheres) ? implode(" AND ", $wheres) : "1") . " " .
@@ -25,23 +25,23 @@ trait SmartShopGiftpackOrderTrait{
     }
 
     /**
+     * 获取优惠券领取详情
+     * @param $record_id
+     * @return array
+     */
+    public function getStoreUsercouponsDetail($record_id, $selects = ["suc.*"]){
+        $sql = "SELECT " .implode(",", $selects) . " FROM {{%store_usercoupons}} suc WHERE suc.id='{$record_id}'";
+        $row = $this->getDB()->createCommand($sql)->queryOne();
+        return $row ? $row : [];
+    }
+
+    /**
      * 批量设置KPI新订单状态
      * @param $orderIds
      * @param $status
      */
-    public function batchSetGiftpackOrderKpiNewStatus($orderIds, $status){
-        $sql = "UPDATE {{%giftpack_order}} SET `kpi_new_status`='{$status}' WHERE `id` IN(".implode(",", $orderIds).")";
+    public function batchSetCouponOrderKpiNewStatus($orderIds, $status){
+        $sql = "UPDATE {{%store_usercoupons}} SET `kpi_new_status`='{$status}' WHERE `id` IN(".implode(",", $orderIds).")";
         $this->getDB()->createCommand($sql)->execute();
-    }
-
-    /**
-     * 获取套餐活动订单详情
-     * @param $record_id
-     * @return array
-     */
-    public function getGiftpackOrderDetail($record_id, $selects = ["go.*"]){
-        $sql = "SELECT " .implode(",", $selects) . " FROM {{%giftpack_order}} go WHERE go.id='{$record_id}'";
-        $row = $this->getDB()->createCommand($sql)->queryOne();
-        return $row ? $row : [];
     }
 }

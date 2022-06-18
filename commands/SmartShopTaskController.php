@@ -6,6 +6,7 @@ class SmartShopTaskController extends SwooleProcessController {
 
     public function actions(){
         return [
+            'kpi-coupon-order-new'   => 'app\commands\smart_shop_task\KpiCouponOrderNewAction',
             'kpi-giftpack-order-new' => 'app\commands\smart_shop_task\KpiGiftpackOrderNewAction',
             'kpi-cyorder-new'        => 'app\commands\smart_shop_task\KpiCyorderNewAction',
             'kpi-czorder-new'        => 'app\commands\smart_shop_task\KpiCzorderNewAction',

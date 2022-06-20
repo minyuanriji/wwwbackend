@@ -4,8 +4,19 @@ namespace app\plugins\smart_shop\controllers\api;
 
 use app\controllers\api\ApiController;
 use app\plugins\smart_shop\components\SmartShopKPI;
+use app\plugins\smart_shop\forms\api\KpiAwardLogForm;
 
 class KpiController extends ApiController {
+
+    /**
+     * 获取KPI奖励记录
+     * @return \yii\web\Response
+     */
+    public function actionAwardLog(){
+        $form = new KpiAwardLogForm();
+        $form->attributes = $this->requestData;
+        return $this->asJson($form->getList());
+    }
 
     /**
      * 分享商品链接访问统计

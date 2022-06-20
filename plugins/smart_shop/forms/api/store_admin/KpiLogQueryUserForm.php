@@ -14,7 +14,10 @@ class KpiLogQueryUserForm extends BaseModel{
     public $merchant_id;
     public $store_id;
     public $page;
+    public $giftpack_id;
+    public $coupon_id;
     public $goods_id;
+    public $user_id;
     public $start_time;
     public $end_time;
 
@@ -22,7 +25,7 @@ class KpiLogQueryUserForm extends BaseModel{
     public function rules(){
         return [
             [['merchant_id', 'store_id'], 'required'],
-            [['page', 'goods_id'], 'integer'],
+            [['page', 'goods_id', 'coupon_id', 'giftpack_id', 'user_id'], 'integer'],
             [['start_time', 'end_time'], 'trim']
         ];
     }
@@ -51,6 +54,7 @@ class KpiLogQueryUserForm extends BaseModel{
                 ["ku.ss_mch_id" => $this->merchant_id],
                 ["ku.ss_store_id" => $this->store_id]
             ]);
+
             $query->select(["ku.id", "ku.user_id", "ku.realname", "ku.mobile"]);
             $query->orderBy("ku.user_id DESC");
             $list = $query->asArray()->page($pagination, 10, $this->page)->all();
@@ -59,12 +63,11 @@ class KpiLogQueryUserForm extends BaseModel{
                     $row = $this->countLinkGoods($row, $startTime, $endTime);
                     $row = $this->countNewOrder($row, $startTime, $endTime);
 
-                    if($this->goods_id){
+                    if($this->goods_id || $this->coupon_id || $this->giftpack_id){
                         $row['total_register_point_1'] = 0;
                         $row['total_register_point_2'] = 0;
                     }else{
                         $row = $this->countRegister($row, $startTime, $endTime);
-
                     }
 
                     $row['total_point_1'] = $row['total_share_1'] + $row['total_register_point_1'] + $row['total_new_order_point_1'];
@@ -107,9 +110,27 @@ class KpiLogQueryUserForm extends BaseModel{
             ["<", "created_at", $endTime],
         ];
 
+        //按员工
+        if($this->user_id){
+            $commonWhere[] = ["inviter_user_id" => $this->user_id];
+        }
+
+        //按商品
         if($this->goods_id){
             $commonWhere[] = ["source_table" => "cyorder"];
             $commonWhere[] = "FIND_IN_SET('".$this->goods_id."', goods_id_list)";
+        }
+
+        //按优惠券查询
+        if($this->coupon_id){
+            $commonWhere[] = ["source_table" => "store_usercoupons"];
+            $commonWhere[] = ["goods_id" => $this->goods_id];
+        }
+
+        //按套餐活动查询
+        if($this->giftpack_id){
+            $commonWhere[] = ["source_table" => "giftpack_order"];
+            $commonWhere[] = ["goods_id" => $this->goods_id];
         }
 
         //直接下单数
@@ -153,6 +174,11 @@ class KpiLogQueryUserForm extends BaseModel{
             [">", "created_at", $startTime],
             ["<", "created_at", $endTime]
         ];
+
+        //按员工
+        if($this->user_id){
+            $commonWhere[] = ["inviter_user_id" => $this->user_id];
+        }
 
         //直接注册数
         $row['total_register_1'] = (int)KpiRegister::find()->andWhere(array_merge($commonWhere, [
@@ -198,8 +224,26 @@ class KpiLogQueryUserForm extends BaseModel{
             ["<", "created_at", $endTime]
         ];
 
+        //按员工
+        if($this->user_id){
+            $commonWhere[] = ["inviter_user_id" => $this->user_id];
+        }
+
+        //按商品查询
         if($this->goods_id){
             $commonWhere[] = ["source_table" => "goods"];
+            $commonWhere[] = ["goods_id" => $this->goods_id];
+        }
+
+        //按优惠券查询
+        if($this->coupon_id){
+            $commonWhere[] = ["source_table" => "coupon"];
+            $commonWhere[] = ["goods_id" => $this->goods_id];
+        }
+
+        //按套餐活动查询
+        if($this->giftpack_id){
+            $commonWhere[] = ["source_table" => "giftpacks"];
             $commonWhere[] = ["goods_id" => $this->goods_id];
         }
 

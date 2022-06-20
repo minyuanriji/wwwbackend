@@ -9,7 +9,7 @@ use app\plugins\smart_shop\forms\api\store_admin\KpiLogQueryUserForm;
 class KpiLogController extends AdminAuthController {
 
     /**
-     * KPI查询
+     * KPI查询-按商品
      * @return \yii\web\Response
      */
     public function actionQueryUser(){

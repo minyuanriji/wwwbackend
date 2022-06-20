@@ -28,14 +28,6 @@ class KpiAwardLogForm  extends BaseModel{
 
         try {
 
-            $kpiUser = KpiUser::find()->where([
-                "mobile"   => $this->mobile,
-                "is_delete" => 0
-            ])->one();
-            if(!$kpiUser){
-                throw new \Exception("推广员信息不存在");
-            }
-
             $sqls = [
                 "(select inviter_user_id, store_id, point, created_at from {{%plugin_smartshop_kpi_new_order}})",
                 "(select inviter_user_id, store_id, point, created_at from {{%plugin_smartshop_kpi_link_goods}})",

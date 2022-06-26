@@ -13,11 +13,15 @@ class KpiAwardLogForm  extends BaseModel{
 
     public $page;
     public $mobile;
+    public $type;
+    public $startTime;
+    public $endTime;
 
     public function rules(){
         return [
             [['mobile'], 'required'],
             [['page'], 'integer'],
+            [['type', 'startTime', 'endTime'], 'trim']
         ];
     }
 
@@ -28,19 +32,26 @@ class KpiAwardLogForm  extends BaseModel{
 
         try {
 
-            $sqls = [
-                "(select inviter_user_id, store_id, point, created_at from {{%plugin_smartshop_kpi_new_order}})",
-                "(select inviter_user_id, store_id, point, created_at from {{%plugin_smartshop_kpi_link_goods}})",
-                "(select inviter_user_id, store_id, point, created_at from {{%plugin_smartshop_kpi_register}})"
-            ];
+            if($this->type == "register"){
+                $query = KpiRegister::find();
+            }elseif($this->type == "new_order"){
+                $query = KpiNewOrder::find();
+            }else{
+                $query = KpiLinkGoods::find();
+            }
 
-            $selects = ["inviter_user_id", "store_id", "point", "created_at"];
-            $query = KpiNewOrder::find()->select($selects)
-                ->union(KpiLinkGoods::find()->select($selects))
-                ->union(KpiRegister::find()->select($selects))
-                ->where(["mobile" => $this->mobile]);
+            $query->where(["mobile" => $this->mobile]);
 
-            $list = $query->asArray()->orderBy("id DESC")->page($pagination, 10, $this->page)->all();
+            if(!empty($this->startTime) && !empty($this->endTime)){
+                $query->andWhere([
+                    "AND",
+                    [">=", "created_at", strtotime($this->startTime . " 00:00:00")],
+                    ["<=", "created_at", strtotime($this->endTime . " 00:00:00") + 3600 * 24 - 1]
+                ]);
+            }
+
+            $selects = ["inviter_user_id", "mobile", "store_id", "point", "created_at"];
+            $list = $query->select($selects)->asArray()->orderBy("id DESC")->page($pagination, 10, $this->page)->all();
             foreach($list as $key => $row){
                 $row['created_at'] = date("Y-m-d H:i:s", $row['created_at']);
                 $list[$key] = $row;

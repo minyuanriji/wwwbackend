@@ -70,8 +70,8 @@ class KpiLogQueryUserForm extends BaseModel{
                         $row = $this->countRegister($row, $startTime, $endTime);
                     }
 
-                    $row['total_point_1'] = $row['total_share_1'] + $row['total_register_point_1'] + $row['total_new_order_point_1'];
-                    $row['total_point_2'] = $row['total_share_2'] + $row['total_register_point_2'] + $row['total_new_order_point_2'];
+                    $row['total_point_1'] = $row['total_share_point_1'] + $row['total_register_point_1'] + $row['total_new_order_point_1'];
+                    $row['total_point_2'] = $row['total_share_point_2'] + $row['total_register_point_2'] + $row['total_new_order_point_2'];
                     $list[$key] = $row;
                 }
             }

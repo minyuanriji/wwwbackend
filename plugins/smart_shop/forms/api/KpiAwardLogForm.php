@@ -4,6 +4,7 @@ namespace app\plugins\smart_shop\forms\api;
 
 use app\core\ApiCode;
 use app\models\BaseModel;
+use app\models\User;
 use app\plugins\smart_shop\models\KpiLinkGoods;
 use app\plugins\smart_shop\models\KpiNewOrder;
 use app\plugins\smart_shop\models\KpiRegister;
@@ -40,7 +41,7 @@ class KpiAwardLogForm  extends BaseModel{
                 $query = KpiLinkGoods::find();
             }
 
-            $query->where(["mobile" => $this->mobile]);
+            $query->andWhere(["IN", "inviter_user_id", User::find()->select("id")->where(["mobile" => $this->mobile])]);
 
             if(!empty($this->startTime) && !empty($this->endTime)){
                 $query->andWhere([
@@ -51,6 +52,7 @@ class KpiAwardLogForm  extends BaseModel{
             }
 
             $selects = ["inviter_user_id", "mobile", "store_id", "point", "created_at"];
+            
             $list = $query->select($selects)->asArray()->orderBy("id DESC")->page($pagination, 10, $this->page)->all();
             foreach($list as $key => $row){
                 $row['created_at'] = date("Y-m-d H:i:s", $row['created_at']);

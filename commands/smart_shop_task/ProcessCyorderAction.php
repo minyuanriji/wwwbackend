@@ -16,8 +16,10 @@ class ProcessCyorderAction extends BaseAction{
         while (true) {
             sleep($this->sleepTime);
             try {
-                $orderIds = Cyorder::find()->select(["id"])->where([
-                    "status" => 0
+                $orderIds = Cyorder::find()->select(["id"])->andWhere([
+                    "AND",
+                    ["status" => 0],
+                    ["<", "created_at", time() - 20],
                 ])->orderBy("updated_at ASC")->limit(1)->column();
                 if($orderIds){
                     $this->activeTime();

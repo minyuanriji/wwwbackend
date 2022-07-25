@@ -105,21 +105,24 @@ class SmartshopCyorderSendAction extends BaseAction {
             }
 
             //赠送用户红包
-            if($storeSet->enable_shopping_voucher && $shoppingVoucherNum > 0 && !$localCyorder->shopping_voucher_status){
-                $modifyForm = new ShoppingVoucherLogModifiyForm([
-                    "money"       => $shoppingVoucherNum,
-                    "desc"        => "门店消费获得赠送红包",
-                    "source_id"   => $localCyorder->id,
-                    "source_type" => "from_smart_shop_cyorder"
-                ]);
-                $modifyForm->add($user, false);
+            if($storeSet->enable_shopping_voucher && !$localCyorder->shopping_voucher_status){
+                if($shoppingVoucherNum > 0){
+                    $modifyForm = new ShoppingVoucherLogModifiyForm([
+                        "money"       => $shoppingVoucherNum,
+                        "desc"        => "门店消费获得赠送红包",
+                        "source_id"   => $localCyorder->id,
+                        "source_type" => "from_smart_shop_cyorder"
+                    ]);
+                    $modifyForm->add($user, false);
+                }
+
                 $localCyorder->shopping_voucher_status = 1;
                 $localCyorder->shopping_voucher_info = json_encode([
-                    "shopping_voucher_num" => $shoppingVoucherNum,
+                    "shopping_voucher_num"  => $shoppingVoucherNum,
                     "shopping_voucher_rate" => $shoppingVoucherRate,
-                    "balance" => $account->balance,
-                    "price" => $shoppingVoucherPrice,
-                    "rate"  => 0.1
+                    "balance"               => $account->balance,
+                    "price"                 => $shoppingVoucherPrice,
+                    "rate"                  => 0.1
                 ], JSON_UNESCAPED_UNICODE);
             }
 
@@ -136,8 +139,8 @@ class SmartshopCyorderSendAction extends BaseAction {
                 $localCyorder->score_status = 1;
                 $localCyorder->score_info = json_encode(array_merge($scoreSetting, [
                     "balance" => $account->balance,
-                    "price" => $scorePrice,
-                    "rate"  => 0.03
+                    "price"   => $scorePrice,
+                    "rate"    => 0.03
                 ]));
                 Integral::addIntegralPlan($user->id, $scoreSetting, '门店消费获得赠送积分', 0, 0, $localCyorder->mall_id);
             }

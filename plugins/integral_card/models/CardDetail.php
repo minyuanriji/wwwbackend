@@ -109,9 +109,9 @@ class CardDetail extends BaseActiveRecord{
                 (new UserModel()) -> updateUsers(['level' => 4],$user_id);
             }
 
-            if($level['role_type'] == 'user'){
+            /*if($level['role_type'] == 'user'){
                 (new UserModel()) -> updateUsers(['role_type' => 'store'],$user_id);
-            }
+            }*/
 
             $link_url = $card->link_url ? json_decode($card->link_url, true) : [];
 

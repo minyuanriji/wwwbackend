@@ -258,7 +258,7 @@ class Mall extends BaseActiveRecord
             'quick_navigation_style' => '1',//1.样式1（点击收起）2.样式2（全部展示）
             'quick_navigation_opened_pic' => $host . 'statics/img/mall/quick_navigation_opened_pic.png',// 快捷导航展开图标
             'quick_navigation_closed_pic' => $host . 'statics/img/mall/quick_navigation_closed_pic.png',// 快捷导航收起图标
-            'is_common_user_member_price' => '1',// 普通用户会员价显示开关 0.关闭 1.开启
+            'is_common_user_member_price' => '1',// VIP会员会员价显示开关 0.关闭 1.开启
             'is_member_user_member_price' => '1',// 会员用户会员价显示开关 0.关闭 1.开启
             'is_distribution_price' => '1',// 分销价显示开关 0.关闭 1.开启
             'is_purchase_frame' => '1',// 首页购买记录框 0.关闭 1.开启

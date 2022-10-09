@@ -93,7 +93,7 @@ class Common extends BaseModel
         $frozen_price = 0;
         $yesterday_price = 0;
         $agent = $this->getAgentUser($user);
-        $level_name = '普通用户';
+        $level_name = 'VIP会员';
         $is_price = '0.00';
         $returnData['nickname'] = $user->nickname;
         $returnData['avatar_url'] = $user->avatar_url;
@@ -108,7 +108,7 @@ class Common extends BaseModel
             $returnData['is_agent'] = 1;
             $total_price = $agent->total_price;
             $agentLevel = AgentLevel::findOne(['level' => $agent->level, 'mall_id' => $user->mall_id]);
-            $level_name = $agentLevel ? $agentLevel->name : "普通用户";
+            $level_name = $agentLevel ? $agentLevel->name : "VIP会员";
             $frozen_price = floatval($agent->frozen_price);
             $query = PriceLog::find()->where(["mall_id" => \Yii::$app->mall->id, "user_id" => $user->id, 'is_price' => 1, 'sign' => $this->sign]);
             $is_price = $query->sum("price");

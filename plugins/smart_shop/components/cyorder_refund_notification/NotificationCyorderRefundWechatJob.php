@@ -32,7 +32,7 @@ class NotificationCyorderRefundWechatJob extends Component implements JobInterfa
                     "mall_id"       => $this->mall_id,
                     "title"         => "你有一条新的退款消息",
                     "date"          => date("Y-m-d H:i:s", $detail['apply_time']),
-                    "nickname"      => !empty($detail['nickname']) ? $detail['nickname'] : "普通用户",
+                    "nickname"      => !empty($detail['nickname']) ? $detail['nickname'] : "VIP会员",
                     "mobile"        => $detail['u_mobile'],
                     "refund_money"  => $detail['total_price'],
                     "refund_reason" => $detail['refund_reason'],

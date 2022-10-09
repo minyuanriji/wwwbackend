@@ -59,7 +59,7 @@
                     <el-table-column prop="member_level" label="会员类型" width="120">
                         <template slot-scope="scope">
                             <div v-if="scope.row.level == item.level" v-for="item in mall_members">{{item.name}}</div>
-                            <div v-if="scope.row.level == -1">普通用户</div>
+                            <div v-if="scope.row.level == -1">VIP会员</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="最新签到时间" prop="company_name">

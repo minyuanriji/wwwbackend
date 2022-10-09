@@ -323,7 +323,7 @@ class UserForm extends BaseModel
             ->asArray()
             ->all();
         $roleTypes = [
-            'store' => 'VIP会员',
+            'store' => 'VIP代理商',
             'partner' => '合伙人',
             'branch_office' => '分公司',
             'user' => '用户'

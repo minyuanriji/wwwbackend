@@ -71,7 +71,7 @@ class SmartShopOrder3rAction extends Action{
 
             $parentDatas = $this->controller->getCommissionParents($payUser->id);
 
-            //计算分公司、合伙人、VIP会员分佣值
+            //计算分公司、合伙人、VIP代理商分佣值
             $this->setCommissoinValues($order, $parentDatas);
 
             //通过相关规则键获取分佣规则进行分佣

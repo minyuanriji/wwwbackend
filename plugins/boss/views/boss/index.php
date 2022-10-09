@@ -59,10 +59,10 @@ Yii::$app->loadPluginComponentView('boss-level');
                     </el-table-column>
                     <el-table-column label="身份" prop="mobile" width="150">
                         <template slot-scope="scope">
-                            <div v-if="scope.row.userInfo[0].role_type == 'user'">普通用户</div>
+                            <div v-if="scope.row.userInfo[0].role_type == 'user'">VIP会员</div>
                             <div v-if="scope.row.userInfo[0].role_type == 'branch_office'">分公司</div>
                             <div v-if="scope.row.userInfo[0].role_type == 'partner'">合伙人</div>
-                            <div v-if="scope.row.userInfo[0].role_type == 'store'">VIP会员</div>
+                            <div v-if="scope.row.userInfo[0].role_type == 'store'">VIP代理商</div>
                         </template>
                     </el-table-column>
                     <el-table-column label="累计佣金" prop="total_price" width="100">

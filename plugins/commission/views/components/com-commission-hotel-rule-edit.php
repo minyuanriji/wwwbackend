@@ -43,7 +43,7 @@
                 commission_hotel_value: '',
                 level_list:[
                     {
-                        name:'普通会员',
+                        name:'VIP会员',
                         commisson_value:''
                     },
                     {
@@ -51,7 +51,7 @@
                         commisson_value:''
                     },
                     {
-                        name:'VIP会员',
+                        name:'VIP代理商',
                         commisson_value:''
                     },
                     {
@@ -65,13 +65,13 @@
             console.log(this.chains)
             for (let i = 0; i < this.chains.length; i++) {
                 if (this.chains[i].role_type == 'user') {
-                    this.level_list[i].name = '普通会员';
+                    this.level_list[i].name = 'VIP会员';
                     this.level_list[i].commisson_value = this.chains[i].commisson_value;
                 } else if (this.chains[i].role_type == 'branch_office') {
                     this.level_list[i].name = '分公司';
                     this.level_list[i].commisson_value = this.chains[i].commisson_value;
                 } else if (this.chains[i].role_type == 'store') {
-                    this.level_list[i].name = 'VIP会员';
+                    this.level_list[i].name = 'VIP代理商';
                     this.level_list[i].commisson_value = this.chains[i].commisson_value;
                 } else if (this.chains[i].role_type == 'partner') {
                     this.level_list[i].name = '合伙人';

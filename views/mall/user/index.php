@@ -70,8 +70,8 @@
                             <div>上级身份：
                                 <span v-if="scope.row.parent_role_type == 'branch_office'">分公司</span>
                                 <span v-if="scope.row.parent_role_type == 'partner'">合伙人</span>
-                                <span v-if="scope.row.parent_role_type == 'store'">VIP会员</span>
-                                <span v-if="scope.row.parent_role_type == 'user'">普通用户</span>
+                                <span v-if="scope.row.parent_role_type == 'store'">VIP代理商</span>
+                                <span v-if="scope.row.parent_role_type == 'user'">VIP会员</span>
                             </div>
                             <div>上级手机：{{scope.row.parent_mobile}}</div>
                             <div>
@@ -94,8 +94,8 @@
                     <template slot-scope="scope">
                         <div v-if="scope.row.role_type == 'branch_office'">分公司</div>
                         <div v-if="scope.row.role_type == 'partner'">合伙人</div>
-                        <div v-if="scope.row.role_type == 'store'">VIP会员</div>
-                        <div v-if="scope.row.role_type == 'user'">普通用户</div>
+                        <div v-if="scope.row.role_type == 'store'">VIP代理商</div>
+                        <div v-if="scope.row.role_type == 'user'">VIP会员</div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="order_count" label="订单数">
@@ -226,8 +226,8 @@
                 <el-option key="" label="全部用户" value=""></el-option>
                 <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
                 <el-option key="partner" label="合伙人" value="partner"></el-option>
-                <el-option key="store" label="VIP会员" value="store"></el-option>
-                <el-option key="user" label="普通用户" value="user"></el-option>
+                <el-option key="store" label="VIP代理商" value="store"></el-option>
+                <el-option key="user" label="VIP会员" value="user"></el-option>
             </el-select>
 
             <el-select size="small" v-model="recommandData.team_type" @change='childSearch' class="select">
@@ -269,8 +269,8 @@
                     <template slot-scope="scope">
                         <div v-if="scope.row.role_type == 'branch_office'">分公司</div>
                         <div v-if="scope.row.role_type == 'partner'">合伙人</div>
-                        <div v-if="scope.row.role_type == 'store'">VIP会员</div>
-                        <div v-if="scope.row.role_type == 'user'">普通用户</div>
+                        <div v-if="scope.row.role_type == 'store'">VIP代理商</div>
+                        <div v-if="scope.row.role_type == 'user'">VIP会员</div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="mobile" label="手机" width="110"></el-table-column>
@@ -387,11 +387,11 @@
                         value:'partner',
                     },
                     {
-                        name:'VIP会员',
+                        name:'VIP代理商',
                         value:'store',
                     },
                     {
-                        name:'普通用户',
+                        name:'VIP会员',
                         value:'user',
                     }
                 ],

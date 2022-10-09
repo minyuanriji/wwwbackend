@@ -212,10 +212,10 @@
         methods: {
             roleText(type){
                 let values = {
-                    store: 'VIP会员',
+                    store: 'VIP代理商',
                     partner: '合伙人',
                     branch_office: '分公司',
-                    user: '普通用户'
+                    user: 'VIP会员'
                 };
                 return values[type] ? values[type] : '';
             },

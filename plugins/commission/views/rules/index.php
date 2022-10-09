@@ -192,7 +192,7 @@
                     },
                     {
                         value: 'store',
-                        label: 'VIP会员'
+                        label: 'VIP代理商'
                     },
                     {
                         value: 'hotel',

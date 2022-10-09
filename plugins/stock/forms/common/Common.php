@@ -111,7 +111,7 @@ class Common extends BaseModel
          * @var StockAgent $agent
          */
         $agent = $this->getAgentUser($user);
-        $level_name = '普通用户';
+        $level_name = 'VIP会员';
         $is_price = 0;
         if($user){
             $returnData['nickname'] = $user->nickname;

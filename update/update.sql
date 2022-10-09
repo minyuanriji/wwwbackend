@@ -1114,7 +1114,7 @@ CREATE TABLE `jxmall_plugin_area_agent` (
   `frozen_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '冻结佣金',
   `delete_reason` text COMMENT '删除原因',
   `upgrade_status` smallint(6) NOT NULL DEFAULT '0' COMMENT '1条件升级  2 购买指定商品升级   3手动升级',
-  `level` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0普通用户 1、镇代 2、区代 3、市代 4、省代',
+  `level` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0VIP会员 1、镇代 2、区代 3、市代 4、省代',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `mall_id` (`mall_id`) USING BTREE,
   KEY `is_delete` (`is_delete`) USING BTREE,

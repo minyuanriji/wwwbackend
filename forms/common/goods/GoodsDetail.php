@@ -425,7 +425,7 @@ class GoodsDetail extends BaseModel
                 $levelShow = 0;
             }
 
-            // 会员价显示 开关，分普通用户开关，会员用户开关
+            // 会员价显示 开关，分VIP会员开关，会员用户开关
             $isMemberPrice = 0;
             if ($this->user) {
                 if ($this->user->identity->member_level) {

@@ -233,7 +233,7 @@
                     buy_btn_text: '立即开通',
                     renew_text_color: '#D0B8A5',
                     renew_btn_bg_color: '',
-                    renew_text: 'SVIP会员优享9.5折，全场包邮',
+                    renew_text: 'SVIP代理商优享9.5折，全场包邮',
                 },
                 form: {},
                 background: '#FFFFFF',
@@ -269,7 +269,7 @@
                     buy_btn_text: '立即开通',
                     renew_text_color: '#D0B8A5',
                     renew_btn_bg_color: '',
-                    renew_text: 'SVIP会员优享9.5折，全场包邮',
+                    renew_text: 'SVIP代理商优享9.5折，全场包邮',
                 },
             };
         },

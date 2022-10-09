@@ -143,7 +143,7 @@ class UserForm extends BaseModel
             $user->parent_id = GLOBAL_PARENT_ID;
         }
 
-        /*$levelName = '普通用户';
+        /*$levelName = 'VIP会员';
         $memberPicUrl = '';
         if ($user->level != 0) {
             $level = MemberLevel::findOne([

@@ -103,7 +103,7 @@ class UserTeamForm extends BaseModel
         //组装默认等级统计数
         $data[0]["id"] = -1;
         $data[0]["pic_url"] = "";
-        $data[0]["name"] = "普通会员";
+        $data[0]["name"] = "VIP会员";
         $data[0]["level"] = -1;
         $data[0]["total"] = isset($userTeamLevelList[-1]) ? count($userTeamLevelList[-1]) : 0;
         $memberLevels = MemberLevel::find()->where(["mall_id" => \Yii::$app->mall->id, "status" => MemberLevel::YES, "is_delete" => MemberLevel::NO])->select("id,pic_url,name,level")

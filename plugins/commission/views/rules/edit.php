@@ -699,13 +699,13 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                     } else if (self.ruleForm.item_type == 'hotel' || self.ruleForm.item_type == 'addcredit') {
                         for (let i=0;i<this.commissionHotelValue.length;i++) {
                             this.commissionHotelValue[i].level = 1;
-                            if (this.commissionHotelValue[i].name == '普通会员') {
+                            if (this.commissionHotelValue[i].name == 'VIP会员') {
                                 this.commissionHotelValue[i].role_type = 'user';
                                 this.commissionHotelValue[i].unique_key = "user#all";
                             } else if (this.commissionHotelValue[i].name == '分公司') {
                                 this.commissionHotelValue[i].role_type = 'branch_office';
                                 this.commissionHotelValue[i].unique_key = "branch_office#all";
-                            } else if (this.commissionHotelValue[i].name == 'VIP会员') {
+                            } else if (this.commissionHotelValue[i].name == 'VIP代理商') {
                                 this.commissionHotelValue[i].role_type = 'store';
                                 this.commissionHotelValue[i].unique_key = "store#all";
                             } else if (this.commissionHotelValue[i].name == '合伙人') {

@@ -98,11 +98,11 @@ class Common extends BaseModel
         $frozen_price = 0;
         $yesterday_price = 0;
         $distribution = $this->getDistributionUser($user);
-        $level_name = '普通用户';
+        $level_name = 'VIP会员';
         $is_price = '0.00';
         if (!empty($distribution)) {
             $total_price = $distribution->total_price;
-            $level_name = isset($distribution->distributionLevel) ? $distribution->distributionLevel->name : "普通用户";
+            $level_name = isset($distribution->distributionLevel) ? $distribution->distributionLevel->name : "VIP会员";
             $frozen_price = floatval($distribution->frozen_price);
             $query = PriceLog::find()->where(["mall_id" => \Yii::$app->mall->id, "user_id" => $user->id, 'is_price' => 1, 'sign' => $this->sign]);
             $is_price = $query->sum("price");

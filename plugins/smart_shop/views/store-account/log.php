@@ -106,7 +106,7 @@
                             }else if(role_type == "partner"){
                                 role_type = "合伙人";
                             }else if(role_type == "store"){
-                                role_type = "VIP会员";
+                                role_type = "VIP代理商";
                             }
                             list.push({name: role_type, value: commission_3r[i].price});
                         }

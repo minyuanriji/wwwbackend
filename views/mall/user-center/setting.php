@@ -187,7 +187,7 @@
                                        :src="ruleForm.top_pic_url">
                             </com-image>
                         </el-form-item>
-                        <el-form-item label="普通用户图标" prop="member_pic_url">
+                        <el-form-item label="VIP会员图标" prop="member_pic_url">
                             <com-attachment :multiple="false" :max="1" @selected="memberPicUrl">
                                 <el-tooltip class="item" effect="dark" content="建议尺寸:44*44" placement="top">
                                     <el-button size="mini">选择文件</el-button>
@@ -631,7 +631,7 @@
                         {required: true, message: '请选择会员图标', trigger: 'change'},
                     ],
                     member_bg_pic_url: [
-                        {required: true, message: '请选择普通会员背景图', trigger: 'change'},
+                        {required: true, message: '请选择VIP会员背景图', trigger: 'change'},
                     ],
                 },
                 btnLoading: false,

@@ -23,7 +23,7 @@ use app\models\User;
  * @property float $frozen_price 冻结佣金
  * @property string|null $delete_reason 删除原因
  * @property int $upgrade_status 1条件升级  2 购买指定商品升级   3手动升级
- * @property int $level 0普通用户 1、镇代 2、区代 3、市代 4、省代
+ * @property int $level 0VIP会员 1、镇代 2、区代 3、市代 4、省代
  * @property int $province_id 省ID
  * @property int $city_id 市id
  * @property int $district_id 区id
@@ -41,7 +41,7 @@ class AreaAgent extends BaseActiveRecord
     const LEVEL_PROVINCE=4;
 
     const LEVEL = [
-        0 => '普通用户',
+        0 => 'VIP会员',
         1 => '镇代',
         2 => '区代',
         3 => '市代',
@@ -91,7 +91,7 @@ class AreaAgent extends BaseActiveRecord
             'frozen_price' => '冻结佣金',
             'delete_reason' => '删除原因',
             'upgrade_status' => '1条件升级  2 购买指定商品升级   3手动升级',
-            'level' => '0普通用户 1、镇代 2、区代 3、市代 4、省代',
+            'level' => '0VIP会员 1、镇代 2、区代 3、市代 4、省代',
             'province_id' => '省ID',
             'city_id' => '市?id',
             'district_id' => '区id',

@@ -437,8 +437,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 
                                     <el-form-item label="购买权限" prop="purchase_permission">
                                         <el-checkbox-group v-model="ruleForm.purchase_permission">
-                                            <el-checkbox label="user">普通用户</el-checkbox>
-                                            <el-checkbox label="store">VIP会员</el-checkbox>
+                                            <el-checkbox label="user">VIP会员</el-checkbox>
+                                            <el-checkbox label="store">VIP代理商</el-checkbox>
                                             <el-checkbox label="partner">合伙人</el-checkbox>
                                             <el-checkbox label="branch_office">分公司</el-checkbox>
                                         </el-checkbox-group>
@@ -529,7 +529,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                             <el-card class="box-card" style="margin-top:10px;">
 
                                                 <div style="display: flex;align-items: center">
-                                                    <span style="width:100px;text-align:right;flex-shrink: 0" v-if="ruleForm.enable_commisson_price == 1" >普通用户：</span>
+                                                    <span style="width:100px;text-align:right;flex-shrink: 0" v-if="ruleForm.enable_commisson_price == 1" >VIP会员：</span>
                                                     <div style="display:flex;flex-grow: 1">
                                                         <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.price" style="flex-grow: 1">
                                                             <template slot="append">元</template>
@@ -551,7 +551,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                                         </el-input>
                                                     </div>
                                                     <div style="display: flex;align-items: center;margin-top:10px;">
-                                                        <span style="width:100px;text-align:right;flex-shrink: 0">VIP会员：</span>
+                                                        <span style="width:100px;text-align:right;flex-shrink: 0">VIP代理商：</span>
                                                         <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.store_price" style="flex-grow: 1">
                                                             <template slot="append">元</template>
                                                         </el-input>
@@ -722,7 +722,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 
                                         <el-card class="box-card" >
                                             <div style="padding:10px 10px;border:1px solid #eee;display:flex;align-items: center">
-                                                <span style="width:90px;text-align:right;flex-shrink: 0;">普通用户：</span>
+                                                <span style="width:90px;text-align:right;flex-shrink: 0;">VIP会员：</span>
                                                 <el-tag @close="freightDelete()" v-if="ruleForm.freight" :key="ruleForm.freight.name" :disable-transitions="true" style="margin-right: 10px;" closable>
                                                     {{ruleForm.freight.name}}
                                                 </el-tag>
@@ -1067,7 +1067,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         </el-switch>
                                         <div v-if="ruleForm.enable_upgrade_user_role == 1">
                                             <el-select v-model="ruleForm.upgrade_user_role_type">
-                                                <el-option :label="'VIP会员'" :value="'store'"></el-option>
+                                                <el-option :label="'VIP代理商'" :value="'store'"></el-option>
                                                 <el-option :label="'合伙人'" :value="'partner'"></el-option>
                                                 <el-option :label="'分公司'" :value="'branch_office'"></el-option>
                                             </el-select>
@@ -1547,7 +1547,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 fulfil_price: 0,
                 cannotrefund:["1","2","3"],
                 profit_price: 0,  //商品利润
-                enable_upgrade_user_role:0, //下单后升级会员VIP会员、合伙人或分公司
+                enable_upgrade_user_role:0, //下单后升级会员VIP代理商、合伙人或分公司
                 upgrade_user_role_type: '',
                 product: '',
                 purchase_permission: [],

@@ -79,10 +79,10 @@ class MchReviewListExportForm extends BaseModel{
                 'applying'  => '资料填写中'
             ];
             $roleTypeText = [
-                'store'         => 'VIP会员',
+                'store'         => 'VIP代理商',
                 'partner'       => '合伙人',
                 'branch_office' => '分公司',
-                'user'          => '普通用户'
+                'user'          => 'VIP会员'
             ];
             foreach($list as &$row){
                 $applyData = !empty($row['json_apply_data']) ? json_decode($row['json_apply_data'], true) : [];

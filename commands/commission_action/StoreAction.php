@@ -57,7 +57,7 @@ class StoreAction extends Action{
                     throw new \Exception("收款推荐分佣>>ID:".$checkoutOrder['id'].">>商铺上级用户[ID:".($parent_user ? $parent_user->id : 0)."]不存在");
 
                 if ($parent_user->role_type == 'user')
-                    throw new \Exception("收款推荐分佣>>ID:".$checkoutOrder['id'].">>普通用户不分佣");
+                    throw new \Exception("收款推荐分佣>>ID:".$checkoutOrder['id'].">>VIP会员不分佣");
 
                 //获取当前店铺分佣规则
                 $query = CommissionRules::find()->alias("cr");

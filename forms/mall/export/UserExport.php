@@ -133,7 +133,7 @@ class UserExport extends BaseExport
                     }
                 }
             } elseif ($memberLevel == 0 || $memberLevel == -1) {
-                $arr['member_level'] = '普通用户';
+                $arr['member_level'] = 'VIP会员';
             } else {
                 $arr['member_level'] = '未知';
             }

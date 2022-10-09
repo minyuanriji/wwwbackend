@@ -641,11 +641,11 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
                 "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/partner.png"
             ],
             'store' => [
-                "name" => "VIP会员",
+                "name" => "VIP代理商",
                 "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/store.png"
             ],
             'user' => [
-                "name" => "普通用户",
+                "name" => "VIP会员",
                 "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/user.png"
             ],
         ];
@@ -685,10 +685,10 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
                 $text = '合伙人';
                 break;
             case 'store':
-                $text = 'VIP会员';
+                $text = 'VIP代理商';
                 break;
             case 'user':
-                $text = '普通用户';
+                $text = 'VIP会员';
                 break;
             default:
         }

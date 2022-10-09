@@ -41,7 +41,7 @@
                                         <td v-for="role_type in chain.relationship">
                                             <span v-if="role_type == 'branch_office'">分公司</span>
                                             <span v-if="role_type == 'partner'">合伙人</span>
-                                            <span v-if="role_type == 'store'">VIP会员</span>
+                                            <span v-if="role_type == 'store'">VIP代理商</span>
                                             <span v-if="role_type == 'all'">消费者</span>
                                         </td>
                                         <td>
@@ -75,7 +75,7 @@
                                     <td v-for="role_type in chain.relationship">
                                         <span v-if="role_type == 'branch_office'">分公司</span>
                                         <span v-if="role_type == 'partner'">合伙人</span>
-                                        <span v-if="role_type == 'store'">VIP会员</span>
+                                        <span v-if="role_type == 'store'">VIP代理商</span>
                                         <span v-if="role_type == 'all'">消费者</span>
                                     </td>
                                     <td>
@@ -119,7 +119,7 @@
                                         <td v-for="role_type in chain.relationship">
                                             <span v-if="role_type == 'branch_office'">分公司</span>
                                             <span v-if="role_type == 'partner'">合伙人</span>
-                                            <span v-if="role_type == 'store'">VIP会员</span>
+                                            <span v-if="role_type == 'store'">VIP代理商</span>
                                             <span v-if="role_type == 'all'">消费者</span>
                                         </td>
                                         <td>
@@ -139,8 +139,8 @@
 
 
 
-            <!-- VIP会员 -->
-            <el-tab-pane label="VIP会员">
+            <!-- VIP代理商 -->
+            <el-tab-pane label="VIP代理商">
                 <table cellspacing="0" cellpadding="0" width="100%">
                     <tr>
                         <th>关系</th>
@@ -165,7 +165,7 @@
                                         <td v-for="role_type in chain.relationship">
                                             <span v-if="role_type == 'branch_office'">分公司</span>
                                             <span v-if="role_type == 'partner'">合伙人</span>
-                                            <span v-if="role_type == 'store'">VIP会员</span>
+                                            <span v-if="role_type == 'store'">VIP代理商</span>
                                             <span v-if="role_type == 'all'">消费者</span>
                                         </td>
                                         <td>

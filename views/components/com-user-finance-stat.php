@@ -19,8 +19,8 @@
                     <el-col :span="12">
                         <span v-if="role_type == 'branch_office'">分公司</span>
                         <span v-if="role_type == 'partner'">合伙人</span>
-                        <span v-if="role_type == 'store'">VIP会员</span>
-                        <span v-if="role_type == 'user'">普通用户</span>
+                        <span v-if="role_type == 'store'">VIP代理商</span>
+                        <span v-if="role_type == 'user'">VIP会员</span>
                     </el-col>
                 </el-row>
                 <el-row class="user-finance-stat-row">

@@ -521,7 +521,7 @@
                                         </el-switch>
                                     </el-form-item>
                                     <el-form-item :class='active_setting == "is_common_user_member_price" ? "active":""'
-                                                  @click.native='chooseSetting("is_common_user_member_price")' label="普通用户会员价"
+                                                  @click.native='chooseSetting("is_common_user_member_price")' label="VIP会员会员价"
                                                   prop="is_common_user_member_price">
                                         <el-switch
                                                 v-model="ruleForm.setting.is_common_user_member_price"

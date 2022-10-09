@@ -68,7 +68,7 @@ class SmartShopCyorderAction extends BaseAction{
                 throw new \Exception("智慧经营>>门店小程序订单推荐分佣>>ID:".$localCyorder->id.">>商户推荐人信息不存在");
             }
             if ($parent->role_type == 'user'){
-                throw new \Exception("智慧经营>>门店小程序订单推荐分佣>>ID:".$localCyorder->id.">>普通用户不分佣");
+                throw new \Exception("智慧经营>>门店小程序订单推荐分佣>>ID:".$localCyorder->id.">>VIP会员不分佣");
             }
 
             //获取当前店铺分佣规则

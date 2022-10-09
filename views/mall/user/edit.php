@@ -38,7 +38,7 @@
                 </el-form-item>
                 <!--<el-form-item label="会员等级" prop="member_level">
                     <el-select size="small" v-model="form.member_level" placeholder="请选择会员等级">
-                        <el-option key="普通用户" label="普通用户" :value="-1"></el-option>
+                        <el-option key="VIP会员" label="VIP会员" :value="-1"></el-option>
                         <el-option
                                 v-for="item in mall_members"
                                 :key="item.name"
@@ -49,10 +49,10 @@
                 </el-form-item>-->
                 <el-form-item label="会员类型" prop="role_type">
                     <el-select @change="roleTypeChange" size="small" v-model="form.role_type" placeholder="请选择会员类型">
-                        <el-option key="user" label="普通用户" value="user"></el-option>
+                        <el-option key="user" label="VIP会员" value="user"></el-option>
                         <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
                         <el-option key="partner" label="合伙人" value="partner"></el-option>
-                        <el-option key="store" label="VIP会员" value="store"></el-option>
+                        <el-option key="store" label="VIP代理商" value="store"></el-option>
                     </el-select>
                 </el-form-item>
 
@@ -147,9 +147,9 @@
                 }else if(e == "partner"){
                     this.form.role_type_label = "合伙人";
                 }else if(e == "store"){
-                    this.form.role_type_label = "VIP会员";
+                    this.form.role_type_label = "VIP代理商";
                 }else{
-                    this.form.role_type_label = "普通用户";
+                    this.form.role_type_label = "VIP会员";
                 }
             },
             //搜索

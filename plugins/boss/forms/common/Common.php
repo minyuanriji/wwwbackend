@@ -90,7 +90,7 @@ class Common extends BaseModel
         if (!$boss) {
             $returnData["is_boss"] = 0;
         }
-        $level_name = '普通用户';
+        $level_name = 'VIP会员';
         $yesterday_total_price=0;
         $returnData["yesterday_total_price"]=0;
         $income_rate=0;
@@ -107,7 +107,7 @@ class Common extends BaseModel
             $returnData["is_boss"] = 1;
             $total_price = $boss->total_price;
             $bossLevel = BossLevel::findOne(['level' => $boss->level, 'is_delete' => 0, 'is_enable' => 1]);
-            $level_name = '普通用户';
+            $level_name = 'VIP会员';
             if (!empty($bossLevel)) {
                 $level_name = $bossLevel->name;
                 $income_rate = $bossLevel->price;

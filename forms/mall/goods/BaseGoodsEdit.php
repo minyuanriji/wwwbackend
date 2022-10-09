@@ -477,7 +477,7 @@ abstract class BaseGoodsEdit extends BaseModel
             $goods->price_display = json_encode($this->price_display);
         }
 
-        //下单后升级会员VIP会员、合伙人或分公司
+        //下单后升级会员VIP代理商、合伙人或分公司
         $goods->enable_upgrade_user_role = (int)$this->enable_upgrade_user_role;
         if(!empty($this->upgrade_user_role_type)){
             $goods->upgrade_user_role_type = $this->upgrade_user_role_type;

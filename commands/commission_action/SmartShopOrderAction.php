@@ -66,7 +66,7 @@ class SmartShopOrderAction extends Action{
                 throw new \Exception("智慧门店小程序订单推荐分佣>>订单[ID:".$order['id']."]>>推荐人[ID:".$order['parent_id']."]不存在");
             }
             if ($parent->role_type == 'user'){
-                throw new \Exception("智慧门店小程序订单推荐分佣>>订单[ID:".$order['id']."]>>普通用户不分佣");
+                throw new \Exception("智慧门店小程序订单推荐分佣>>订单[ID:".$order['id']."]>>VIP会员不分佣");
             }
 
             //获取当前店铺分佣规则

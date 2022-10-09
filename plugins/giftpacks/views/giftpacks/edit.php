@@ -214,8 +214,8 @@ Yii::$app->loadComponentView('com-rich-text');
                                     <template slot-scope="scope">
                                         <span v-if="scope.row.type == 'branch_office'">分公司</span>
                                         <span v-if="scope.row.type == 'partner'">合伙人</span>
-                                        <span v-if="scope.row.type == 'store'">VIP会员</span>
-                                        <span v-if="scope.row.type == 'user'">普通用户</span>
+                                        <span v-if="scope.row.type == 'store'">VIP代理商</span>
+                                        <span v-if="scope.row.type == 'user'">VIP会员</span>
                                     </template>
                                 </el-table-column>
                                 <el-table-column label="比例">

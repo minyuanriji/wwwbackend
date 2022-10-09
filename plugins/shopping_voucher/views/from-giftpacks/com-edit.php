@@ -44,8 +44,8 @@
                                 <div v-for="recommender in scope.row.recommender">
                                     <span v-if="recommender.type == 'branch_office'">分公司</span>
                                     <span v-if="recommender.type == 'partner'">合伙人</span>
-                                    <span v-if="recommender.type == 'store'">VIP会员</span>
-                                    <span v-if="recommender.type == 'user'">普通用户</span>
+                                    <span v-if="recommender.type == 'store'">VIP代理商</span>
+                                    <span v-if="recommender.type == 'user'">VIP会员</span>
                                     <span v-if="recommender.give_type == 1">按比例{{recommender.give_value}}%赠送</span>
                                     <span v-if="recommender.give_type == 2">按固定值{{recommender.give_value}}赠送</span>
                                 </div>
@@ -97,8 +97,8 @@
                             <template slot-scope="scope">
                                 <span v-if="scope.row.type == 'branch_office'">分公司</span>
                                 <span v-if="scope.row.type == 'partner'">合伙人</span>
-                                <span v-if="scope.row.type == 'store'">VIP会员</span>
-                                <span v-if="scope.row.type == 'user'">普通用户</span>
+                                <span v-if="scope.row.type == 'store'">VIP代理商</span>
+                                <span v-if="scope.row.type == 'user'">VIP会员</span>
                             </template>
                         </el-table-column>
                         <el-table-column label="比例">

@@ -44,7 +44,7 @@ class NotificationCyorderPaidWechatJob extends Component implements JobInterface
                     "order_sn"   => $detail['order_no'],
                     "goods_name" => $goodsName,
                     "pay_price"  => $detail['total_price'],
-                    "nickname"   => !empty($detail['nickname']) ? $detail['nickname'] : "普通用户",
+                    "nickname"   => !empty($detail['nickname']) ? $detail['nickname'] : "VIP会员",
                     "mobile"     => $detail['u_mobile'],
                     "remark"     => "请及时处理！"
                 ]))->send($setting['data']['openid']);

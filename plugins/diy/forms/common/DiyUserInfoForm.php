@@ -17,7 +17,7 @@ class DiyUserInfoForm extends BaseModel
 {
     public function getInfo()
     {
-        $level_name = '普通用户';
+        $level_name = 'VIP会员';
         $level_pic = '';
         if (\Yii::$app->user->identity->identity->member_level != 0) {
             $level = MallMembers::findOne([

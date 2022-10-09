@@ -44,7 +44,7 @@ class SettingForm extends BaseModel
     public $is_use_sale_out;//是否启用显示售罄
     public $sale_out_pic;//售罄图标
     public $sale_out_other_pic;
-    public $is_common_user_member_price;//是否显示普通用户会员价
+    public $is_common_user_member_price;//是否显示VIP会员会员价
     public $is_member_user_member_price;//是否显示会员用户会员价
     public $is_comment;//显示评论
     public $is_sales;//显示销量

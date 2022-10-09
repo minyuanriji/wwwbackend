@@ -436,7 +436,7 @@
                             <td class="label">等级：</td>
                             <td>
                                 {{infoDialog.parentUserInfo.role_type}}
-                                <span v-if="infoDialog.parentUserInfo.role_type == '普通用户'" style="color: red">(不分佣)</span>
+                                <span v-if="infoDialog.parentUserInfo.role_type == 'VIP会员'" style="color: red">(不分佣)</span>
                             </td>
                         </tr>
                     </table>

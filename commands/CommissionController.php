@@ -7,7 +7,9 @@ use app\models\User;
 use app\models\UserRelationshipLink;
 use app\plugins\area\models\AreaAgent;
 use app\plugins\commission\models\CommissionRuleChain;
+use app\plugins\commission\models\CommissionRules;
 use yii\db\ActiveQuery;
+use function EasyWeChat\Kernel\Support\generate_sign;
 
 class CommissionController extends BaseCommandController{
 
@@ -73,6 +75,7 @@ class CommissionController extends BaseCommandController{
      * @throws \Exception
      */
     public function getCommissionParents($user_id, $lianc_user_id = null){
+
         //获取支付用户信息
         $user = User::findOne($user_id);
         $userLink = UserRelationshipLink::findOne(["user_id" => $user_id]);
@@ -202,92 +205,81 @@ class CommissionController extends BaseCommandController{
         }
 
         //生成相关规则键
-        $parentDatas = [];
-        while(!empty($newParentDatas)){
+        $generateRelKeys = function($index) use($newParentDatas, $user_role_type){
+            if(!$newParentDatas)
+                return [];
+            $count = count($newParentDatas);
+            $item = $newParentDatas[$index];
             $relKeys = [];
-            foreach($newParentDatas as $newParentData){
-                $relKeys[] = $newParentData['role_type'] . "#all";
+            for($i=$index;$i < $count; $i++){
+                $relKeys[] = $newParentDatas[$i]['role_type'];
             }
-            $parentData = array_shift($newParentDatas);
-            $parentData['rel_keys'] = $relKeys;
-            $parentDatas[] = $parentData;
-        }
-
-        //如果开启了独立分销价规则设置
-        if($enable_commisson_price && $parentDatas){
-            $row = User::find()->where(["id" => $user_id])->select(["role_type"])->one();
-            $suffix = $row && $row['role_type'] != "user" ? $row['role_type'] : "all";
-            $parentData = $parentDatas[count($parentDatas) - 1];
-            $relKey = $parentData['role_type'] . "#{$suffix}";
-            $parentData['rel_keys'] = [$relKey];
-            $parentDatas[count($parentDatas) - 1] = $parentData;
-        }
-
-        //处理合伙人平级插入
-        foreach($parentDatas as $key => $parentData){
-            if(isset($parentData['pingji']) && $parentData['pingji']){
-                $parentDatas[$key]['rel_keys'] = ["partner#partner#all"];
-                break;
+            if($user_role_type != "user" && $index == ($count - 1)){
+                if($item['role_type'] == "branch_office" && in_array($user_role_type, ["branch_office", "partner", "store"])){
+                    $relKeys[] = $user_role_type;
+                }elseif($item['role_type'] == "partner" && in_array($user_role_type, ["partner", "store"])){
+                    $relKeys[] = $user_role_type;
+                }elseif($item['role_type'] == "store" && in_array($user_role_type, ["store"])){
+                    $relKeys[] = $user_role_type;
+                }else{
+                    $relKeys[] = "all";
+                }
+            }else{
+                $relKeys[] = "all";
             }
-        }
-
-        $getChainRuleData = function(ActiveQuery $query, $item_id){
-
-            //独立设置规则
-            $newQuery = clone $query;
-            $newQuery->andWhere([
-                "AND",
-                ['cr.apply_all_item' => 0],
-                ['cr.item_id' => $item_id]
-            ]);
-            $ruleData = $newQuery->one();
-
-            //无独立规则，使用全局规则
-            if(!$ruleData){
-                $newQuery = clone $query;
-                $newQuery->andWhere(['cr.apply_all_item' => 1]);
-                $ruleData = $newQuery->one();
-            }
-
-            return $ruleData;
+            return $relKeys;
         };
 
-        $currentLevel = count($parentDatas);
-        foreach($parentDatas as $key => $parentData){
-
-            $query = CommissionRuleChain::find()->alias("crc");
-            $query->leftJoin("{{%plugin_commission_rules}} cr", "cr.id=crc.rule_id");
-            $query->andWhere([
-                "AND",
-                ["cr.is_delete"  => 0],
-                ['cr.item_type'  => $item_type],
-                ['crc.role_type' => $parentData['role_type']],
-                ['crc.level'     => $currentLevel]
+        //获取独立规则
+        $commissionRule = CommissionRules::findOne([
+            "item_type"      => "goods",
+            "item_id"        => $item_id,
+            "apply_all_item" => 0,
+            "is_delete"      => 0
+        ]);
+        if(!$commissionRule){
+            $commissionRule = CommissionRules::findOne([
+                "item_type"      => "goods",
+                "item_id"        => 0,
+                "apply_all_item" => 1,
+                "is_delete"      => 0
             ]);
-            $query->orderBy("crc.level DESC");
-            $query->select(["cr.id as rule_id", "cr.commission_type", "crc.level", "crc.commisson_value"]);
-            $query->asArray();
-
-            //查找规则
-            $relKeys = array_reverse($parentData['rel_keys']);
-            $ruleData = null;
-            foreach($relKeys as $relKey){
-                $newQuery = clone $query;
-                $newQuery->andWhere("crc.unique_key LIKE '%{$relKey}'" );
-                $ruleData = $getChainRuleData($newQuery, $item_id);
-
-                //$this->commandOut("current LEVEL:" . $currentLevel);
-                //$this->commandOut($newQuery->createCommand()->getRawSql());
-                //$this->commandOut(json_encode($ruleData));
-                if($ruleData) break;
-            }
-
-            $parentDatas[$key]['rule_data'] = $ruleData ? $ruleData : null;
-
-            $currentLevel--;
         }
+        if($commissionRule){
+            foreach($newParentDatas as $key => $newParentData){
+                $relKey = implode("#", $generateRelKeys($key));
+                if(empty($relKey)){
+                    unset($newParentDatas[$key]);
+                    continue;
+                }
 
-        return $parentDatas;
+                $ruleChain = CommissionRuleChain::findOne([
+                    "mall_id"    => $commissionRule->mall_id,
+                    "rule_id"    => $commissionRule->id,
+                    "unique_key" => $relKey
+                ]);
+                if($ruleChain){
+                    $ruleData = [
+                        "rule_id"         => $commissionRule->id,
+                        "commission_type" => $commissionRule->commission_type,
+                        "level"           => $ruleChain->level,
+                        "commisson_value" => $ruleChain->commisson_value,
+                        "rel_key"         => $relKey
+                    ];
+                }else{
+                    $ruleData = null;
+                }
+                $newParentDatas[$key]['rule_data'] = $ruleData;
+            }
+        }
+        foreach($newParentDatas as $key => $newParentData){
+            $relKey = implode("#", $generateRelKeys($key));
+            if(empty($relKey)){
+                unset($newParentDatas[$key]);
+                continue;
+            }
+        }
+        return $newParentDatas;
     }
 
     /* *

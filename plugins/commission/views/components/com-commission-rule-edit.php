@@ -153,9 +153,14 @@
         },
         data() {
             let branch_office_level_1_chain = [
+                {commisson_value:0, relationship:['branch_office', 'branch_office'], unique_key:'branch_office#branch_office'},
+                {commisson_value:0, relationship:['branch_office', 'partner'], unique_key:'branch_office#partner'},
+                {commisson_value:0, relationship:['branch_office', 'store'], unique_key:'branch_office#store'},
                 {commisson_value:0, relationship:['branch_office', 'all'], unique_key:'branch_office#all'}
             ];
             let partner_level_1_chain = [
+                {commisson_value:0, relationship:['partner', 'partner'], unique_key:'partner#partner'},
+                {commisson_value:0, relationship:['partner', 'store'], unique_key:'partner#store'},
                 {commisson_value:0, relationship:['partner', 'all'], unique_key:'partner#all'},
             ];
             if(this.commissonPrice){
@@ -192,6 +197,7 @@
                     ],
                     store:[
                         {role:'store', level:1, chain:[
+                            {commisson_value:0, relationship:['store', 'store'], unique_key:'store#store'},
                             {commisson_value:0, relationship:['store', 'all'], unique_key:'store#all'}
                         ]}
                     ]

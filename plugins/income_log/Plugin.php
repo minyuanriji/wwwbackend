@@ -3,6 +3,7 @@ namespace app\plugins\income_log;
 
 
 use app\handlers\BaseHandler;
+use app\helpers\PluginHelper;
 use app\plugins\stock\handlers\HandlerRegister;
 
 class Plugin extends \app\plugins\Plugin
@@ -101,5 +102,24 @@ class Plugin extends \app\plugins\Plugin
     {
         // TODO: Implement getPriceTypeName() method.
         return '';
+    }
+
+    /* 插件可共用的跳转链接
+     * @return array
+    */
+    public function getPickLink()
+    {
+        $iconBaseUrl = PluginHelper::getPluginBaseAssetsUrl($this->getName()) . '/img/pick-link';
+        $iconUrlPrefix = \Yii::$app->request->hostInfo . \Yii::$app->request->baseUrl .
+            '/statics/img/mall/pick-link/';
+        return [
+            [
+                'type' => 'income_index',
+                'name' => '我的收益',
+                'open_type' => '',
+                'icon' => $iconUrlPrefix . 'icon-article-detail.png',
+                'value' => '/plugins/income_log/index'
+            ],
+        ];
     }
 }

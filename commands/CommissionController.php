@@ -125,48 +125,49 @@ class CommissionController extends BaseCommandController{
         }
 
         //对获取的所有上级进行处理
-        $existData = $newParentDatas = [];
-        $partner2Data = null;
-        unset($parentData);
+        $newParentDatas = [];
         for($i=0; $i < count($parentDatas); $i++){
             $parentData = $parentDatas[$i];
-            if(count($existData) >= 3) break;
-            $appendNew = false;
+            $newParentDatas[] = $parentData;
+        }
 
-            if(empty($partner2Data) && isset($existData['partner']) && $parentData['role_type'] == "partner"){
-                if($existData['partner']['parent_id'] == $parentData['id']){
-                    $partner2Data = $parentData;
-                    continue;
+        $levelScore = ["user" => 0, "store" => 1, "partner" => 2, "branch_office" => 3];
+        $parentDatas = [];
+        for($i=0; $i < count($newParentDatas); $i++){
+            $allowLevel = true;
+            $score1 = $levelScore[$newParentDatas[$i]['role_type']];
+            for($j=0;$j<count($parentDatas);$j++){
+                $score2 = $levelScore[$parentDatas[$j]['role_type']];
+                if($score1 < $score2){
+                    $allowLevel = false;
+                    break;
                 }
-            }elseif($parentData['role_type'] == "store" && !isset($existData['store']) && !isset($existData['branch_office']) && !isset($existData['partner'])){
-                $appendNew = true;
-            }elseif($parentData['role_type'] == "partner" && !isset($existData['partner']) && !isset($existData['branch_office'])){
-                $appendNew = true;
-            }elseif($parentData['role_type'] == "branch_office" && !isset($existData['branch_office'])){
-                $appendNew = true;
             }
-
-            if($appendNew){
-                $existData[$parentData['role_type']] = $parentData;
-                $newParentDatas[] = $parentData;
+            if($allowLevel){
+                $parentDatas[] = $newParentDatas[$i];
             }
         }
 
-        //平级合伙人插入
-        $newParentDatas = array_reverse($newParentDatas);
-        if(!empty($partner2Data)){
-            $partner2Data['pingji'] = 1;
-            $tmpDatas = [];
-            foreach($newParentDatas as $parentData){
-                if($parentData['role_type'] == "partner"){
-                    $tmpDatas[] = $partner2Data;
-                }
-                $tmpDatas[] = $parentData;
+        $newParentDatas = [];
+        $roleTypes = [];
+        for($i=0; $i < count($parentDatas); $i++){
+            $roleType = $parentDatas[$i]['role_type'];
+            if(!isset($roleTypes[$roleType])){
+                $roleTypes[$roleType] = 0;
             }
-            $newParentDatas = $tmpDatas;
+
+            if(in_array($roleType, ["partner", "store"]) && $roleTypes[$roleType] < 2){
+                $newParentDatas[] = $parentDatas[$i];
+                $roleTypes[$roleType]++;
+            }elseif(in_array($roleType, ["branch_office"]) && $roleTypes[$roleType] < 1){
+                $newParentDatas[] = $parentDatas[$i];
+                $roleTypes[$roleType]++;
+            }
         }
 
-        return $newParentDatas;
+        $parentDatas = array_reverse($newParentDatas);
+
+        return $parentDatas;
     }
 
     /**
@@ -248,6 +249,7 @@ class CommissionController extends BaseCommandController{
         if($commissionRule){
             foreach($newParentDatas as $key => $newParentData){
                 $relKey = implode("#", $generateRelKeys($key));
+                $newParentDatas[$key]['rel_key'] = $relKey;
                 if(empty($relKey)){
                     unset($newParentDatas[$key]);
                     continue;
@@ -272,6 +274,7 @@ class CommissionController extends BaseCommandController{
                 $newParentDatas[$key]['rule_data'] = $ruleData;
             }
         }
+
         foreach($newParentDatas as $key => $newParentData){
             $relKey = implode("#", $generateRelKeys($key));
             if(empty($relKey)){
@@ -279,6 +282,7 @@ class CommissionController extends BaseCommandController{
                 continue;
             }
         }
+
         return $newParentDatas;
     }
 

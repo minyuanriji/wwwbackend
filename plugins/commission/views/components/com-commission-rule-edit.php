@@ -163,11 +163,6 @@
                 {commisson_value:0, relationship:['partner', 'store'], unique_key:'partner#store'},
                 {commisson_value:0, relationship:['partner', 'all'], unique_key:'partner#all'},
             ];
-            if(this.commissonPrice){
-                branch_office_level_1_chain.push({commisson_value:0, relationship:['branch_office', 'partner'], unique_key:'branch_office#partner'});
-                branch_office_level_1_chain.push({commisson_value:0, relationship:['branch_office', 'store'], unique_key:'branch_office#store'});
-                partner_level_1_chain.push({commisson_value:0, relationship:['partner', 'store'], unique_key:'partner#store'});
-            }
             return {
                 commission_type: 1,
                 groupData: {
@@ -183,6 +178,9 @@
                         ]},
                         {role:'branch_office', level:4, chain:[
                             {commisson_value:0, relationship:['branch_office', 'partner', 'partner', 'store', 'all'], unique_key:'branch_office#partner#partner#store#all'},
+                        ]},
+                        {role:'branch_office', level:5, chain:[
+                            {commisson_value:0, relationship:['branch_office', 'partner', 'partner', 'store', 'store', 'all'], unique_key:'branch_office#partner#partner#store#store#all'},
                         ]}
                     ],
                     partner:[
@@ -192,6 +190,7 @@
                             {commisson_value:0, relationship:['partner', 'store', 'all'], unique_key:'partner#store#all'}
                         ]},
                         {role:'partner', level:3, chain:[
+                            {commisson_value:0, relationship:['partner', 'store', 'store', 'all'], unique_key:'partner#store#store#all'},
                             {commisson_value:0, relationship:['partner', 'partner', 'store', 'all'], unique_key:'partner#partner#store#all'},
                         ]}
                     ],
@@ -199,6 +198,9 @@
                         {role:'store', level:1, chain:[
                             {commisson_value:0, relationship:['store', 'store'], unique_key:'store#store'},
                             {commisson_value:0, relationship:['store', 'all'], unique_key:'store#all'}
+                        ]},
+                        {role:'store', level:2, chain:[
+                            {commisson_value:0, relationship:['store', 'store', 'all'], unique_key:'store#store#all'}
                         ]}
                     ]
                 }

@@ -107,7 +107,7 @@ Yii::$app->loadComponentView('com-user-finance-stat');
                 </el-table-column>
                 <el-table-column label="总收益"  prop="money" width="130">
                     <template slot-scope="scope">
-                        {{Number(scope.row.money) + Number(scope.row.income)}}
+                        {{Number(scope.row.money) + Number(scope.row.income) * scope.row.type == 2 ? -1 : 1}}
                     </template>
                 </el-table-column>
                 <el-table-column prop="desc" label="说明" width="700"></el-table-column>

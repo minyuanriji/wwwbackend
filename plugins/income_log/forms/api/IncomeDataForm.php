@@ -98,14 +98,16 @@ class IncomeDataForm extends BaseModel{
             $statPrice1 = CommissionGoodsPriceLog::find()->andWhere([
                 "AND",
                 ["user_id" => \Yii::$app->user->id],
-                ["status" => 0]
+                ["status" => 0],
+                ["IN", "goods_id", $showGoodsIds]
             ])->sum("price");
 
             //已到账总收益
             $statPrice2 = CommissionGoodsPriceLog::find()->andWhere([
                 "AND",
                 ["user_id" => \Yii::$app->user->id],
-                ["status" => 1]
+                ["status" => 1],
+                ["IN", "goods_id", $showGoodsIds]
             ])->sum("price");
 
 
@@ -113,7 +115,7 @@ class IncomeDataForm extends BaseModel{
                 'list'        => $list ? $list : [],
                 'pagination'  => $pagination,
                 "stat_price1" => round($statPrice1, 2),
-                "stat_price2" => round($statPrice2, 2)
+                "stat_price2" => round($statPrice2, 2),
             ]);
         }catch (\Exception $e){
             return $this->returnApiResultData(ApiCode::CODE_FAIL);

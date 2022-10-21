@@ -173,6 +173,7 @@
                             {commisson_value:0, relationship:['branch_office', 'store', 'all'], unique_key:'branch_office#store#all'}
                         ]},
                         {role:'branch_office', level:3, chain:[
+                            {commisson_value:0, relationship:['branch_office', 'store', 'store', 'all'], unique_key:'branch_office#store#store#all'},
                             {commisson_value:0, relationship:['branch_office', 'partner', 'store', 'all'], unique_key:'branch_office#partner#store#all'},
                             {commisson_value:0, relationship:['branch_office', 'partner', 'partner', 'all'], unique_key:'branch_office#partner#partner#all'},
                         ]},

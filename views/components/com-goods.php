@@ -214,10 +214,10 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 
                         </el-card>
 
-                        <!-- 联创合伙人 -->
+                        <!-- 联创区域服务商 -->
                         <el-card shadow="never" class="mt-24">
                             <div slot="header">
-                                <span>联创合伙人</span>
+                                <span>联创区域服务商</span>
                             </div>
                             <el-row>
                                 <el-col :xl="12" :lg="16">
@@ -439,8 +439,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         <el-checkbox-group v-model="ruleForm.purchase_permission">
                                             <el-checkbox label="user">VIP会员</el-checkbox>
                                             <el-checkbox label="store">VIP代理商</el-checkbox>
-                                            <el-checkbox label="partner">合伙人</el-checkbox>
-                                            <el-checkbox label="branch_office">分公司</el-checkbox>
+                                            <el-checkbox label="partner">区域服务商</el-checkbox>
+                                            <el-checkbox label="branch_office">城市服务商</el-checkbox>
                                         </el-checkbox-group>
                                     </el-form-item>
 
@@ -539,13 +539,13 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 
                                                 <div v-if="ruleForm.enable_commisson_price == 1" style="">
                                                     <div style="display: flex;align-items: center;margin-top:10px;">
-                                                        <span style="width:100px;text-align:right;flex-shrink: 0">分公司：</span>
+                                                        <span style="width:100px;text-align:right;flex-shrink: 0">城市服务商：</span>
                                                         <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.branch_office_price" style="flex-grow: 1">
                                                             <template slot="append">元</template>
                                                         </el-input>
                                                     </div>
                                                     <div style="display: flex;align-items: center;margin-top:10px;">
-                                                        <span style="width:100px;text-align:right;flex-shrink: 0">合伙人：</span>
+                                                        <span style="width:100px;text-align:right;flex-shrink: 0">区域服务商：</span>
                                                         <el-input type="number" oninput="this.value = this.value.replace(/[^0-9\.]/, '');" min="0" v-model="ruleForm.partner_price" style="flex-grow: 1">
                                                             <template slot="append">元</template>
                                                         </el-input>
@@ -731,25 +731,25 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
 
                                             <template v-if="ruleForm.enable_commisson_price == 1">
 
-                                                <!-- 分公司运费模板 start-->
+                                                <!-- 城市服务商运费模板 start-->
                                                 <div style="padding:10px 10px;border:1px solid #eee;display:flex;align-items: center">
-                                                    <span style="width:90px;text-align:right;flex-shrink: 0">分公司：</span>
+                                                    <span style="width:90px;text-align:right;flex-shrink: 0">城市服务商：</span>
                                                     <el-tag @close="freightDelete('branch_office')" v-if="ruleForm.branch_office_freight" :key="ruleForm.branch_office_freight.name" :disable-transitions="true" style="margin-right: 10px;" closable>
                                                         {{ruleForm.branch_office_freight.name}}
                                                     </el-tag>
                                                     <el-button type="button" size="mini" @click="freightOpen('branch_office')">选择运费</el-button>
                                                 </div>
-                                                <!-- 分公司运费模板 end-->
+                                                <!-- 城市服务商运费模板 end-->
 
-                                                <!-- 合伙人运费模板 start-->
+                                                <!-- 区域服务商运费模板 start-->
                                                 <div style="padding:10px 10px;border:1px solid #eee;display:flex;align-items: center">
-                                                    <span style="width:90px;text-align:right;flex-shrink: 0">合伙人：</span>
+                                                    <span style="width:90px;text-align:right;flex-shrink: 0">区域服务商：</span>
                                                     <el-tag @close="freightDelete('partner')" v-if="ruleForm.partner_freight" :key="ruleForm.partner_freight.name" :disable-transitions="true" style="margin-right: 10px;" closable>
                                                         {{ruleForm.partner_freight.name}}
                                                     </el-tag>
                                                     <el-button type="button" size="mini" @click="freightOpen('partner')">选择运费</el-button>
                                                 </div>
-                                                <!-- 合伙人运费模板 end-->
+                                                <!-- 区域服务商运费模板 end-->
 
                                                 <!-- VIP运费模板 start-->
                                                 <div style="padding:10px 10px;border:1px solid #eee;display:flex;align-items: center">
@@ -1068,8 +1068,8 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                                         <div v-if="ruleForm.enable_upgrade_user_role == 1">
                                             <el-select v-model="ruleForm.upgrade_user_role_type">
                                                 <el-option :label="'VIP代理商'" :value="'store'"></el-option>
-                                                <el-option :label="'合伙人'" :value="'partner'"></el-option>
-                                                <el-option :label="'分公司'" :value="'branch_office'"></el-option>
+                                                <el-option :label="'区域服务商'" :value="'partner'"></el-option>
+                                                <el-option :label="'城市服务商'" :value="'branch_office'"></el-option>
                                             </el-select>
                                         </div>
                                     </el-form-item>
@@ -1547,7 +1547,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 fulfil_price: 0,
                 cannotrefund:["1","2","3"],
                 profit_price: 0,  //商品利润
-                enable_upgrade_user_role:0, //下单后升级会员VIP代理商、合伙人或分公司
+                enable_upgrade_user_role:0, //下单后升级会员VIP代理商、区域服务商或城市服务商
                 upgrade_user_role_type: '',
                 product: '',
                 purchase_permission: [],
@@ -2335,7 +2335,7 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                         //独立分销价
                         detail['enable_commisson_price'] = parseInt(detail['enable_commisson_price']);
 
-                        //联创合伙人
+                        //联创区域服务商
                         self.forLiancDlgSelect.selection = Object.assign(
                             self.forLiancDlgSelect.selection,
                             detail['lianc_user_info']
@@ -2767,10 +2767,10 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 this.freight.dialog = false;
             },
             freightConfirm() {
-                if(this.freight.type == 'branch_office') { //分公司
+                if(this.freight.type == 'branch_office') { //城市服务商
                     this.ruleForm.branch_office_freight = JSON.parse(JSON.stringify(this.freight.checked));
                     this.ruleForm.branch_office_freight_id = this.ruleForm.branch_office_freight.id;
-                }else if(this.freight.type == 'partner'){ //合伙人
+                }else if(this.freight.type == 'partner'){ //区域服务商
                     this.ruleForm.partner_freight = JSON.parse(JSON.stringify(this.freight.checked));
                     this.ruleForm.partner_freight_id = this.ruleForm.partner_freight.id;
                 }else if(this.freight.type == 'store'){ //VIP
@@ -2790,10 +2790,10 @@ Yii::$app->loadComponentView('goods/com-goods-agent');
                 this.freightCancel();
             },
             freightDelete(t) {
-                if(t == "branch_office") { //分公司
+                if(t == "branch_office") { //城市服务商
                     this.ruleForm.branch_office_freight = null;
                     this.ruleForm.branch_office_freight_id = 0;
-                }else if(t == "partner"){ //合伙人
+                }else if(t == "partner"){ //区域服务商
                     this.ruleForm.partner_freight = null;
                     this.ruleForm.partner_freight_id = 0;
                 }else if(t == "store"){ //VIP

@@ -66,7 +66,7 @@ class SmartShopCyorder3rAction extends BaseAction{
             //获取上级数据
             $parentDatas = $this->controller->getCommissionParents($payUser->id);
 
-            //计算分公司、合伙人、VIP代理商分佣值
+            //计算城市服务商、区域服务商、VIP代理商分佣值
             $this->setCommissoinValues($localCyorder, $parentDatas, $mch);
 
             //红包赠送信息

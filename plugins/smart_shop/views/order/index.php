@@ -213,8 +213,8 @@
             roleText(type){
                 let values = {
                     store: 'VIP代理商',
-                    partner: '合伙人',
-                    branch_office: '分公司',
+                    partner: '区域服务商',
+                    branch_office: '城市服务商',
                     user: 'VIP会员'
                 };
                 return values[type] ? values[type] : '';

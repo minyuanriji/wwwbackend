@@ -702,13 +702,13 @@ echo $this->render('../components/com-commission-hotel_3r-rule-edit');
                             if (this.commissionHotelValue[i].name == 'VIP会员') {
                                 this.commissionHotelValue[i].role_type = 'user';
                                 this.commissionHotelValue[i].unique_key = "user#all";
-                            } else if (this.commissionHotelValue[i].name == '分公司') {
+                            } else if (this.commissionHotelValue[i].name == '城市服务商') {
                                 this.commissionHotelValue[i].role_type = 'branch_office';
                                 this.commissionHotelValue[i].unique_key = "branch_office#all";
                             } else if (this.commissionHotelValue[i].name == 'VIP代理商') {
                                 this.commissionHotelValue[i].role_type = 'store';
                                 this.commissionHotelValue[i].unique_key = "store#all";
-                            } else if (this.commissionHotelValue[i].name == '合伙人') {
+                            } else if (this.commissionHotelValue[i].name == '区域服务商') {
                                 this.commissionHotelValue[i].role_type = 'partner';
                                 this.commissionHotelValue[i].unique_key = "partner#all";
                             }

@@ -66,8 +66,8 @@
                         </com-image>
                         <div>昵称：{{scope.row.nickname}}(ID:{{scope.row.user_id}})</div>
                         <div v-if="scope.row.role_type=='store'">身份：VIP代理商</div>
-                        <div v-if="scope.row.role_type=='partner'">身份：合伙人</div>
-                        <div v-if="scope.row.role_type=='branch_office'">身份：分公司</div>
+                        <div v-if="scope.row.role_type=='partner'">身份：区域服务商</div>
+                        <div v-if="scope.row.role_type=='branch_office'">身份：城市服务商</div>
                         <div v-if="scope.row.role_type=='user'">身份：VIP会员</div>
                         <div>手机号：{{scope.row.mobile}}</div>
                     </template>

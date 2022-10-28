@@ -633,11 +633,11 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
     public function getUserLevel(){
         $levelList = [
             'branch_office' => [
-                "name" => "分公司",
+                "name" => "城市服务商",
                 "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/branch_office.png"
             ],
             'partner' => [
-                "name" => "合伙人",
+                "name" => "区域服务商",
                 "icon" => \Yii::$app->getRequest()->getHostInfo() . "/web/static/partner.png"
             ],
             'store' => [
@@ -679,10 +679,10 @@ class User extends BaseActiveRecord implements \yii\web\IdentityInterface
     {
         switch ($type) {
             case 'branch_office':
-                $text = '分公司';
+                $text = '城市服务商';
                 break;
             case 'partner':
-                $text = '合伙人';
+                $text = '区域服务商';
                 break;
             case 'store':
                 $text = 'VIP代理商';

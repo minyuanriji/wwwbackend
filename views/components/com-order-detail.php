@@ -508,8 +508,8 @@ Yii::$app->loadComponentView('order/com-city');
                                     </el-table-column>
                                     <el-table-column label="等级">
                                         <template slot-scope="scope">
-                                            <div v-if="scope.row.role_type=='branch_office'">分公司</div>
-                                            <div v-if="scope.row.role_type=='partner'">合伙人</div>
+                                            <div v-if="scope.row.role_type=='branch_office'">城市服务商</div>
+                                            <div v-if="scope.row.role_type=='partner'">区域服务商</div>
                                             <div v-if="scope.row.role_type=='store'">VIP代理商</div>
                                             <div v-if="scope.row.role_type=='user'">用户</div>
                                         </template>

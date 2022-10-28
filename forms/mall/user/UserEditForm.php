@@ -60,7 +60,7 @@ class UserEditForm extends BaseModel
             'money' => '佣金',
             'is_inviter' => '是否是推广者',
             'is_examine' => '是否拥有审核资格',
-            'is_lianc' => '是否联创合伙人',
+            'is_lianc' => '是否联创区域服务商',
             'lock_parent' => '锁定上下级关系'
         ];
     }

@@ -33,8 +33,8 @@
                             <div>推荐人：{{scope.row.parent_nickname}}</div>
                             <div>推荐人手机：{{scope.row.parent_mobile}}</DIV>
                             <div>推荐人等级：
-                                <span v-if="scope.row.parent_role_type == 'branch_office'">分公司</span>
-                                <span v-if="scope.row.parent_role_type == 'partner'">合伙人</span>
+                                <span v-if="scope.row.parent_role_type == 'branch_office'">城市服务商</span>
+                                <span v-if="scope.row.parent_role_type == 'partner'">区域服务商</span>
                                 <span v-if="scope.row.parent_role_type == 'store'">VIP代理商</span>
                                 <span v-if="scope.row.parent_role_type == 'user'">VIP会员</span>
                             </DIV>
@@ -179,8 +179,8 @@
                         </el-form-item>
                         <el-form-item label="推荐人等级：">
                             <div v-if="apply.data.parent_role_type == 'store'">VIP代理商</div>
-                            <div v-if="apply.data.parent_role_type == 'partner'">合伙人</div>
-                            <div v-if="apply.data.parent_role_type == 'branch_office'">分公司</div>
+                            <div v-if="apply.data.parent_role_type == 'partner'">区域服务商</div>
+                            <div v-if="apply.data.parent_role_type == 'branch_office'">城市服务商</div>
                             <div v-if="apply.data.parent_role_type == 'user'">VIP会员</div>
                         </el-form-item>
                     </el-tab-pane>

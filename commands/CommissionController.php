@@ -70,7 +70,7 @@ class CommissionController extends BaseCommandController{
     /**
      * 获取上级信息
      * @param $user_id
-     * @param $lianc_user_id 品牌商ID。如果消费用户是品牌商直推的，品牌商临时升级成分公司
+     * @param $lianc_user_id 品牌商ID。如果消费用户是品牌商直推的，品牌商临时升级成城市服务商
      * @return array
      * @throws \Exception
      */
@@ -99,7 +99,7 @@ class CommissionController extends BaseCommandController{
             $parentDatas = array_merge($parentDatas, $rows);
         }
 
-        //如果消费用户是品牌商直推的，品牌商临时升级成分公司
+        //如果消费用户是品牌商直推的，品牌商临时升级成城市服务商
         if(!empty($lianc_user_id)){
             //先判断是否已经在列表中
             $isExists = false;
@@ -175,7 +175,7 @@ class CommissionController extends BaseCommandController{
      * @param $user_id
      * @param $item_id
      * @param $item_type
-     * @param $lianc_user_id 品牌商ID。如果消费用户是品牌商直推的，品牌商临时升级成分公司
+     * @param $lianc_user_id 品牌商ID。如果消费用户是品牌商直推的，品牌商临时升级成城市服务商
      * @return array
      * @throws \Exception
      */

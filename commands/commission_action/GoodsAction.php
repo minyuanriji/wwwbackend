@@ -162,7 +162,7 @@ class GoodsAction extends Action{
                 throw new \Exception("订单商品[ID:".$orderDetailData['order_detail_id']."]已退款");
             }
 
-            //联创合伙人收益
+            //联创区域服务商收益
             $liancUserId = null;
             if(!empty($orderDetailData['lianc_user_id'])){
                 $liancData = [
@@ -176,7 +176,7 @@ class GoodsAction extends Action{
                     $newPriceLogFunc($orderDetailData['lianc_user_id'], 1, $price, $orderDetailData['lianc_total_income'], $liancData, $orderDetailData);
                 }
 
-                //如果消费用户是品牌商这个推荐条线的，品牌商临时升级成分公司
+                //如果消费用户是品牌商这个推荐条线的，品牌商临时升级成城市服务商
                 if($orderDetailData['lianc_left'] < $orderDetailData['left'] && $orderDetailData['right'] < $orderDetailData['lianc_right'] ){
                     $liancUserId = $orderDetailData['lianc_user_id'];
                 }

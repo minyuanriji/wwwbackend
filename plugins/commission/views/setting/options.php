@@ -26,7 +26,7 @@
                                     :data="tableData"
                                     border style="width: 100%;" class="invited-table-rule">
                                 <el-table-column prop="text" label="角色" width="180"></el-table-column>
-                                <el-table-column label="推荐分公司奖励" prop="branch_office">
+                                <el-table-column label="推荐城市服务商奖励" prop="branch_office">
                                     <template slot-scope="scope">
                                         <el-input placeholder="请输入内容" v-model="scope.row.branch_office.first">
                                             <template slot="prepend">1级</template>
@@ -42,7 +42,7 @@
                                         </el-input>
                                     </template>
                                 </el-table-column>
-                                <el-table-column label="推荐合伙人奖励" prop="partner">
+                                <el-table-column label="推荐区域服务商奖励" prop="partner">
                                     <template slot-scope="scope">
                                         <el-input placeholder="请输入内容" v-model="scope.row.partner.first">
                                             <template slot="prepend">1级</template>
@@ -90,7 +90,7 @@
                 selectList: [],
                 tableData: [
                     {
-                        text          : '分公司',
+                        text          : '城市服务商',
                         role          : 'branch_office',
                         branch_office : {
                             first  : '0.00',
@@ -104,7 +104,7 @@
                         }
                     },
                     {
-                        text          : '合伙人',
+                        text          : '区域服务商',
                         role          : 'partner',
                         branch_office : {
                             first  : '0.00',

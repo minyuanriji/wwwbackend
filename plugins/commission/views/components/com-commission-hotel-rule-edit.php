@@ -47,7 +47,7 @@
                         commisson_value:''
                     },
                     {
-                        name:'分公司',
+                        name:'城市服务商',
                         commisson_value:''
                     },
                     {
@@ -55,7 +55,7 @@
                         commisson_value:''
                     },
                     {
-                        name:'合伙人',
+                        name:'区域服务商',
                         commisson_value:''
                     }
                 ]
@@ -68,13 +68,13 @@
                     this.level_list[i].name = 'VIP会员';
                     this.level_list[i].commisson_value = this.chains[i].commisson_value;
                 } else if (this.chains[i].role_type == 'branch_office') {
-                    this.level_list[i].name = '分公司';
+                    this.level_list[i].name = '城市服务商';
                     this.level_list[i].commisson_value = this.chains[i].commisson_value;
                 } else if (this.chains[i].role_type == 'store') {
                     this.level_list[i].name = 'VIP代理商';
                     this.level_list[i].commisson_value = this.chains[i].commisson_value;
                 } else if (this.chains[i].role_type == 'partner') {
-                    this.level_list[i].name = '合伙人';
+                    this.level_list[i].name = '区域服务商';
                     this.level_list[i].commisson_value = this.chains[i].commisson_value;
                 }
             }

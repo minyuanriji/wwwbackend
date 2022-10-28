@@ -212,8 +212,8 @@ Yii::$app->loadComponentView('com-rich-text');
                             <el-table :data="shoppingFormData.recommender" border style="margin-top:10px;width:100%">
                                 <el-table-column label="级别" width="110" align="center">
                                     <template slot-scope="scope">
-                                        <span v-if="scope.row.type == 'branch_office'">分公司</span>
-                                        <span v-if="scope.row.type == 'partner'">合伙人</span>
+                                        <span v-if="scope.row.type == 'branch_office'">城市服务商</span>
+                                        <span v-if="scope.row.type == 'partner'">区域服务商</span>
                                         <span v-if="scope.row.type == 'store'">VIP代理商</span>
                                         <span v-if="scope.row.type == 'user'">VIP会员</span>
                                     </template>

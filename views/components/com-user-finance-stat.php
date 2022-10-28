@@ -17,8 +17,8 @@
                 <el-row class="user-finance-stat-row">
                     <el-col :span="12" class="l-label">用户等级</el-col>
                     <el-col :span="12">
-                        <span v-if="role_type == 'branch_office'">分公司</span>
-                        <span v-if="role_type == 'partner'">合伙人</span>
+                        <span v-if="role_type == 'branch_office'">城市服务商</span>
+                        <span v-if="role_type == 'partner'">区域服务商</span>
                         <span v-if="role_type == 'store'">VIP代理商</span>
                         <span v-if="role_type == 'user'">VIP会员</span>
                     </el-col>

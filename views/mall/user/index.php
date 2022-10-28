@@ -68,8 +68,8 @@
                         <div style="font-size:12px;">
                             <div>上级名称：[ID:{{scope.row.parent_id}}]{{scope.row.parent_nickname}}</div>
                             <div>上级身份：
-                                <span v-if="scope.row.parent_role_type == 'branch_office'">分公司</span>
-                                <span v-if="scope.row.parent_role_type == 'partner'">合伙人</span>
+                                <span v-if="scope.row.parent_role_type == 'branch_office'">城市服务商</span>
+                                <span v-if="scope.row.parent_role_type == 'partner'">区域服务商</span>
                                 <span v-if="scope.row.parent_role_type == 'store'">VIP代理商</span>
                                 <span v-if="scope.row.parent_role_type == 'user'">VIP会员</span>
                             </div>
@@ -92,8 +92,8 @@
 
                 <el-table-column prop="role_type" label="会员类型" width="120">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.role_type == 'branch_office'">分公司</div>
-                        <div v-if="scope.row.role_type == 'partner'">合伙人</div>
+                        <div v-if="scope.row.role_type == 'branch_office'">城市服务商</div>
+                        <div v-if="scope.row.role_type == 'partner'">区域服务商</div>
                         <div v-if="scope.row.role_type == 'store'">VIP代理商</div>
                         <div v-if="scope.row.role_type == 'user'">VIP会员</div>
                     </template>
@@ -224,8 +224,8 @@
         <el-dialog :title="'用户'+recommandData.nickname+'[ID:'+recommandData.id+']的推荐列表'" :visible.sync="dialogChildren" width="50%">
             <el-select size="small" v-model="recommandData.role_type" @change='childSearch' class="select">
                 <el-option key="" label="全部用户" value=""></el-option>
-                <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
-                <el-option key="partner" label="合伙人" value="partner"></el-option>
+                <el-option key="branch_office" label="城市服务商" value="branch_office"></el-option>
+                <el-option key="partner" label="区域服务商" value="partner"></el-option>
                 <el-option key="store" label="VIP代理商" value="store"></el-option>
                 <el-option key="user" label="VIP会员" value="user"></el-option>
             </el-select>
@@ -267,8 +267,8 @@
                 </el-table-column>
                 <el-table-column label="等级" width="110">
                     <template slot-scope="scope">
-                        <div v-if="scope.row.role_type == 'branch_office'">分公司</div>
-                        <div v-if="scope.row.role_type == 'partner'">合伙人</div>
+                        <div v-if="scope.row.role_type == 'branch_office'">城市服务商</div>
+                        <div v-if="scope.row.role_type == 'partner'">区域服务商</div>
                         <div v-if="scope.row.role_type == 'store'">VIP代理商</div>
                         <div v-if="scope.row.role_type == 'user'">VIP会员</div>
                     </template>
@@ -379,11 +379,11 @@
                         value:'0',
                     },
                     {
-                        name:'分公司',
+                        name:'城市服务商',
                         value:'branch_office',
                     },
                     {
-                        name:'合伙人',
+                        name:'区域服务商',
                         value:'partner',
                     },
                     {

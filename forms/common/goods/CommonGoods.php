@@ -175,12 +175,12 @@ class CommonGoods extends BaseModel
         $detail['freight_id'] = $postageRule ? $postageRule->id : 0;
         $detail['freight'] = $postageRule ? $postageRule : ['id' => 0, 'name' => '默认运费'];
 
-        //分公司
+        //城市服务商
         $postageRule = PostageRules::findOne(['is_delete' => 0, 'id' => $detail['branch_office_freight_id']]);
         $detail['branch_office_freight_id'] = $postageRule ? $postageRule->id : 0;
         $detail['branch_office_freight'] = $postageRule ? $postageRule : ['id' => 0, 'name' => '默认运费'];
 
-        //合伙人
+        //区域服务商
         $postageRule = PostageRules::findOne(['is_delete' => 0, 'id' => $detail['partner_freight_id']]);
         $detail['partner_freight_id'] = $postageRule ? $postageRule->id : 0;
         $detail['partner_freight'] = $postageRule ? $postageRule : ['id' => 0, 'name' => '默认运费'];
@@ -287,7 +287,7 @@ class CommonGoods extends BaseModel
             ];
 
 
-        //联创合伙人
+        //联创区域服务商
         $detail['lianc_user_info'] = [];
         if($detail['lianc_user_id']){
             $detail['lianc_user_info'] = User::find()->where([

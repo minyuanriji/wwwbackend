@@ -324,8 +324,8 @@ class UserForm extends BaseModel
             ->all();
         $roleTypes = [
             'store' => 'VIP代理商',
-            'partner' => '合伙人',
-            'branch_office' => '分公司',
+            'partner' => '区域服务商',
+            'branch_office' => '城市服务商',
             'user' => '用户'
         ];
         foreach ($list as &$v) {

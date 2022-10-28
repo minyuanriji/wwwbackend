@@ -14,8 +14,8 @@
         </div>
         <el-tabs type="border-card">
 
-            <!-- 分公司 -->
-            <el-tab-pane label="分公司">
+            <!-- 城市服务商 -->
+            <el-tab-pane label="城市服务商">
 
                 <table cellspacing="0" cellpadding="0" width="100%">
                     <tr>
@@ -39,8 +39,8 @@
                                 <template v-else>
                                     <tr v-for="chain in row.chain">
                                         <td v-for="role_type in chain.relationship">
-                                            <span v-if="role_type == 'branch_office'">分公司</span>
-                                            <span v-if="role_type == 'partner'">合伙人</span>
+                                            <span v-if="role_type == 'branch_office'">城市服务商</span>
+                                            <span v-if="role_type == 'partner'">区域服务商</span>
                                             <span v-if="role_type == 'store'">VIP代理商</span>
                                             <span v-if="role_type == 'all'">消费者</span>
                                         </td>
@@ -59,8 +59,8 @@
 
             </el-tab-pane>
 
-            <!-- 合伙人 -->
-            <el-tab-pane label="合伙人">
+            <!-- 区域服务商 -->
+            <el-tab-pane label="区域服务商">
 
                 <table cellspacing="0" cellpadding="0" width="100%">
                     <tr>
@@ -84,8 +84,8 @@
                                 <template v-else>
                                     <tr v-for="chain in row.chain">
                                         <td v-for="role_type in chain.relationship">
-                                            <span v-if="role_type == 'branch_office'">分公司</span>
-                                            <span v-if="role_type == 'partner'">合伙人</span>
+                                            <span v-if="role_type == 'branch_office'">城市服务商</span>
+                                            <span v-if="role_type == 'partner'">区域服务商</span>
                                             <span v-if="role_type == 'store'">VIP代理商</span>
                                             <span v-if="role_type == 'all'">消费者</span>
                                         </td>
@@ -128,8 +128,8 @@
                                 <template v-else>
                                     <tr v-for="chain in row.chain">
                                         <td v-for="role_type in chain.relationship">
-                                            <span v-if="role_type == 'branch_office'">分公司</span>
-                                            <span v-if="role_type == 'partner'">合伙人</span>
+                                            <span v-if="role_type == 'branch_office'">城市服务商</span>
+                                            <span v-if="role_type == 'partner'">区域服务商</span>
                                             <span v-if="role_type == 'store'">VIP代理商</span>
                                             <span v-if="role_type == 'all'">消费者</span>
                                         </td>

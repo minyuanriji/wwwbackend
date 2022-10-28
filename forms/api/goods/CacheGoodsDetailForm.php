@@ -333,7 +333,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
         if($goods->enable_commisson_price && !\Yii::$app->user->isGuest){
             $identity = \Yii::$app->user->getIdentity();
             foreach($newAttr as $key => $attr){
-                if($identity->role_type == "branch_office"){ //分公司
+                if($identity->role_type == "branch_office"){ //城市服务商
                     $attr['price'] = $item['branch_office_price'];
                 }elseif($identity->role_type == "partner"){
                     $attr['price'] = $item['partner_price'];
@@ -458,7 +458,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
         foreach ($attr as $index => $item) {
             if($goods->enable_commisson_price && !\Yii::$app->user->isGuest){
                 $identity = \Yii::$app->user->getIdentity();
-                if($identity->role_type == "branch_office"){ //分公司
+                if($identity->role_type == "branch_office"){ //城市服务商
                     $price = max($price, $item['branch_office_price']);
                 }elseif($identity->role_type == "partner"){
                     $price = max($price, $item['partner_price']);
@@ -486,7 +486,7 @@ class CacheGoodsDetailForm extends BaseModel implements ICacheForm{
         foreach ($attr as $index => $item) {
             if($goods->enable_commisson_price && !\Yii::$app->user->isGuest){
                 $identity = \Yii::$app->user->getIdentity();
-                if($identity->role_type == "branch_office"){ //分公司
+                if($identity->role_type == "branch_office"){ //城市服务商
                     $price = min($price, $item['branch_office_price']);
                 }elseif($identity->role_type == "partner"){
                     $price = min($price, $item['partner_price']);

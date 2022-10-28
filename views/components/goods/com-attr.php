@@ -193,8 +193,8 @@
                     if(key == "price"){
                         newObj['price'] = '价格';
                         if(this.commissonPrice == 1){
-                            newObj['branch_office_price'] = '分公司';
-                            newObj['partner_price'] = '合伙人';
+                            newObj['branch_office_price'] = '城市服务商';
+                            newObj['partner_price'] = '区域服务商';
                             newObj['store_price'] = 'VIP';
                         }
                     }else{

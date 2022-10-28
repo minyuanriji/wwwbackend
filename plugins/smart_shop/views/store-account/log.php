@@ -102,9 +102,9 @@
                         for(i=0; i < commission_3r.length; i++){
                             role_type = commission_3r[i].role_type;
                             if(role_type == "branch_office"){
-                                role_type = "分公司";
+                                role_type = "城市服务商";
                             }else if(role_type == "partner"){
-                                role_type = "合伙人";
+                                role_type = "区域服务商";
                             }else if(role_type == "store"){
                                 role_type = "VIP代理商";
                             }

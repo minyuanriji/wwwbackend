@@ -2639,7 +2639,7 @@ class OrderSubmitForm extends BaseModel
         $newGoodsAttr->setGoods($goods);
         $newGoodsAttr->setGoodsAttrById($goodsAttrId);
 
-        //设置商品独立分销价（分公司、合伙人、VIP）
+        //设置商品独立分销价（城市服务商、区域服务商、VIP）
         $newGoodsAttr->setCommissionPrice();
 
         return $newGoodsAttr;

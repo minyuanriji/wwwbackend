@@ -50,8 +50,8 @@
                 <el-form-item label="会员类型" prop="role_type">
                     <el-select @change="roleTypeChange" size="small" v-model="form.role_type" placeholder="请选择会员类型">
                         <el-option key="user" label="VIP会员" value="user"></el-option>
-                        <el-option key="branch_office" label="分公司" value="branch_office"></el-option>
-                        <el-option key="partner" label="合伙人" value="partner"></el-option>
+                        <el-option key="branch_office" label="城市服务商" value="branch_office"></el-option>
+                        <el-option key="partner" label="区域服务商" value="partner"></el-option>
                         <el-option key="store" label="VIP代理商" value="store"></el-option>
                     </el-select>
                 </el-form-item>
@@ -71,7 +71,7 @@
                     <span class="tip">开启可锁定上下级不变</span>
                 </el-form-item>
 
-                <el-form-item label="联创合伙人" prop="is_lianc">
+                <el-form-item label="联创区域服务商" prop="is_lianc">
                     <el-switch v-model="form.is_lianc" :active-value="1" :inactive-value="0"></el-switch>
                     <span class="tip">开启可设置商品归属</span>
                 </el-form-item>
@@ -143,9 +143,9 @@
         methods: {
             roleTypeChange(e){
                 if(e == "branch_office"){
-                    this.form.role_type_label = "分公司";
+                    this.form.role_type_label = "城市服务商";
                 }else if(e == "partner"){
-                    this.form.role_type_label = "合伙人";
+                    this.form.role_type_label = "区域服务商";
                 }else if(e == "store"){
                     this.form.role_type_label = "VIP代理商";
                 }else{

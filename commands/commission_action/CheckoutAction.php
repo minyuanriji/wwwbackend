@@ -51,7 +51,7 @@ class CheckoutAction extends Action{
 
                 $parentDatas = $this->controller->getCommissionParents($checkoutOrder['pay_user_id']);
 
-                //计算分公司、合伙人、VIP代理商分佣值
+                //计算城市服务商、区域服务商、VIP代理商分佣值
                 $this->setCommissoinValues($checkoutOrder, $parentDatas);
 
                 //通过相关规则键获取分佣规则进行分佣

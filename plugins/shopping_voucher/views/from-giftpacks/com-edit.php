@@ -42,8 +42,8 @@
                             </div>
                             <div v-if="scope.row.recommender != ''"><b>推荐人：</b>
                                 <div v-for="recommender in scope.row.recommender">
-                                    <span v-if="recommender.type == 'branch_office'">分公司</span>
-                                    <span v-if="recommender.type == 'partner'">合伙人</span>
+                                    <span v-if="recommender.type == 'branch_office'">城市服务商</span>
+                                    <span v-if="recommender.type == 'partner'">区域服务商</span>
                                     <span v-if="recommender.type == 'store'">VIP代理商</span>
                                     <span v-if="recommender.type == 'user'">VIP会员</span>
                                     <span v-if="recommender.give_type == 1">按比例{{recommender.give_value}}%赠送</span>
@@ -95,8 +95,8 @@
                     <el-table :data="formData.recommender" border style="margin-top:10px;width:100%">
                         <el-table-column label="级别" width="110" align="center">
                             <template slot-scope="scope">
-                                <span v-if="scope.row.type == 'branch_office'">分公司</span>
-                                <span v-if="scope.row.type == 'partner'">合伙人</span>
+                                <span v-if="scope.row.type == 'branch_office'">城市服务商</span>
+                                <span v-if="scope.row.type == 'partner'">区域服务商</span>
                                 <span v-if="scope.row.type == 'store'">VIP代理商</span>
                                 <span v-if="scope.row.type == 'user'">VIP会员</span>
                             </template>

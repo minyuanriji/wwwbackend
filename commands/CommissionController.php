@@ -184,6 +184,8 @@ class CommissionController extends BaseCommandController{
 
         $newParentDatas = $this->getCommissionParents($user_id, $lianc_user_id);
 
+        file_put_contents(dirname(ROOT_PATH) . "/runtime/commission.debug", "newParentDatas=" . json_encode($newParentDatas) . "\n");
+
         //如果是独立分销价，比消费用户级别低或同级别的都不分佣
         if($item_type == "goods" && $is_commisson_price){
             $newNewParentDatas = [];

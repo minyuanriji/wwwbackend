@@ -186,6 +186,8 @@ class GoodsAction extends Action{
                 $orderDetailData['goods_id'], 'goods', $liancUserId, $orderDetailData['is_commisson_price'],
                 $orderDetailData['user_role_type'], $orderDetailData['enable_commisson_price']);
 
+            file_put_contents(dirname(ROOT_PATH) . "/runtime/commission.debug", "parentDatas=" . json_encode($parentDatas) . "\n");
+
             //通过相关规则键获取分佣规则进行分佣
             foreach($parentDatas as $parentData){
 
